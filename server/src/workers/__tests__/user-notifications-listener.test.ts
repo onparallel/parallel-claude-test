@@ -32,11 +32,7 @@ describe("Worker - User Notifications Listener", () => {
 
     [organization] = await mocks.createRandomOrganizations(1);
     users = await mocks.createRandomUsers(organization.id, 2);
-    [petition] = await mocks.createRandomPetitions(
-      organization.id,
-      users[0].id,
-      1
-    );
+    [petition] = await mocks.createRandomPetitions(organization.id, users[0].id, 1);
 
     [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
       type: "SHORT_TEXT",
@@ -75,18 +71,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       users.map((user) => ({
@@ -103,11 +90,7 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification when a recipient comments a field", async () => {
-    const [comment] = await mocks.createRandomCommentsFromAccess(
-      access.id,
-      field.id,
-      petition.id
-    );
+    const [comment] = await mocks.createRandomCommentsFromAccess(access.id, field.id, petition.id);
     await userNotificationsListener(
       {
         id: 1,
@@ -122,18 +105,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       users.map((user) => ({
@@ -151,11 +125,7 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification when another user comments a field", async () => {
-    const [comment] = await mocks.createRandomCommentsFromUser(
-      users[1].id,
-      field.id,
-      petition.id
-    );
+    const [comment] = await mocks.createRandomCommentsFromUser(users[1].id, field.id, petition.id);
     await userNotificationsListener(
       {
         id: 1,
@@ -170,18 +140,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual([
       {
@@ -215,18 +176,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual([
       {
@@ -267,18 +219,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       members.map((member) => ({
@@ -311,18 +254,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       users.map((user) => ({
@@ -357,18 +291,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       users.map((user) => ({
@@ -404,18 +329,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual([
       {
@@ -432,16 +348,10 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification either if they are subscribed or not", async () => {
-    const [unsubscribedUser] = await mocks.createRandomUsers(
-      organization.id,
-      1
-    );
-    await mocks.sharePetitions(
-      [petition.id],
-      unsubscribedUser.id,
-      "READ",
-      () => ({ is_subscribed: false })
-    );
+    const [unsubscribedUser] = await mocks.createRandomUsers(organization.id, 1);
+    await mocks.sharePetitions([petition.id], unsubscribedUser.id, "READ", () => ({
+      is_subscribed: false,
+    }));
 
     await userNotificationsListener(
       {
@@ -456,18 +366,9 @@ describe("Worker - User Notifications Listener", () => {
       ctx
     );
 
-    const notifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select(
-        "is_read",
-        "processed_at",
-        "data",
-        "petition_id",
-        "type",
-        "user_id"
-      );
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       [...users, unsubscribedUser].map((user) => ({

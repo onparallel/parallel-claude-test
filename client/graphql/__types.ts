@@ -1,13 +1,9 @@
 import { gql } from "@apollo/client";
 import * as Apollo from "@apollo/client";
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
-  { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
-  { [SubKey in K]: Maybe<T[SubKey]> };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export interface Scalars {
@@ -73,13 +69,9 @@ export type BatchSendSigningMode =
   /** Let recipients of each group to choose who will sign the petitions. */
   | "LET_RECIPIENT_CHOOSE";
 
-export type ChangePasswordResult =
-  | "INCORRECT_PASSWORD"
-  | "INVALID_NEW_PASSWORD"
-  | "SUCCESS";
+export type ChangePasswordResult = "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD" | "SUCCESS";
 
-export interface CommentCreatedUserNotification
-  extends PetitionUserNotification {
+export interface CommentCreatedUserNotification extends PetitionUserNotification {
   __typename?: "CommentCreatedUserNotification";
   comment: PetitionFieldComment;
   createdAt: Scalars["DateTime"];
@@ -295,8 +287,7 @@ export interface MessageCancelledEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
-export interface MessageEmailBouncedUserNotification
-  extends PetitionUserNotification {
+export interface MessageEmailBouncedUserNotification extends PetitionUserNotification {
   __typename?: "MessageEmailBouncedUserNotification";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
@@ -1449,8 +1440,7 @@ export interface PetitionCompletedEvent extends PetitionEvent {
   id: Scalars["GID"];
 }
 
-export interface PetitionCompletedUserNotification
-  extends PetitionUserNotification {
+export interface PetitionCompletedUserNotification extends PetitionUserNotification {
   __typename?: "PetitionCompletedUserNotification";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
@@ -1704,8 +1694,7 @@ export interface PetitionReopenedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
-export interface PetitionSharedUserNotification
-  extends PetitionUserNotification {
+export interface PetitionSharedUserNotification extends PetitionUserNotification {
   __typename?: "PetitionSharedUserNotification";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -1749,11 +1738,7 @@ export interface PetitionSignatureRequest extends Timestamps {
   updatedAt: Scalars["DateTime"];
 }
 
-export type PetitionSignatureRequestStatus =
-  | "CANCELLED"
-  | "COMPLETED"
-  | "ENQUEUED"
-  | "PROCESSING";
+export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
 
 /** The status of a petition. */
 export type PetitionStatus =
@@ -1830,9 +1815,7 @@ export interface PetitionTemplatePagination {
 }
 
 /** The permission for a petition and user group */
-export interface PetitionUserGroupPermission
-  extends PetitionPermission,
-    Timestamps {
+export interface PetitionUserGroupPermission extends PetitionPermission, Timestamps {
   __typename?: "PetitionUserGroupPermission";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -2270,14 +2253,9 @@ export type QueryPetitions_OrderBy =
   | "sentAt_DESC";
 
 /** Order to use on Query.userGroups */
-export type QueryUserGroups_OrderBy =
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "name_ASC"
-  | "name_DESC";
+export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
 
-export interface ReminderEmailBouncedUserNotification
-  extends PetitionUserNotification {
+export interface ReminderEmailBouncedUserNotification extends PetitionUserNotification {
   __typename?: "ReminderEmailBouncedUserNotification";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
@@ -2384,8 +2362,7 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
-export interface SignatureCancelledUserNotification
-  extends PetitionUserNotification {
+export interface SignatureCancelledUserNotification extends PetitionUserNotification {
   __typename?: "SignatureCancelledUserNotification";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -2399,8 +2376,7 @@ export interface SignatureCompletedEvent extends PetitionEvent {
   id: Scalars["GID"];
 }
 
-export interface SignatureCompletedUserNotification
-  extends PetitionUserNotification {
+export interface SignatureCompletedUserNotification extends PetitionUserNotification {
   __typename?: "SignatureCompletedUserNotification";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -2781,15 +2757,12 @@ export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
   tags: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
 };
 
-export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment =
-  {
-    __typename?: "PetitionTemplate";
-    id: string;
-    isReadOnly: boolean;
-    tags: Array<
-      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-    >;
-  };
+export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  isReadOnly: boolean;
+  tags: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
+};
 
 export type PetitionTagListCellContent_PetitionBaseFragment =
   | PetitionTagListCellContent_PetitionBase_Petition_Fragment
@@ -2802,9 +2775,7 @@ export type PetitionTagListCellContent_tagsQueryVariables = Exact<{
 export type PetitionTagListCellContent_tagsQuery = {
   tags: {
     __typename?: "TagPagination";
-    items: Array<
-      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-    >;
+    items: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
   };
 };
 
@@ -2818,16 +2789,12 @@ export type PetitionTagListCellContent_tagPetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        tags: Array<
-          { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-        >;
+        tags: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        tags: Array<
-          { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-        >;
+        tags: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
       };
 };
 
@@ -2841,16 +2808,12 @@ export type PetitionTagListCellContent_untagPetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        tags: Array<
-          { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-        >;
+        tags: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        tags: Array<
-          { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-        >;
+        tags: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
       };
 };
 
@@ -2899,11 +2862,7 @@ export type ShareButton_PetitionBaseFragment =
   | ShareButton_PetitionBase_Petition_Fragment
   | ShareButton_PetitionBase_PetitionTemplate_Fragment;
 
-export type Tag_TagFragment = {
-  __typename?: "Tag";
-  name: string;
-  color: string;
-};
+export type Tag_TagFragment = { __typename?: "Tag"; name: string; color: string };
 
 export type TagEditDialog_TagFragment = {
   __typename?: "Tag";
@@ -3002,9 +2961,7 @@ export type useGetUsersOrGroupsQuery = {
   >;
 };
 
-export type WithAdminOrganizationRoleQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type WithAdminOrganizationRoleQueryVariables = Exact<{ [key: string]: never }>;
 
 export type WithAdminOrganizationRoleQuery = {
   me: { __typename?: "User"; role: OrganizationRole };
@@ -3018,13 +2975,9 @@ export type HasFeatureFlagQuery = {
   me: { __typename?: "User"; id: string; hasFeatureFlag: boolean };
 };
 
-export type WithSuperAdminAccessQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type WithSuperAdminAccessQueryVariables = Exact<{ [key: string]: never }>;
 
-export type WithSuperAdminAccessQuery = {
-  me: { __typename?: "User"; isSuperAdmin: boolean };
-};
+export type WithSuperAdminAccessQuery = { me: { __typename?: "User"; isSuperAdmin: boolean } };
 
 export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
   file: Scalars["Upload"];
@@ -3053,9 +3006,7 @@ export type AppLayout_updateOnboardingStatusMutation = {
   };
 };
 
-export type AppLayoutNavbar_UserFragment = {
-  __typename?: "User";
-} & UserMenu_UserFragment;
+export type AppLayoutNavbar_UserFragment = { __typename?: "User" } & UserMenu_UserFragment;
 
 export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -3106,11 +3057,10 @@ export type PetitionHeader_reopenPetitionMutation = {
   };
 };
 
-export type PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    isSubscribed: Scalars["Boolean"];
-  }>;
+export type PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  isSubscribed: Scalars["Boolean"];
+}>;
 
 export type PetitionHeader_updatePetitionPermissionSubscriptionMutation = {
   updatePetitionPermissionSubscription: {
@@ -3139,9 +3089,7 @@ export type PetitionLayout_PetitionBaseFragment =
   | PetitionLayout_PetitionBase_Petition_Fragment
   | PetitionLayout_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionLayout_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment &
+export type PetitionLayout_UserFragment = { __typename?: "User" } & AppLayout_UserFragment &
   PetitionHeader_UserFragment;
 
 export type PetitionTemplateHeader_PetitionTemplateFragment = {
@@ -3151,14 +3099,9 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
   isPublic: boolean;
 } & HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionTemplateHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-};
+export type PetitionTemplateHeader_UserFragment = { __typename?: "User"; id: string };
 
-export type SettingsLayout_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
+export type SettingsLayout_UserFragment = { __typename?: "User" } & AppLayout_UserFragment;
 
 export type UserMenu_UserFragment = {
   __typename?: "User";
@@ -3167,17 +3110,17 @@ export type UserMenu_UserFragment = {
   role: OrganizationRole;
 };
 
-export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables =
-  Exact<{ [key: string]: never }>;
+export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
 
 export type Notifications_UnreadPetitionUserNotificationIdsQuery = {
   me: { __typename?: "User"; id: string; unreadNotificationIds: Array<string> };
 };
 
-export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
-  {
-    __typename?: "CommentCreatedUserNotification";
-  } & NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
+export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
+  __typename?: "CommentCreatedUserNotification";
+} & NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
   {
@@ -3189,20 +3132,18 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNo
     __typename?: "PetitionCompletedUserNotification";
   } & NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment;
 
-export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
-  {
-    __typename?: "PetitionSharedUserNotification";
-  } & NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
+export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment = {
+  __typename?: "PetitionSharedUserNotification";
+} & NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
   {
     __typename?: "ReminderEmailBouncedUserNotification";
   } & NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment;
 
-export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment =
-  {
-    __typename?: "RemindersOptOutNotification";
-  } & NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment;
+export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment = {
+  __typename?: "RemindersOptOutNotification";
+} & NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
   {
@@ -3224,12 +3165,11 @@ export type NotificationsDrawer_PetitionUserNotificationFragment =
   | NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
-export type NotificationsDrawer_PetitionUserNotificationsQueryVariables =
-  Exact<{
-    limit: Scalars["Int"];
-    before?: Maybe<Scalars["DateTime"]>;
-    filter?: Maybe<PetitionUserNotificationFilter>;
-  }>;
+export type NotificationsDrawer_PetitionUserNotificationsQueryVariables = Exact<{
+  limit: Scalars["Int"];
+  before?: Maybe<Scalars["DateTime"]>;
+  filter?: Maybe<PetitionUserNotificationFilter>;
+}>;
 
 export type NotificationsDrawer_PetitionUserNotificationsQuery = {
   me: {
@@ -3269,10 +3209,9 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
   };
 };
 
-export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
-  {
-    __typename?: "CommentCreatedUserNotification";
-  } & CommentCreatedUserNotification_CommentCreatedUserNotificationFragment;
+export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
+  __typename?: "CommentCreatedUserNotification";
+} & CommentCreatedUserNotification_CommentCreatedUserNotificationFragment;
 
 export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
   {
@@ -3284,20 +3223,18 @@ export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNoti
     __typename?: "PetitionCompletedUserNotification";
   } & PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment;
 
-export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
-  {
-    __typename?: "PetitionSharedUserNotification";
-  } & PetitionSharedUserNotification_PetitionSharedUserNotificationFragment;
+export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment = {
+  __typename?: "PetitionSharedUserNotification";
+} & PetitionSharedUserNotification_PetitionSharedUserNotificationFragment;
 
 export type NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
   {
     __typename?: "ReminderEmailBouncedUserNotification";
   } & ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment;
 
-export type NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment =
-  {
-    __typename?: "RemindersOptOutNotification";
-  } & RemindersOptOutNotification_RemindersOptOutNotificationFragment;
+export type NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment = {
+  __typename?: "RemindersOptOutNotification";
+} & RemindersOptOutNotification_RemindersOptOutNotificationFragment;
 
 export type NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
   {
@@ -3319,54 +3256,48 @@ export type NotificationsList_PetitionUserNotificationFragment =
   | NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
-export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragment =
-  {
-    __typename?: "CommentCreatedUserNotification";
-    field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
-    comment: {
-      __typename?: "PetitionFieldComment";
-      id: string;
-      isInternal: boolean;
-      author?: Maybe<
-        | {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<
-              { __typename?: "Contact" } & ContactLink_ContactFragment
-            >;
-          }
-        | ({ __typename?: "User" } & UserReference_UserFragment)
-      >;
-    };
-  } & PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
-
-export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment =
-  {
-    __typename?: "MessageEmailBouncedUserNotification";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
-  } & PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment;
-
-export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment =
-  {
-    __typename?: "PetitionCompletedUserNotification";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
-  } & PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment;
-
-export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragment =
-  {
-    __typename?: "PetitionSharedUserNotification";
-    permissionType: PetitionPermissionTypeRW;
-    petition: { __typename: "Petition" } | { __typename: "PetitionTemplate" };
-    owner: { __typename?: "User" } & UserReference_UserFragment;
-    sharedWith:
+export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragment = {
+  __typename?: "CommentCreatedUserNotification";
+  field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
+  comment: {
+    __typename?: "PetitionFieldComment";
+    id: string;
+    isInternal: boolean;
+    author?: Maybe<
+      | {
+          __typename?: "PetitionAccess";
+          contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+        }
       | ({ __typename?: "User" } & UserReference_UserFragment)
-      | { __typename?: "UserGroup"; id: string; name: string };
-  } & PetitionUserNotification_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
+    >;
+  };
+} & PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
+
+export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment = {
+  __typename?: "MessageEmailBouncedUserNotification";
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
+} & PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment;
+
+export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment = {
+  __typename?: "PetitionCompletedUserNotification";
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
+} & PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment;
+
+export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragment = {
+  __typename?: "PetitionSharedUserNotification";
+  permissionType: PetitionPermissionTypeRW;
+  petition: { __typename: "Petition" } | { __typename: "PetitionTemplate" };
+  owner: { __typename?: "User" } & UserReference_UserFragment;
+  sharedWith:
+    | ({ __typename?: "User" } & UserReference_UserFragment)
+    | { __typename?: "UserGroup"; id: string; name: string };
+} & PetitionUserNotification_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
 
 export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
   {
@@ -3466,14 +3397,13 @@ export type PetitionUserNotification_PetitionUserNotificationFragment =
   | PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
-export type ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment =
-  {
-    __typename?: "ReminderEmailBouncedUserNotification";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
-  } & PetitionUserNotification_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment;
+export type ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment = {
+  __typename?: "ReminderEmailBouncedUserNotification";
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
+} & PetitionUserNotification_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment;
 
 export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
   __typename?: "RemindersOptOutNotification";
@@ -3485,23 +3415,19 @@ export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
   };
 } & PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment;
 
-export type SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment =
-  {
-    __typename?: "SignatureCancelledUserNotification";
-  } & PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment;
+export type SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment = {
+  __typename?: "SignatureCancelledUserNotification";
+} & PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment;
 
-export type SignatureCompletedUserNotification_SignatureCompletedUserNotificationFragment =
-  {
-    __typename?: "SignatureCompletedUserNotification";
-  } & PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
+export type SignatureCompletedUserNotification_SignatureCompletedUserNotificationFragment = {
+  __typename?: "SignatureCompletedUserNotification";
+} & PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
 export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
   email: Scalars["String"];
 }>;
 
-export type CreateUserDialog_emailIsAvailableQuery = {
-  emailIsAvailable: boolean;
-};
+export type CreateUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
 
 export type OrganizationGroupListTableHeader_UserFragment = {
   __typename?: "User";
@@ -3527,11 +3453,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   emailBody?: Maybe<any>;
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
-    contacts: Array<
-      Maybe<
-        { __typename?: "Contact" } & CopySignatureConfigDialog_ContactFragment
-      >
-    >;
+    contacts: Array<Maybe<{ __typename?: "Contact" } & CopySignatureConfigDialog_ContactFragment>>;
   }>;
   remindersConfig?: Maybe<{
     __typename?: "RemindersConfig";
@@ -3547,9 +3469,7 @@ export type AddPetitionAccessDialog_contactsByEmailQueryVariables = Exact<{
 }>;
 
 export type AddPetitionAccessDialog_contactsByEmailQuery = {
-  contactsByEmail: Array<
-    Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
-  >;
+  contactsByEmail: Array<Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>>;
 };
 
 export type MessageEventsIndicator_PetitionMessageFragment = {
@@ -3562,11 +3482,7 @@ export type MessageEventsIndicator_PetitionMessageFragment = {
 export type PetitionAccessTable_PetitionFragment = {
   __typename?: "Petition";
   status: PetitionStatus;
-  accesses: Array<
-    {
-      __typename?: "PetitionAccess";
-    } & PetitionAccessTable_PetitionAccessFragment
-  >;
+  accesses: Array<{ __typename?: "PetitionAccess" } & PetitionAccessTable_PetitionAccessFragment>;
 };
 
 export type PetitionAccessTable_PetitionAccessRemindersConfigFragment = {
@@ -3589,9 +3505,7 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   createdAt: string;
   contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   remindersConfig?: Maybe<
-    {
-      __typename?: "RemindersConfig";
-    } & PetitionAccessTable_PetitionAccessRemindersConfigFragment
+    { __typename?: "RemindersConfig" } & PetitionAccessTable_PetitionAccessRemindersConfigFragment
   >;
 };
 
@@ -3700,191 +3614,166 @@ export type PetitionActivityTimeline_PetitionFragment = {
   };
 };
 
-export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment =
-  {
-    __typename?: "AccessActivatedEvent";
-    id: string;
-  } & TimelineAccessActivatedEvent_AccessActivatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment = {
+  __typename?: "AccessActivatedEvent";
+  id: string;
+} & TimelineAccessActivatedEvent_AccessActivatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment =
-  {
-    __typename?: "AccessDeactivatedEvent";
-    id: string;
-  } & TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment = {
+  __typename?: "AccessDeactivatedEvent";
+  id: string;
+} & TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment =
-  {
-    __typename?: "AccessDelegatedEvent";
-    id: string;
-  } & TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment = {
+  __typename?: "AccessDelegatedEvent";
+  id: string;
+} & TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment =
-  {
-    __typename?: "AccessOpenedEvent";
-    id: string;
-  } & TimelineAccessOpenedEvent_AccessOpenedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = {
+  __typename?: "AccessOpenedEvent";
+  id: string;
+} & TimelineAccessOpenedEvent_AccessOpenedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment =
-  {
-    __typename?: "CommentDeletedEvent";
-    id: string;
-  } & TimelineCommentDeletedEvent_CommentDeletedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment = {
+  __typename?: "CommentDeletedEvent";
+  id: string;
+} & TimelineCommentDeletedEvent_CommentDeletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment =
-  {
-    __typename?: "CommentPublishedEvent";
-    id: string;
-  } & TimelineCommentPublishedEvent_CommentPublishedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment = {
+  __typename?: "CommentPublishedEvent";
+  id: string;
+} & TimelineCommentPublishedEvent_CommentPublishedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment =
-  {
-    __typename?: "GroupPermissionAddedEvent";
-    id: string;
-  } & TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment = {
+  __typename?: "GroupPermissionAddedEvent";
+  id: string;
+} & TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment =
-  {
-    __typename?: "GroupPermissionEditedEvent";
-    id: string;
-  } & TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment = {
+  __typename?: "GroupPermissionEditedEvent";
+  id: string;
+} & TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment =
-  {
-    __typename?: "GroupPermissionRemovedEvent";
-    id: string;
-  } & TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment = {
+  __typename?: "GroupPermissionRemovedEvent";
+  id: string;
+} & TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment =
-  {
-    __typename?: "MessageCancelledEvent";
-    id: string;
-  } & TimelineMessageCancelledEvent_MessageCancelledEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
+  __typename?: "MessageCancelledEvent";
+  id: string;
+} & TimelineMessageCancelledEvent_MessageCancelledEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment =
-  {
-    __typename?: "MessageScheduledEvent";
-    id: string;
-    message: { __typename?: "PetitionMessage"; id: string };
-  } & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment = {
+  __typename?: "MessageScheduledEvent";
+  id: string;
+  message: { __typename?: "PetitionMessage"; id: string };
+} & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
   __typename?: "MessageSentEvent";
   id: string;
 } & TimelineMessageSentEvent_MessageSentEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment =
-  {
-    __typename?: "OwnershipTransferredEvent";
-    id: string;
-  } & TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment = {
+  __typename?: "OwnershipTransferredEvent";
+  id: string;
+} & TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionClonedEvent_Fragment =
-  {
-    __typename?: "PetitionClonedEvent";
-    id: string;
-  } & TimelinePetitionClonedEvent_PetitionClonedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionClonedEvent_Fragment = {
+  __typename?: "PetitionClonedEvent";
+  id: string;
+} & TimelinePetitionClonedEvent_PetitionClonedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment =
-  {
-    __typename?: "PetitionClosedEvent";
-    id: string;
-  } & TimelinePetitionClosedEvent_PetitionClosedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment = {
+  __typename?: "PetitionClosedEvent";
+  id: string;
+} & TimelinePetitionClosedEvent_PetitionClosedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment =
-  {
-    __typename?: "PetitionClosedNotifiedEvent";
-    id: string;
-  } & TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment = {
+  __typename?: "PetitionClosedNotifiedEvent";
+  id: string;
+} & TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment =
-  {
-    __typename?: "PetitionCompletedEvent";
-    id: string;
-  } & TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment = {
+  __typename?: "PetitionCompletedEvent";
+  id: string;
+} & TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment =
-  {
-    __typename?: "PetitionCreatedEvent";
-    id: string;
-  } & TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
+  __typename?: "PetitionCreatedEvent";
+  id: string;
+} & TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment =
-  { __typename?: "PetitionDeletedEvent"; id: string };
+export type PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment = {
+  __typename?: "PetitionDeletedEvent";
+  id: string;
+};
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment =
-  {
-    __typename?: "PetitionReopenedEvent";
-    id: string;
-  } & TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment = {
+  __typename?: "PetitionReopenedEvent";
+  id: string;
+} & TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment =
-  {
-    __typename?: "ReminderSentEvent";
-    id: string;
-  } & TimelineReminderSentEvent_ReminderSentEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
+  __typename?: "ReminderSentEvent";
+  id: string;
+} & TimelineReminderSentEvent_ReminderSentEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment =
-  {
-    __typename?: "RemindersOptOutEvent";
-    id: string;
-  } & TimelineRemindersOptOutEvent_RemindersOptOutEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment = {
+  __typename?: "RemindersOptOutEvent";
+  id: string;
+} & TimelineRemindersOptOutEvent_RemindersOptOutEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment =
-  {
-    __typename?: "ReplyCreatedEvent";
-    id: string;
-  } & TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = {
+  __typename?: "ReplyCreatedEvent";
+  id: string;
+} & TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment =
-  {
-    __typename?: "ReplyDeletedEvent";
-    id: string;
-  } & TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = {
+  __typename?: "ReplyDeletedEvent";
+  id: string;
+} & TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment =
-  {
-    __typename?: "ReplyUpdatedEvent";
-    id: string;
-  } & TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = {
+  __typename?: "ReplyUpdatedEvent";
+  id: string;
+} & TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment =
-  {
-    __typename?: "SignatureCancelledEvent";
-    id: string;
-  } & TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
+  __typename?: "SignatureCancelledEvent";
+  id: string;
+} & TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment =
-  {
-    __typename?: "SignatureCompletedEvent";
-    id: string;
-  } & TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment = {
+  __typename?: "SignatureCompletedEvent";
+  id: string;
+} & TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment =
-  {
-    __typename?: "SignatureStartedEvent";
-    id: string;
-  } & TimelineSignatureStartedEvent_SignatureStartedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment = {
+  __typename?: "SignatureStartedEvent";
+  id: string;
+} & TimelineSignatureStartedEvent_SignatureStartedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_TemplateUsedEvent_Fragment =
-  { __typename?: "TemplateUsedEvent"; id: string };
+export type PetitionActivityTimeline_PetitionEvent_TemplateUsedEvent_Fragment = {
+  __typename?: "TemplateUsedEvent";
+  id: string;
+};
 
-export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment =
-  {
-    __typename?: "UserPermissionAddedEvent";
-    id: string;
-  } & TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment = {
+  __typename?: "UserPermissionAddedEvent";
+  id: string;
+} & TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment =
-  {
-    __typename?: "UserPermissionEditedEvent";
-    id: string;
-  } & TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment = {
+  __typename?: "UserPermissionEditedEvent";
+  id: string;
+} & TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment =
-  {
-    __typename?: "UserPermissionRemovedEvent";
-    id: string;
-  } & TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment = {
+  __typename?: "UserPermissionRemovedEvent";
+  id: string;
+} & TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
@@ -3999,17 +3888,11 @@ export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
 export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
   __typename?: "CommentDeletedEvent";
   createdAt: string;
-  field?: Maybe<
-    {
-      __typename?: "PetitionField";
-    } & PetitionFieldReference_PetitionFieldFragment
-  >;
+  field?: Maybe<{ __typename?: "PetitionField" } & PetitionFieldReference_PetitionFieldFragment>;
   deletedBy?: Maybe<
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<
-          { __typename?: "Contact" } & ContactLink_ContactFragment
-        >;
+        contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
       }
     | ({ __typename?: "User" } & UserReference_UserFragment)
   >;
@@ -4018,11 +3901,7 @@ export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
 export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
   __typename?: "CommentPublishedEvent";
   createdAt: string;
-  field?: Maybe<
-    {
-      __typename?: "PetitionField";
-    } & PetitionFieldReference_PetitionFieldFragment
-  >;
+  field?: Maybe<{ __typename?: "PetitionField" } & PetitionFieldReference_PetitionFieldFragment>;
   comment?: Maybe<{
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
@@ -4030,40 +3909,35 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
     author?: Maybe<
       | {
           __typename?: "PetitionAccess";
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
+          contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
         }
       | ({ __typename?: "User" } & UserReference_UserFragment)
     >;
   }>;
 };
 
-export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment =
-  {
-    __typename?: "GroupPermissionAddedEvent";
-    permissionType: PetitionPermissionType;
-    createdAt: string;
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    permissionGroup: { __typename?: "UserGroup"; name: string };
-  };
+export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment = {
+  __typename?: "GroupPermissionAddedEvent";
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  permissionGroup: { __typename?: "UserGroup"; name: string };
+};
 
-export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment =
-  {
-    __typename?: "GroupPermissionEditedEvent";
-    permissionType: PetitionPermissionType;
-    createdAt: string;
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    permissionGroup: { __typename?: "UserGroup"; name: string };
-  };
+export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment = {
+  __typename?: "GroupPermissionEditedEvent";
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  permissionGroup: { __typename?: "UserGroup"; name: string };
+};
 
-export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment =
-  {
-    __typename?: "GroupPermissionRemovedEvent";
-    createdAt: string;
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    permissionGroup: { __typename?: "UserGroup"; name: string };
-  };
+export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment = {
+  __typename?: "GroupPermissionRemovedEvent";
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  permissionGroup: { __typename?: "UserGroup"; name: string };
+};
 
 export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
   __typename?: "MessageCancelledEvent";
@@ -4113,14 +3987,13 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
     SentPetitionMessageDialog_PetitionMessageFragment;
 };
 
-export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment =
-  {
-    __typename?: "OwnershipTransferredEvent";
-    createdAt: string;
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    previousOwner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-  };
+export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment = {
+  __typename?: "OwnershipTransferredEvent";
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  previousOwner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+};
 
 export type TimelinePetitionClonedEvent_PetitionClonedEventFragment = {
   __typename?: "PetitionClonedEvent";
@@ -4134,16 +4007,15 @@ export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
   user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
 };
 
-export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment =
-  {
-    __typename?: "PetitionClosedNotifiedEvent";
-    createdAt: string;
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment = {
+  __typename?: "PetitionClosedNotifiedEvent";
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
+};
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   __typename?: "PetitionCompletedEvent";
@@ -4194,17 +4066,11 @@ export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
   __typename?: "ReplyCreatedEvent";
   createdAt: string;
-  field?: Maybe<
-    {
-      __typename?: "PetitionField";
-    } & PetitionFieldReference_PetitionFieldFragment
-  >;
+  field?: Maybe<{ __typename?: "PetitionField" } & PetitionFieldReference_PetitionFieldFragment>;
   createdBy?: Maybe<
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<
-          { __typename?: "Contact" } & ContactLink_ContactFragment
-        >;
+        contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
       }
     | ({ __typename?: "User" } & UserReference_UserFragment)
   >;
@@ -4213,17 +4079,11 @@ export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
   __typename?: "ReplyDeletedEvent";
   createdAt: string;
-  field?: Maybe<
-    {
-      __typename?: "PetitionField";
-    } & PetitionFieldReference_PetitionFieldFragment
-  >;
+  field?: Maybe<{ __typename?: "PetitionField" } & PetitionFieldReference_PetitionFieldFragment>;
   deletedBy?: Maybe<
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<
-          { __typename?: "Contact" } & ContactLink_ContactFragment
-        >;
+        contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
       }
     | ({ __typename?: "User" } & UserReference_UserFragment)
   >;
@@ -4232,17 +4092,11 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
 export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
   __typename?: "ReplyUpdatedEvent";
   createdAt: string;
-  field?: Maybe<
-    {
-      __typename?: "PetitionField";
-    } & PetitionFieldReference_PetitionFieldFragment
-  >;
+  field?: Maybe<{ __typename?: "PetitionField" } & PetitionFieldReference_PetitionFieldFragment>;
   updatedBy?: Maybe<
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<
-          { __typename?: "Contact" } & ContactLink_ContactFragment
-        >;
+        contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
       }
     | ({ __typename?: "User" } & UserReference_UserFragment)
   >;
@@ -4267,37 +4121,28 @@ export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
   createdAt: string;
 };
 
-export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment =
-  {
-    __typename?: "UserPermissionAddedEvent";
-    permissionType: PetitionPermissionType;
-    createdAt: string;
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    permissionUser?: Maybe<
-      { __typename?: "User" } & UserReference_UserFragment
-    >;
-  };
+export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = {
+  __typename?: "UserPermissionAddedEvent";
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  permissionUser?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+};
 
-export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment =
-  {
-    __typename?: "UserPermissionEditedEvent";
-    permissionType: PetitionPermissionType;
-    createdAt: string;
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    permissionUser?: Maybe<
-      { __typename?: "User" } & UserReference_UserFragment
-    >;
-  };
+export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment = {
+  __typename?: "UserPermissionEditedEvent";
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  permissionUser?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+};
 
-export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment =
-  {
-    __typename?: "UserPermissionRemovedEvent";
-    createdAt: string;
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    permissionUser?: Maybe<
-      { __typename?: "User" } & UserReference_UserFragment
-    >;
-  };
+export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment = {
+  __typename?: "UserPermissionRemovedEvent";
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  permissionUser?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+};
 
 export type PetitionContents_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -4316,9 +4161,7 @@ export type PetitionSettings_UserFragment = {
     __typename?: "Organization";
     id: string;
     signatureIntegrations: Array<
-      {
-        __typename?: "OrgIntegration";
-      } & SignatureConfigDialog_OrgIntegrationFragment
+      { __typename?: "OrgIntegration" } & SignatureConfigDialog_OrgIntegrationFragment
     >;
   };
 };
@@ -4355,10 +4198,9 @@ export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
   | PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-  }>;
+export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
 
 export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
   cancelSignatureRequest: {
@@ -4368,10 +4210,9 @@ export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
   };
 };
 
-export type PetitionSettings_startPetitionSignatureRequestMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-  }>;
+export type PetitionSettings_startPetitionSignatureRequestMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
 
 export type PetitionSettings_startPetitionSignatureRequestMutation = {
   startSignatureRequest: {
@@ -4450,51 +4291,42 @@ export type PetitionSharingModal_UserGroupFragment = {
   }>;
 };
 
-export type PetitionSharingModal_addPetitionPermissionMutationVariables =
-  Exact<{
-    petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
-    userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-    userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-    permissionType: PetitionPermissionTypeRW;
-    notify?: Maybe<Scalars["Boolean"]>;
-    subscribe?: Maybe<Scalars["Boolean"]>;
-    message?: Maybe<Scalars["String"]>;
-  }>;
+export type PetitionSharingModal_addPetitionPermissionMutationVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  permissionType: PetitionPermissionTypeRW;
+  notify?: Maybe<Scalars["Boolean"]>;
+  subscribe?: Maybe<Scalars["Boolean"]>;
+  message?: Maybe<Scalars["String"]>;
+}>;
 
 export type PetitionSharingModal_addPetitionPermissionMutation = {
   addPetitionPermission: Array<
-    {
-      __typename?: "Petition";
-    } & PetitionSharingModal_Petition_Petition_Fragment
+    { __typename?: "Petition" } & PetitionSharingModal_Petition_Petition_Fragment
   >;
 };
 
-export type PetitionSharingModal_removePetitionPermissionMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-    userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  }>;
+export type PetitionSharingModal_removePetitionPermissionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+}>;
 
 export type PetitionSharingModal_removePetitionPermissionMutation = {
   removePetitionPermission: Array<
-    {
-      __typename?: "Petition";
-    } & PetitionSharingModal_Petition_Petition_Fragment
+    { __typename?: "Petition" } & PetitionSharingModal_Petition_Petition_Fragment
   >;
 };
 
-export type PetitionSharingModal_transferPetitionOwnershipMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    userId: Scalars["GID"];
-  }>;
+export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userId: Scalars["GID"];
+}>;
 
 export type PetitionSharingModal_transferPetitionOwnershipMutation = {
   transferPetitionOwnership: Array<
-    {
-      __typename?: "Petition";
-    } & PetitionSharingModal_Petition_Petition_Fragment
+    { __typename?: "Petition" } & PetitionSharingModal_Petition_Petition_Fragment
   >;
 };
 
@@ -4505,9 +4337,7 @@ export type PetitionSharingModal_PetitionsQueryVariables = Exact<{
 export type PetitionSharingModal_PetitionsQuery = {
   petitionsById: Array<
     Maybe<
-      | ({
-          __typename?: "Petition";
-        } & PetitionSharingModal_Petition_Petition_Fragment)
+      | ({ __typename?: "Petition" } & PetitionSharingModal_Petition_Petition_Fragment)
       | ({
           __typename?: "PetitionTemplate";
         } & PetitionSharingModal_Petition_PetitionTemplate_Fragment)
@@ -4524,9 +4354,7 @@ export type SignatureConfigDialog_PetitionFragment = {
     provider: string;
     title: string;
     review: boolean;
-    contacts: Array<
-      Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
-    >;
+    contacts: Array<Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>>;
   }>;
 };
 
@@ -4543,9 +4371,7 @@ export type useTemplateDetailsDialogPetitionQueryVariables = Exact<{
 export type useTemplateDetailsDialogPetitionQuery = {
   petition?: Maybe<
     | { __typename?: "Petition" }
-    | ({
-        __typename?: "PetitionTemplate";
-      } & TemplateDetailsDialog_PetitionTemplateFragment)
+    | ({ __typename?: "PetitionTemplate" } & TemplateDetailsDialog_PetitionTemplateFragment)
   >;
 };
 
@@ -4581,12 +4407,11 @@ export type CopySignatureConfigDialog_ContactFragment = {
   email: string;
 };
 
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-    file: Scalars["Upload"];
-  }>;
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+}>;
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
   uploadDynamicSelectFieldFile: {
@@ -4596,11 +4421,10 @@ export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
   };
 };
 
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-  }>;
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+}>;
 
 export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
   dynamicSelectFieldFileDownloadLink: {
@@ -4633,57 +4457,51 @@ export type PetitionComposeField_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
 } & PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment;
 
-export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-    data: FileUploadInput;
-  }>;
+export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  data: FileUploadInput;
+}>;
 
-export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation =
-  {
-    createPetitionFieldAttachmentUploadLink: {
-      __typename?: "CreateFileUploadFieldAttachment";
-      presignedPostData: {
-        __typename?: "AWSPresignedPostData";
-      } & uploadFile_AWSPresignedPostDataFragment;
-      attachment: {
-        __typename?: "PetitionFieldAttachment";
-      } & PetitionComposeField_PetitionFieldAttachmentFragment;
-    };
-  };
-
-export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-    attachmentId: Scalars["GID"];
-  }>;
-
-export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation =
-  {
-    petitionFieldAttachmentUploadComplete: {
+export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation = {
+  createPetitionFieldAttachmentUploadLink: {
+    __typename?: "CreateFileUploadFieldAttachment";
+    presignedPostData: {
+      __typename?: "AWSPresignedPostData";
+    } & uploadFile_AWSPresignedPostDataFragment;
+    attachment: {
       __typename?: "PetitionFieldAttachment";
     } & PetitionComposeField_PetitionFieldAttachmentFragment;
   };
+};
 
-export type PetitionComposeField_removePetitionFieldAttachmentMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-    attachmentId: Scalars["GID"];
-  }>;
+export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
+
+export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation = {
+  petitionFieldAttachmentUploadComplete: {
+    __typename?: "PetitionFieldAttachment";
+  } & PetitionComposeField_PetitionFieldAttachmentFragment;
+};
+
+export type PetitionComposeField_removePetitionFieldAttachmentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
 
 export type PetitionComposeField_removePetitionFieldAttachmentMutation = {
   removePetitionFieldAttachment: Result;
 };
 
-export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-    attachmentId: Scalars["GID"];
-  }>;
+export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
 
 export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation = {
   petitionFieldAttachmentDownloadLink: {
@@ -4692,15 +4510,14 @@ export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation = {
   };
 };
 
-export type PetitionComposeField_updateFieldAttachments_PetitionFieldFragment =
-  {
-    __typename?: "PetitionField";
-    attachments: Array<
-      {
-        __typename?: "PetitionFieldAttachment";
-      } & PetitionComposeField_PetitionFieldAttachmentFragment
-    >;
-  };
+export type PetitionComposeField_updateFieldAttachments_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  attachments: Array<
+    {
+      __typename?: "PetitionFieldAttachment";
+    } & PetitionComposeField_PetitionFieldAttachmentFragment
+  >;
+};
 
 export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
@@ -4783,9 +4600,7 @@ export type PetitionListTagFilter_tagsQueryVariables = Exact<{
 export type PetitionListTagFilter_tagsQuery = {
   tags: {
     __typename?: "TagPagination";
-    items: Array<
-      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-    >;
+    items: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
   };
 };
 
@@ -4812,9 +4627,7 @@ export type ExportRepliesDialog_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   replies: Array<
-    {
-      __typename?: "PetitionFieldReply";
-    } & useFilenamePlaceholdersRename_PetitionFieldReplyFragment
+    { __typename?: "PetitionFieldReply" } & useFilenamePlaceholdersRename_PetitionFieldReplyFragment
   >;
 } & useFilenamePlaceholdersRename_PetitionFieldFragment;
 
@@ -4851,18 +4664,15 @@ export type ExportRepliesProgressDialog_PetitionRepliesQueryVariables = Exact<{
 
 export type ExportRepliesProgressDialog_PetitionRepliesQuery = {
   petition?: Maybe<
-    | ({
-        __typename?: "Petition";
-      } & ExportRepliesProgressDialog_PetitionFragment)
+    | ({ __typename?: "Petition" } & ExportRepliesProgressDialog_PetitionFragment)
     | { __typename?: "PetitionTemplate" }
   >;
 };
 
-export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    replyId: Scalars["GID"];
-  }>;
+export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
 
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: {
@@ -4872,11 +4682,10 @@ export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
   };
 };
 
-export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-    downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
+}>;
 
 export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
   signedPetitionDownloadLink: {
@@ -4886,36 +4695,32 @@ export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
   };
 };
 
-export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    replyId: Scalars["GID"];
-    metadata: Scalars["JSONObject"];
-  }>;
+export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  metadata: Scalars["JSONObject"];
+}>;
 
-export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation =
-  {
-    updatePetitionFieldReplyMetadata: {
-      __typename?: "PetitionFieldReply";
-      id: string;
-      metadata: { [key: string]: any };
-    };
+export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation = {
+  updatePetitionFieldReplyMetadata: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    metadata: { [key: string]: any };
   };
+};
 
-export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-    metadata: Scalars["JSONObject"];
-  }>;
+export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  metadata: Scalars["JSONObject"];
+}>;
 
-export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation =
-  {
-    updateSignatureRequestMetadata: {
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      metadata: { [key: string]: any };
-    };
+export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation = {
+  updateSignatureRequestMetadata: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    metadata: { [key: string]: any };
   };
+};
 
 export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -4925,9 +4730,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   description?: Maybe<string>;
   validated: boolean;
   replies: Array<
-    {
-      __typename?: "PetitionFieldReply";
-    } & PetitionRepliesField_PetitionFieldReplyFragment
+    { __typename?: "PetitionFieldReply" } & PetitionRepliesField_PetitionFieldReplyFragment
   >;
   comments: Array<{
     __typename?: "PetitionFieldComment";
@@ -4947,12 +4750,11 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   id: string;
 } & PetitionRepliesFieldReply_PetitionFieldReplyFragment;
 
-export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-    attachmentId: Scalars["GID"];
-  }>;
+export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
 
 export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation = {
   petitionFieldAttachmentDownloadLink: {
@@ -4990,9 +4792,7 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
     } & PetitionRepliesFieldComments_PetitionFieldCommentFragment
   >;
   replies: Array<
-    {
-      __typename?: "PetitionFieldReply";
-    } & PetitionRepliesFieldComments_PetitionFieldReplyFragment
+    { __typename?: "PetitionFieldReply" } & PetitionRepliesFieldComments_PetitionFieldReplyFragment
   >;
 };
 
@@ -5013,9 +4813,7 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   author?: Maybe<
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<
-          { __typename?: "Contact" } & ContactLink_ContactFragment
-        >;
+        contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
       }
     | ({ __typename?: "User" } & UserReference_UserFragment)
   >;
@@ -5036,9 +4834,7 @@ export type PetitionSignaturesCard_UserFragment = {
   organization: {
     __typename?: "Organization";
     signatureIntegrations: Array<
-      {
-        __typename?: "OrgIntegration";
-      } & SignatureConfigDialog_OrgIntegrationFragment
+      { __typename?: "OrgIntegration" } & SignatureConfigDialog_OrgIntegrationFragment
     >;
   };
 };
@@ -5050,9 +4846,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
     timezone: string;
-    contacts: Array<
-      Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
-    >;
+    contacts: Array<Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>>;
   }>;
   signatureRequests?: Maybe<
     Array<
@@ -5069,17 +4863,14 @@ export type PetitionSignaturesCard_PetitionSignatureRequestFragment = {
   status: PetitionSignatureRequestStatus;
   signatureConfig: {
     __typename?: "SignatureConfig";
-    contacts: Array<
-      Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
-    >;
+    contacts: Array<Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>>;
   };
 };
 
-export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    signatureConfig?: Maybe<SignatureConfigInput>;
-  }>;
+export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  signatureConfig?: Maybe<SignatureConfigInput>;
+}>;
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
   updatePetition:
@@ -5087,10 +4878,9 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
     | { __typename?: "PetitionTemplate" };
 };
 
-export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-  }>;
+export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
 
 export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
   cancelSignatureRequest: {
@@ -5100,10 +4890,9 @@ export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
   };
 };
 
-export type PetitionSignaturesCard_startSignatureRequestMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-  }>;
+export type PetitionSignaturesCard_startSignatureRequestMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
 
 export type PetitionSignaturesCard_startSignatureRequestMutation = {
   startSignatureRequest: {
@@ -5113,11 +4902,10 @@ export type PetitionSignaturesCard_startSignatureRequestMutation = {
   };
 };
 
-export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-    preview?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  preview?: Maybe<Scalars["Boolean"]>;
+}>;
 
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   signedPetitionDownloadLink: {
@@ -5158,9 +4946,7 @@ export type RecipientViewContentsCard_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   status: PetitionStatus;
   fields: Array<
-    {
-      __typename?: "PublicPetitionField";
-    } & RecipientViewContentsCard_PublicPetitionFieldFragment
+    { __typename?: "PublicPetitionField" } & RecipientViewContentsCard_PublicPetitionFieldFragment
   >;
 };
 
@@ -5199,14 +4985,13 @@ export type RecipientViewHeader_PublicUserFragment = {
   };
 };
 
-export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    email: Scalars["String"];
-    firstName: Scalars["String"];
-    lastName: Scalars["String"];
-    messageBody: Scalars["JSON"];
-  }>;
+export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  messageBody: Scalars["JSON"];
+}>;
 
 export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
   publicDelegateAccessToContact: {
@@ -5228,9 +5013,7 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   status: PetitionStatus;
   fields: Array<
-    {
-      __typename?: "PublicPetitionField";
-    } & RecipientViewProgressFooter_PublicPetitionFieldFragment
+    { __typename?: "PublicPetitionField" } & RecipientViewProgressFooter_PublicPetitionFieldFragment
   >;
   signature?: Maybe<{ __typename?: "PublicSignatureConfig"; review: boolean }>;
 };
@@ -5272,13 +5055,12 @@ export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink
     attachmentId: Scalars["GID"];
   }>;
 
-export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation =
-  {
-    publicPetitionFieldAttachmentDownloadLink: {
-      __typename?: "FileUploadDownloadLinkResult";
-      url?: Maybe<string>;
-    };
+export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation = {
+  publicPetitionFieldAttachmentDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    url?: Maybe<string>;
   };
+};
 
 export type RecipientViewPetitionFieldCard_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
@@ -5317,28 +5099,29 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment = {
   updatedAt: string;
 };
 
-export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment =
-  {
-    __typename?: "PublicPetitionAccess";
-    granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
-    contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
-  };
+export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment = {
+  __typename?: "PublicPetitionAccess";
+  granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
+  contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
+};
 
-export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment =
-  { __typename?: "PublicPetitionField"; id: string; title?: Maybe<string> };
+export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+  id: string;
+  title?: Maybe<string>;
+};
 
-export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment =
-  {
-    __typename?: "PublicPetitionFieldComment";
-    id: string;
-    content: string;
-    createdAt: string;
-    isUnread: boolean;
-    author?: Maybe<
-      | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-      | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-    >;
-  };
+export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment = {
+  __typename?: "PublicPetitionFieldComment";
+  id: string;
+  content: string;
+  createdAt: string;
+  isUnread: boolean;
+  author?: Maybe<
+    | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
+    | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
+  >;
+};
 
 export type RecipientViewPetitionFieldCommentsQueryVariables = Exact<{
   keycode: Scalars["ID"];
@@ -5359,14 +5142,13 @@ export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAs
     petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
   }>;
 
-export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation =
-  {
-    publicMarkPetitionFieldCommentsAsRead: Array<{
-      __typename?: "PublicPetitionFieldComment";
-      id: string;
-      isUnread: boolean;
-    }>;
-  };
+export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation = {
+  publicMarkPetitionFieldCommentsAsRead: Array<{
+    __typename?: "PublicPetitionFieldComment";
+    id: string;
+    isUnread: boolean;
+  }>;
+};
 
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables =
   Exact<{
@@ -5375,12 +5157,11 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
     content: Scalars["String"];
   }>;
 
-export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation =
-  {
-    publicCreatePetitionFieldComment: {
-      __typename?: "PublicPetitionFieldComment";
-    } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
-  };
+export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation = {
+  publicCreatePetitionFieldComment: {
+    __typename?: "PublicPetitionFieldComment";
+  } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
+};
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables =
   Exact<{
@@ -5390,12 +5171,11 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
     content: Scalars["String"];
   }>;
 
-export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation =
-  {
-    publicUpdatePetitionFieldComment: {
-      __typename?: "PublicPetitionFieldComment";
-    } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
-  };
+export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation = {
+  publicUpdatePetitionFieldComment: {
+    __typename?: "PublicPetitionFieldComment";
+  } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
+};
 
 export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables =
   Exact<{
@@ -5404,15 +5184,15 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
     petitionFieldCommentId: Scalars["GID"];
   }>;
 
-export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation =
-  { publicDeletePetitionFieldComment: Result };
+export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation = {
+  publicDeletePetitionFieldComment: Result;
+};
 
-export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment =
-  {
-    __typename?: "PublicPetitionField";
-    commentCount: number;
-    unreadCommentCount: number;
-  };
+export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment = {
+  __typename?: "PublicPetitionField";
+  commentCount: number;
+  unreadCommentCount: number;
+};
 
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables =
   Exact<{
@@ -5421,87 +5201,78 @@ export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLi
     preview?: Maybe<Scalars["Boolean"]>;
   }>;
 
-export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation =
-  {
-    publicFileUploadReplyDownloadLink: {
-      __typename?: "FileUploadDownloadLinkResult";
-      result: Result;
-      url?: Maybe<string>;
-    };
+export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation = {
+  publicFileUploadReplyDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: Maybe<string>;
   };
+};
 
-export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables =
-  Exact<{
-    replyId: Scalars["GID"];
-    keycode: Scalars["ID"];
-  }>;
+export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables = Exact<{
+  replyId: Scalars["GID"];
+  keycode: Scalars["ID"];
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation =
-  { publicDeletePetitionReply: Result };
+export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation = {
+  publicDeletePetitionReply: Result;
+};
 
-export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    replyId: Scalars["GID"];
-    value: Scalars["String"];
-  }>;
+export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  value: Scalars["String"];
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation =
-  {
-    publicUpdateSimpleReply: {
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-      status: PetitionFieldReplyStatus;
-      updatedAt: string;
-    };
+export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation = {
+  publicUpdateSimpleReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    updatedAt: string;
   };
+};
 
-export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    fieldId: Scalars["GID"];
-    value: Scalars["String"];
-  }>;
+export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  value: Scalars["String"];
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation =
-  {
-    publicCreateSimpleReply: {
-      __typename?: "PublicPetitionFieldReply";
-    } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation = {
+  publicCreateSimpleReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+};
+
+export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  values: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation = {
+  publicCreateCheckboxReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+};
+
+export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  values: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation = {
+  publicUpdateCheckboxReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    updatedAt: string;
   };
-
-export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    fieldId: Scalars["GID"];
-    values: Array<Scalars["String"]> | Scalars["String"];
-  }>;
-
-export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation =
-  {
-    publicCreateCheckboxReply: {
-      __typename?: "PublicPetitionFieldReply";
-    } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-  };
-
-export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    replyId: Scalars["GID"];
-    values: Array<Scalars["String"]> | Scalars["String"];
-  }>;
-
-export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation =
-  {
-    publicUpdateCheckboxReply: {
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-      status: PetitionFieldReplyStatus;
-      updatedAt: string;
-    };
-  };
+};
 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables =
   Exact<{
@@ -5513,12 +5284,11 @@ export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMu
       | Maybe<Scalars["String"]>;
   }>;
 
-export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation =
-  {
-    publicCreateDynamicSelectReply: {
-      __typename?: "PublicPetitionFieldReply";
-    } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-  };
+export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation = {
+  publicCreateDynamicSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+};
 
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables =
   Exact<{
@@ -5530,16 +5300,15 @@ export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMu
       | Maybe<Scalars["String"]>;
   }>;
 
-export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation =
-  {
-    publicUpdateDynamicSelectReply: {
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-      status: PetitionFieldReplyStatus;
-      updatedAt: string;
-    };
+export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation = {
+  publicUpdateDynamicSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    updatedAt: string;
   };
+};
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables =
   Exact<{
@@ -5548,18 +5317,17 @@ export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutat
     data: FileUploadInput;
   }>;
 
-export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation =
-  {
-    publicCreateFileUploadReply: {
-      __typename?: "CreateFileUploadReply";
-      presignedPostData: {
-        __typename?: "AWSPresignedPostData";
-      } & uploadFile_AWSPresignedPostDataFragment;
-      reply: {
-        __typename?: "PublicPetitionFieldReply";
-      } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-    };
+export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation = {
+  publicCreateFileUploadReply: {
+    __typename?: "CreateFileUploadReply";
+    presignedPostData: {
+      __typename?: "AWSPresignedPostData";
+    } & uploadFile_AWSPresignedPostDataFragment;
+    reply: {
+      __typename?: "PublicPetitionFieldReply";
+    } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
   };
+};
 
 export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables =
   Exact<{
@@ -5567,31 +5335,30 @@ export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMut
     replyId: Scalars["GID"];
   }>;
 
-export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation =
-  {
-    publicFileUploadReplyComplete: {
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    };
+export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation = {
+  publicFileUploadReplyComplete: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
   };
+};
 
-export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment =
-  {
-    __typename?: "PublicPetitionField";
-    replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
-  };
+export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+  replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+};
 
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
   { __typename?: "PublicPetitionFieldReply"; content: { [key: string]: any } };
 
-export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment =
-  { __typename?: "PublicPetition"; status: PetitionStatus };
+export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+  status: PetitionStatus;
+};
 
-export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables =
-  Exact<{
-    tokenName: Scalars["String"];
-  }>;
+export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
+  tokenName: Scalars["String"];
+}>;
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
   generateUserAuthToken: {
@@ -5607,15 +5374,11 @@ export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
   };
 };
 
-export type Admin_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
+export type Admin_UserFragment = { __typename?: "User" } & AppLayout_UserFragment;
 
 export type AdminQueryVariables = Exact<{ [key: string]: never }>;
 
-export type AdminQuery = {
-  me: { __typename?: "User"; id: string } & Admin_UserFragment;
-};
+export type AdminQuery = { me: { __typename?: "User"; id: string } & Admin_UserFragment };
 
 export type AdminOrganizations_OrganizationFragment = {
   __typename?: "Organization";
@@ -5628,17 +5391,13 @@ export type AdminOrganizations_OrganizationFragment = {
   createdAt: string;
 };
 
-export type AdminOrganizations_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
+export type AdminOrganizations_UserFragment = { __typename?: "User" } & AppLayout_UserFragment;
 
 export type AdminOrganizationsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<
-    Array<QueryOrganizations_OrderBy> | QueryOrganizations_OrderBy
-  >;
+  sortBy?: Maybe<Array<QueryOrganizations_OrderBy> | QueryOrganizations_OrderBy>;
   status?: Maybe<OrganizationStatus>;
 }>;
 
@@ -5646,27 +5405,19 @@ export type AdminOrganizationsQuery = {
   organizations: {
     __typename?: "OrganizationPagination";
     totalCount: number;
-    items: Array<
-      { __typename?: "Organization" } & AdminOrganizations_OrganizationFragment
-    >;
+    items: Array<{ __typename?: "Organization" } & AdminOrganizations_OrganizationFragment>;
   };
 };
 
-export type AdminOrganizationsUserQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type AdminOrganizationsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AdminOrganizationsUserQuery = {
   me: { __typename?: "User" } & AdminOrganizations_UserFragment;
 };
 
-export type AdminSupportMethods_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
+export type AdminSupportMethods_UserFragment = { __typename?: "User" } & AppLayout_UserFragment;
 
-export type AdminSupportMethodsUserQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type AdminSupportMethodsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AdminSupportMethodsUserQuery = {
   me: { __typename?: "User" } & AdminSupportMethods_UserFragment;
@@ -5677,9 +5428,7 @@ export type Contact_ContactFragment = {
   id: string;
   accesses: {
     __typename?: "PetitionAccessPagination";
-    items: Array<
-      { __typename?: "PetitionAccess" } & Contact_PetitionAccessFragment
-    >;
+    items: Array<{ __typename?: "PetitionAccess" } & Contact_PetitionAccessFragment>;
   };
 } & Contact_Contact_ProfileFragment;
 
@@ -5718,9 +5467,7 @@ export type Contact_PetitionFragment = {
 } & PetitionStatusCellContent_PetitionFragment &
   PetitionSignatureCellContent_PetitionFragment;
 
-export type Contact_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment &
+export type Contact_UserFragment = { __typename?: "User" } & AppLayout_UserFragment &
   PetitionSignatureCellContent_UserFragment;
 
 export type Contact_updateContactMutationVariables = Exact<{
@@ -5734,9 +5481,7 @@ export type Contact_updateContactMutation = {
 
 export type ContactUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ContactUserQuery = {
-  me: { __typename?: "User" } & Contact_UserFragment;
-};
+export type ContactUserQuery = { me: { __typename?: "User" } & Contact_UserFragment };
 
 export type ContactQueryVariables = Exact<{
   id: Scalars["GID"];
@@ -5761,9 +5506,7 @@ export type Contacts_ContactsListFragment = {
   }>;
 };
 
-export type Contacts_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
+export type Contacts_UserFragment = { __typename?: "User" } & AppLayout_UserFragment;
 
 export type Contacts_deleteContactsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
@@ -5779,16 +5522,12 @@ export type ContactsQueryVariables = Exact<{
 }>;
 
 export type ContactsQuery = {
-  contacts: {
-    __typename?: "ContactPagination";
-  } & Contacts_ContactsListFragment;
+  contacts: { __typename?: "ContactPagination" } & Contacts_ContactsListFragment;
 };
 
 export type ContactsUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ContactsUserQuery = {
-  me: { __typename?: "User" } & Contacts_UserFragment;
-};
+export type ContactsUserQuery = { me: { __typename?: "User" } & Contacts_UserFragment };
 
 export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
   orgId: Scalars["GID"];
@@ -5796,16 +5535,10 @@ export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
 }>;
 
 export type OrganizationBranding_updateOrgLogoMutation = {
-  updateOrganizationLogo: {
-    __typename?: "Organization";
-    id: string;
-    logoUrl?: Maybe<string>;
-  };
+  updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: Maybe<string> };
 };
 
-export type OrganizationBrandingQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type OrganizationBrandingQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationBrandingQuery = {
   me: {
@@ -5824,28 +5557,17 @@ export type OrganizationGroup_UserGroupFragment = {
   id: string;
   name: string;
   createdAt: string;
-  members: Array<
-    {
-      __typename?: "UserGroupMember";
-    } & OrganizationGroup_UserGroupMemberFragment
-  >;
+  members: Array<{ __typename?: "UserGroupMember" } & OrganizationGroup_UserGroupMemberFragment>;
 };
 
 export type OrganizationGroup_UserGroupMemberFragment = {
   __typename?: "UserGroupMember";
   id: string;
   addedAt: string;
-  user: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    email: string;
-  };
+  user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
 };
 
-export type OrganizationGroup_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
+export type OrganizationGroup_UserFragment = { __typename?: "User" } & AppLayout_UserFragment;
 
 export type OrganizationGroup_updateUserGroupMutationVariables = Exact<{
   id: Scalars["GID"];
@@ -5853,9 +5575,7 @@ export type OrganizationGroup_updateUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_updateUserGroupMutation = {
-  updateUserGroup: {
-    __typename?: "UserGroup";
-  } & OrganizationGroup_UserGroupFragment;
+  updateUserGroup: { __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment;
 };
 
 export type OrganizationGroup_addUsersToUserGroupMutationVariables = Exact<{
@@ -5864,9 +5584,7 @@ export type OrganizationGroup_addUsersToUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_addUsersToUserGroupMutation = {
-  addUsersToUserGroup: {
-    __typename?: "UserGroup";
-  } & OrganizationGroup_UserGroupFragment;
+  addUsersToUserGroup: { __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment;
 };
 
 export type OrganizationGroup_removeUsersFromGroupMutationVariables = Exact<{
@@ -5875,18 +5593,14 @@ export type OrganizationGroup_removeUsersFromGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_removeUsersFromGroupMutation = {
-  removeUsersFromGroup: {
-    __typename?: "UserGroup";
-  } & OrganizationGroup_UserGroupFragment;
+  removeUsersFromGroup: { __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment;
 };
 
 export type OrganizationGroup_deleteUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type OrganizationGroup_deleteUserGroupMutation = {
-  deleteUserGroup: Result;
-};
+export type OrganizationGroup_deleteUserGroupMutation = { deleteUserGroup: Result };
 
 export type OrganizationGroup_cloneUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
@@ -5894,9 +5608,7 @@ export type OrganizationGroup_cloneUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_cloneUserGroupMutation = {
-  cloneUserGroup: Array<
-    { __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment
-  >;
+  cloneUserGroup: Array<{ __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment>;
 };
 
 export type OrganizationGroupQueryVariables = Exact<{
@@ -5904,14 +5616,10 @@ export type OrganizationGroupQueryVariables = Exact<{
 }>;
 
 export type OrganizationGroupQuery = {
-  userGroup?: Maybe<
-    { __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment
-  >;
+  userGroup?: Maybe<{ __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment>;
 };
 
-export type OrganizationGroupUserQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type OrganizationGroupUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationGroupUserQuery = {
   me: { __typename?: "User" } & OrganizationGroup_UserFragment &
@@ -5921,9 +5629,7 @@ export type OrganizationGroupUserQuery = {
 export type OrganizationGroups_UserGroupPaginationFragment = {
   __typename?: "UserGroupPagination";
   totalCount: number;
-  items: Array<
-    { __typename?: "UserGroup" } & OrganizationGroups_UserGroupFragment
-  >;
+  items: Array<{ __typename?: "UserGroup" } & OrganizationGroups_UserGroupFragment>;
 };
 
 export type OrganizationGroups_UserGroupFragment = {
@@ -5937,9 +5643,7 @@ export type OrganizationGroups_UserGroupFragment = {
   }>;
 };
 
-export type OrganizationGroups_UserFragment = {
-  __typename?: "User";
-} & SettingsLayout_UserFragment;
+export type OrganizationGroups_UserFragment = { __typename?: "User" } & SettingsLayout_UserFragment;
 
 export type OrganizationGroups_createUserGroupMutationVariables = Exact<{
   name: Scalars["String"];
@@ -5947,18 +5651,14 @@ export type OrganizationGroups_createUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroups_createUserGroupMutation = {
-  createUserGroup: {
-    __typename?: "UserGroup";
-  } & OrganizationGroups_UserGroupFragment;
+  createUserGroup: { __typename?: "UserGroup" } & OrganizationGroups_UserGroupFragment;
 };
 
 export type OrganizationGroups_deleteUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type OrganizationGroups_deleteUserGroupMutation = {
-  deleteUserGroup: Result;
-};
+export type OrganizationGroups_deleteUserGroupMutation = { deleteUserGroup: Result };
 
 export type OrganizationGroups_cloneUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
@@ -5966,9 +5666,7 @@ export type OrganizationGroups_cloneUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroups_cloneUserGroupMutation = {
-  cloneUserGroup: Array<
-    { __typename?: "UserGroup" } & OrganizationGroups_UserGroupFragment
-  >;
+  cloneUserGroup: Array<{ __typename?: "UserGroup" } & OrganizationGroups_UserGroupFragment>;
 };
 
 export type OrganizationGroupsQueryVariables = Exact<{
@@ -5984,18 +5682,14 @@ export type OrganizationGroupsQuery = {
   } & OrganizationGroups_UserGroupPaginationFragment;
 };
 
-export type OrganizationGroupsUserQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type OrganizationGroupsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationGroupsUserQuery = {
   me: { __typename?: "User" } & OrganizationGroups_UserFragment &
     OrganizationGroupsListTableHeader_UserFragment;
 };
 
-export type OrganizationSettingsQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type OrganizationSettingsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationSettingsQuery = {
   me: { __typename?: "User"; id: string } & SettingsLayout_UserFragment;
@@ -6023,9 +5717,7 @@ export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
 }>;
 
 export type OrganizationUsers_createOrganizationUserMutation = {
-  createOrganizationUser: {
-    __typename?: "User";
-  } & OrganizationUsers_UserFragment;
+  createOrganizationUser: { __typename?: "User" } & OrganizationUsers_UserFragment;
 };
 
 export type OrganizationUsers_updateOrganizationUserMutationVariables = Exact<{
@@ -6034,9 +5726,7 @@ export type OrganizationUsers_updateOrganizationUserMutationVariables = Exact<{
 }>;
 
 export type OrganizationUsers_updateOrganizationUserMutation = {
-  updateOrganizationUser: {
-    __typename?: "User";
-  } & OrganizationUsers_UserFragment;
+  updateOrganizationUser: { __typename?: "User" } & OrganizationUsers_UserFragment;
 };
 
 export type OrganizationUsers_updateUserStatusMutationVariables = Exact<{
@@ -6046,11 +5736,7 @@ export type OrganizationUsers_updateUserStatusMutationVariables = Exact<{
 }>;
 
 export type OrganizationUsers_updateUserStatusMutation = {
-  updateUserStatus: Array<{
-    __typename?: "User";
-    id: string;
-    status: UserStatus;
-  }>;
+  updateUserStatus: Array<{ __typename?: "User"; id: string; status: UserStatus }>;
 };
 
 export type OrganizationUsersQueryVariables = Exact<{
@@ -6086,9 +5772,7 @@ export type PetitionActivity_PetitionFragment = {
   ShareButton_PetitionBase_Petition_Fragment &
   AddPetitionAccessDialog_PetitionFragment;
 
-export type PetitionActivity_UserFragment = {
-  __typename?: "User";
-} & PetitionLayout_UserFragment &
+export type PetitionActivity_UserFragment = { __typename?: "User" } & PetitionLayout_UserFragment &
   useUpdateIsReadNotification_UserFragment;
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
@@ -6170,10 +5854,7 @@ export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_switchAutomaticRemindersMutation = {
-  switchAutomaticReminders: Array<{
-    __typename?: "PetitionAccess";
-    id: string;
-  }>;
+  switchAutomaticReminders: Array<{ __typename?: "PetitionAccess"; id: string }>;
 };
 
 export type PetitionActivityQueryVariables = Exact<{
@@ -6187,9 +5868,7 @@ export type PetitionActivityQuery = {
   >;
 };
 
-export type PetitionActivityUserQueryVariables = Exact<{
-  [key: string]: never;
-}>;
+export type PetitionActivityUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionActivityUserQuery = {
   me: { __typename?: "User" } & PetitionActivity_UserFragment;
@@ -6199,9 +5878,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   status: PetitionStatus;
   id: string;
-  fields: Array<
-    { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
-  >;
+  fields: Array<{ __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment>;
 } & PetitionLayout_PetitionBase_Petition_Fragment &
   AddPetitionAccessDialog_PetitionFragment &
   PetitionSettings_PetitionBase_Petition_Fragment;
@@ -6210,9 +5887,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
   id: string;
-  fields: Array<
-    { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
-  >;
+  fields: Array<{ __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment>;
 } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
   PetitionTemplateComposeMessageEditor_PetitionFragment &
   PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
@@ -6227,9 +5902,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   PetitionComposeFieldSettings_PetitionFieldFragment &
   PetitionContents_PetitionFieldFragment;
 
-export type PetitionCompose_UserFragment = {
-  __typename?: "User";
-} & PetitionLayout_UserFragment &
+export type PetitionCompose_UserFragment = { __typename?: "User" } & PetitionLayout_UserFragment &
   PetitionSettings_UserFragment &
   useUpdateIsReadNotification_UserFragment;
 
@@ -6241,14 +5914,10 @@ export type PetitionCompose_updatePetitionMutationVariables = Exact<{
 
 export type PetitionCompose_updatePetitionMutation = {
   updatePetition:
-    | ({
-        __typename?: "Petition";
-      } & PetitionLayout_PetitionBase_Petition_Fragment &
+    | ({ __typename?: "Petition" } & PetitionLayout_PetitionBase_Petition_Fragment &
         PetitionSettings_PetitionBase_Petition_Fragment &
         AddPetitionAccessDialog_PetitionFragment)
-    | ({
-        __typename?: "PetitionTemplate";
-      } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
+    | ({ __typename?: "PetitionTemplate" } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
         PetitionSettings_PetitionBase_PetitionTemplate_Fragment &
         PetitionTemplateComposeMessageEditor_PetitionFragment);
 };
@@ -6282,10 +5951,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
   createPetitionField:
     | {
         __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-        } & PetitionCompose_PetitionFieldFragment;
+        field: { __typename?: "PetitionField"; id: string } & PetitionCompose_PetitionFieldFragment;
         petition: {
           __typename?: "Petition";
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
@@ -6293,10 +5959,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
       }
     | {
         __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-        } & PetitionCompose_PetitionFieldFragment;
+        field: { __typename?: "PetitionField"; id: string } & PetitionCompose_PetitionFieldFragment;
         petition: {
           __typename?: "PetitionTemplate";
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
@@ -6313,10 +5976,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
   clonePetitionField:
     | {
         __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-        } & PetitionCompose_PetitionFieldFragment;
+        field: { __typename?: "PetitionField"; id: string } & PetitionCompose_PetitionFieldFragment;
         petition: {
           __typename?: "Petition";
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
@@ -6324,10 +5984,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
       }
     | {
         __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-        } & PetitionCompose_PetitionFieldFragment;
+        field: { __typename?: "PetitionField"; id: string } & PetitionCompose_PetitionFieldFragment;
         petition: {
           __typename?: "PetitionTemplate";
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
@@ -6365,10 +6022,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
   updatePetitionField:
     | {
         __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-        } & PetitionCompose_PetitionFieldFragment;
+        field: { __typename?: "PetitionField"; id: string } & PetitionCompose_PetitionFieldFragment;
         petition: {
           __typename?: "Petition";
           status: PetitionStatus;
@@ -6378,15 +6032,8 @@ export type PetitionCompose_updatePetitionFieldMutation = {
       }
     | {
         __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-        } & PetitionCompose_PetitionFieldFragment;
-        petition: {
-          __typename?: "PetitionTemplate";
-          id: string;
-          updatedAt: string;
-        };
+        field: { __typename?: "PetitionField"; id: string } & PetitionCompose_PetitionFieldFragment;
+        petition: { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
       };
 };
 
@@ -6401,10 +6048,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
   changePetitionFieldType:
     | {
         __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-        } & PetitionCompose_PetitionFieldFragment;
+        field: { __typename?: "PetitionField"; id: string } & PetitionCompose_PetitionFieldFragment;
         petition: {
           __typename?: "Petition";
           status: PetitionStatus;
@@ -6414,15 +6058,8 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
       }
     | {
         __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-        } & PetitionCompose_PetitionFieldFragment;
-        petition: {
-          __typename?: "PetitionTemplate";
-          id: string;
-          updatedAt: string;
-        };
+        field: { __typename?: "PetitionField"; id: string } & PetitionCompose_PetitionFieldFragment;
+        petition: { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
       };
 };
 
@@ -6443,11 +6080,7 @@ export type PetitionCompose_batchSendPetitionMutation = {
   batchSendPetition: Array<{
     __typename?: "SendPetitionResult";
     result: Result;
-    petition?: Maybe<{
-      __typename?: "Petition";
-      id: string;
-      status: PetitionStatus;
-    }>;
+    petition?: Maybe<{ __typename?: "Petition"; id: string; status: PetitionStatus }>;
   }>;
 };
 
@@ -6464,12 +6097,8 @@ export type PetitionComposeQueryVariables = Exact<{
 
 export type PetitionComposeQuery = {
   petition?: Maybe<
-    | ({
-        __typename?: "Petition";
-      } & PetitionCompose_PetitionBase_Petition_Fragment)
-    | ({
-        __typename?: "PetitionTemplate";
-      } & PetitionCompose_PetitionBase_PetitionTemplate_Fragment)
+    | ({ __typename?: "Petition" } & PetitionCompose_PetitionBase_Petition_Fragment)
+    | ({ __typename?: "PetitionTemplate" } & PetitionCompose_PetitionBase_PetitionTemplate_Fragment)
   >;
 };
 
@@ -6488,9 +6117,7 @@ export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   hasCommentsEnabled: boolean;
-  fields: Array<
-    { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
-  >;
+  fields: Array<{ __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment>;
   currentSignatureRequest?: Maybe<{
     __typename?: "PetitionSignatureRequest";
     id: string;
@@ -6527,12 +6154,8 @@ export type PetitionReplies_updatePetitionMutationVariables = Exact<{
 
 export type PetitionReplies_updatePetitionMutation = {
   updatePetition:
-    | ({
-        __typename?: "Petition";
-      } & PetitionLayout_PetitionBase_Petition_Fragment)
-    | ({
-        __typename?: "PetitionTemplate";
-      } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
+    | ({ __typename?: "Petition" } & PetitionLayout_PetitionBase_Petition_Fragment)
+    | ({ __typename?: "PetitionTemplate" } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
 };
 
 export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
@@ -6559,12 +6182,11 @@ export type PetitionReplies_validatePetitionFieldsMutation = {
   };
 };
 
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    replyId: Scalars["GID"];
-    preview?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  preview?: Maybe<Scalars["Boolean"]>;
+}>;
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: {
@@ -6574,14 +6196,13 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   };
 };
 
-export type PetitionReplies_createPetitionFieldCommentMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldId: Scalars["GID"];
-    content: Scalars["String"];
-    isInternal?: Maybe<Scalars["Boolean"]>;
-    hasInternalComments: Scalars["Boolean"];
-  }>;
+export type PetitionReplies_createPetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  content: Scalars["String"];
+  isInternal?: Maybe<Scalars["Boolean"]>;
+  hasInternalComments: Scalars["Boolean"];
+}>;
 
 export type PetitionReplies_createPetitionFieldCommentMutation = {
   createPetitionFieldComment: {
@@ -6589,14 +6210,13 @@ export type PetitionReplies_createPetitionFieldCommentMutation = {
   } & PetitionRepliesFieldComments_PetitionFieldFragment;
 };
 
-export type PetitionReplies_updatePetitionFieldCommentMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldCommentId: Scalars["GID"];
-    content: Scalars["String"];
-    hasInternalComments: Scalars["Boolean"];
-  }>;
+export type PetitionReplies_updatePetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
+  content: Scalars["String"];
+  hasInternalComments: Scalars["Boolean"];
+}>;
 
 export type PetitionReplies_updatePetitionFieldCommentMutation = {
   updatePetitionFieldComment: {
@@ -6604,13 +6224,12 @@ export type PetitionReplies_updatePetitionFieldCommentMutation = {
   } & PetitionRepliesFieldComments_PetitionFieldFragment;
 };
 
-export type PetitionReplies_deletePetitionFieldCommentMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldCommentId: Scalars["GID"];
-    hasInternalComments: Scalars["Boolean"];
-  }>;
+export type PetitionReplies_deletePetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
+  hasInternalComments: Scalars["Boolean"];
+}>;
 
 export type PetitionReplies_deletePetitionFieldCommentMutation = {
   deletePetitionFieldComment: {
@@ -6618,13 +6237,12 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
   } & PetitionRepliesFieldComments_PetitionFieldFragment;
 };
 
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldReplyIds: Array<Scalars["GID"]> | Scalars["GID"];
-    status: PetitionFieldReplyStatus;
-  }>;
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldReplyIds: Array<Scalars["GID"]> | Scalars["GID"];
+  status: PetitionFieldReplyStatus;
+}>;
 
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   updatePetitionFieldRepliesStatus: {
@@ -6639,14 +6257,13 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   };
 };
 
-export type PetitionReplies_sendPetitionClosedNotificationMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    emailBody: Scalars["JSON"];
-    attachPdfExport: Scalars["Boolean"];
-    pdfExportTitle?: Maybe<Scalars["String"]>;
-    force?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type PetitionReplies_sendPetitionClosedNotificationMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  emailBody: Scalars["JSON"];
+  attachPdfExport: Scalars["Boolean"];
+  pdfExportTitle?: Maybe<Scalars["String"]>;
+  force?: Maybe<Scalars["Boolean"]>;
+}>;
 
 export type PetitionReplies_sendPetitionClosedNotificationMutation = {
   sendPetitionClosedNotification: { __typename?: "Petition"; id: string };
@@ -6676,9 +6293,7 @@ export type Petitions_PetitionBasePaginationFragment = {
   totalCount: number;
   items: Array<
     | ({ __typename?: "Petition" } & Petitions_PetitionBase_Petition_Fragment)
-    | ({
-        __typename?: "PetitionTemplate";
-      } & Petitions_PetitionBase_PetitionTemplate_Fragment)
+    | ({ __typename?: "PetitionTemplate" } & Petitions_PetitionBase_PetitionTemplate_Fragment)
   >;
 };
 
@@ -6695,16 +6310,12 @@ export type Petitions_PetitionBaseFragment =
   | Petitions_PetitionBase_Petition_Fragment
   | Petitions_PetitionBase_PetitionTemplate_Fragment;
 
-export type Petitions_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment &
+export type Petitions_UserFragment = { __typename?: "User" } & AppLayout_UserFragment &
   usePetitionsTableColumns_UserFragment;
 
 export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type PetitionsUserQuery = {
-  me: { __typename?: "User" } & Petitions_UserFragment;
-};
+export type PetitionsUserQuery = { me: { __typename?: "User" } & Petitions_UserFragment };
 
 export type PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -6716,18 +6327,14 @@ export type PetitionsQueryVariables = Exact<{
 }>;
 
 export type PetitionsQuery = {
-  petitions: {
-    __typename?: "PetitionBasePagination";
-  } & Petitions_PetitionBasePaginationFragment;
+  petitions: { __typename?: "PetitionBasePagination" } & Petitions_PetitionBasePaginationFragment;
 };
 
 export type NewPetition_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
 } & NewPetitionTemplatesList_PetitionTemplateFragment;
 
-export type NewPetition_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
+export type NewPetition_UserFragment = { __typename?: "User" } & AppLayout_UserFragment;
 
 export type NewPetitionPublicTemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -6740,9 +6347,7 @@ export type NewPetitionPublicTemplatesQuery = {
   publicTemplates: {
     __typename?: "PetitionTemplatePagination";
     totalCount: number;
-    items: Array<
-      { __typename?: "PetitionTemplate" } & NewPetition_PetitionTemplateFragment
-    >;
+    items: Array<{ __typename?: "PetitionTemplate" } & NewPetition_PetitionTemplateFragment>;
   };
 };
 
@@ -6759,9 +6364,7 @@ export type NewPetitionTemplatesQuery = {
     totalCount: number;
     items: Array<
       | { __typename?: "Petition" }
-      | ({
-          __typename?: "PetitionTemplate";
-        } & NewPetition_PetitionTemplateFragment)
+      | ({ __typename?: "PetitionTemplate" } & NewPetition_PetitionTemplateFragment)
     >;
   };
   hasTemplates: { __typename?: "PetitionBasePagination"; totalCount: number };
@@ -6769,9 +6372,7 @@ export type NewPetitionTemplatesQuery = {
 
 export type NewPetitionUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type NewPetitionUserQuery = {
-  me: { __typename?: "User" } & NewPetition_UserFragment;
-};
+export type NewPetitionUserQuery = { me: { __typename?: "User" } & NewPetition_UserFragment };
 
 export type Account_UserFragment = {
   __typename?: "User";
@@ -6798,37 +6399,26 @@ export type Account_updateAccountMutation = {
 
 export type AccountQueryVariables = Exact<{ [key: string]: never }>;
 
-export type AccountQuery = {
-  me: { __typename?: "User"; id: string } & Account_UserFragment;
-};
+export type AccountQuery = { me: { __typename?: "User"; id: string } & Account_UserFragment };
 
-export type Settings_UserFragment = {
-  __typename?: "User";
-} & SettingsLayout_UserFragment &
+export type Settings_UserFragment = { __typename?: "User" } & SettingsLayout_UserFragment &
   useSettingsSections_UserFragment;
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type SettingsQuery = {
-  me: { __typename?: "User"; id: string } & Settings_UserFragment;
-};
+export type SettingsQuery = { me: { __typename?: "User"; id: string } & Settings_UserFragment };
 
 export type Security_updatePasswordMutationVariables = Exact<{
   password: Scalars["String"];
   newPassword: Scalars["String"];
 }>;
 
-export type Security_updatePasswordMutation = {
-  changePassword: ChangePasswordResult;
-};
+export type Security_updatePasswordMutation = { changePassword: ChangePasswordResult };
 
 export type SecurityQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SecurityQuery = {
-  me: {
-    __typename?: "User";
-    isSsoUser: boolean;
-  } & SettingsLayout_UserFragment &
+  me: { __typename?: "User"; isSsoUser: boolean } & SettingsLayout_UserFragment &
     useSettingsSections_UserFragment;
 };
 
@@ -6850,9 +6440,7 @@ export type TokensQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<
-    Array<UserAuthenticationTokens_OrderBy> | UserAuthenticationTokens_OrderBy
-  >;
+  sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy> | UserAuthenticationTokens_OrderBy>;
 }>;
 
 export type TokensQuery = {
@@ -6863,9 +6451,7 @@ export type TokensQuery = {
       __typename?: "UserAuthenticationTokenPagination";
       totalCount: number;
       items: Array<
-        {
-          __typename?: "UserAuthenticationToken";
-        } & Tokens_UserAuthenticationTokenFragment
+        { __typename?: "UserAuthenticationToken" } & Tokens_UserAuthenticationTokenFragment
       >;
     };
   } & SettingsLayout_UserFragment &
@@ -6874,9 +6460,7 @@ export type TokensQuery = {
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type CurrentUserQuery = {
-  me: { __typename?: "User" } & Login_UserFragment;
-};
+export type CurrentUserQuery = { me: { __typename?: "User" } & Login_UserFragment };
 
 export type Login_UserFragment = {
   __typename?: "User";
@@ -6887,22 +6471,14 @@ export type Login_UserFragment = {
 
 export type RecipientView_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  petition?: Maybe<
-    { __typename?: "PublicPetition" } & RecipientView_PublicPetitionFragment
-  >;
-  granter?: Maybe<
-    { __typename?: "PublicUser" } & RecipientView_PublicUserFragment
-  >;
+  petition?: Maybe<{ __typename?: "PublicPetition" } & RecipientView_PublicPetitionFragment>;
+  granter?: Maybe<{ __typename?: "PublicUser" } & RecipientView_PublicUserFragment>;
   contact?: Maybe<
-    {
-      __typename?: "PublicContact";
-    } & RecipientViewHeader_PublicContactFragment &
+    { __typename?: "PublicContact" } & RecipientViewHeader_PublicContactFragment &
       useCompleteSignerInfoDialog_PublicContactFragment
   >;
   message?: Maybe<
-    {
-      __typename?: "PublicPetitionMessage";
-    } & RecipientView_PublicPetitionMessageFragment
+    { __typename?: "PublicPetitionMessage" } & RecipientView_PublicPetitionMessageFragment
   >;
 } & RecipientViewPetitionField_PublicPetitionAccessFragment;
 
@@ -6920,22 +6496,12 @@ export type RecipientView_PublicPetitionFragment = {
   hasCommentsEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
   signatureStatus?: Maybe<PublicSignatureStatus>;
-  fields: Array<
-    {
-      __typename?: "PublicPetitionField";
-    } & RecipientView_PublicPetitionFieldFragment
-  >;
+  fields: Array<{ __typename?: "PublicPetitionField" } & RecipientView_PublicPetitionFieldFragment>;
   signature?: Maybe<{
     __typename?: "PublicSignatureConfig";
-    signers: Array<
-      Maybe<
-        { __typename?: "PublicContact" } & RecipientView_PublicContactFragment
-      >
-    >;
+    signers: Array<Maybe<{ __typename?: "PublicContact" } & RecipientView_PublicContactFragment>>;
   }>;
-  recipients: Array<
-    { __typename?: "PublicContact" } & RecipientViewHeader_PublicContactFragment
-  >;
+  recipients: Array<{ __typename?: "PublicContact" } & RecipientViewHeader_PublicContactFragment>;
 } & RecipientViewContentsCard_PublicPetitionFragment &
   RecipientViewProgressFooter_PublicPetitionFragment;
 
@@ -6964,11 +6530,7 @@ export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
 }>;
 
 export type RecipientView_publicCompletePetitionMutation = {
-  publicCompletePetition: {
-    __typename?: "PublicPetition";
-    id: string;
-    status: PetitionStatus;
-  };
+  publicCompletePetition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
 };
 
 export type PublicPetitionQueryVariables = Exact<{
@@ -6977,9 +6539,7 @@ export type PublicPetitionQueryVariables = Exact<{
 
 export type PublicPetitionQuery = {
   access?: Maybe<
-    {
-      __typename?: "PublicPetitionAccess";
-    } & RecipientView_PublicPetitionAccessFragment
+    { __typename?: "PublicPetitionAccess" } & RecipientView_PublicPetitionAccessFragment
   >;
 };
 
@@ -7063,37 +6623,22 @@ export type PublicOptOutQueryVariables = Exact<{
 }>;
 
 export type PublicOptOutQuery = {
-  access?: Maybe<
-    {
-      __typename?: "PublicPetitionAccess";
-    } & OptOut_PublicPetitionAccessFragment
-  >;
+  access?: Maybe<{ __typename?: "PublicPetitionAccess" } & OptOut_PublicPetitionAccessFragment>;
 };
 
 export type PetitionPdf_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   name?: Maybe<string>;
-  fields: Array<
-    { __typename?: "PetitionField" } & PetitionPdf_PetitionFieldFragment
-  >;
-  organization: {
-    __typename?: "Organization";
-    name: string;
-    logoUrl?: Maybe<string>;
-  };
+  fields: Array<{ __typename?: "PetitionField" } & PetitionPdf_PetitionFieldFragment>;
+  organization: { __typename?: "Organization"; name: string; logoUrl?: Maybe<string> };
   currentSignatureRequest?: Maybe<{
     __typename?: "PetitionSignatureRequest";
     signatureConfig: {
       __typename?: "SignatureConfig";
       timezone: string;
       contacts: Array<
-        Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>
+        Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
       >;
     };
   }>;
@@ -7119,113 +6664,7 @@ export type PdfViewPetitionQueryVariables = Exact<{
 }>;
 
 export type PdfViewPetitionQuery = {
-  petitionAuthToken?: Maybe<
-    { __typename?: "Petition" } & PetitionPdf_PetitionFragment
-  >;
-};
-
-export type LandingTemplateDetails_LandingTemplateFragment = {
-  __typename?: "LandingTemplate";
-  id: string;
-  name?: Maybe<string>;
-  slug: string;
-  locale: PetitionLocale;
-  imageUrl?: Maybe<string>;
-  backgroundColor?: Maybe<string>;
-  categories?: Maybe<Array<string>>;
-  ownerFullName: string;
-  ownerAvatarUrl?: Maybe<string>;
-  organizationName: string;
-  fieldCount: number;
-  hasConditionals: boolean;
-  descriptionHtml?: Maybe<string>;
-  shortDescription?: Maybe<string>;
-  updatedAt: string;
-};
-
-export type LandingTemplateDetails_landingTemplateBySlugQueryVariables = Exact<{
-  slug: Scalars["String"];
-}>;
-
-export type LandingTemplateDetails_landingTemplateBySlugQuery = {
-  landingTemplateBySlug?: Maybe<
-    {
-      __typename?: "LandingTemplate";
-    } & LandingTemplateDetails_LandingTemplateFragment
-  >;
-};
-
-export type LandingTemplateDetails_landingTemplatesQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  locale: PetitionLocale;
-  categories?: Maybe<Array<Scalars["String"]> | Scalars["String"]>;
-}>;
-
-export type LandingTemplateDetails_landingTemplatesQuery = {
-  landingTemplates: {
-    __typename?: "LandingTemplatePagination";
-    totalCount: number;
-    items: Array<
-      {
-        __typename?: "LandingTemplate";
-      } & PublicTemplateCard_LandingTemplateFragment
-    >;
-  };
-};
-
-export type LandingTemplatesCategory_landingTemplatesSamplesQueryVariables =
-  Exact<{
-    locale: PetitionLocale;
-  }>;
-
-export type LandingTemplatesCategory_landingTemplatesSamplesQuery = {
-  landingTemplatesSamples: Array<{
-    __typename?: "LandingTemplateSample";
-    category: string;
-    templates: { __typename?: "LandingTemplatePagination"; totalCount: number };
-  }>;
-};
-
-export type LandingTemplatesCategory_landingTemplatesQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  category: Scalars["String"];
-  locale: PetitionLocale;
-}>;
-
-export type LandingTemplatesCategory_landingTemplatesQuery = {
-  landingTemplates: {
-    __typename?: "LandingTemplatePagination";
-    totalCount: number;
-    items: Array<
-      {
-        __typename?: "LandingTemplate";
-      } & PublicTemplateCard_LandingTemplateFragment
-    >;
-  };
-};
-
-export type LandingTemplates_landingTemplatesSamplesQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  locale: PetitionLocale;
-}>;
-
-export type LandingTemplates_landingTemplatesSamplesQuery = {
-  landingTemplatesSamples: Array<{
-    __typename?: "LandingTemplateSample";
-    category: string;
-    templates: {
-      __typename?: "LandingTemplatePagination";
-      totalCount: number;
-      items: Array<
-        {
-          __typename?: "LandingTemplate";
-        } & PublicTemplateCard_LandingTemplateFragment
-      >;
-    };
-  }>;
+  petitionAuthToken?: Maybe<{ __typename?: "Petition" } & PetitionPdf_PetitionFragment>;
 };
 
 export type Thanks_PetitionLogoQueryVariables = Exact<{
@@ -7279,8 +6718,7 @@ export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
 
 export type useClonePetitions_clonePetitionsMutation = {
   clonePetitions: Array<
-    | { __typename?: "Petition"; id: string }
-    | { __typename?: "PetitionTemplate"; id: string }
+    { __typename?: "Petition"; id: string } | { __typename?: "PetitionTemplate"; id: string }
   >;
 };
 
@@ -7316,9 +6754,7 @@ export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type useDeletePetitions_deletePetitionsMutation = {
-  deletePetitions: Result;
-};
+export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Result };
 
 export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -7326,8 +6762,11 @@ export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   name?: Maybe<string>;
 };
 
-export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment =
-  { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: Maybe<string>;
+};
 
 export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
   | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
@@ -7349,41 +6788,13 @@ export type useUpdateIsReadNotificationMutation = {
         isRead: boolean;
         comment: { __typename?: "PetitionFieldComment"; id: string };
       }
-    | {
-        __typename?: "MessageEmailBouncedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "PetitionCompletedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "PetitionSharedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "ReminderEmailBouncedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "RemindersOptOutNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "SignatureCancelledUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "SignatureCompletedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
+    | { __typename?: "MessageEmailBouncedUserNotification"; id: string; isRead: boolean }
+    | { __typename?: "PetitionCompletedUserNotification"; id: string; isRead: boolean }
+    | { __typename?: "PetitionSharedUserNotification"; id: string; isRead: boolean }
+    | { __typename?: "ReminderEmailBouncedUserNotification"; id: string; isRead: boolean }
+    | { __typename?: "RemindersOptOutNotification"; id: string; isRead: boolean }
+    | { __typename?: "SignatureCancelledUserNotification"; id: string; isRead: boolean }
+    | { __typename?: "SignatureCompletedUserNotification"; id: string; isRead: boolean }
   >;
 };
 
@@ -7496,10 +6907,7 @@ export type PetitionComposeSearchContactsQuery = {
   };
 };
 
-export type useSettingsSections_UserFragment = {
-  __typename?: "User";
-  hasApiTokens: boolean;
-};
+export type useSettingsSections_UserFragment = { __typename?: "User"; hasApiTokens: boolean };
 
 export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -8154,8 +7562,7 @@ export const usePetitionCurrentSignatureStatus_PetitionFragmentDoc = gql`
 `;
 export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
   fragment PetitionSignatureCellContent_Petition on Petition {
-    ...usePetitionCurrentSignatureStatus_Petition
-      @include(if: $hasPetitionSignature)
+    ...usePetitionCurrentSignatureStatus_Petition @include(if: $hasPetitionSignature)
   }
   ${usePetitionCurrentSignatureStatus_PetitionFragmentDoc}
 `;
@@ -9233,9 +8640,7 @@ export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
-    hasHideRecipientViewContents: hasFeatureFlag(
-      featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS
-    )
+    hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     organization {
       id
       signatureIntegrations: integrations(type: SIGNATURE) {
@@ -9434,8 +8839,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       status
     }
     ...PetitionSignaturesCard_Petition @include(if: $hasPetitionSignature)
-    ...usePetitionCurrentSignatureStatus_Petition
-      @include(if: $hasPetitionSignature)
+    ...usePetitionCurrentSignatureStatus_Petition @include(if: $hasPetitionSignature)
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
@@ -9960,25 +9364,6 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
   }
   ${PetitionPdf_PetitionFieldFragmentDoc}
 `;
-export const LandingTemplateDetails_LandingTemplateFragmentDoc = gql`
-  fragment LandingTemplateDetails_LandingTemplate on LandingTemplate {
-    id
-    name
-    slug
-    locale
-    imageUrl
-    backgroundColor
-    categories
-    ownerFullName
-    ownerAvatarUrl
-    organizationName
-    fieldCount
-    hasConditionals
-    descriptionHtml
-    shortDescription
-    updatedAt
-  }
-`;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
     id
@@ -10046,10 +9431,7 @@ export type PetitionTagListCellContent_tagsLazyQueryHookResult = ReturnType<
   typeof usePetitionTagListCellContent_tagsLazyQuery
 >;
 export const PetitionTagListCellContent_tagPetitionDocument = gql`
-  mutation PetitionTagListCellContent_tagPetition(
-    $tagId: GID!
-    $petitionId: GID!
-  ) {
+  mutation PetitionTagListCellContent_tagPetition($tagId: GID!, $petitionId: GID!) {
     tagPetition(tagId: $tagId, petitionId: $petitionId) {
       id
       tags {
@@ -10071,13 +9453,11 @@ export function usePetitionTagListCellContent_tagPetitionMutation(
     PetitionTagListCellContent_tagPetitionMutationVariables
   >(PetitionTagListCellContent_tagPetitionDocument, options);
 }
-export type PetitionTagListCellContent_tagPetitionMutationHookResult =
-  ReturnType<typeof usePetitionTagListCellContent_tagPetitionMutation>;
+export type PetitionTagListCellContent_tagPetitionMutationHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_tagPetitionMutation
+>;
 export const PetitionTagListCellContent_untagPetitionDocument = gql`
-  mutation PetitionTagListCellContent_untagPetition(
-    $tagId: GID!
-    $petitionId: GID!
-  ) {
+  mutation PetitionTagListCellContent_untagPetition($tagId: GID!, $petitionId: GID!) {
     untagPetition(tagId: $tagId, petitionId: $petitionId) {
       id
       tags {
@@ -10099,13 +9479,11 @@ export function usePetitionTagListCellContent_untagPetitionMutation(
     PetitionTagListCellContent_untagPetitionMutationVariables
   >(PetitionTagListCellContent_untagPetitionDocument, options);
 }
-export type PetitionTagListCellContent_untagPetitionMutationHookResult =
-  ReturnType<typeof usePetitionTagListCellContent_untagPetitionMutation>;
+export type PetitionTagListCellContent_untagPetitionMutationHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_untagPetitionMutation
+>;
 export const PetitionTagListCellContent_createTagDocument = gql`
-  mutation PetitionTagListCellContent_createTag(
-    $name: String!
-    $color: String!
-  ) {
+  mutation PetitionTagListCellContent_createTag($name: String!, $color: String!) {
     createTag(name: $name, color: $color) {
       ...PetitionTagListCellContent_Tag
     }
@@ -10138,16 +9516,13 @@ export const TagEditDialog_tagsDocument = gql`
   ${TagEditDialog_TagFragmentDoc}
 `;
 export function useTagEditDialog_tagsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    TagEditDialog_tagsQuery,
-    TagEditDialog_tagsQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<TagEditDialog_tagsQuery, TagEditDialog_tagsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    TagEditDialog_tagsQuery,
-    TagEditDialog_tagsQueryVariables
-  >(TagEditDialog_tagsDocument, options);
+  return Apollo.useQuery<TagEditDialog_tagsQuery, TagEditDialog_tagsQueryVariables>(
+    TagEditDialog_tagsDocument,
+    options
+  );
 }
 export function useTagEditDialog_tagsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -10156,14 +9531,12 @@ export function useTagEditDialog_tagsLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    TagEditDialog_tagsQuery,
-    TagEditDialog_tagsQueryVariables
-  >(TagEditDialog_tagsDocument, options);
+  return Apollo.useLazyQuery<TagEditDialog_tagsQuery, TagEditDialog_tagsQueryVariables>(
+    TagEditDialog_tagsDocument,
+    options
+  );
 }
-export type TagEditDialog_tagsQueryHookResult = ReturnType<
-  typeof useTagEditDialog_tagsQuery
->;
+export type TagEditDialog_tagsQueryHookResult = ReturnType<typeof useTagEditDialog_tagsQuery>;
 export type TagEditDialog_tagsLazyQueryHookResult = ReturnType<
   typeof useTagEditDialog_tagsLazyQuery
 >;
@@ -10223,10 +9596,10 @@ export function useuseSearchUsers_searchUsersQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    useSearchUsers_searchUsersQuery,
-    useSearchUsers_searchUsersQueryVariables
-  >(useSearchUsers_searchUsersDocument, options);
+  return Apollo.useQuery<useSearchUsers_searchUsersQuery, useSearchUsers_searchUsersQueryVariables>(
+    useSearchUsers_searchUsersDocument,
+    options
+  );
 }
 export function useuseSearchUsers_searchUsersLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -10261,16 +9634,13 @@ export const useGetUsersOrGroupsDocument = gql`
   ${UserSelect_UserGroupFragmentDoc}
 `;
 export function useuseGetUsersOrGroupsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    useGetUsersOrGroupsQuery,
-    useGetUsersOrGroupsQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<useGetUsersOrGroupsQuery, useGetUsersOrGroupsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    useGetUsersOrGroupsQuery,
-    useGetUsersOrGroupsQueryVariables
-  >(useGetUsersOrGroupsDocument, options);
+  return Apollo.useQuery<useGetUsersOrGroupsQuery, useGetUsersOrGroupsQueryVariables>(
+    useGetUsersOrGroupsDocument,
+    options
+  );
 }
 export function useuseGetUsersOrGroupsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -10279,14 +9649,12 @@ export function useuseGetUsersOrGroupsLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    useGetUsersOrGroupsQuery,
-    useGetUsersOrGroupsQueryVariables
-  >(useGetUsersOrGroupsDocument, options);
+  return Apollo.useLazyQuery<useGetUsersOrGroupsQuery, useGetUsersOrGroupsQueryVariables>(
+    useGetUsersOrGroupsDocument,
+    options
+  );
 }
-export type useGetUsersOrGroupsQueryHookResult = ReturnType<
-  typeof useuseGetUsersOrGroupsQuery
->;
+export type useGetUsersOrGroupsQueryHookResult = ReturnType<typeof useuseGetUsersOrGroupsQuery>;
 export type useGetUsersOrGroupsLazyQueryHookResult = ReturnType<
   typeof useuseGetUsersOrGroupsLazyQuery
 >;
@@ -10304,10 +9672,10 @@ export function useWithAdminOrganizationRoleQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    WithAdminOrganizationRoleQuery,
-    WithAdminOrganizationRoleQueryVariables
-  >(WithAdminOrganizationRoleDocument, options);
+  return Apollo.useQuery<WithAdminOrganizationRoleQuery, WithAdminOrganizationRoleQueryVariables>(
+    WithAdminOrganizationRoleDocument,
+    options
+  );
 }
 export function useWithAdminOrganizationRoleLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -10336,10 +9704,7 @@ export const HasFeatureFlagDocument = gql`
   }
 `;
 export function useHasFeatureFlagQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    HasFeatureFlagQuery,
-    HasFeatureFlagQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>(
@@ -10348,10 +9713,7 @@ export function useHasFeatureFlagQuery(
   );
 }
 export function useHasFeatureFlagLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    HasFeatureFlagQuery,
-    HasFeatureFlagQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>(
@@ -10359,12 +9721,8 @@ export function useHasFeatureFlagLazyQuery(
     options
   );
 }
-export type HasFeatureFlagQueryHookResult = ReturnType<
-  typeof useHasFeatureFlagQuery
->;
-export type HasFeatureFlagLazyQueryHookResult = ReturnType<
-  typeof useHasFeatureFlagLazyQuery
->;
+export type HasFeatureFlagQueryHookResult = ReturnType<typeof useHasFeatureFlagQuery>;
+export type HasFeatureFlagLazyQueryHookResult = ReturnType<typeof useHasFeatureFlagLazyQuery>;
 export const WithSuperAdminAccessDocument = gql`
   query WithSuperAdminAccess {
     me {
@@ -10379,10 +9737,10 @@ export function useWithSuperAdminAccessQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    WithSuperAdminAccessQuery,
-    WithSuperAdminAccessQueryVariables
-  >(WithSuperAdminAccessDocument, options);
+  return Apollo.useQuery<WithSuperAdminAccessQuery, WithSuperAdminAccessQueryVariables>(
+    WithSuperAdminAccessDocument,
+    options
+  );
 }
 export function useWithSuperAdminAccessLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -10391,14 +9749,12 @@ export function useWithSuperAdminAccessLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    WithSuperAdminAccessQuery,
-    WithSuperAdminAccessQueryVariables
-  >(WithSuperAdminAccessDocument, options);
+  return Apollo.useLazyQuery<WithSuperAdminAccessQuery, WithSuperAdminAccessQueryVariables>(
+    WithSuperAdminAccessDocument,
+    options
+  );
 }
-export type WithSuperAdminAccessQueryHookResult = ReturnType<
-  typeof useWithSuperAdminAccessQuery
->;
+export type WithSuperAdminAccessQueryHookResult = ReturnType<typeof useWithSuperAdminAccessQuery>;
 export type WithSuperAdminAccessLazyQueryHookResult = ReturnType<
   typeof useWithSuperAdminAccessLazyQuery
 >;
@@ -10421,13 +9777,11 @@ export function useImportContactsDialog_bulkCreateContactsMutation(
     ImportContactsDialog_bulkCreateContactsMutationVariables
   >(ImportContactsDialog_bulkCreateContactsDocument, options);
 }
-export type ImportContactsDialog_bulkCreateContactsMutationHookResult =
-  ReturnType<typeof useImportContactsDialog_bulkCreateContactsMutation>;
+export type ImportContactsDialog_bulkCreateContactsMutationHookResult = ReturnType<
+  typeof useImportContactsDialog_bulkCreateContactsMutation
+>;
 export const AppLayout_updateOnboardingStatusDocument = gql`
-  mutation AppLayout_updateOnboardingStatus(
-    $key: OnboardingKey!
-    $status: OnboardingStatus!
-  ) {
+  mutation AppLayout_updateOnboardingStatus($key: OnboardingKey!, $status: OnboardingStatus!) {
     updateOnboardingStatus(key: $key, status: $status) {
       id
       onboardingStatus
@@ -10478,10 +9832,7 @@ export const PetitionHeader_updatePetitionPermissionSubscriptionDocument = gql`
     $petitionId: GID!
     $isSubscribed: Boolean!
   ) {
-    updatePetitionPermissionSubscription(
-      petitionId: $petitionId
-      isSubscribed: $isSubscribed
-    ) {
+    updatePetitionPermissionSubscription(petitionId: $petitionId, isSubscribed: $isSubscribed) {
       id
       myEffectivePermission {
         isSubscribed
@@ -10501,10 +9852,9 @@ export function usePetitionHeader_updatePetitionPermissionSubscriptionMutation(
     PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables
   >(PetitionHeader_updatePetitionPermissionSubscriptionDocument, options);
 }
-export type PetitionHeader_updatePetitionPermissionSubscriptionMutationHookResult =
-  ReturnType<
-    typeof usePetitionHeader_updatePetitionPermissionSubscriptionMutation
-  >;
+export type PetitionHeader_updatePetitionPermissionSubscriptionMutationHookResult = ReturnType<
+  typeof usePetitionHeader_updatePetitionPermissionSubscriptionMutation
+>;
 export const Notifications_UnreadPetitionUserNotificationIdsDocument = gql`
   query Notifications_UnreadPetitionUserNotificationIds {
     me {
@@ -10537,12 +9887,12 @@ export function useNotifications_UnreadPetitionUserNotificationIdsLazyQuery(
     Notifications_UnreadPetitionUserNotificationIdsQueryVariables
   >(Notifications_UnreadPetitionUserNotificationIdsDocument, options);
 }
-export type Notifications_UnreadPetitionUserNotificationIdsQueryHookResult =
-  ReturnType<typeof useNotifications_UnreadPetitionUserNotificationIdsQuery>;
-export type Notifications_UnreadPetitionUserNotificationIdsLazyQueryHookResult =
-  ReturnType<
-    typeof useNotifications_UnreadPetitionUserNotificationIdsLazyQuery
-  >;
+export type Notifications_UnreadPetitionUserNotificationIdsQueryHookResult = ReturnType<
+  typeof useNotifications_UnreadPetitionUserNotificationIdsQuery
+>;
+export type Notifications_UnreadPetitionUserNotificationIdsLazyQueryHookResult = ReturnType<
+  typeof useNotifications_UnreadPetitionUserNotificationIdsLazyQuery
+>;
 export const NotificationsDrawer_PetitionUserNotificationsDocument = gql`
   query NotificationsDrawer_PetitionUserNotifications(
     $limit: Int!
@@ -10586,10 +9936,12 @@ export function useNotificationsDrawer_PetitionUserNotificationsLazyQuery(
     NotificationsDrawer_PetitionUserNotificationsQueryVariables
   >(NotificationsDrawer_PetitionUserNotificationsDocument, options);
 }
-export type NotificationsDrawer_PetitionUserNotificationsQueryHookResult =
-  ReturnType<typeof useNotificationsDrawer_PetitionUserNotificationsQuery>;
-export type NotificationsDrawer_PetitionUserNotificationsLazyQueryHookResult =
-  ReturnType<typeof useNotificationsDrawer_PetitionUserNotificationsLazyQuery>;
+export type NotificationsDrawer_PetitionUserNotificationsQueryHookResult = ReturnType<
+  typeof useNotificationsDrawer_PetitionUserNotificationsQuery
+>;
+export type NotificationsDrawer_PetitionUserNotificationsLazyQueryHookResult = ReturnType<
+  typeof useNotificationsDrawer_PetitionUserNotificationsLazyQuery
+>;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {
     emailIsAvailable(email: $email)
@@ -10660,15 +10012,12 @@ export function useAddPetitionAccessDialog_contactsByEmailLazyQuery(
 export type AddPetitionAccessDialog_contactsByEmailQueryHookResult = ReturnType<
   typeof useAddPetitionAccessDialog_contactsByEmailQuery
 >;
-export type AddPetitionAccessDialog_contactsByEmailLazyQueryHookResult =
-  ReturnType<typeof useAddPetitionAccessDialog_contactsByEmailLazyQuery>;
+export type AddPetitionAccessDialog_contactsByEmailLazyQueryHookResult = ReturnType<
+  typeof useAddPetitionAccessDialog_contactsByEmailLazyQuery
+>;
 export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
-  mutation PetitionSettings_cancelPetitionSignatureRequest(
-    $petitionSignatureRequestId: GID!
-  ) {
-    cancelSignatureRequest(
-      petitionSignatureRequestId: $petitionSignatureRequestId
-    ) {
+  mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {
+    cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
       id
       status
     }
@@ -10686,8 +10035,9 @@ export function usePetitionSettings_cancelPetitionSignatureRequestMutation(
     PetitionSettings_cancelPetitionSignatureRequestMutationVariables
   >(PetitionSettings_cancelPetitionSignatureRequestDocument, options);
 }
-export type PetitionSettings_cancelPetitionSignatureRequestMutationHookResult =
-  ReturnType<typeof usePetitionSettings_cancelPetitionSignatureRequestMutation>;
+export type PetitionSettings_cancelPetitionSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSettings_cancelPetitionSignatureRequestMutation
+>;
 export const PetitionSettings_startPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_startPetitionSignatureRequest($petitionId: GID!) {
     startSignatureRequest(petitionId: $petitionId) {
@@ -10708,8 +10058,9 @@ export function usePetitionSettings_startPetitionSignatureRequestMutation(
     PetitionSettings_startPetitionSignatureRequestMutationVariables
   >(PetitionSettings_startPetitionSignatureRequestDocument, options);
 }
-export type PetitionSettings_startPetitionSignatureRequestMutationHookResult =
-  ReturnType<typeof usePetitionSettings_startPetitionSignatureRequestMutation>;
+export type PetitionSettings_startPetitionSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSettings_startPetitionSignatureRequestMutation
+>;
 export const PetitionSharingModal_addPetitionPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionPermission(
     $petitionIds: [GID!]!
@@ -10746,8 +10097,9 @@ export function usePetitionSharingModal_addPetitionPermissionMutation(
     PetitionSharingModal_addPetitionPermissionMutationVariables
   >(PetitionSharingModal_addPetitionPermissionDocument, options);
 }
-export type PetitionSharingModal_addPetitionPermissionMutationHookResult =
-  ReturnType<typeof usePetitionSharingModal_addPetitionPermissionMutation>;
+export type PetitionSharingModal_addPetitionPermissionMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_addPetitionPermissionMutation
+>;
 export const PetitionSharingModal_removePetitionPermissionDocument = gql`
   mutation PetitionSharingModal_removePetitionPermission(
     $petitionId: GID!
@@ -10776,13 +10128,11 @@ export function usePetitionSharingModal_removePetitionPermissionMutation(
     PetitionSharingModal_removePetitionPermissionMutationVariables
   >(PetitionSharingModal_removePetitionPermissionDocument, options);
 }
-export type PetitionSharingModal_removePetitionPermissionMutationHookResult =
-  ReturnType<typeof usePetitionSharingModal_removePetitionPermissionMutation>;
+export type PetitionSharingModal_removePetitionPermissionMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_removePetitionPermissionMutation
+>;
 export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
-  mutation PetitionSharingModal_transferPetitionOwnership(
-    $petitionId: GID!
-    $userId: GID!
-  ) {
+  mutation PetitionSharingModal_transferPetitionOwnership($petitionId: GID!, $userId: GID!) {
     transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
       ...PetitionSharingModal_Petition
     }
@@ -10801,8 +10151,9 @@ export function usePetitionSharingModal_transferPetitionOwnershipMutation(
     PetitionSharingModal_transferPetitionOwnershipMutationVariables
   >(PetitionSharingModal_transferPetitionOwnershipDocument, options);
 }
-export type PetitionSharingModal_transferPetitionOwnershipMutationHookResult =
-  ReturnType<typeof usePetitionSharingModal_transferPetitionOwnershipMutation>;
+export type PetitionSharingModal_transferPetitionOwnershipMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_transferPetitionOwnershipMutation
+>;
 export const PetitionSharingModal_PetitionsDocument = gql`
   query PetitionSharingModal_Petitions($petitionIds: [GID!]!) {
     petitionsById(ids: $petitionIds) {
@@ -10885,11 +10236,7 @@ export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
     $fieldId: GID!
     $file: Upload!
   ) {
-    uploadDynamicSelectFieldFile(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      file: $file
-    ) {
+    uploadDynamicSelectFieldFile(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
       id
       options
     }
@@ -10907,19 +10254,15 @@ export function useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation(
     DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables
   >(DynamicSelectSettings_uploadDynamicSelectFieldFileDocument, options);
 }
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationHookResult =
-  ReturnType<
-    typeof useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation
-  >;
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationHookResult = ReturnType<
+  typeof useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation
+>;
 export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = gql`
   mutation DynamicSelectSettings_dynamicSelectFieldFileDownloadLink(
     $petitionId: GID!
     $fieldId: GID!
   ) {
-    dynamicSelectFieldFileDownloadLink(
-      petitionId: $petitionId
-      fieldId: $fieldId
-    ) {
+    dynamicSelectFieldFileDownloadLink(petitionId: $petitionId, fieldId: $fieldId) {
       result
       url
     }
@@ -10937,10 +10280,9 @@ export function useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutat
     DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
   >(DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument, options);
 }
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation
-  >;
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationHookResult = ReturnType<
+  typeof useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation
+>;
 export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument = gql`
   mutation PetitionComposeField_createPetitionFieldAttachmentUploadLink(
     $petitionId: GID!
@@ -10973,15 +10315,10 @@ export function usePetitionComposeField_createPetitionFieldAttachmentUploadLinkM
   return Apollo.useMutation<
     PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation,
     PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutationVariables
-  >(
-    PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
-    options
-  );
+  >(PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument, options);
 }
 export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutationHookResult =
-  ReturnType<
-    typeof usePetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation
-  >;
+  ReturnType<typeof usePetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation>;
 export const PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument = gql`
   mutation PetitionComposeField_petitionFieldAttachmentUploadComplete(
     $petitionId: GID!
@@ -11008,15 +10345,10 @@ export function usePetitionComposeField_petitionFieldAttachmentUploadCompleteMut
   return Apollo.useMutation<
     PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation,
     PetitionComposeField_petitionFieldAttachmentUploadCompleteMutationVariables
-  >(
-    PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
-    options
-  );
+  >(PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument, options);
 }
 export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutationHookResult =
-  ReturnType<
-    typeof usePetitionComposeField_petitionFieldAttachmentUploadCompleteMutation
-  >;
+  ReturnType<typeof usePetitionComposeField_petitionFieldAttachmentUploadCompleteMutation>;
 export const PetitionComposeField_removePetitionFieldAttachmentDocument = gql`
   mutation PetitionComposeField_removePetitionFieldAttachment(
     $petitionId: GID!
@@ -11042,10 +10374,9 @@ export function usePetitionComposeField_removePetitionFieldAttachmentMutation(
     PetitionComposeField_removePetitionFieldAttachmentMutationVariables
   >(PetitionComposeField_removePetitionFieldAttachmentDocument, options);
 }
-export type PetitionComposeField_removePetitionFieldAttachmentMutationHookResult =
-  ReturnType<
-    typeof usePetitionComposeField_removePetitionFieldAttachmentMutation
-  >;
+export type PetitionComposeField_removePetitionFieldAttachmentMutationHookResult = ReturnType<
+  typeof usePetitionComposeField_removePetitionFieldAttachmentMutation
+>;
 export const PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PetitionComposeField_petitionFieldAttachmentDownloadLink(
     $petitionId: GID!
@@ -11073,10 +10404,9 @@ export function usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutat
     PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables
   >(PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument, options);
 }
-export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation
-  >;
+export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationHookResult = ReturnType<
+  typeof usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation
+>;
 export const PetitionListTagFilter_tagsDocument = gql`
   query PetitionListTagFilter_tags($search: String) {
     tags(search: $search) {
@@ -11094,10 +10424,10 @@ export function usePetitionListTagFilter_tagsQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    PetitionListTagFilter_tagsQuery,
-    PetitionListTagFilter_tagsQueryVariables
-  >(PetitionListTagFilter_tagsDocument, options);
+  return Apollo.useQuery<PetitionListTagFilter_tagsQuery, PetitionListTagFilter_tagsQueryVariables>(
+    PetitionListTagFilter_tagsDocument,
+    options
+  );
 }
 export function usePetitionListTagFilter_tagsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -11149,10 +10479,12 @@ export function useExportRepliesProgressDialog_PetitionRepliesLazyQuery(
     ExportRepliesProgressDialog_PetitionRepliesQueryVariables
   >(ExportRepliesProgressDialog_PetitionRepliesDocument, options);
 }
-export type ExportRepliesProgressDialog_PetitionRepliesQueryHookResult =
-  ReturnType<typeof useExportRepliesProgressDialog_PetitionRepliesQuery>;
-export type ExportRepliesProgressDialog_PetitionRepliesLazyQueryHookResult =
-  ReturnType<typeof useExportRepliesProgressDialog_PetitionRepliesLazyQuery>;
+export type ExportRepliesProgressDialog_PetitionRepliesQueryHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_PetitionRepliesQuery
+>;
+export type ExportRepliesProgressDialog_PetitionRepliesLazyQueryHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_PetitionRepliesLazyQuery
+>;
 export const ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument = gql`
   mutation ExportRepliesProgressDialog_fileUploadReplyDownloadLink(
     $petitionId: GID!
@@ -11176,10 +10508,9 @@ export function useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutati
     ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables
   >(ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument, options);
 }
-export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation
-  >;
+export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation
+>;
 export const ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument = gql`
   mutation ExportRepliesProgressDialog_signedPetitionDownloadLink(
     $petitionSignatureRequestId: GID!
@@ -11206,10 +10537,9 @@ export function useExportRepliesProgressDialog_signedPetitionDownloadLinkMutatio
     ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables
   >(ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument, options);
 }
-export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation
-  >;
+export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation
+>;
 export const ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument = gql`
   mutation ExportRepliesProgressDialog_updatePetitionFieldReplyMetadata(
     $petitionId: GID!
@@ -11236,15 +10566,10 @@ export function useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataM
   return Apollo.useMutation<
     ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation,
     ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables
-  >(
-    ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument,
-    options
-  );
+  >(ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument, options);
 }
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationHookResult =
-  ReturnType<
-    typeof useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation
-  >;
+  ReturnType<typeof useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation>;
 export const ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument = gql`
   mutation ExportRepliesProgressDialog_updateSignatureRequestMetadata(
     $petitionSignatureRequestId: GID!
@@ -11269,15 +10594,10 @@ export function useExportRepliesProgressDialog_updateSignatureRequestMetadataMut
   return Apollo.useMutation<
     ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation,
     ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables
-  >(
-    ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument,
-    options
-  );
+  >(ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument, options);
 }
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationHookResult =
-  ReturnType<
-    typeof useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation
-  >;
+  ReturnType<typeof useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation>;
 export const PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
     $petitionId: GID!
@@ -11305,19 +10625,15 @@ export function usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutat
     PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables
   >(PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument, options);
 }
-export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation
-  >;
+export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationHookResult = ReturnType<
+  typeof usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation
+>;
 export const PetitionSignaturesCard_updatePetitionSignatureConfigDocument = gql`
   mutation PetitionSignaturesCard_updatePetitionSignatureConfig(
     $petitionId: GID!
     $signatureConfig: SignatureConfigInput
   ) {
-    updatePetition(
-      petitionId: $petitionId
-      data: { signatureConfig: $signatureConfig }
-    ) {
+    updatePetition(petitionId: $petitionId, data: { signatureConfig: $signatureConfig }) {
       ... on Petition {
         ...PetitionSignaturesCard_Petition
       }
@@ -11337,17 +10653,12 @@ export function usePetitionSignaturesCard_updatePetitionSignatureConfigMutation(
     PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables
   >(PetitionSignaturesCard_updatePetitionSignatureConfigDocument, options);
 }
-export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationHookResult =
-  ReturnType<
-    typeof usePetitionSignaturesCard_updatePetitionSignatureConfigMutation
-  >;
+export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_updatePetitionSignatureConfigMutation
+>;
 export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
-  mutation PetitionSignaturesCard_cancelSignatureRequest(
-    $petitionSignatureRequestId: GID!
-  ) {
-    cancelSignatureRequest(
-      petitionSignatureRequestId: $petitionSignatureRequestId
-    ) {
+  mutation PetitionSignaturesCard_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
+    cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
       id
       status
     }
@@ -11365,8 +10676,9 @@ export function usePetitionSignaturesCard_cancelSignatureRequestMutation(
     PetitionSignaturesCard_cancelSignatureRequestMutationVariables
   >(PetitionSignaturesCard_cancelSignatureRequestDocument, options);
 }
-export type PetitionSignaturesCard_cancelSignatureRequestMutationHookResult =
-  ReturnType<typeof usePetitionSignaturesCard_cancelSignatureRequestMutation>;
+export type PetitionSignaturesCard_cancelSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_cancelSignatureRequestMutation
+>;
 export const PetitionSignaturesCard_startSignatureRequestDocument = gql`
   mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!) {
     startSignatureRequest(petitionId: $petitionId) {
@@ -11387,8 +10699,9 @@ export function usePetitionSignaturesCard_startSignatureRequestMutation(
     PetitionSignaturesCard_startSignatureRequestMutationVariables
   >(PetitionSignaturesCard_startSignatureRequestDocument, options);
 }
-export type PetitionSignaturesCard_startSignatureRequestMutationHookResult =
-  ReturnType<typeof usePetitionSignaturesCard_startSignatureRequestMutation>;
+export type PetitionSignaturesCard_startSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_startSignatureRequestMutation
+>;
 export const PetitionSignaturesCard_signedPetitionDownloadLinkDocument = gql`
   mutation PetitionSignaturesCard_signedPetitionDownloadLink(
     $petitionSignatureRequestId: GID!
@@ -11415,10 +10728,9 @@ export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
     PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables
   >(PetitionSignaturesCard_signedPetitionDownloadLinkDocument, options);
 }
-export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
-  >;
+export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
+>;
 export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   mutation RecipientViewHeader_publicDelegateAccessToContact(
     $keycode: ID!
@@ -11457,10 +10769,9 @@ export function useRecipientViewHeader_publicDelegateAccessToContactMutation(
     RecipientViewHeader_publicDelegateAccessToContactMutationVariables
   >(RecipientViewHeader_publicDelegateAccessToContactDocument, options);
 }
-export type RecipientViewHeader_publicDelegateAccessToContactMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewHeader_publicDelegateAccessToContactMutation
-  >;
+export type RecipientViewHeader_publicDelegateAccessToContactMutationHookResult = ReturnType<
+  typeof useRecipientViewHeader_publicDelegateAccessToContactMutation
+>;
 export const RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument = gql`
   mutation RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink(
     $keycode: ID!
@@ -11486,24 +10797,15 @@ export function useRecipientViewPetitionField_publicPetitionFieldAttachmentDownl
   return Apollo.useMutation<
     RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation,
     RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutationVariables
-  >(
-    RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
-    options
-  );
+  >(RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument, options);
 }
 export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutationHookResult =
   ReturnType<
     typeof useRecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation
   >;
 export const RecipientViewPetitionFieldCommentsDocument = gql`
-  query RecipientViewPetitionFieldComments(
-    $keycode: ID!
-    $petitionFieldId: GID!
-  ) {
-    petitionFieldComments(
-      keycode: $keycode
-      petitionFieldId: $petitionFieldId
-    ) {
+  query RecipientViewPetitionFieldComments($keycode: ID!, $petitionFieldId: GID!) {
+    petitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {
       ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
     }
   }
@@ -11563,10 +10865,7 @@ export function useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCom
   return Apollo.useMutation<
     RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation,
     RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationVariables
-  >(
-    RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument, options);
 }
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationHookResult =
   ReturnType<
@@ -11598,15 +10897,10 @@ export function useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldC
   return Apollo.useMutation<
     RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation,
     RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables
-  >(
-    RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument, options);
 }
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation>;
 export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument = gql`
   mutation RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment(
     $keycode: ID!
@@ -11635,15 +10929,10 @@ export function useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldC
   return Apollo.useMutation<
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation,
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables
-  >(
-    RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument, options);
 }
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation>;
 export const RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument = gql`
   mutation RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment(
     $keycode: ID!
@@ -11667,26 +10956,17 @@ export function useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldC
   return Apollo.useMutation<
     RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation,
     RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables
-  >(
-    RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument, options);
 }
 export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation>;
 export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument = gql`
   mutation RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLink(
     $keycode: ID!
     $replyId: GID!
     $preview: Boolean
   ) {
-    publicFileUploadReplyDownloadLink(
-      keycode: $keycode
-      replyId: $replyId
-      preview: $preview
-    ) {
+    publicFileUploadReplyDownloadLink(keycode: $keycode, replyId: $replyId, preview: $preview) {
       result
       url
     }
@@ -11702,10 +10982,7 @@ export function useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDow
   return Apollo.useMutation<
     RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation,
     RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables
-  >(
-    RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument, options);
 }
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationHookResult =
   ReturnType<
@@ -11729,26 +11006,17 @@ export function useRecipientViewPetitionFieldMutations_publicDeletePetitionReply
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
     RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation>;
 export const RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicUpdateSimpleReply(
     $keycode: ID!
     $replyId: GID!
     $value: String!
   ) {
-    publicUpdateSimpleReply(
-      keycode: $keycode
-      replyId: $replyId
-      value: $value
-    ) {
+    publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
       id
       content
       status
@@ -11766,26 +11034,17 @@ export function useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMu
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
     RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation>;
 export const RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateSimpleReply(
     $keycode: ID!
     $fieldId: GID!
     $value: String!
   ) {
-    publicCreateSimpleReply(
-      keycode: $keycode
-      fieldId: $fieldId
-      value: $value
-    ) {
+    publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
   }
@@ -11801,26 +11060,17 @@ export function useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMu
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation,
     RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation>;
 export const RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateCheckboxReply(
     $keycode: ID!
     $fieldId: GID!
     $values: [String!]!
   ) {
-    publicCreateCheckboxReply(
-      keycode: $keycode
-      fieldId: $fieldId
-      values: $values
-    ) {
+    publicCreateCheckboxReply(keycode: $keycode, fieldId: $fieldId, values: $values) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
   }
@@ -11836,26 +11086,17 @@ export function useRecipientViewPetitionFieldMutations_publicCreateCheckboxReply
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation,
     RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation>;
 export const RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicUpdateCheckboxReply(
     $keycode: ID!
     $replyId: GID!
     $values: [String!]!
   ) {
-    publicUpdateCheckboxReply(
-      keycode: $keycode
-      replyId: $replyId
-      values: $values
-    ) {
+    publicUpdateCheckboxReply(keycode: $keycode, replyId: $replyId, values: $values) {
       id
       content
       status
@@ -11873,26 +11114,17 @@ export function useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReply
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation,
     RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation>;
 export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
     $keycode: ID!
     $fieldId: GID!
     $value: [[String]!]!
   ) {
-    publicCreateDynamicSelectReply(
-      keycode: $keycode
-      fieldId: $fieldId
-      value: $value
-    ) {
+    publicCreateDynamicSelectReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
   }
@@ -11908,26 +11140,17 @@ export function useRecipientViewPetitionFieldMutations_publicCreateDynamicSelect
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
     RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation>;
 export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
     $keycode: ID!
     $replyId: GID!
     $value: [[String]!]!
   ) {
-    publicUpdateDynamicSelectReply(
-      keycode: $keycode
-      replyId: $replyId
-      value: $value
-    ) {
+    publicUpdateDynamicSelectReply(keycode: $keycode, replyId: $replyId, value: $value) {
       id
       content
       status
@@ -11945,26 +11168,17 @@ export function useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelect
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
     RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation>;
 export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(
     $keycode: ID!
     $fieldId: GID!
     $data: FileUploadInput!
   ) {
-    publicCreateFileUploadReply(
-      keycode: $keycode
-      fieldId: $fieldId
-      data: $data
-    ) {
+    publicCreateFileUploadReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
       presignedPostData {
         ...uploadFile_AWSPresignedPostData
       }
@@ -11986,15 +11200,10 @@ export function useRecipientViewPetitionFieldMutations_publicCreateFileUploadRep
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation,
     RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation>;
 export const RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicFileUploadReplyComplete(
     $keycode: ID!
@@ -12016,15 +11225,10 @@ export function useRecipientViewPetitionFieldMutations_publicFileUploadReplyComp
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
     RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables
-  >(
-    RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument,
-    options
-  );
+  >(RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument, options);
 }
 export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation
-  >;
+  ReturnType<typeof useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation>;
 export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
   mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {
     generateUserAuthToken(tokenName: $tokenName) {
@@ -12050,8 +11254,9 @@ export function useGenerateNewTokenDialog_generateUserAuthTokenMutation(
     GenerateNewTokenDialog_generateUserAuthTokenMutationVariables
   >(GenerateNewTokenDialog_generateUserAuthTokenDocument, options);
 }
-export type GenerateNewTokenDialog_generateUserAuthTokenMutationHookResult =
-  ReturnType<typeof useGenerateNewTokenDialog_generateUserAuthTokenMutation>;
+export type GenerateNewTokenDialog_generateUserAuthTokenMutationHookResult = ReturnType<
+  typeof useGenerateNewTokenDialog_generateUserAuthTokenMutation
+>;
 export const AdminDocument = gql`
   query Admin {
     me {
@@ -12065,19 +11270,13 @@ export function useAdminQuery(
   baseOptions?: Apollo.QueryHookOptions<AdminQuery, AdminQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<AdminQuery, AdminQueryVariables>(
-    AdminDocument,
-    options
-  );
+  return Apollo.useQuery<AdminQuery, AdminQueryVariables>(AdminDocument, options);
 }
 export function useAdminLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<AdminQuery, AdminQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<AdminQuery, AdminQueryVariables>(
-    AdminDocument,
-    options
-  );
+  return Apollo.useLazyQuery<AdminQuery, AdminQueryVariables>(AdminDocument, options);
 }
 export type AdminQueryHookResult = ReturnType<typeof useAdminQuery>;
 export type AdminLazyQueryHookResult = ReturnType<typeof useAdminLazyQuery>;
@@ -12105,16 +11304,13 @@ export const AdminOrganizationsDocument = gql`
   ${AdminOrganizations_OrganizationFragmentDoc}
 `;
 export function useAdminOrganizationsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    AdminOrganizationsQuery,
-    AdminOrganizationsQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<AdminOrganizationsQuery, AdminOrganizationsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    AdminOrganizationsQuery,
-    AdminOrganizationsQueryVariables
-  >(AdminOrganizationsDocument, options);
+  return Apollo.useQuery<AdminOrganizationsQuery, AdminOrganizationsQueryVariables>(
+    AdminOrganizationsDocument,
+    options
+  );
 }
 export function useAdminOrganizationsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12123,14 +11319,12 @@ export function useAdminOrganizationsLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    AdminOrganizationsQuery,
-    AdminOrganizationsQueryVariables
-  >(AdminOrganizationsDocument, options);
+  return Apollo.useLazyQuery<AdminOrganizationsQuery, AdminOrganizationsQueryVariables>(
+    AdminOrganizationsDocument,
+    options
+  );
 }
-export type AdminOrganizationsQueryHookResult = ReturnType<
-  typeof useAdminOrganizationsQuery
->;
+export type AdminOrganizationsQueryHookResult = ReturnType<typeof useAdminOrganizationsQuery>;
 export type AdminOrganizationsLazyQueryHookResult = ReturnType<
   typeof useAdminOrganizationsLazyQuery
 >;
@@ -12149,10 +11343,10 @@ export function useAdminOrganizationsUserQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    AdminOrganizationsUserQuery,
-    AdminOrganizationsUserQueryVariables
-  >(AdminOrganizationsUserDocument, options);
+  return Apollo.useQuery<AdminOrganizationsUserQuery, AdminOrganizationsUserQueryVariables>(
+    AdminOrganizationsUserDocument,
+    options
+  );
 }
 export function useAdminOrganizationsUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12161,10 +11355,10 @@ export function useAdminOrganizationsUserLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    AdminOrganizationsUserQuery,
-    AdminOrganizationsUserQueryVariables
-  >(AdminOrganizationsUserDocument, options);
+  return Apollo.useLazyQuery<AdminOrganizationsUserQuery, AdminOrganizationsUserQueryVariables>(
+    AdminOrganizationsUserDocument,
+    options
+  );
 }
 export type AdminOrganizationsUserQueryHookResult = ReturnType<
   typeof useAdminOrganizationsUserQuery
@@ -12187,10 +11381,10 @@ export function useAdminSupportMethodsUserQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    AdminSupportMethodsUserQuery,
-    AdminSupportMethodsUserQueryVariables
-  >(AdminSupportMethodsUserDocument, options);
+  return Apollo.useQuery<AdminSupportMethodsUserQuery, AdminSupportMethodsUserQueryVariables>(
+    AdminSupportMethodsUserDocument,
+    options
+  );
 }
 export function useAdminSupportMethodsUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12199,10 +11393,10 @@ export function useAdminSupportMethodsUserLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    AdminSupportMethodsUserQuery,
-    AdminSupportMethodsUserQueryVariables
-  >(AdminSupportMethodsUserDocument, options);
+  return Apollo.useLazyQuery<AdminSupportMethodsUserQuery, AdminSupportMethodsUserQueryVariables>(
+    AdminSupportMethodsUserDocument,
+    options
+  );
 }
 export type AdminSupportMethodsUserQueryHookResult = ReturnType<
   typeof useAdminSupportMethodsUserQuery
@@ -12225,10 +11419,10 @@ export function useContact_updateContactMutation(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    Contact_updateContactMutation,
-    Contact_updateContactMutationVariables
-  >(Contact_updateContactDocument, options);
+  return Apollo.useMutation<Contact_updateContactMutation, Contact_updateContactMutationVariables>(
+    Contact_updateContactDocument,
+    options
+  );
 }
 export type Contact_updateContactMutationHookResult = ReturnType<
   typeof useContact_updateContactMutation
@@ -12242,22 +11436,13 @@ export const ContactUserDocument = gql`
   ${Contact_UserFragmentDoc}
 `;
 export function useContactUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ContactUserQuery,
-    ContactUserQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<ContactUserQuery, ContactUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ContactUserQuery, ContactUserQueryVariables>(
-    ContactUserDocument,
-    options
-  );
+  return Apollo.useQuery<ContactUserQuery, ContactUserQueryVariables>(ContactUserDocument, options);
 }
 export function useContactUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ContactUserQuery,
-    ContactUserQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<ContactUserQuery, ContactUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<ContactUserQuery, ContactUserQueryVariables>(
@@ -12266,9 +11451,7 @@ export function useContactUserLazyQuery(
   );
 }
 export type ContactUserQueryHookResult = ReturnType<typeof useContactUserQuery>;
-export type ContactUserLazyQueryHookResult = ReturnType<
-  typeof useContactUserLazyQuery
->;
+export type ContactUserLazyQueryHookResult = ReturnType<typeof useContactUserLazyQuery>;
 export const ContactDocument = gql`
   query Contact($id: GID!, $hasPetitionSignature: Boolean!) {
     contact(id: $id) {
@@ -12281,19 +11464,13 @@ export function useContactQuery(
   baseOptions: Apollo.QueryHookOptions<ContactQuery, ContactQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ContactQuery, ContactQueryVariables>(
-    ContactDocument,
-    options
-  );
+  return Apollo.useQuery<ContactQuery, ContactQueryVariables>(ContactDocument, options);
 }
 export function useContactLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<ContactQuery, ContactQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ContactQuery, ContactQueryVariables>(
-    ContactDocument,
-    options
-  );
+  return Apollo.useLazyQuery<ContactQuery, ContactQueryVariables>(ContactDocument, options);
 }
 export type ContactQueryHookResult = ReturnType<typeof useContactQuery>;
 export type ContactLazyQueryHookResult = ReturnType<typeof useContactLazyQuery>;
@@ -12318,12 +11495,7 @@ export type Contacts_deleteContactsMutationHookResult = ReturnType<
   typeof useContacts_deleteContactsMutation
 >;
 export const ContactsDocument = gql`
-  query Contacts(
-    $offset: Int!
-    $limit: Int!
-    $search: String
-    $sortBy: [QueryContacts_OrderBy!]
-  ) {
+  query Contacts($offset: Int!, $limit: Int!, $search: String, $sortBy: [QueryContacts_OrderBy!]) {
     contacts(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
       ...Contacts_ContactsList
     }
@@ -12334,27 +11506,16 @@ export function useContactsQuery(
   baseOptions: Apollo.QueryHookOptions<ContactsQuery, ContactsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ContactsQuery, ContactsQueryVariables>(
-    ContactsDocument,
-    options
-  );
+  return Apollo.useQuery<ContactsQuery, ContactsQueryVariables>(ContactsDocument, options);
 }
 export function useContactsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ContactsQuery,
-    ContactsQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<ContactsQuery, ContactsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ContactsQuery, ContactsQueryVariables>(
-    ContactsDocument,
-    options
-  );
+  return Apollo.useLazyQuery<ContactsQuery, ContactsQueryVariables>(ContactsDocument, options);
 }
 export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
-export type ContactsLazyQueryHookResult = ReturnType<
-  typeof useContactsLazyQuery
->;
+export type ContactsLazyQueryHookResult = ReturnType<typeof useContactsLazyQuery>;
 export const ContactsUserDocument = gql`
   query ContactsUser {
     me {
@@ -12364,10 +11525,7 @@ export const ContactsUserDocument = gql`
   ${Contacts_UserFragmentDoc}
 `;
 export function useContactsUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ContactsUserQuery,
-    ContactsUserQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<ContactsUserQuery, ContactsUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<ContactsUserQuery, ContactsUserQueryVariables>(
@@ -12376,10 +11534,7 @@ export function useContactsUserQuery(
   );
 }
 export function useContactsUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ContactsUserQuery,
-    ContactsUserQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<ContactsUserQuery, ContactsUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<ContactsUserQuery, ContactsUserQueryVariables>(
@@ -12387,12 +11542,8 @@ export function useContactsUserLazyQuery(
     options
   );
 }
-export type ContactsUserQueryHookResult = ReturnType<
-  typeof useContactsUserQuery
->;
-export type ContactsUserLazyQueryHookResult = ReturnType<
-  typeof useContactsUserLazyQuery
->;
+export type ContactsUserQueryHookResult = ReturnType<typeof useContactsUserQuery>;
+export type ContactsUserLazyQueryHookResult = ReturnType<typeof useContactsUserLazyQuery>;
 export const OrganizationBranding_updateOrgLogoDocument = gql`
   mutation OrganizationBranding_updateOrgLogo($orgId: GID!, $file: Upload!) {
     updateOrganizationLogo(orgId: $orgId, file: $file) {
@@ -12436,10 +11587,10 @@ export function useOrganizationBrandingQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    OrganizationBrandingQuery,
-    OrganizationBrandingQueryVariables
-  >(OrganizationBrandingDocument, options);
+  return Apollo.useQuery<OrganizationBrandingQuery, OrganizationBrandingQueryVariables>(
+    OrganizationBrandingDocument,
+    options
+  );
 }
 export function useOrganizationBrandingLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12448,22 +11599,17 @@ export function useOrganizationBrandingLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    OrganizationBrandingQuery,
-    OrganizationBrandingQueryVariables
-  >(OrganizationBrandingDocument, options);
+  return Apollo.useLazyQuery<OrganizationBrandingQuery, OrganizationBrandingQueryVariables>(
+    OrganizationBrandingDocument,
+    options
+  );
 }
-export type OrganizationBrandingQueryHookResult = ReturnType<
-  typeof useOrganizationBrandingQuery
->;
+export type OrganizationBrandingQueryHookResult = ReturnType<typeof useOrganizationBrandingQuery>;
 export type OrganizationBrandingLazyQueryHookResult = ReturnType<
   typeof useOrganizationBrandingLazyQuery
 >;
 export const OrganizationGroup_updateUserGroupDocument = gql`
-  mutation OrganizationGroup_updateUserGroup(
-    $id: GID!
-    $data: UpdateUserGroupInput!
-  ) {
+  mutation OrganizationGroup_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
     updateUserGroup(id: $id, data: $data) {
       ...OrganizationGroup_UserGroup
     }
@@ -12486,10 +11632,7 @@ export type OrganizationGroup_updateUserGroupMutationHookResult = ReturnType<
   typeof useOrganizationGroup_updateUserGroupMutation
 >;
 export const OrganizationGroup_addUsersToUserGroupDocument = gql`
-  mutation OrganizationGroup_addUsersToUserGroup(
-    $userGroupId: GID!
-    $userIds: [GID!]!
-  ) {
+  mutation OrganizationGroup_addUsersToUserGroup($userGroupId: GID!, $userIds: [GID!]!) {
     addUsersToUserGroup(userGroupId: $userGroupId, userIds: $userIds) {
       ...OrganizationGroup_UserGroup
     }
@@ -12508,13 +11651,11 @@ export function useOrganizationGroup_addUsersToUserGroupMutation(
     OrganizationGroup_addUsersToUserGroupMutationVariables
   >(OrganizationGroup_addUsersToUserGroupDocument, options);
 }
-export type OrganizationGroup_addUsersToUserGroupMutationHookResult =
-  ReturnType<typeof useOrganizationGroup_addUsersToUserGroupMutation>;
+export type OrganizationGroup_addUsersToUserGroupMutationHookResult = ReturnType<
+  typeof useOrganizationGroup_addUsersToUserGroupMutation
+>;
 export const OrganizationGroup_removeUsersFromGroupDocument = gql`
-  mutation OrganizationGroup_removeUsersFromGroup(
-    $userGroupId: GID!
-    $userIds: [GID!]!
-  ) {
+  mutation OrganizationGroup_removeUsersFromGroup($userGroupId: GID!, $userIds: [GID!]!) {
     removeUsersFromGroup(userGroupId: $userGroupId, userIds: $userIds) {
       ...OrganizationGroup_UserGroup
     }
@@ -12533,8 +11674,9 @@ export function useOrganizationGroup_removeUsersFromGroupMutation(
     OrganizationGroup_removeUsersFromGroupMutationVariables
   >(OrganizationGroup_removeUsersFromGroupDocument, options);
 }
-export type OrganizationGroup_removeUsersFromGroupMutationHookResult =
-  ReturnType<typeof useOrganizationGroup_removeUsersFromGroupMutation>;
+export type OrganizationGroup_removeUsersFromGroupMutationHookResult = ReturnType<
+  typeof useOrganizationGroup_removeUsersFromGroupMutation
+>;
 export const OrganizationGroup_deleteUserGroupDocument = gql`
   mutation OrganizationGroup_deleteUserGroup($ids: [GID!]!) {
     deleteUserGroup(ids: $ids)
@@ -12587,35 +11729,25 @@ export const OrganizationGroupDocument = gql`
   ${OrganizationGroup_UserGroupFragmentDoc}
 `;
 export function useOrganizationGroupQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    OrganizationGroupQuery,
-    OrganizationGroupQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<OrganizationGroupQuery, OrganizationGroupQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    OrganizationGroupQuery,
-    OrganizationGroupQueryVariables
-  >(OrganizationGroupDocument, options);
+  return Apollo.useQuery<OrganizationGroupQuery, OrganizationGroupQueryVariables>(
+    OrganizationGroupDocument,
+    options
+  );
 }
 export function useOrganizationGroupLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    OrganizationGroupQuery,
-    OrganizationGroupQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<OrganizationGroupQuery, OrganizationGroupQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    OrganizationGroupQuery,
-    OrganizationGroupQueryVariables
-  >(OrganizationGroupDocument, options);
+  return Apollo.useLazyQuery<OrganizationGroupQuery, OrganizationGroupQueryVariables>(
+    OrganizationGroupDocument,
+    options
+  );
 }
-export type OrganizationGroupQueryHookResult = ReturnType<
-  typeof useOrganizationGroupQuery
->;
-export type OrganizationGroupLazyQueryHookResult = ReturnType<
-  typeof useOrganizationGroupLazyQuery
->;
+export type OrganizationGroupQueryHookResult = ReturnType<typeof useOrganizationGroupQuery>;
+export type OrganizationGroupLazyQueryHookResult = ReturnType<typeof useOrganizationGroupLazyQuery>;
 export const OrganizationGroupUserDocument = gql`
   query OrganizationGroupUser {
     me {
@@ -12633,10 +11765,10 @@ export function useOrganizationGroupUserQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    OrganizationGroupUserQuery,
-    OrganizationGroupUserQueryVariables
-  >(OrganizationGroupUserDocument, options);
+  return Apollo.useQuery<OrganizationGroupUserQuery, OrganizationGroupUserQueryVariables>(
+    OrganizationGroupUserDocument,
+    options
+  );
 }
 export function useOrganizationGroupUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12645,22 +11777,17 @@ export function useOrganizationGroupUserLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    OrganizationGroupUserQuery,
-    OrganizationGroupUserQueryVariables
-  >(OrganizationGroupUserDocument, options);
+  return Apollo.useLazyQuery<OrganizationGroupUserQuery, OrganizationGroupUserQueryVariables>(
+    OrganizationGroupUserDocument,
+    options
+  );
 }
-export type OrganizationGroupUserQueryHookResult = ReturnType<
-  typeof useOrganizationGroupUserQuery
->;
+export type OrganizationGroupUserQueryHookResult = ReturnType<typeof useOrganizationGroupUserQuery>;
 export type OrganizationGroupUserLazyQueryHookResult = ReturnType<
   typeof useOrganizationGroupUserLazyQuery
 >;
 export const OrganizationGroups_createUserGroupDocument = gql`
-  mutation OrganizationGroups_createUserGroup(
-    $name: String!
-    $userIds: [GID!]!
-  ) {
+  mutation OrganizationGroups_createUserGroup($name: String!, $userIds: [GID!]!) {
     createUserGroup(name: $name, userIds: $userIds) {
       ...OrganizationGroups_UserGroup
     }
@@ -12732,28 +11859,20 @@ export const OrganizationGroupsDocument = gql`
     $search: String
     $sortBy: [QueryUserGroups_OrderBy!]
   ) {
-    userGroups(
-      offset: $offset
-      limit: $limit
-      search: $search
-      sortBy: $sortBy
-    ) {
+    userGroups(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
       ...OrganizationGroups_UserGroupPagination
     }
   }
   ${OrganizationGroups_UserGroupPaginationFragmentDoc}
 `;
 export function useOrganizationGroupsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    OrganizationGroupsQuery,
-    OrganizationGroupsQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<OrganizationGroupsQuery, OrganizationGroupsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    OrganizationGroupsQuery,
-    OrganizationGroupsQueryVariables
-  >(OrganizationGroupsDocument, options);
+  return Apollo.useQuery<OrganizationGroupsQuery, OrganizationGroupsQueryVariables>(
+    OrganizationGroupsDocument,
+    options
+  );
 }
 export function useOrganizationGroupsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12762,14 +11881,12 @@ export function useOrganizationGroupsLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    OrganizationGroupsQuery,
-    OrganizationGroupsQueryVariables
-  >(OrganizationGroupsDocument, options);
+  return Apollo.useLazyQuery<OrganizationGroupsQuery, OrganizationGroupsQueryVariables>(
+    OrganizationGroupsDocument,
+    options
+  );
 }
-export type OrganizationGroupsQueryHookResult = ReturnType<
-  typeof useOrganizationGroupsQuery
->;
+export type OrganizationGroupsQueryHookResult = ReturnType<typeof useOrganizationGroupsQuery>;
 export type OrganizationGroupsLazyQueryHookResult = ReturnType<
   typeof useOrganizationGroupsLazyQuery
 >;
@@ -12790,10 +11907,10 @@ export function useOrganizationGroupsUserQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    OrganizationGroupsUserQuery,
-    OrganizationGroupsUserQueryVariables
-  >(OrganizationGroupsUserDocument, options);
+  return Apollo.useQuery<OrganizationGroupsUserQuery, OrganizationGroupsUserQueryVariables>(
+    OrganizationGroupsUserDocument,
+    options
+  );
 }
 export function useOrganizationGroupsUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12802,10 +11919,10 @@ export function useOrganizationGroupsUserLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    OrganizationGroupsUserQuery,
-    OrganizationGroupsUserQueryVariables
-  >(OrganizationGroupsUserDocument, options);
+  return Apollo.useLazyQuery<OrganizationGroupsUserQuery, OrganizationGroupsUserQueryVariables>(
+    OrganizationGroupsUserDocument,
+    options
+  );
 }
 export type OrganizationGroupsUserQueryHookResult = ReturnType<
   typeof useOrganizationGroupsUserQuery
@@ -12829,10 +11946,10 @@ export function useOrganizationSettingsQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    OrganizationSettingsQuery,
-    OrganizationSettingsQueryVariables
-  >(OrganizationSettingsDocument, options);
+  return Apollo.useQuery<OrganizationSettingsQuery, OrganizationSettingsQueryVariables>(
+    OrganizationSettingsDocument,
+    options
+  );
 }
 export function useOrganizationSettingsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12841,14 +11958,12 @@ export function useOrganizationSettingsLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    OrganizationSettingsQuery,
-    OrganizationSettingsQueryVariables
-  >(OrganizationSettingsDocument, options);
+  return Apollo.useLazyQuery<OrganizationSettingsQuery, OrganizationSettingsQueryVariables>(
+    OrganizationSettingsDocument,
+    options
+  );
 }
-export type OrganizationSettingsQueryHookResult = ReturnType<
-  typeof useOrganizationSettingsQuery
->;
+export type OrganizationSettingsQueryHookResult = ReturnType<typeof useOrganizationSettingsQuery>;
 export type OrganizationSettingsLazyQueryHookResult = ReturnType<
   typeof useOrganizationSettingsLazyQuery
 >;
@@ -12859,12 +11974,7 @@ export const OrganizationUsers_createOrganizationUserDocument = gql`
     $email: String!
     $role: OrganizationRole!
   ) {
-    createOrganizationUser(
-      email: $email
-      firstName: $firstName
-      lastName: $lastName
-      role: $role
-    ) {
+    createOrganizationUser(email: $email, firstName: $firstName, lastName: $lastName, role: $role) {
       ...OrganizationUsers_User
     }
   }
@@ -12882,13 +11992,11 @@ export function useOrganizationUsers_createOrganizationUserMutation(
     OrganizationUsers_createOrganizationUserMutationVariables
   >(OrganizationUsers_createOrganizationUserDocument, options);
 }
-export type OrganizationUsers_createOrganizationUserMutationHookResult =
-  ReturnType<typeof useOrganizationUsers_createOrganizationUserMutation>;
+export type OrganizationUsers_createOrganizationUserMutationHookResult = ReturnType<
+  typeof useOrganizationUsers_createOrganizationUserMutation
+>;
 export const OrganizationUsers_updateOrganizationUserDocument = gql`
-  mutation OrganizationUsers_updateOrganizationUser(
-    $userId: GID!
-    $role: OrganizationRole!
-  ) {
+  mutation OrganizationUsers_updateOrganizationUser($userId: GID!, $role: OrganizationRole!) {
     updateOrganizationUser(userId: $userId, role: $role) {
       ...OrganizationUsers_User
     }
@@ -12907,19 +12015,16 @@ export function useOrganizationUsers_updateOrganizationUserMutation(
     OrganizationUsers_updateOrganizationUserMutationVariables
   >(OrganizationUsers_updateOrganizationUserDocument, options);
 }
-export type OrganizationUsers_updateOrganizationUserMutationHookResult =
-  ReturnType<typeof useOrganizationUsers_updateOrganizationUserMutation>;
+export type OrganizationUsers_updateOrganizationUserMutationHookResult = ReturnType<
+  typeof useOrganizationUsers_updateOrganizationUserMutation
+>;
 export const OrganizationUsers_updateUserStatusDocument = gql`
   mutation OrganizationUsers_updateUserStatus(
     $userIds: [GID!]!
     $newStatus: UserStatus!
     $transferToUserId: GID
   ) {
-    updateUserStatus(
-      userIds: $userIds
-      status: $newStatus
-      transferToUserId: $transferToUserId
-    ) {
+    updateUserStatus(userIds: $userIds, status: $newStatus, transferToUserId: $transferToUserId) {
       id
       status
     }
@@ -12973,40 +12078,27 @@ export const OrganizationUsersDocument = gql`
   ${OrganizationUsersListTableHeader_UserFragmentDoc}
 `;
 export function useOrganizationUsersQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    OrganizationUsersQuery,
-    OrganizationUsersQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<OrganizationUsersQuery, OrganizationUsersQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    OrganizationUsersQuery,
-    OrganizationUsersQueryVariables
-  >(OrganizationUsersDocument, options);
+  return Apollo.useQuery<OrganizationUsersQuery, OrganizationUsersQueryVariables>(
+    OrganizationUsersDocument,
+    options
+  );
 }
 export function useOrganizationUsersLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    OrganizationUsersQuery,
-    OrganizationUsersQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<OrganizationUsersQuery, OrganizationUsersQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    OrganizationUsersQuery,
-    OrganizationUsersQueryVariables
-  >(OrganizationUsersDocument, options);
+  return Apollo.useLazyQuery<OrganizationUsersQuery, OrganizationUsersQueryVariables>(
+    OrganizationUsersDocument,
+    options
+  );
 }
-export type OrganizationUsersQueryHookResult = ReturnType<
-  typeof useOrganizationUsersQuery
->;
-export type OrganizationUsersLazyQueryHookResult = ReturnType<
-  typeof useOrganizationUsersLazyQuery
->;
+export type OrganizationUsersQueryHookResult = ReturnType<typeof useOrganizationUsersQuery>;
+export type OrganizationUsersLazyQueryHookResult = ReturnType<typeof useOrganizationUsersLazyQuery>;
 export const PetitionActivity_updatePetitionDocument = gql`
-  mutation PetitionActivity_updatePetition(
-    $petitionId: GID!
-    $data: UpdatePetitionInput!
-  ) {
+  mutation PetitionActivity_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...PetitionActivity_Petition
     }
@@ -13029,11 +12121,7 @@ export type PetitionActivity_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionActivity_updatePetitionMutation
 >;
 export const PetitionActivity_sendRemindersDocument = gql`
-  mutation PetitionActivity_sendReminders(
-    $petitionId: GID!
-    $accessIds: [GID!]!
-    $body: JSON
-  ) {
+  mutation PetitionActivity_sendReminders($petitionId: GID!, $accessIds: [GID!]!, $body: JSON) {
     sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body)
   }
 `;
@@ -13053,10 +12141,7 @@ export type PetitionActivity_sendRemindersMutationHookResult = ReturnType<
   typeof usePetitionActivity_sendRemindersMutation
 >;
 export const PetitionActivity_deactivateAccessesDocument = gql`
-  mutation PetitionActivity_deactivateAccesses(
-    $petitionId: GID!
-    $accessIds: [GID!]!
-  ) {
+  mutation PetitionActivity_deactivateAccesses($petitionId: GID!, $accessIds: [GID!]!) {
     deactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
       id
       status
@@ -13079,10 +12164,7 @@ export type PetitionActivity_deactivateAccessesMutationHookResult = ReturnType<
   typeof usePetitionActivity_deactivateAccessesMutation
 >;
 export const PetitionActivity_reactivateAccessesDocument = gql`
-  mutation PetitionActivity_reactivateAccesses(
-    $petitionId: GID!
-    $accessIds: [GID!]!
-  ) {
+  mutation PetitionActivity_reactivateAccesses($petitionId: GID!, $accessIds: [GID!]!) {
     reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
       id
       status
@@ -13105,10 +12187,7 @@ export type PetitionActivity_reactivateAccessesMutationHookResult = ReturnType<
   typeof usePetitionActivity_reactivateAccessesMutation
 >;
 export const PetitionActivity_cancelScheduledMessageDocument = gql`
-  mutation PetitionActivity_cancelScheduledMessage(
-    $petitionId: GID!
-    $messageId: GID!
-  ) {
+  mutation PetitionActivity_cancelScheduledMessage($petitionId: GID!, $messageId: GID!) {
     cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
       id
       status
@@ -13127,8 +12206,9 @@ export function usePetitionActivity_cancelScheduledMessageMutation(
     PetitionActivity_cancelScheduledMessageMutationVariables
   >(PetitionActivity_cancelScheduledMessageDocument, options);
 }
-export type PetitionActivity_cancelScheduledMessageMutationHookResult =
-  ReturnType<typeof usePetitionActivity_cancelScheduledMessageMutation>;
+export type PetitionActivity_cancelScheduledMessageMutationHookResult = ReturnType<
+  typeof usePetitionActivity_cancelScheduledMessageMutation
+>;
 export const PetitionsActivity_sendPetitionDocument = gql`
   mutation PetitionsActivity_sendPetition(
     $petitionId: GID!
@@ -13194,8 +12274,9 @@ export function usePetitionActivity_switchAutomaticRemindersMutation(
     PetitionActivity_switchAutomaticRemindersMutationVariables
   >(PetitionActivity_switchAutomaticRemindersDocument, options);
 }
-export type PetitionActivity_switchAutomaticRemindersMutationHookResult =
-  ReturnType<typeof usePetitionActivity_switchAutomaticRemindersMutation>;
+export type PetitionActivity_switchAutomaticRemindersMutationHookResult = ReturnType<
+  typeof usePetitionActivity_switchAutomaticRemindersMutation
+>;
 export const PetitionActivityDocument = gql`
   query PetitionActivity($id: GID!) {
     petition(id: $id) {
@@ -13205,10 +12286,7 @@ export const PetitionActivityDocument = gql`
   ${PetitionActivity_PetitionFragmentDoc}
 `;
 export function usePetitionActivityQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PetitionActivityQuery,
-    PetitionActivityQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<PetitionActivityQuery, PetitionActivityQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
@@ -13217,23 +12295,16 @@ export function usePetitionActivityQuery(
   );
 }
 export function usePetitionActivityLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionActivityQuery,
-    PetitionActivityQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PetitionActivityQuery, PetitionActivityQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PetitionActivityQuery,
-    PetitionActivityQueryVariables
-  >(PetitionActivityDocument, options);
+  return Apollo.useLazyQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
+    PetitionActivityDocument,
+    options
+  );
 }
-export type PetitionActivityQueryHookResult = ReturnType<
-  typeof usePetitionActivityQuery
->;
-export type PetitionActivityLazyQueryHookResult = ReturnType<
-  typeof usePetitionActivityLazyQuery
->;
+export type PetitionActivityQueryHookResult = ReturnType<typeof usePetitionActivityQuery>;
+export type PetitionActivityLazyQueryHookResult = ReturnType<typeof usePetitionActivityLazyQuery>;
 export const PetitionActivityUserDocument = gql`
   query PetitionActivityUser {
     me {
@@ -13249,10 +12320,10 @@ export function usePetitionActivityUserQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    PetitionActivityUserQuery,
-    PetitionActivityUserQueryVariables
-  >(PetitionActivityUserDocument, options);
+  return Apollo.useQuery<PetitionActivityUserQuery, PetitionActivityUserQueryVariables>(
+    PetitionActivityUserDocument,
+    options
+  );
 }
 export function usePetitionActivityUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -13261,14 +12332,12 @@ export function usePetitionActivityUserLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PetitionActivityUserQuery,
-    PetitionActivityUserQueryVariables
-  >(PetitionActivityUserDocument, options);
+  return Apollo.useLazyQuery<PetitionActivityUserQuery, PetitionActivityUserQueryVariables>(
+    PetitionActivityUserDocument,
+    options
+  );
 }
-export type PetitionActivityUserQueryHookResult = ReturnType<
-  typeof usePetitionActivityUserQuery
->;
+export type PetitionActivityUserQueryHookResult = ReturnType<typeof usePetitionActivityUserQuery>;
 export type PetitionActivityUserLazyQueryHookResult = ReturnType<
   typeof usePetitionActivityUserLazyQuery
 >;
@@ -13306,10 +12375,7 @@ export type PetitionCompose_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionCompose_updatePetitionMutation
 >;
 export const PetitionCompose_updateFieldPositionsDocument = gql`
-  mutation PetitionCompose_updateFieldPositions(
-    $petitionId: GID!
-    $fieldIds: [GID!]!
-  ) {
+  mutation PetitionCompose_updateFieldPositions($petitionId: GID!, $fieldIds: [GID!]!) {
     updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
       id
       ...PetitionLayout_PetitionBase
@@ -13341,11 +12407,7 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
     $type: PetitionFieldType!
     $position: Int
   ) {
-    createPetitionField(
-      petitionId: $petitionId
-      type: $type
-      position: $position
-    ) {
+    createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
       field {
         id
         ...PetitionCompose_PetitionField
@@ -13377,10 +12439,7 @@ export type PetitionCompose_createPetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_createPetitionFieldMutation
 >;
 export const PetitionCompose_clonePetitionFieldDocument = gql`
-  mutation PetitionCompose_clonePetitionField(
-    $petitionId: GID!
-    $fieldId: GID!
-  ) {
+  mutation PetitionCompose_clonePetitionField($petitionId: GID!, $fieldId: GID!) {
     clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
       field {
         id
@@ -13413,16 +12472,8 @@ export type PetitionCompose_clonePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_clonePetitionFieldMutation
 >;
 export const PetitionCompose_deletePetitionFieldDocument = gql`
-  mutation PetitionCompose_deletePetitionField(
-    $petitionId: GID!
-    $fieldId: GID!
-    $force: Boolean
-  ) {
-    deletePetitionField(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      force: $force
-    ) {
+  mutation PetitionCompose_deletePetitionField($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
+    deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
       id
       ...PetitionLayout_PetitionBase
       fields {
@@ -13453,11 +12504,7 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
     $fieldId: GID!
     $data: UpdatePetitionFieldInput!
   ) {
-    updatePetitionField(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      data: $data
-    ) {
+    updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
       field {
         id
         ...PetitionCompose_PetitionField
@@ -13528,8 +12575,9 @@ export function usePetitionCompose_changePetitionFieldTypeMutation(
     PetitionCompose_changePetitionFieldTypeMutationVariables
   >(PetitionCompose_changePetitionFieldTypeDocument, options);
 }
-export type PetitionCompose_changePetitionFieldTypeMutationHookResult =
-  ReturnType<typeof usePetitionCompose_changePetitionFieldTypeMutation>;
+export type PetitionCompose_changePetitionFieldTypeMutationHookResult = ReturnType<
+  typeof usePetitionCompose_changePetitionFieldTypeMutation
+>;
 export const PetitionCompose_batchSendPetitionDocument = gql`
   mutation PetitionCompose_batchSendPetition(
     $petitionId: GID!
@@ -13581,16 +12629,13 @@ export const PetitionComposeUserDocument = gql`
   ${PetitionCompose_UserFragmentDoc}
 `;
 export function usePetitionComposeUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    PetitionComposeUserQuery,
-    PetitionComposeUserQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<PetitionComposeUserQuery, PetitionComposeUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    PetitionComposeUserQuery,
-    PetitionComposeUserQueryVariables
-  >(PetitionComposeUserDocument, options);
+  return Apollo.useQuery<PetitionComposeUserQuery, PetitionComposeUserQueryVariables>(
+    PetitionComposeUserDocument,
+    options
+  );
 }
 export function usePetitionComposeUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -13599,14 +12644,12 @@ export function usePetitionComposeUserLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PetitionComposeUserQuery,
-    PetitionComposeUserQueryVariables
-  >(PetitionComposeUserDocument, options);
+  return Apollo.useLazyQuery<PetitionComposeUserQuery, PetitionComposeUserQueryVariables>(
+    PetitionComposeUserDocument,
+    options
+  );
 }
-export type PetitionComposeUserQueryHookResult = ReturnType<
-  typeof usePetitionComposeUserQuery
->;
+export type PetitionComposeUserQueryHookResult = ReturnType<typeof usePetitionComposeUserQuery>;
 export type PetitionComposeUserLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeUserLazyQuery
 >;
@@ -13619,10 +12662,7 @@ export const PetitionComposeDocument = gql`
   ${PetitionCompose_PetitionBaseFragmentDoc}
 `;
 export function usePetitionComposeQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PetitionComposeQuery,
-    PetitionComposeQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<PetitionComposeQuery, PetitionComposeQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
@@ -13631,23 +12671,16 @@ export function usePetitionComposeQuery(
   );
 }
 export function usePetitionComposeLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionComposeQuery,
-    PetitionComposeQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PetitionComposeQuery, PetitionComposeQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PetitionComposeQuery,
-    PetitionComposeQueryVariables
-  >(PetitionComposeDocument, options);
+  return Apollo.useLazyQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
+    PetitionComposeDocument,
+    options
+  );
 }
-export type PetitionComposeQueryHookResult = ReturnType<
-  typeof usePetitionComposeQuery
->;
-export type PetitionComposeLazyQueryHookResult = ReturnType<
-  typeof usePetitionComposeLazyQuery
->;
+export type PetitionComposeQueryHookResult = ReturnType<typeof usePetitionComposeQuery>;
+export type PetitionComposeLazyQueryHookResult = ReturnType<typeof usePetitionComposeLazyQuery>;
 export const PetitionDocument = gql`
   query Petition($id: GID!) {
     petition(id: $id) {
@@ -13662,32 +12695,18 @@ export function usePetitionQuery(
   baseOptions: Apollo.QueryHookOptions<PetitionQuery, PetitionQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<PetitionQuery, PetitionQueryVariables>(
-    PetitionDocument,
-    options
-  );
+  return Apollo.useQuery<PetitionQuery, PetitionQueryVariables>(PetitionDocument, options);
 }
 export function usePetitionLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionQuery,
-    PetitionQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PetitionQuery, PetitionQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<PetitionQuery, PetitionQueryVariables>(
-    PetitionDocument,
-    options
-  );
+  return Apollo.useLazyQuery<PetitionQuery, PetitionQueryVariables>(PetitionDocument, options);
 }
 export type PetitionQueryHookResult = ReturnType<typeof usePetitionQuery>;
-export type PetitionLazyQueryHookResult = ReturnType<
-  typeof usePetitionLazyQuery
->;
+export type PetitionLazyQueryHookResult = ReturnType<typeof usePetitionLazyQuery>;
 export const PetitionReplies_updatePetitionDocument = gql`
-  mutation PetitionReplies_updatePetition(
-    $petitionId: GID!
-    $data: UpdatePetitionInput!
-  ) {
+  mutation PetitionReplies_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...PetitionLayout_PetitionBase
     }
@@ -13749,19 +12768,16 @@ export function usePetitionReplies_validatePetitionFieldsMutation(
     PetitionReplies_validatePetitionFieldsMutationVariables
   >(PetitionReplies_validatePetitionFieldsDocument, options);
 }
-export type PetitionReplies_validatePetitionFieldsMutationHookResult =
-  ReturnType<typeof usePetitionReplies_validatePetitionFieldsMutation>;
+export type PetitionReplies_validatePetitionFieldsMutationHookResult = ReturnType<
+  typeof usePetitionReplies_validatePetitionFieldsMutation
+>;
 export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
   mutation PetitionReplies_fileUploadReplyDownloadLink(
     $petitionId: GID!
     $replyId: GID!
     $preview: Boolean
   ) {
-    fileUploadReplyDownloadLink(
-      petitionId: $petitionId
-      replyId: $replyId
-      preview: $preview
-    ) {
+    fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId, preview: $preview) {
       result
       url
     }
@@ -13779,8 +12795,9 @@ export function usePetitionReplies_fileUploadReplyDownloadLinkMutation(
     PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
   >(PetitionReplies_fileUploadReplyDownloadLinkDocument, options);
 }
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationHookResult =
-  ReturnType<typeof usePetitionReplies_fileUploadReplyDownloadLinkMutation>;
+export type PetitionReplies_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
+  typeof usePetitionReplies_fileUploadReplyDownloadLinkMutation
+>;
 export const PetitionReplies_createPetitionFieldCommentDocument = gql`
   mutation PetitionReplies_createPetitionFieldComment(
     $petitionId: GID!
@@ -13812,8 +12829,9 @@ export function usePetitionReplies_createPetitionFieldCommentMutation(
     PetitionReplies_createPetitionFieldCommentMutationVariables
   >(PetitionReplies_createPetitionFieldCommentDocument, options);
 }
-export type PetitionReplies_createPetitionFieldCommentMutationHookResult =
-  ReturnType<typeof usePetitionReplies_createPetitionFieldCommentMutation>;
+export type PetitionReplies_createPetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_createPetitionFieldCommentMutation
+>;
 export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_updatePetitionFieldComment(
     $petitionId: GID!
@@ -13845,8 +12863,9 @@ export function usePetitionReplies_updatePetitionFieldCommentMutation(
     PetitionReplies_updatePetitionFieldCommentMutationVariables
   >(PetitionReplies_updatePetitionFieldCommentDocument, options);
 }
-export type PetitionReplies_updatePetitionFieldCommentMutationHookResult =
-  ReturnType<typeof usePetitionReplies_updatePetitionFieldCommentMutation>;
+export type PetitionReplies_updatePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_updatePetitionFieldCommentMutation
+>;
 export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_deletePetitionFieldComment(
     $petitionId: GID!
@@ -13876,8 +12895,9 @@ export function usePetitionReplies_deletePetitionFieldCommentMutation(
     PetitionReplies_deletePetitionFieldCommentMutationVariables
   >(PetitionReplies_deletePetitionFieldCommentDocument, options);
 }
-export type PetitionReplies_deletePetitionFieldCommentMutationHookResult =
-  ReturnType<typeof usePetitionReplies_deletePetitionFieldCommentMutation>;
+export type PetitionReplies_deletePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_deletePetitionFieldCommentMutation
+>;
 export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
   mutation PetitionReplies_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
@@ -13918,10 +12938,9 @@ export function usePetitionReplies_updatePetitionFieldRepliesStatusMutation(
     PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
   >(PetitionReplies_updatePetitionFieldRepliesStatusDocument, options);
 }
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationHookResult =
-  ReturnType<
-    typeof usePetitionReplies_updatePetitionFieldRepliesStatusMutation
-  >;
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationHookResult = ReturnType<
+  typeof usePetitionReplies_updatePetitionFieldRepliesStatusMutation
+>;
 export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
   mutation PetitionReplies_sendPetitionClosedNotification(
     $petitionId: GID!
@@ -13953,8 +12972,9 @@ export function usePetitionReplies_sendPetitionClosedNotificationMutation(
     PetitionReplies_sendPetitionClosedNotificationMutationVariables
   >(PetitionReplies_sendPetitionClosedNotificationDocument, options);
 }
-export type PetitionReplies_sendPetitionClosedNotificationMutationHookResult =
-  ReturnType<typeof usePetitionReplies_sendPetitionClosedNotificationMutation>;
+export type PetitionReplies_sendPetitionClosedNotificationMutationHookResult = ReturnType<
+  typeof usePetitionReplies_sendPetitionClosedNotificationMutation
+>;
 export const PetitionRepliesUserDocument = gql`
   query PetitionRepliesUser {
     me {
@@ -13964,16 +12984,13 @@ export const PetitionRepliesUserDocument = gql`
   ${PetitionReplies_UserFragmentDoc}
 `;
 export function usePetitionRepliesUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    PetitionRepliesUserQuery,
-    PetitionRepliesUserQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<PetitionRepliesUserQuery, PetitionRepliesUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    PetitionRepliesUserQuery,
-    PetitionRepliesUserQueryVariables
-  >(PetitionRepliesUserDocument, options);
+  return Apollo.useQuery<PetitionRepliesUserQuery, PetitionRepliesUserQueryVariables>(
+    PetitionRepliesUserDocument,
+    options
+  );
 }
 export function usePetitionRepliesUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -13982,14 +12999,12 @@ export function usePetitionRepliesUserLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PetitionRepliesUserQuery,
-    PetitionRepliesUserQueryVariables
-  >(PetitionRepliesUserDocument, options);
+  return Apollo.useLazyQuery<PetitionRepliesUserQuery, PetitionRepliesUserQueryVariables>(
+    PetitionRepliesUserDocument,
+    options
+  );
 }
-export type PetitionRepliesUserQueryHookResult = ReturnType<
-  typeof usePetitionRepliesUserQuery
->;
+export type PetitionRepliesUserQueryHookResult = ReturnType<typeof usePetitionRepliesUserQuery>;
 export type PetitionRepliesUserLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesUserLazyQuery
 >;
@@ -14006,10 +13021,7 @@ export const PetitionRepliesDocument = gql`
   ${PetitionReplies_PetitionFragmentDoc}
 `;
 export function usePetitionRepliesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PetitionRepliesQuery,
-    PetitionRepliesQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<PetitionRepliesQuery, PetitionRepliesQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
@@ -14018,23 +13030,16 @@ export function usePetitionRepliesQuery(
   );
 }
 export function usePetitionRepliesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionRepliesQuery,
-    PetitionRepliesQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PetitionRepliesQuery, PetitionRepliesQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PetitionRepliesQuery,
-    PetitionRepliesQueryVariables
-  >(PetitionRepliesDocument, options);
+  return Apollo.useLazyQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
+    PetitionRepliesDocument,
+    options
+  );
 }
-export type PetitionRepliesQueryHookResult = ReturnType<
-  typeof usePetitionRepliesQuery
->;
-export type PetitionRepliesLazyQueryHookResult = ReturnType<
-  typeof usePetitionRepliesLazyQuery
->;
+export type PetitionRepliesQueryHookResult = ReturnType<typeof usePetitionRepliesQuery>;
+export type PetitionRepliesLazyQueryHookResult = ReturnType<typeof usePetitionRepliesLazyQuery>;
 export const PetitionsUserDocument = gql`
   query PetitionsUser {
     me {
@@ -14044,10 +13049,7 @@ export const PetitionsUserDocument = gql`
   ${Petitions_UserFragmentDoc}
 `;
 export function usePetitionsUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    PetitionsUserQuery,
-    PetitionsUserQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<PetitionsUserQuery, PetitionsUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
@@ -14056,10 +13058,7 @@ export function usePetitionsUserQuery(
   );
 }
 export function usePetitionsUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionsUserQuery,
-    PetitionsUserQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PetitionsUserQuery, PetitionsUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
@@ -14067,12 +13066,8 @@ export function usePetitionsUserLazyQuery(
     options
   );
 }
-export type PetitionsUserQueryHookResult = ReturnType<
-  typeof usePetitionsUserQuery
->;
-export type PetitionsUserLazyQueryHookResult = ReturnType<
-  typeof usePetitionsUserLazyQuery
->;
+export type PetitionsUserQueryHookResult = ReturnType<typeof usePetitionsUserQuery>;
+export type PetitionsUserLazyQueryHookResult = ReturnType<typeof usePetitionsUserLazyQuery>;
 export const PetitionsDocument = gql`
   query Petitions(
     $offset: Int!
@@ -14082,13 +13077,7 @@ export const PetitionsDocument = gql`
     $hasPetitionSignature: Boolean!
     $filters: PetitionFilter
   ) {
-    petitions(
-      offset: $offset
-      limit: $limit
-      search: $search
-      sortBy: $sortBy
-      filters: $filters
-    ) {
+    petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
       ...Petitions_PetitionBasePagination
     }
   }
@@ -14098,27 +13087,16 @@ export function usePetitionsQuery(
   baseOptions: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(
-    PetitionsDocument,
-    options
-  );
+  return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(PetitionsDocument, options);
 }
 export function usePetitionsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionsQuery,
-    PetitionsQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(
-    PetitionsDocument,
-    options
-  );
+  return Apollo.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(PetitionsDocument, options);
 }
 export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
-export type PetitionsLazyQueryHookResult = ReturnType<
-  typeof usePetitionsLazyQuery
->;
+export type PetitionsLazyQueryHookResult = ReturnType<typeof usePetitionsLazyQuery>;
 export const NewPetitionPublicTemplatesDocument = gql`
   query NewPetitionPublicTemplates(
     $offset: Int!
@@ -14126,12 +13104,7 @@ export const NewPetitionPublicTemplatesDocument = gql`
     $search: String
     $locale: PetitionLocale
   ) {
-    publicTemplates(
-      offset: $offset
-      limit: $limit
-      search: $search
-      locale: $locale
-    ) {
+    publicTemplates(offset: $offset, limit: $limit, search: $search, locale: $locale) {
       items {
         ...NewPetition_PetitionTemplate
       }
@@ -14147,10 +13120,10 @@ export function useNewPetitionPublicTemplatesQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    NewPetitionPublicTemplatesQuery,
-    NewPetitionPublicTemplatesQueryVariables
-  >(NewPetitionPublicTemplatesDocument, options);
+  return Apollo.useQuery<NewPetitionPublicTemplatesQuery, NewPetitionPublicTemplatesQueryVariables>(
+    NewPetitionPublicTemplatesDocument,
+    options
+  );
 }
 export function useNewPetitionPublicTemplatesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -14202,10 +13175,10 @@ export function useNewPetitionTemplatesQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    NewPetitionTemplatesQuery,
-    NewPetitionTemplatesQueryVariables
-  >(NewPetitionTemplatesDocument, options);
+  return Apollo.useQuery<NewPetitionTemplatesQuery, NewPetitionTemplatesQueryVariables>(
+    NewPetitionTemplatesDocument,
+    options
+  );
 }
 export function useNewPetitionTemplatesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -14214,14 +13187,12 @@ export function useNewPetitionTemplatesLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    NewPetitionTemplatesQuery,
-    NewPetitionTemplatesQueryVariables
-  >(NewPetitionTemplatesDocument, options);
+  return Apollo.useLazyQuery<NewPetitionTemplatesQuery, NewPetitionTemplatesQueryVariables>(
+    NewPetitionTemplatesDocument,
+    options
+  );
 }
-export type NewPetitionTemplatesQueryHookResult = ReturnType<
-  typeof useNewPetitionTemplatesQuery
->;
+export type NewPetitionTemplatesQueryHookResult = ReturnType<typeof useNewPetitionTemplatesQuery>;
 export type NewPetitionTemplatesLazyQueryHookResult = ReturnType<
   typeof useNewPetitionTemplatesLazyQuery
 >;
@@ -14234,10 +13205,7 @@ export const NewPetitionUserDocument = gql`
   ${NewPetition_UserFragmentDoc}
 `;
 export function useNewPetitionUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    NewPetitionUserQuery,
-    NewPetitionUserQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<NewPetitionUserQuery, NewPetitionUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<NewPetitionUserQuery, NewPetitionUserQueryVariables>(
@@ -14246,23 +13214,16 @@ export function useNewPetitionUserQuery(
   );
 }
 export function useNewPetitionUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    NewPetitionUserQuery,
-    NewPetitionUserQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<NewPetitionUserQuery, NewPetitionUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    NewPetitionUserQuery,
-    NewPetitionUserQueryVariables
-  >(NewPetitionUserDocument, options);
+  return Apollo.useLazyQuery<NewPetitionUserQuery, NewPetitionUserQueryVariables>(
+    NewPetitionUserDocument,
+    options
+  );
 }
-export type NewPetitionUserQueryHookResult = ReturnType<
-  typeof useNewPetitionUserQuery
->;
-export type NewPetitionUserLazyQueryHookResult = ReturnType<
-  typeof useNewPetitionUserLazyQuery
->;
+export type NewPetitionUserQueryHookResult = ReturnType<typeof useNewPetitionUserQuery>;
+export type NewPetitionUserLazyQueryHookResult = ReturnType<typeof useNewPetitionUserLazyQuery>;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
     updateUser(id: $id, data: $data) {
@@ -14280,10 +13241,10 @@ export function useAccount_updateAccountMutation(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    Account_updateAccountMutation,
-    Account_updateAccountMutationVariables
-  >(Account_updateAccountDocument, options);
+  return Apollo.useMutation<Account_updateAccountMutation, Account_updateAccountMutationVariables>(
+    Account_updateAccountDocument,
+    options
+  );
 }
 export type Account_updateAccountMutationHookResult = ReturnType<
   typeof useAccount_updateAccountMutation
@@ -14301,19 +13262,13 @@ export function useAccountQuery(
   baseOptions?: Apollo.QueryHookOptions<AccountQuery, AccountQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<AccountQuery, AccountQueryVariables>(
-    AccountDocument,
-    options
-  );
+  return Apollo.useQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
 }
 export function useAccountLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<AccountQuery, AccountQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(
-    AccountDocument,
-    options
-  );
+  return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
 }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
 export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
@@ -14330,27 +13285,16 @@ export function useSettingsQuery(
   baseOptions?: Apollo.QueryHookOptions<SettingsQuery, SettingsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<SettingsQuery, SettingsQueryVariables>(
-    SettingsDocument,
-    options
-  );
+  return Apollo.useQuery<SettingsQuery, SettingsQueryVariables>(SettingsDocument, options);
 }
 export function useSettingsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    SettingsQuery,
-    SettingsQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<SettingsQuery, SettingsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<SettingsQuery, SettingsQueryVariables>(
-    SettingsDocument,
-    options
-  );
+  return Apollo.useLazyQuery<SettingsQuery, SettingsQueryVariables>(SettingsDocument, options);
 }
 export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
-export type SettingsLazyQueryHookResult = ReturnType<
-  typeof useSettingsLazyQuery
->;
+export type SettingsLazyQueryHookResult = ReturnType<typeof useSettingsLazyQuery>;
 export const Security_updatePasswordDocument = gql`
   mutation Security_updatePassword($password: String!, $newPassword: String!) {
     changePassword(password: $password, newPassword: $newPassword)
@@ -14386,27 +13330,16 @@ export function useSecurityQuery(
   baseOptions?: Apollo.QueryHookOptions<SecurityQuery, SecurityQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<SecurityQuery, SecurityQueryVariables>(
-    SecurityDocument,
-    options
-  );
+  return Apollo.useQuery<SecurityQuery, SecurityQueryVariables>(SecurityDocument, options);
 }
 export function useSecurityLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    SecurityQuery,
-    SecurityQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<SecurityQuery, SecurityQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<SecurityQuery, SecurityQueryVariables>(
-    SecurityDocument,
-    options
-  );
+  return Apollo.useLazyQuery<SecurityQuery, SecurityQueryVariables>(SecurityDocument, options);
 }
 export type SecurityQueryHookResult = ReturnType<typeof useSecurityQuery>;
-export type SecurityLazyQueryHookResult = ReturnType<
-  typeof useSecurityLazyQuery
->;
+export type SecurityLazyQueryHookResult = ReturnType<typeof useSecurityLazyQuery>;
 export const RevokeUserAuthTokenDocument = gql`
   mutation RevokeUserAuthToken($authTokenIds: [GID!]!) {
     revokeUserAuthToken(authTokenIds: $authTokenIds)
@@ -14419,10 +13352,10 @@ export function useRevokeUserAuthTokenMutation(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RevokeUserAuthTokenMutation,
-    RevokeUserAuthTokenMutationVariables
-  >(RevokeUserAuthTokenDocument, options);
+  return Apollo.useMutation<RevokeUserAuthTokenMutation, RevokeUserAuthTokenMutationVariables>(
+    RevokeUserAuthTokenDocument,
+    options
+  );
 }
 export type RevokeUserAuthTokenMutationHookResult = ReturnType<
   typeof useRevokeUserAuthTokenMutation
@@ -14436,12 +13369,7 @@ export const TokensDocument = gql`
   ) {
     me {
       id
-      authenticationTokens(
-        limit: $limit
-        offset: $offset
-        search: $search
-        sortBy: $sortBy
-      ) {
+      authenticationTokens(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy) {
         totalCount
         items {
           ...Tokens_UserAuthenticationToken
@@ -14459,19 +13387,13 @@ export function useTokensQuery(
   baseOptions: Apollo.QueryHookOptions<TokensQuery, TokensQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<TokensQuery, TokensQueryVariables>(
-    TokensDocument,
-    options
-  );
+  return Apollo.useQuery<TokensQuery, TokensQueryVariables>(TokensDocument, options);
 }
 export function useTokensLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<TokensQuery, TokensQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<TokensQuery, TokensQueryVariables>(
-    TokensDocument,
-    options
-  );
+  return Apollo.useLazyQuery<TokensQuery, TokensQueryVariables>(TokensDocument, options);
 }
 export type TokensQueryHookResult = ReturnType<typeof useTokensQuery>;
 export type TokensLazyQueryHookResult = ReturnType<typeof useTokensLazyQuery>;
@@ -14484,22 +13406,13 @@ export const CurrentUserDocument = gql`
   ${Login_UserFragmentDoc}
 `;
 export function useCurrentUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options
-  );
+  return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, options);
 }
 export function useCurrentUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(
@@ -14508,14 +13421,9 @@ export function useCurrentUserLazyQuery(
   );
 }
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
-export type CurrentUserLazyQueryHookResult = ReturnType<
-  typeof useCurrentUserLazyQuery
->;
+export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
 export const RecipientView_publicCompletePetitionDocument = gql`
-  mutation RecipientView_publicCompletePetition(
-    $keycode: ID!
-    $signer: PublicPetitionSignerData
-  ) {
+  mutation RecipientView_publicCompletePetition($keycode: ID!, $signer: PublicPetitionSignerData) {
     publicCompletePetition(keycode: $keycode, signer: $signer) {
       id
       status
@@ -14546,10 +13454,7 @@ export const PublicPetitionDocument = gql`
   ${RecipientView_PublicPetitionAccessFragmentDoc}
 `;
 export function usePublicPetitionQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<PublicPetitionQuery, PublicPetitionQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
@@ -14558,10 +13463,7 @@ export function usePublicPetitionQuery(
   );
 }
 export function usePublicPetitionLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PublicPetitionQuery, PublicPetitionQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
@@ -14569,12 +13471,8 @@ export function usePublicPetitionLazyQuery(
     options
   );
 }
-export type PublicPetitionQueryHookResult = ReturnType<
-  typeof usePublicPetitionQuery
->;
-export type PublicPetitionLazyQueryHookResult = ReturnType<
-  typeof usePublicPetitionLazyQuery
->;
+export type PublicPetitionQueryHookResult = ReturnType<typeof usePublicPetitionQuery>;
+export type PublicPetitionLazyQueryHookResult = ReturnType<typeof usePublicPetitionLazyQuery>;
 export const RecipientView_verifyPublicAccessDocument = gql`
   mutation RecipientView_verifyPublicAccess(
     $token: ID!
@@ -14582,12 +13480,7 @@ export const RecipientView_verifyPublicAccessDocument = gql`
     $ip: String
     $userAgent: String
   ) {
-    verifyPublicAccess(
-      token: $token
-      keycode: $keycode
-      ip: $ip
-      userAgent: $userAgent
-    ) {
+    verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
       isAllowed
       cookieName
       cookieValue
@@ -14637,11 +13530,7 @@ export type publicSendVerificationCodeMutationHookResult = ReturnType<
   typeof usepublicSendVerificationCodeMutation
 >;
 export const publicCheckVerificationCodeDocument = gql`
-  mutation publicCheckVerificationCode(
-    $keycode: ID!
-    $token: ID!
-    $code: String!
-  ) {
+  mutation publicCheckVerificationCode($keycode: ID!, $token: ID!, $code: String!) {
     publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
       result
       remainingAttempts
@@ -14664,11 +13553,7 @@ export type publicCheckVerificationCodeMutationHookResult = ReturnType<
   typeof usepublicCheckVerificationCodeMutation
 >;
 export const OptOut_publicOptOutRemindersDocument = gql`
-  mutation OptOut_publicOptOutReminders(
-    $keycode: ID!
-    $reason: String!
-    $other: String!
-  ) {
+  mutation OptOut_publicOptOutReminders($keycode: ID!, $reason: String!, $other: String!) {
     publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other) {
       petition {
         id
@@ -14700,10 +13585,7 @@ export const PublicOptOutDocument = gql`
   ${OptOut_PublicPetitionAccessFragmentDoc}
 `;
 export function usePublicOptOutQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PublicOptOutQuery,
-    PublicOptOutQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<PublicOptOutQuery, PublicOptOutQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PublicOptOutQuery, PublicOptOutQueryVariables>(
@@ -14712,10 +13594,7 @@ export function usePublicOptOutQuery(
   );
 }
 export function usePublicOptOutLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PublicOptOutQuery,
-    PublicOptOutQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PublicOptOutQuery, PublicOptOutQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<PublicOptOutQuery, PublicOptOutQueryVariables>(
@@ -14723,12 +13602,8 @@ export function usePublicOptOutLazyQuery(
     options
   );
 }
-export type PublicOptOutQueryHookResult = ReturnType<
-  typeof usePublicOptOutQuery
->;
-export type PublicOptOutLazyQueryHookResult = ReturnType<
-  typeof usePublicOptOutLazyQuery
->;
+export type PublicOptOutQueryHookResult = ReturnType<typeof usePublicOptOutQuery>;
+export type PublicOptOutLazyQueryHookResult = ReturnType<typeof usePublicOptOutLazyQuery>;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($token: String!) {
     petitionAuthToken(token: $token) {
@@ -14738,10 +13613,7 @@ export const PdfViewPetitionDocument = gql`
   ${PetitionPdf_PetitionFragmentDoc}
 `;
 export function usePdfViewPetitionQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PdfViewPetitionQuery,
-    PdfViewPetitionQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<PdfViewPetitionQuery, PdfViewPetitionQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PdfViewPetitionQuery, PdfViewPetitionQueryVariables>(
@@ -14750,262 +13622,29 @@ export function usePdfViewPetitionQuery(
   );
 }
 export function usePdfViewPetitionLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PdfViewPetitionQuery,
-    PdfViewPetitionQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<PdfViewPetitionQuery, PdfViewPetitionQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PdfViewPetitionQuery,
-    PdfViewPetitionQueryVariables
-  >(PdfViewPetitionDocument, options);
+  return Apollo.useLazyQuery<PdfViewPetitionQuery, PdfViewPetitionQueryVariables>(
+    PdfViewPetitionDocument,
+    options
+  );
 }
-export type PdfViewPetitionQueryHookResult = ReturnType<
-  typeof usePdfViewPetitionQuery
->;
-export type PdfViewPetitionLazyQueryHookResult = ReturnType<
-  typeof usePdfViewPetitionLazyQuery
->;
-export const LandingTemplateDetails_landingTemplateBySlugDocument = gql`
-  query LandingTemplateDetails_landingTemplateBySlug($slug: String!) {
-    landingTemplateBySlug(slug: $slug) {
-      ...LandingTemplateDetails_LandingTemplate
-    }
-  }
-  ${LandingTemplateDetails_LandingTemplateFragmentDoc}
-`;
-export function useLandingTemplateDetails_landingTemplateBySlugQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    LandingTemplateDetails_landingTemplateBySlugQuery,
-    LandingTemplateDetails_landingTemplateBySlugQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    LandingTemplateDetails_landingTemplateBySlugQuery,
-    LandingTemplateDetails_landingTemplateBySlugQueryVariables
-  >(LandingTemplateDetails_landingTemplateBySlugDocument, options);
-}
-export function useLandingTemplateDetails_landingTemplateBySlugLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    LandingTemplateDetails_landingTemplateBySlugQuery,
-    LandingTemplateDetails_landingTemplateBySlugQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    LandingTemplateDetails_landingTemplateBySlugQuery,
-    LandingTemplateDetails_landingTemplateBySlugQueryVariables
-  >(LandingTemplateDetails_landingTemplateBySlugDocument, options);
-}
-export type LandingTemplateDetails_landingTemplateBySlugQueryHookResult =
-  ReturnType<typeof useLandingTemplateDetails_landingTemplateBySlugQuery>;
-export type LandingTemplateDetails_landingTemplateBySlugLazyQueryHookResult =
-  ReturnType<typeof useLandingTemplateDetails_landingTemplateBySlugLazyQuery>;
-export const LandingTemplateDetails_landingTemplatesDocument = gql`
-  query LandingTemplateDetails_landingTemplates(
-    $offset: Int!
-    $limit: Int!
-    $locale: PetitionLocale!
-    $categories: [String!]
-  ) {
-    landingTemplates(
-      offset: $offset
-      limit: $limit
-      locale: $locale
-      categories: $categories
-    ) {
-      items {
-        ...PublicTemplateCard_LandingTemplate
-      }
-      totalCount
-    }
-  }
-  ${PublicTemplateCard_LandingTemplateFragmentDoc}
-`;
-export function useLandingTemplateDetails_landingTemplatesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    LandingTemplateDetails_landingTemplatesQuery,
-    LandingTemplateDetails_landingTemplatesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    LandingTemplateDetails_landingTemplatesQuery,
-    LandingTemplateDetails_landingTemplatesQueryVariables
-  >(LandingTemplateDetails_landingTemplatesDocument, options);
-}
-export function useLandingTemplateDetails_landingTemplatesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    LandingTemplateDetails_landingTemplatesQuery,
-    LandingTemplateDetails_landingTemplatesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    LandingTemplateDetails_landingTemplatesQuery,
-    LandingTemplateDetails_landingTemplatesQueryVariables
-  >(LandingTemplateDetails_landingTemplatesDocument, options);
-}
-export type LandingTemplateDetails_landingTemplatesQueryHookResult = ReturnType<
-  typeof useLandingTemplateDetails_landingTemplatesQuery
->;
-export type LandingTemplateDetails_landingTemplatesLazyQueryHookResult =
-  ReturnType<typeof useLandingTemplateDetails_landingTemplatesLazyQuery>;
-export const LandingTemplatesCategory_landingTemplatesSamplesDocument = gql`
-  query LandingTemplatesCategory_landingTemplatesSamples(
-    $locale: PetitionLocale!
-  ) {
-    landingTemplatesSamples {
-      category
-      templates(locale: $locale) {
-        totalCount
-      }
-    }
-  }
-`;
-export function useLandingTemplatesCategory_landingTemplatesSamplesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    LandingTemplatesCategory_landingTemplatesSamplesQuery,
-    LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    LandingTemplatesCategory_landingTemplatesSamplesQuery,
-    LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
-  >(LandingTemplatesCategory_landingTemplatesSamplesDocument, options);
-}
-export function useLandingTemplatesCategory_landingTemplatesSamplesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    LandingTemplatesCategory_landingTemplatesSamplesQuery,
-    LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    LandingTemplatesCategory_landingTemplatesSamplesQuery,
-    LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
-  >(LandingTemplatesCategory_landingTemplatesSamplesDocument, options);
-}
-export type LandingTemplatesCategory_landingTemplatesSamplesQueryHookResult =
-  ReturnType<typeof useLandingTemplatesCategory_landingTemplatesSamplesQuery>;
-export type LandingTemplatesCategory_landingTemplatesSamplesLazyQueryHookResult =
-  ReturnType<
-    typeof useLandingTemplatesCategory_landingTemplatesSamplesLazyQuery
-  >;
-export const LandingTemplatesCategory_landingTemplatesDocument = gql`
-  query LandingTemplatesCategory_landingTemplates(
-    $offset: Int!
-    $limit: Int!
-    $category: String!
-    $locale: PetitionLocale!
-  ) {
-    landingTemplates(
-      offset: $offset
-      limit: $limit
-      categories: [$category]
-      locale: $locale
-    ) {
-      totalCount
-      items {
-        ...PublicTemplateCard_LandingTemplate
-      }
-    }
-  }
-  ${PublicTemplateCard_LandingTemplateFragmentDoc}
-`;
-export function useLandingTemplatesCategory_landingTemplatesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    LandingTemplatesCategory_landingTemplatesQuery,
-    LandingTemplatesCategory_landingTemplatesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    LandingTemplatesCategory_landingTemplatesQuery,
-    LandingTemplatesCategory_landingTemplatesQueryVariables
-  >(LandingTemplatesCategory_landingTemplatesDocument, options);
-}
-export function useLandingTemplatesCategory_landingTemplatesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    LandingTemplatesCategory_landingTemplatesQuery,
-    LandingTemplatesCategory_landingTemplatesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    LandingTemplatesCategory_landingTemplatesQuery,
-    LandingTemplatesCategory_landingTemplatesQueryVariables
-  >(LandingTemplatesCategory_landingTemplatesDocument, options);
-}
-export type LandingTemplatesCategory_landingTemplatesQueryHookResult =
-  ReturnType<typeof useLandingTemplatesCategory_landingTemplatesQuery>;
-export type LandingTemplatesCategory_landingTemplatesLazyQueryHookResult =
-  ReturnType<typeof useLandingTemplatesCategory_landingTemplatesLazyQuery>;
-export const LandingTemplates_landingTemplatesSamplesDocument = gql`
-  query LandingTemplates_landingTemplatesSamples(
-    $offset: Int!
-    $limit: Int!
-    $locale: PetitionLocale!
-  ) {
-    landingTemplatesSamples {
-      category
-      templates(offset: $offset, limit: $limit, locale: $locale) {
-        items {
-          ...PublicTemplateCard_LandingTemplate
-        }
-        totalCount
-      }
-    }
-  }
-  ${PublicTemplateCard_LandingTemplateFragmentDoc}
-`;
-export function useLandingTemplates_landingTemplatesSamplesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    LandingTemplates_landingTemplatesSamplesQuery,
-    LandingTemplates_landingTemplatesSamplesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    LandingTemplates_landingTemplatesSamplesQuery,
-    LandingTemplates_landingTemplatesSamplesQueryVariables
-  >(LandingTemplates_landingTemplatesSamplesDocument, options);
-}
-export function useLandingTemplates_landingTemplatesSamplesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    LandingTemplates_landingTemplatesSamplesQuery,
-    LandingTemplates_landingTemplatesSamplesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    LandingTemplates_landingTemplatesSamplesQuery,
-    LandingTemplates_landingTemplatesSamplesQueryVariables
-  >(LandingTemplates_landingTemplatesSamplesDocument, options);
-}
-export type LandingTemplates_landingTemplatesSamplesQueryHookResult =
-  ReturnType<typeof useLandingTemplates_landingTemplatesSamplesQuery>;
-export type LandingTemplates_landingTemplatesSamplesLazyQueryHookResult =
-  ReturnType<typeof useLandingTemplates_landingTemplatesSamplesLazyQuery>;
+export type PdfViewPetitionQueryHookResult = ReturnType<typeof usePdfViewPetitionQuery>;
+export type PdfViewPetitionLazyQueryHookResult = ReturnType<typeof usePdfViewPetitionLazyQuery>;
 export const Thanks_PetitionLogoDocument = gql`
   query Thanks_PetitionLogo($id: GID!) {
     publicOrgLogoUrl(id: $id)
   }
 `;
 export function useThanks_PetitionLogoQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    Thanks_PetitionLogoQuery,
-    Thanks_PetitionLogoQueryVariables
-  >
+  baseOptions: Apollo.QueryHookOptions<Thanks_PetitionLogoQuery, Thanks_PetitionLogoQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    Thanks_PetitionLogoQuery,
-    Thanks_PetitionLogoQueryVariables
-  >(Thanks_PetitionLogoDocument, options);
+  return Apollo.useQuery<Thanks_PetitionLogoQuery, Thanks_PetitionLogoQueryVariables>(
+    Thanks_PetitionLogoDocument,
+    options
+  );
 }
 export function useThanks_PetitionLogoLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -15014,14 +13653,12 @@ export function useThanks_PetitionLogoLazyQuery(
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    Thanks_PetitionLogoQuery,
-    Thanks_PetitionLogoQueryVariables
-  >(Thanks_PetitionLogoDocument, options);
+  return Apollo.useLazyQuery<Thanks_PetitionLogoQuery, Thanks_PetitionLogoQueryVariables>(
+    Thanks_PetitionLogoDocument,
+    options
+  );
 }
-export type Thanks_PetitionLogoQueryHookResult = ReturnType<
-  typeof useThanks_PetitionLogoQuery
->;
+export type Thanks_PetitionLogoQueryHookResult = ReturnType<typeof useThanks_PetitionLogoQuery>;
 export type Thanks_PetitionLogoLazyQueryHookResult = ReturnType<
   typeof useThanks_PetitionLogoLazyQuery
 >;
@@ -15036,19 +13673,13 @@ export function useGetMyIdQuery(
   baseOptions?: Apollo.QueryHookOptions<GetMyIdQuery, GetMyIdQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetMyIdQuery, GetMyIdQueryVariables>(
-    GetMyIdDocument,
-    options
-  );
+  return Apollo.useQuery<GetMyIdQuery, GetMyIdQueryVariables>(GetMyIdDocument, options);
 }
 export function useGetMyIdLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<GetMyIdQuery, GetMyIdQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetMyIdQuery, GetMyIdQueryVariables>(
-    GetMyIdDocument,
-    options
-  );
+  return Apollo.useLazyQuery<GetMyIdQuery, GetMyIdQueryVariables>(GetMyIdDocument, options);
 }
 export type GetMyIdQueryHookResult = ReturnType<typeof useGetMyIdQuery>;
 export type GetMyIdLazyQueryHookResult = ReturnType<typeof useGetMyIdLazyQuery>;
@@ -15107,12 +13738,7 @@ export const useCreatePetition_createPetitionDocument = gql`
     $petitionId: GID
     $type: PetitionBaseType
   ) {
-    createPetition(
-      name: $name
-      locale: $locale
-      petitionId: $petitionId
-      type: $type
-    ) {
+    createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
       id
     }
   }

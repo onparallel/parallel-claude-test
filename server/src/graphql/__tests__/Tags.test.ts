@@ -53,11 +53,7 @@ describe("GraphQL/Tags", () => {
     [privateTag] = await mocks.createRandomTags(otherOrg.id, 1);
 
     [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
-    [privatePetition] = await mocks.createRandomPetitions(
-      otherOrg.id,
-      otherUser.id,
-      1
-    );
+    [privatePetition] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1);
     await mocks.tagPetitions([petition.id], tags[4].id);
   });
 
@@ -133,9 +129,7 @@ describe("GraphQL/Tags", () => {
         },
       });
 
-      const expectedTags = tags.filter(
-        (t) => t.name === "todo" || t.name === "to do"
-      );
+      const expectedTags = tags.filter((t) => t.name === "todo" || t.name === "to do");
       expect(errors).toBeUndefined();
       expect(data?.tags).toEqual({
         totalCount: expectedTags.length,
@@ -304,38 +298,35 @@ describe("GraphQL/Tags", () => {
 
   describe("deleteTag", () => {
     it("removes the tag from every petition when deleting it", async () => {
-      const { errors: deleteError, data: deleteData } = await testClient.mutate(
-        {
-          mutation: gql`
-            mutation ($id: GID!) {
-              deleteTag(id: $id)
-            }
-          `,
-          variables: {
-            id: toGlobalId("Tag", tags[4].id),
-          },
-        }
-      );
+      const { errors: deleteError, data: deleteData } = await testClient.mutate({
+        mutation: gql`
+          mutation ($id: GID!) {
+            deleteTag(id: $id)
+          }
+        `,
+        variables: {
+          id: toGlobalId("Tag", tags[4].id),
+        },
+      });
 
       expect(deleteError).toBeUndefined();
       expect(deleteData?.deleteTag).toEqual("SUCCESS");
 
-      const { errors: petitionError, data: petitionData } =
-        await testClient.query({
-          query: gql`
-            query ($id: GID!) {
-              petition(id: $id) {
+      const { errors: petitionError, data: petitionData } = await testClient.query({
+        query: gql`
+          query ($id: GID!) {
+            petition(id: $id) {
+              id
+              tags {
                 id
-                tags {
-                  id
-                }
               }
             }
-          `,
-          variables: {
-            id: toGlobalId("Petition", petition.id),
-          },
-        });
+          }
+        `,
+        variables: {
+          id: toGlobalId("Petition", petition.id),
+        },
+      });
 
       expect(petitionError).toBeUndefined();
       expect(petitionData?.petition).toEqual({
@@ -386,10 +377,7 @@ describe("GraphQL/Tags", () => {
       expect(errors).toBeUndefined();
       expect(data?.tagPetition).toEqual({
         id: toGlobalId("Petition", petition.id),
-        tags: [
-          { id: toGlobalId("Tag", tags[3].id) },
-          { id: toGlobalId("Tag", tags[2].id) },
-        ],
+        tags: [{ id: toGlobalId("Tag", tags[3].id) }, { id: toGlobalId("Tag", tags[2].id) }],
       });
     });
 

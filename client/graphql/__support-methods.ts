@@ -7,8 +7,7 @@ export const supportMethods: {
   {
     field: {
       name: "assignPetitionToUser",
-      description:
-        "Clones the petition and assigns the given user as owner and creator.",
+      description: "Clones the petition and assigns the given user as owner and creator.",
       args: [
         {
           name: "petitionId",
@@ -216,8 +215,7 @@ export const supportMethods: {
   {
     field: {
       name: "globalIdDecode",
-      description:
-        "Decodes the given Global ID into an entity in the database.",
+      description: "Decodes the given Global ID into an entity in the database.",
       args: [
         {
           name: "id",
@@ -285,8 +283,7 @@ export const supportMethods: {
   {
     field: {
       name: "resetSignaturitOrganizationBranding",
-      description:
-        "Removes the Signaturit Branding Ids of selected organization.",
+      description: "Removes the Signaturit Branding Ids of selected organization.",
       args: [
         {
           name: "orgId",
@@ -533,18 +530,8 @@ export const schemaTypes: IntrospectionType[] = [
     inputFields: null,
     interfaces: null,
     enumValues: [
-      {
-        name: "FAILURE",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
-      {
-        name: "SUCCESS",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
+      { name: "FAILURE", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "SUCCESS", description: null, isDeprecated: false, deprecationReason: null },
     ],
     possibleTypes: null,
   },
@@ -593,24 +580,9 @@ export const schemaTypes: IntrospectionType[] = [
     inputFields: null,
     interfaces: null,
     enumValues: [
-      {
-        name: "ADMIN",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
-      {
-        name: "NORMAL",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
-      {
-        name: "OWNER",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
+      { name: "ADMIN", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "NORMAL", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "OWNER", description: null, isDeprecated: false, deprecationReason: null },
     ],
     possibleTypes: null,
   },
@@ -623,30 +595,10 @@ export const schemaTypes: IntrospectionType[] = [
     inputFields: null,
     interfaces: null,
     enumValues: [
-      {
-        name: "Contact",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
-      {
-        name: "Organization",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
-      {
-        name: "Petition",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
-      {
-        name: "User",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
+      { name: "Contact", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "Organization", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "Petition", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "User", description: null, isDeprecated: false, deprecationReason: null },
     ],
     possibleTypes: null,
   },

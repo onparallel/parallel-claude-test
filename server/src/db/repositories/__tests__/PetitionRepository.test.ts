@@ -42,24 +42,16 @@ describe("repositories/PetitionRepository", () => {
       await deleteAllData(knex);
       [org] = await mocks.createRandomOrganizations(1);
       [user] = await mocks.createRandomUsers(org.id, 2);
-      _petitions = await mocks.createRandomPetitions(
-        org.id,
-        user.id,
-        15,
-        (i) => ({ name: i % 3 === 0 ? "good petition" : "bad petition" })
-      );
+      _petitions = await mocks.createRandomPetitions(org.id, user.id, 15, (i) => ({
+        name: i % 3 === 0 ? "good petition" : "bad petition",
+      }));
       const [contact] = await mocks.createRandomContacts(org.id, 1, () => ({
         email: "jesse.pinkman@gmail.com",
         first_name: "Jesse",
         last_name: "Pinkman",
       }));
 
-      await mocks.createPetitionAccess(
-        _petitions[0].id,
-        user.id,
-        [contact.id],
-        user.id
-      );
+      await mocks.createPetitionAccess(_petitions[0].id, user.id, [contact.id], user.id);
     });
 
     test("returns an empty page without options", async () => {
@@ -74,9 +66,7 @@ describe("repositories/PetitionRepository", () => {
         limit: 5,
       });
       expect(result.totalCount).toBe(15);
-      expect(result.items).toMatchObject(
-        _petitions.slice(5, 10).map(pick(["id"]))
-      );
+      expect(result.items).toMatchObject(_petitions.slice(5, 10).map(pick(["id"])));
     });
 
     test("returns a slice of filtered petitions", async () => {
@@ -87,9 +77,7 @@ describe("repositories/PetitionRepository", () => {
       });
       expect(result.totalCount).toBe(5);
       expect(result.items).toMatchObject(
-        _petitions
-          .filter((p) => (p.name ?? "").toLowerCase().includes("good"))
-          .slice(2, 2 + 5)
+        _petitions.filter((p) => (p.name ?? "").toLowerCase().includes("good")).slice(2, 2 + 5)
       );
     });
 
@@ -124,11 +112,7 @@ describe("repositories/PetitionRepository", () => {
       await deleteAllData(knex);
       [org] = await mocks.createRandomOrganizations(1);
       [user] = await mocks.createRandomUsers(org.id, 2);
-      [petition1, petition2] = await mocks.createRandomPetitions(
-        org.id,
-        user.id,
-        2
-      );
+      [petition1, petition2] = await mocks.createRandomPetitions(org.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6, (i) => ({
         deleted_at: i === 5 ? new Date() : null,
       }));
@@ -158,62 +142,34 @@ describe("repositories/PetitionRepository", () => {
     let org: Organization;
     let user: User;
     let petition1: Petition, petition2: Petition;
-    let fields: PetitionField[],
-      deleted: PetitionField[],
-      foreignField: PetitionField;
+    let fields: PetitionField[], deleted: PetitionField[], foreignField: PetitionField;
 
     beforeAll(async () => {
       await deleteAllData(knex);
       [org] = await mocks.createRandomOrganizations(1);
       [user] = await mocks.createRandomUsers(org.id, 2);
-      [petition1, petition2] = await mocks.createRandomPetitions(
-        org.id,
-        user.id,
-        2
-      );
+      [petition1, petition2] = await mocks.createRandomPetitions(org.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6);
       // add some random deleted fields
-      deleted = await mocks.createRandomPetitionFields(
-        petition1.id,
-        10,
-        (index) => ({
-          position: faker.datatype.number(10),
-          deleted_at: new Date(),
-        })
-      );
+      deleted = await mocks.createRandomPetitionFields(petition1.id, 10, (index) => ({
+        position: faker.datatype.number(10),
+        deleted_at: new Date(),
+      }));
       [foreignField] = await mocks.createRandomPetitionFields(petition2.id, 1);
     });
 
     test("fails if the ids passed do not match with the petition field ids", async () => {
-      const [
-        { id: id1 },
-        { id: id2 },
-        { id: id3 },
-        { id: id4 },
-        { id: id5 },
-        { id: id6 },
-      ] = fields;
+      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
       await expect(
         petitions.updateFieldPositions(petition1.id, [id2, id5, id6], user)
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
       await expect(
-        petitions.updateFieldPositions(
-          petition1.id,
-          [id1, id2, id3, id4, id5, id6, id6],
-          user
-        )
+        petitions.updateFieldPositions(petition1.id, [id1, id2, id3, id4, id5, id6, id6], user)
       ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
     test("fails if passed deleted field ids", async () => {
-      const [
-        { id: id1 },
-        { id: id2 },
-        { id: id3 },
-        { id: id4 },
-        { id: id5 },
-        { id: id6 },
-      ] = fields;
+      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
       await expect(
         petitions.updateFieldPositions(
           petition1.id,
@@ -224,14 +180,7 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("fails if passed fields ids from another petition", async () => {
-      const [
-        { id: id1 },
-        { id: id2 },
-        { id: id3 },
-        { id: id4 },
-        { id: id5 },
-        { id: id6 },
-      ] = fields;
+      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
       await expect(
         petitions.updateFieldPositions(
           petition1.id,
@@ -242,19 +191,8 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("updates the positions", async () => {
-      const [
-        { id: id1 },
-        { id: id2 },
-        { id: id3 },
-        { id: id4 },
-        { id: id5 },
-        { id: id6 },
-      ] = fields;
-      await petitions.updateFieldPositions(
-        petition1.id,
-        [id2, id5, id6, id3, id1, id4],
-        user
-      );
+      const [{ id: id1 }, { id: id2 }, { id: id3 }, { id: id4 }, { id: id5 }, { id: id6 }] = fields;
+      await petitions.updateFieldPositions(petition1.id, [id2, id5, id6, id3, id1, id4], user);
       const result1 = await petitions.loadFieldsForPetition(petition1.id, {
         refresh: true,
       });
@@ -265,11 +203,7 @@ describe("repositories/PetitionRepository", () => {
           deleted_at: null,
         }))
       );
-      await petitions.updateFieldPositions(
-        petition1.id,
-        [id6, id5, id4, id3, id2, id1],
-        user
-      );
+      await petitions.updateFieldPositions(petition1.id, [id6, id5, id4, id3, id2, id1], user);
       const result2 = await petitions.loadFieldsForPetition(petition1.id, {
         refresh: true,
       });
@@ -287,29 +221,19 @@ describe("repositories/PetitionRepository", () => {
     let org: Organization;
     let user: User;
     let petition1: Petition, petition2: Petition;
-    let fields: PetitionField[],
-      deleted: PetitionField[],
-      foreignField: PetitionField;
+    let fields: PetitionField[], deleted: PetitionField[], foreignField: PetitionField;
 
     beforeAll(async () => {
       await deleteAllData(knex);
       [org] = await mocks.createRandomOrganizations(1);
       [user] = await mocks.createRandomUsers(org.id, 2);
-      [petition1, petition2] = await mocks.createRandomPetitions(
-        org.id,
-        user.id,
-        2
-      );
+      [petition1, petition2] = await mocks.createRandomPetitions(org.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6);
       // add some random deleted fields
-      deleted = await mocks.createRandomPetitionFields(
-        petition1.id,
-        10,
-        (index) => ({
-          position: faker.datatype.number(10),
-          deleted_at: new Date(),
-        })
-      );
+      deleted = await mocks.createRandomPetitionFields(petition1.id, 10, (index) => ({
+        position: faker.datatype.number(10),
+        deleted_at: new Date(),
+      }));
       [foreignField] = await mocks.createRandomPetitionFields(petition2.id, 1);
     });
 
@@ -397,15 +321,12 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("sets automatic reminders", async () => {
-      const [startedPetitionAccess] = await petitions.startAccessReminders(
-        [petitionAccess.id],
-        {
-          offset: 1,
-          time: "12:00",
-          timezone: "Europe/Madrid",
-          weekdaysOnly: true,
-        }
-      );
+      const [startedPetitionAccess] = await petitions.startAccessReminders([petitionAccess.id], {
+        offset: 1,
+        time: "12:00",
+        timezone: "Europe/Madrid",
+        weekdaysOnly: true,
+      });
 
       expect(startedPetitionAccess).toMatchObject({
         reminders_active: true,
@@ -426,9 +347,7 @@ describe("repositories/PetitionRepository", () => {
         weekdaysOnly: true,
       });
 
-      const [stoppedPetitionAccess] = await petitions.stopAccessReminders([
-        petitionAccess.id,
-      ]);
+      const [stoppedPetitionAccess] = await petitions.stopAccessReminders([petitionAccess.id]);
 
       expect(stoppedPetitionAccess).toMatchObject({
         reminders_active: false,
@@ -458,18 +377,14 @@ describe("repositories/PetitionRepository", () => {
 
     test("should throw an error on invalid fieldId", async () => {
       const invalidFieldId = 823098123;
-      await expect(
-        petitions.clonePetitionField(petition.id, invalidFieldId, user)
-      ).rejects.toThrow("invalid fieldId: " + invalidFieldId);
+      await expect(petitions.clonePetitionField(petition.id, invalidFieldId, user)).rejects.toThrow(
+        "invalid fieldId: " + invalidFieldId
+      );
     });
 
     test("should clone second field", async () => {
       const toCloneId = fields[1].id;
-      const { field: newField } = await petitions.clonePetitionField(
-        petition.id,
-        toCloneId,
-        user
-      );
+      const { field: newField } = await petitions.clonePetitionField(petition.id, toCloneId, user);
 
       const newFields = await petitions.loadFieldsForPetition(petition.id, {
         refresh: true,
@@ -481,11 +396,7 @@ describe("repositories/PetitionRepository", () => {
 
     test("cloned field should have the same contents", async () => {
       const toClone = fields[3];
-      const { field: newField } = await petitions.clonePetitionField(
-        petition.id,
-        toClone.id,
-        user
-      );
+      const { field: newField } = await petitions.clonePetitionField(petition.id, toClone.id, user);
 
       expect(toClone).toMatchObject({
         petition_id: newField.petition_id,
@@ -500,17 +411,8 @@ describe("repositories/PetitionRepository", () => {
 
     test("validated field should be cloned invalidated", async () => {
       const toClone = fields[3];
-      await petitions.validatePetitionFields(
-        petition.id,
-        [toClone.id],
-        true,
-        user
-      );
-      const { field: cloned } = await petitions.clonePetitionField(
-        petition.id,
-        toClone.id,
-        user
-      );
+      await petitions.validatePetitionFields(petition.id, [toClone.id], true, user);
+      const { field: cloned } = await petitions.clonePetitionField(petition.id, toClone.id, user);
 
       expect(cloned).toMatchObject({
         validated: false,
@@ -530,35 +432,28 @@ describe("repositories/PetitionRepository", () => {
     });
 
     beforeEach(async () => {
-      user0Petitions = await mocks.createRandomPetitions(
-        org.id,
-        users[0].id,
-        3
-      );
+      user0Petitions = await mocks.createRandomPetitions(org.id, users[0].id, 3);
     });
 
     describe("loadUserPermissions", () => {
       test("should load current user permissions", async () => {
-        expect(
-          await petitions.loadUserPermissionsByPetitionId(user0Petitions[0].id)
-        ).toMatchObject([
-          {
-            petition_id: user0Petitions[0].id,
-            user_id: users[0].id,
-            type: "OWNER",
-          },
-        ]);
+        expect(await petitions.loadUserPermissionsByPetitionId(user0Petitions[0].id)).toMatchObject(
+          [
+            {
+              petition_id: user0Petitions[0].id,
+              user_id: users[0].id,
+              type: "OWNER",
+            },
+          ]
+        );
       });
 
       test("loading for multiple petitions should return permissions grouped by petition_id", async () => {
         const petitionIds = user0Petitions.map((p) => p.id);
-        const groupedPermissions =
-          await petitions.loadUserPermissionsByPetitionId(petitionIds);
+        const groupedPermissions = await petitions.loadUserPermissionsByPetitionId(petitionIds);
         expect(groupedPermissions).toHaveLength(3);
         for (let i = 0; i < 3; i++) {
-          expect(
-            groupedPermissions[i].every((p) => p.petition_id === petitionIds[i])
-          ).toBe(true);
+          expect(groupedPermissions[i].every((p) => p.petition_id === petitionIds[i])).toBe(true);
         }
       });
     });
@@ -578,9 +473,7 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const permissions = await petitions.loadUserPermissionsByPetitionId(
-          user0Petitions[0].id
-        );
+        const permissions = await petitions.loadUserPermissionsByPetitionId(user0Petitions[0].id);
         permissions.sort((a, b) => a.id - b.id);
 
         expect(newPermissions).toHaveLength(1);
@@ -600,15 +493,14 @@ describe("repositories/PetitionRepository", () => {
       });
 
       test("should not set new permission for user with access to the petitions", async () => {
-        const { newPermissions: firstPermissions } =
-          await petitions.addPetitionPermissions(
-            [user0Petitions[0].id],
-            [users[2].id],
-            [],
-            "WRITE",
-            true,
-            users[0]
-          );
+        const { newPermissions: firstPermissions } = await petitions.addPetitionPermissions(
+          [user0Petitions[0].id],
+          [users[2].id],
+          [],
+          "WRITE",
+          true,
+          users[0]
+        );
 
         const { newPermissions } = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
@@ -634,8 +526,7 @@ describe("repositories/PetitionRepository", () => {
         );
 
         expect(newPermissions).toHaveLength(3);
-        let groupedPermissions =
-          await petitions.loadUserPermissionsByPetitionId(petitionIds);
+        const groupedPermissions = await petitions.loadUserPermissionsByPetitionId(petitionIds);
 
         expect(groupedPermissions).toHaveLength(3);
         for (let i = 0; i < 3; i++) {
@@ -667,9 +558,7 @@ describe("repositories/PetitionRepository", () => {
         );
 
         expect(newPermissions).toHaveLength(userIds.length);
-        const permissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(permissions).toHaveLength(userIds.length + 1);
       });
 
@@ -696,30 +585,13 @@ describe("repositories/PetitionRepository", () => {
         await mocks.clearSharedPetitions();
         petitionId = user0Petitions[0].id;
         userId = users[1].id;
-        await petitions.addPetitionPermissions(
-          [petitionId],
-          [userId],
-          [],
-          "READ",
-          true,
-          users[0]
-        );
+        await petitions.addPetitionPermissions([petitionId], [userId], [], "READ", true, users[0]);
       });
 
       test("should update permissions for users with shared petitions", async () => {
-        const permissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
-        await petitions.editPetitionPermissions(
-          [petitionId],
-          [userId],
-          [],
-          "WRITE",
-          users[0]
-        );
-        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
+        await petitions.editPetitionPermissions([petitionId], [userId], [], "WRITE", users[0]);
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(permissions.length).toEqual(newPermissions.length);
         permissions.sort((a, b) => a.id - b.id);
         expect(newPermissions).toMatchObject([
@@ -740,35 +612,18 @@ describe("repositories/PetitionRepository", () => {
         // this test should assert 1 time on the catch block
         expect.assertions(1);
         try {
-          await petitions.editPetitionPermissions(
-            [petitionId],
-            [userId],
-            [],
-            "OWNER",
-            users[0]
-          );
+          await petitions.editPetitionPermissions([petitionId], [userId], [], "OWNER", users[0]);
         } catch (e) {
           expect(e.constraint).toBe("petition_permission__owner");
         }
       });
 
       test("should not edit for user without permissions", async () => {
-        const permissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
-        await petitions.editPetitionPermissions(
-          [petitionId],
-          [users[3].id],
-          [],
-          "READ",
-          users[0]
-        );
-        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId,
-          {
-            cache: false,
-          }
-        );
+        const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
+        await petitions.editPetitionPermissions([petitionId], [users[3].id], [], "READ", users[0]);
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId, {
+          cache: false,
+        });
         expect(permissions).toMatchObject(newPermissions);
       });
     });
@@ -779,27 +634,12 @@ describe("repositories/PetitionRepository", () => {
         await mocks.clearSharedPetitions();
         petitionId = user0Petitions[0].id;
         userId = users[1].id;
-        await petitions.addPetitionPermissions(
-          [petitionId],
-          [userId],
-          [],
-          "READ",
-          true,
-          users[0]
-        );
+        await petitions.addPetitionPermissions([petitionId], [userId], [], "READ", true, users[0]);
       });
 
       test("should remove access to a single petition for a single user", async () => {
-        await petitions.removePetitionPermissions(
-          [petitionId],
-          [userId],
-          [],
-          false,
-          users[0]
-        );
-        const permissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        await petitions.removePetitionPermissions([petitionId], [userId], [], false, users[0]);
+        const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(permissions).toHaveLength(1);
         expect(permissions).toMatchObject([
           {
@@ -827,9 +667,7 @@ describe("repositories/PetitionRepository", () => {
           false,
           users[0]
         );
-        const permissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(permissions).toHaveLength(2);
         permissions.sort((a, b) => a.id - b.id);
         expect(permissions).toMatchObject([
@@ -864,9 +702,7 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const permissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(permissions).toHaveLength(1);
         expect(permissions).toMatchObject([
           {
@@ -895,9 +731,7 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const permissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(permissions).toMatchObject([
           {
             petition_id: petitionId,
@@ -943,16 +777,9 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user without access to the petition", async () => {
         const petitionId = user0Petitions[1].id;
 
-        await petitions.transferOwnership(
-          [petitionId],
-          users[2].id,
-          true,
-          users[0]
-        );
+        await petitions.transferOwnership([petitionId], users[2].id, true, users[0]);
 
-        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,
@@ -970,16 +797,9 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user without access to the petition and remove original permissions", async () => {
         const petitionId = user0Petitions[1].id;
 
-        await petitions.transferOwnership(
-          [petitionId],
-          users[2].id,
-          false,
-          users[0]
-        );
+        await petitions.transferOwnership([petitionId], users[2].id, false, users[0]);
 
-        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,
@@ -992,19 +812,10 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user with READ or WRITE access", async () => {
         const petitionId = user0Petitions[2].id;
         const userId = users[2].id;
-        await petitions.addPetitionPermissions(
-          [petitionId],
-          [userId],
-          [],
-          "READ",
-          true,
-          users[0]
-        );
+        await petitions.addPetitionPermissions([petitionId], [userId], [], "READ", true, users[0]);
 
         await petitions.transferOwnership([petitionId], userId, true, users[0]);
-        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,
@@ -1022,25 +833,11 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user with READ or WRITE access and remove original permissions", async () => {
         const petitionId = user0Petitions[2].id;
         const userId = users[2].id;
-        await petitions.addPetitionPermissions(
-          [petitionId],
-          [userId],
-          [],
-          "READ",
-          true,
-          users[0]
-        );
+        await petitions.addPetitionPermissions([petitionId], [userId], [], "READ", true, users[0]);
 
-        await petitions.transferOwnership(
-          [petitionId],
-          userId,
-          false,
-          users[0]
-        );
+        await petitions.transferOwnership([petitionId], userId, false, users[0]);
 
-        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
-          petitionId
-        );
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,

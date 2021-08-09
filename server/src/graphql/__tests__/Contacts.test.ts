@@ -34,16 +34,9 @@ describe("GraphQL/Contacts", () => {
       org_id: organization.id,
     }));
 
-    userContacts = await mocks.createRandomContacts(
-      organization.id,
-      5,
-      (n) => ({
-        email:
-          n === 4
-            ? "email.search@onparallel.com"
-            : faker.internet.email().toLowerCase(),
-      })
-    );
+    userContacts = await mocks.createRandomContacts(organization.id, 5, (n) => ({
+      email: n === 4 ? "email.search@onparallel.com" : faker.internet.email().toLowerCase(),
+    }));
   });
 
   afterAll(async () => {
@@ -70,7 +63,7 @@ describe("GraphQL/Contacts", () => {
   it("filters contacts by search value", async () => {
     const { data, errors } = await testClient.query({
       query: gql`
-        query($search: String) {
+        query ($search: String) {
           contacts(search: $search, limit: 100) {
             totalCount
             items {
@@ -92,7 +85,7 @@ describe("GraphQL/Contacts", () => {
   it("excludes contacts from result", async () => {
     const { data, errors } = await testClient.query({
       query: gql`
-        query($exclude: [GID!]) {
+        query ($exclude: [GID!]) {
           contacts(exclude: $exclude) {
             totalCount
           }
@@ -110,7 +103,7 @@ describe("GraphQL/Contacts", () => {
   it("sorts results by email in descending order", async () => {
     const { data, errors } = await testClient.query({
       query: gql`
-        query($sortBy: [QueryContacts_OrderBy!]) {
+        query ($sortBy: [QueryContacts_OrderBy!]) {
           contacts(sortBy: $sortBy, limit: 100) {
             items {
               id
@@ -169,7 +162,7 @@ describe("GraphQL/Contacts", () => {
     const id = toGlobalId("Contact", contact.id);
     const { data, errors } = await testClient.query({
       query: gql`
-        query($id: GID!) {
+        query ($id: GID!) {
           contact(id: $id) {
             id
             email
@@ -196,7 +189,7 @@ describe("GraphQL/Contacts", () => {
 
     const { data, errors } = await testClient.query({
       query: gql`
-        query($id: GID!) {
+        query ($id: GID!) {
           contact(id: $id) {
             id
           }
@@ -211,10 +204,8 @@ describe("GraphQL/Contacts", () => {
   it("creates a new contact with email and full name", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation($email: String!, $firstName: String, $lastName: String) {
-          createContact(
-            data: { email: $email, firstName: $firstName, lastName: $lastName }
-          ) {
+        mutation ($email: String!, $firstName: String, $lastName: String) {
+          createContact(data: { email: $email, firstName: $firstName, lastName: $lastName }) {
             email
             firstName
             lastName
@@ -241,7 +232,7 @@ describe("GraphQL/Contacts", () => {
   it("sends error when trying to create a contact with an existing email", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation($email: String!) {
+        mutation ($email: String!) {
           createContact(data: { email: $email }) {
             id
             email
@@ -261,7 +252,7 @@ describe("GraphQL/Contacts", () => {
     const contact = userContacts[1];
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation($id: GID!, $firstName: String!) {
+        mutation ($id: GID!, $firstName: String!) {
           updateContact(id: $id, data: { firstName: $firstName }) {
             id
             fullName
@@ -285,7 +276,7 @@ describe("GraphQL/Contacts", () => {
     const contact = userContacts[1];
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation($id: GID!) {
+        mutation ($id: GID!) {
           updateContact(id: $id, data: {}) {
             id
           }
@@ -306,7 +297,7 @@ describe("GraphQL/Contacts", () => {
 
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation($id: GID!, $firstName: String) {
+        mutation ($id: GID!, $firstName: String) {
           updateContact(id: $id, data: { firstName: $firstName }) {
             id
           }
@@ -327,7 +318,7 @@ describe("GraphQL/Contacts", () => {
 
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation($ids: [GID!]!) {
+        mutation ($ids: [GID!]!) {
           deleteContacts(ids: $ids)
         }
       `,
@@ -342,7 +333,7 @@ describe("GraphQL/Contacts", () => {
   it("sends whitelisted error when trying to delete a contact", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation($ids: [GID!]!) {
+        mutation ($ids: [GID!]!) {
           deleteContacts(ids: $ids)
         }
       `,

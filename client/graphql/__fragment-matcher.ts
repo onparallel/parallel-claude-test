@@ -47,10 +47,7 @@ const result: PossibleTypesResultData = {
       "UserPermissionEditedEvent",
       "UserPermissionRemovedEvent",
     ],
-    PetitionPermission: [
-      "PetitionUserGroupPermission",
-      "PetitionUserPermission",
-    ],
+    PetitionPermission: ["PetitionUserGroupPermission", "PetitionUserPermission"],
     PetitionUserNotification: [
       "CommentCreatedUserNotification",
       "MessageEmailBouncedUserNotification",

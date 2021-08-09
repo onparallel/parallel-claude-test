@@ -114,53 +114,37 @@ describe("GraphQL/Petitions", () => {
       type: "TEXT",
     }));
 
-    await mocks.knex.raw(
-      "UPDATE petition_field set visibility = ? where id = ?",
-      [
-        JSON.stringify({
-          type: "SHOW",
-          operator: "AND",
-          conditions: [
-            {
-              fieldId: fields[0].id,
-              modifier: "NONE",
-              operator: "CONTAIN",
-              value: "$",
-            },
-          ],
-        }),
-        fields[1].id,
-      ]
-    );
+    await mocks.knex.raw("UPDATE petition_field set visibility = ? where id = ?", [
+      JSON.stringify({
+        type: "SHOW",
+        operator: "AND",
+        conditions: [
+          {
+            fieldId: fields[0].id,
+            modifier: "NONE",
+            operator: "CONTAIN",
+            value: "$",
+          },
+        ],
+      }),
+      fields[1].id,
+    ]);
 
     // petitions[0] and petitions[1] are shared to another user
-    await mocks.sharePetitions(
-      [petitions[0].id, petitions[1].id],
-      sameOrgUser.id,
-      "WRITE"
-    );
+    await mocks.sharePetitions([petitions[0].id, petitions[1].id], sameOrgUser.id, "WRITE");
 
     // a public template from secondary organization
-    [publicTemplate] = await mocks.createRandomPetitions(
-      otherOrg.id,
-      otherUser.id,
-      1,
-      () => ({
-        locale: "en",
-        template_public: true,
-        is_template: true,
-        status: null,
-        name: "KYC (Know Your Client)",
-        template_description: "Template description for KYC",
-      })
-    );
+    [publicTemplate] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1, () => ({
+      locale: "en",
+      template_public: true,
+      is_template: true,
+      status: null,
+      name: "KYC (Know Your Client)",
+      template_description: "Template description for KYC",
+    }));
 
     // a petition from secondary user
-    [otherPetition] = await mocks.createRandomPetitions(
-      otherOrg.id,
-      otherUser.id,
-      1
-    );
+    [otherPetition] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1);
   });
 
   afterAll(async () => {
@@ -225,10 +209,7 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           filters: {
-            tagIds: [
-              toGlobalId("Tag", tags[0].id),
-              toGlobalId("Tag", tags[1].id),
-            ],
+            tagIds: [toGlobalId("Tag", tags[0].id), toGlobalId("Tag", tags[1].id)],
           },
         },
       });
@@ -279,8 +260,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       const expectedPetitions = petitions.filter(
-        (p) =>
-          !p.is_template && p.id !== petitions[0].id && p.id !== petitions[1].id
+        (p) => !p.is_template && p.id !== petitions[0].id && p.id !== petitions[1].id
       );
       expect(errors).toBeUndefined();
       expect(data?.petitions).toEqual({
@@ -376,11 +356,7 @@ describe("GraphQL/Petitions", () => {
       await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID) {
-            createPetition(
-              type: PETITION
-              petitionId: $petitionId
-              locale: en
-            ) {
+            createPetition(type: PETITION, petitionId: $petitionId, locale: en) {
               id
             }
           }
@@ -456,9 +432,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.petition.owner.organization.id).toBe(
-        toGlobalId("Organization", otherOrg.id)
-      );
+      expect(data!.petition.owner.organization.id).toBe(toGlobalId("Organization", otherOrg.id));
       expect(data!.petition.owner.id).toBe(toGlobalId("User", otherUser.id));
       expect(data!.petition.__typename).toBe("PetitionTemplate");
     });
@@ -502,11 +476,7 @@ describe("GraphQL/Petitions", () => {
       await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID) {
-            createPetition(
-              type: PETITION
-              petitionId: $petitionId
-              locale: en
-            ) {
+            createPetition(type: PETITION, petitionId: $petitionId, locale: en) {
               id
             }
           }
@@ -656,11 +626,7 @@ describe("GraphQL/Petitions", () => {
     it("creates a template from scratch with given name", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $name: String
-            $locale: PetitionLocale!
-            $type: PetitionBaseType
-          ) {
+          mutation ($name: String, $locale: PetitionLocale!, $type: PetitionBaseType) {
             createPetition(name: $name, locale: $locale, type: $type) {
               name
               locale
@@ -705,16 +671,8 @@ describe("GraphQL/Petitions", () => {
       const base = petitions[3];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $locale: PetitionLocale!
-            $petitionId: GID
-            $type: PetitionBaseType
-          ) {
-            createPetition(
-              locale: $locale
-              petitionId: $petitionId
-              type: $type
-            ) {
+          mutation ($locale: PetitionLocale!, $petitionId: GID, $type: PetitionBaseType) {
+            createPetition(locale: $locale, petitionId: $petitionId, type: $type) {
               name
               owner {
                 id
@@ -741,16 +699,8 @@ describe("GraphQL/Petitions", () => {
     it("creates a template based on a public template from other organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $locale: PetitionLocale!
-            $petitionId: GID
-            $type: PetitionBaseType
-          ) {
-            createPetition(
-              locale: $locale
-              petitionId: $petitionId
-              type: $type
-            ) {
+          mutation ($locale: PetitionLocale!, $petitionId: GID, $type: PetitionBaseType) {
+            createPetition(locale: $locale, petitionId: $petitionId, type: $type) {
               name
               locale
               owner {
@@ -803,12 +753,7 @@ describe("GraphQL/Petitions", () => {
             $petitionId: GID
             $type: PetitionBaseType
           ) {
-            createPetition(
-              name: $name
-              locale: $locale
-              petitionId: $petitionId
-              type: $type
-            ) {
+            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
               tags {
                 id
               }
@@ -971,12 +916,7 @@ describe("GraphQL/Petitions", () => {
             $petitionId: GID
             $type: PetitionBaseType
           ) {
-            createPetition(
-              name: $name
-              locale: $locale
-              petitionId: $petitionId
-              type: $type
-            ) {
+            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
               name
               locale
               owner {
@@ -1050,12 +990,7 @@ describe("GraphQL/Petitions", () => {
             $petitionId: GID
             $type: PetitionBaseType
           ) {
-            createPetition(
-              locale: $locale
-              name: $name
-              petitionId: $petitionId
-              type: $type
-            ) {
+            createPetition(locale: $locale, name: $name, petitionId: $petitionId, type: $type) {
               name
               locale
             }
@@ -1079,16 +1014,8 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to create a petition based on a private petition from other organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $locale: PetitionLocale!
-            $petitionId: GID
-            $type: PetitionBaseType
-          ) {
-            createPetition(
-              locale: $locale
-              petitionId: $petitionId
-              type: $type
-            ) {
+          mutation ($locale: PetitionLocale!, $petitionId: GID, $type: PetitionBaseType) {
+            createPetition(locale: $locale, petitionId: $petitionId, type: $type) {
               id
             }
           }
@@ -1174,9 +1101,7 @@ describe("GraphQL/Petitions", () => {
       });
       expect(errors).toBeUndefined();
       expect(data!.clonePetitions[0]).toEqual({
-        name: publicTemplate.name?.concat(
-          publicTemplate.locale === "en" ? " (copy)" : " (copia)"
-        ),
+        name: publicTemplate.name?.concat(publicTemplate.locale === "en" ? " (copy)" : " (copia)"),
         isPublic: false,
         __typename: "PetitionTemplate",
       });
@@ -1269,9 +1194,7 @@ describe("GraphQL/Petitions", () => {
         variables: { petitionIds: [toGlobalId("Petition", petitions[0].id)] },
       });
 
-      const clonedFieldIds = data!.clonePetitions[0].fields.map(
-        (f: any) => f.id
-      );
+      const clonedFieldIds = data!.clonePetitions[0].fields.map((f: any) => f.id);
 
       expect(errors).toBeUndefined();
       expect(data!.clonePetitions[0]).toEqual({
@@ -1415,9 +1338,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.clonePetitions).toEqual([
-        { myEffectivePermission: { isSubscribed: false } },
-      ]);
+      expect(data?.clonePetitions).toEqual([{ myEffectivePermission: { isSubscribed: false } }]);
     });
   });
 
@@ -1431,11 +1352,7 @@ describe("GraphQL/Petitions", () => {
         petitionsBuilder(organization.id)
       );
 
-      await mocks.sharePetitions(
-        [petitionsToDelete[0].id],
-        sameOrgUser.id,
-        "WRITE"
-      );
+      await mocks.sharePetitions([petitionsToDelete[0].id], sameOrgUser.id, "WRITE");
     });
     afterEach(async () => {
       await mocks.clearSharedPetitions();
@@ -1489,9 +1406,7 @@ describe("GraphQL/Petitions", () => {
       expect(data!.deletePetitions).toBe("SUCCESS");
 
       // make sure that nobody has access to a force-deleted petition owned by me
-      const permissions = await mocks.loadUserPermissionsByPetitionId(
-        sharedByMe.id
-      );
+      const permissions = await mocks.loadUserPermissionsByPetitionId(sharedByMe.id);
       const petition = await mocks.loadPetition(sharedByMe.id);
 
       expect(permissions).toEqual([]);
@@ -1523,9 +1438,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data!.deletePetitions).toBe("SUCCESS");
 
-      const userPermissions = await mocks.loadUserPermissionsByPetitionId(
-        sharedToMe.id
-      );
+      const userPermissions = await mocks.loadUserPermissionsByPetitionId(sharedToMe.id);
       expect(userPermissions).toEqual([
         {
           ...userPermissions[0],
@@ -1588,17 +1501,10 @@ describe("GraphQL/Petitions", () => {
     let userGroup: UserGroup;
 
     beforeAll(async () => {
-      [petition] = await mocks.createRandomPetitions(
-        sessionUser.org_id,
-        sessionUser.id,
-        1
-      );
+      [petition] = await mocks.createRandomPetitions(sessionUser.org_id, sessionUser.id, 1);
       users = await mocks.createRandomUsers(sessionUser.org_id, 2);
       [userGroup] = await mocks.createUserGroups(1, sessionUser.org_id);
-      await mocks.insertUserGroupMembers(userGroup.id, [
-        sessionUser.id,
-        ...users.map((u) => u.id),
-      ]);
+      await mocks.insertUserGroupMembers(userGroup.id, [sessionUser.id, ...users.map((u) => u.id)]);
       await mocks.sharePetitionWithGroups(petition.id, [userGroup.id]);
       await mocks.knex<PetitionPermission>("petition_permission").insert({
         user_id: users[1].id,
@@ -1727,10 +1633,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $remindersConfig: RemindersConfigInput) {
-            updatePetition(
-              petitionId: $petitionId
-              data: { remindersConfig: $remindersConfig }
-            ) {
+            updatePetition(petitionId: $petitionId, data: { remindersConfig: $remindersConfig }) {
               id
               ... on Petition {
                 remindersConfig {
@@ -1773,10 +1676,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $description: JSON) {
-            updatePetition(
-              petitionId: $petitionId
-              data: { description: $description }
-            ) {
+            updatePetition(petitionId: $petitionId, data: { description: $description }) {
               id
               ... on PetitionTemplate {
                 descriptionExcerpt
@@ -1888,10 +1788,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $emailBody: JSON) {
-            updatePetition(
-              petitionId: $petitionId
-              data: { emailBody: $emailBody }
-            ) {
+            updatePetition(petitionId: $petitionId, data: { emailBody: $emailBody }) {
               id
             }
           }
@@ -1918,13 +1815,9 @@ describe("GraphQL/Petitions", () => {
         () => ({ is_readonly: true })
       );
 
-      fields = await mocks.createRandomPetitionFields(
-        readonlyPetition.id,
-        3,
-        (i) => ({
-          type: ["HEADING", "TEXT", "DYNAMIC_SELECT"][i] as PetitionFieldType,
-        })
-      );
+      fields = await mocks.createRandomPetitionFields(readonlyPetition.id, 3, (i) => ({
+        type: ["HEADING", "TEXT", "DYNAMIC_SELECT"][i] as PetitionFieldType,
+      }));
     });
 
     it("should not allow to edit the petition title", async () => {
@@ -1984,16 +1877,8 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to edit field title and description", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               petition {
                 id
               }
@@ -2056,16 +1941,8 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to switch 'required' option on field", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               petition {
                 id
               }
@@ -2088,16 +1965,8 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to add visibility conditions on field", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               petition {
                 id
               }
@@ -2152,11 +2021,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: true
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
               id
             }
           }
@@ -2173,11 +2038,7 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to change the field type", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -2243,16 +2104,8 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to edit field options", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               petition {
                 id
               }

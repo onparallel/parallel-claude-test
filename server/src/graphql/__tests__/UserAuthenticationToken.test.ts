@@ -3,12 +3,7 @@ import { Knex } from "knex";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import {
-  FeatureFlagOverride,
-  Organization,
-  User,
-  UserAuthenticationToken,
-} from "../../db/__types";
+import { FeatureFlagOverride, Organization, User, UserAuthenticationToken } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { initServer, TestClient } from "./server";
@@ -26,9 +21,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
     await deleteAllData(knex);
 
     [organization] = await mocks.createRandomOrganizations(1);
-    await mocks.createFeatureFlags([
-      { name: "API_TOKENS", default_value: false },
-    ]);
+    await mocks.createFeatureFlags([{ name: "API_TOKENS", default_value: false }]);
     await knex.from<FeatureFlagOverride>("feature_flag_override").insert({
       org_id: organization.id,
       feature_flag_name: "API_TOKENS",
@@ -49,15 +42,9 @@ describe("GraphQL/UserAuthenticationToken", () => {
     let authTokens: UserAuthenticationToken[];
     beforeEach(async () => {
       authTokens = [
-        await mocks
-          .createUserAuthToken("My First Token", user.id)
-          .then(({ auth }) => auth),
-        await mocks
-          .createUserAuthToken("My Second Token", user.id)
-          .then(({ auth }) => auth),
-        await mocks
-          .createUserAuthToken("My Third Token", user.id)
-          .then(({ auth }) => auth),
+        await mocks.createUserAuthToken("My First Token", user.id).then(({ auth }) => auth),
+        await mocks.createUserAuthToken("My Second Token", user.id).then(({ auth }) => auth),
+        await mocks.createUserAuthToken("My Third Token", user.id).then(({ auth }) => auth),
       ];
     });
 
@@ -70,11 +57,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
         query: gql`
           query me {
             me {
-              authenticationTokens(
-                limit: 10
-                offset: 0
-                sortBy: createdAt_DESC
-              ) {
+              authenticationTokens(limit: 10, offset: 0, sortBy: createdAt_DESC) {
                 totalCount
                 items {
                   tokenName
@@ -106,9 +89,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
           }
         `,
         variables: {
-          authTokenIds: [
-            toGlobalId("UserAuthenticationToken", authTokens[1].id),
-          ],
+          authTokenIds: [toGlobalId("UserAuthenticationToken", authTokens[1].id)],
         },
       });
 
@@ -116,11 +97,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
         query: gql`
           query me {
             me {
-              authenticationTokens(
-                limit: 10
-                offset: 0
-                sortBy: createdAt_DESC
-              ) {
+              authenticationTokens(limit: 10, offset: 0, sortBy: createdAt_DESC) {
                 totalCount
                 items {
                   tokenName
@@ -135,10 +112,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
       expect(data!.me).toEqual({
         authenticationTokens: {
           totalCount: 2,
-          items: [
-            { tokenName: "My Third Token" },
-            { tokenName: "My First Token" },
-          ],
+          items: [{ tokenName: "My Third Token" }, { tokenName: "My First Token" }],
         },
       });
     });
@@ -206,10 +180,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
     let anotherUserToken: UserAuthenticationToken;
 
     beforeEach(async () => {
-      ({ auth: userAuthToken } = await mocks.createUserAuthToken(
-        "My First Token",
-        user.id
-      ));
+      ({ auth: userAuthToken } = await mocks.createUserAuthToken("My First Token", user.id));
 
       [anotherUser] = await mocks.createRandomUsers(organization.id, 1);
       ({ auth: anotherUserToken } = await mocks.createUserAuthToken(
@@ -230,9 +201,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
           }
         `,
         variables: {
-          authTokenIds: [
-            toGlobalId("UserAuthenticationToken", userAuthToken.id),
-          ],
+          authTokenIds: [toGlobalId("UserAuthenticationToken", userAuthToken.id)],
         },
       });
 
@@ -248,9 +217,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
           }
         `,
         variables: {
-          authTokenIds: [
-            toGlobalId("UserAuthenticationToken", anotherUserToken.id),
-          ],
+          authTokenIds: [toGlobalId("UserAuthenticationToken", anotherUserToken.id)],
         },
       });
 

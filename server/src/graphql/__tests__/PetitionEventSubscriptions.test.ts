@@ -2,12 +2,7 @@ import gql from "graphql-tag";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import {
-  Organization,
-  Petition,
-  PetitionEventSubscription,
-  User,
-} from "../../db/__types";
+import { Organization, Petition, PetitionEventSubscription, User } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
@@ -49,23 +44,11 @@ describe("GraphQL/Petition Event Subscriptions", () => {
   });
 
   beforeEach(async () => {
-    [userPetition] = await mocks.createRandomPetitions(
-      organization.id,
-      user.id,
-      1
-    );
+    [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
 
-    [sharedToMe] = await mocks.createRandomPetitions(
-      organization.id,
-      user2.id,
-      1
-    );
+    [sharedToMe] = await mocks.createRandomPetitions(organization.id, user2.id, 1);
 
-    [privatePetition] = await mocks.createRandomPetitions(
-      organization.id,
-      user2.id,
-      1
-    );
+    [privatePetition] = await mocks.createRandomPetitions(organization.id, user2.id, 1);
 
     await mocks.sharePetitions(
       [sharedToMe.id],
@@ -78,14 +61,8 @@ describe("GraphQL/Petition Event Subscriptions", () => {
     it("creates a subscription on an owned petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation createPetitionSubscription(
-            $petitionId: GID!
-            $endpoint: String!
-          ) {
-            createPetitionSubscription(
-              petitionId: $petitionId
-              endpoint: $endpoint
-            ) {
+          mutation createPetitionSubscription($petitionId: GID!, $endpoint: String!) {
+            createPetitionSubscription(petitionId: $petitionId, endpoint: $endpoint) {
               endpoint
               petition {
                 id
@@ -111,14 +88,8 @@ describe("GraphQL/Petition Event Subscriptions", () => {
     it("sends error when trying to create a subscription on a petition shared to me with READ/WRITE", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation createPetitionSubscription(
-            $petitionId: GID!
-            $endpoint: String!
-          ) {
-            createPetitionSubscription(
-              petitionId: $petitionId
-              endpoint: $endpoint
-            ) {
+          mutation createPetitionSubscription($petitionId: GID!, $endpoint: String!) {
+            createPetitionSubscription(petitionId: $petitionId, endpoint: $endpoint) {
               endpoint
               petition {
                 id
@@ -139,14 +110,8 @@ describe("GraphQL/Petition Event Subscriptions", () => {
     it("sends error when trying to create a subscription on an private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation createPetitionSubscription(
-            $petitionId: GID!
-            $endpoint: String!
-          ) {
-            createPetitionSubscription(
-              petitionId: $petitionId
-              endpoint: $endpoint
-            ) {
+          mutation createPetitionSubscription($petitionId: GID!, $endpoint: String!) {
+            createPetitionSubscription(petitionId: $petitionId, endpoint: $endpoint) {
               endpoint
               petition {
                 id
@@ -230,21 +195,9 @@ describe("GraphQL/Petition Event Subscriptions", () => {
     let s2: PetitionEventSubscription;
     let s3: PetitionEventSubscription;
     beforeEach(async () => {
-      [s1] = await mocks.createSubscriptions(
-        [userPetition.id],
-        "https://first.com",
-        user.id
-      );
-      [s2] = await mocks.createSubscriptions(
-        [userPetition.id],
-        "https://second.com",
-        user.id
-      );
-      [s3] = await mocks.createSubscriptions(
-        [userPetition.id],
-        "https://third.com",
-        user.id
-      );
+      [s1] = await mocks.createSubscriptions([userPetition.id], "https://first.com", user.id);
+      [s2] = await mocks.createSubscriptions([userPetition.id], "https://second.com", user.id);
+      [s3] = await mocks.createSubscriptions([userPetition.id], "https://third.com", user.id);
     });
 
     afterEach(async () => {

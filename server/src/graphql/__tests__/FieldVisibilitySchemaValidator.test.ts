@@ -36,32 +36,23 @@ describe("Field Visibility Conditions", () => {
     [user] = await mocks.createRandomUsers(organization.id, 1);
     petition = await mocks.createRandomPetitions(organization.id, user.id, 2);
 
-    [
-      textField,
-      fileUploadField,
-      selectField,
-      headingField,
-      finalTextField,
-      deletedField,
-    ] = await mocks.createRandomPetitionFields(petition[0].id, 6, (i) => ({
-      type:
-        i === 0
-          ? "TEXT"
-          : i === 1
-          ? "FILE_UPLOAD"
-          : i === 2
-          ? "SELECT"
-          : i === 3
-          ? "HEADING"
-          : "TEXT",
-      options: i === 2 ? { values: ["Option 1", "Option 2", "Option 3"] } : {},
-      deleted_at: i === 5 ? new Date() : null,
-    }));
+    [textField, fileUploadField, selectField, headingField, finalTextField, deletedField] =
+      await mocks.createRandomPetitionFields(petition[0].id, 6, (i) => ({
+        type:
+          i === 0
+            ? "TEXT"
+            : i === 1
+            ? "FILE_UPLOAD"
+            : i === 2
+            ? "SELECT"
+            : i === 3
+            ? "HEADING"
+            : "TEXT",
+        options: i === 2 ? { values: ["Option 1", "Option 2", "Option 3"] } : {},
+        deleted_at: i === 5 ? new Date() : null,
+      }));
 
-    [fieldOnAnotherPetition] = await mocks.createRandomPetitionFields(
-      petition[1].id,
-      1
-    );
+    [fieldOnAnotherPetition] = await mocks.createRandomPetitionFields(petition[1].id, 1);
   });
 
   afterAll(async () => {
@@ -342,9 +333,7 @@ describe("Field Visibility Conditions", () => {
         selectField.id,
         ctx
       )
-    ).rejects.toThrowError(
-      "Invalid value type string for modifier NUMBER_OF_REPLIES"
-    );
+    ).rejects.toThrowError("Invalid value type string for modifier NUMBER_OF_REPLIES");
   });
 
   it("value for text match modifier should be a string", async () => {
@@ -388,9 +377,7 @@ describe("Field Visibility Conditions", () => {
         selectField.id,
         ctx
       )
-    ).rejects.toThrowError(
-      "Invalid operator START_WITH for modifier NUMBER_OF_REPLIES"
-    );
+    ).rejects.toThrowError("Invalid operator START_WITH for modifier NUMBER_OF_REPLIES");
   });
 
   it("operator for text match modifiers should be of text comparator", async () => {
@@ -434,9 +421,7 @@ describe("Field Visibility Conditions", () => {
         finalTextField.id,
         ctx
       )
-    ).rejects.toThrowError(
-      "Invalid operator START_WITH for field of type SELECT"
-    );
+    ).rejects.toThrowError("Invalid operator START_WITH for field of type SELECT");
   });
 
   it("value on SELECT field replies should be one of the selector options", async () => {
@@ -482,9 +467,7 @@ describe("Field Visibility Conditions", () => {
         selectField.id,
         ctx
       )
-    ).rejects.toThrowError(
-      "Invalid modifier NONE for field of type FILE_UPLOAD"
-    );
+    ).rejects.toThrowError("Invalid modifier NONE for field of type FILE_UPLOAD");
   });
 
   it("fieldId value for conditions should be a PetitionField GID", async () => {

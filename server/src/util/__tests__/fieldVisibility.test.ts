@@ -94,10 +94,7 @@ describe("fieldVisibility", () => {
           type: "TEXT",
           options: {},
           visibility: null,
-          replies: [
-            { content: { text: "Jon Snow" } },
-            { content: { text: "Daenerys Targaryen" } },
-          ],
+          replies: [{ content: { text: "Jon Snow" } }, { content: { text: "Daenerys Targaryen" } }],
         },
         {
           id: 2,
@@ -634,9 +631,7 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [
-            { content: { choices: ["Choice 1", "Choice 2", "Choice 3"] } },
-          ],
+          replies: [{ content: { choices: ["Choice 1", "Choice 2", "Choice 3"] } }],
         },
         {
           id: 2,
@@ -750,9 +745,7 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [
-            { content: { choices: ["Choice 1", "Choice 2", "Choice 3"] } },
-          ],
+          replies: [{ content: { choices: ["Choice 1", "Choice 2", "Choice 3"] } }],
         },
         {
           id: 2,

@@ -32,10 +32,8 @@ describe("repositories/UserAuthenticationRepository", () => {
   beforeEach(async () => {
     // run in series to ensure default order
     authTokens = [
-      (await userAuth.createUserAuthenticationToken("My Token 1", user))
-        .userAuthToken,
-      (await userAuth.createUserAuthenticationToken("My Token 2", user))
-        .userAuthToken,
+      (await userAuth.createUserAuthenticationToken("My Token 1", user)).userAuthToken,
+      (await userAuth.createUserAuthenticationToken("My Token 2", user)).userAuthToken,
     ];
   });
 
@@ -44,10 +42,10 @@ describe("repositories/UserAuthenticationRepository", () => {
   });
 
   it("creates an auth token and returns its API key", async () => {
-    const {
-      userAuthToken,
-      apiKey,
-    } = await userAuth.createUserAuthenticationToken("My Token", user);
+    const { userAuthToken, apiKey } = await userAuth.createUserAuthenticationToken(
+      "My Token",
+      user
+    );
 
     expect(userAuthToken).toBeDefined();
     expect(userAuthToken.token_name).toEqual("My Token");
@@ -64,15 +62,12 @@ describe("repositories/UserAuthenticationRepository", () => {
   });
 
   it("deletes an user auth token by its id", async () => {
-    const [deletedToken] = await userAuth.deleteUserAuthenticationTokens(
-      [authTokens[0].id],
-      user
-    );
+    const [deletedToken] = await userAuth.deleteUserAuthenticationTokens([authTokens[0].id], user);
 
-    const availableTokens = await userAuth.loadUserAuthenticationTokens(
-      user.id,
-      { limit: 10, offset: 0 }
-    );
+    const availableTokens = await userAuth.loadUserAuthenticationTokens(user.id, {
+      limit: 10,
+      offset: 0,
+    });
 
     expect(deletedToken.id).toEqual(authTokens[0].id);
     expect(availableTokens.items).toEqual([authTokens[1]]);
@@ -80,8 +75,6 @@ describe("repositories/UserAuthenticationRepository", () => {
 
   it("should throw error when trying to create a token with a taken name", async () => {
     expect.assertions(1);
-    await expect(
-      userAuth.createUserAuthenticationToken("My Token 1", user)
-    ).rejects.toBeDefined();
+    await expect(userAuth.createUserAuthenticationToken("My Token 1", user)).rejects.toBeDefined();
   });
 });

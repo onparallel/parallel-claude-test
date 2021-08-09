@@ -1,11 +1,7 @@
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
-  { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
-  { [SubKey in K]: Maybe<T[SubKey]> };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -65,10 +61,7 @@ export type BatchSendSigningMode =
   /** Let recipients of each group to choose who will sign the petitions. */
   | "LET_RECIPIENT_CHOOSE";
 
-export type ChangePasswordResult =
-  | "INCORRECT_PASSWORD"
-  | "INVALID_NEW_PASSWORD"
-  | "SUCCESS";
+export type ChangePasswordResult = "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD" | "SUCCESS";
 
 export type CommentCreatedUserNotification = PetitionUserNotification & {
   comment: PetitionFieldComment;
@@ -1687,11 +1680,7 @@ export type PetitionSignatureRequest = Timestamps & {
   updatedAt: Scalars["DateTime"];
 };
 
-export type PetitionSignatureRequestStatus =
-  | "CANCELLED"
-  | "COMPLETED"
-  | "ENQUEUED"
-  | "PROCESSING";
+export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
 
 /** The status of a petition. */
 export type PetitionStatus =
@@ -2190,11 +2179,7 @@ export type QueryPetitions_OrderBy =
   | "sentAt_DESC";
 
 /** Order to use on Query.userGroups */
-export type QueryUserGroups_OrderBy =
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "name_ASC"
-  | "name_DESC";
+export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
 
 export type ReminderEmailBouncedUserNotification = PetitionUserNotification & {
   access: PetitionAccess;
@@ -2601,22 +2586,13 @@ export type TemplateFragment = Pick<
   "id" | "name" | "description" | "locale" | "createdAt"
 >;
 
-export type UserFragment = Pick<
-  User,
-  "id" | "fullName" | "firstName" | "lastName"
->;
+export type UserFragment = Pick<User, "id" | "fullName" | "firstName" | "lastName">;
 
 export type UserGroupFragment = Pick<UserGroup, "id" | "name">;
 
 export type ContactFragment = Pick<
   Contact,
-  | "id"
-  | "email"
-  | "fullName"
-  | "firstName"
-  | "lastName"
-  | "createdAt"
-  | "updatedAt"
+  "id" | "email" | "fullName" | "firstName" | "lastName" | "createdAt" | "updatedAt"
 >;
 
 export type PetitionAccessFragment = Pick<
@@ -2630,10 +2606,7 @@ export type PetitionAccessFragment = Pick<
   | "createdAt"
 > & { contact: Maybe<ContactFragment>; granter: Maybe<UserFragment> };
 
-export type SubscriptionFragment = Pick<
-  Subscription,
-  "id" | "endpoint" | "createdAt"
->;
+export type SubscriptionFragment = Pick<Subscription, "id" | "endpoint" | "createdAt">;
 
 export type Permission_PetitionUserGroupPermission_Fragment = Pick<
   PetitionUserGroupPermission,
@@ -2662,9 +2635,7 @@ export type GetPetitions_PetitionsQueryVariables = Exact<{
 }>;
 
 export type GetPetitions_PetitionsQuery = {
-  petitions: Pick<PetitionBasePagination, "totalCount"> & {
-    items: Array<PetitionFragment>;
-  };
+  petitions: Pick<PetitionBasePagination, "totalCount"> & { items: Array<PetitionFragment> };
 };
 
 export type CreatePetition_PetitionMutationVariables = Exact<{
@@ -2673,9 +2644,7 @@ export type CreatePetition_PetitionMutationVariables = Exact<{
   eventsUrl?: Maybe<Scalars["String"]>;
 }>;
 
-export type CreatePetition_PetitionMutation = {
-  createPetition: PetitionFragment;
-};
+export type CreatePetition_PetitionMutation = { createPetition: PetitionFragment };
 
 export type GetPetition_PetitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -2688,19 +2657,14 @@ export type UpdatePetition_PetitionMutationVariables = Exact<{
   data: UpdatePetitionInput;
 }>;
 
-export type UpdatePetition_PetitionMutation = {
-  updatePetition: PetitionFragment;
-};
+export type UpdatePetition_PetitionMutation = { updatePetition: PetitionFragment };
 
 export type DeletePetition_deletePetitionsMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   force: Scalars["Boolean"];
 }>;
 
-export type DeletePetition_deletePetitionsMutation = Pick<
-  Mutation,
-  "deletePetitions"
->;
+export type DeletePetition_deletePetitionsMutation = Pick<Mutation, "deletePetitions">;
 
 export type GetPetitionRecipients_PetitionAccessesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -2723,17 +2687,13 @@ export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
   data: UpdateContactInput;
 }>;
 
-export type CreatePetitionRecipients_updateContactMutation = {
-  updateContact: Pick<Contact, "id">;
-};
+export type CreatePetitionRecipients_updateContactMutation = { updateContact: Pick<Contact, "id"> };
 
 export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
   data: CreateContactInput;
 }>;
 
-export type CreatePetitionRecipients_createContactMutation = {
-  createContact: Pick<Contact, "id">;
-};
+export type CreatePetitionRecipients_createContactMutation = { createContact: Pick<Contact, "id"> };
 
 export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -2771,11 +2731,10 @@ export type PetitionReplies_RepliesQuery = {
   >;
 };
 
-export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    replyId: Scalars["GID"];
-  }>;
+export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: Pick<FileUploadDownloadLinkResult, "url">;
@@ -2811,8 +2770,7 @@ export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
 export type SharePetition_addPetitionPermissionMutation = {
   addPetitionPermission: Array<{
     permissions: Array<
-      | Permission_PetitionUserGroupPermission_Fragment
-      | Permission_PetitionUserPermission_Fragment
+      Permission_PetitionUserGroupPermission_Fragment | Permission_PetitionUserPermission_Fragment
     >;
   }>;
 };
@@ -2825,37 +2783,33 @@ export type StopSharing_removePetitionPermissionMutation = {
   removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
-export type RemoveUserPermission_removePetitionPermissionMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    userId: Scalars["GID"];
-  }>;
+export type RemoveUserPermission_removePetitionPermissionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userId: Scalars["GID"];
+}>;
 
 export type RemoveUserPermission_removePetitionPermissionMutation = {
   removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
-export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    userGroupId: Scalars["GID"];
-  }>;
+export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userGroupId: Scalars["GID"];
+}>;
 
 export type RemoveUserGroupPermission_removePetitionPermissionMutation = {
   removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
-export type TransferPetition_transferPetitionOwnershipMutationVariables =
-  Exact<{
-    userId: Scalars["GID"];
-    petitionId: Scalars["GID"];
-  }>;
+export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<{
+  userId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}>;
 
 export type TransferPetition_transferPetitionOwnershipMutation = {
   transferPetitionOwnership: Array<{
     permissions: Array<
-      | Permission_PetitionUserGroupPermission_Fragment
-      | Permission_PetitionUserPermission_Fragment
+      Permission_PetitionUserGroupPermission_Fragment | Permission_PetitionUserPermission_Fragment
     >;
   }>;
 };
@@ -2868,20 +2822,18 @@ export type GetSubscriptions_SubscriptionQuery = {
   petition: Maybe<{ subscriptions: Array<SubscriptionFragment> }>;
 };
 
-export type CreateSubscription_createPetitionSubscriptionMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    endpoint: Scalars["String"];
-  }>;
+export type CreateSubscription_createPetitionSubscriptionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  endpoint: Scalars["String"];
+}>;
 
 export type CreateSubscription_createPetitionSubscriptionMutation = {
   createPetitionSubscription: SubscriptionFragment;
 };
 
-export type DeleteSubscription_deletePetitionSubscriptionMutationVariables =
-  Exact<{
-    subscriptionId: Scalars["GID"];
-  }>;
+export type DeleteSubscription_deletePetitionSubscriptionMutationVariables = Exact<{
+  subscriptionId: Scalars["GID"];
+}>;
 
 export type DeleteSubscription_deletePetitionSubscriptionMutation = Pick<
   Mutation,
@@ -2895,9 +2847,7 @@ export type GetTemplates_TemplatesQueryVariables = Exact<{
 }>;
 
 export type GetTemplates_TemplatesQuery = {
-  templates: Pick<PetitionBasePagination, "totalCount"> & {
-    items: Array<TemplateFragment>;
-  };
+  templates: Pick<PetitionBasePagination, "totalCount"> & { items: Array<TemplateFragment> };
 };
 
 export type GetTemplate_TemplateQueryVariables = Exact<{
@@ -2911,10 +2861,7 @@ export type DeleteTemplate_deletePetitionsMutationVariables = Exact<{
   force: Scalars["Boolean"];
 }>;
 
-export type DeleteTemplate_deletePetitionsMutation = Pick<
-  Mutation,
-  "deletePetitions"
->;
+export type DeleteTemplate_deletePetitionsMutation = Pick<Mutation, "deletePetitions">;
 
 export type GetContacts_ContactsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -2923,9 +2870,7 @@ export type GetContacts_ContactsQueryVariables = Exact<{
 }>;
 
 export type GetContacts_ContactsQuery = {
-  contacts: Pick<ContactPagination, "totalCount"> & {
-    items: Array<ContactFragment>;
-  };
+  contacts: Pick<ContactPagination, "totalCount"> & { items: Array<ContactFragment> };
 };
 
 export type CreateContact_ContactMutationVariables = Exact<{
@@ -2948,10 +2893,6 @@ export type GetOrganizationUsers_UsersQueryVariables = Exact<{
 
 export type GetOrganizationUsers_UsersQuery = {
   me: {
-    organization: {
-      users: Pick<UserPagination, "totalCount"> & {
-        items: Array<UserFragment>;
-      };
-    };
+    organization: { users: Pick<UserPagination, "totalCount"> & { items: Array<UserFragment> } };
   };
 };

@@ -57,9 +57,7 @@ describe("repositories/TagRepository", () => {
   });
 
   it("should load tags linked to petition ordered by creation date", async () => {
-    expect(await repo.loadTagsByPetitionId(petition.id)).toEqual(
-      tags.slice(0, 3)
-    );
+    expect(await repo.loadTagsByPetitionId(petition.id)).toEqual(tags.slice(0, 3));
   });
 
   it("should allow to create tags with same name in different organizations", async () => {
@@ -75,14 +73,10 @@ describe("repositories/TagRepository", () => {
   });
 
   it("should not allow to use a taken name to update the tag", async () => {
-    await expect(
-      repo.updateTag(tags[2].id, { name: tags[3].name }, user)
-    ).rejects.toThrowError();
+    await expect(repo.updateTag(tags[2].id, { name: tags[3].name }, user)).rejects.toThrowError();
   });
 
   it("should not allow to tag a petition twice with the same tag", async () => {
-    await expect(
-      repo.tagPetition(tags[0].id, petition.id, user)
-    ).rejects.toThrowError();
+    await expect(repo.tagPetition(tags[0].id, petition.id, user)).rejects.toThrowError();
   });
 });

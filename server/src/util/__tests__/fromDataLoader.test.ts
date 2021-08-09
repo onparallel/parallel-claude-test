@@ -24,15 +24,8 @@ describe("fromDataLoader", () => {
 
   test("loads data", async () => {
     expect(await load(0)).toMatchObject({ name: "Alice" });
-    expect(await load([1, 2])).toMatchObject([
-      { name: "Bob" },
-      { name: "Charlie" },
-    ]);
-    expect(await load([0, 3, 1])).toMatchObject([
-      { name: "Alice" },
-      null,
-      { name: "Bob" },
-    ]);
+    expect(await load([1, 2])).toMatchObject([{ name: "Bob" }, { name: "Charlie" }]);
+    expect(await load([0, 3, 1])).toMatchObject([{ name: "Alice" }, null, { name: "Bob" }]);
   });
 
   test("caches repeated calls", async () => {

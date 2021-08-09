@@ -48,15 +48,8 @@ describe("GraphQL/Petition Fields", () => {
 
     const [otherOrg] = await mocks.createRandomOrganizations(1);
     const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
-    [privatePetition] = await mocks.createRandomPetitions(
-      otherOrg.id,
-      otherUser.id,
-      1
-    );
-    [privateField] = await mocks.createRandomPetitionFields(
-      privatePetition.id,
-      1
-    );
+    [privatePetition] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1);
+    [privateField] = await mocks.createRandomPetitionFields(privatePetition.id, 1);
   });
 
   afterAll(async () => {
@@ -67,14 +60,9 @@ describe("GraphQL/Petition Fields", () => {
     let userPetition: Petition;
     beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
-      [userPetition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1,
-        () => ({
-          status: "DRAFT",
-        })
-      );
+      [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "DRAFT",
+      }));
     });
 
     it("creates an empty Text field with default options", async () => {
@@ -282,16 +270,8 @@ describe("GraphQL/Petition Fields", () => {
       const createFieldOnPosition = async (type: string, position?: number) => {
         return await testClient.mutate({
           mutation: gql`
-            mutation (
-              $petitionId: GID!
-              $type: PetitionFieldType!
-              $position: Int
-            ) {
-              createPetitionField(
-                petitionId: $petitionId
-                type: $type
-                position: $position
-              ) {
+            mutation ($petitionId: GID!, $type: PetitionFieldType!, $position: Int) {
+              createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
                 petition {
                   fields {
                     id
@@ -317,10 +297,7 @@ describe("GraphQL/Petition Fields", () => {
       const { data: f2Data } = await createFieldOnPosition("TEXT", 1);
       const { data: f3Data } = await createFieldOnPosition("TEXT", 2);
       const { data: f4Data } = await createFieldOnPosition("HEADING", 300);
-      const { errors, data: f5Data } = await createFieldOnPosition(
-        "FILE_UPLOAD",
-        2
-      );
+      const { errors, data: f5Data } = await createFieldOnPosition("FILE_UPLOAD", 2);
 
       expect(errors).toBeUndefined();
       expect(f5Data!.createPetitionField).toEqual({
@@ -379,16 +356,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when position argument is less than zero", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $type: PetitionFieldType!
-            $position: Int
-          ) {
-            createPetitionField(
-              petitionId: $petitionId
-              type: $type
-              position: $position
-            ) {
+          mutation ($petitionId: GID!, $type: PetitionFieldType!, $position: Int) {
+            createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
               petition {
                 id
               }
@@ -431,11 +400,7 @@ describe("GraphQL/Petition Fields", () => {
     let fields: PetitionField[];
     beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
-      [userPetition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1
-      );
+      [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
       fields = await mocks.createRandomPetitionFields(userPetition.id, 5);
     });
 
@@ -460,9 +425,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      const fieldTypes: { type: string }[] = fields.map((f) =>
-        pick(f, ["type"])
-      );
+      const fieldTypes: { type: string }[] = fields.map((f) => pick(f, ["type"]));
       expect(errors).toBeUndefined();
       expect(data!.clonePetitionField).toEqual({
         petition: {
@@ -527,23 +490,14 @@ describe("GraphQL/Petition Fields", () => {
     let fields: PetitionField[];
     beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
-      [userPetition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1,
-        () => ({
-          status: "DRAFT",
-        })
-      );
-      fields = await mocks.createRandomPetitionFields(
-        userPetition.id,
-        6,
-        (index) => ({
-          type: index === 0 ? "HEADING" : "TEXT",
-          is_fixed: index === 0,
-          validated: index < 4,
-        })
-      );
+      [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "DRAFT",
+      }));
+      fields = await mocks.createRandomPetitionFields(userPetition.id, 6, (index) => ({
+        type: index === 0 ? "HEADING" : "TEXT",
+        is_fixed: index === 0,
+        validated: index < 4,
+      }));
 
       await mocks.knex.raw(
         /* sql */ `
@@ -612,11 +566,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: $force
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               fields {
                 id
                 replies {
@@ -668,11 +618,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: $force
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               ... on Petition {
                 status
               }
@@ -696,11 +642,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: $force
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               ... on Petition {
                 status
               }
@@ -724,11 +666,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: $force
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               fields {
                 id
               }
@@ -750,11 +688,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: $force
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               fields {
                 id
               }
@@ -818,11 +752,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: true
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
               fields {
                 id
               }
@@ -840,25 +770,16 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("deletes the linked attachments and uploaded files when deleting a field", async () => {
-      const [newField] = await mocks.createRandomPetitionFields(
-        userPetition.id,
-        1,
-        () => ({ position: 7 })
-      );
+      const [newField] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        position: 7,
+      }));
 
-      const [attachment] = await mocks.createPetitionFieldAttachment(
-        newField.id,
-        1
-      );
+      const [attachment] = await mocks.createPetitionFieldAttachment(newField.id, 1);
 
       const { errors } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: true
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
               fields {
                 id
               }
@@ -887,34 +808,24 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("don't delete the attached file if its being used as attachment in other field", async () => {
-      const newFields = await mocks.createRandomPetitionFields(
-        userPetition.id,
-        2,
-        (i) => ({ position: 8 + i })
-      );
+      const newFields = await mocks.createRandomPetitionFields(userPetition.id, 2, (i) => ({
+        position: 8 + i,
+      }));
 
       const [file] = await mocks.createRandomFileUpload(1);
 
       // set two attachments with the same file_upload on two different fields
-      const [firstAttachment] = await mocks.createPetitionFieldAttachment(
-        newFields[0].id,
-        1,
-        [file]
-      );
-      const [secondAttachment] = await mocks.createPetitionFieldAttachment(
-        newFields[1].id,
-        1,
-        [file]
-      );
+      const [firstAttachment] = await mocks.createPetitionFieldAttachment(newFields[0].id, 1, [
+        file,
+      ]);
+      const [secondAttachment] = await mocks.createPetitionFieldAttachment(newFields[1].id, 1, [
+        file,
+      ]);
 
       const { errors } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
-            deletePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              force: true
-            ) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
               fields {
                 id
               }
@@ -954,19 +865,11 @@ describe("GraphQL/Petition Fields", () => {
 
     beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
-      [userPetition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1
-      );
-      fields = await mocks.createRandomPetitionFields(
-        userPetition.id,
-        5,
-        (index) => ({
-          type: index === 0 ? "HEADING" : "TEXT",
-          is_fixed: index === 0,
-        })
-      );
+      [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      fields = await mocks.createRandomPetitionFields(userPetition.id, 5, (index) => ({
+        type: index === 0 ? "HEADING" : "TEXT",
+        is_fixed: index === 0,
+      }));
 
       await mocks.knex.raw(
         /* sql */ `
@@ -1005,13 +908,7 @@ describe("GraphQL/Petition Fields", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", userPetition.id),
-          fieldIds: [
-            fieldGIDs[0],
-            fieldGIDs[2],
-            fieldGIDs[1],
-            fieldGIDs[4],
-            fieldGIDs[3],
-          ],
+          fieldIds: [fieldGIDs[0], fieldGIDs[2], fieldGIDs[1], fieldGIDs[4], fieldGIDs[3]],
         },
       });
 
@@ -1082,13 +979,7 @@ describe("GraphQL/Petition Fields", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", userPetition.id),
-          fieldIds: [
-            fieldGIDs[1],
-            fieldGIDs[2],
-            fieldGIDs[3],
-            fieldGIDs[4],
-            fieldGIDs[0],
-          ],
+          fieldIds: [fieldGIDs[1], fieldGIDs[2], fieldGIDs[3], fieldGIDs[4], fieldGIDs[0]],
         },
       });
 
@@ -1109,13 +1000,7 @@ describe("GraphQL/Petition Fields", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", userPetition.id),
-          fieldIds: [
-            fieldGIDs[0],
-            fieldGIDs[4],
-            fieldGIDs[1],
-            fieldGIDs[2],
-            fieldGIDs[3],
-          ],
+          fieldIds: [fieldGIDs[0], fieldGIDs[4], fieldGIDs[1], fieldGIDs[2], fieldGIDs[3]],
         },
       });
 
@@ -1131,25 +1016,17 @@ describe("GraphQL/Petition Fields", () => {
 
     beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
-      [userPetition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1
-      );
+      [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
       const types: PetitionFieldType[] = ["HEADING", "TEXT", "FILE_UPLOAD"];
-      fields = await mocks.createRandomPetitionFields(
-        userPetition.id,
-        5,
-        (index) => {
-          const type = types[index % types.length];
-          return {
-            type,
-            is_fixed: index === 0,
-            validated: true,
-            options: defaultFieldOptions(type).options,
-          };
-        }
-      );
+      fields = await mocks.createRandomPetitionFields(userPetition.id, 5, (index) => {
+        const type = types[index % types.length];
+        return {
+          type,
+          is_fixed: index === 0,
+          validated: true,
+          options: defaultFieldOptions(type).options,
+        };
+      });
 
       fieldGIDs = fields.map((f) => toGlobalId("PetitionField", f.id));
     });
@@ -1157,16 +1034,8 @@ describe("GraphQL/Petition Fields", () => {
     it("updates the petition field with given values", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
                 title
@@ -1231,16 +1100,8 @@ describe("GraphQL/Petition Fields", () => {
     it("should allow updating the petition field with a null condition value", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
                 visibility
@@ -1290,16 +1151,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when updating petition field with invalid visibility json", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
                 visibility
@@ -1333,16 +1186,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when adding visibility conditions refering to a next field", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
                 visibility
@@ -1376,16 +1221,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to add visibility conditions on a heading with page break", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
                 visibility
@@ -1419,16 +1256,8 @@ describe("GraphQL/Petition Fields", () => {
     it("trims title and description of field before writing to database", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 title
                 description
@@ -1459,16 +1288,8 @@ describe("GraphQL/Petition Fields", () => {
     it("invalidates the field when updating it", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 options
                 validated
@@ -1502,11 +1323,7 @@ describe("GraphQL/Petition Fields", () => {
       const { data: pre } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               petition {
                 ... on Petition {
                   status
@@ -1530,16 +1347,8 @@ describe("GraphQL/Petition Fields", () => {
       // then update field to required, petition status should change
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               petition {
                 ... on Petition {
                   status
@@ -1575,16 +1384,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when field title is longer than 500 chars", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
               }
@@ -1605,16 +1406,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to update a field on a private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
               }
@@ -1636,16 +1429,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to update a field that doesn't belong to petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
               }
@@ -1667,16 +1452,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to update a field with empty data object", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
               }
@@ -1696,16 +1473,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to update a field with unknown key on options", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
               }
@@ -1728,16 +1497,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to update a field with an additional unknown key on options", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
               }
@@ -1760,16 +1521,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to update a field with invalid type values on options", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: UpdatePetitionFieldInput!
-          ) {
-            updatePetitionField(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              data: $data
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               field {
                 id
               }
@@ -1798,40 +1551,24 @@ describe("GraphQL/Petition Fields", () => {
 
     beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
-      [userPetition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1
-      );
+      [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
 
-      [fixedHeadingField] = await mocks.createRandomPetitionFields(
-        userPetition.id,
-        1,
-        () => ({
-          type: "HEADING",
-          is_fixed: true,
-          position: 0,
-        })
-      );
+      [fixedHeadingField] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "HEADING",
+        is_fixed: true,
+        position: 0,
+      }));
 
-      [field] = await mocks.createRandomPetitionFields(
-        userPetition.id,
-        1,
-        () => ({
-          type: "TEXT",
-          position: 1,
-        })
-      );
+      [field] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "TEXT",
+        position: 1,
+      }));
 
-      [fieldWithReply] = await mocks.createRandomPetitionFields(
-        userPetition.id,
-        1,
-        () => ({
-          type: "TEXT",
-          position: 2,
-          validated: true,
-        })
-      );
+      [fieldWithReply] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "TEXT",
+        position: 2,
+        validated: true,
+      }));
 
       const [contact] = await mocks.createRandomContacts(organization.id, 1);
 
@@ -1848,16 +1585,8 @@ describe("GraphQL/Petition Fields", () => {
     it("changes field type to SHORT_TEXT and sets its default options merging with existents", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-          ) {
-            changePetitionFieldType(
-              fieldId: $fieldId
-              petitionId: $petitionId
-              type: $type
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               field {
                 id
                 type
@@ -1890,16 +1619,8 @@ describe("GraphQL/Petition Fields", () => {
     it("changes field type to HEADING and sets its default options", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-          ) {
-            changePetitionFieldType(
-              fieldId: $fieldId
-              petitionId: $petitionId
-              type: $type
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               field {
                 id
                 type
@@ -1934,16 +1655,8 @@ describe("GraphQL/Petition Fields", () => {
     it("changes field type to FILE_UPLOAD and sets its default options", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-          ) {
-            changePetitionFieldType(
-              fieldId: $fieldId
-              petitionId: $petitionId
-              type: $type
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               field {
                 id
                 type
@@ -1978,12 +1691,7 @@ describe("GraphQL/Petition Fields", () => {
     it("changes field type and persists its replies", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-            $force: Boolean
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
               petitionId: $petitionId
@@ -2021,12 +1729,7 @@ describe("GraphQL/Petition Fields", () => {
     it("changes field type and deletes its replies", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-            $force: Boolean
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
               petitionId: $petitionId
@@ -2064,12 +1767,7 @@ describe("GraphQL/Petition Fields", () => {
     it("changes field type and sets it as not validated", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-            $force: Boolean
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
               petitionId: $petitionId
@@ -2105,12 +1803,7 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to change a field on a private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-            $force: Boolean
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
               petitionId: $petitionId
@@ -2138,12 +1831,7 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to change a field that doesn't belong to petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-            $force: Boolean
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
               petitionId: $petitionId
@@ -2171,16 +1859,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to change a field containing replies without using force flag", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-          ) {
-            changePetitionFieldType(
-              fieldId: $fieldId
-              petitionId: $petitionId
-              type: $type
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               field {
                 id
               }
@@ -2201,16 +1881,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error when trying to change the type of a fixed field", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $type: PetitionFieldType!
-          ) {
-            changePetitionFieldType(
-              fieldId: $fieldId
-              petitionId: $petitionId
-              type: $type
-            ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               field {
                 id
               }
@@ -2237,19 +1909,10 @@ describe("GraphQL/Petition Fields", () => {
     let field2Reply: PetitionFieldReply;
 
     beforeEach(async () => {
-      [petition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1
-      );
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
 
       [contact] = await mocks.createRandomContacts(organization.id, 1);
-      [access] = await mocks.createPetitionAccess(
-        petition.id,
-        user.id,
-        [contact.id],
-        user.id
-      );
+      [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
 
       fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "TEXT",
@@ -2259,23 +1922,16 @@ describe("GraphQL/Petition Fields", () => {
         validated: false,
       }));
 
-      [field2Reply] = await mocks.createRandomTextReply(
-        fields[2].id,
-        access.id,
-        1,
-        () => ({ status: "PENDING" })
-      );
+      [field2Reply] = await mocks.createRandomTextReply(fields[2].id, access.id, 1, () => ({
+        status: "PENDING",
+      }));
     });
 
     it("validates a field without a reply", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               fields {
                 validated
               }
@@ -2299,11 +1955,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               fields {
                 id
                 validated
@@ -2343,11 +1995,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               fields {
                 id
                 validated
@@ -2438,11 +2086,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               petition {
                 ... on Petition {
                   status
@@ -2532,11 +2176,7 @@ describe("GraphQL/Petition Fields", () => {
       await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               petition {
                 ... on Petition {
                   status
@@ -2559,11 +2199,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               petition {
                 ... on Petition {
                   status
@@ -2589,11 +2225,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               petition {
                 id
               }
@@ -2615,11 +2247,7 @@ describe("GraphQL/Petition Fields", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
-            validatePetitionFields(
-              petitionId: $petitionId
-              fieldIds: $fieldIds
-              value: $value
-            ) {
+            validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               petition {
                 id
               }
@@ -2646,19 +2274,10 @@ describe("GraphQL/Petition Fields", () => {
     let field2Replies: PetitionFieldReply[];
 
     beforeEach(async () => {
-      [petition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1
-      );
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
 
       [contact] = await mocks.createRandomContacts(organization.id, 1);
-      [access] = await mocks.createPetitionAccess(
-        petition.id,
-        user.id,
-        [contact.id],
-        user.id
-      );
+      [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
 
       fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "TEXT",
@@ -2668,12 +2287,9 @@ describe("GraphQL/Petition Fields", () => {
         validated: false,
       }));
 
-      field2Replies = await mocks.createRandomTextReply(
-        fields[2].id,
-        access.id,
-        2,
-        () => ({ status: "PENDING" })
-      );
+      field2Replies = await mocks.createRandomTextReply(fields[2].id, access.id, 2, () => ({
+        status: "PENDING",
+      }));
     });
 
     it("updates status of a petition field reply", async () => {
@@ -2701,9 +2317,7 @@ describe("GraphQL/Petition Fields", () => {
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
-          petitionFieldReplyIds: [
-            toGlobalId("PetitionFieldReply", field2Replies[0].id),
-          ],
+          petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", field2Replies[0].id)],
           status: "APPROVED",
         },
       });
@@ -2748,9 +2362,7 @@ describe("GraphQL/Petition Fields", () => {
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
-          petitionFieldReplyIds: field2Replies.map((r) =>
-            toGlobalId("PetitionFieldReply", r.id)
-          ),
+          petitionFieldReplyIds: field2Replies.map((r) => toGlobalId("PetitionFieldReply", r.id)),
           status: "APPROVED",
         },
       });
@@ -2792,9 +2404,7 @@ describe("GraphQL/Petition Fields", () => {
         variables: {
           petitionId: toGlobalId("Petition", privatePetition.id),
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
-          petitionFieldReplyIds: field2Replies.map((r) =>
-            toGlobalId("PetitionFieldReply", r.id)
-          ),
+          petitionFieldReplyIds: field2Replies.map((r) => toGlobalId("PetitionFieldReply", r.id)),
           status: "APPROVED",
         },
       });
@@ -2827,9 +2437,7 @@ describe("GraphQL/Petition Fields", () => {
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", 123123),
-          petitionFieldReplyIds: field2Replies.map((r) =>
-            toGlobalId("PetitionFieldReply", r.id)
-          ),
+          petitionFieldReplyIds: field2Replies.map((r) => toGlobalId("PetitionFieldReply", r.id)),
           status: "APPROVED",
         },
       });

@@ -4,13 +4,7 @@ import { sort } from "remeda";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import {
-  Organization,
-  Petition,
-  PetitionPermission,
-  User,
-  UserGroup,
-} from "../../db/__types";
+import { Organization, Petition, PetitionPermission, User, UserGroup } from "../../db/__types";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -41,11 +35,7 @@ describe("GraphQL/UserGroups", () => {
       organization_role: "ADMIN",
     }));
 
-    [petition] = await mocks.createRandomPetitions(
-      organization.id,
-      sessionUser.id,
-      1
-    );
+    [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
   });
 
   afterAll(async () => {
@@ -228,19 +218,14 @@ describe("GraphQL/UserGroups", () => {
     expect(errors).toBeUndefined();
     expect(data!.createUserGroup).toEqual({
       name: "Marketing",
-      members: users
-        .slice(0, 2)
-        .map((m) => ({ user: { id: toGlobalId("User", m.id) } })),
+      members: users.slice(0, 2).map((m) => ({ user: { id: toGlobalId("User", m.id) } })),
     });
   });
 
   it("updates the name of a user group", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation UserGroups_updateUserGroup(
-          $groupId: GID!
-          $data: UpdateUserGroupInput!
-        ) {
+        mutation UserGroups_updateUserGroup($groupId: GID!, $data: UpdateUserGroupInput!) {
           updateUserGroup(id: $groupId, data: $data) {
             id
             name
@@ -313,9 +298,7 @@ describe("GraphQL/UserGroups", () => {
       .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_by")
       .andWhere((q) =>
-        q
-          .where("from_user_group_id", userGroups[0].id)
-          .orWhere("user_group_id", userGroups[0].id)
+        q.where("from_user_group_id", userGroups[0].id).orWhere("user_group_id", userGroups[0].id)
       );
 
     expect(groupPermissions).toHaveLength(0);
@@ -324,10 +307,7 @@ describe("GraphQL/UserGroups", () => {
   it("add users as group members", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation UserGroups_addUsersToUserGroup(
-          $userGroupId: GID!
-          $userIds: [GID!]!
-        ) {
+        mutation UserGroups_addUsersToUserGroup($userGroupId: GID!, $userIds: [GID!]!) {
           addUsersToUserGroup(userIds: $userIds, userGroupId: $userGroupId) {
             id
             name
@@ -355,10 +335,7 @@ describe("GraphQL/UserGroups", () => {
   it("gives new group members permissions on group-shared petitions", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation UserGroups_addUsersToUserGroup(
-          $userGroupId: GID!
-          $userIds: [GID!]!
-        ) {
+        mutation UserGroups_addUsersToUserGroup($userGroupId: GID!, $userIds: [GID!]!) {
           addUsersToUserGroup(userIds: $userIds, userGroupId: $userGroupId) {
             id
             name
@@ -397,10 +374,7 @@ describe("GraphQL/UserGroups", () => {
   it("removes members from a group", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation UserGroups_removeUsersFromGroup(
-          $userGroupId: GID!
-          $userIds: [GID!]!
-        ) {
+        mutation UserGroups_removeUsersFromGroup($userGroupId: GID!, $userIds: [GID!]!) {
           removeUsersFromGroup(userIds: $userIds, userGroupId: $userGroupId) {
             id
             name
@@ -414,10 +388,7 @@ describe("GraphQL/UserGroups", () => {
       `,
       variables: {
         userGroupId: toGlobalId("UserGroup", userGroups[0].id),
-        userIds: [
-          toGlobalId("User", users[0].id),
-          toGlobalId("User", users[1].id),
-        ],
+        userIds: [toGlobalId("User", users[0].id), toGlobalId("User", users[1].id)],
       },
     });
     expect(errors).toBeUndefined();
@@ -431,10 +402,7 @@ describe("GraphQL/UserGroups", () => {
   it("users removed from a group lose permissions on the group-shared petitions", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation UserGroups_removeUsersFromGroup(
-          $userGroupId: GID!
-          $userIds: [GID!]!
-        ) {
+        mutation UserGroups_removeUsersFromGroup($userGroupId: GID!, $userIds: [GID!]!) {
           removeUsersFromGroup(userIds: $userIds, userGroupId: $userGroupId) {
             id
             name
@@ -448,10 +416,7 @@ describe("GraphQL/UserGroups", () => {
       `,
       variables: {
         userGroupId: toGlobalId("UserGroup", userGroups[0].id),
-        userIds: [
-          toGlobalId("User", users[0].id),
-          toGlobalId("User", users[1].id),
-        ],
+        userIds: [toGlobalId("User", users[0].id), toGlobalId("User", users[1].id)],
       },
     });
     expect(errors).toBeUndefined();
@@ -493,9 +458,7 @@ describe("GraphQL/UserGroups", () => {
     expect(data?.cloneUserGroup).toEqual([
       {
         name: userGroups[0].name.concat(" (copy)"),
-        members: users
-          .slice(0, 3)
-          .map((user) => ({ user: { id: toGlobalId("User", user.id) } })),
+        members: users.slice(0, 3).map((user) => ({ user: { id: toGlobalId("User", user.id) } })),
       },
     ]);
   });
@@ -519,9 +482,7 @@ describe("GraphQL/UserGroups", () => {
       .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_at")
       .andWhere((q) =>
-        q
-          .where("user_group_id", newGroupId)
-          .orWhere("from_user_group_id", newGroupId)
+        q.where("user_group_id", newGroupId).orWhere("from_user_group_id", newGroupId)
       )
       .select("*");
 

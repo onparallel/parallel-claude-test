@@ -23,9 +23,7 @@ describe("repositories/FeatureFlagRepository", () => {
 
     await deleteAllData(knex);
     const mocks = new Mocks(knex);
-    await mocks.createFeatureFlags([
-      { name: "PETITION_SIGNATURE", default_value: false },
-    ]);
+    await mocks.createFeatureFlags([{ name: "PETITION_SIGNATURE", default_value: false }]);
     [org] = await mocks.createRandomOrganizations(1);
     [user1, user2] = await mocks.createRandomUsers(org.id, 2);
   });

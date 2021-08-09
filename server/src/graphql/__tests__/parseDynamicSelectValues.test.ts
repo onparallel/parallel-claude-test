@@ -31,15 +31,7 @@ describe("parseDynamicSelectValues", () => {
         [
           "Cataluña",
           [
-            [
-              "Barcelona",
-              [
-                "Badalona",
-                "Barcelona",
-                "L'hospitalet de Llobregat",
-                "Terrassa",
-              ],
-            ],
+            ["Barcelona", ["Badalona", "Barcelona", "L'hospitalet de Llobregat", "Terrassa"]],
             ["Tarragona", ["Salou", "Tarragona", "Valls"]],
           ],
         ],
@@ -81,15 +73,7 @@ describe("parseDynamicSelectValues", () => {
         [
           "Cataluña",
           [
-            [
-              "Barcelona",
-              [
-                "Badalona",
-                "Barcelona",
-                "L'hospitalet de Llobregat",
-                "Terrassa",
-              ],
-            ],
+            ["Barcelona", ["Badalona", "Barcelona", "L'hospitalet de Llobregat", "Terrassa"]],
             ["Tarragona", ["Salou", "Tarragona", "Valls"]],
           ],
         ],
@@ -127,15 +111,7 @@ describe("parseDynamicSelectValues", () => {
         [
           "Cataluña",
           [
-            [
-              "Barcelona",
-              [
-                "Badalona",
-                "Barcelona",
-                "L'hospitalet de Llobregat",
-                "Terrassa",
-              ],
-            ],
+            ["Barcelona", ["Badalona", "Barcelona", "L'hospitalet de Llobregat", "Terrassa"]],
             ["Tarragona", ["Salou", "Tarragona", "Valls"]],
           ],
         ],

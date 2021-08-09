@@ -3,12 +3,7 @@ import { Knex } from "knex";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import {
-  Petition,
-  PetitionField,
-  PetitionFieldAttachment,
-  User,
-} from "../../db/__types";
+import { Petition, PetitionField, PetitionFieldAttachment, User } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -84,11 +79,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
     it("creates a new attachment on a petition field and returns the file information", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: FileUploadInput!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: FileUploadInput!) {
             createPetitionFieldAttachmentUploadLink(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -138,11 +129,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
     it("sends error if trying to attach a file on a private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: FileUploadInput!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: FileUploadInput!) {
             createPetitionFieldAttachmentUploadLink(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -171,11 +158,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
     it("sends error if fieldId does not correspond to a user petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: FileUploadInput!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: FileUploadInput!) {
             createPetitionFieldAttachmentUploadLink(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -204,11 +187,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
     it("sends error if trying to attach a file of size > 100MB", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: FileUploadInput!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: FileUploadInput!) {
             createPetitionFieldAttachmentUploadLink(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -238,11 +217,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       await mocks.createPetitionFieldAttachment(field.id, 10);
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $data: FileUploadInput!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: FileUploadInput!) {
             createPetitionFieldAttachmentUploadLink(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -274,11 +249,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       const [file] = await mocks.createRandomFileUpload(1, () => ({
         upload_complete: false,
       }));
-      const [attachment] = await mocks.createPetitionFieldAttachment(
-        field.id,
-        1,
-        [file]
-      );
+      const [attachment] = await mocks.createPetitionFieldAttachment(field.id, 1, [file]);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -320,11 +291,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
         size: "2048",
         upload_complete: true,
       }));
-      const [attachment] = await mocks.createPetitionFieldAttachment(
-        field.id,
-        1,
-        [file]
-      );
+      const [attachment] = await mocks.createPetitionFieldAttachment(field.id, 1, [file]);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -373,11 +340,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
         upload_complete: false,
       }));
 
-      const [attachment] = await mocks.createPetitionFieldAttachment(
-        field.id,
-        1,
-        [file]
-      );
+      const [attachment] = await mocks.createPetitionFieldAttachment(field.id, 1, [file]);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -451,11 +414,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
         upload_complete: false,
       }));
 
-      const [attachment] = await mocks.createPetitionFieldAttachment(
-        field.id,
-        1,
-        [file]
-      );
+      const [attachment] = await mocks.createPetitionFieldAttachment(field.id, 1, [file]);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`

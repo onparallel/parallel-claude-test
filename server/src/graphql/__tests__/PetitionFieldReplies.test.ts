@@ -75,11 +75,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
-            createSimpleReply(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              reply: $reply
-            ) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
               id
               status
               content
@@ -105,10 +101,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      const replyId = fromGlobalId(
-        data!.createSimpleReply.id,
-        "PetitionFieldReply"
-      ).id;
+      const replyId = fromGlobalId(data!.createSimpleReply.id, "PetitionFieldReply").id;
 
       const [row] = await mocks.knex
         .from("petition_field_reply")
@@ -128,11 +121,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
-            createSimpleReply(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              reply: $reply
-            ) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
               id
             }
           }
@@ -146,10 +135,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
       expect(errors).toBeUndefined();
 
-      const replyId = fromGlobalId(
-        data!.createSimpleReply.id,
-        "PetitionFieldReply"
-      ).id;
+      const replyId = fromGlobalId(data!.createSimpleReply.id, "PetitionFieldReply").id;
 
       const events = await mocks.knex
         .from("petition_event")
@@ -172,11 +158,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
-            createSimpleReply(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              reply: $reply
-            ) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
               id
               status
               content
@@ -201,11 +183,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
-            createSimpleReply(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              reply: $reply
-            ) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
               id
               status
               content
@@ -239,34 +217,23 @@ describe("GraphQL/Petition Field Replies", () => {
         1,
         () => ({ created_by: `Contact:${contact.id}` })
       );
-      [userTextReply] = await mocks.createRandomTextReply(
-        fields[0].id,
-        0,
-        1,
-        () => ({
-          user_id: user.id,
-          petition_access_id: null,
-          created_by: `User:${user.id}`,
-        })
-      );
+      [userTextReply] = await mocks.createRandomTextReply(fields[0].id, 0, 1, () => ({
+        user_id: user.id,
+        petition_access_id: null,
+        created_by: `User:${user.id}`,
+      }));
 
-      [userFileReply] = await mocks.createRandomFileReply(
-        fields[2].id,
-        1,
-        () => ({ user_id: user.id, petition_access_id: null })
-      );
+      [userFileReply] = await mocks.createRandomFileReply(fields[2].id, 1, () => ({
+        user_id: user.id,
+        petition_access_id: null,
+      }));
 
-      [userSelectReply] = await mocks.createRandomTextReply(
-        fields[1].id,
-        0,
-        1,
-        () => ({
-          user_id: user.id,
-          petition_access_id: null,
-          type: "SELECT",
-          content: { text: "option 1" },
-        })
-      );
+      [userSelectReply] = await mocks.createRandomTextReply(fields[1].id, 0, 1, () => ({
+        user_id: user.id,
+        petition_access_id: null,
+        type: "SELECT",
+        content: { text: "option 1" },
+      }));
     });
 
     afterEach(async () => {
@@ -279,11 +246,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
-            updateSimpleReply(
-              petitionId: $petitionId
-              replyId: $replyId
-              reply: $reply
-            ) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
               id
               status
               content
@@ -303,22 +266,12 @@ describe("GraphQL/Petition Field Replies", () => {
         content: { text: "my new reply" },
       });
 
-      const replyId = fromGlobalId(
-        data!.updateSimpleReply.id,
-        "PetitionFieldReply"
-      ).id;
+      const replyId = fromGlobalId(data!.updateSimpleReply.id, "PetitionFieldReply").id;
 
       const [row] = await mocks.knex
         .from("petition_field_reply")
         .where("id", replyId)
-        .select([
-          "id",
-          "type",
-          "created_by",
-          "updated_by",
-          "user_id",
-          "petition_access_id",
-        ]);
+        .select(["id", "type", "created_by", "updated_by", "user_id", "petition_access_id"]);
 
       expect(row).toEqual({
         id: replyId,
@@ -334,11 +287,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
-            updateSimpleReply(
-              petitionId: $petitionId
-              replyId: $replyId
-              reply: $reply
-            ) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
               id
               status
               content
@@ -354,22 +303,12 @@ describe("GraphQL/Petition Field Replies", () => {
 
       expect(errors).toBeUndefined();
 
-      const replyId = fromGlobalId(
-        data!.updateSimpleReply.id,
-        "PetitionFieldReply"
-      ).id;
+      const replyId = fromGlobalId(data!.updateSimpleReply.id, "PetitionFieldReply").id;
 
       const [row] = await mocks.knex
         .from("petition_field_reply")
         .where("id", replyId)
-        .select([
-          "id",
-          "type",
-          "created_by",
-          "updated_by",
-          "user_id",
-          "petition_access_id",
-        ]);
+        .select(["id", "type", "created_by", "updated_by", "user_id", "petition_access_id"]);
 
       expect(row).toEqual({
         id: replyId,
@@ -385,11 +324,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
-            updateSimpleReply(
-              petitionId: $petitionId
-              replyId: $replyId
-              reply: $reply
-            ) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
               id
             }
           }
@@ -403,10 +338,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
       expect(errors).toBeUndefined();
 
-      const replyId = fromGlobalId(
-        data!.updateSimpleReply.id,
-        "PetitionFieldReply"
-      ).id;
+      const replyId = fromGlobalId(data!.updateSimpleReply.id, "PetitionFieldReply").id;
 
       const events = await mocks.knex
         .from("petition_event")
@@ -439,11 +371,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
-            updateSimpleReply(
-              petitionId: $petitionId
-              replyId: $replyId
-              reply: $reply
-            ) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
               id
             }
           }
@@ -457,10 +385,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
       expect(errors).toBeUndefined();
 
-      const replyId = fromGlobalId(
-        data!.updateSimpleReply.id,
-        "PetitionFieldReply"
-      ).id;
+      const replyId = fromGlobalId(data!.updateSimpleReply.id, "PetitionFieldReply").id;
 
       const events = await mocks.knex
         .from("petition_event")
@@ -495,11 +420,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
-            updateSimpleReply(
-              petitionId: $petitionId
-              replyId: $replyId
-              reply: $reply
-            ) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
               id
             }
           }
@@ -513,10 +434,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
       expect(errors).toBeUndefined();
 
-      const replyId = fromGlobalId(
-        data!.updateSimpleReply.id,
-        "PetitionFieldReply"
-      ).id;
+      const replyId = fromGlobalId(data!.updateSimpleReply.id, "PetitionFieldReply").id;
 
       const events = await mocks.knex
         .from("petition_event")
@@ -547,11 +465,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
-            updateSimpleReply(
-              petitionId: $petitionId
-              replyId: $replyId
-              reply: $reply
-            ) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
               id
             }
           }
@@ -571,11 +485,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
-            updateSimpleReply(
-              petitionId: $petitionId
-              replyId: $replyId
-              reply: $reply
-            ) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
               id
             }
           }
@@ -598,23 +508,17 @@ describe("GraphQL/Petition Field Replies", () => {
     let userFileReply: PetitionFieldReply;
 
     beforeAll(async () => {
-      [userSimpleReply] = await mocks.createRandomTextReply(
-        fields[0].id,
-        0,
-        1,
-        () => ({ petition_access_id: null, user_id: user.id })
-      );
+      [userSimpleReply] = await mocks.createRandomTextReply(fields[0].id, 0, 1, () => ({
+        petition_access_id: null,
+        user_id: user.id,
+      }));
 
       [uploadedFile] = await mocks.createRandomFileUpload();
-      [userFileReply] = await mocks.createRandomFileReply(
-        fields[2].id,
-        1,
-        () => ({
-          content: { file_upload_id: uploadedFile.id },
-          user_id: user.id,
-          petition_access_id: null,
-        })
-      );
+      [userFileReply] = await mocks.createRandomFileReply(fields[2].id, 1, () => ({
+        content: { file_upload_id: uploadedFile.id },
+        user_id: user.id,
+        petition_access_id: null,
+      }));
     });
 
     it("deletes a simple reply as an User", async () => {

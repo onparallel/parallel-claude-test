@@ -98,17 +98,13 @@ describe("repositories/OrganizationRepository", () => {
         offset: 10,
       });
       expect(result.totalCount).toBe(42);
-      expect(result.items).toMatchObject(
-        org1Users.slice(10, 20).map(pick(["id"]))
-      );
+      expect(result.items).toMatchObject(org1Users.slice(10, 20).map(pick(["id"])));
     });
 
     test("returns the right amount of non-deleted users", async () => {
       const result = await organizations.loadOrgUsers(org2.id, { limit: 10 });
       expect(result.totalCount).toBe(5);
-      expect(result.items).toMatchObject(
-        org2Users.filter((_, i) => i % 2 !== 0).map(pick(["id"]))
-      );
+      expect(result.items).toMatchObject(org2Users.filter((_, i) => i % 2 !== 0).map(pick(["id"])));
     });
 
     test("returns empty for an org without users", async () => {

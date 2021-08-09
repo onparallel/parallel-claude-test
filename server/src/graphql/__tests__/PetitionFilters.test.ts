@@ -28,22 +28,11 @@ describe("Petition Filters", () => {
 
     users = await mocks.createRandomUsers(organization.id, 3);
     [userGroup] = await mocks.createUserGroups(1, organization.id);
-    await mocks.insertUserGroupMembers(userGroup.id, [
-      sessionUser.id,
-      users[0].id,
-    ]);
+    await mocks.insertUserGroupMembers(userGroup.id, [sessionUser.id, users[0].id]);
 
-    petitions = await mocks.createRandomPetitions(
-      organization.id,
-      sessionUser.id,
-      4
-    );
+    petitions = await mocks.createRandomPetitions(organization.id, sessionUser.id, 4);
 
-    const [otherPetition] = await mocks.createRandomPetitions(
-      organization.id,
-      users[1].id,
-      1
-    );
+    const [otherPetition] = await mocks.createRandomPetitions(organization.id, users[1].id, 1);
 
     petitions.push(otherPetition);
 

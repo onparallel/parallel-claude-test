@@ -41,9 +41,7 @@ import {
 export class Mocks {
   constructor(public knex: Knex) {}
 
-  async loadUserPermissionsByPetitionId(
-    id: number
-  ): Promise<PetitionPermission[]> {
+  async loadUserPermissionsByPetitionId(id: number): Promise<PetitionPermission[]> {
     const { rows: permissions } = await this.knex.raw(
       /* sql */ `SELECT * from petition_permission where petition_id = ? and deleted_at is null`,
       [id]
@@ -208,10 +206,7 @@ export class Mocks {
       .returning("*");
   }
 
-  async createRandomFileUpload(
-    amount?: number,
-    builder?: (index: number) => Partial<FileUpload>
-  ) {
+  async createRandomFileUpload(amount?: number, builder?: (index: number) => Partial<FileUpload>) {
     return await this.knex<FileUpload>("file_upload")
       .insert(
         range(0, amount || 1).map<CreateFileUpload>((index) => ({
@@ -226,11 +221,7 @@ export class Mocks {
       .returning("*");
   }
 
-  async createPetitionFieldAttachment(
-    fieldId: number,
-    amount?: number,
-    files?: FileUpload[]
-  ) {
+  async createPetitionFieldAttachment(fieldId: number, amount?: number, files?: FileUpload[]) {
     const fileUploads = files ?? (await this.createRandomFileUpload(amount));
     return await this.knex<PetitionFieldAttachment>("petition_field_attachment")
       .insert(
@@ -334,9 +325,7 @@ export class Mocks {
 
   async createUserAuthToken(tokenName: string, userId: number) {
     const apiKey = random(48);
-    const [auth] = await this.knex<UserAuthenticationToken>(
-      "user_authentication_token"
-    )
+    const [auth] = await this.knex<UserAuthenticationToken>("user_authentication_token")
       .insert({
         token_name: tokenName,
         token_hash: await hash(apiKey, ""),
@@ -349,19 +338,11 @@ export class Mocks {
   }
 
   async clearUserAuthTokens() {
-    return await this.knex<UserAuthenticationToken>(
-      "user_authentication_token"
-    ).delete();
+    return await this.knex<UserAuthenticationToken>("user_authentication_token").delete();
   }
 
-  async createSubscriptions(
-    petitionIds: number[],
-    endpoint: string,
-    userId: number
-  ) {
-    return await this.knex<PetitionEventSubscription>(
-      "petition_event_subscription"
-    )
+  async createSubscriptions(petitionIds: number[], endpoint: string, userId: number) {
+    return await this.knex<PetitionEventSubscription>("petition_event_subscription")
       .insert(
         petitionIds.map((petitionId) => ({
           petition_id: petitionId,
@@ -434,9 +415,7 @@ export class Mocks {
   }
 
   async clearUserNotifications() {
-    return await this.knex<PetitionUserNotification>(
-      "petition_user_notification"
-    ).delete();
+    return await this.knex<PetitionUserNotification>("petition_user_notification").delete();
   }
 
   async createRandomCommentsFromUser(
@@ -519,11 +498,7 @@ function randomPetitionStatus() {
 }
 
 function randomPetitionFieldType() {
-  return faker.random.arrayElement<PetitionFieldType>([
-    "FILE_UPLOAD",
-    "TEXT",
-    "SELECT",
-  ]);
+  return faker.random.arrayElement<PetitionFieldType>(["FILE_UPLOAD", "TEXT", "SELECT"]);
 }
 
 function randomSupportedLocale() {

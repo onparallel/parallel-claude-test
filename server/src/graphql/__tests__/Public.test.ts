@@ -1,10 +1,6 @@
 import gql from "graphql-tag";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import {
-  PetitionAccess,
-  PetitionField,
-  PetitionFieldReply,
-} from "../../db/__types";
+import { PetitionAccess, PetitionField, PetitionFieldReply } from "../../db/__types";
 import { initServer, TestClient } from "./server";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
@@ -24,8 +20,7 @@ describe("GraphQL/Public", () => {
   beforeAll(async () => {
     testClient = await initServer();
     knex = testClient.container.get<Knex>(KNEX);
-    contactRepository =
-      testClient.container.get<ContactRepository>(ContactRepository);
+    contactRepository = testClient.container.get<ContactRepository>(ContactRepository);
     mocks = new Mocks(knex);
     const [org] = await mocks.createRandomOrganizations(1, () => ({
       identifier: "parallel",
@@ -38,18 +33,11 @@ describe("GraphQL/Public", () => {
       petition.id,
       3,
       (i) =>
-        [
-          { type: "HEADING", is_fixed: true },
-          { type: "TEXT" },
-          { type: "FILE_UPLOAD" },
-        ][i] as Partial<PetitionField>
+        [{ type: "HEADING", is_fixed: true }, { type: "TEXT" }, { type: "FILE_UPLOAD" }][
+          i
+        ] as Partial<PetitionField>
     );
-    [access] = await mocks.createPetitionAccess(
-      petition.id,
-      user.id,
-      [contact.id],
-      user.id
-    );
+    [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
   });
 
   afterAll(async () => {
@@ -58,17 +46,10 @@ describe("GraphQL/Public", () => {
 
   it("allows access on the first time and gives cookie required for subsequent times", async () => {
     // make sure there's no previous contact authentications
-    expect(
-      await contactRepository.hasContactAuthentication(access.contact_id)
-    ).toBe(false);
+    expect(await contactRepository.hasContactAuthentication(access.contact_id)).toBe(false);
     const mutation = gql`
       mutation ($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
-        verifyPublicAccess(
-          token: $token
-          keycode: $keycode
-          ip: $ip
-          userAgent: $userAgent
-        ) {
+        verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
           isAllowed
           cookieName
           cookieValue
@@ -129,9 +110,7 @@ describe("GraphQL/Public", () => {
 
   it("sends a verification code", async () => {
     // assume already existing contact authentication from previous test
-    expect(
-      await contactRepository.hasContactAuthentication(access.contact_id)
-    ).toBe(true);
+    expect(await contactRepository.hasContactAuthentication(access.contact_id)).toBe(true);
 
     const emailSpy = jest.spyOn(
       testClient.container.get<IEmailsService>(EMAILS),
@@ -155,9 +134,7 @@ describe("GraphQL/Public", () => {
 
     // get generated code
     const requestId = emailSpy.mock.calls[emailSpy.mock.calls.length - 1][0];
-    const [{ code }] = await knex
-      .from("contact_authentication_request")
-      .where("id", requestId);
+    const [{ code }] = await knex.from("contact_authentication_request").where("id", requestId);
 
     const req = {
       headers: {},
@@ -172,11 +149,7 @@ describe("GraphQL/Public", () => {
     const res2 = await testClient.mutate({
       mutation: gql`
         mutation ($keycode: ID!, $token: ID!, $code: String!) {
-          publicCheckVerificationCode(
-            keycode: $keycode
-            token: $token
-            code: $code
-          ) {
+          publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
             result
             remainingAttempts
           }
@@ -193,9 +166,7 @@ describe("GraphQL/Public", () => {
     expect(res2.data!.publicCheckVerificationCode.result).toBe("SUCCESS");
     expect(cookieSpy).toHaveBeenCalled();
 
-    const [cookieName, cookieValue] = cookieSpy.mock.calls[
-      cookieSpy.mock.calls.length - 1
-    ] as any;
+    const [cookieName, cookieValue] = cookieSpy.mock.calls[cookieSpy.mock.calls.length - 1] as any;
 
     // verify cookie is valid
     testClient.setNextReq({
@@ -207,12 +178,7 @@ describe("GraphQL/Public", () => {
     const res3 = await testClient.mutate({
       mutation: gql`
         mutation ($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
-          verifyPublicAccess(
-            token: $token
-            keycode: $keycode
-            ip: $ip
-            userAgent: $userAgent
-          ) {
+          verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
             isAllowed
           }
         }
@@ -254,11 +220,7 @@ describe("GraphQL/Public", () => {
         upload_complete: true,
       }));
 
-      const [attachment] = await mocks.createPetitionFieldAttachment(
-        fields[1].id,
-        1,
-        [file]
-      );
+      const [attachment] = await mocks.createPetitionFieldAttachment(fields[1].id, 1, [file]);
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($keycode: ID!, $fieldId: GID!, $attachmentId: GID!) {
@@ -304,11 +266,7 @@ describe("GraphQL/Public", () => {
         size: "150",
         upload_complete: false,
       }));
-      const [attachment] = await mocks.createPetitionFieldAttachment(
-        fields[1].id,
-        1,
-        [file]
-      );
+      const [attachment] = await mocks.createPetitionFieldAttachment(fields[1].id, 1, [file]);
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($keycode: ID!, $fieldId: GID!, $attachmentId: GID!) {
@@ -391,23 +349,15 @@ describe("GraphQL/Public", () => {
     });
 
     it("sends error if trying to submit wrong option", async () => {
-      const [checkboxField] = await mocks.createRandomPetitionFields(
-        access.petition_id,
-        1,
-        () => ({
-          type: "CHECKBOX",
-          position: 5,
-        })
-      );
+      const [checkboxField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+        type: "CHECKBOX",
+        position: 5,
+      }));
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($keycode: ID!, $fieldId: GID!, $values: [String!]!) {
-            publicCreateCheckboxReply(
-              keycode: $keycode
-              fieldId: $fieldId
-              values: $values
-            ) {
+            publicCreateCheckboxReply(keycode: $keycode, fieldId: $fieldId, values: $values) {
               id
             }
           }
@@ -434,11 +384,7 @@ describe("GraphQL/Public", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($keycode: ID!, $fieldId: GID!, $values: [String!]!) {
-            publicCreateCheckboxReply(
-              keycode: $keycode
-              fieldId: $fieldId
-              values: $values
-            ) {
+            publicCreateCheckboxReply(keycode: $keycode, fieldId: $fieldId, values: $values) {
               id
               content
             }
@@ -464,11 +410,7 @@ describe("GraphQL/Public", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($keycode: ID!, $replyId: GID!, $values: [String!]!) {
-            publicUpdateCheckboxReply(
-              keycode: $keycode
-              replyId: $replyId
-              values: $values
-            ) {
+            publicUpdateCheckboxReply(keycode: $keycode, replyId: $replyId, values: $values) {
               content
             }
           }
@@ -487,11 +429,7 @@ describe("GraphQL/Public", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($keycode: ID!, $replyId: GID!, $values: [String!]!) {
-            publicUpdateCheckboxReply(
-              keycode: $keycode
-              replyId: $replyId
-              values: $values
-            ) {
+            publicUpdateCheckboxReply(keycode: $keycode, replyId: $replyId, values: $values) {
               content
             }
           }

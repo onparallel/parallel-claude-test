@@ -55,15 +55,10 @@ describe("GraphQL - PetitionUserNotifications", () => {
   });
 
   beforeEach(async () => {
-    [petition] = await mocks.createRandomPetitions(
-      organization.id,
-      sessionUser.id
-    );
-    [petitionField] = await mocks.createRandomPetitionFields(
-      petition.id,
-      1,
-      () => ({ type: "TEXT" })
-    );
+    [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id);
+    [petitionField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+      type: "TEXT",
+    }));
 
     [petitionFieldComment] = await mocks.createRandomCommentsFromUser(
       sessionUser.id,
@@ -343,10 +338,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
         mutation ($isRead: Boolean!, $filter: PetitionUserNotificationFilter) {
-          updatePetitionUserNotificationReadStatus(
-            isRead: $isRead
-            filter: $filter
-          ) {
+          updatePetitionUserNotificationReadStatus(isRead: $isRead, filter: $filter) {
             id
           }
         }
@@ -368,10 +360,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
         mutation ($isRead: Boolean!, $filter: PetitionUserNotificationFilter) {
-          updatePetitionUserNotificationReadStatus(
-            isRead: $isRead
-            filter: $filter
-          ) {
+          updatePetitionUserNotificationReadStatus(isRead: $isRead, filter: $filter) {
             id
             ... on PetitionCompletedUserNotification {
               access {
@@ -400,10 +389,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
         mutation ($isRead: Boolean!, $petitionIds: [GID!]) {
-          updatePetitionUserNotificationReadStatus(
-            isRead: $isRead
-            petitionIds: $petitionIds
-          ) {
+          updatePetitionUserNotificationReadStatus(isRead: $isRead, petitionIds: $petitionIds) {
             id
           }
         }
@@ -434,9 +420,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       `,
       variables: {
         isRead: true,
-        petitionFieldCommentIds: [
-          toGlobalId("PetitionFieldComment", petitionFieldComment.id),
-        ],
+        petitionFieldCommentIds: [toGlobalId("PetitionFieldComment", petitionFieldComment.id)],
       },
     });
     expect(errors).toBeUndefined();
@@ -458,9 +442,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
         }
       `,
       variables: {
-        notificationIds: [
-          toGlobalId("PetitionUserNotification", notifications[0].id),
-        ],
+        notificationIds: [toGlobalId("PetitionUserNotification", notifications[0].id)],
         isRead: false,
       },
     });
@@ -511,9 +493,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
         }
       `,
       variables: {
-        notificationIds: [
-          toGlobalId("PetitionUserNotification", notifications[1].id),
-        ],
+        notificationIds: [toGlobalId("PetitionUserNotification", notifications[1].id)],
         isRead: true,
       },
     });
@@ -592,11 +572,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
   it("notification should be deleted if the user comments a field and then deletes the comment", async () => {
     const { errors } = await testClient.mutate({
       mutation: gql`
-        mutation (
-          $petitionFieldCommentId: GID!
-          $petitionFieldId: GID!
-          $petitionId: GID!
-        ) {
+        mutation ($petitionFieldCommentId: GID!, $petitionFieldId: GID!, $petitionId: GID!) {
           deletePetitionFieldComment(
             petitionFieldCommentId: $petitionFieldCommentId
             petitionFieldId: $petitionFieldId
@@ -609,10 +585,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       variables: {
         petitionId: toGlobalId("Petition", petition.id),
         petitionFieldId: toGlobalId("PetitionField", petitionField.id),
-        petitionFieldCommentId: toGlobalId(
-          "PetitionFieldComment",
-          petitionFieldComment.id
-        ),
+        petitionFieldCommentId: toGlobalId("PetitionFieldComment", petitionFieldComment.id),
       },
     });
 
@@ -640,9 +613,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
     expect(errors).toBeUndefined();
 
-    const petitionNotifications = await knex<PetitionUserNotification>(
-      "petition_user_notification"
-    )
+    const petitionNotifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where("petition_id", petition.id)
       .select("id");
 
@@ -653,10 +624,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     const { errors: transferErrors } = await testClient.mutate({
       mutation: gql`
         mutation ($petitionIds: [GID!]!, $userId: GID!) {
-          transferPetitionOwnership(
-            petitionIds: $petitionIds
-            userId: $userId
-          ) {
+          transferPetitionOwnership(petitionIds: $petitionIds, userId: $userId) {
             id
           }
         }
@@ -708,10 +676,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     const { errors: transferErrors } = await testClient.mutate({
       mutation: gql`
         mutation ($petitionIds: [GID!]!, $userId: GID!) {
-          transferPetitionOwnership(
-            petitionIds: $petitionIds
-            userId: $userId
-          ) {
+          transferPetitionOwnership(petitionIds: $petitionIds, userId: $userId) {
             id
           }
         }
@@ -728,10 +693,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       .mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]) {
-            removePetitionPermission(
-              petitionIds: $petitionIds
-              userIds: $userIds
-            ) {
+            removePetitionPermission(petitionIds: $petitionIds, userIds: $userIds) {
               id
             }
           }
@@ -772,11 +734,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
   it("notifications should be deleted if other user stops sharing the petition with a group i'm in", async () => {
     const [userGroup] = await mocks.createUserGroups(1, organization.id);
     await mocks.insertUserGroupMembers(userGroup.id, [sessionUser.id]);
-    const [groupPetition] = await mocks.createRandomPetitions(
-      organization.id,
-      otherUser.id,
-      1
-    );
+    const [groupPetition] = await mocks.createRandomPetitions(organization.id, otherUser.id, 1);
     await mocks.sharePetitionWithGroups(groupPetition.id, [userGroup.id]);
     await knex("petition_user_notification").insert({
       created_at: "2021-07-10T10:00:00Z",
@@ -799,10 +757,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       .mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]) {
-            removePetitionPermission(
-              petitionIds: $petitionIds
-              userGroupIds: $userGroupIds
-            ) {
+            removePetitionPermission(petitionIds: $petitionIds, userGroupIds: $userGroupIds) {
               id
             }
           }
@@ -854,10 +809,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
   it("notifications should not be deleted if other user stops sharing with a group but user still has direct access", async () => {
     const [userGroup] = await mocks.createUserGroups(1, organization.id);
     await mocks.insertUserGroupMembers(userGroup.id, [sessionUser.id]);
-    const [otherPetition] = await mocks.createRandomPetitions(
-      organization.id,
-      otherUser.id
-    );
+    const [otherPetition] = await mocks.createRandomPetitions(organization.id, otherUser.id);
 
     await mocks.sharePetitionWithGroups(otherPetition.id, [userGroup.id]);
     await mocks.sharePetitions([otherPetition.id], sessionUser.id, "READ");
@@ -867,10 +819,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       .mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]) {
-            removePetitionPermission(
-              petitionIds: $petitionIds
-              userGroupIds: $userGroupIds
-            ) {
+            removePetitionPermission(petitionIds: $petitionIds, userGroupIds: $userGroupIds) {
               id
             }
           }
