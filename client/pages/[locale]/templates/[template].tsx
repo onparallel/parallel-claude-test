@@ -39,6 +39,7 @@ function LandingTemplateDetails({
   const intl = useIntl();
 
   const {
+    slug,
     name,
     imageUrl,
     backgroundColor,
@@ -229,9 +230,12 @@ function LandingTemplateDetails({
               }}
               gap={6}
             >
-              {relatedTemplates.items.map((t) => (
-                <PublicTemplateCard key={t.id} template={t} showCategories />
-              ))}
+              {relatedTemplates.items
+                .filter((t) => t.slug !== slug)
+                .slice(0, 3)
+                .map((t) => (
+                  <PublicTemplateCard key={t.id} template={t} showCategories />
+                ))}
             </Grid>
           </Stack>
         </Stack>
@@ -326,7 +330,7 @@ export const getServerSideProps: GetServerSideProps<{
       `,
       variables: {
         offset: 0,
-        limit: 3,
+        limit: 4,
         locale: locale as PetitionLocale,
         categories,
       },
