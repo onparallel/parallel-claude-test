@@ -19,6 +19,7 @@ type SlateNode = {
     | "bulleted-list"
     | "numbered-list"
     | "list-item"
+    | "list-item-child"
     | "placeholder"
     | "link";
   placeholder?: string;
@@ -70,6 +71,7 @@ function renderSlate(
   if (Array.isArray(node.children)) {
     switch (node.type) {
       case "paragraph":
+      case "list-item-child":
       case undefined: {
         return (
           <p style={{ margin: 0 }}>
@@ -165,39 +167,48 @@ export function toHtml(
 }
 
 export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
-  function serialize(node: SlateNode): string {
+  function serialize(node: SlateNode, parent?: SlateNode, index?: number): string {
     if (Array.isArray(node.children)) {
       switch (node.type) {
         case "paragraph":
         case undefined:
         case "heading":
         case "subheading":
-          return `${node.children.map(serialize).join("")}`;
+          return node.children.map((child) => serialize(child, node)).join("");
         case "bulleted-list":
         case "numbered-list":
-          return node.children.map((child) => serialize(child).replace(/^/gm, "  ")).join("\n");
+          return node.children
+            .map((child, i) => serialize(child, node, i))
+            .join("\n")
+            .replace(/^/gm, "  ");
         case "list-item":
           return node.children
             .map((child, i: number) => {
               switch (child.type) {
+                // first child on list-item used to be a paragraph
                 case "paragraph":
-                  return `${i === 0 ? "- " : "  "}${serialize(child)}`;
+                case "list-item-child":
+                  const prefix = parent!.type === "bulleted-list" ? "- " : `${index! + 1}. `;
+                  return `${prefix}${child.children!.map((c) => serialize(c, child)).join("")}`;
+                case "bulleted-list":
+                case "numbered-list":
+                  return serialize(child, node);
                 default:
-                  return serialize(child).replace(/^/gm, "  ");
+                  throw new Error(`Unexpected child of list-item ${child.type}`);
               }
             })
             .join("\n");
         case "placeholder":
           return getPlaceholder(node.placeholder, ctx);
         case "link":
-          return `${node.children.map(serialize).join("")}`;
+          return `${node.children.map((child) => serialize(child, node)).join("")}`;
       }
     } else if (typeof node.text === "string") {
       return node.text;
     }
     return "";
   }
-  return body.map(serialize).join("\n");
+  return body.map((child) => serialize(child)).join("\n");
 }
 
 export function fromPlainText(value: string): SlateNode[] {

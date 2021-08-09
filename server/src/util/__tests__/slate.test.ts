@@ -1,14 +1,11 @@
+import { outdent } from "outdent";
 import { toHtml, toPlainText } from "../slate";
 
 const rootNode = (...children: string[]) => children.join("");
-const paragraph = (...children: string[]) =>
-  `<p style="margin:0">${children.join("")}</p>`;
+const paragraph = (...children: string[]) => `<p style="margin:0">${children.join("")}</p>`;
 const bulletList = (...children: string[]) =>
-  `<ul style="margin:0;margin-left:24px;padding-left:0">${children.join(
-    ""
-  )}</ul>`;
-const listItem = (...children: string[]) =>
-  `<li style="margin-left:0">${children.join("")}</li>`;
+  `<ul style="margin:0;margin-left:24px;padding-left:0">${children.join("")}</ul>`;
+const listItem = (...children: string[]) => `<li style="margin-left:0">${children.join("")}</li>`;
 
 describe("Slate", () => {
   describe("toHTML", () => {
@@ -16,11 +13,7 @@ describe("Slate", () => {
       expect(
         toHtml([
           {
-            children: [
-              {
-                text: "Hello World!",
-              },
-            ],
+            children: [{ text: "Hello World!" }],
           },
         ])
       ).toEqual(rootNode(paragraph("<span>Hello World!</span>")));
@@ -29,28 +22,11 @@ describe("Slate", () => {
     it("two paragraphs", () => {
       expect(
         toHtml([
-          {
-            type: "paragraph",
-            children: [
-              {
-                text: "Hello World!",
-              },
-            ],
-          },
-          {
-            type: "paragraph",
-            children: [
-              {
-                text: "Goodbye.",
-              },
-            ],
-          },
+          { type: "paragraph", children: [{ text: "Hello World!" }] },
+          { type: "paragraph", children: [{ text: "Goodbye." }] },
         ])
       ).toEqual(
-        rootNode(
-          paragraph("<span>Hello World!</span>"),
-          paragraph("<span>Goodbye.</span>")
-        )
+        rootNode(paragraph("<span>Hello World!</span>"), paragraph("<span>Goodbye.</span>"))
       );
     });
 
@@ -58,20 +34,37 @@ describe("Slate", () => {
       expect(
         toHtml([
           {
+            children: [{ text: "Hello", bold: true }, { text: "World!" }],
+          },
+        ])
+      ).toEqual(
+        rootNode(paragraph('<span style="font-weight:bold">Hello</span>', "<span>World!</span>"))
+      );
+    });
+
+    it("old style bulleted list", () => {
+      // first child on list-item used to be a paragraph
+      expect(
+        toHtml([
+          {
+            type: "bulleted-list",
             children: [
               {
-                text: "Hello",
-                bold: true,
+                type: "list-item",
+                children: [{ type: "paragraph", children: [{ text: "item 1" }] }],
               },
-              { text: "World!" },
+              {
+                type: "list-item",
+                children: [{ type: "paragraph", children: [{ text: "item 2" }] }],
+              },
             ],
           },
         ])
       ).toEqual(
         rootNode(
-          paragraph(
-            '<span style="font-weight:bold">Hello</span>',
-            "<span>World!</span>"
+          bulletList(
+            listItem(paragraph("<span>item 1</span>")),
+            listItem(paragraph("<span>item 2</span>"))
           )
         )
       );
@@ -85,21 +78,11 @@ describe("Slate", () => {
             children: [
               {
                 type: "list-item",
-                children: [
-                  {
-                    type: "paragraph",
-                    children: [{ text: "item 1" }],
-                  },
-                ],
+                children: [{ type: "list-item-child", children: [{ text: "item 1" }] }],
               },
               {
                 type: "list-item",
-                children: [
-                  {
-                    type: "paragraph",
-                    children: [{ text: "item 2" }],
-                  },
-                ],
+                children: [{ type: "list-item-child", children: [{ text: "item 2" }] }],
               },
             ],
           },
@@ -160,23 +143,14 @@ describe("Slate", () => {
                           children: [
                             {
                               type: "paragraph",
-                              children: [
-                                {
-                                  text: "foto",
-                                  bold: true,
-                                  underline: true,
-                                },
-                              ],
+                              children: [{ text: "foto", bold: true, underline: true }],
                             },
                           ],
                           type: "list-item",
                         },
                         {
                           children: [
-                            {
-                              type: "paragraph",
-                              children: [{ text: "pasaporte", italic: true }],
-                            },
+                            { type: "paragraph", children: [{ text: "pasaporte", italic: true }] },
                           ],
                           type: "list-item",
                         },
@@ -203,21 +177,15 @@ describe("Slate", () => {
           paragraph("<span>hmmm</span>"),
           bulletList(
             listItem(
-              paragraph(
-                '<span style="font-weight:bold;text-decoration:underline">foto</span>'
-              )
+              paragraph('<span style="font-weight:bold;text-decoration:underline">foto</span>')
             ),
             listItem(
               paragraph('<span style="font-style:italic">pasaporte</span>'),
               bulletList(
                 listItem(
-                  paragraph(
-                    '<span style="font-weight:bold;text-decoration:underline">foto</span>'
-                  )
+                  paragraph('<span style="font-weight:bold;text-decoration:underline">foto</span>')
                 ),
-                listItem(
-                  paragraph('<span style="font-style:italic">pasaporte</span>')
-                )
+                listItem(paragraph('<span style="font-style:italic">pasaporte</span>'))
               )
             )
           )
@@ -230,9 +198,7 @@ describe("Slate", () => {
         toHtml([
           {
             type: "paragraph",
-            children: [
-              { text: '<div style="color:red">im a malicious script!</div>' },
-            ],
+            children: [{ text: '<div style="color:red">im a malicious script!</div>' }],
           },
         ])
       ).toEqual(
@@ -252,11 +218,7 @@ describe("Slate", () => {
             children: [{ text: "hola que  tal   estas?" }],
           },
         ])
-      ).toEqual(
-        rootNode(
-          paragraph("<span>hola que &nbsp;tal &nbsp;&nbsp;estas?</span>")
-        )
-      );
+      ).toEqual(rootNode(paragraph("<span>hola que &nbsp;tal &nbsp;&nbsp;estas?</span>")));
     });
   });
 
@@ -264,24 +226,176 @@ describe("Slate", () => {
     it("two paragraphs", () => {
       expect(
         toPlainText([
+          { type: "paragraph", children: [{ text: "Hello World!" }] },
+          { type: "paragraph", children: [{ text: "Goodbye." }] },
+        ])
+      ).toEqual(outdent`
+        Hello World!
+        Goodbye.
+      `);
+    });
+
+    it("old style bulleted list", () => {
+      // first child on list-item used to be a paragraph
+      expect(
+        toPlainText([
+          { type: "paragraph", children: [{ text: "Hello World!" }] },
           {
-            type: "paragraph",
+            type: "bulleted-list",
             children: [
               {
-                text: "Hello World!",
+                type: "list-item",
+                children: [{ type: "paragraph", children: [{ text: "item 1" }] }],
               },
-            ],
-          },
-          {
-            type: "paragraph",
-            children: [
               {
-                text: "Goodbye.",
+                type: "list-item",
+                children: [{ type: "paragraph", children: [{ text: "item 2" }] }],
               },
             ],
           },
         ])
-      ).toEqual("Hello World!\nGoodbye.");
+      ).toEqual(outdent`
+        Hello World!
+          - item 1
+          - item 2
+      `);
+    });
+
+    it("bulleted list", () => {
+      expect(
+        toPlainText([
+          { type: "paragraph", children: [{ text: "Hello World!" }] },
+          {
+            type: "bulleted-list",
+            children: [
+              {
+                type: "list-item",
+                children: [{ type: "list-item-child", children: [{ text: "item 1" }] }],
+              },
+              {
+                type: "list-item",
+                children: [{ type: "list-item-child", children: [{ text: "item 2" }] }],
+              },
+            ],
+          },
+        ])
+      ).toEqual(outdent`
+        Hello World!
+          - item 1
+          - item 2
+      `);
+    });
+
+    it("nested unordered lists", () => {
+      expect(
+        toPlainText([
+          { type: "paragraph", children: [{ text: "Hello World!" }] },
+          {
+            type: "bulleted-list",
+            children: [
+              {
+                type: "list-item",
+                children: [
+                  { type: "list-item-child", children: [{ text: "item 1" }] },
+                  {
+                    type: "bulleted-list",
+                    children: [
+                      {
+                        type: "list-item",
+                        children: [{ type: "list-item-child", children: [{ text: "item 1.1" }] }],
+                      },
+                      {
+                        type: "list-item",
+                        children: [
+                          { type: "list-item-child", children: [{ text: "item 1.2" }] },
+                          {
+                            type: "bulleted-list",
+                            children: [
+                              {
+                                type: "list-item",
+                                children: [
+                                  { type: "list-item-child", children: [{ text: "item 1.2.1" }] },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "list-item",
+                children: [{ type: "paragraph", children: [{ text: "item 2" }] }],
+              },
+            ],
+          },
+        ])
+      ).toEqual(outdent`
+        Hello World!
+          - item 1
+            - item 1.1
+            - item 1.2
+              - item 1.2.1
+          - item 2
+      `);
+    });
+
+    it("nested ordered lists", () => {
+      expect(
+        toPlainText([
+          { type: "paragraph", children: [{ text: "Hello World!" }] },
+          {
+            type: "numbered-list",
+            children: [
+              {
+                type: "list-item",
+                children: [
+                  { type: "list-item-child", children: [{ text: "item 1" }] },
+                  {
+                    type: "numbered-list",
+                    children: [
+                      {
+                        type: "list-item",
+                        children: [{ type: "list-item-child", children: [{ text: "item 1.1" }] }],
+                      },
+                      {
+                        type: "list-item",
+                        children: [
+                          { type: "list-item-child", children: [{ text: "item 1.2" }] },
+                          {
+                            type: "numbered-list",
+                            children: [
+                              {
+                                type: "list-item",
+                                children: [
+                                  { type: "list-item-child", children: [{ text: "item 1.2.1" }] },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "list-item",
+                children: [{ type: "paragraph", children: [{ text: "item 2" }] }],
+              },
+            ],
+          },
+        ])
+      ).toEqual(outdent`
+        Hello World!
+          1. item 1
+            1. item 1.1
+            2. item 1.2
+              1. item 1.2.1
+          2. item 2
+      `);
     });
   });
 });
