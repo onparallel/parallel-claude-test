@@ -125,7 +125,7 @@ export function PublicTemplatesContainer({
           })}
         </Stack>
 
-        <Box display={{ base: "box", md: "none" }}>
+        <Box display={{ base: "block", md: "none" }}>
           <Menu placement="bottom" matchWidth={true}>
             {({ isOpen }) => (
               <>

@@ -1,16 +1,9 @@
-import {
-  Button,
-  Flex,
-  Grid,
-  GridItem,
-  Text,
-  useBreakpointValue,
-} from "@chakra-ui/react";
+import { Button, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { PublicTemplateCard } from "./PublicTemplateCard";
 import { PublicTemplateCategory } from "../../../utils/usePublicTemplateCategories";
+import { PublicTemplateCard } from "./PublicTemplateCard";
 
 export function PublicTemplateCategoryPreview({
   category,
@@ -19,8 +12,6 @@ export function PublicTemplateCategoryPreview({
   category: PublicTemplateCategory;
   templates: PublicTemplateCard_LandingTemplateFragment[];
 }) {
-  const displaySideMenu = useBreakpointValue({ base: false, md: true });
-
   const { label, slug } = category;
 
   return (
@@ -28,11 +19,10 @@ export function PublicTemplateCategoryPreview({
       gap={6}
       templateColumns="1fr auto"
       templateRows="auto 1fr auto"
-      templateAreas={
-        displaySideMenu
-          ? `'title actions' 'content content'`
-          : `'title title' 'content content' 'actions actions'`
-      }
+      templateAreas={{
+        base: `'title title' 'content content' 'actions actions'`,
+        md: `'title actions' 'content content'`,
+      }}
     >
       <GridItem gridArea="title" as={Flex} alignItems="flex-end">
         <Text fontSize="2xl" fontWeight="bold">
