@@ -96,11 +96,13 @@ export function PetitionListStatusFilter({
         if (index === 0) {
           newValue.clear();
         } else {
-          const status = statuses[index - 1].value;
-          if (newValue.has(status)) {
-            newValue.delete(status);
-          } else {
-            newValue.add(status);
+          const status = statuses[index - 1]?.value;
+          if (status) {
+            if (newValue.has(status)) {
+              newValue.delete(status);
+            } else {
+              newValue.add(status);
+            }
           }
         }
         onChange(newValue.size === 0 ? null : Array.from(newValue.values()));
@@ -145,7 +147,7 @@ export function PetitionListStatusFilter({
         data-index={0}
         tabIndex={activeIndex === 0 || activeIndex === null ? 0 : -1}
       >
-        <Center boxSize={4} marginRight={2}>
+        <Center boxSize={4} marginRight={2} pointerEvents="none">
           <CloseIcon fontSize="xs" role="presentation" />
         </Center>
         <FormattedMessage
