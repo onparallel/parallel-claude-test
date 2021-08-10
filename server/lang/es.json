@@ -376,8 +376,8 @@
   },
   {
     "term": "verification-code-request.subject",
-    "definition": "Verifique su dispositivo",
-    "context": "Verify your device"
+    "definition": "{code} es tu código de verificación en Parallel",
+    "context": "{code} is your verification code on Parallel"
   },
   {
     "term": "welcome.click-to-verify",

@@ -21,11 +21,14 @@ const email: Email<ContactAuthenticationRequest> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({}, intl) {
-    return intl.formatMessage({
-      id: "verification-code-request.subject",
-      defaultMessage: "Verify your device",
-    });
+  subject({ code }, intl) {
+    return intl.formatMessage(
+      {
+        id: "verification-code-request.subject",
+        defaultMessage: "{code} is your verification code on Parallel",
+      },
+      { code }
+    );
   },
   text({ fullName, code, browserName, osName }, intl) {
     return outdent`
