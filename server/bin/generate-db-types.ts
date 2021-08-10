@@ -107,7 +107,12 @@ export type Create${table.name} = PartialProps<
     )
     .join("\n")}
   `;
-  await fs.writeFile(dist, format(contents, { parser: "typescript" }));
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const prettierOptions = await fs.readFile(path.join(__dirname, "../../.prettierrc"), "utf-8");
+  await fs.writeFile(
+    dist,
+    format(contents, { parser: "typescript", ...JSON.parse(prettierOptions) })
+  );
 }
 
 async function query<T>(sql: string, bindings?: any[]) {
