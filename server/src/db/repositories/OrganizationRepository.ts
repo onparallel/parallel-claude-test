@@ -31,6 +31,14 @@ export class OrganizationRepository extends BaseRepository {
     super(knex);
   }
 
+  readonly defaultOrganizationUsageDetails: OrganizationUsageDetails = {
+    USER_SEATS: 1000,
+    PETITION_SEND: {
+      limit: 5000,
+      period: "month",
+    },
+  };
+
   readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
 
   async loadOrgUsers(
@@ -115,6 +123,7 @@ export class OrganizationRepository extends BaseRepository {
         ...data,
         created_by: createdBy,
         updated_by: createdBy,
+        usage_details: data.usage_details || this.defaultOrganizationUsageDetails,
       },
       t
     );
