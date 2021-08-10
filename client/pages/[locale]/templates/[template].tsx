@@ -237,7 +237,7 @@ function LandingTemplateDetails({
                 .filter((t) => t.slug !== slug)
                 .slice(0, 3)
                 .map((t) => (
-                  <PublicTemplateCard key={t.id} template={t} showCategories />
+                  <PublicTemplateCard key={t.id} template={t} />
                 ))}
             </Grid>
           </Stack>

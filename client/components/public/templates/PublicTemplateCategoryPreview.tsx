@@ -52,7 +52,7 @@ export function PublicTemplateCategoryPreview({
           gap={6}
         >
           {templates.map((t) => (
-            <PublicTemplateCard key={t.id} template={t} showCategories />
+            <PublicTemplateCard key={t.id} template={t} />
           ))}
         </Grid>
       </GridItem>

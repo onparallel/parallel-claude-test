@@ -6624,11 +6624,8 @@ export type PublicTemplateCard_LandingTemplateFragment = {
   locale: PetitionLocale;
   name?: Maybe<string>;
   slug: string;
-  shortDescription?: Maybe<string>;
-  descriptionHtml?: Maybe<string>;
   imageUrl?: Maybe<string>;
   backgroundColor?: Maybe<string>;
-  categories?: Maybe<Array<string>>;
   ownerFullName: string;
   organizationName: string;
 };
@@ -12340,11 +12337,8 @@ export type LandingTemplateDetails_landingTemplatesQuery = {
       locale: PetitionLocale;
       name?: Maybe<string>;
       slug: string;
-      shortDescription?: Maybe<string>;
-      descriptionHtml?: Maybe<string>;
       imageUrl?: Maybe<string>;
       backgroundColor?: Maybe<string>;
-      categories?: Maybe<Array<string>>;
       ownerFullName: string;
       organizationName: string;
     }>;
@@ -12380,11 +12374,8 @@ export type LandingTemplatesCategory_landingTemplatesQuery = {
       locale: PetitionLocale;
       name?: Maybe<string>;
       slug: string;
-      shortDescription?: Maybe<string>;
-      descriptionHtml?: Maybe<string>;
       imageUrl?: Maybe<string>;
       backgroundColor?: Maybe<string>;
-      categories?: Maybe<Array<string>>;
       ownerFullName: string;
       organizationName: string;
     }>;
@@ -12410,11 +12401,8 @@ export type LandingTemplates_landingTemplatesSamplesQuery = {
         locale: PetitionLocale;
         name?: Maybe<string>;
         slug: string;
-        shortDescription?: Maybe<string>;
-        descriptionHtml?: Maybe<string>;
         imageUrl?: Maybe<string>;
         backgroundColor?: Maybe<string>;
-        categories?: Maybe<Array<string>>;
         ownerFullName: string;
         organizationName: string;
       }>;
@@ -13179,11 +13167,8 @@ export const PublicTemplateCard_LandingTemplateFragmentDoc = gql`
     locale
     name
     slug
-    shortDescription
-    descriptionHtml
     imageUrl
     backgroundColor
-    categories
     ownerFullName
     organizationName
   }
