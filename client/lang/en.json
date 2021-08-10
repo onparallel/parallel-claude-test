@@ -6091,8 +6091,8 @@
   },
   {
     "term": "public.template-details.designed-for",
-    "definition": "Designed for",
-    "context": "Designed for"
+    "definition": "Designed for {categories}",
+    "context": "Designed for {categories}"
   },
   {
     "term": "public.template-details.last-updated-on",

@@ -3,6 +3,7 @@ import {
   Box,
   Center,
   Grid,
+  Heading,
   HStack,
   Image,
   ListItem,
@@ -12,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
@@ -90,54 +92,57 @@ function LandingTemplateDetails({
                 />
               </Text>
               <Stack spacing={4}>
-                <Text fontSize="2xl" fontWeight="bold">
+                <Heading size="xl" as="h1">
                   {name}
-                </Text>
-                <Text fontSize="xl">
+                </Heading>
+                <Text fontSize="lg">
                   <FormattedMessage
                     id="public.template-details.designed-for"
-                    defaultMessage="Designed for"
-                  />{" "}
-                  <EnumerateList
-                    maxItems={7}
-                    values={categories}
-                    renderItem={({ value }) => (
-                      <Link
-                        key={value.slug}
-                        locale={template.locale}
-                        href={`/templates/categories/${value.slug}`}
-                      >
-                        {`${value.label}`}
-                      </Link>
-                    )}
-                    type="conjunction"
+                    defaultMessage="Designed for {categories}"
+                    values={{
+                      categories: (
+                        <EnumerateList
+                          maxItems={7}
+                          values={categories}
+                          renderItem={({ value }) => (
+                            <Link
+                              key={value.slug}
+                              locale={template.locale}
+                              href={`/templates/categories/${value.slug}`}
+                            >
+                              {`${value.label}`}
+                            </Link>
+                          )}
+                          type="conjunction"
+                        />
+                      ),
+                    }}
                   />
                 </Text>
+                <Spacer />
+                <HStack spacing={2}>
+                  <UserAvatar boxSize="40px" user={owner} />
+                  <Text>
+                    <FormattedMessage
+                      id="public.template-card.created-by"
+                      defaultMessage="Created by {name} on {orgName}"
+                      values={{
+                        name: ownerFullName,
+                        orgName: <Text as="strong">{organizationName}</Text>,
+                      }}
+                    />
+                  </Text>
+                </HStack>
               </Stack>
-              <HStack paddingTop={6} spacing={1}>
-                <UserAvatar boxSize="40px" user={owner} marginRight={2} />
-                <FormattedMessage
-                  id="public.template-card.created-by"
-                  defaultMessage="Created by {name} on {orgName}"
-                  values={{
-                    name: ownerFullName,
-                    orgName: (
-                      <Text marginLeft={1} as="b">
-                        {organizationName}
-                      </Text>
-                    ),
-                  }}
-                />
-              </HStack>
             </Grid>
             <Center
               height="min-content"
-              backgroundColor={backgroundColor as any}
+              backgroundColor={backgroundColor ?? "gray.100"}
               flex="1"
-              minHeight="140px"
+              padding={8}
             >
               <Image
-                padding={10}
+                maxHeight="225px"
                 src={
                   imageUrl ??
                   `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${intl.locale}_radio_button.png`

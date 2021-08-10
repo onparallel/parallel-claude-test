@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex, Grid, Stack, Text } from "@chakra-ui/react";
+import { Flex, Grid, Heading, Stack } from "@chakra-ui/react";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
@@ -52,14 +52,14 @@ function LandingTemplatesCategory({
       <PublicTemplatesHero />
       <PublicTemplatesContainer categories={filteredCategories}>
         <Stack spacing={6}>
-          <Flex height="40px" alignItems="flex-end">
-            <Text fontSize="2xl" fontWeight="bold">
+          <Flex height="40px" alignItems="center">
+            <Heading as="h1" size="lg">
               <FormattedMessage
                 id="public.template-category-preview.templates-for"
                 defaultMessage="Templates for {category}"
                 values={{ category: currentCategory.label }}
               />
-            </Text>
+            </Heading>
           </Flex>
 
           <Grid

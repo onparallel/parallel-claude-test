@@ -6091,8 +6091,8 @@
   },
   {
     "term": "public.template-details.designed-for",
-    "definition": "Pensada para",
-    "context": "Designed for"
+    "definition": "Pensada para {categories}",
+    "context": "Designed for {categories}"
   },
   {
     "term": "public.template-details.last-updated-on",

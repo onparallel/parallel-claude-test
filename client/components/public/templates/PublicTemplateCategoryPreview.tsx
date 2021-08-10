@@ -1,4 +1,4 @@
-import { Button, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
+import { Button, Flex, Grid, GridItem, Heading, Text } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
@@ -24,14 +24,14 @@ export function PublicTemplateCategoryPreview({
         md: `'title actions' 'content content'`,
       }}
     >
-      <GridItem gridArea="title" as={Flex} alignItems="flex-end">
-        <Text fontSize="2xl" fontWeight="bold">
+      <GridItem gridArea="title" as={Flex} alignItems="center">
+        <Heading size="lg">
           <FormattedMessage
             id="public.template-category-preview.templates-for"
             defaultMessage="Templates for {category}"
             values={{ category: label }}
           />
-        </Text>
+        </Heading>
       </GridItem>
       <GridItem gridArea="actions">
         <NakedLink href={`/templates/categories/${slug}`}>
