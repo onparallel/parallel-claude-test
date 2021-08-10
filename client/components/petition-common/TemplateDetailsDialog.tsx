@@ -221,7 +221,12 @@ export function TemplateDetailsDialog({
             </Heading>
           </Stack>
           {template.descriptionHtml ? (
-            <Text dangerouslySetInnerHTML={{ __html: template.descriptionHtml }} />
+            <Box
+              sx={{
+                a: { color: "purple.600", _hover: { color: "purple.800" } },
+              }}
+              dangerouslySetInnerHTML={{ __html: template.descriptionHtml }}
+            />
           ) : (
             <Text textAlign="center" textStyle="hint">
               <FormattedMessage

@@ -202,7 +202,12 @@ function LandingTemplateDetails({
                 />
               </Text>
               {descriptionHtml ? (
-                <Box dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+                <Box
+                  sx={{
+                    a: { color: "purple.600", _hover: { color: "purple.800" } },
+                  }}
+                  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                />
               ) : (
                 <Text textStyle="hint">
                   <FormattedMessage
