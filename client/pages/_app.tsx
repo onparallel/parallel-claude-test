@@ -2,7 +2,6 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
 import "@parallel/styles/global.css";
-import PlausibleProvider from "next-plausible";
 import { AppProps } from "next/app";
 import { createElement } from "react";
 import { DndProvider } from "react-dnd";
@@ -18,14 +17,6 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
   return (
     <>
       {[
-        [
-          PlausibleProvider,
-          {
-            customDomain: "https://p.onparallel.com",
-            domain: "onparallel.com",
-            exclude: "/*/print/*, /*/app/*, /*/petition/*",
-          },
-        ],
         [I18nProvider, props],
         [ChakraProvider, { theme, resetCSS: true, portalZIndex: 40 }],
         [DndProvider, { backend: HTML5Backend }],
