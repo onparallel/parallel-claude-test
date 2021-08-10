@@ -175,8 +175,8 @@ function PublicHeaderMenu(props: StackProps) {
       <PublicHeaderLink href="/login" variant="outline" id="pw-public-login">
         <FormattedMessage id="public.login-button" defaultMessage="Login" />
       </PublicHeaderLink>
-      <PublicHeaderLink href="/book-demo" colorScheme="purple" _activeLink={{}}>
-        <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
+      <PublicHeaderLink href="/signup" colorScheme="purple" _activeLink={{}}>
+        <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
       </PublicHeaderLink>
     </Stack>
   );
