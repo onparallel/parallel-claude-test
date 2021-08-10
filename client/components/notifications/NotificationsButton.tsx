@@ -1,5 +1,4 @@
 import { gql, useQuery } from "@apollo/client";
-import { IconButton } from "@chakra-ui/button";
 import { Box, BoxProps } from "@chakra-ui/layout";
 import { Circle } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
@@ -9,6 +8,7 @@ import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useIntl } from "react-intl";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 const MotionBox = motion<Omit<BoxProps, "transition">>(Box);
 
@@ -49,16 +49,17 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(function Notif
   };
 
   return (
-    <IconButton
+    <IconButtonWithTooltip
       ref={ref}
       aria-pressed={isOpen}
-      aria-label={intl.formatMessage(
+      label={intl.formatMessage(
         {
           id: "component.notifications-button.notifications",
           defaultMessage: "Notifications{count, plural, =0 {} other {, # unread}}",
         },
         { count: unreadCount }
       )}
+      placement="right"
       position="relative"
       size="md"
       variant={isOpen ? "solid" : "ghost"}

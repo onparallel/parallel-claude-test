@@ -4,11 +4,9 @@ import {
   BoxProps,
   Center,
   Flex,
-  IconButton,
   List,
   ListItem,
   Stack,
-  Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import {
@@ -23,6 +21,7 @@ import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
@@ -125,27 +124,19 @@ export const AppLayoutNavbar = Object.assign(
           </NakedLink>
         </Center>
         <Flex justifyContent="center" alignItems="center">
-          <Tooltip
+          <IconButtonWithTooltip
+            id="create-petition"
+            colorScheme="purple"
+            icon={<AddIcon />}
+            size="lg"
+            isRound
+            onClick={() => router.push(`/${router.query.locale}/app/petitions/new`)}
             label={intl.formatMessage({
               id: "new-petition.title",
               defaultMessage: "New petition",
             })}
             placement={isMobile ? "top" : "right"}
-          >
-            <IconButton
-              id="create-petition"
-              placement={isMobile ? "top-start" : "right"}
-              colorScheme="purple"
-              icon={<AddIcon />}
-              size="lg"
-              isRound
-              onClick={() => router.push(`/${router.query.locale}/app/petitions/new`)}
-              aria-label={intl.formatMessage({
-                id: "new-petition.title",
-                defaultMessage: "New petition",
-              })}
-            />
-          </Tooltip>
+          />
         </Flex>
         <Flex
           as={List}
@@ -170,14 +161,15 @@ export const AppLayoutNavbar = Object.assign(
           ))}
         </Flex>
         <Spacer display={{ base: "none", sm: "block" }} />
-        <Center display={{ base: "none", sm: "flex" }} marginBottom={6}>
-          <Stack spacing={6}>
+        <Stack spacing={4} alignItems="center">
+          <Stack spacing={2} alignItems="center" display={{ base: "none", sm: "flex" }}>
             <NotificationsButton />
-            <IconButton
-              aria-label={intl.formatMessage({
+            <IconButtonWithTooltip
+              label={intl.formatMessage({
                 id: "navbar.help-center",
                 defaultMessage: "Help center",
               })}
+              placement="right"
               size="md"
               variant={"ghost"}
               backgroundColor="white"
@@ -186,16 +178,13 @@ export const AppLayoutNavbar = Object.assign(
               icon={<HelpOutlineIcon fontSize="22px" />}
             />
           </Stack>
-        </Center>
-
-        <Center>
           <UserMenu
             placement={isMobile ? "top-end" : "right-end"}
             user={user}
             onOnboardingClick={onOnboardingClick}
             onLocaleChange={handleLocaleChange}
           />
-        </Center>
+        </Stack>
       </Flex>
     );
   }),
