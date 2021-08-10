@@ -15,11 +15,11 @@
     "generate-types": "cd server && yarn generate-graphql-types && yarn generate-db-types && cd ../client && yarn generate-graphql-types"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.28.3",
-    "@typescript-eslint/parser": "^4.28.3",
-    "eslint": "^7.30.0",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.1",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-formatjs": "^2.17.1",
+    "eslint-plugin-formatjs": "^2.17.3",
     "eslint-plugin-graphql": "^4.0.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
@@ -34,6 +34,7 @@
     "@apollo/client": "@types/apollo-upload-client is depending on an old version which is causing build issues"
   },
   "resolutions": {
-    "@apollo/client": "^3.3.21"
+    "@apollo/client": "^3.4.7",
+    "core-js": "^3.16.1"
   }
 }

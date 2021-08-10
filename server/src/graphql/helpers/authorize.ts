@@ -1,7 +1,7 @@
 import { core } from "@nexus/schema";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { AuthenticationError } from "apollo-server-express";
-import pEvery from "p-every";
+import pAll from "p-all";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
@@ -66,27 +66,44 @@ export function hasOrgRole<TypeName extends string, FieldName extends string>(
   };
 }
 
+function _all<TypeName extends string, FieldName extends string>(
+  resolvers: FieldAuthorizeResolver<TypeName, FieldName>[],
+  concurrency: number
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    try {
+      await pAll(
+        resolvers.map((resolver) => async () => {
+          try {
+            const passes = await resolver(root, args, ctx, info);
+            if (typeof passes === "boolean") {
+              return passes;
+            } else {
+              throw passes;
+            }
+          } catch {
+            return false;
+          }
+        }),
+        { concurrency }
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  };
+}
+
 export function chain<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (root, args, ctx, info) => {
-    return await pEvery(
-      resolvers,
-      async (resolver) => await (resolver(root, args, ctx, info) as Promise<boolean>),
-      { concurrency: 1 }
-    );
-  };
+  return _all(resolvers, 1);
 }
 
 export function and<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (root, args, ctx, info) => {
-    return await pEvery(
-      resolvers,
-      async (resolver) => await (resolver(root, args, ctx, info) as Promise<boolean>)
-    );
-  };
+  return _all(resolvers, Infinity);
 }
 
 export function or<TypeName extends string, FieldName extends string>(

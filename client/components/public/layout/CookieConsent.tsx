@@ -1,28 +1,16 @@
 import { Button, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
-import Cookie from "js-cookie";
-import { useEffect, useState } from "react";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
-
-const COOKIE_NAME = "cookie-consent";
 
 export type CookieConsentProps = {};
 
 export function CookieConsent({}: CookieConsentProps) {
-  const [showConsentBanner, setShowConsentBanner] = useState(false);
-  useEffect(() => {
-    const hasConsent = Cookie.getJSON(COOKIE_NAME);
-    setShowConsentBanner(!hasConsent);
-  }, []);
+  const [hasCookieConsent, setHasCookieConsent] = useUserPreference("cookie-consent", false);
 
-  function handleConsentClick() {
-    Cookie.set(COOKIE_NAME, "true", { sameSite: "strict" });
-    setShowConsentBanner(false);
-  }
-
-  return showConsentBanner ? (
+  return !hasCookieConsent ? (
     <PublicContainer
       wrapper={{
         position: "fixed",
@@ -73,7 +61,7 @@ export function CookieConsent({}: CookieConsentProps) {
           color: "white",
         }}
         rightIcon={<CheckIcon />}
-        onClick={handleConsentClick}
+        onClick={() => setHasCookieConsent(true)}
       >
         <FormattedMessage id="component.cookie-consent.accept-button" defaultMessage="Accept" />
       </Button>

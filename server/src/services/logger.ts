@@ -21,6 +21,7 @@ export function createLogger({ container }: interfaces.Context) {
               ),
       }),
       new WinstonCloudWatch({
+        name: "cloudwatch",
         level: "info",
         awsAccessKeyId: config.aws.accessKeyId,
         awsSecretKey: config.aws.secretAccessKey,
