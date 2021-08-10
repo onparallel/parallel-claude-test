@@ -4,9 +4,11 @@ import { Knex } from "knex";
 import { groupBy, indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { KeysOfType, MaybeArray, UnwrapPromise } from "../../util/types";
-import { CreatePetitionEvent, PetitionEvent, SystemEvent, CreateSystemEvent } from "../events";
+import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
+import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
 import {
+  Organization,
   TableCreateTypes as _TableCreateTypes,
   TablePrimaryKeys,
   TableTypes as _TableTypes,
@@ -17,6 +19,7 @@ interface TableTypes
   petition_event: PetitionEvent;
   petition_user_notification: PetitionUserNotification;
   system_event: SystemEvent;
+  organization: Omit<Organization, "usage_details"> & { usage_details: OrganizationUsageDetails };
 }
 
 interface TableCreateTypes

@@ -77,6 +77,9 @@ export function buildConfig() {
           10
         ),
       }),
+      "organization-limits": Object.freeze({
+        rule: process.env.WORKERS_ORGANIZATION_LIMITS_RULE!,
+      }),
       reporting: Object.freeze({
         rule: process.env.WORKERS_REPORTING_RULE!,
       }),

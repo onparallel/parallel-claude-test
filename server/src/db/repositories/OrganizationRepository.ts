@@ -3,12 +3,27 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
+import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
-import { Maybe } from "../../util/types";
+import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { CreateOrganization, Organization, OrganizationStatus, User } from "../__types";
+import {
+  CreateOrganization,
+  CreateOrganizationUsageLimit,
+  Organization,
+  OrganizationStatus,
+  User,
+} from "../__types";
+
+export type OrganizationUsageDetails = {
+  USER_SEATS: number;
+  PETITION_SEND: {
+    limit: number;
+    period: "month" | "year";
+  };
+};
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {
@@ -161,5 +176,29 @@ export class OrganizationRepository extends BaseRepository {
       .select("*");
 
     return owner;
+  }
+
+  async getOrganizationUsageDetails() {
+    return await this.from("organization").select("id", "usage_details");
+  }
+
+  readonly loadOrganizationCurrentUsagePeriod = this.buildLoadBy(
+    "organization_usage_limit",
+    "org_id",
+    (q) => q.whereNull("period_end_date")
+  );
+
+  async createUsagePeriod(
+    orgId: number,
+    data: MaybeArray<Omit<CreateOrganizationUsageLimit, "org_id">>
+  ) {
+    const dataArr = unMaybeArray(data).map((d) => ({ org_id: orgId, ...d }));
+    return await this.insert("organization_usage_limit", dataArr);
+  }
+
+  async updateUsagePeriodAsExpired(orgUsageLimitId: number) {
+    return await this.from("organization_usage_limit")
+      .where("id", orgUsageLimitId)
+      .update("period_end_date", this.now());
   }
 }
