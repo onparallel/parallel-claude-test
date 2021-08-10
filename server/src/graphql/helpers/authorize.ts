@@ -74,23 +74,26 @@ function _all<TypeName extends string, FieldName extends string>(
     try {
       await pAll(
         resolvers.map((resolver) => async () => {
-          try {
-            const passes = await resolver(root, args, ctx, info);
-            if (typeof passes === "boolean") {
-              return passes;
-            } else {
-              throw passes;
+          const passes = await resolver(root, args, ctx, info);
+          if (typeof passes === "boolean") {
+            if (!passes) {
+              throw new Error("Not authorized");
             }
-          } catch {
-            return false;
+            return true;
+          } else {
+            throw passes;
           }
         }),
         { concurrency }
       );
-      return true;
-    } catch {
-      return false;
+    } catch (e) {
+      // recapture "Not authorized" error, rethrow otherwise
+      if (e.message === "Not authorized") {
+        return false;
+      }
+      throw e;
     }
+    return true;
   };
 }
 
