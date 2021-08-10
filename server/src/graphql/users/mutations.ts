@@ -11,8 +11,8 @@ import pMap from "p-map";
 import { isDefined, zip } from "remeda";
 import { PublicFileUpload } from "../../db/__types";
 import { partition } from "../../util/arrays";
-import { withError } from "../../util/promises/withError";
 import { fullName } from "../../util/fullName";
+import { withError } from "../../util/promises/withError";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
@@ -36,7 +36,7 @@ import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validPassword } from "../helpers/validators/validPassword";
-import { orgDoesNotHaveSsoProvider } from "../organization/authorizers";
+import { orgDoesNotHaveSsoProvider, orgHasAvailableUserSeats } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import {
   contextUserIsAdmin,
@@ -141,7 +141,11 @@ export const updateOnboardingStatus = mutationField("updateOnboardingStatus", {
 export const createOrganizationUser = mutationField("createOrganizationUser", {
   description: "Creates a new user in the same organization as the context user",
   type: "User",
-  authorize: authenticateAnd(contextUserIsAdmin(), orgDoesNotHaveSsoProvider()),
+  authorize: authenticateAnd(
+    contextUserIsAdmin(),
+    orgDoesNotHaveSsoProvider(),
+    orgHasAvailableUserSeats()
+  ),
   args: {
     email: nonNull(stringArg()),
     firstName: nonNull(stringArg()),

@@ -46,3 +46,22 @@ export function orgDoesNotHaveSsoProvider<
     return true;
   };
 }
+
+export function orgHasAvailableUserSeats<
+  TypeName extends string,
+  FieldName extends string
+>(): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, _, ctx) => {
+    const [org, userCount] = await Promise.all([
+      ctx.organizations.loadOrg(ctx.user!.org_id),
+      ctx.organizations.loadUserCount(ctx.user!.org_id),
+    ]);
+
+    if (org!.usage_details.USER_SEATS <= userCount) {
+      return new WhitelistedError(`Not enough seats available`, "USER_SEATS_LIMIT_ERROR", {
+        maxSeatsAvailable: org!.usage_details.USER_SEATS,
+      });
+    }
+    return true;
+  };
+}

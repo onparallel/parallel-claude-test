@@ -93,7 +93,7 @@ export class Mocks {
             org_id: orgId,
             first_name: firstName,
             last_name: lastName,
-            email: faker.internet.email(firstName, lastName),
+            email: faker.internet.email(firstName, lastName).toLowerCase(),
             cognito_id: faker.datatype.uuid(),
             ...builder?.(index),
           };

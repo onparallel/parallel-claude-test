@@ -639,4 +639,154 @@ describe("GraphQL/Users", () => {
       expect(data).toBeNull();
     });
   });
+
+  describe("createOrganizationUser", () => {
+    let normalUser: User;
+    let normalUserApiKey: string;
+
+    beforeAll(async () => {
+      // make sure there is only one user in the org
+      await mocks.knex
+        .from("user")
+        .whereNot("id", sessionUser.id)
+        .update("deleted_at", mocks.knex.raw("CURRENT_TIMESTAMP"));
+
+      await mocks.knex
+        .from("organization")
+        .where("id", organization.id)
+        .update({ usage_details: { USER_SEATS: 3 } });
+
+      [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
+        organization_role: "NORMAL",
+      }));
+      ({ apiKey: normalUserApiKey } = await mocks.createUserAuthToken(
+        "normal-token",
+        normalUser.id
+      ));
+    });
+
+    it("normal users should not be able to create new users", async () => {
+      const { errors, data } = await testClient.withApiKey(normalUserApiKey).mutate({
+        mutation: gql`
+          mutation (
+            $email: String!
+            $firstName: String!
+            $lastName: String!
+            $role: OrganizationRole!
+          ) {
+            createOrganizationUser(
+              email: $email
+              firstName: $firstName
+              lastName: $lastName
+              role: $role
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          email: "dwight-schrute@dundermifflin.com",
+          firstName: "Dwight",
+          lastName: "Schrute",
+          role: "NORMAL",
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not create a user if the email is already registered", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $email: String!
+            $firstName: String!
+            $lastName: String!
+            $role: OrganizationRole!
+          ) {
+            createOrganizationUser(
+              email: $email
+              firstName: $firstName
+              lastName: $lastName
+              role: $role
+            ) {
+              fullName
+              role
+            }
+          }
+        `,
+        variables: {
+          email: sessionUser.email,
+          firstName: "Michael",
+          lastName: "Scott",
+          role: "ADMIN",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("should create a user in the organization", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $email: String!
+            $firstName: String!
+            $lastName: String!
+            $role: OrganizationRole!
+          ) {
+            createOrganizationUser(
+              email: $email
+              firstName: $firstName
+              lastName: $lastName
+              role: $role
+            ) {
+              fullName
+              role
+            }
+          }
+        `,
+        variables: {
+          email: "michael.scott@dundermifflin.com",
+          firstName: "Michael",
+          lastName: "Scott",
+          role: "ADMIN",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createOrganizationUser).toEqual({ fullName: "Michael Scott", role: "ADMIN" });
+    });
+
+    it("should not create a user if the organization does not have enough seats", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $email: String!
+            $firstName: String!
+            $lastName: String!
+            $role: OrganizationRole!
+          ) {
+            createOrganizationUser(
+              email: $email
+              firstName: $firstName
+              lastName: $lastName
+              role: $role
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          email: "jim.halpert@dundermifflin.com",
+          firstName: "Jim",
+          lastName: "Halpert",
+          role: "NORMAL",
+        },
+      });
+      expect(errors).toContainGraphQLError("USER_SEATS_LIMIT_ERROR");
+      expect(data).toBeNull();
+    });
+  });
 });
