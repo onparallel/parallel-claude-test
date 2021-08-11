@@ -98,7 +98,7 @@ function LandingTemplatesCategory({
             defaultMessage="Do you want to know more about our templates?"
           />
           <br />
-          <FormattedMessage id="public.templates.we-show-you" defaultMessage="We show you!" />
+          <FormattedMessage id="public.templates.we-show-you" defaultMessage="Let us show you!" />
         </Heading>
         <Flex marginTop={10} justifyContent="center">
           <NakedLink href="/book-demo">
