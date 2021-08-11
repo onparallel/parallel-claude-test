@@ -369,7 +369,6 @@ export interface Organization {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
-  public_file_logo_id: Maybe<number>; // int4
   custom_host: Maybe<string>; // varchar
   custom_email_from: Maybe<string>; // varchar
   logo_public_file_id: Maybe<number>; // int4
@@ -383,7 +382,6 @@ export type CreateOrganization = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
-  | "public_file_logo_id"
   | "custom_host"
   | "custom_email_from"
   | "logo_public_file_id"
