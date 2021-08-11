@@ -1,5 +1,7 @@
 import { gql } from "@apollo/client";
-import { Flex, Grid, Heading, Stack } from "@chakra-ui/react";
+import { Button, Flex, Grid, Heading, Stack } from "@chakra-ui/react";
+import { NakedLink } from "@parallel/components/common/Link";
+import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
@@ -75,6 +77,37 @@ function LandingTemplatesCategory({
           </Grid>
         </Stack>
       </PublicTemplatesContainer>
+      <PublicContainer
+        paddingY={20}
+        maxWidth="container.sm"
+        textAlign="center"
+        wrapper={{
+          backgroundColor: "purple.50",
+        }}
+      >
+        <Heading
+          as="h2"
+          color="gray.900"
+          size="lg"
+          fontFamily="hero"
+          fontWeight="600"
+          lineHeight={1.5}
+        >
+          <FormattedMessage
+            id="public.templates.know-more-about"
+            defaultMessage="Do you want to know more about our templates?"
+          />
+          <br />
+          <FormattedMessage id="public.templates.we-show-you" defaultMessage="We show you!" />
+        </Heading>
+        <Flex marginTop={10} justifyContent="center">
+          <NakedLink href="/book-demo">
+            <Button as="a" colorScheme="purple" size="lg">
+              <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
+            </Button>
+          </NakedLink>
+        </Flex>
+      </PublicContainer>
     </PublicLayout>
   );
 }
