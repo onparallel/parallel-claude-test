@@ -120,7 +120,7 @@ export function PublicFooter(props: BoxProps) {
               </Link>
             </ListItem>
             <ListItem>
-              <NormalLink href="/blog">
+              <NormalLink href={`${process.env.NEXT_PUBLIC_PARALLEL_URL}/blog`}>
                 <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
               </NormalLink>
             </ListItem>
