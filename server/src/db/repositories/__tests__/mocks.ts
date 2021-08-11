@@ -19,6 +19,8 @@ import {
   EmailLog,
   FileUpload,
   Organization,
+  OrganizationUsageLimit,
+  OrganizationUsageLimitName,
   Petition,
   PetitionAccess,
   PetitionEventSubscription,
@@ -516,6 +518,17 @@ export class Mocks {
     });
 
     return data;
+  }
+
+  async createOrganizationUsageLimit(
+    orgId: number,
+    limitName: OrganizationUsageLimitName,
+    limit: number
+  ) {
+    const [row] = await this.knex<OrganizationUsageLimit>("organization_usage_limit")
+      .insert({ limit, limit_name: limitName, org_id: orgId, period: "month" })
+      .returning("*");
+    return row;
   }
 }
 

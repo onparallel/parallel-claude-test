@@ -6,7 +6,9 @@ import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
+  Contact,
   Organization,
+  OrganizationUsageLimit,
   Petition,
   PetitionField,
   PetitionFieldType,
@@ -2124,6 +2126,147 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("sendPetition", () => {
+    let petition: Petition;
+    let usageLimit: OrganizationUsageLimit;
+    let contact: Contact;
+    beforeAll(async () => {
+      [contact] = await mocks.createRandomContacts(organization.id, 1);
+      usageLimit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 0);
+    });
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+        title: "Text reply",
+      }));
+    });
+
+    it("updates the organization usage limit after sending a petition", async () => {
+      await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .update({ used: 0, limit: 5 });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contact.id)],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.sendPetition).toEqual({ result: "SUCCESS" });
+
+      const [orgUsageLimit] = await mocks.knex
+        .from("organization_usage_limit")
+        .where({
+          period_end_date: null,
+          org_id: organization.id,
+          limit_name: "PETITION_SEND",
+        })
+        .select("id", "used", "limit");
+
+      expect(orgUsageLimit).toEqual({
+        id: usageLimit.id,
+        used: 1,
+        limit: 5,
+      });
+    });
+
+    it("should not be able to send a petition without send credits", async () => {
+      await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .update({ used: 5, limit: 5 });
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contact.id)],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors).toContainGraphQLError("PETITION_SEND_CREDITS_ERROR", {
+        needed: 1,
+        used: 5,
+        limit: 5,
+      });
+      expect(data).toBeNull();
+    });
+
+    it("batch sends should be limited to the amount of remaining petition send credits", async () => {
+      await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .update({ used: 0, limit: 2 });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $contactIdGroups: [[GID!]!]!
+            $subject: String!
+            $body: JSON!
+          ) {
+            batchSendPetition(
+              petitionId: $petitionId
+              contactIdGroups: $contactIdGroups
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIdGroups: [
+            [toGlobalId("Contact", contact.id)],
+            [toGlobalId("Contact", contact.id)],
+            [toGlobalId("Contact", contact.id)],
+          ],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors).toContainGraphQLError("PETITION_SEND_CREDITS_ERROR", {
+        needed: 3,
+        limit: 2,
+        used: 0,
+      });
       expect(data).toBeNull();
     });
   });

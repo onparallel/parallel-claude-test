@@ -785,7 +785,7 @@ describe("GraphQL/Users", () => {
           role: "NORMAL",
         },
       });
-      expect(errors).toContainGraphQLError("USER_SEATS_LIMIT_ERROR");
+      expect(errors).toContainGraphQLError("USER_SEATS_LIMIT_ERROR", { maxSeatsAvailable: 3 });
       expect(data).toBeNull();
     });
   });

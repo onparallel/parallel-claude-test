@@ -1,3 +1,4 @@
+import { core } from "@nexus/schema";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
@@ -58,9 +59,42 @@ export function orgHasAvailableUserSeats<
     ]);
 
     if (org!.usage_details.USER_SEATS <= userCount) {
-      return new WhitelistedError(`Not enough seats available`, "USER_SEATS_LIMIT_ERROR", {
+      throw new WhitelistedError(`Not enough seats available`, "USER_SEATS_LIMIT_ERROR", {
         maxSeatsAvailable: org!.usage_details.USER_SEATS,
       });
+    }
+    return true;
+  };
+}
+
+export function orgHasAvailablePetitionSendCredits<
+  TypeName extends string,
+  FieldName extends string
+>(
+  requiredCredits: (args: core.ArgsValue<TypeName, FieldName>) => number
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx) => {
+    const needed = requiredCredits(args);
+    const currentUsageLimit = await ctx.organizations.loadOrganizationCurrentUsageLimit(
+      ctx.user!.org_id
+    );
+    const petitionSendUsageLimit = currentUsageLimit.find(
+      (ul) => ul.limit_name === "PETITION_SEND"
+    );
+
+    if (
+      !petitionSendUsageLimit ||
+      petitionSendUsageLimit.used + needed > petitionSendUsageLimit.limit
+    ) {
+      throw new WhitelistedError(
+        `Not enough credits to send the petition`,
+        "PETITION_SEND_CREDITS_ERROR",
+        {
+          needed,
+          used: petitionSendUsageLimit?.used || 0,
+          limit: petitionSendUsageLimit?.limit || 0,
+        }
+      );
     }
     return true;
   };

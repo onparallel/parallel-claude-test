@@ -59,6 +59,7 @@ import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
+import { orgHasAvailablePetitionSendCredits } from "../../organization/authorizers";
 import { fieldHasType } from "../../public/authorizers";
 import {
   accessesBelongToPetition,
@@ -989,7 +990,8 @@ export const batchSendPetition = mutationField("batchSendPetition", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionHasRepliableFields("petitionId"),
-    userHasAccessToContactGroups("contactIdGroups")
+    userHasAccessToContactGroups("contactIdGroups"),
+    orgHasAvailablePetitionSendCredits((args) => args.contactIdGroups.length) // each contactId group takes a credit
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1108,6 +1110,12 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       ]);
     }
 
+    await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+      ctx.user!.org_id,
+      "PETITION_SEND",
+      args.contactIdGroups.length
+    );
+
     return results.map((r) => omit(r, ["messages"]));
   },
 });
@@ -1118,7 +1126,8 @@ export const sendPetition = mutationField("sendPetition", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     userHasAccessToContacts("contactIds"),
-    petitionHasRepliableFields("petitionId")
+    petitionHasRepliableFields("petitionId"),
+    orgHasAvailablePetitionSendCredits(() => 1) // 1 credit needed to send a petition
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1169,6 +1178,12 @@ export const sendPetition = mutationField("sendPetition", {
         ]);
       }
     }
+
+    await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+      ctx.user!.org_id,
+      "PETITION_SEND",
+      1
+    );
 
     return {
       petition: updatedPetition,

@@ -14,6 +14,7 @@ import {
   CreateOrganizationUsageLimit,
   Organization,
   OrganizationStatus,
+  OrganizationUsageLimitName,
   User,
 } from "../__types";
 
@@ -191,13 +192,13 @@ export class OrganizationRepository extends BaseRepository {
     return await this.from("organization").select("id", "usage_details");
   }
 
-  readonly loadOrganizationCurrentUsagePeriod = this.buildLoadBy(
+  readonly loadOrganizationCurrentUsageLimit = this.buildLoadMultipleBy(
     "organization_usage_limit",
     "org_id",
     (q) => q.whereNull("period_end_date")
   );
 
-  async createUsagePeriod(
+  async createOrganizationUsageLimit(
     orgId: number,
     data: MaybeArray<Omit<CreateOrganizationUsageLimit, "org_id">>
   ) {
@@ -205,9 +206,23 @@ export class OrganizationRepository extends BaseRepository {
     return await this.insert("organization_usage_limit", dataArr);
   }
 
-  async updateUsagePeriodAsExpired(orgUsageLimitId: number) {
+  async updateUsageLimitAsExpired(orgUsageLimitId: number) {
     return await this.from("organization_usage_limit")
       .where("id", orgUsageLimitId)
       .update("period_end_date", this.now());
+  }
+
+  async updateOrganizationCurrentUsageLimitCredits(
+    orgId: number,
+    limitName: OrganizationUsageLimitName,
+    creditsSpent: number
+  ) {
+    return await this.from("organization_usage_limit")
+      .where({
+        period_end_date: null,
+        limit_name: limitName,
+        org_id: orgId,
+      })
+      .update({ used: this.knex.raw(`used + ?`, [creditsSpent]) });
   }
 }
