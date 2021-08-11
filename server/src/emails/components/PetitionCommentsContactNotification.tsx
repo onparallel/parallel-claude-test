@@ -94,7 +94,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
             <Button href={`${parallelUrl}/${locale}/petition/${keycode}`}>
               <FormattedMessage
                 id="petition-comments-contact-notification.access-button"
-                defaultMessage="See the comments here"
+                defaultMessage="Reply to the comments here"
               />
             </Button>
           </MjmlColumn>
