@@ -2,6 +2,7 @@ import { Box } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { HighlightText } from "@parallel/components/common/HighlightText";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import useMergedRef from "@react-hook/merged-ref";
 import { getNodeDeserializer, getText } from "@udecode/plate-common";
 import { getPlatePluginTypes, PlatePlugin, TRenderElementProps } from "@udecode/plate-core";
@@ -46,6 +47,10 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
     ? placeholders.filter((c) => c.label.toLowerCase().includes(search.toLowerCase()))
     : placeholders;
 
+  const valuesRef = useUpdatingRef(values);
+  const indexRef = useUpdatingRef(index);
+  const targetRef = useUpdatingRef(target);
+
   const onAddPlaceholder = useCallback(
     (editor: Editor, placeholder: Placeholder) => {
       if (target !== null) {
@@ -59,6 +64,9 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
 
   const onKeyDownPlaceholder = useCallback(
     (e: KeyboardEvent, editor: Editor) => {
+      const values = valuesRef.current;
+      const index = indexRef.current;
+      const target = targetRef.current;
       if (target && values.length > 0) {
         if (e.key === "ArrowDown") {
           e.preventDefault();
@@ -88,7 +96,7 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
         }
       }
     },
-    [values, index, target, onAddPlaceholder]
+    [onAddPlaceholder]
   );
 
   const onChangePlaceholder = useCallback((editor: Editor) => {

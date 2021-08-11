@@ -92,6 +92,7 @@ import React, {
   memo,
   MouseEvent,
   ReactElement,
+  ReactNode,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -165,6 +166,23 @@ const options = {
   [MARK_UNDERLINE]: DEFAULTS_UNDERLINE,
   [ELEMENT_LINK]: { type: "link" },
 } as Record<string, PlatePluginOptions>;
+
+function renderEditable(editable: ReactNode) {
+  return (
+    <Box
+      sx={{
+        '[contenteditable="false"]': {
+          width: "auto !important",
+        },
+        "> div": {
+          minHeight: "120px !important",
+        },
+      }}
+    >
+      {editable}
+    </Box>
+  );
+}
 
 export interface RichTextEditorProps
   extends ValueProps<RichTextEditorValue, false>,
@@ -299,15 +317,6 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       _focusWithin: (inputStyleConfig as any)._focus,
       _invalid: (inputStyleConfig as any)._invalid,
     } as any;
-    const style = useMemo(
-      () =>
-        ({
-          padding: "12px 16px",
-          maxHeight: "250px",
-          overflow: "auto",
-        } as CSSProperties),
-      []
-    );
 
     const isMenuOpen = Boolean(target && values.length > 0);
     const selected = isMenuOpen ? values[selectedIndex] : undefined;
@@ -331,6 +340,22 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
     const itemIdPrefix = useId(undefined, "rte-placeholder-menu-item");
 
+    const editableProps = useMemo(
+      () => ({
+        readOnly: isDisabled,
+        placeholder,
+        style: {
+          padding: "12px 16px",
+          maxHeight: "250px",
+          overflow: "auto",
+        } as CSSProperties,
+        onKeyDown: handleKeyDown,
+        "aria-controls": placeholderMenuId,
+        "aria-autocomplete": "list" as const,
+        "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
+      }),
+      [isDisabled, placeholder, handleKeyDown, placeholderMenuId, itemIdPrefix, selected?.value]
+    );
     const { referenceRef, popperRef, forceUpdate } = usePopper({
       placement: "bottom-start",
       enabled: isMenuOpen,
@@ -400,30 +425,8 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           components={components}
           value={value}
           onChange={handleChange}
-          editableProps={{
-            readOnly: isDisabled,
-            placeholder,
-            style,
-            onKeyDown: handleKeyDown,
-            "aria-controls": placeholderMenuId,
-            "aria-autocomplete": "list",
-            "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
-            ...props,
-          }}
-          renderEditable={(editable) => (
-            <Box
-              sx={{
-                '[contenteditable="false"]': {
-                  width: "auto !important",
-                },
-                "> div": {
-                  minHeight: "120px !important",
-                },
-              }}
-            >
-              {editable}
-            </Box>
-          )}
+          editableProps={editableProps}
+          renderEditable={renderEditable}
         >
           <Toolbar
             height="40px"

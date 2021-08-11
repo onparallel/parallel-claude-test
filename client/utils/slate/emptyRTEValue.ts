@@ -1,5 +1,5 @@
-import { ParagraphElement } from "./types";
+import { CustomElement } from "./types";
 
-export function emptyRTEValue(): ParagraphElement[] {
+export function emptyRTEValue(): CustomElement[] {
   return [{ type: "paragraph", children: [{ text: "" }] }];
 }
