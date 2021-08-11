@@ -136,6 +136,7 @@ describe("GraphQL/Contacts", () => {
             items {
               id
               email
+              firstName
             }
           }
         }
@@ -153,6 +154,7 @@ describe("GraphQL/Contacts", () => {
       items: orderedContacts.map((c) => ({
         id: toGlobalId("Contact", c.id),
         email: c.email,
+        firstName: c.first_name,
       })),
     });
   });
