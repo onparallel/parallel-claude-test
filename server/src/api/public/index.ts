@@ -195,7 +195,7 @@ export const api = new RestApi({
   },
   errorHandler: (error: Error) => {
     if (error instanceof ClientError && error.response.errors?.[0]) {
-      const code = error.response.errors[0].extensions.code as string;
+      const code = (error.response.errors[0] as any)?.extensions?.code as string;
       switch (code) {
         case "UNAUTHENTICATED":
           throw new UnauthorizedError("API token is invalid");
