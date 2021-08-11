@@ -7,7 +7,7 @@ echo "Adding public keys"
 cat authorized_keys >> .ssh/authorized_keys
 rm authorized_keys
 
-yum update
+yum update -y
 yum install -y \
     git \
     gcc \
