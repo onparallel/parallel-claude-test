@@ -57,10 +57,13 @@ export class UnknownError extends HttpError {
     res.status(this.status).json({
       code: this.code,
       message: this.message,
-      originalError: this.originalError && {
-        message: this.originalError.message,
-        stack: this.originalError.stack,
-      },
+      originalError:
+        process.env.NODE_ENV === "development"
+          ? this.originalError && {
+              message: this.originalError.message,
+              stack: this.originalError.stack,
+            }
+          : undefined,
     });
   }
 }

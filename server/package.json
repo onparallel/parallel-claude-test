@@ -63,7 +63,7 @@
     "fuse.js": "^6.4.6",
     "graphql": "^15.5.1",
     "graphql-iso-date": "^3.6.1",
-    "graphql-request": "^3.5.0",
+    "graphql-request": "3.4.0",
     "graphql-type-json": "^0.3.2",
     "graphql-upload": "^12.0.0",
     "inversify": "^5.1.1",
