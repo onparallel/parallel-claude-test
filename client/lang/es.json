@@ -1685,6 +1685,356 @@
     "context": "Press # to add replaceable placeholders"
   },
   {
+    "term": "component.public-signup-form-experience.complete-button",
+    "definition": "Finalizar registro",
+    "context": "Complete registration"
+  },
+  {
+    "term": "component.public-signup-form-experience.description",
+    "definition": "Te haremos algunas preguntas para conocerte mejor y ofrecerte la mejor experiencia posible.",
+    "context": "We will ask you some questions to get to know you better and offer you the best possible experience."
+  },
+  {
+    "term": "component.public-signup-form-experience.go-back-button",
+    "definition": "Volver atrás",
+    "context": "Go back"
+  },
+  {
+    "term": "component.public-signup-form-experience.heading",
+    "definition": "Ayúdanos a mejorar tu experiencia",
+    "context": "Help us improve your experience"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-advisory",
+    "definition": "Asesoría",
+    "context": "Advisory"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-consulting",
+    "definition": "Consultoría",
+    "context": "Consulting"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-e-commerce",
+    "definition": "E-commerce",
+    "context": "E-commerce"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-education",
+    "definition": "Educación",
+    "context": "Education"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-entertainment",
+    "definition": "Entretenimiento",
+    "context": "Entertainment"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-financial-services",
+    "definition": "Servicios financieros",
+    "context": "Financial Services"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-government",
+    "definition": "Administración Pública",
+    "context": "Government"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-healthcare",
+    "definition": "Salud",
+    "context": "Healthcare"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-legal",
+    "definition": "Legal",
+    "context": "Legal"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-other",
+    "definition": "Otros",
+    "context": "Other"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-outsourcing",
+    "definition": "Outsourcing",
+    "context": "Outsourcing"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-real-estate",
+    "definition": "Inmobiliario",
+    "context": "Real Estate"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-software",
+    "definition": "Software",
+    "context": "Software"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-administration",
+    "definition": "Administración",
+    "context": "Administration"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-business-development",
+    "definition": "Desarrollo de negocio",
+    "context": "Business development"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-compliance",
+    "definition": "Compliance",
+    "context": "Compliance"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-customer-service",
+    "definition": "Servicio al cliente",
+    "context": "Customer service"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-engineering",
+    "definition": "Ingeniería",
+    "context": "Engineering"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-finance",
+    "definition": "Finanzas",
+    "context": "Finance"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-general-management",
+    "definition": "Gestión general",
+    "context": "General Management"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-hr",
+    "definition": "RRHH",
+    "context": "HR"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-it",
+    "definition": "IT",
+    "context": "IT"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-legal",
+    "definition": "Legal",
+    "context": "Legal"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-marketing",
+    "definition": "Marketing",
+    "context": "Marketing"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-operations",
+    "definition": "Operaciones",
+    "context": "Operations"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-other",
+    "definition": "Otros",
+    "context": "Other"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-procurement",
+    "definition": "Compras",
+    "context": "Procurement"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-product",
+    "definition": "Producto",
+    "context": "Product"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-sales",
+    "definition": "Ventas",
+    "context": "Sales"
+  },
+  {
+    "term": "component.public-signup-form-inbox.description-one",
+    "definition": "Hemos mandado un correo de verificación a <b>{email}</b>. Esto nos ayudará a que tu cuenta sea lo más segura posible.",
+    "context": "We’ve sent a verification email to <b>{email}</b>. This will help to make your account as secure as possible."
+  },
+  {
+    "term": "component.public-signup-form-inbox.description-two",
+    "definition": "¿No encuentras nuestro mail? Revisa la bandeja de spam y si no está ponte en contacto con nuestro <Link>Equipo de soporte</Link>.",
+    "context": "Didn’t receive our email? Check your spam folder and if you don’t found it contact with our <Link>Support team</Link>."
+  },
+  {
+    "term": "component.public-signup-form-inbox.heading",
+    "definition": "Revisa tu bandeja de entrada",
+    "context": "Ckeck your inbox"
+  },
+  {
+    "term": "component.public-signup-form-name.continue-button",
+    "definition": "Continuar",
+    "context": "Continue"
+  },
+  {
+    "term": "component.public-signup-form-name.description",
+    "definition": "Para empezar, un par de datos rápidos para que sepamos como dirigirnos a ti.",
+    "context": "To start with, a couple of quick facts so we know how to address you."
+  },
+  {
+    "term": "component.public-signup-form-name.first-name-label",
+    "definition": "Nombre*",
+    "context": "First name*"
+  },
+  {
+    "term": "component.public-signup-form-name.heading",
+    "definition": "¿Cómo te llamas?",
+    "context": "What’s your name?"
+  },
+  {
+    "term": "component.public-signup-form-name.invalid-first-name-error",
+    "definition": "Por favor, ingrese un nombre",
+    "context": "Please, enter a name"
+  },
+  {
+    "term": "component.public-signup-form-name.invalid-last-name-error",
+    "definition": "Por favor, ingrese un apellido",
+    "context": "Please, enter a last name"
+  },
+  {
+    "term": "component.public-signup-form-name.last-name-label",
+    "definition": "Apellidos*",
+    "context": "Last name*"
+  },
+  {
+    "term": "component.public-signup-form-organization.company-name-description",
+    "definition": "Este será el nombre que aparecerá en tus peticiones, elige uno que tus clientes puedan reconocer.",
+    "context": "This is the name that will appear in your petitions, so make sure it is the one your customers will recognize."
+  },
+  {
+    "term": "component.public-signup-form-organization.company-name-label",
+    "definition": "Nombre de tu organización*",
+    "context": "Company name*"
+  },
+  {
+    "term": "component.public-signup-form-organization.continue-button",
+    "definition": "Continuar",
+    "context": "Continue"
+  },
+  {
+    "term": "component.public-signup-form-organization.description",
+    "definition": "Completa el perfil de tu organización que verán tus clientes en tus comunicaciones.",
+    "context": "Fill out your organization’s profile that your customers will see in your communications."
+  },
+  {
+    "term": "component.public-signup-form-organization.go-back-button",
+    "definition": "Volver atrás",
+    "context": "Go back"
+  },
+  {
+    "term": "component.public-signup-form-organization.heading",
+    "definition": "Configura tu organización",
+    "context": "Set up your organization"
+  },
+  {
+    "term": "component.public-signup-form-organization.invalid-company-name-error",
+    "definition": "Por favor, ingrese el nombre de la empresa",
+    "context": "Please, enter a company name"
+  },
+  {
+    "term": "component.public-signup-form-organization.logo-label",
+    "definition": "Logotipo",
+    "context": "Logo"
+  },
+  {
+    "term": "component.public-signup-form-organization.logo-label-help",
+    "definition": "Adjunta una imagen que quieras que mostremos en tus correos.",
+    "context": "Attach an image you want to show in your emails."
+  },
+  {
+    "term": "component.public-signup-form-organization.upload-logo-button",
+    "definition": "Subir logotipo",
+    "context": "Upload logo"
+  },
+  {
+    "term": "component.public-signup-form-organization.upload-logo-size-error",
+    "definition": "archivo demasiado pesado. Adjunte un archivo de hasta 50kB",
+    "context": "File too heavy. Attach a file up to 50kB"
+  },
+  {
+    "term": "component.public-signup-form-organization.upload-logo-text",
+    "definition": "(Imagen PNG máx. 50kB) ",
+    "context": "(PNG file of size up 50kB)"
+  },
+  {
+    "term": "component.public-signup-form-organization.upload-other-logo-button",
+    "definition": "Subir otro logo",
+    "context": "Upload other logo"
+  },
+  {
+    "term": "component.public-signup-form.description",
+    "definition": "Crea ya tu cuenta gratuita y automatiza tus procesos de una forma ágil y segura.",
+    "context": "Create your free account now and automate your workflow agilely and safety."
+  },
+  {
+    "term": "component.public-signup-form.experience.industry-label",
+    "definition": "¿En qué sector trabajas?",
+    "context": "What industry do you work at?"
+  },
+  {
+    "term": "component.public-signup-form.experience.industry-placeholder",
+    "definition": "Selecciona un sector",
+    "context": "Select an industry"
+  },
+  {
+    "term": "component.public-signup-form.experience.position-label",
+    "definition": "Y por último, ¿cuál es tu posición?",
+    "context": "And finally, what’s your position?"
+  },
+  {
+    "term": "component.public-signup-form.experience.position-placeholder",
+    "definition": "Ej: Analista financiero",
+    "context": "E.g: Financial Analyst"
+  },
+  {
+    "term": "component.public-signup-form.experience.role-label",
+    "definition": "¿Cuál describe mejor tu rol?",
+    "context": "Which best describes your role?"
+  },
+  {
+    "term": "component.public-signup-form.experience.role-placeholder",
+    "definition": "Selecciona una función",
+    "context": "Select a role"
+  },
+  {
+    "term": "component.public-signup-form.heading",
+    "definition": "Empieza a acelerar tu trabajo",
+    "context": "Start to speed up your work"
+  },
+  {
+    "term": "component.public-signup-form.legal-text",
+    "definition": "Haciéndo click en “Registrarme” aceptas nuestros <Terms>Términos y Condiciones</Terms> y la <Policy>Política de Privacidad</Policy>",
+    "context": "By signing up you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
+  },
+  {
+    "term": "component.public-signup-form.login-text",
+    "definition": "¿Ya tienes cuenta? <Link>Accede aquí</Link>",
+    "context": "Already have an account? <Link>Login</Link>"
+  },
+  {
+    "term": "component.public-signup-form.password-label",
+    "definition": "Contraseña",
+    "context": "Password"
+  },
+  {
+    "term": "component.public-signup-form.signup-button",
+    "definition": "Registrarme",
+    "context": "Sign up"
+  },
+  {
+    "term": "component.public-signup-form.work-email-label",
+    "definition": "Correo profesional",
+    "context": "Work email"
+  },
+  {
+    "term": "component.public-signup-right-heading.heading",
+    "definition": "Trabaja mejor con",
+    "context": "Work better with"
+  },
+  {
     "term": "component.react-select.loading",
     "definition": "Cargando...",
     "context": "Loading..."
@@ -6443,6 +6793,11 @@
     "term": "public.terms.title",
     "definition": "Términos y condiciones",
     "context": "Terms & Conditions"
+  },
+  {
+    "term": "public.try-for-free-button",
+    "definition": "Pruébalo gratis",
+    "context": "Try for free"
   },
   {
     "term": "public.who-trust-us.feedback",

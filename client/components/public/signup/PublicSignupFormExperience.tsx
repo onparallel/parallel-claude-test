@@ -1,27 +1,29 @@
-import { Button, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
-import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { Button, FormControl, FormLabel, Input, Select, Stack, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
 
 export type PublicSignupFormExperienceProps = {
   onBack: () => void;
-  onFinish: () => void;
+  onFinish: ({
+    industry,
+    role,
+    position,
+  }: {
+    industry?: string;
+    role?: string;
+    position?: string;
+  }) => void;
 };
 
 export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFormExperienceProps) {
-  const reactSelectProps = useFieldSelectReactSelectProps({});
   const intl = useIntl();
+  const [industry, setIndustry] = useState("");
+  const [role, setRole] = useState("");
+  const [position, setPosition] = useState("");
 
-  const [industry, setIndustry] = useState({
-    label: "",
-    value: "",
-  });
-
-  const [role, setRole] = useState({
-    label: "",
-    value: "",
-  });
+  const handleComplete = () => {
+    onFinish({ industry, role, position });
+  };
 
   const industryOptions = useMemo(
     () => [
@@ -56,7 +58,7 @@ export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFor
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-entertainment",
-          defaultMessage: "Shared",
+          defaultMessage: "Entertainment",
         }),
         value: "Entertainment",
       },
@@ -91,7 +93,7 @@ export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFor
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-outsourcing",
-          defaultMessage: "Others",
+          defaultMessage: "Outsourcing",
         }),
         value: "Outsourcing",
       },
@@ -264,12 +266,20 @@ export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFor
             />
           </FormLabel>
           <Select
-            options={industryOptions}
-            value={industry}
-            isSearchable={true}
-            onChange={(selected) => setIndustry(selected)}
-            {...reactSelectProps}
-          />
+            onChange={(e) => setIndustry(e.target.value)}
+            placeholder={intl.formatMessage({
+              id: "component.public-signup-form.experience.industry-placeholder",
+              defaultMessage: "Select an industry",
+            })}
+            color={industry ? "gray.800" : "gray.400"}
+            iconColor="gray.800"
+          >
+            {industryOptions.map((industry, index) => (
+              <option key={index} value={industry.value}>
+                {industry.label}
+              </option>
+            ))}
+          </Select>
         </FormControl>
         <FormControl id="role">
           <FormLabel>
@@ -279,12 +289,20 @@ export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFor
             />
           </FormLabel>
           <Select
-            options={roleOptions}
-            value={role}
-            isSearchable={true}
-            onChange={(selected) => setRole(selected)}
-            {...reactSelectProps}
-          />
+            onChange={(e) => setRole(e.target.value)}
+            placeholder={intl.formatMessage({
+              id: "component.public-signup-form.experience.role-placeholder",
+              defaultMessage: "Select a role",
+            })}
+            color={role ? "gray.800" : "gray.400"}
+            iconColor="gray.800"
+          >
+            {roleOptions.map((role, index) => (
+              <option key={index} value={role.value}>
+                {role.label}
+              </option>
+            ))}
+          </Select>
         </FormControl>
         <FormControl id="position">
           <FormLabel>
@@ -293,16 +311,32 @@ export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFor
               defaultMessage="And finally, what’s your position?"
             />
           </FormLabel>
-          <Input name="position" type="text" placeholder="E.g: Financial Analyst" />
+          <Input
+            name="position"
+            autoComplete="off"
+            type="text"
+            placeholder={intl.formatMessage({
+              id: "component.public-signup-form.experience.position-placeholder",
+              defaultMessage: "E.g: Financial Analyst",
+            })}
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
+          />
         </FormControl>
-        <Stack spacing={4} paddingTop={4} direction={{ base: "column", md: "row" }}>
+        <Stack spacing={4} paddingTop={4} direction={{ base: "column-reverse", md: "row" }}>
           <Button width="100%" variant="outline" size="md" fontSize="md" onClick={onBack}>
             <FormattedMessage
               id="component.public-signup-form-experience.go-back-button"
               defaultMessage="Go back"
             />
           </Button>
-          <Button width="100%" colorScheme="purple" size="md" fontSize="md" onClick={onFinish}>
+          <Button
+            width="100%"
+            colorScheme="purple"
+            size="md"
+            fontSize="md"
+            onClick={handleComplete}
+          >
             <FormattedMessage
               id="component.public-signup-form-experience.complete-button"
               defaultMessage="Complete registration"

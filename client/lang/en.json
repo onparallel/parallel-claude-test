@@ -1685,6 +1685,356 @@
     "context": "Press # to add replaceable placeholders"
   },
   {
+    "term": "component.public-signup-form-experience.complete-button",
+    "definition": "Complete registration",
+    "context": "Complete registration"
+  },
+  {
+    "term": "component.public-signup-form-experience.description",
+    "definition": "We will ask you some questions to get to know you better and offer you the best possible experience.",
+    "context": "We will ask you some questions to get to know you better and offer you the best possible experience."
+  },
+  {
+    "term": "component.public-signup-form-experience.go-back-button",
+    "definition": "Go back",
+    "context": "Go back"
+  },
+  {
+    "term": "component.public-signup-form-experience.heading",
+    "definition": "Help us improve your experience",
+    "context": "Help us improve your experience"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-advisory",
+    "definition": "Advisory",
+    "context": "Advisory"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-consulting",
+    "definition": "Consulting",
+    "context": "Consulting"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-e-commerce",
+    "definition": "E-commerce",
+    "context": "E-commerce"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-education",
+    "definition": "Education",
+    "context": "Education"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-entertainment",
+    "definition": "Entertainment",
+    "context": "Entertainment"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-financial-services",
+    "definition": "Financial Services",
+    "context": "Financial Services"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-government",
+    "definition": "Government",
+    "context": "Government"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-healthcare",
+    "definition": "Healthcare",
+    "context": "Healthcare"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-legal",
+    "definition": "Legal",
+    "context": "Legal"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-other",
+    "definition": "Other",
+    "context": "Other"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-outsourcing",
+    "definition": "Outsourcing",
+    "context": "Outsourcing"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-real-estate",
+    "definition": "Real Estate",
+    "context": "Real Estate"
+  },
+  {
+    "term": "component.public-signup-form-experience.industry-software",
+    "definition": "Software",
+    "context": "Software"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-administration",
+    "definition": "Administration",
+    "context": "Administration"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-business-development",
+    "definition": "Business development",
+    "context": "Business development"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-compliance",
+    "definition": "Compliance",
+    "context": "Compliance"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-customer-service",
+    "definition": "Customer service",
+    "context": "Customer service"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-engineering",
+    "definition": "Engineering",
+    "context": "Engineering"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-finance",
+    "definition": "Finance",
+    "context": "Finance"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-general-management",
+    "definition": "General Management",
+    "context": "General Management"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-hr",
+    "definition": "HR",
+    "context": "HR"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-it",
+    "definition": "IT",
+    "context": "IT"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-legal",
+    "definition": "Legal",
+    "context": "Legal"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-marketing",
+    "definition": "Marketing",
+    "context": "Marketing"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-operations",
+    "definition": "Operations",
+    "context": "Operations"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-other",
+    "definition": "Other",
+    "context": "Other"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-procurement",
+    "definition": "Procurement",
+    "context": "Procurement"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-product",
+    "definition": "Product",
+    "context": "Product"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-sales",
+    "definition": "Sales",
+    "context": "Sales"
+  },
+  {
+    "term": "component.public-signup-form-inbox.description-one",
+    "definition": "We’ve sent a verification email to <b>{email}</b>. This will help to make your account as secure as possible.",
+    "context": "We’ve sent a verification email to <b>{email}</b>. This will help to make your account as secure as possible."
+  },
+  {
+    "term": "component.public-signup-form-inbox.description-two",
+    "definition": "Didn’t receive our email? Check your spam folder and if you don’t found it contact with our <Link>Support team</Link>.",
+    "context": "Didn’t receive our email? Check your spam folder and if you don’t found it contact with our <Link>Support team</Link>."
+  },
+  {
+    "term": "component.public-signup-form-inbox.heading",
+    "definition": "Ckeck your inbox",
+    "context": "Ckeck your inbox"
+  },
+  {
+    "term": "component.public-signup-form-name.continue-button",
+    "definition": "Continue",
+    "context": "Continue"
+  },
+  {
+    "term": "component.public-signup-form-name.description",
+    "definition": "To start with, a couple of quick facts so we know how to address you.",
+    "context": "To start with, a couple of quick facts so we know how to address you."
+  },
+  {
+    "term": "component.public-signup-form-name.first-name-label",
+    "definition": "First name*",
+    "context": "First name*"
+  },
+  {
+    "term": "component.public-signup-form-name.heading",
+    "definition": "What’s your name?",
+    "context": "What’s your name?"
+  },
+  {
+    "term": "component.public-signup-form-name.invalid-first-name-error",
+    "definition": "Please, enter a name",
+    "context": "Please, enter a name"
+  },
+  {
+    "term": "component.public-signup-form-name.invalid-last-name-error",
+    "definition": "Please, enter a last name",
+    "context": "Please, enter a last name"
+  },
+  {
+    "term": "component.public-signup-form-name.last-name-label",
+    "definition": "Last name*",
+    "context": "Last name*"
+  },
+  {
+    "term": "component.public-signup-form-organization.company-name-description",
+    "definition": "This is the name that will appear in your petitions, so make sure it is the one your customers will recognize.",
+    "context": "This is the name that will appear in your petitions, so make sure it is the one your customers will recognize."
+  },
+  {
+    "term": "component.public-signup-form-organization.company-name-label",
+    "definition": "Company name*",
+    "context": "Company name*"
+  },
+  {
+    "term": "component.public-signup-form-organization.continue-button",
+    "definition": "Continue",
+    "context": "Continue"
+  },
+  {
+    "term": "component.public-signup-form-organization.description",
+    "definition": "Fill out your organization’s profile that your customers will see in your communications.",
+    "context": "Fill out your organization’s profile that your customers will see in your communications."
+  },
+  {
+    "term": "component.public-signup-form-organization.go-back-button",
+    "definition": "Go back",
+    "context": "Go back"
+  },
+  {
+    "term": "component.public-signup-form-organization.heading",
+    "definition": "Set up your organization",
+    "context": "Set up your organization"
+  },
+  {
+    "term": "component.public-signup-form-organization.invalid-company-name-error",
+    "definition": "Please, enter a company name",
+    "context": "Please, enter a company name"
+  },
+  {
+    "term": "component.public-signup-form-organization.logo-label",
+    "definition": "Logo",
+    "context": "Logo"
+  },
+  {
+    "term": "component.public-signup-form-organization.logo-label-help",
+    "definition": "Attach an image you want to show in your emails.",
+    "context": "Attach an image you want to show in your emails."
+  },
+  {
+    "term": "component.public-signup-form-organization.upload-logo-button",
+    "definition": "Upload logo",
+    "context": "Upload logo"
+  },
+  {
+    "term": "component.public-signup-form-organization.upload-logo-size-error",
+    "definition": "File too heavy. Attach a file up to 50kB",
+    "context": "File too heavy. Attach a file up to 50kB"
+  },
+  {
+    "term": "component.public-signup-form-organization.upload-logo-text",
+    "definition": "(PNG file of size up 50kB)",
+    "context": "(PNG file of size up 50kB)"
+  },
+  {
+    "term": "component.public-signup-form-organization.upload-other-logo-button",
+    "definition": "Upload other logo",
+    "context": "Upload other logo"
+  },
+  {
+    "term": "component.public-signup-form.description",
+    "definition": "Create your free account now and automate your workflow agilely and safety.",
+    "context": "Create your free account now and automate your workflow agilely and safety."
+  },
+  {
+    "term": "component.public-signup-form.experience.industry-label",
+    "definition": "What industry do you work at?",
+    "context": "What industry do you work at?"
+  },
+  {
+    "term": "component.public-signup-form.experience.industry-placeholder",
+    "definition": "Select an industry",
+    "context": "Select an industry"
+  },
+  {
+    "term": "component.public-signup-form.experience.position-label",
+    "definition": "And finally, what’s your position?",
+    "context": "And finally, what’s your position?"
+  },
+  {
+    "term": "component.public-signup-form.experience.position-placeholder",
+    "definition": "E.g: Financial Analyst",
+    "context": "E.g: Financial Analyst"
+  },
+  {
+    "term": "component.public-signup-form.experience.role-label",
+    "definition": "Which best describes your role?",
+    "context": "Which best describes your role?"
+  },
+  {
+    "term": "component.public-signup-form.experience.role-placeholder",
+    "definition": "Select a role",
+    "context": "Select a role"
+  },
+  {
+    "term": "component.public-signup-form.heading",
+    "definition": "Start to speed up your work",
+    "context": "Start to speed up your work"
+  },
+  {
+    "term": "component.public-signup-form.legal-text",
+    "definition": "By signing up you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>",
+    "context": "By signing up you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
+  },
+  {
+    "term": "component.public-signup-form.login-text",
+    "definition": "Already have an account? <Link>Login</Link>",
+    "context": "Already have an account? <Link>Login</Link>"
+  },
+  {
+    "term": "component.public-signup-form.password-label",
+    "definition": "Password",
+    "context": "Password"
+  },
+  {
+    "term": "component.public-signup-form.signup-button",
+    "definition": "Sign up",
+    "context": "Sign up"
+  },
+  {
+    "term": "component.public-signup-form.work-email-label",
+    "definition": "Work email",
+    "context": "Work email"
+  },
+  {
+    "term": "component.public-signup-right-heading.heading",
+    "definition": "Work better with",
+    "context": "Work better with"
+  },
+  {
     "term": "component.react-select.loading",
     "definition": "Loading...",
     "context": "Loading..."
@@ -6443,6 +6793,11 @@
     "term": "public.terms.title",
     "definition": "Terms & Conditions",
     "context": "Terms & Conditions"
+  },
+  {
+    "term": "public.try-for-free-button",
+    "definition": "Try for free",
+    "context": "Try for free"
   },
   {
     "term": "public.who-trust-us.feedback",

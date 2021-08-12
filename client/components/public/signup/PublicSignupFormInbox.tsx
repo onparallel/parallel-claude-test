@@ -2,7 +2,7 @@ import { Stack, Text } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
 
-export function PublicSignupFormInbox() {
+export function PublicSignupFormInbox({ email }: { email: string }) {
   return (
     <>
       <Stack spacing={6}>
@@ -15,7 +15,11 @@ export function PublicSignupFormInbox() {
         <Text>
           <FormattedMessage
             id="component.public-signup-form-inbox.description-one"
-            defaultMessage="We’ve sent a verification email to name@company.com. This will help to make your account as secure as possible."
+            defaultMessage="We’ve sent a verification email to <b>{email}</b>. This will help to make your account as secure as possible."
+            values={{
+              email,
+              b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
+            }}
           />
         </Text>
         <Text>

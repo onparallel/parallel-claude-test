@@ -1,12 +1,37 @@
 import { Box, Button, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { useEffect } from "react";
+import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 export type PublicSignupFormProps = {
-  onNext: () => void;
+  onNext: ({ email, password }: { email: string; password: string }) => void;
 };
 export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
+  const [email, setEmail] = useState("");
+  const [isInvalidEmail, setIsInvalidEmail] = useState(false);
+  const [password, setPassword] = useState("");
+  const [isInvalidPassword, setIsInvalidPassword] = useState(false);
+
+  const handleNext = () => {
+    if (!email || !EMAIL_REGEX.test(email)) setIsInvalidEmail(true);
+    if (!password) setIsInvalidPassword(true);
+
+    if (email && EMAIL_REGEX.test(email) && password) {
+      onNext({ email, password });
+    }
+  };
+
+  useEffect(() => {
+    if (isInvalidEmail && EMAIL_REGEX.test(email)) setIsInvalidEmail(false);
+  }, [email]);
+
+  useEffect(() => {
+    if (isInvalidPassword) setIsInvalidPassword(false);
+  }, [password]);
+
   return (
     <>
       <Stack spacing={4}>
@@ -34,8 +59,18 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             type="email"
             autoComplete="email"
             placeholder="example@company.com"
-            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            isInvalid={isInvalidEmail}
           />
+          {isInvalidEmail && (
+            <Text fontSize="sm" color="red.600" paddingTop={1}>
+              <FormattedMessage
+                id="generic.forms.invalid-email-error"
+                defaultMessage="Please, enter a valid email"
+              />
+            </Text>
+          )}
         </FormControl>
         <FormControl id="password">
           <FormLabel>
@@ -44,18 +79,30 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
               defaultMessage="Password"
             />
           </FormLabel>
-          <PasswordInput />
+          <PasswordInput
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            isInvalid={isInvalidPassword}
+            autoComplete="current-password"
+          />
+          {isInvalidPassword && (
+            <Text fontSize="sm" color="red.600" paddingTop={1}>
+              <FormattedMessage
+                id="generic.forms.required-password-error"
+                defaultMessage="Please, enter a password"
+              />
+            </Text>
+          )}
         </FormControl>
 
         <Box>
           <Button
-            type="submit"
             width="100%"
             colorScheme="purple"
             size="md"
             fontSize="md"
             marginTop={4}
-            onClick={onNext}
+            onClick={handleNext}
           >
             <FormattedMessage
               id="component.public-signup-form.signup-button"
@@ -66,7 +113,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
         <Text align="center" fontSize="sm">
           <FormattedMessage
             id="component.public-signup-form.legal-text"
-            defaultMessage="By signing up you agree to our <Terms>Login</Terms> and <Policy>Privacy policy</Policy>"
+            defaultMessage="By signing up you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
             values={{
               Terms: (chunks: any[]) => (
                 <NormalLink role="a" href="legal/terms" target="_blank">
@@ -81,7 +128,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             }}
           />
         </Text>
-        <Text align="center">
+        <Text align="center" paddingTop={6}>
           <FormattedMessage
             id="component.public-signup-form.login-text"
             defaultMessage="Already have an account? <Link>Login</Link>"

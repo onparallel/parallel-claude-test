@@ -9,42 +9,43 @@ import { PublicSignupFormInbox } from "@parallel/components/public/signup/Public
 import { PublicSignupFormName } from "@parallel/components/public/signup/PublicSignupFormName";
 import { PublicSignupFormOrganization } from "@parallel/components/public/signup/PublicSignupFormOrganization";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useIntl } from "react-intl";
+
+type FormDataType = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  companyName: string;
+  logo?: File;
+  industry?: string;
+  role?: string;
+  position?: string;
+};
 
 function Signup() {
   const intl = useIntl();
   const [index, setIndex] = useState(0);
 
-  const handleNextPage = () => {
-    setIndex((i) => {
-      if (i !== 4) {
-        return i + 1;
-      } else {
-        return i;
-      }
-    });
+  const formData = useRef<FormDataType>();
+
+  const nextPage = () => {
+    setIndex((i) => i + 1);
   };
 
   const handlePreviousPage = () => {
-    setIndex((i) => {
-      if (i !== 0) {
-        return i - 1;
-      } else {
-        return i;
-      }
-    });
+    setIndex((i) => i - 1);
   };
 
-  const handleSubmit = () => {
-    console.log("FINISH");
-    setIndex((i) => {
-      if (i !== 4) {
-        return i + 1;
-      } else {
-        return i;
-      }
-    });
+  const handleNextPage = (data: any) => {
+    formData.current = { ...(formData?.current ?? {}), ...data };
+    nextPage();
+  };
+
+  const handleFinish = (data: any) => {
+    formData.current = { ...(formData?.current ?? {}), ...data };
+    nextPage();
   };
 
   return (
@@ -79,7 +80,7 @@ function Signup() {
           },
         }}
       >
-        <Flex direction="column" paddingX={{ base: 10, md: 20 }} minWidth="50vw">
+        <Flex direction="column" paddingX={{ base: 6, md: 20 }} minWidth="50vw">
           <Box paddingTop={5} marginLeft={-1}>
             <NakedLink href="/">
               <Box
@@ -93,24 +94,27 @@ function Signup() {
               </Box>
             </NakedLink>
           </Box>
+
           <Center className="form-container" flex="1" maxWidth="md" paddingY={10}>
-            <SimpleWizard index={index}>
-              <PublicSignupForm onNext={handleNextPage} />
-              <PublicSignupFormName onNext={handleNextPage} />
-              <PublicSignupFormOrganization onBack={handlePreviousPage} onNext={handleNextPage} />
-              <PublicSignupFormExperience onBack={handlePreviousPage} onFinish={handleSubmit} />
-              <PublicSignupFormInbox />
-            </SimpleWizard>
+            <form>
+              <SimpleWizard index={index}>
+                <PublicSignupForm onNext={handleNextPage} />
+                <PublicSignupFormName onNext={handleNextPage} />
+                <PublicSignupFormOrganization onBack={handlePreviousPage} onNext={handleNextPage} />
+                <PublicSignupFormExperience onBack={handlePreviousPage} onFinish={handleFinish} />
+                <PublicSignupFormInbox email={formData?.current?.email ?? ""} />
+              </SimpleWizard>
+            </form>
           </Center>
         </Flex>
-        <Box display={{ base: "none", lg: "block" }} paddingLeft={8}>
+        <Box display={{ base: "none", lg: "block" }} paddingLeft={8} width="100%">
           <Flex
             direction="column"
             backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/signup-bg.svg`}
             backgroundPosition="center"
             backgroundRepeat="no-repeat"
             backgroundSize="cover"
-            backgroundColor="#6b66ea"
+            width="100%"
             height="100%"
             padding={16}
             maxWidth="container.lg"

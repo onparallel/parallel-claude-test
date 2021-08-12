@@ -1,11 +1,33 @@
 import { Box, Button, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 export type PublicSignupFormNameProps = {
-  onNext: () => void;
+  onNext: ({ firstName, lastName }: { firstName: string; lastName: string }) => void;
 };
 
 export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
+  const [firstName, setFirstName] = useState("");
+  const [isInvalidFirstName, setIsInvalidFirstName] = useState(false);
+  const [lastName, setLastName] = useState("");
+  const [isInvalidLastName, setIsInvalidLastName] = useState(false);
+
+  const handleNext = () => {
+    if (!firstName) setIsInvalidFirstName(true);
+    if (!lastName) setIsInvalidLastName(true);
+    if (firstName && lastName) {
+      onNext({ firstName, lastName });
+    }
+  };
+
+  useEffect(() => {
+    if (isInvalidFirstName) setIsInvalidFirstName(false);
+  }, [firstName]);
+
+  useEffect(() => {
+    if (isInvalidLastName) setIsInvalidLastName(false);
+  }, [lastName]);
+
   return (
     <>
       <Text as="span" textStyle="muted" fontSize="sm">
@@ -31,7 +53,22 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
               defaultMessage="First name*"
             />
           </FormLabel>
-          <Input name="first-name" type="first-name" autoComplete="first-name" required />
+          <Input
+            name="first-name"
+            type="text"
+            autoComplete="given-name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            isInvalid={isInvalidFirstName}
+          />
+          {isInvalidFirstName && (
+            <Text fontSize="sm" color="red.600" paddingTop={1}>
+              <FormattedMessage
+                id="component.public-signup-form-name.invalid-first-name-error"
+                defaultMessage="Please, enter a name"
+              />
+            </Text>
+          )}
         </FormControl>
         <FormControl id="last-name">
           <FormLabel>
@@ -40,17 +77,31 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
               defaultMessage="Last name*"
             />
           </FormLabel>
-          <Input name="last-name" type="last-name" autoComplete="last-name" required />
+          <Input
+            name="last-name"
+            type="text"
+            autoComplete="family-name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            isInvalid={isInvalidLastName}
+          />
+          {isInvalidLastName && (
+            <Text fontSize="sm" color="red.600" paddingTop={1}>
+              <FormattedMessage
+                id="component.public-signup-form-name.invalid-last-name-error"
+                defaultMessage="Please, enter a last name"
+              />
+            </Text>
+          )}
         </FormControl>
         <Box>
           <Button
-            type="submit"
             width="100%"
             colorScheme="purple"
             size="md"
             fontSize="md"
             marginTop={4}
-            onClick={onNext}
+            onClick={handleNext}
           >
             <FormattedMessage
               id="component.public-signup-form-name.continue-button"

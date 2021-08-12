@@ -10,6 +10,26 @@
     "context": "{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
   },
   {
+    "term": "account-verification.activate-button",
+    "definition": "Activar mi cuenta",
+    "context": "Activate my account"
+  },
+  {
+    "term": "account-verification.ignore",
+    "definition": "Si no has solicitado este correo, simplemente ignóralo.",
+    "context": "If you did not ask for this email just ignore it."
+  },
+  {
+    "term": "account-verification.intro-text",
+    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente dale al botón para verificar tu cuenta.  ",
+    "context": "You are almost on Parallel, to start using Parallel just click the verify email button below."
+  },
+  {
+    "term": "account-verification.subject",
+    "definition": "Activa tu cuenta de Parallel",
+    "context": "Activate your Parallel account"
+  },
+  {
     "term": "closing.formal.regards",
     "definition": "Reciba un cordial saludo.",
     "context": "Best regards."
