@@ -10,6 +10,8 @@ import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
 import Router from "next/router";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { OnboardingTour, OnboardingTourContext } from "../common/OnboardingTour";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
@@ -94,52 +96,60 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           <Segment />
         </>
       ) : null}
-      <Flex
-        alignItems="stretch"
-        overflow="hidden"
-        height="100vh"
-        maxWidth="100vw"
-        sx={{
-          "@supports (-webkit-touch-callout: none)": {
-            height: "-webkit-fill-available",
-          },
-        }}
-        flexDirection={{ base: "column-reverse", sm: "row" }}
-      >
+      <DndProvider backend={HTML5Backend}>
         <Flex
-          flexDirection={{ base: "row", sm: "column" }}
-          flexShrink={0}
-          borderWidth={{ base: "1px 0 0 0", sm: "0 1px 0 0" }}
-          borderColor="gray.200"
-          overflow={{ base: "auto hidden", sm: "hidden auto" }}
+          alignItems="stretch"
+          overflow="hidden"
+          height="100vh"
+          maxWidth="100vw"
+          sx={{
+            "@supports (-webkit-touch-callout: none)": {
+              height: "-webkit-fill-available",
+            },
+          }}
+          flexDirection={{ base: "column-reverse", sm: "row" }}
         >
-          <AppLayoutNavbar
-            user={user}
-            onOnboardingClick={handleOnboardingClick}
+          <Flex
+            flexDirection={{ base: "row", sm: "column" }}
+            flexShrink={0}
+            borderWidth={{ base: "1px 0 0 0", sm: "0 1px 0 0" }}
+            borderColor="gray.200"
+            overflow={{ base: "auto hidden", sm: "hidden auto" }}
+          >
+            <AppLayoutNavbar
+              user={user}
+              onOnboardingClick={handleOnboardingClick}
+              flex="1"
+              zIndex="2"
+            />
+          </Flex>
+          <Flex
             flex="1"
-            zIndex="2"
-          />
-        </Flex>
-        <Flex flex="1" flexDirection="column" minHeight="0" minWidth="0" backgroundColor="gray.50">
-          <Flex flex="1" as="main" direction="column" minHeight={0} overflow="auto" {...props}>
-            {rehydrated && !isLoading ? (
-              children
-            ) : (
-              <Center flex="1">
-                <Spinner
-                  thickness="4px"
-                  speed="0.65s"
-                  emptyColor="gray.200"
-                  color="purple.500"
-                  size="xl"
-                />
-              </Center>
-            )}
+            flexDirection="column"
+            minHeight="0"
+            minWidth="0"
+            backgroundColor="gray.50"
+          >
+            <Flex flex="1" as="main" direction="column" minHeight={0} overflow="auto" {...props}>
+              {rehydrated && !isLoading ? (
+                children
+              ) : (
+                <Center flex="1">
+                  <Spinner
+                    thickness="4px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color="purple.500"
+                    size="xl"
+                  />
+                </Center>
+              )}
+            </Flex>
           </Flex>
         </Flex>
-      </Flex>
-      <OnboardingTour onUpdateTour={handleUpdateTour} status={user.onboardingStatus as any} />
-      <NotificationsDrawer />
+        <OnboardingTour onUpdateTour={handleUpdateTour} status={user.onboardingStatus as any} />
+        <NotificationsDrawer />
+      </DndProvider>
     </>
   );
 }

@@ -33,10 +33,15 @@ export function PublicTemplateCard({ template }: PublicTemplateCardProps) {
       overflow="hidden"
     >
       <Stack spacing={0}>
-        <Center height="130px" backgroundColor={backgroundColor ?? "gray.200"}>
+        <Center height="130px" padding={5} backgroundColor={backgroundColor ?? "gray.200"}>
           <Image
+            width="100%"
             height="100%"
-            padding={5}
+            objectFit="contain"
+            alt={intl.formatMessage({
+              id: "public.template-card.image-alt",
+              defaultMessage: "Example of question you will find in this template.",
+            })}
             src={
               imageUrl ??
               `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${intl.locale}_radio_button.png`

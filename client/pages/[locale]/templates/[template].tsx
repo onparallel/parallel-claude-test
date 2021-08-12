@@ -142,7 +142,14 @@ function LandingTemplateDetails({
               padding={8}
             >
               <Image
+                width="100%"
+                height="100%"
+                objectFit="contain"
                 maxHeight="225px"
+                alt={intl.formatMessage({
+                  id: "public.template-card.image-alt",
+                  defaultMessage: "Example of question you will find in this template.",
+                })}
                 src={
                   imageUrl ??
                   `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${intl.locale}_radio_button.png`

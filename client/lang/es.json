@@ -6075,6 +6075,11 @@
     "context": "Created by {name} on {orgName}"
   },
   {
+    "term": "public.template-card.image-alt",
+    "definition": "Ejemplo de pregunta que encontrarás en esta plantilla.",
+    "context": "Example of question you will find in this template."
+  },
+  {
     "term": "public.template-category-preview.templates-for",
     "definition": "Plantillas para {category}",
     "context": "Templates for {category}"

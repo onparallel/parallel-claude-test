@@ -6075,6 +6075,11 @@
     "context": "Created by {name} on {orgName}"
   },
   {
+    "term": "public.template-card.image-alt",
+    "definition": "Example of question you will find in this template.",
+    "context": "Example of question you will find in this template."
+  },
+  {
     "term": "public.template-category-preview.templates-for",
     "definition": "Templates for {category}",
     "context": "Templates for {category}"
