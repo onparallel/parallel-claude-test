@@ -12,6 +12,7 @@ import { useConfirmActivateUsersDialog } from "@parallel/components/organization
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/ConfirmDeactivateUserDialog";
 import { useCreateOrUpdateUserDialog } from "@parallel/components/organization/CreateOrUpdateUserDialog";
 import { OrganizationUsersListTableHeader } from "@parallel/components/organization/OrganizationUsersListTableHeader";
+import { UserLimitReachedAlert } from "@parallel/components/organization/UserLimitReachedAlert";
 import {
   OrganizationRole,
   OrganizationUsersQuery,
@@ -27,7 +28,6 @@ import {
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import { isAdmin } from "@parallel/utils/roles";
 import {
   integer,
   parseQuery,
@@ -36,6 +36,7 @@ import {
   useQueryState,
   values,
 } from "@parallel/utils/queryState";
+import { isAdmin } from "@parallel/utils/roles";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
@@ -207,6 +208,8 @@ function OrganizationUsers() {
     } catch {}
   };
 
+  const isUserLimitReached = userList.totalCount >= me.organization.usageLimits.users.limit;
+
   return (
     <SettingsLayout
       title={intl.formatMessage({
@@ -226,6 +229,7 @@ function OrganizationUsers() {
       }
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4} backgroundColor={"gray.50"}>
+        {isUserLimitReached ? <UserLimitReachedAlert /> : null}
         <TablePage
           flex="0 1 auto"
           minHeight={0}
@@ -256,6 +260,7 @@ function OrganizationUsers() {
               search={search}
               selectedUsers={selectedUsers}
               hasSsoProvider={hasSsoProvider}
+              isCreateUserButtonDisabled={isUserLimitReached}
               onCreateUser={handleCreateUser}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
@@ -483,6 +488,11 @@ OrganizationUsers.getInitialProps = async ({ fetchQuery, ...context }: WithApoll
               totalCount
               items {
                 ...OrganizationUsers_User
+              }
+            }
+            usageLimits {
+              users {
+                limit
               }
             }
           }

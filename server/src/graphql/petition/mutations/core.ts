@@ -1113,7 +1113,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
       ctx.user!.org_id,
       "PETITION_SEND",
-      args.contactIdGroups.length
+      successfulSends.length
     );
 
     return results.map((r) => omit(r, ["messages"]));

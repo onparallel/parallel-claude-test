@@ -124,5 +124,54 @@ export const Organization = objectType({
         return type ? integrations.filter((i) => i.type === type) : integrations;
       },
     });
+    t.nonNull.field("usageLimits", {
+      type: objectType({
+        name: "OrganizationUsageLimit",
+        rootTyping: /* ts*/ `{
+          petitions: {
+            limit: number,
+            used: number
+          },
+          users: {
+            limit: number,
+          }
+        }`,
+        definition(t) {
+          t.nonNull.field("petitions", {
+            type: objectType({
+              name: "OrganizationUsagePetitionLimit",
+              definition(d) {
+                d.nonNull.int("limit");
+                d.nonNull.int("used");
+              },
+            }),
+          });
+          t.nonNull.field("users", {
+            type: objectType({
+              name: "OrganizationUsageUserLimit",
+              definition(d) {
+                d.nonNull.int("limit");
+              },
+            }),
+          });
+        },
+      }),
+      resolve: async (root, _, ctx) => {
+        const [organization, petitionSendLimits] = await Promise.all([
+          ctx.organizations.loadOrg(root.id),
+          ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "PETITION_SEND"),
+        ]);
+
+        return {
+          petitions: {
+            limit: petitionSendLimits?.limit || 0,
+            used: petitionSendLimits?.used || 0,
+          },
+          users: {
+            limit: organization!.usage_details.USER_SEATS,
+          },
+        };
+      },
+    });
   },
 });

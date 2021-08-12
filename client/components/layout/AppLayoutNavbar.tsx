@@ -40,6 +40,8 @@ export const AppLayoutNavbar = Object.assign(
     const intl = useIntl();
     const router = useRouter();
     const { pathname, query } = router;
+    const petitionLimitReached =
+      user.organization.usageLimits.petitions.used >= user.organization.usageLimits.petitions.limit;
     const items = useMemo(
       () => [
         {
@@ -52,6 +54,12 @@ export const AppLayoutNavbar = Object.assign(
             id: "navbar.petitions-link",
             defaultMessage: "Petitions",
           }),
+          warning: petitionLimitReached
+            ? intl.formatMessage({
+                id: "navbar.petitions-link.limit-reached.warning",
+                defaultMessage: "Petitions limit reached. Contact with us to upgrade your plan.",
+              })
+            : undefined,
         },
         {
           section: "contacts",
@@ -147,13 +155,14 @@ export const AppLayoutNavbar = Object.assign(
           marginX={{ base: 2, sm: 0 }}
           marginY={{ base: 0, sm: 2 }}
         >
-          {items.map(({ section, href, isActive, isAvailable, icon, text }) => (
+          {items.map(({ section, href, isActive, isAvailable, icon, text, warning }) => (
             <ListItem key={section} id={`pw-section-${section}`}>
               <AppLayoutNavbarLink
                 href={href}
                 isAvailable={isAvailable}
                 isActive={isActive}
                 icon={icon}
+                warningTooltip={warning}
               >
                 {text}
               </AppLayoutNavbarLink>
@@ -194,6 +203,15 @@ export const AppLayoutNavbar = Object.assign(
           id
           email
           ...UserMenu_User
+          organization {
+            id
+            usageLimits {
+              petitions {
+                limit
+                used
+              }
+            }
+          }
         }
         ${UserMenu.fragments.User}
       `,

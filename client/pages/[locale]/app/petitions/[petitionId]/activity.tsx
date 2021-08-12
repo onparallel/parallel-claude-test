@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
@@ -36,6 +37,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
+import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
@@ -143,6 +145,8 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const addPetitionAccessDialog = useAddPetitionAccessDialog();
   const handleSearchContacts = useSearchContacts();
   const [sendPetition] = usePetitionsActivity_sendPetitionMutation();
+  const showErrorDialog = useErrorDialog();
+
   const handleAddPetitionAccess = useCallback(async () => {
     try {
       const currentRecipientIds = petition.accesses
@@ -171,7 +175,23 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         },
       });
       await refetch();
-    } catch {}
+    } catch (e) {
+      if (e.graphQLErrors?.[0]?.extensions.code === "PETITION_SEND_CREDITS_ERROR") {
+        await withError(
+          showErrorDialog({
+            header: intl.formatMessage({
+              id: "petition-activity.send-petition.not-enough-credits-error.header",
+              defaultMessage: "Error sending the petition",
+            }),
+            message: intl.formatMessage({
+              id: "petition-activity.send-petition.not-enough-credits-error.message",
+              defaultMessage:
+                "You don't have enough credits to send this petition to another contact.",
+            }),
+          })
+        );
+      }
+    }
   }, [petitionId, petition.accesses]);
 
   const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();

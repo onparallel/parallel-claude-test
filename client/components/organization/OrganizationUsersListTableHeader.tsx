@@ -25,6 +25,7 @@ export type OrganizationUsersListTableHeaderProps = {
   search: string | null;
   selectedUsers: OrganizationUsers_UserFragment[];
   hasSsoProvider: boolean;
+  isCreateUserButtonDisabled?: boolean;
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onCreateUser: () => void;
@@ -36,6 +37,7 @@ export function OrganizationUsersListTableHeader({
   search,
   selectedUsers,
   hasSsoProvider,
+  isCreateUserButtonDisabled,
   onSearchChange,
   onReload,
   onCreateUser,
@@ -131,6 +133,7 @@ export function OrganizationUsersListTableHeader({
           </Box>
           {hasSsoProvider ? null : (
             <Button
+              isDisabled={isCreateUserButtonDisabled}
               colorScheme="purple"
               leftIcon={<UserPlusIcon fontSize="18px" />}
               onClick={onCreateUser}

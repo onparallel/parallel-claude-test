@@ -14,6 +14,7 @@ import {
   CreateOrganizationUsageLimit,
   Organization,
   OrganizationStatus,
+  OrganizationUsageLimit,
   OrganizationUsageLimitName,
   User,
 } from "../__types";
@@ -192,11 +193,18 @@ export class OrganizationRepository extends BaseRepository {
     return await this.from("organization").select("id", "usage_details");
   }
 
-  readonly loadOrganizationCurrentUsageLimit = this.buildLoadMultipleBy(
-    "organization_usage_limit",
-    "org_id",
-    (q) => q.whereNull("period_end_date")
-  );
+  async getOrganizationCurrentUsageLimit(
+    orgId: number,
+    limitName: OrganizationUsageLimitName
+  ): Promise<OrganizationUsageLimit | null> {
+    const [row] = await this.from("organization_usage_limit").where({
+      org_id: orgId,
+      period_end_date: null,
+      limit_name: limitName,
+    });
+
+    return row;
+  }
 
   async createOrganizationUsageLimit(
     orgId: number,

@@ -17,11 +17,10 @@ createCronWorker("organization-limits", async (context) => {
   const orgUsageDetails = await context.organizations.getOrganizationUsageDetails();
 
   for (const org of orgUsageDetails) {
-    const currentUsageLimits = await context.organizations.loadOrganizationCurrentUsageLimit(
-      org.id
+    const petitionSendUsageLimit = await context.organizations.getOrganizationCurrentUsageLimit(
+      org.id,
+      "PETITION_SEND"
     );
-
-    const petitionSendUsageLimit = currentUsageLimits.find((p) => p.limit_name === "PETITION_SEND");
 
     if (!petitionSendUsageLimit) {
       // if the organization does not have a current period, create one using today as start date
@@ -30,15 +29,13 @@ createCronWorker("organization-limits", async (context) => {
         limit: org.usage_details.PETITION_SEND.limit,
         period: org.usage_details.PETITION_SEND.period,
       });
-    } else {
-      if (isCurrentUsageLimitExpired(petitionSendUsageLimit)) {
-        await context.organizations.updateUsageLimitAsExpired(petitionSendUsageLimit.id);
-        await context.organizations.createOrganizationUsageLimit(org.id, {
-          limit_name: "PETITION_SEND",
-          limit: org.usage_details.PETITION_SEND.limit,
-          period: org.usage_details.PETITION_SEND.period,
-        });
-      }
+    } else if (isCurrentUsageLimitExpired(petitionSendUsageLimit)) {
+      await context.organizations.updateUsageLimitAsExpired(petitionSendUsageLimit.id);
+      await context.organizations.createOrganizationUsageLimit(org.id, {
+        limit_name: "PETITION_SEND",
+        limit: org.usage_details.PETITION_SEND.limit,
+        period: org.usage_details.PETITION_SEND.period,
+      });
     }
   }
 });

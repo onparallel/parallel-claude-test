@@ -75,11 +75,9 @@ export function orgHasAvailablePetitionSendCredits<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
     const needed = requiredCredits(args);
-    const currentUsageLimit = await ctx.organizations.loadOrganizationCurrentUsageLimit(
-      ctx.user!.org_id
-    );
-    const petitionSendUsageLimit = currentUsageLimit.find(
-      (ul) => ul.limit_name === "PETITION_SEND"
+    const petitionSendUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
+      ctx.user!.org_id,
+      "PETITION_SEND"
     );
 
     if (

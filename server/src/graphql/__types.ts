@@ -340,6 +340,24 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["Organization"][]; // [Organization!]!
     totalCount: number; // Int!
   };
+  OrganizationUsageLimit: {
+    petitions: {
+      limit: number;
+      used: number;
+    };
+    users: {
+      limit: number;
+    };
+  };
+  OrganizationUsagePetitionLimit: {
+    // root type
+    limit: number; // Int!
+    used: number; // Int!
+  };
+  OrganizationUsageUserLimit: {
+    // root type
+    limit: number; // Int!
+  };
   OwnershipTransferredEvent: events.OwnershipTransferredEvent;
   Petition: db.Petition;
   PetitionAccess: db.PetitionAccess;
@@ -896,6 +914,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    usageLimits: NexusGenRootTypes["OrganizationUsageLimit"]; // OrganizationUsageLimit!
     userCount: number; // Int!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
   };
@@ -903,6 +922,20 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["Organization"][]; // [Organization!]!
     totalCount: number; // Int!
+  };
+  OrganizationUsageLimit: {
+    // field return type
+    petitions: NexusGenRootTypes["OrganizationUsagePetitionLimit"]; // OrganizationUsagePetitionLimit!
+    users: NexusGenRootTypes["OrganizationUsageUserLimit"]; // OrganizationUsageUserLimit!
+  };
+  OrganizationUsagePetitionLimit: {
+    // field return type
+    limit: number; // Int!
+    used: number; // Int!
+  };
+  OrganizationUsageUserLimit: {
+    // field return type
+    limit: number; // Int!
   };
   OwnershipTransferredEvent: {
     // field return type
@@ -1984,6 +2017,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     status: "OrganizationStatus";
     updatedAt: "DateTime";
+    usageLimits: "OrganizationUsageLimit";
     userCount: "Int";
     users: "UserPagination";
   };
@@ -1991,6 +2025,20 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "Organization";
     totalCount: "Int";
+  };
+  OrganizationUsageLimit: {
+    // field return type name
+    petitions: "OrganizationUsagePetitionLimit";
+    users: "OrganizationUsageUserLimit";
+  };
+  OrganizationUsagePetitionLimit: {
+    // field return type name
+    limit: "Int";
+    used: "Int";
+  };
+  OrganizationUsageUserLimit: {
+    // field return type name
+    limit: "Int";
   };
   OwnershipTransferredEvent: {
     // field return type name

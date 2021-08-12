@@ -30,6 +30,21 @@
     "context": "Add members to group"
   },
   {
+    "term": "component.add-petition-access-dialog.limit-reached.subtext",
+    "definition": "Remember that sending a petition to yourself doesn't consume any credits.",
+    "context": "Remember that sending a petition to yourself doesn't consume any credits."
+  },
+  {
+    "term": "component.add-petition-access-dialog.petition-limit-near.text",
+    "definition": "You only have {left, plural, =1{# send} other{# sends}} left.",
+    "context": "You only have {left, plural, =1{# send} other{# sends}} left."
+  },
+  {
+    "term": "component.add-petition-access-dialog.petition-limit-reached.text",
+    "definition": "You reached the limit of petitions sent.",
+    "context": "You reached the limit of petitions sent."
+  },
+  {
     "term": "component.add-petition-access-dialog.recipient-groups-description",
     "definition": "Each group will reply to different petitions.",
     "context": "Each group will reply to different petitions."
@@ -1253,6 +1268,11 @@
     "term": "component.petition-header.subscribed-description",
     "definition": "Get email notifications about activity in this petition.",
     "context": "Get email notifications about activity in this petition."
+  },
+  {
+    "term": "component.petition-limit-reached-alert.title",
+    "definition": "Seems that you have reached your limit of {limit} petitions, <a>contact with us to upgrade your plan.</a>",
+    "context": "Seems that you have reached your limit of {limit} petitions, <a>contact with us to upgrade your plan.</a>"
   },
   {
     "term": "component.petition-list-header.clone-petition-label",
@@ -3785,6 +3805,11 @@
     "context": "Petitions"
   },
   {
+    "term": "navbar.petitions-link.limit-reached.warning",
+    "definition": "Petitions limit reached. Contact with us to upgrade your plan.",
+    "context": "Petitions limit reached. Contact with us to upgrade your plan."
+  },
+  {
     "term": "navbar.reports-link",
     "definition": "Reports",
     "context": "Reports"
@@ -3928,6 +3953,11 @@
     "term": "organization-users.header.user-role",
     "definition": "Role",
     "context": "Role"
+  },
+  {
+    "term": "organization-users.max-limit-reached",
+    "definition": "You reached the maximum amount of users you can create, <a>contact with us to upgrade your plan.</a>",
+    "context": "You reached the maximum amount of users you can create, <a>contact with us to upgrade your plan.</a>"
   },
   {
     "term": "organization-users.normal-role",
@@ -4118,6 +4148,26 @@
     "term": "petition-accesses.status-header",
     "definition": "Status",
     "context": "Status"
+  },
+  {
+    "term": "petition-activity.send-petition.not-enough-credits-error.header",
+    "definition": "Error sending the petition",
+    "context": "Error sending the petition"
+  },
+  {
+    "term": "petition-activity.send-petition.not-enough-credits-error.message",
+    "definition": "You don't have enough credits to send this petition to another contact.",
+    "context": "You don't have enough credits to send this petition to another contact."
+  },
+  {
+    "term": "petition-compose.send-petition.not-enough-credits-error.header",
+    "definition": "Error sending the petition",
+    "context": "Error sending the petition"
+  },
+  {
+    "term": "petition-compose.send-petition.not-enough-credits-error.message",
+    "definition": "You don't have enough credits to send this petition.",
+    "context": "You don't have enough credits to send this petition."
   },
   {
     "term": "petition-compose.settings",

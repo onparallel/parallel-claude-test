@@ -1355,6 +1355,7 @@ type Organization implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+  usageLimits: OrganizationUsageLimit!
 
   """
   The total number of users
@@ -1434,6 +1435,20 @@ enum OrganizationStatus {
   Used for development or testing purposes
   """
   DEV
+}
+
+type OrganizationUsageLimit {
+  petitions: OrganizationUsagePetitionLimit!
+  users: OrganizationUsageUserLimit!
+}
+
+type OrganizationUsagePetitionLimit {
+  limit: Int!
+  used: Int!
+}
+
+type OrganizationUsageUserLimit {
+  limit: Int!
 }
 
 """

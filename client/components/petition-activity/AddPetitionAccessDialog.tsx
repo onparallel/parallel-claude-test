@@ -1,5 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Box, Button, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Button, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
@@ -146,6 +146,8 @@ export function AddPetitionAccessDialog({
     } catch {}
   };
 
+  const { used, limit } = petition.organization.usageLimits.petitions;
+
   return (
     <ConfirmDialog
       id="send-petition-dialog"
@@ -212,6 +214,28 @@ export function AddPetitionAccessDialog({
       }
       body={
         <>
+          {limit - used <= 10 ? (
+            <Alert status="warning" borderRadius="md" mb={2}>
+              <AlertIcon color="yellow.500" />
+              {limit === used ? (
+                <FormattedMessage
+                  id="component.add-petition-access-dialog.petition-limit-reached.text"
+                  defaultMessage="You reached the limit of petitions sent."
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.add-petition-access-dialog.petition-limit-near.text"
+                  defaultMessage="You only have {left, plural, =1{# send} other{# sends}} left."
+                  values={{ left: limit - used }}
+                />
+              )}
+              <br />
+              <FormattedMessage
+                id="component.add-petition-access-dialog.limit-reached.subtext"
+                defaultMessage="Remember that sending a petition to yourself doesn't consume any credits."
+              />
+            </Alert>
+          ) : null}
           <RecipientSelectGroups
             recipientGroups={recipientGroups}
             onChangeRecipientGroups={setRecipientGroups}
@@ -269,6 +293,15 @@ AddPetitionAccessDialog.fragments = {
         time
         timezone
         weekdaysOnly
+      }
+      organization {
+        id
+        usageLimits {
+          petitions {
+            limit
+            used
+          }
+        }
       }
     }
     ${CopySignatureConfigDialog.fragments.Contact}

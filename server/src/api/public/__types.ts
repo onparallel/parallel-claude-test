@@ -1204,6 +1204,7 @@ export type Organization = Timestamps & {
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+  usageLimits: OrganizationUsageLimit;
   /** The total number of users */
   userCount: Scalars["Int"];
   /** The users in the organization. */
@@ -1245,6 +1246,20 @@ export type OrganizationStatus =
   | "DEMO"
   /** Used for development or testing purposes */
   | "DEV";
+
+export type OrganizationUsageLimit = {
+  petitions: OrganizationUsagePetitionLimit;
+  users: OrganizationUsageUserLimit;
+};
+
+export type OrganizationUsagePetitionLimit = {
+  limit: Scalars["Int"];
+  used: Scalars["Int"];
+};
+
+export type OrganizationUsageUserLimit = {
+  limit: Scalars["Int"];
+};
 
 /** Order to use on Organization.users */
 export type OrganizationUsers_OrderBy =

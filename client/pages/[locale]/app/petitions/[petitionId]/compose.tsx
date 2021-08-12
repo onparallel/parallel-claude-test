@@ -33,6 +33,7 @@ import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compo
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/PetitionComposeFieldSettings";
+import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/PublicTemplateDialog";
@@ -478,7 +479,22 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         });
       }
       router.push(`/${router.query.locale}/app/petitions`);
-    } catch {}
+    } catch (e) {
+      if (e.graphQLErrors?.[0]?.extensions.code === "PETITION_SEND_CREDITS_ERROR") {
+        await withError(
+          showErrorDialog({
+            header: intl.formatMessage({
+              id: "petition-compose.send-petition.not-enough-credits-error.header",
+              defaultMessage: "Error sending the petition",
+            }),
+            message: intl.formatMessage({
+              id: "petition-compose.send-petition.not-enough-credits-error.message",
+              defaultMessage: "You don't have enough credits to send this petition.",
+            }),
+          })
+        );
+      }
+    }
   }, [petition]);
 
   const handleIndexFieldClick = useCallback(async (fieldId: string) => {
@@ -506,6 +522,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     minHeight: 0,
   } as const;
 
+  const displayPetitionLimitReachedAlert =
+    me.organization.usageLimits.petitions.limit <= me.organization.usageLimits.petitions.used &&
+    petition?.__typename === "Petition" &&
+    petition.status === "DRAFT";
+
   return (
     <PetitionLayout
       key={petition!.id}
@@ -531,6 +552,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         ) : null
       }
     >
+      {displayPetitionLimitReachedAlert ? (
+        <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+      ) : null}
       <PaneWithFlyout
         isFlyoutActive={Boolean(activeField)}
         alignWith={activeField ? activeFieldElement : null}
@@ -681,13 +705,30 @@ PetitionCompose.fragments = {
   get User() {
     return gql`
       fragment PetitionCompose_User on User {
+        id
         ...PetitionLayout_User
         ...PetitionSettings_User
         ...useUpdateIsReadNotification_User
+        organization {
+          ...PetitionCompose_Organization
+        }
       }
       ${PetitionLayout.fragments.User}
       ${PetitionSettings.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
+      ${this.Organization}
+    `;
+  },
+  get Organization() {
+    return gql`
+      fragment PetitionCompose_Organization on Organization {
+        usageLimits {
+          petitions {
+            limit
+            used
+          }
+        }
+      }
     `;
   },
 };

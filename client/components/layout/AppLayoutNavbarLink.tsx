@@ -1,4 +1,5 @@
 import { Box, Text, Tooltip, useBreakpointValue } from "@chakra-ui/react";
+import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Link } from "../common/Link";
@@ -9,6 +10,7 @@ export interface AppLayoutNavbarLinkProps {
   icon: ReactElement;
   isAvailable?: boolean;
   children: ReactNode;
+  warningTooltip?: ReactNode;
 }
 
 export function AppLayoutNavbarLink({
@@ -17,6 +19,7 @@ export function AppLayoutNavbarLink({
   icon,
   isAvailable,
   children,
+  warningTooltip,
 }: AppLayoutNavbarLinkProps) {
   const intl = useIntl();
   const isMobile = useBreakpointValue({ base: true, sm: false });
@@ -60,7 +63,9 @@ export function AppLayoutNavbarLink({
         },
       }}
     >
-      <AppLayoutNavbarLinkContent icon={icon}>{children}</AppLayoutNavbarLinkContent>
+      <AppLayoutNavbarLinkContent icon={icon} warningTooltip={warningTooltip}>
+        {children}
+      </AppLayoutNavbarLinkContent>
     </Link>
   ) : (
     <Tooltip
@@ -83,10 +88,12 @@ function AppLayoutNavbarLinkContent({
   icon,
   isDisabled,
   children,
+  warningTooltip,
 }: {
   icon: ReactElement;
   isDisabled?: boolean;
   children: ReactNode;
+  warningTooltip?: ReactNode;
 }) {
   return (
     <Box
@@ -109,6 +116,17 @@ function AppLayoutNavbarLinkContent({
           boxSize: "24px",
           transition: "transform 150ms ease",
         })}
+        {warningTooltip ? (
+          <Tooltip label={warningTooltip} placement="right">
+            <AlertCircleFilledIcon
+              position="absolute"
+              color="yellow.500"
+              right={4}
+              top={2}
+              transition="transform 150ms ease"
+            />
+          </Tooltip>
+        ) : null}
       </Box>
       <Text as="div" textTransform="uppercase" fontSize="xs" fontWeight="600">
         {children}
