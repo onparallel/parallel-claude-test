@@ -45,7 +45,7 @@
     "cookie": "^0.4.1",
     "core-js": "^3.16.1",
     "date-fns": "^2.23.0",
-    "escape-string-regexp": "^5.0.0",
+    "escape-string-regexp": "^4.0.0",
     "framer-motion": "^4.1.17",
     "graphql": "^15.5.1",
     "jwt-decode": "^3.1.2",
