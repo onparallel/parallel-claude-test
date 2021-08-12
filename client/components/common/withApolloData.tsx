@@ -6,8 +6,7 @@ import {
   OperationVariables,
 } from "@apollo/client";
 import { createApolloClient } from "@parallel/utils/apollo/client";
-import { NextComponentType } from "next";
-import { NextPageContext } from "next/dist/next-server/lib/utils";
+import { NextComponentType, NextPageContext } from "next";
 import Router from "next/router";
 
 export type WithApolloDataContext = NextPageContext & {
