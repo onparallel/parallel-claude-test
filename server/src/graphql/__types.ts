@@ -314,6 +314,7 @@ export interface NexusGenObjects {
   GroupPermissionEditedEvent: events.GroupPermissionEditedEvent;
   GroupPermissionRemovedEvent: events.GroupPermissionRemovedEvent;
   LandingTemplate: db.Petition;
+  LandingTemplateField: db.PetitionField;
   LandingTemplatePagination: {
     // root type
     items: NexusGenRootTypes["LandingTemplate"][]; // [LandingTemplate!]!
@@ -680,6 +681,7 @@ export interface NexusGenFieldTypes {
     categories: string[] | null; // [String!]
     descriptionHtml: string | null; // String
     fieldCount: number; // Int!
+    fields: NexusGenRootTypes["LandingTemplateField"][]; // [LandingTemplateField!]!
     hasConditionals: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     imageUrl: string | null; // String
@@ -691,6 +693,12 @@ export interface NexusGenFieldTypes {
     shortDescription: string | null; // String
     slug: string; // String!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  LandingTemplateField: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    title: string | null; // String
+    type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
   };
   LandingTemplatePagination: {
     // field return type
@@ -1703,6 +1711,7 @@ export interface NexusGenFieldTypeNames {
     categories: "String";
     descriptionHtml: "String";
     fieldCount: "Int";
+    fields: "LandingTemplateField";
     hasConditionals: "Boolean";
     id: "GID";
     imageUrl: "String";
@@ -1714,6 +1723,12 @@ export interface NexusGenFieldTypeNames {
     shortDescription: "String";
     slug: "String";
     updatedAt: "DateTime";
+  };
+  LandingTemplateField: {
+    // field return type name
+    id: "GID";
+    title: "String";
+    type: "PetitionFieldType";
   };
   LandingTemplatePagination: {
     // field return type name

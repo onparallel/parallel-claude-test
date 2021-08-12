@@ -297,6 +297,7 @@ type LandingTemplate {
   categories: [String!]
   descriptionHtml: String
   fieldCount: Int!
+  fields: [LandingTemplateField!]!
   hasConditionals: Boolean!
   id: GID!
   imageUrl: String
@@ -308,6 +309,15 @@ type LandingTemplate {
   shortDescription: String
   slug: String!
   updatedAt: DateTime!
+}
+
+"""
+A public template field
+"""
+type LandingTemplateField {
+  id: GID!
+  title: String
+  type: PetitionFieldType!
 }
 
 type LandingTemplatePagination {

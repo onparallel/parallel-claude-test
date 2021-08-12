@@ -6,6 +6,17 @@ import { isDefined } from "../../util/remedaExtensions";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { toHtml } from "../../util/slate";
 
+export const LandingTemplateField = objectType({
+  name: "LandingTemplateField",
+  description: "A public template field",
+  rootTyping: "db.PetitionField",
+  definition(t) {
+    t.globalId("id", { prefixName: "PetitionField" });
+    t.field("type", { type: "PetitionFieldType" });
+    t.nullable.string("title");
+  },
+});
+
 export const LandingTemplate = objectType({
   name: "LandingTemplate",
   description: "A public template on landing page",
@@ -71,6 +82,12 @@ export const LandingTemplate = objectType({
           return `${ctx.config.misc.uploadsUrl}/${file!.path}`;
         }
         return null;
+      },
+    });
+    t.list.field("fields", {
+      type: "LandingTemplateField",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadFieldsForPetition(o.id);
       },
     });
   },
