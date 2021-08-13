@@ -1,6 +1,7 @@
 import { Button, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
+import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
@@ -9,8 +10,9 @@ export type CookieConsentProps = {};
 
 export function CookieConsent({}: CookieConsentProps) {
   const [hasCookieConsent, setHasCookieConsent] = useUserPreference("cookie-consent", false);
+  const rehydrated = useRehydrated();
 
-  return !hasCookieConsent ? (
+  return rehydrated && !hasCookieConsent ? (
     <PublicContainer
       wrapper={{
         position: "fixed",
