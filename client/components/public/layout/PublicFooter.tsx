@@ -27,12 +27,10 @@ export function PublicFooter(props: BoxProps) {
   const router = useRouter();
   const intl = useIntl();
   const supportUrl =
-    (
-      {
-        en: "https://support.onparallel.com/hc/en-us",
-        es: "https://support.onparallel.com/hc/es",
-      } as any
-    )[router.query.locale as string] ?? "https://support.onparallel.com/hc";
+    ({
+      en: "https://support.onparallel.com/hc/en-us",
+      es: "https://support.onparallel.com/hc/es",
+    } as any)[router.query.locale as string] ?? "https://support.onparallel.com/hc";
 
   function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
     const locale = event.target.value;
@@ -58,6 +56,9 @@ export function PublicFooter(props: BoxProps) {
           md: "repeat(4, 1fr)",
         }}
         gridGap={8}
+        sx={{
+          a: { paddingY: 1, display: "inline-block" },
+        }}
       >
         <PublicFooterBox
           heading={intl.formatMessage({
@@ -65,7 +66,7 @@ export function PublicFooter(props: BoxProps) {
             defaultMessage: "Product",
           })}
         >
-          <List>
+          <List spacing={2}>
             <ListItem>
               <Link href="/security">
                 <FormattedMessage id="public.security-link" defaultMessage="Security" />
@@ -84,7 +85,7 @@ export function PublicFooter(props: BoxProps) {
             defaultMessage: "Support",
           })}
         >
-          <List>
+          <List spacing={2}>
             <ListItem>
               <NormalLink href={supportUrl}>
                 <FormattedMessage
@@ -108,7 +109,7 @@ export function PublicFooter(props: BoxProps) {
             defaultMessage: "Company",
           })}
         >
-          <List>
+          <List spacing={2}>
             <ListItem>
               <Link href="/about">
                 <FormattedMessage id="public.about-link" defaultMessage="About" />
@@ -137,7 +138,7 @@ export function PublicFooter(props: BoxProps) {
             defaultMessage: "Legal information",
           })}
         >
-          <List>
+          <List spacing={2}>
             <ListItem>
               <Link href="/legal/terms">
                 <FormattedMessage id="public.terms.title" defaultMessage="Terms & Conditions" />
