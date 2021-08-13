@@ -1,26 +1,19 @@
-
-      export interface PossibleTypesResultData {
-        possibleTypes: {
-          [key: string]: string[]
-        }
-      }
-      const result: PossibleTypesResultData = {
-  "possibleTypes": {
-    "CreatedAt": [
+export interface PossibleTypesResultData {
+  possibleTypes: {
+    [key: string]: string[];
+  };
+}
+const result: PossibleTypesResultData = {
+  possibleTypes: {
+    CreatedAt: [
       "PetitionFieldAttachment",
       "PetitionMessage",
       "PetitionReminder",
-      "UserAuthenticationToken"
+      "UserAuthenticationToken",
     ],
-    "PetitionBase": [
-      "Petition",
-      "PetitionTemplate"
-    ],
-    "PetitionBaseAndField": [
-      "PetitionAndField",
-      "PetitionTemplateAndField"
-    ],
-    "PetitionEvent": [
+    PetitionBase: ["Petition", "PetitionTemplate"],
+    PetitionBaseAndField: ["PetitionAndField", "PetitionTemplateAndField"],
+    PetitionEvent: [
       "AccessActivatedEvent",
       "AccessActivatedFromPublicPetitionLinkEvent",
       "AccessDeactivatedEvent",
@@ -53,7 +46,7 @@
       "TemplateUsedEvent",
       "UserPermissionAddedEvent",
       "UserPermissionEditedEvent",
-      "UserPermissionRemovedEvent"
+      "UserPermissionRemovedEvent",
     ],
     PetitionPermission: ["PetitionUserGroupPermission", "PetitionUserPermission"],
     PetitionUserNotification: [
@@ -65,7 +58,7 @@
       "ReminderEmailBouncedUserNotification",
       "RemindersOptOutNotification",
       "SignatureCancelledUserNotification",
-      "SignatureCompletedUserNotification"
+      "SignatureCompletedUserNotification",
     ],
     PublicPetitionLinkPermission: [
       "PublicPetitionLinkUserGroupPermission",
@@ -86,21 +79,11 @@
       "PublicPetitionLinkUserPermission",
       "Subscription",
       "User",
-      "UserGroup"
+      "UserGroup",
     ],
-    "UserOrContact": [
-      "Contact",
-      "User"
-    ],
-    "UserOrPetitionAccess": [
-      "PetitionAccess",
-      "User"
-    ],
-    "UserOrUserGroup": [
-      "User",
-      "UserGroup"
-    ]
-  }
+    UserOrContact: ["Contact", "User"],
+    UserOrPetitionAccess: ["PetitionAccess", "User"],
+    UserOrUserGroup: ["User", "UserGroup"],
+  },
 };
-      export default result;
-    
+export default result;
