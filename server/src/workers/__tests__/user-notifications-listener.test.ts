@@ -322,6 +322,7 @@ describe("Worker - User Notifications Listener", () => {
         id: 1,
         created_at: new Date(),
         type: "PETITION_MESSAGE_BOUNCED",
+        petition_id: message.petition_id,
         data: {
           petition_message_id: message.id,
         },

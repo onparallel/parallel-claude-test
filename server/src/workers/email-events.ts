@@ -47,9 +47,10 @@ createQueueWorker(
           ),
           context.emails.sendPetitionMessageBouncedEmail(message.id),
           context.petitions.updateRemindersForPetition(message.petition_id, null),
-          context.system.createEvent({
+          context.petitions.createEvent({
             type: "PETITION_MESSAGE_BOUNCED",
             data: { petition_message_id: message.id },
+            petition_id: message.petition_id,
           }),
         ]);
       } else if (reminder) {
@@ -62,12 +63,12 @@ createQueueWorker(
             "Worker:email-events"
           ),
           context.petitions.updateRemindersForPetition(access.petition_id, null),
-          context.system.createEvent({
+          context.petitions.createEvent({
             type: "PETITION_REMINDER_BOUNCED",
             data: {
               petition_reminder_id: reminder.id,
-              petition_id: access.petition_id,
             },
+            petition_id: access.petition_id,
           }),
         ]);
       }

@@ -249,6 +249,16 @@ function mapEventPayload(event: PetitionEvent) {
         ),
       };
     }
+    case "PETITION_MESSAGE_BOUNCED": {
+      return {
+        petitionMessageId: toGlobalId("PetitionMessage", event.data.petition_message_id),
+      };
+    }
+    case "PETITION_REMINDER_BOUNCED": {
+      return {
+        petitionReminderId: toGlobalId("PetitionReminder", event.data.petition_reminder_id),
+      };
+    }
     default:
       return {};
   }

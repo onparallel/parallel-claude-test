@@ -137,6 +137,12 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
     petition_access_id: number;
   };
+  PETITION_MESSAGE_BOUNCED: {
+    petition_message_id: number;
+  };
+  PETITION_REMINDER_BOUNCED: {
+    petition_reminder_id: number;
+  };
 }[TType];
 
 export type GenericPetitionEvent<
@@ -286,6 +292,16 @@ export type RecipientSignedEvent<IsCreate extends boolean = false> = GenericPeti
   IsCreate
 >;
 
+export type PetitionReminderBouncedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_REMINDER_BOUNCED",
+  IsCreate
+>;
+
+export type PetitionMessageBouncedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_MESSAGE_BOUNCED",
+  IsCreate
+>;
+
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -320,7 +336,9 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionDeletedEvent<IsCreate>
   | RemindersOptOutEvent<IsCreate>
   | AccessActivatedFromPublicPetitionLinkEvent<IsCreate>
-  | RecipientSignedEvent<IsCreate>;
+  | RecipientSignedEvent<IsCreate>
+  | PetitionReminderBouncedEvent<IsCreate>
+  | PetitionMessageBouncedEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;
 
@@ -372,14 +390,6 @@ export type UserCreatedEvent<IsCreate extends boolean = false> = GenericSystemEv
 >;
 export type UserLoggedInEvent<IsCreate extends boolean = false> = GenericSystemEvent<
   "USER_LOGGED_IN",
-  IsCreate
->;
-export type PetitionMessageBouncedEvent<IsCreate extends boolean = false> = GenericSystemEvent<
-  "PETITION_MESSAGE_BOUNCED",
-  IsCreate
->;
-export type PetitionReminderBouncedEvent<IsCreate extends boolean = false> = GenericSystemEvent<
-  "PETITION_REMINDER_BOUNCED",
   IsCreate
 >;
 

@@ -100,7 +100,7 @@ async function createPetitionMessageBouncedUserNotifications(
       is_read: false,
       processed_at: null,
       user_id: sender.id,
-      petition_id: message.petition_id,
+      petition_id: event.petition_id,
       data: {
         petition_access_id: message.petition_access_id,
       },
@@ -126,7 +126,7 @@ async function createPetitionReminderBouncedUserNotifications(
       is_read: false,
       processed_at: null,
       user_id: sender.id,
-      petition_id: event.data.petition_id,
+      petition_id: event.petition_id,
       data: {
         petition_access_id: reminder.petition_access_id,
       },

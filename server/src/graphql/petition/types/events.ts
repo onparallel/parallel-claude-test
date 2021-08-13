@@ -96,6 +96,10 @@ export const PetitionEvent = interfaceType({
         return "AccessActivatedFromPublicPetitionLinkEvent";
       case "RECIPIENT_SIGNED":
         return "RecipientSignedEvent";
+      case "PETITION_MESSAGE_BOUNCED":
+        return "PetitionMessageBouncedEvent";
+      case "PETITION_REMINDER_BOUNCED":
+        return "PetitionReminderBouncedEvent";
     }
   },
   sourceType: "events.PetitionEvent",
@@ -574,3 +578,13 @@ export const RecipientSignedEvent = createPetitionEvent("RecipientSignedEvent", 
     resolve: async (root, _, ctx) => await ctx.contacts.loadContact(root.data.contact_id),
   });
 });
+
+export const PetitionMessageBouncedEvent = createPetitionEvent(
+  "PetitionMessageBouncedEvent",
+  (t) => {}
+);
+
+export const PetitionReminderBouncedEvent = createPetitionEvent(
+  "PetitionReminderBouncedEvent",
+  (t) => {}
+);

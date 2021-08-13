@@ -2243,6 +2243,11 @@ type PetitionMessage implements CreatedAt {
   status: PetitionMessageStatus!
 }
 
+type PetitionMessageBouncedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+}
+
 """
 The status of a petition message.
 """
@@ -2363,6 +2368,11 @@ type PetitionReminder implements CreatedAt {
   The type of the reminder.
   """
   type: PetitionReminderType!
+}
+
+type PetitionReminderBouncedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
 }
 
 """

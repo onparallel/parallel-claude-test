@@ -398,6 +398,7 @@ export interface NexusGenObjects {
   PetitionFieldComment: db.PetitionFieldComment;
   PetitionFieldReply: db.PetitionFieldReply;
   PetitionMessage: db.PetitionMessage;
+  PetitionMessageBouncedEvent: events.PetitionMessageBouncedEvent;
   PetitionProgress: {
     // root type
     optional: number; // Int!
@@ -406,6 +407,7 @@ export interface NexusGenObjects {
     validated: number; // Int!
   };
   PetitionReminder: db.PetitionReminder;
+  PetitionReminderBouncedEvent: events.PetitionReminderBouncedEvent;
   PetitionReopenedEvent: events.PetitionReopenedEvent;
   PetitionSharedUserNotification: notifications.PetitionSharedUserNotification;
   PetitionSignatureRequest: db.PetitionSignatureRequest;
@@ -1134,6 +1136,11 @@ export interface NexusGenFieldTypes {
     sentAt: NexusGenScalars["DateTime"] | null; // DateTime
     status: NexusGenEnums["PetitionMessageStatus"]; // PetitionMessageStatus!
   };
+  PetitionMessageBouncedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+  };
   PetitionProgress: {
     // field return type
     optional: number; // Int!
@@ -1149,6 +1156,11 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     sender: NexusGenRootTypes["User"] | null; // User
     type: NexusGenEnums["PetitionReminderType"]; // PetitionReminderType!
+  };
+  PetitionReminderBouncedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
   };
   PetitionReopenedEvent: {
     // field return type
@@ -2263,6 +2275,11 @@ export interface NexusGenFieldTypeNames {
     sentAt: "DateTime";
     status: "PetitionMessageStatus";
   };
+  PetitionMessageBouncedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+  };
   PetitionProgress: {
     // field return type name
     optional: "Int";
@@ -2278,6 +2295,11 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     sender: "User";
     type: "PetitionReminderType";
+  };
+  PetitionReminderBouncedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
   };
   PetitionReopenedEvent: {
     // field return type name
@@ -3722,6 +3744,8 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionCompletedEvent"
     | "PetitionCreatedEvent"
     | "PetitionDeletedEvent"
+    | "PetitionMessageBouncedEvent"
+    | "PetitionReminderBouncedEvent"
     | "PetitionReopenedEvent"
     | "RecipientSignedEvent"
     | "ReminderSentEvent"
@@ -3800,7 +3824,9 @@ export interface NexusGenTypeInterfaces {
   PetitionFieldAttachment: "CreatedAt";
   PetitionFieldReply: "Timestamps";
   PetitionMessage: "CreatedAt";
+  PetitionMessageBouncedEvent: "PetitionEvent";
   PetitionReminder: "CreatedAt";
+  PetitionReminderBouncedEvent: "PetitionEvent";
   PetitionReopenedEvent: "PetitionEvent";
   PetitionSharedUserNotification: "PetitionUserNotification";
   PetitionSignatureRequest: "Timestamps";

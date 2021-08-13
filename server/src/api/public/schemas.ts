@@ -1189,6 +1189,25 @@ export const PetitionEvent = schema({
       properties: {
         petitionAccessId: {
           description: "The ID of the petition access",
+        },
+      },
+    },
+    PETITION_MESSAGE_BOUNCED: {
+      description: "A message email has bounced",
+      required: ["petitionMessageId"],
+      properties: {
+        petitionMessageId: {
+          description: "The ID of the petition message that caused the bounce",
+          type: "string",
+        },
+      },
+    },
+    PETITION_REMINDER_BOUNCED: {
+      description: "A reminder email has bounced",
+      required: ["petitionReminderId"],
+      properties: {
+        petitionReminderId: {
+          description: "The ID of the petition reminder that caused the bounce",
           type: "string",
         },
       },
