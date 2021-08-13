@@ -1,7 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
-import "@parallel/styles/global.css";
 import { init as initSentry } from "@parallel/utils/sentry";
 import { AppProps } from "next/app";
 

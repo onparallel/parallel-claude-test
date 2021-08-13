@@ -70,6 +70,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
     }
   }, []);
   useEffect(() => {
+    // Hide zendesk launcher on route changes
     const hide = () => (window as any).zE?.(() => zE.hide());
     Router.events.on("routeChangeStart", hide);
     window.addEventListener("load", hide);
@@ -81,6 +82,21 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
   useEffect(() => {
     window.analytics?.identify(user.id);
   }, [user.id]);
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerText = /* css */ `
+      body #hubspot-messages-iframe-container {
+        display: none !important;
+      }
+      body iframe#launcher {
+        display: none;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
   return (
     <>
       <Head>
