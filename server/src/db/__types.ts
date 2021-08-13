@@ -5,8 +5,7 @@
 
 type Maybe<T> = T | null;
 
-type PartialProps<T, K extends keyof T = never> = Omit<T, K> &
-  Partial<Pick<T, K>>;
+type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type FeatureFlagName =
   | "API_TOKENS"
@@ -71,11 +70,7 @@ export type PetitionFieldType =
   | "SHORT_TEXT"
   | "TEXT";
 
-export type PetitionMessageStatus =
-  | "CANCELLED"
-  | "PROCESSED"
-  | "PROCESSING"
-  | "SCHEDULED";
+export type PetitionMessageStatus = "CANCELLED" | "PROCESSED" | "PROCESSING" | "SCHEDULED";
 
 export type PetitionPermissionType = "OWNER" | "READ" | "WRITE";
 
@@ -88,11 +83,7 @@ export type PetitionSignatureCancelReason =
   | "DECLINED_BY_SIGNER"
   | "REQUEST_ERROR";
 
-export type PetitionSignatureStatus =
-  | "CANCELLED"
-  | "COMPLETED"
-  | "ENQUEUED"
-  | "PROCESSING";
+export type PetitionSignatureStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
 
 export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
 
@@ -305,10 +296,7 @@ export interface EmailEvent {
   created_at: Date; // timestamptz
 }
 
-export type CreateEmailEvent = PartialProps<
-  Omit<EmailEvent, "id">,
-  "created_at"
->;
+export type CreateEmailEvent = PartialProps<Omit<EmailEvent, "id">, "created_at">;
 
 export interface EmailLog {
   id: number; // int4
@@ -328,12 +316,7 @@ export interface EmailLog {
 
 export type CreateEmailLog = PartialProps<
   Omit<EmailLog, "id">,
-  | "track_opens"
-  | "created_at"
-  | "sent_at"
-  | "response"
-  | "external_id"
-  | "reply_to"
+  "track_opens" | "created_at" | "sent_at" | "response" | "external_id" | "reply_to"
 >;
 
 export interface FeatureFlag {
@@ -342,10 +325,7 @@ export interface FeatureFlag {
   default_value: boolean; // bool
 }
 
-export type CreateFeatureFlag = PartialProps<
-  Omit<FeatureFlag, "id">,
-  "default_value"
->;
+export type CreateFeatureFlag = PartialProps<Omit<FeatureFlag, "id">, "default_value">;
 
 export interface FeatureFlagOverride {
   id: number; // int4
@@ -544,10 +524,7 @@ export interface PetitionEvent {
   created_at: Date; // timestamptz
 }
 
-export type CreatePetitionEvent = PartialProps<
-  Omit<PetitionEvent, "id">,
-  "data" | "created_at"
->;
+export type CreatePetitionEvent = PartialProps<Omit<PetitionEvent, "id">, "data" | "created_at">;
 
 export interface PetitionEventSubscription {
   id: number; // int4
@@ -564,12 +541,7 @@ export interface PetitionEventSubscription {
 
 export type CreatePetitionEventSubscription = PartialProps<
   Omit<PetitionEventSubscription, "id">,
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface PetitionField {
@@ -702,12 +674,7 @@ export interface PetitionMessage {
 
 export type CreatePetitionMessage = PartialProps<
   Omit<PetitionMessage, "id">,
-  | "email_subject"
-  | "email_body"
-  | "scheduled_at"
-  | "email_log_id"
-  | "created_at"
-  | "created_by"
+  "email_subject" | "email_body" | "scheduled_at" | "email_log_id" | "created_at" | "created_by"
 >;
 
 export interface PetitionPermission {
@@ -798,10 +765,7 @@ export interface PetitionTag {
   created_by: Maybe<string>; // varchar
 }
 
-export type CreatePetitionTag = PartialProps<
-  Omit<PetitionTag, "id">,
-  "created_at" | "created_by"
->;
+export type CreatePetitionTag = PartialProps<Omit<PetitionTag, "id">, "created_at" | "created_by">;
 
 export interface PetitionUserNotification {
   id: number; // int4
@@ -835,12 +799,7 @@ export interface PublicFileUpload {
 
 export type CreatePublicFileUpload = PartialProps<
   Omit<PublicFileUpload, "id">,
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface PublicPetitionLink {
@@ -898,10 +857,7 @@ export interface SystemEvent {
   created_at: Date; // timestamptz
 }
 
-export type CreateSystemEvent = PartialProps<
-  Omit<SystemEvent, "id">,
-  "data" | "created_at"
->;
+export type CreateSystemEvent = PartialProps<Omit<SystemEvent, "id">, "data" | "created_at">;
 
 export interface Tag {
   id: number; // int4
@@ -918,12 +874,7 @@ export interface Tag {
 
 export type CreateTag = PartialProps<
   Omit<Tag, "id">,
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface TemporaryFile {
@@ -1013,12 +964,7 @@ export interface UserGroup {
 
 export type CreateUserGroup = PartialProps<
   Omit<UserGroup, "id">,
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface UserGroupMember {
