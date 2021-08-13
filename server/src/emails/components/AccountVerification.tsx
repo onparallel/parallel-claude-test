@@ -25,7 +25,7 @@ const email: Email<AccountVerificationProps> = {
       defaultMessage: "Activate your Parallel account",
     });
   },
-  text({ userName, activationUrl, parallelUrl }: AccountVerificationProps, intl: IntlShape) {
+  text({ userName, activationUrl }: AccountVerificationProps, intl: IntlShape) {
     return outdent`
       ${greeting({ name: userName }, intl)}
 
@@ -35,7 +35,7 @@ const email: Email<AccountVerificationProps> = {
           "You are almost on Parallel, to start using Parallel just click the verify email button below.",
       })}
 
-      ${parallelUrl}/${activationUrl}
+      ${activationUrl}
 
       ${intl.formatMessage({
         id: "account-verification.ignore",
@@ -67,7 +67,7 @@ const email: Email<AccountVerificationProps> = {
         </MjmlSection>
         <MjmlSection paddingTop="0px">
           <MjmlColumn>
-            <Button href={`${parallelUrl}/${activationUrl}`}>
+            <Button href={`${activationUrl}`}>
               <FormattedMessage
                 id="account-verification.activate-button"
                 defaultMessage="Activate my account"
