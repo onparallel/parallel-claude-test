@@ -45,7 +45,7 @@ export function PublicSignupFormOrganization({
 
   return (
     <>
-      <Text as="span" textStyle="muted" fontSize="sm">
+      <Text as="span" color="gray.500" fontSize="sm">
         2/3
       </Text>
       <Stack spacing={4}>

@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Grid, Image, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { SimpleWizard } from "@parallel/components/common/SimpleWizard";
@@ -11,6 +11,7 @@ import { PublicSignupFormOrganization } from "@parallel/components/public/signup
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
 import { useRef, useState } from "react";
 import { useIntl } from "react-intl";
+import styles from "@parallel/styles/Signup.module.css";
 
 type FormDataType = {
   email: string;
@@ -61,11 +62,7 @@ function Signup() {
       hideHeader
       hideFooter
     >
-      <Grid
-        gridTemplateColumns={{
-          base: "1fr",
-          lg: "1fr auto",
-        }}
+      <Flex
         height="100vh"
         sx={{
           "@media only screen and (max-width: 62em)": {
@@ -80,7 +77,7 @@ function Signup() {
           },
         }}
       >
-        <Flex direction="column" paddingX={{ base: 6, md: 20 }} minWidth="50vw">
+        <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
           <Box paddingTop={5} marginLeft={-1}>
             <NakedLink href="/">
               <Box
@@ -94,10 +91,9 @@ function Signup() {
               </Box>
             </NakedLink>
           </Box>
-
           <Center className="form-container" flex="1" maxWidth="md" paddingY={10}>
             <form>
-              <SimpleWizard index={index}>
+              <SimpleWizard index={index} direction="column">
                 <PublicSignupForm onNext={handleNextPage} />
                 <PublicSignupFormName onNext={handleNextPage} />
                 <PublicSignupFormOrganization onBack={handlePreviousPage} onNext={handleNextPage} />
@@ -107,31 +103,39 @@ function Signup() {
             </form>
           </Center>
         </Flex>
-        <Box display={{ base: "none", lg: "block" }} paddingLeft={8} width="100%">
+        <Box
+          display={{ base: "none", lg: "block" }}
+          paddingLeft={8}
+          maxWidth="container.md"
+          flex="1"
+        >
           <Flex
             direction="column"
             backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/signup-bg.svg`}
             backgroundPosition="center"
             backgroundRepeat="no-repeat"
             backgroundSize="cover"
-            width="100%"
             height="100%"
             padding={16}
-            maxWidth="container.lg"
           >
             <PublicSignupRightHeading display={index === 4 ? "none" : "block"} />
             <Center height="100%">
               <Flex width="100%">
-                <SimpleWizard index={index}>
+                <SimpleWizard index={index} width="100%">
                   <Stack spacing={10}>
                     <Image
+                      opacity="0"
+                      animation={`${styles.fadeInLeft} 1.2s ease 0.2s forwards`}
                       src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-1.svg`}
                     />
                     <Image
-                      transform={"translateX(-96px)"}
+                      opacity="0"
+                      animation={`${styles.fadeInLeftOffset96} 1.4s ease 0.36s forwards `}
                       src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-2.svg`}
                     />
                     <Image
+                      opacity="0"
+                      animation={`${styles.fadeInLeft} 1.6s ease 0.68s forwards `}
                       src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-3.svg`}
                     />
                   </Stack>
@@ -175,18 +179,19 @@ function Signup() {
                     />
                   </Stack>
 
-                  <Stack spacing={10} paddingX={10}>
+                  <Box paddingX={6} margin="0 auto">
                     <Image
-                      w="501px"
+                      opacity="0"
+                      animation={`${styles.fadeInUp} 1.2s ease 0.12s forwards`}
                       src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/check-inbox.svg`}
                     />
-                  </Stack>
+                  </Box>
                 </SimpleWizard>
               </Flex>
             </Center>
           </Flex>
         </Box>
-      </Grid>
+      </Flex>
     </PublicLayout>
   );
 }

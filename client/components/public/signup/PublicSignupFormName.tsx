@@ -30,7 +30,7 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
 
   return (
     <>
-      <Text as="span" textStyle="muted" fontSize="sm">
+      <Text as="span" color="gray.500" fontSize="sm">
         1/3
       </Text>
       <Stack spacing={4}>

@@ -242,7 +242,7 @@ export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFor
 
   return (
     <>
-      <Text as="span" textStyle="muted" fontSize="sm">
+      <Text as="span" color="gray.500" fontSize="sm">
         3/3
       </Text>
       <Stack spacing={4}>
