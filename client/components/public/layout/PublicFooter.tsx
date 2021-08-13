@@ -27,10 +27,12 @@ export function PublicFooter(props: BoxProps) {
   const router = useRouter();
   const intl = useIntl();
   const supportUrl =
-    ({
-      en: "https://support.onparallel.com/hc/en-us",
-      es: "https://support.onparallel.com/hc/es",
-    } as any)[router.query.locale as string] ?? "https://support.onparallel.com/hc";
+    (
+      {
+        en: "https://support.onparallel.com/hc/en-us",
+        es: "https://support.onparallel.com/hc/es",
+      } as any
+    )[router.query.locale as string] ?? "https://support.onparallel.com/hc";
 
   function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
     const locale = event.target.value;
