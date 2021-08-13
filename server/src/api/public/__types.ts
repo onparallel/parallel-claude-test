@@ -223,7 +223,6 @@ export type LandingTemplate = {
   categories: Maybe<Array<Scalars["String"]>>;
   descriptionHtml: Maybe<Scalars["String"]>;
   fieldCount: Scalars["Int"];
-  fields: Array<LandingTemplateField>;
   hasConditionals: Scalars["Boolean"];
   id: Scalars["GID"];
   imageUrl: Maybe<Scalars["String"]>;
@@ -235,13 +234,6 @@ export type LandingTemplate = {
   shortDescription: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];
-};
-
-/** A public template field */
-export type LandingTemplateField = {
-  id: Scalars["GID"];
-  title: Maybe<Scalars["String"]>;
-  type: PetitionFieldType;
 };
 
 export type LandingTemplatePagination = {
@@ -2584,91 +2576,56 @@ export type VerificationCodeRequest = {
   token: Scalars["ID"];
 };
 
-export type PetitionFragment = {
-  id: string;
-  name: Maybe<string>;
-  status: PetitionStatus;
-  deadline: Maybe<string>;
-  locale: PetitionLocale;
-  createdAt: string;
-};
+export type PetitionFragment = Pick<
+  Petition,
+  "id" | "name" | "status" | "deadline" | "locale" | "createdAt"
+>;
 
-export type TemplateFragment = {
-  id: string;
-  name: Maybe<string>;
-  description: Maybe<any>;
-  locale: PetitionLocale;
-  createdAt: string;
-};
+export type TemplateFragment = Pick<
+  PetitionTemplate,
+  "id" | "name" | "description" | "locale" | "createdAt"
+>;
 
-export type UserFragment = {
-  id: string;
-  fullName: Maybe<string>;
-  firstName: Maybe<string>;
-  lastName: Maybe<string>;
-};
+export type UserFragment = Pick<User, "id" | "fullName" | "firstName" | "lastName">;
 
-export type UserGroupFragment = { id: string; name: string };
+export type UserGroupFragment = Pick<UserGroup, "id" | "name">;
 
-export type ContactFragment = {
-  id: string;
-  email: string;
-  fullName: Maybe<string>;
-  firstName: Maybe<string>;
-  lastName: Maybe<string>;
-  createdAt: string;
-  updatedAt: string;
-};
+export type ContactFragment = Pick<
+  Contact,
+  "id" | "email" | "fullName" | "firstName" | "lastName" | "createdAt" | "updatedAt"
+>;
 
-export type PetitionAccessFragment = {
-  id: string;
-  status: PetitionAccessStatus;
-  reminderCount: number;
-  remindersLeft: number;
-  remindersActive: boolean;
-  nextReminderAt: Maybe<string>;
-  createdAt: string;
-  contact: Maybe<{
-    id: string;
-    email: string;
-    fullName: Maybe<string>;
-    firstName: Maybe<string>;
-    lastName: Maybe<string>;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  granter: Maybe<{
-    id: string;
-    fullName: Maybe<string>;
-    firstName: Maybe<string>;
-    lastName: Maybe<string>;
-  }>;
-};
+export type PetitionAccessFragment = Pick<
+  PetitionAccess,
+  | "id"
+  | "status"
+  | "reminderCount"
+  | "remindersLeft"
+  | "remindersActive"
+  | "nextReminderAt"
+  | "createdAt"
+> & { contact: Maybe<ContactFragment>; granter: Maybe<UserFragment> };
 
-export type SubscriptionFragment = { id: string; endpoint: string; createdAt: string };
+export type SubscriptionFragment = Pick<Subscription, "id" | "endpoint" | "createdAt">;
 
-export type Permission_PetitionUserGroupPermission_Fragment = {
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  group: { id: string; name: string };
-};
+export type Permission_PetitionUserGroupPermission_Fragment = Pick<
+  PetitionUserGroupPermission,
+  "permissionType" | "createdAt"
+> & { group: UserGroupFragment };
 
-export type Permission_PetitionUserPermission_Fragment = {
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user: { id: string; fullName: Maybe<string>; firstName: Maybe<string>; lastName: Maybe<string> };
-};
+export type Permission_PetitionUserPermission_Fragment = Pick<
+  PetitionUserPermission,
+  "permissionType" | "createdAt"
+> & { user: UserFragment };
 
 export type PermissionFragment =
   | Permission_PetitionUserGroupPermission_Fragment
   | Permission_PetitionUserPermission_Fragment;
 
-export type PetitionFieldReplyFragment = {
-  id: string;
-  content: { [key: string]: any };
-  createdAt: string;
-  updatedAt: string;
-};
+export type PetitionFieldReplyFragment = Pick<
+  PetitionFieldReply,
+  "id" | "content" | "createdAt" | "updatedAt"
+>;
 
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -2678,20 +2635,7 @@ export type GetPetitions_PetitionsQueryVariables = Exact<{
 }>;
 
 export type GetPetitions_PetitionsQuery = {
-  petitions: {
-    totalCount: number;
-    items: Array<
-      | {
-          id: string;
-          name: Maybe<string>;
-          status: PetitionStatus;
-          deadline: Maybe<string>;
-          locale: PetitionLocale;
-          createdAt: string;
-        }
-      | {}
-    >;
-  };
+  petitions: Pick<PetitionBasePagination, "totalCount"> & { items: Array<PetitionFragment> };
 };
 
 export type CreatePetition_PetitionMutationVariables = Exact<{
@@ -2700,96 +2644,34 @@ export type CreatePetition_PetitionMutationVariables = Exact<{
   eventsUrl?: Maybe<Scalars["String"]>;
 }>;
 
-export type CreatePetition_PetitionMutation = {
-  createPetition:
-    | {
-        id: string;
-        name: Maybe<string>;
-        status: PetitionStatus;
-        deadline: Maybe<string>;
-        locale: PetitionLocale;
-        createdAt: string;
-      }
-    | {};
-};
+export type CreatePetition_PetitionMutation = { createPetition: PetitionFragment };
 
 export type GetPetition_PetitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
-export type GetPetition_PetitionQuery = {
-  petition: Maybe<
-    | {
-        id: string;
-        name: Maybe<string>;
-        status: PetitionStatus;
-        deadline: Maybe<string>;
-        locale: PetitionLocale;
-        createdAt: string;
-      }
-    | {}
-  >;
-};
+export type GetPetition_PetitionQuery = { petition: Maybe<PetitionFragment> };
 
 export type UpdatePetition_PetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
 }>;
 
-export type UpdatePetition_PetitionMutation = {
-  updatePetition:
-    | {
-        id: string;
-        name: Maybe<string>;
-        status: PetitionStatus;
-        deadline: Maybe<string>;
-        locale: PetitionLocale;
-        createdAt: string;
-      }
-    | {};
-};
+export type UpdatePetition_PetitionMutation = { updatePetition: PetitionFragment };
 
 export type DeletePetition_deletePetitionsMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   force: Scalars["Boolean"];
 }>;
 
-export type DeletePetition_deletePetitionsMutation = { deletePetitions: Result };
+export type DeletePetition_deletePetitionsMutation = Pick<Mutation, "deletePetitions">;
 
 export type GetPetitionRecipients_PetitionAccessesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
 export type GetPetitionRecipients_PetitionAccessesQuery = {
-  petition: Maybe<
-    | {
-        accesses: Array<{
-          id: string;
-          status: PetitionAccessStatus;
-          reminderCount: number;
-          remindersLeft: number;
-          remindersActive: boolean;
-          nextReminderAt: Maybe<string>;
-          createdAt: string;
-          contact: Maybe<{
-            id: string;
-            email: string;
-            fullName: Maybe<string>;
-            firstName: Maybe<string>;
-            lastName: Maybe<string>;
-            createdAt: string;
-            updatedAt: string;
-          }>;
-          granter: Maybe<{
-            id: string;
-            fullName: Maybe<string>;
-            firstName: Maybe<string>;
-            lastName: Maybe<string>;
-          }>;
-        }>;
-      }
-    | {}
-  >;
+  petition: Maybe<{ accesses: Array<PetitionAccessFragment> }>;
 };
 
 export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
@@ -2797,7 +2679,7 @@ export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
 }>;
 
 export type CreatePetitionRecipients_ContactQuery = {
-  contacts: Array<Maybe<{ id: string; firstName: Maybe<string>; lastName: Maybe<string> }>>;
+  contacts: Array<Maybe<Pick<Contact, "id" | "firstName" | "lastName">>>;
 };
 
 export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
@@ -2805,13 +2687,13 @@ export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
   data: UpdateContactInput;
 }>;
 
-export type CreatePetitionRecipients_updateContactMutation = { updateContact: { id: string } };
+export type CreatePetitionRecipients_updateContactMutation = { updateContact: Pick<Contact, "id"> };
 
 export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
   data: CreateContactInput;
 }>;
 
-export type CreatePetitionRecipients_createContactMutation = { createContact: { id: string } };
+export type CreatePetitionRecipients_createContactMutation = { createContact: Pick<Contact, "id"> };
 
 export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -2823,34 +2705,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
 }>;
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
-  sendPetition: {
-    accesses: Maybe<
-      Array<{
-        id: string;
-        status: PetitionAccessStatus;
-        reminderCount: number;
-        remindersLeft: number;
-        remindersActive: boolean;
-        nextReminderAt: Maybe<string>;
-        createdAt: string;
-        contact: Maybe<{
-          id: string;
-          email: string;
-          fullName: Maybe<string>;
-          firstName: Maybe<string>;
-          lastName: Maybe<string>;
-          createdAt: string;
-          updatedAt: string;
-        }>;
-        granter: Maybe<{
-          id: string;
-          fullName: Maybe<string>;
-          firstName: Maybe<string>;
-          lastName: Maybe<string>;
-        }>;
-      }>
-    >;
-  };
+  sendPetition: { accesses: Maybe<Array<PetitionAccessFragment>> };
 };
 
 export type PetitionReplies_RepliesQueryVariables = Exact<{
@@ -2860,30 +2715,18 @@ export type PetitionReplies_RepliesQueryVariables = Exact<{
 export type PetitionReplies_RepliesQuery = {
   petition: Maybe<
     | {
-        fields: Array<{
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            createdAt: string;
-            updatedAt: string;
-          }>;
-        }>;
+        fields: Array<
+          Pick<PetitionField, "id" | "type" | "options"> & {
+            replies: Array<PetitionFieldReplyFragment>;
+          }
+        >;
       }
     | {
-        fields: Array<{
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            createdAt: string;
-            updatedAt: string;
-          }>;
-        }>;
+        fields: Array<
+          Pick<PetitionField, "id" | "type" | "options"> & {
+            replies: Array<PetitionFieldReplyFragment>;
+          }
+        >;
       }
   >;
 };
@@ -2894,7 +2737,7 @@ export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exa
 }>;
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
-  fileUploadReplyDownloadLink: { url: Maybe<string> };
+  fileUploadReplyDownloadLink: Pick<FileUploadDownloadLinkResult, "url">;
 };
 
 export type GetPermissions_PermissionsQueryVariables = Exact<{
@@ -2905,40 +2748,14 @@ export type GetPermissions_PermissionsQuery = {
   petition: Maybe<
     | {
         permissions: Array<
-          | {
-              permissionType: PetitionPermissionType;
-              createdAt: string;
-              group: { id: string; name: string };
-            }
-          | {
-              permissionType: PetitionPermissionType;
-              createdAt: string;
-              user: {
-                id: string;
-                fullName: Maybe<string>;
-                firstName: Maybe<string>;
-                lastName: Maybe<string>;
-              };
-            }
+          | Permission_PetitionUserGroupPermission_Fragment
+          | Permission_PetitionUserPermission_Fragment
         >;
       }
     | {
         permissions: Array<
-          | {
-              permissionType: PetitionPermissionType;
-              createdAt: string;
-              group: { id: string; name: string };
-            }
-          | {
-              permissionType: PetitionPermissionType;
-              createdAt: string;
-              user: {
-                id: string;
-                fullName: Maybe<string>;
-                firstName: Maybe<string>;
-                lastName: Maybe<string>;
-              };
-            }
+          | Permission_PetitionUserGroupPermission_Fragment
+          | Permission_PetitionUserPermission_Fragment
         >;
       }
   >;
@@ -2953,21 +2770,7 @@ export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
 export type SharePetition_addPetitionPermissionMutation = {
   addPetitionPermission: Array<{
     permissions: Array<
-      | {
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          group: { id: string; name: string };
-        }
-      | {
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user: {
-            id: string;
-            fullName: Maybe<string>;
-            firstName: Maybe<string>;
-            lastName: Maybe<string>;
-          };
-        }
+      Permission_PetitionUserGroupPermission_Fragment | Permission_PetitionUserPermission_Fragment
     >;
   }>;
 };
@@ -2977,7 +2780,7 @@ export type StopSharing_removePetitionPermissionMutationVariables = Exact<{
 }>;
 
 export type StopSharing_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string }>;
+  removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
 export type RemoveUserPermission_removePetitionPermissionMutationVariables = Exact<{
@@ -2986,7 +2789,7 @@ export type RemoveUserPermission_removePetitionPermissionMutationVariables = Exa
 }>;
 
 export type RemoveUserPermission_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string }>;
+  removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
 export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables = Exact<{
@@ -2995,7 +2798,7 @@ export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables 
 }>;
 
 export type RemoveUserGroupPermission_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string }>;
+  removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
 export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<{
@@ -3006,21 +2809,7 @@ export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<
 export type TransferPetition_transferPetitionOwnershipMutation = {
   transferPetitionOwnership: Array<{
     permissions: Array<
-      | {
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          group: { id: string; name: string };
-        }
-      | {
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user: {
-            id: string;
-            fullName: Maybe<string>;
-            firstName: Maybe<string>;
-            lastName: Maybe<string>;
-          };
-        }
+      Permission_PetitionUserGroupPermission_Fragment | Permission_PetitionUserPermission_Fragment
     >;
   }>;
 };
@@ -3030,9 +2819,7 @@ export type GetSubscriptions_SubscriptionQueryVariables = Exact<{
 }>;
 
 export type GetSubscriptions_SubscriptionQuery = {
-  petition: Maybe<
-    { subscriptions: Array<{ id: string; endpoint: string; createdAt: string }> } | {}
-  >;
+  petition: Maybe<{ subscriptions: Array<SubscriptionFragment> }>;
 };
 
 export type CreateSubscription_createPetitionSubscriptionMutationVariables = Exact<{
@@ -3041,16 +2828,17 @@ export type CreateSubscription_createPetitionSubscriptionMutationVariables = Exa
 }>;
 
 export type CreateSubscription_createPetitionSubscriptionMutation = {
-  createPetitionSubscription: { id: string; endpoint: string; createdAt: string };
+  createPetitionSubscription: SubscriptionFragment;
 };
 
 export type DeleteSubscription_deletePetitionSubscriptionMutationVariables = Exact<{
   subscriptionId: Scalars["GID"];
 }>;
 
-export type DeleteSubscription_deletePetitionSubscriptionMutation = {
-  deletePetitionSubscription: Result;
-};
+export type DeleteSubscription_deletePetitionSubscriptionMutation = Pick<
+  Mutation,
+  "deletePetitionSubscription"
+>;
 
 export type GetTemplates_TemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -3059,44 +2847,21 @@ export type GetTemplates_TemplatesQueryVariables = Exact<{
 }>;
 
 export type GetTemplates_TemplatesQuery = {
-  templates: {
-    totalCount: number;
-    items: Array<
-      | {
-          id: string;
-          name: Maybe<string>;
-          description: Maybe<any>;
-          locale: PetitionLocale;
-          createdAt: string;
-        }
-      | {}
-    >;
-  };
+  templates: Pick<PetitionBasePagination, "totalCount"> & { items: Array<TemplateFragment> };
 };
 
 export type GetTemplate_TemplateQueryVariables = Exact<{
   templateId: Scalars["GID"];
 }>;
 
-export type GetTemplate_TemplateQuery = {
-  template: Maybe<
-    | {
-        id: string;
-        name: Maybe<string>;
-        description: Maybe<any>;
-        locale: PetitionLocale;
-        createdAt: string;
-      }
-    | {}
-  >;
-};
+export type GetTemplate_TemplateQuery = { template: Maybe<TemplateFragment> };
 
 export type DeleteTemplate_deletePetitionsMutationVariables = Exact<{
   templateId: Scalars["GID"];
   force: Scalars["Boolean"];
 }>;
 
-export type DeleteTemplate_deletePetitionsMutation = { deletePetitions: Result };
+export type DeleteTemplate_deletePetitionsMutation = Pick<Mutation, "deletePetitions">;
 
 export type GetContacts_ContactsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -3105,51 +2870,20 @@ export type GetContacts_ContactsQueryVariables = Exact<{
 }>;
 
 export type GetContacts_ContactsQuery = {
-  contacts: {
-    totalCount: number;
-    items: Array<{
-      id: string;
-      email: string;
-      fullName: Maybe<string>;
-      firstName: Maybe<string>;
-      lastName: Maybe<string>;
-      createdAt: string;
-      updatedAt: string;
-    }>;
-  };
+  contacts: Pick<ContactPagination, "totalCount"> & { items: Array<ContactFragment> };
 };
 
 export type CreateContact_ContactMutationVariables = Exact<{
   data: CreateContactInput;
 }>;
 
-export type CreateContact_ContactMutation = {
-  createContact: {
-    id: string;
-    email: string;
-    fullName: Maybe<string>;
-    firstName: Maybe<string>;
-    lastName: Maybe<string>;
-    createdAt: string;
-    updatedAt: string;
-  };
-};
+export type CreateContact_ContactMutation = { createContact: ContactFragment };
 
 export type GetContact_ContactQueryVariables = Exact<{
   contactId: Scalars["GID"];
 }>;
 
-export type GetContact_ContactQuery = {
-  contact: Maybe<{
-    id: string;
-    email: string;
-    fullName: Maybe<string>;
-    firstName: Maybe<string>;
-    lastName: Maybe<string>;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-};
+export type GetContact_ContactQuery = { contact: Maybe<ContactFragment> };
 
 export type GetOrganizationUsers_UsersQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -3159,16 +2893,6 @@ export type GetOrganizationUsers_UsersQueryVariables = Exact<{
 
 export type GetOrganizationUsers_UsersQuery = {
   me: {
-    organization: {
-      users: {
-        totalCount: number;
-        items: Array<{
-          id: string;
-          fullName: Maybe<string>;
-          firstName: Maybe<string>;
-          lastName: Maybe<string>;
-        }>;
-      };
-    };
+    organization: { users: Pick<UserPagination, "totalCount"> & { items: Array<UserFragment> } };
   };
 };
