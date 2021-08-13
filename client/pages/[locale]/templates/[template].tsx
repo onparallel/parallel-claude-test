@@ -266,9 +266,7 @@ function LandingTemplateDetails({
                     <Text key={field.id} marginLeft={4} marginBottom={2}>
                       {index}.{" "}
                       {field.title ? (
-                        <Text as="span" aria-label={field.title}>
-                          {field.title}
-                        </Text>
+                        <Text as="span">{field.title}</Text>
                       ) : (
                         <Text as="span" textStyle="hint">
                           <FormattedMessage
@@ -292,8 +290,8 @@ function LandingTemplateDetails({
                   <Button size="sm" onClick={handleToggle} variant="outline">
                     <FormattedMessage
                       id="generic.show-more-less"
-                      defaultMessage="Show {showFields, select, false {more} other {less}}"
-                      values={{ showFields }}
+                      defaultMessage="Show {more, select, true {more} other {less}}"
+                      values={{ more: !showFields }}
                     />
                   </Button>
                 </Box>

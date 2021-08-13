@@ -3131,8 +3131,8 @@
   },
   {
     "term": "generic.show-more-less",
-    "definition": "Mostrar {showFields, select, false {más} other {menos}}",
-    "context": "Show {showFields, select, false {more} other {less}}"
+    "definition": "Mostrar {more, select, true {más} other {menos}}",
+    "context": "Show {more, select, true {more} other {less}}"
   },
   {
     "term": "generic.skip",
