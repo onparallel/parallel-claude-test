@@ -1,7 +1,9 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  Button,
   Center,
+  Collapse,
   Grid,
   Heading,
   HStack,
@@ -28,11 +30,14 @@ import {
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
+import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { Assert } from "@parallel/utils/types";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { useEffect } from "react";
+import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, zip } from "remeda";
 
 function LandingTemplateDetails({
   template,
@@ -53,7 +58,15 @@ function LandingTemplateDetails({
     descriptionHtml,
     shortDescription,
     updatedAt,
+    fields,
   } = template!;
+
+  const [showFields, setShowFields] = useState(false);
+  const handleToggle = () => setShowFields(!showFields);
+
+  useEffect(() => {
+    setShowFields(false);
+  }, [slug]);
 
   const categoryList = usePublicTemplateCategories();
   const categories = (template.categories ?? [])
@@ -61,6 +74,8 @@ function LandingTemplateDetails({
     .filter(isDefined);
 
   const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
+
+  const indices = useFieldIndices(fields);
   return (
     <PublicLayout
       title={name as string}
@@ -223,6 +238,66 @@ function LandingTemplateDetails({
                   />
                 </Text>
               )}
+              <Heading size="md" paddingTop={8} paddingBottom={4}>
+                <FormattedMessage
+                  id="template-details.fields-list"
+                  defaultMessage="Information list"
+                />
+              </Heading>
+              <Collapse startingHeight={"300px"} in={fields.length <= 10 ? true : showFields}>
+                {zip(fields, indices).map(([field, index]) => {
+                  return field.type === "HEADING" ? (
+                    <Text key={field.id} fontWeight="bold" marginBottom={2}>
+                      {index}.{" "}
+                      {field.title ? (
+                        <Text as="span" fontWeight="bold">
+                          {field.title}
+                        </Text>
+                      ) : (
+                        <Text as="span" textStyle="hint">
+                          <FormattedMessage
+                            id="generic.empty-heading"
+                            defaultMessage="Untitled heading"
+                          />
+                        </Text>
+                      )}
+                    </Text>
+                  ) : (
+                    <Text key={field.id} marginLeft={4} marginBottom={2}>
+                      {index}.{" "}
+                      {field.title ? (
+                        <Text as="span" aria-label={field.title}>
+                          {field.title}
+                        </Text>
+                      ) : (
+                        <Text as="span" textStyle="hint">
+                          <FormattedMessage
+                            id="generic.untitled-field"
+                            defaultMessage="Untitled field"
+                          />
+                        </Text>
+                      )}
+                    </Text>
+                  );
+                })}
+              </Collapse>
+              {fields.length > 10 ? (
+                <Box
+                  paddingTop={4}
+                  paddingLeft={4}
+                  sx={{
+                    boxShadow: showFields ? undefined : "0px -23px 50px 45px #fff",
+                  }}
+                >
+                  <Button size="sm" onClick={handleToggle} variant="outline">
+                    <FormattedMessage
+                      id="generic.show-more-less"
+                      defaultMessage="Show {showFields, select, false {more} other {less}}"
+                      values={{ showFields }}
+                    />
+                  </Button>
+                </Box>
+              ) : null}
             </Stack>
           </Stack>
           <Stack spacing={12}>
@@ -272,6 +347,11 @@ LandingTemplateDetails.fragments = {
       descriptionHtml
       shortDescription
       updatedAt
+      fields {
+        id
+        type
+        title
+      }
     }
   `,
 };

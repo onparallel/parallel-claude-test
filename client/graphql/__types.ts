@@ -246,6 +246,7 @@ export interface LandingTemplate {
   categories?: Maybe<Array<Scalars["String"]>>;
   descriptionHtml?: Maybe<Scalars["String"]>;
   fieldCount: Scalars["Int"];
+  fields: Array<LandingTemplateField>;
   hasConditionals: Scalars["Boolean"];
   id: Scalars["GID"];
   imageUrl?: Maybe<Scalars["String"]>;
@@ -257,6 +258,14 @@ export interface LandingTemplate {
   shortDescription?: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];
+}
+
+/** A public template field */
+export interface LandingTemplateField {
+  __typename?: "LandingTemplateField";
+  id: Scalars["GID"];
+  title?: Maybe<Scalars["String"]>;
+  type: PetitionFieldType;
 }
 
 export interface LandingTemplatePagination {
@@ -12293,6 +12302,12 @@ export type LandingTemplateDetails_LandingTemplateFragment = {
   descriptionHtml?: Maybe<string>;
   shortDescription?: Maybe<string>;
   updatedAt: string;
+  fields: Array<{
+    __typename?: "LandingTemplateField";
+    id: string;
+    type: PetitionFieldType;
+    title?: Maybe<string>;
+  }>;
 };
 
 export type LandingTemplateDetails_landingTemplateBySlugQueryVariables = Exact<{
@@ -12317,6 +12332,12 @@ export type LandingTemplateDetails_landingTemplateBySlugQuery = {
     descriptionHtml?: Maybe<string>;
     shortDescription?: Maybe<string>;
     updatedAt: string;
+    fields: Array<{
+      __typename?: "LandingTemplateField";
+      id: string;
+      type: PetitionFieldType;
+      title?: Maybe<string>;
+    }>;
   }>;
 };
 
@@ -15142,6 +15163,11 @@ export const LandingTemplateDetails_LandingTemplateFragmentDoc = gql`
     descriptionHtml
     shortDescription
     updatedAt
+    fields {
+      id
+      type
+      title
+    }
   }
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`

@@ -3130,6 +3130,11 @@
     "context": "Share"
   },
   {
+    "term": "generic.show-more-less",
+    "definition": "Mostrar {showFields, select, false {más} other {menos}}",
+    "context": "Show {showFields, select, false {more} other {less}}"
+  },
+  {
     "term": "generic.skip",
     "definition": "Omitir",
     "context": "Skip"
