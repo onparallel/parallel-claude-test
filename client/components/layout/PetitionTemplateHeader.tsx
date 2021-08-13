@@ -83,6 +83,7 @@ export function PetitionTemplateHeader({
       await showPetitionSharingDialog({
         userId: user.id,
         petitionIds: [petition.id],
+        isTemplate: true,
       });
     } catch {}
   };

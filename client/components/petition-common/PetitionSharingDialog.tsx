@@ -168,7 +168,7 @@ export function PetitionSharingDialog({
             userGroupIds: groups.length ? groups : null,
             permissionType: "WRITE",
             notify,
-            subscribe,
+            subscribe: isTemplate ? false : subscribe,
             message: message || null,
           },
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
@@ -301,18 +301,20 @@ export function PetitionSharingDialog({
                   })}
                 />
               </PaddedCollapse>
-              <Checkbox {...register("subscribe")} colorScheme="purple" defaultIsChecked>
-                <FormattedMessage
-                  id="component.petition-sharing-dialog.subscribe"
-                  defaultMessage="Subscribe to notifications"
-                />
-                <HelpPopover marginLeft={2}>
+              {!isTemplate ? (
+                <Checkbox {...register("subscribe")} colorScheme="purple" defaultIsChecked>
                   <FormattedMessage
-                    id="component.petition-sharing-dialog.subscribe-help"
-                    defaultMessage="Users will receive notifications about the activity of this petition."
+                    id="component.petition-sharing-dialog.subscribe"
+                    defaultMessage="Subscribe to notifications"
                   />
-                </HelpPopover>
-              </Checkbox>
+                  <HelpPopover marginLeft={2}>
+                    <FormattedMessage
+                      id="component.petition-sharing-dialog.subscribe-help"
+                      defaultMessage="Users will receive notifications about the activity of this petition."
+                    />
+                  </HelpPopover>
+                </Checkbox>
+              ) : null}
             </Stack>
             <Stack display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"} paddingTop={2}>
               {userPermissions?.map(({ user, permissionType }) => (
