@@ -1,8 +1,8 @@
 import { core } from "@nexus/schema";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { getRequiredPetitionSendCredits } from "../../util/organizationUsageLimits";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
-
 export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
   "Organization",
   FieldName
@@ -71,10 +71,11 @@ export function orgHasAvailablePetitionSendCredits<
   TypeName extends string,
   FieldName extends string
 >(
-  requiredCredits: (args: core.ArgsValue<TypeName, FieldName>) => number
+  contactIdGroupsProp: (args: core.ArgsValue<TypeName, FieldName>) => number[][]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (root, args, ctx) => {
-    const needed = requiredCredits(args);
+  return async (_, args, ctx) => {
+    const needed = await getRequiredPetitionSendCredits(contactIdGroupsProp(args), ctx.user!, ctx);
+
     const petitionSendUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
       ctx.user!.org_id,
       "PETITION_SEND"

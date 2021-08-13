@@ -1,4 +1,4 @@
-import faker from "faker";
+import { datatype, internet } from "faker";
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import { omit, sortBy } from "remeda";
@@ -351,7 +351,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = templates!.templates;
 
       // pick a random templateId that is not on first position of items array
-      const index = faker.datatype.number({ min: 1, max: items.length - 1 });
+      const index = datatype.number({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
@@ -471,7 +471,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = templates!.publicTemplates;
 
       // pick a random templateId that is not on first position of items array
-      const index = faker.datatype.number({ min: 1, max: items.length - 1 });
+      const index = datatype.number({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
@@ -2133,9 +2133,11 @@ describe("GraphQL/Petitions", () => {
   describe("sendPetition", () => {
     let petition: Petition;
     let usageLimit: OrganizationUsageLimit;
-    let contact: Contact;
+    let contacts: Contact[];
     beforeAll(async () => {
-      [contact] = await mocks.createRandomContacts(organization.id, 1);
+      contacts = await mocks.createRandomContacts(organization.id, 2, (i) => ({
+        email: i === 0 ? sessionUser.email : internet.email(),
+      }));
       usageLimit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 0);
     });
     beforeEach(async () => {
@@ -2167,7 +2169,7 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
-          contactIds: [toGlobalId("Contact", contact.id)],
+          contactIds: [toGlobalId("Contact", contacts[1].id)],
           subject: "petition send subject",
           body: [],
         },
@@ -2212,7 +2214,7 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
-          contactIds: [toGlobalId("Contact", contact.id)],
+          contactIds: [toGlobalId("Contact", contacts[1].id)],
           subject: "petition send subject",
           body: [],
         },
@@ -2253,9 +2255,9 @@ describe("GraphQL/Petitions", () => {
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
           contactIdGroups: [
-            [toGlobalId("Contact", contact.id)],
-            [toGlobalId("Contact", contact.id)],
-            [toGlobalId("Contact", contact.id)],
+            [toGlobalId("Contact", contacts[1].id)],
+            [toGlobalId("Contact", contacts[1].id)],
+            [toGlobalId("Contact", contacts[1].id)],
           ],
           subject: "petition send subject",
           body: [],
@@ -2268,6 +2270,90 @@ describe("GraphQL/Petitions", () => {
         used: 0,
       });
       expect(data).toBeNull();
+    });
+
+    it("sending a petition to myself should not consume credits", async () => {
+      await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
+        used: 10,
+        limit: 10,
+      });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contacts[0].id)],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.sendPetition).toEqual({ result: "SUCCESS" });
+
+      const organizationCurrentUsageLimit = await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .select("id", "used", "limit");
+
+      expect(organizationCurrentUsageLimit).toEqual([{ id: usageLimit.id, used: 10, limit: 10 }]);
+    });
+
+    it("doing a batch send with only me in a group should reduce the amount of credits needed", async () => {
+      await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
+        used: 9,
+        limit: 10,
+      });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $contactIdGroups: [[GID!]!]!
+            $subject: String!
+            $body: JSON!
+          ) {
+            batchSendPetition(
+              petitionId: $petitionId
+              contactIdGroups: $contactIdGroups
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIdGroups: [
+            [toGlobalId("Contact", contacts[0].id)],
+            [toGlobalId("Contact", contacts[1].id)],
+          ],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.batchSendPetition).toEqual([{ result: "SUCCESS" }, { result: "SUCCESS" }]);
+
+      const organizationCurrentUsageLimit = await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .select("id", "used", "limit");
+
+      expect(organizationCurrentUsageLimit).toEqual([{ id: usageLimit.id, used: 10, limit: 10 }]);
     });
   });
 });

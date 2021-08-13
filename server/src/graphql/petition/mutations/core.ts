@@ -24,6 +24,7 @@ import {
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
+import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
 import { random } from "../../../util/token";
 import { userHasAccessToContactGroups, userHasAccessToContacts } from "../../contact/authorizers";
@@ -991,7 +992,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     userHasAccessToPetitions("petitionId"),
     petitionHasRepliableFields("petitionId"),
     userHasAccessToContactGroups("contactIdGroups"),
-    orgHasAvailablePetitionSendCredits((args) => args.contactIdGroups.length) // each contactId group takes a credit
+    orgHasAvailablePetitionSendCredits((args) => args.contactIdGroups)
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1110,11 +1111,14 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       ]);
     }
 
-    await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-      ctx.user!.org_id,
-      "PETITION_SEND",
-      successfulSends.length
-    );
+    const usedCredits = await getRequiredPetitionSendCredits(args.contactIdGroups, ctx.user!, ctx);
+    if (usedCredits > 0) {
+      await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+        ctx.user!.org_id,
+        "PETITION_SEND",
+        usedCredits
+      );
+    }
 
     return results.map((r) => omit(r, ["messages"]));
   },
@@ -1127,7 +1131,7 @@ export const sendPetition = mutationField("sendPetition", {
     userHasAccessToPetitions("petitionId"),
     userHasAccessToContacts("contactIds"),
     petitionHasRepliableFields("petitionId"),
-    orgHasAvailablePetitionSendCredits(() => 1) // 1 credit needed to send a petition
+    orgHasAvailablePetitionSendCredits((args) => [args.contactIds])
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1178,12 +1182,14 @@ export const sendPetition = mutationField("sendPetition", {
         ]);
       }
     }
-
-    await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-      ctx.user!.org_id,
-      "PETITION_SEND",
-      1
-    );
+    const usedCredits = await getRequiredPetitionSendCredits([args.contactIds], ctx.user!, ctx);
+    if (usedCredits > 0) {
+      await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+        ctx.user!.org_id,
+        "PETITION_SEND",
+        usedCredits
+      );
+    }
 
     return {
       petition: updatedPetition,
