@@ -3131,8 +3131,8 @@
   },
   {
     "term": "generic.show-more-less",
-    "definition": "Show {more, select, false {more} other {less}}",
-    "context": "Show {more, select, false {more} other {less}}"
+    "definition": "Show {more, select, true {more} other {less}}",
+    "context": "Show {more, select, true {more} other {less}}"
   },
   {
     "term": "generic.skip",
