@@ -20,10 +20,10 @@ import {
 } from "../__types";
 
 export type OrganizationUsageDetails = {
-  USER_SEATS: number;
+  USER_LIMIT: number;
   PETITION_SEND: {
     limit: number;
-    period: "month" | "year";
+    period: string; //pg interval
   };
 };
 
@@ -34,10 +34,10 @@ export class OrganizationRepository extends BaseRepository {
   }
 
   readonly defaultOrganizationUsageDetails: OrganizationUsageDetails = {
-    USER_SEATS: 1000,
+    USER_LIMIT: 1000,
     PETITION_SEND: {
       limit: 5000,
-      period: "month",
+      period: "1 month",
     },
   };
 
@@ -189,10 +189,6 @@ export class OrganizationRepository extends BaseRepository {
     return owner;
   }
 
-  async getOrganizationUsageDetails() {
-    return await this.from("organization").select("id", "usage_details");
-  }
-
   async getOrganizationCurrentUsageLimit(
     orgId: number,
     limitName: OrganizationUsageLimitName
@@ -204,6 +200,16 @@ export class OrganizationRepository extends BaseRepository {
     });
 
     return row;
+  }
+
+  async getOrganizationExpiredUsageLimitsAndDetails(): Promise<
+    Array<OrganizationUsageLimit & { usage_details: OrganizationUsageDetails }>
+  > {
+    return await this.from("organization_usage_limit")
+      .whereNull("period_end_date")
+      .whereRaw(`"period_start_date" + "period" < now()`)
+      .join(this.knex.raw("organization o on o.id = organization_usage_limit.org_id"))
+      .select("organization_usage_limit.*", "o.usage_details");
   }
 
   async createOrganizationUsageLimit(

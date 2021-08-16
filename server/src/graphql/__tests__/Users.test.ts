@@ -654,7 +654,7 @@ describe("GraphQL/Users", () => {
       await mocks.knex
         .from("organization")
         .where("id", organization.id)
-        .update({ usage_details: { USER_SEATS: 3 } });
+        .update({ usage_details: { USER_LIMIT: 3 } });
 
       [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
         organization_role: "NORMAL",
@@ -759,7 +759,7 @@ describe("GraphQL/Users", () => {
       expect(data?.createOrganizationUser).toEqual({ fullName: "Michael Scott", role: "ADMIN" });
     });
 
-    it("should not create a user if the organization does not have enough seats", async () => {
+    it("should not create a user if the organization reached the max limit of users", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
@@ -785,7 +785,7 @@ describe("GraphQL/Users", () => {
           role: "NORMAL",
         },
       });
-      expect(errors).toContainGraphQLError("USER_SEATS_LIMIT_ERROR", { maxSeatsAvailable: 3 });
+      expect(errors).toContainGraphQLError("USER_LIMIT_ERROR", { userLimit: 3 });
       expect(data).toBeNull();
     });
   });

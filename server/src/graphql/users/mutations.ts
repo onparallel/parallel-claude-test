@@ -36,7 +36,7 @@ import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validPassword } from "../helpers/validators/validPassword";
-import { orgDoesNotHaveSsoProvider, orgHasAvailableUserSeats } from "../organization/authorizers";
+import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import {
   contextUserIsAdmin,
@@ -144,7 +144,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   authorize: authenticateAnd(
     contextUserIsAdmin(),
     orgDoesNotHaveSsoProvider(),
-    orgHasAvailableUserSeats()
+    orgCanCreateNewUser()
   ),
   args: {
     email: nonNull(stringArg()),

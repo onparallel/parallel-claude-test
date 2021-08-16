@@ -1,5 +1,6 @@
+import { isDefined, uniq } from "remeda";
 import { ApiContext } from "../context";
-import { User } from "../db/__types";
+import { Contact, User } from "../db/__types";
 
 export async function getRequiredPetitionSendCredits(
   contactIdGroups: number[][],
@@ -8,9 +9,11 @@ export async function getRequiredPetitionSendCredits(
 ) {
   let requiredCredits = 0;
 
+  const contacts = await ctx.contacts.loadContact(uniq(contactIdGroups.flat()));
+
   for (const group of contactIdGroups) {
-    const contactGroup = await ctx.contacts.loadContact(group);
-    if (contactGroup.some((c) => c && c.email !== user.email)) {
+    const contactGroup = contacts.filter((c) => isDefined(c) && group.includes(c.id)) as Contact[];
+    if (contactGroup.some((c) => c.email !== user.email)) {
       requiredCredits++;
     }
   }

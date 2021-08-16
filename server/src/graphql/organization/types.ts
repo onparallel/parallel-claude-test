@@ -169,7 +169,7 @@ export const Organization = objectType({
             used: petitionSendLimits?.used || 0,
           },
           users: {
-            limit: organization!.usage_details.USER_SEATS,
+            limit: organization!.usage_details.USER_LIMIT,
           },
         };
       },

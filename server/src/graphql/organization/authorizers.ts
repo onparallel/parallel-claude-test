@@ -48,7 +48,7 @@ export function orgDoesNotHaveSsoProvider<
   };
 }
 
-export function orgHasAvailableUserSeats<
+export function orgCanCreateNewUser<
   TypeName extends string,
   FieldName extends string
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
@@ -58,9 +58,9 @@ export function orgHasAvailableUserSeats<
       ctx.organizations.loadUserCount(ctx.user!.org_id),
     ]);
 
-    if (org!.usage_details.USER_SEATS <= userCount) {
-      throw new WhitelistedError(`Not enough seats available`, "USER_SEATS_LIMIT_ERROR", {
-        maxSeatsAvailable: org!.usage_details.USER_SEATS,
+    if (org!.usage_details.USER_LIMIT <= userCount) {
+      throw new WhitelistedError(`User limit reached for this organization`, "USER_LIMIT_ERROR", {
+        userLimit: org!.usage_details.USER_LIMIT,
       });
     }
     return true;
