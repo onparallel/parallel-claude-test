@@ -225,14 +225,14 @@ export function AddPetitionAccessDialog({
               ) : (
                 <FormattedMessage
                   id="component.add-petition-access-dialog.petition-limit-near.text"
-                  defaultMessage="You only have {left, plural, =1{# send} other{# sends}} left."
+                  defaultMessage="You can send {left, plural, =1{# more petition} other{# more petitions}}."
                   values={{ left: limit - used }}
                 />
               )}
               <br />
               <FormattedMessage
                 id="component.add-petition-access-dialog.limit-reached.subtext"
-                defaultMessage="Remember that sending a petition to yourself doesn't consume any credits."
+                defaultMessage="Remember that petitions sent to your own email address do not count towards the limit."
               />
             </Alert>
           ) : null}

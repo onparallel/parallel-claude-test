@@ -3,6 +3,7 @@ import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Link } from "../common/Link";
+import { SmallPopover } from "../common/SmallPopover";
 
 export interface AppLayoutNavbarLinkProps {
   href?: string;
@@ -10,7 +11,7 @@ export interface AppLayoutNavbarLinkProps {
   icon: ReactElement;
   isAvailable?: boolean;
   children: ReactNode;
-  warningTooltip?: ReactNode;
+  warningPopover?: ReactNode;
 }
 
 export function AppLayoutNavbarLink({
@@ -19,7 +20,7 @@ export function AppLayoutNavbarLink({
   icon,
   isAvailable,
   children,
-  warningTooltip,
+  warningPopover,
 }: AppLayoutNavbarLinkProps) {
   const intl = useIntl();
   const isMobile = useBreakpointValue({ base: true, sm: false });
@@ -63,7 +64,7 @@ export function AppLayoutNavbarLink({
         },
       }}
     >
-      <AppLayoutNavbarLinkContent icon={icon} warningTooltip={warningTooltip}>
+      <AppLayoutNavbarLinkContent icon={icon} warningPopover={warningPopover}>
         {children}
       </AppLayoutNavbarLinkContent>
     </Link>
@@ -88,12 +89,12 @@ function AppLayoutNavbarLinkContent({
   icon,
   isDisabled,
   children,
-  warningTooltip,
+  warningPopover,
 }: {
   icon: ReactElement;
   isDisabled?: boolean;
   children: ReactNode;
-  warningTooltip?: ReactNode;
+  warningPopover?: ReactNode;
 }) {
   return (
     <Box
@@ -116,8 +117,8 @@ function AppLayoutNavbarLinkContent({
           boxSize: "24px",
           transition: "transform 150ms ease",
         })}
-        {warningTooltip ? (
-          <Tooltip label={warningTooltip} placement="right">
+        {warningPopover ? (
+          <SmallPopover content={warningPopover} placement="right">
             <AlertCircleFilledIcon
               position="absolute"
               color="yellow.500"
@@ -125,7 +126,7 @@ function AppLayoutNavbarLinkContent({
               top={2}
               transition="transform 150ms ease"
             />
-          </Tooltip>
+          </SmallPopover>
         ) : null}
       </Box>
       <Text as="div" textTransform="uppercase" fontSize="xs" fontWeight="600">

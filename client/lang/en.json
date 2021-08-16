@@ -31,13 +31,13 @@
   },
   {
     "term": "component.add-petition-access-dialog.limit-reached.subtext",
-    "definition": "Remember that sending a petition to yourself doesn't consume any credits.",
-    "context": "Remember that sending a petition to yourself doesn't consume any credits."
+    "definition": "Remember that petitions sent to your own email address do not count towards the limit.",
+    "context": "Remember that petitions sent to your own email address do not count towards the limit."
   },
   {
     "term": "component.add-petition-access-dialog.petition-limit-near.text",
-    "definition": "You only have {left, plural, =1{# send} other{# sends}} left.",
-    "context": "You only have {left, plural, =1{# send} other{# sends}} left."
+    "definition": "You can send {left, plural, =1{# more petition} other{# more petitions}}.",
+    "context": "You can send {left, plural, =1{# more petition} other{# more petitions}}."
   },
   {
     "term": "component.add-petition-access-dialog.petition-limit-reached.text",
@@ -1271,8 +1271,18 @@
   },
   {
     "term": "component.petition-limit-reached-alert.title",
-    "definition": "Seems that you have reached your limit of {limit} petitions, <a>contact with us to upgrade your plan.</a>",
-    "context": "Seems that you have reached your limit of {limit} petitions, <a>contact with us to upgrade your plan.</a>"
+    "definition": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>",
+    "context": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
+  },
+  {
+    "term": "component.petition-limit-reached-error-dialog.header",
+    "definition": "Error sending the petition",
+    "context": "Error sending the petition"
+  },
+  {
+    "term": "component.petition-limit-reached-error-dialog.message",
+    "definition": "You have reached your limit of petitions sent, <a>reach out to us to upgrade your plan.</a>",
+    "context": "You have reached your limit of petitions sent, <a>reach out to us to upgrade your plan.</a>"
   },
   {
     "term": "component.petition-list-header.clone-petition-label",
@@ -3806,8 +3816,8 @@
   },
   {
     "term": "navbar.petitions-link.limit-reached.warning",
-    "definition": "Petitions limit reached. Contact with us to upgrade your plan.",
-    "context": "Petitions limit reached. Contact with us to upgrade your plan."
+    "definition": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>",
+    "context": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
   },
   {
     "term": "navbar.reports-link",
@@ -3966,8 +3976,8 @@
   },
   {
     "term": "organization-users.max-limit-reached",
-    "definition": "You reached the maximum amount of users you can create, <a>contact with us to upgrade your plan.</a>",
-    "context": "You reached the maximum amount of users you can create, <a>contact with us to upgrade your plan.</a>"
+    "definition": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>",
+    "context": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
   },
   {
     "term": "organization-users.normal-role",
@@ -4178,26 +4188,6 @@
     "term": "petition-accesses.status-header",
     "definition": "Status",
     "context": "Status"
-  },
-  {
-    "term": "petition-activity.send-petition.not-enough-credits-error.header",
-    "definition": "Error sending the petition",
-    "context": "Error sending the petition"
-  },
-  {
-    "term": "petition-activity.send-petition.not-enough-credits-error.message",
-    "definition": "You don't have enough credits to send this petition to another contact.",
-    "context": "You don't have enough credits to send this petition to another contact."
-  },
-  {
-    "term": "petition-compose.send-petition.not-enough-credits-error.header",
-    "definition": "Error sending the petition",
-    "context": "Error sending the petition"
-  },
-  {
-    "term": "petition-compose.send-petition.not-enough-credits-error.message",
-    "definition": "You don't have enough credits to send this petition.",
-    "context": "You don't have enough credits to send this petition."
   },
   {
     "term": "petition-compose.settings",

@@ -12,11 +12,13 @@ export function PetitionLimitReachedAlert({ limit, ...props }: PetitionLimitReac
       <AlertIcon color="yellow.500" />
       <FormattedMessage
         id="component.petition-limit-reached-alert.title"
-        defaultMessage="Seems that you have reached your limit of {limit} petitions, <a>contact with us to upgrade your plan.</a>"
+        defaultMessage="It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
         values={{
           limit,
           a: (chunks: any[]) => (
-            <NormalLink href="mailto:support@onparallel.com">&nbsp;{chunks}</NormalLink>
+            <NormalLink display="contents" href="mailto:support@onparallel.com">
+              {chunks}
+            </NormalLink>
           ),
         }}
       />

@@ -22,7 +22,7 @@ import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NakedLink } from "../common/Link";
+import { NakedLink, NormalLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 import { NotificationsButton } from "../notifications/NotificationsButton";
@@ -55,10 +55,21 @@ export const AppLayoutNavbar = Object.assign(
             defaultMessage: "Petitions",
           }),
           warning: petitionLimitReached
-            ? intl.formatMessage({
-                id: "navbar.petitions-link.limit-reached.warning",
-                defaultMessage: "Petitions limit reached. Contact with us to upgrade your plan.",
-              })
+            ? intl.formatMessage(
+                {
+                  id: "navbar.petitions-link.limit-reached.warning",
+                  defaultMessage:
+                    "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>",
+                },
+                {
+                  limit: user.organization.usageLimits.petitions.limit,
+                  a: (chunks: any[]) => (
+                    <NormalLink display="contents" href="mailto:support@onparallel.com">
+                      {chunks}
+                    </NormalLink>
+                  ),
+                }
+              )
             : undefined,
         },
         {
@@ -162,7 +173,7 @@ export const AppLayoutNavbar = Object.assign(
                 isAvailable={isAvailable}
                 isActive={isActive}
                 icon={icon}
-                warningTooltip={warning}
+                warningPopover={warning}
               >
                 {text}
               </AppLayoutNavbarLink>

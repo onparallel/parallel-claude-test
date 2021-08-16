@@ -8,10 +8,12 @@ export function UserLimitReachedAlert(props: AlertProps) {
       <AlertIcon color="yellow.500" />
       <FormattedMessage
         id="organization-users.max-limit-reached"
-        defaultMessage="You reached the maximum amount of users you can create, <a>contact with us to upgrade your plan.</a>"
+        defaultMessage="You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
         values={{
           a: (chunks: any[]) => (
-            <NormalLink href="mailto:support@onparallel.com">&nbsp;{chunks}</NormalLink>
+            <NormalLink display="contents" href="mailto:support@onparallel.com">
+              {chunks}
+            </NormalLink>
           ),
         }}
       />

@@ -68,6 +68,7 @@ import {
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
+import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
@@ -361,6 +362,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [batchSendPetition] = usePetitionCompose_batchSendPetitionMutation();
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
   const showLongBatchSendDialog = useBlockingDialog();
+  const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
   const handleNextClick = useCallback(async () => {
     if (petition?.__typename !== "Petition") {
       throw new Error("Can't send a template");
@@ -481,18 +483,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       router.push(`/${router.query.locale}/app/petitions`);
     } catch (e) {
       if (e.graphQLErrors?.[0]?.extensions.code === "PETITION_SEND_CREDITS_ERROR") {
-        await withError(
-          showErrorDialog({
-            header: intl.formatMessage({
-              id: "petition-compose.send-petition.not-enough-credits-error.header",
-              defaultMessage: "Error sending the petition",
-            }),
-            message: intl.formatMessage({
-              id: "petition-compose.send-petition.not-enough-credits-error.message",
-              defaultMessage: "You don't have enough credits to send this petition.",
-            }),
-          })
-        );
+        await withError(showPetitionLimitReachedErrorDialog());
       }
     }
   }, [petition]);
