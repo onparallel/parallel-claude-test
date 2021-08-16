@@ -22,6 +22,13 @@ export function useOrganizationSections(user: Pick<User, "role">) {
         }),
         path: "/app/organization/groups",
       },
+      {
+        title: intl.formatMessage({
+          id: "organization.usage.title",
+          defaultMessage: "Usage",
+        }),
+        path: "/app/organization/usage",
+      },
       ...(userIsAdmin
         ? [
             {

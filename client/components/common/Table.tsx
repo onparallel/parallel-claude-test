@@ -519,6 +519,12 @@ export function DefaultHeader({
     },
   });
 
+  const toFlexAlignment = (alignment: BoxProps["textAlign"]) => {
+    if (alignment === "right") return "flex-end";
+    if (alignment === "left") return "flex-start";
+    else return alignment;
+  };
+
   const _ref = useMergedRef(ref, popperRef);
   return (
     <Box
@@ -563,7 +569,11 @@ export function DefaultHeader({
       }}
       {...props}
     >
-      <HStack spacing={1} alignItems="center" justifyContent={column.align ?? "left"}>
+      <HStack
+        spacing={1}
+        alignItems="center"
+        justifyContent={toFlexAlignment(column.align) ?? "flex-start"}
+      >
         <Text as="div" isTruncated>
           {column.header}
         </Text>

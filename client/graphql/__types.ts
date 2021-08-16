@@ -7699,6 +7699,11 @@ export type AdminOrganizations_OrganizationFragment = {
   status: OrganizationStatus;
   userCount: number;
   createdAt: string;
+  usageLimits: {
+    __typename?: "OrganizationUsageLimit";
+    users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+    petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+  };
 };
 
 export type AdminOrganizations_UserFragment = {
@@ -7739,6 +7744,11 @@ export type AdminOrganizationsQuery = {
       status: OrganizationStatus;
       userCount: number;
       createdAt: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+      };
     }>;
   };
 };
@@ -8477,6 +8487,29 @@ export type OrganizationSettingsQuery = {
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+};
+
+export type OrganizationUsageQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrganizationUsageQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    onboardingStatus: { [key: string]: any };
+    fullName?: Maybe<string>;
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      userCount: number;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
       };
     };
   };
@@ -14270,6 +14303,15 @@ export const AdminOrganizations_OrganizationFragmentDoc = gql`
     status
     userCount
     createdAt
+    usageLimits {
+      users {
+        limit
+      }
+      petitions {
+        used
+        limit
+      }
+    }
   }
 `;
 export const AdminOrganizations_UserFragmentDoc = gql`
@@ -18975,6 +19017,47 @@ export type OrganizationSettingsQueryHookResult = ReturnType<typeof useOrganizat
 export type OrganizationSettingsLazyQueryHookResult = ReturnType<
   typeof useOrganizationSettingsLazyQuery
 >;
+export const OrganizationUsageDocument = gql`
+  query OrganizationUsage {
+    me {
+      ...SettingsLayout_User
+      organization {
+        id
+        userCount
+        usageLimits {
+          users {
+            limit
+          }
+          petitions {
+            used
+            limit
+          }
+        }
+      }
+    }
+  }
+  ${SettingsLayout_UserFragmentDoc}
+`;
+export function useOrganizationUsageQuery(
+  baseOptions?: Apollo.QueryHookOptions<OrganizationUsageQuery, OrganizationUsageQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<OrganizationUsageQuery, OrganizationUsageQueryVariables>(
+    OrganizationUsageDocument,
+    options
+  );
+}
+export function useOrganizationUsageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<OrganizationUsageQuery, OrganizationUsageQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<OrganizationUsageQuery, OrganizationUsageQueryVariables>(
+    OrganizationUsageDocument,
+    options
+  );
+}
+export type OrganizationUsageQueryHookResult = ReturnType<typeof useOrganizationUsageQuery>;
+export type OrganizationUsageLazyQueryHookResult = ReturnType<typeof useOrganizationUsageLazyQuery>;
 export const OrganizationUsers_createOrganizationUserDocument = gql`
   mutation OrganizationUsers_createOrganizationUser(
     $firstName: String!

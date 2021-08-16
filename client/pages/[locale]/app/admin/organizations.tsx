@@ -203,11 +203,35 @@ function useOrganizationColumns() {
           id: "organizations.header.user-count",
           defaultMessage: "Users",
         }),
-        cellProps: {
-          width: "1px",
-        },
         align: "right",
         CellContent: ({ row }) => <FormattedNumber value={row.userCount} />,
+      },
+      {
+        key: "usersLimit",
+        header: intl.formatMessage({
+          id: "organizations.header.users-limit",
+          defaultMessage: "Users limit",
+        }),
+        align: "right",
+        CellContent: ({ row }) => <FormattedNumber value={row.usageLimits.users.limit} />,
+      },
+      {
+        key: "petitionsUsage",
+        header: intl.formatMessage({
+          id: "organizations.header.petitions-used",
+          defaultMessage: "Petitions used",
+        }),
+        align: "right",
+        CellContent: ({ row }) => <FormattedNumber value={row.usageLimits.petitions.used} />,
+      },
+      {
+        key: "petitionsLimit",
+        header: intl.formatMessage({
+          id: "organizations.header.petitions-limit",
+          defaultMessage: "Petitions limit",
+        }),
+        align: "right",
+        CellContent: ({ row }) => <FormattedNumber value={row.usageLimits.petitions.limit} />,
       },
       {
         key: "createdAt",
@@ -238,6 +262,15 @@ AdminOrganizations.fragments = {
         status
         userCount
         createdAt
+        usageLimits {
+          users {
+            limit
+          }
+          petitions {
+            used
+            limit
+          }
+        }
       }
     `;
   },
