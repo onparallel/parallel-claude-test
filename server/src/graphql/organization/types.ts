@@ -125,6 +125,7 @@ export const Organization = objectType({
       },
     });
     t.nonNull.field("usageLimits", {
+      authorize: isOwnOrgOrSuperAdmin(),
       type: objectType({
         name: "OrganizationUsageLimit",
         rootTyping: /* ts*/ `{
