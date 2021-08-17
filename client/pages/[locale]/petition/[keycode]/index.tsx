@@ -25,6 +25,7 @@ import {
   usepublicSendVerificationCodeMutation,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
+import { isInsecureBrowser } from "@parallel/utils/isInsecureBrowser";
 import { resolveUrl } from "@parallel/utils/next";
 import { serialize as serializeCookie } from "cookie";
 import { isPast } from "date-fns";
@@ -35,8 +36,6 @@ import { FormEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { getClientIp } from "request-ip";
-import { UAParser } from "ua-parser-js";
-import compareVersions from "compare-versions";
 
 interface RecipientViewVerifyProps {
   email: string;
@@ -360,25 +359,3 @@ RecipientViewVerify.mutations = [
 ];
 
 export default withApolloData(RecipientViewVerify);
-
-function isInsecureBrowser(userAgent: string | undefined) {
-  if (userAgent === undefined) {
-    return false;
-  }
-  const ua = new UAParser(userAgent);
-  const browser = ua.getBrowser();
-  const insecure: Record<string, string> = {
-    IE: "999",
-    Edge: "89",
-    Safari: "13.3",
-    Firefox: "60.5",
-  };
-  if (
-    browser.name &&
-    browser.name in insecure &&
-    browser.version &&
-    compareVersions(browser.version, insecure[browser.name]) < 0
-  ) {
-    return true;
-  }
-}

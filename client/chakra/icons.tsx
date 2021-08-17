@@ -1132,6 +1132,18 @@ export const QuestionIcon = createIcon({
   ),
 });
 
+export const QuestionOutlineIcon = createIcon({
+  displayName: "QuestionOutlineIcon",
+  viewBox: "-1 -1 26 26",
+  path: (
+    <g fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <path d="M9,9a3,3,0,1,1,4,2.829,1.5,1.5,0,0,0-1,1.415V14.25"></path>
+      <path d="M12,17.25a.375.375,0,1,0,.375.375A.375.375,0,0,0,12,17.25h0"></path>
+      <circle strokeMiterlimit="10" cx="12" cy="12" r="11.25"></circle>
+    </g>
+  ),
+});
+
 export const CheckIcon = createIcon({
   displayName: "CheckIcon",
   viewBox: "0 0 14 14",
