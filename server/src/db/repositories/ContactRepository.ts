@@ -80,7 +80,8 @@ export class ContactRepository extends BaseRepository {
       firstName: string;
       lastName: string;
     },
-    createdBy: string
+    createdBy: string,
+    t?: Knex.Transaction
   ) {
     const [contact] = await this.raw<Contact>(
       /* sql */ `
@@ -98,7 +99,8 @@ export class ContactRepository extends BaseRepository {
           last_name: lastName,
           created_by: createdBy,
         }),
-      ]
+      ],
+      t
     );
     return contact;
   }

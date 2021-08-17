@@ -732,6 +732,16 @@ type Mutation {
   publicCompletePetition(keycode: ID!, signer: PublicPetitionSignerData): PublicPetition!
 
   """
+  Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args
+  """
+  publicCreateAndSendPetitionFromPublicLink(
+    contactEmail: String!
+    contactFirstName: String!
+    contactLastName: String!
+    publicPetitionLinkId: GID!
+  ): Result!
+
+  """
   Creates a reply to a checkbox field.
   """
   publicCreateCheckboxReply(
@@ -2838,6 +2848,12 @@ type PublicPetitionFieldReply implements Timestamps {
   updatedAt: DateTime!
 }
 
+type PublicPetitionLink {
+  description: String!
+  id: GID!
+  title: String!
+}
+
 """
 A public message in a petition
 """
@@ -3067,6 +3083,7 @@ type Query {
   ): PetitionBasePagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
   publicOrgLogoUrl(id: GID!): String
+  publicPetitionLinkBySlug(slug: String!): PublicPetitionLink
 
   """
   The publicly available templates

@@ -1,4 +1,4 @@
-import { idArg, list, nonNull, nullable, queryField } from "@nexus/schema";
+import { idArg, list, nonNull, nullable, queryField, stringArg } from "@nexus/schema";
 import { chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { authenticatePublicAccess, fieldBelongsToAccess } from "./authorizers";
@@ -37,5 +37,15 @@ export const publicOrgLogo = queryField("publicOrgLogoUrl", {
   },
   resolve: async (_, { id }, ctx) => {
     return await ctx.organizations.getOrgLogoUrl(id);
+  },
+});
+
+export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
+  type: nullable("PublicPetitionLink"),
+  args: {
+    slug: nonNull(stringArg()),
+  },
+  resolve: async (_, { slug }, ctx) => {
+    return await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
   },
 });

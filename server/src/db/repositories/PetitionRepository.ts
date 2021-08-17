@@ -472,7 +472,8 @@ export class PetitionRepository extends BaseRepository {
       CreatePetitionAccess,
       "contact_id" | "next_reminder_at" | "reminders_active" | "reminders_config" | "reminders_left"
     >[],
-    user: User
+    user: User,
+    t?: Knex.Transaction
   ) {
     const rows =
       data.length === 0
@@ -487,7 +488,8 @@ export class PetitionRepository extends BaseRepository {
               status: "ACTIVE",
               created_by: `User:${user.id}`,
               updated_by: `User:${user.id}`,
-            }))
+            })),
+            t
           );
 
     await this.createEvent(
@@ -498,7 +500,8 @@ export class PetitionRepository extends BaseRepository {
           petition_access_id: access.id,
           user_id: user.id,
         },
-      }))
+      })),
+      t
     );
 
     return rows;
@@ -540,7 +543,8 @@ export class PetitionRepository extends BaseRepository {
       CreatePetitionMessage,
       "status" | "petition_access_id" | "email_subject" | "email_body"
     >[],
-    user: User
+    user: User,
+    t?: Knex.Transaction
   ) {
     const rows =
       data.length === 0
@@ -553,7 +557,8 @@ export class PetitionRepository extends BaseRepository {
               petition_id: petitionId,
               sender_id: user.id,
               created_by: `User:${user.id}`,
-            }))
+            })),
+            t
           );
 
     if (scheduledAt) {
@@ -564,7 +569,8 @@ export class PetitionRepository extends BaseRepository {
           data: {
             petition_message_id: message.id,
           },
-        }))
+        })),
+        t
       );
     }
 
@@ -1416,7 +1422,8 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     user: User,
     data?: Partial<CreatePetition>,
-    insertUserPermissions = true
+    insertUserPermissions = true,
+    t?: Knex.Transaction
   ) {
     const [sourcePetition, userPermissions] = await Promise.all([
       this.loadPetition(petitionId),
@@ -1570,7 +1577,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       return cloned;
-    });
+    }, t);
   }
 
   readonly loadReminder = this.buildLoadBy("petition_reminder", "id");
@@ -3295,5 +3302,23 @@ export class PetitionRepository extends BaseRepository {
       user,
       t
     );
+  }
+
+  readonly loadPublicPetitionLink = this.buildLoadBy("public_petition_link", "id");
+
+  readonly loadPublicPetitionLinkBySlug = this.buildLoadBy("public_petition_link", "slug", (q) =>
+    q.where("is_active", true)
+  );
+
+  async getPublicPetitionLinkUsersByPublicPetitionLinkId(
+    publicPetitionLinkId: number
+  ): Promise<(User | null)[]> {
+    return await this.from("public_petition_link_user")
+      .where("public_petition_link_id", publicPetitionLinkId)
+      .whereNull("public_petition_link_user.deleted_at")
+      .leftJoin("user", "public_petition_link_user.user_id", "user.id")
+      .whereNull("user.deleted_at")
+      .select("user.*")
+      .orderBy("public_petition_link_user.created_at", "asc");
   }
 }

@@ -11,6 +11,7 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
+import { Knex } from "knex";
 import pMap from "p-map";
 import { isDefined, omit, pick, zip } from "remeda";
 import { ApiContext } from "../../../context";
@@ -21,6 +22,7 @@ import {
   CreatePetitionField,
   Petition,
   PetitionPermission,
+  User,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
@@ -978,7 +980,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
 /**
  * creates the required accesses and messages to send a petition to a group of contacts
  */
-async function presendPetition(
+export async function presendPetition(
   petition: Petition,
   contactIds: number[],
   args: {
@@ -987,7 +989,9 @@ async function presendPetition(
     subject: string;
     body: any;
   },
-  ctx: ApiContext
+  user: User,
+  ctx: ApiContext,
+  t?: Knex.Transaction
 ) {
   try {
     const accesses = await ctx.petitions.createAccesses(
@@ -1002,7 +1006,8 @@ async function presendPetition(
           ? calculateNextReminder(args.scheduledAt ?? new Date(), args.remindersConfig)
           : null,
       })),
-      ctx.user!
+      user,
+      t
     );
 
     const messages = await ctx.petitions.createMessages(
@@ -1014,13 +1019,15 @@ async function presendPetition(
         email_subject: args.subject,
         email_body: JSON.stringify(args.body),
       })),
-      ctx.user!
+      user,
+      t
     );
 
     const [updatedPetition] = await ctx.petitions.updatePetition(
       petition.id,
       { name: petition.name ?? args.subject, status: "PENDING" },
-      `User:${ctx.user!.id}`
+      `User:${user.id}`,
+      t
     );
 
     return {
@@ -1140,7 +1147,8 @@ export const batchSendPetition = mutationField("batchSendPetition", {
 
     const results = await pMap(
       zip([petition, ...clonedPetitions], args.contactIdGroups),
-      async ([petition, contactIds]) => await presendPetition(petition, contactIds, args, ctx),
+      async ([petition, contactIds]) =>
+        await presendPetition(petition, contactIds, args, ctx.user!, ctx),
       { concurrency: 5 }
     );
 
@@ -1198,7 +1206,7 @@ export const sendPetition = mutationField("sendPetition", {
       accesses,
       messages,
       petition: updatedPetition,
-    } = await presendPetition(petition, args.contactIds, args, ctx);
+    } = await presendPetition(petition, args.contactIds, args, ctx.user!, ctx);
 
     if (result === "FAILURE" && error.constraint === "petition_access__petition_id_contact_id") {
       throw new WhitelistedError(

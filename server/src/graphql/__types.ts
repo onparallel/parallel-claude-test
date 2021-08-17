@@ -419,6 +419,7 @@ export interface NexusGenObjects {
   PublicPetitionField: db.PetitionField;
   PublicPetitionFieldComment: db.PetitionFieldComment;
   PublicPetitionFieldReply: db.PetitionFieldReply;
+  PublicPetitionLink: db.PublicPetitionLink;
   PublicPetitionMessage: db.PetitionMessage;
   PublicSignatureConfig: {
     contactIds: number[];
@@ -782,6 +783,7 @@ export interface NexusGenFieldTypes {
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
+    publicCreateAndSendPetitionFromPublicLink: NexusGenEnums["Result"]; // Result!
     publicCreateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
@@ -1237,6 +1239,12 @@ export interface NexusGenFieldTypes {
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
+  PublicPetitionLink: {
+    // field return type
+    description: string; // String!
+    id: NexusGenScalars["GID"]; // GID!
+    title: string; // String!
+  };
   PublicPetitionMessage: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
@@ -1278,6 +1286,7 @@ export interface NexusGenFieldTypes {
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     publicOrgLogoUrl: string | null; // String
+    publicPetitionLinkBySlug: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
@@ -1812,6 +1821,7 @@ export interface NexusGenFieldTypeNames {
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
+    publicCreateAndSendPetitionFromPublicLink: "Result";
     publicCreateCheckboxReply: "PublicPetitionFieldReply";
     publicCreateDynamicSelectReply: "PublicPetitionFieldReply";
     publicCreateFileUploadReply: "CreateFileUploadReply";
@@ -2267,6 +2277,12 @@ export interface NexusGenFieldTypeNames {
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
   };
+  PublicPetitionLink: {
+    // field return type name
+    description: "String";
+    id: "GID";
+    title: "String";
+  };
   PublicPetitionMessage: {
     // field return type name
     id: "GID";
@@ -2308,6 +2324,7 @@ export interface NexusGenFieldTypeNames {
     petitions: "PetitionBasePagination";
     petitionsById: "PetitionBase";
     publicOrgLogoUrl: "String";
+    publicPetitionLinkBySlug: "PublicPetitionLink";
     publicTemplates: "PetitionTemplatePagination";
     searchUsers: "UserOrUserGroup";
     tags: "TagPagination";
@@ -2865,6 +2882,13 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       signer?: NexusGenInputs["PublicPetitionSignerData"] | null; // PublicPetitionSignerData
     };
+    publicCreateAndSendPetitionFromPublicLink: {
+      // args
+      contactEmail: string; // String!
+      contactFirstName: string; // String!
+      contactLastName: string; // String!
+      publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
+    };
     publicCreateCheckboxReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
@@ -3328,6 +3352,10 @@ export interface NexusGenArgTypes {
     publicOrgLogoUrl: {
       // args
       id: NexusGenScalars["GID"]; // GID!
+    };
+    publicPetitionLinkBySlug: {
+      // args
+      slug: string; // String!
     };
     publicTemplates: {
       // args

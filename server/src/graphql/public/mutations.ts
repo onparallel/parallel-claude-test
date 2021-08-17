@@ -23,8 +23,10 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { jsonArg } from "../helpers/json";
 import { RESULT } from "../helpers/result";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { fieldAttachmentBelongsToField } from "../petition/authorizers";
+import { presendPetition } from "../petition/mutations";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -32,6 +34,7 @@ import {
   fieldBelongsToAccess,
   fieldHasType,
   getContactAuthCookieValue,
+  isValidPublicPetitionLink,
   replyBelongsToAccess,
   replyIsForFieldOfType,
 } from "./authorizers";
@@ -965,3 +968,84 @@ export const publicOptOutReminders = mutationField("publicOptOutReminders", {
     return (await ctx.petitions.optOutReminders([access!.id]))[0];
   },
 });
+
+export const publicCreateAndSendPetitionFromPublicLink = mutationField(
+  "publicCreateAndSendPetitionFromPublicLink",
+  {
+    description:
+      "Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args",
+    type: "Result",
+    args: {
+      publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
+      contactFirstName: nonNull(stringArg()),
+      contactLastName: nonNull(stringArg()),
+      contactEmail: nonNull(stringArg()),
+    },
+
+    authorize: isValidPublicPetitionLink("publicPetitionLinkId"),
+    validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
+    resolve: async (_, args, ctx) => {
+      // for now we can assume that the first user in the array is the owner of the link
+      const [publicPetitionLink, [linkOwner]] = await Promise.all([
+        ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId),
+        ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(args.publicPetitionLinkId),
+      ]);
+
+      return await ctx.petitions.withTransaction(async (t) => {
+        const [newPetition, contact] = await Promise.all([
+          ctx.petitions.clonePetition(
+            publicPetitionLink!.template_id,
+            linkOwner!,
+            {
+              is_template: false,
+              status: "DRAFT",
+            },
+            true,
+            t
+          ),
+          ctx.contacts.loadOrCreate(
+            {
+              email: args.contactEmail,
+              firstName: args.contactFirstName,
+              lastName: args.contactLastName,
+              orgId: linkOwner!.org_id,
+            },
+            `PublicPetitionLink:${args.publicPetitionLinkId}`,
+            t
+          ),
+        ]);
+
+        // presend petition to contact
+        const { result, messages, error } = await presendPetition(
+          newPetition,
+          [contact.id],
+          {
+            subject: newPetition.email_subject!,
+            body: JSON.parse(newPetition.email_body!),
+          },
+          linkOwner!,
+          ctx,
+          t
+        );
+
+        if (error) throw error; // transaction rollback
+
+        // trigger emails and events
+        if (result === "SUCCESS") {
+          await Promise.all([
+            ctx.emails.sendPetitionMessageEmail(messages!.map((s) => s.id)),
+            ctx.petitions.createEvent(
+              messages!.map((message) => ({
+                type: "MESSAGE_SENT",
+                data: { petition_message_id: message.id },
+                petition_id: message.petition_id,
+              })),
+              t
+            ),
+          ]);
+        }
+        return result;
+      });
+    },
+  }
+);

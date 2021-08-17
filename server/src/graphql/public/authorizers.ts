@@ -1,6 +1,7 @@
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
+import { countBy, isDefined } from "remeda";
 import { PetitionFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
@@ -151,5 +152,47 @@ export function commentsBelongsToAccess<
       );
     } catch {}
     return false;
+  };
+}
+
+export function isValidPublicPetitionLink<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(argPublicPetitionLinkId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const id = args[argPublicPetitionLinkId] as number;
+
+    const [publicPetitionLink, publicPetitionLinkUsers] = await Promise.all([
+      ctx.petitions.loadPublicPetitionLink(id),
+      ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(id),
+    ]);
+
+    // public link exists and is active
+    if (!publicPetitionLink || !publicPetitionLink.is_active) {
+      return false;
+    }
+
+    // link owner exists
+    if (publicPetitionLinkUsers.length === 0 || !publicPetitionLinkUsers.every(isDefined)) {
+      return false;
+    }
+
+    const [petition, fields] = await Promise.all([
+      ctx.petitions.loadPetition(publicPetitionLink.template_id),
+      ctx.petitions.loadFieldsForPetition(publicPetitionLink.template_id),
+    ]);
+
+    // petition exists and is of type template
+    if (!petition || !petition.is_template) {
+      return false;
+    }
+
+    // template has repliable fields
+    if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
+      return false;
+    }
+
+    return true;
   };
 }

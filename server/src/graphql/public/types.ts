@@ -428,3 +428,12 @@ export const PublicPetitionFieldComment = objectType({
     });
   },
 });
+
+export const PublicPetitionLink = objectType({
+  name: "PublicPetitionLink",
+  definition(t) {
+    t.globalId("id");
+    t.nonNull.string("title");
+    t.nonNull.string("description");
+  },
+});
