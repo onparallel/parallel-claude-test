@@ -310,16 +310,6 @@
     "context": "Search for existing contacts or enter a valid email."
   },
   {
-    "term": "component.cookie-consent.accept-button",
-    "definition": "Aceptar",
-    "context": "Accept"
-  },
-  {
-    "term": "component.cookie-consent.text",
-    "definition": "Las cookies nos ayudan a mejorar tu experiencia y personalizar el contenido. Usando nuestra página, aceptas nuestra <a>uso de cookies</a>.",
-    "context": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>."
-  },
-  {
     "term": "component.copy-signature-config-dialog.body",
     "definition": "Has asignado a {contacts} para firmar la primera petición.",
     "context": "You have assigned {contacts} to sign the first petition."
@@ -2133,6 +2123,71 @@
     "term": "component.template-header.use-template",
     "definition": "Usar esta plantilla",
     "context": "Use this template"
+  },
+  {
+    "term": "component.third-party.accept-button",
+    "definition": "Aceptar cookies",
+    "context": "Accept cookies"
+  },
+  {
+    "term": "component.third-party.advertising-description",
+    "definition": "Las cookies de marketing se utilizan para rastrear a los visitantes en las páginas web. La intención es mostrar anuncios relevantes y atractivos para el usuario individual, y por lo tanto, más valiosos para los editores y terceros anunciantes.",
+    "context": "Marketing cookies are used to track visitors across websites. The intention is to display ads that are relevant and engaging for the individual user and thereby more valuable for publishers and third party advertisers."
+  },
+  {
+    "term": "component.third-party.advertising-title",
+    "definition": "Marketing",
+    "context": "Marketing"
+  },
+  {
+    "term": "component.third-party.analytics-description",
+    "definition": "Las cookies estadísticas ayudan a los propietarios de páginas web a comprender cómo interactúan los visitantes con las páginas web reuniendo y proporcionando información de forma anónima.",
+    "context": "Statistic cookies help website owners to understand how visitors interact with websites by collecting and reporting information anonymously."
+  },
+  {
+    "term": "component.third-party.analytics-title",
+    "definition": "Estadísticas",
+    "context": "Statistics"
+  },
+  {
+    "term": "component.third-party.banner-read-more",
+    "definition": "Lee más sobre nuestra política de cookies",
+    "context": "Read more about our cookie policy"
+  },
+  {
+    "term": "component.third-party.banner-text",
+    "definition": "Utilizamos cookies y otras tecnologías similares para ayudarnos a mejorar la tu experiencia y personalizar el contenido y los anuncios.",
+    "context": "We use cookies and other similar technologies to help us improve your experience and personalize the content and advertising."
+  },
+  {
+    "term": "component.third-party.functional-description",
+    "definition": "Las cookies necesarias ayudan a hacer una página web utilizable activando funciones básicas como la navegación en la página y el acceso a áreas seguras de la página web. La página web no puede funcionar adecuadamente sin estas cookies.",
+    "context": "Necessary cookies help make a website usable by enabling basic functions like page navigation and access to secure areas of the website. The website cannot function properly without these cookies."
+  },
+  {
+    "term": "component.third-party.functional-title",
+    "definition": "Necesarias",
+    "context": "Necessary"
+  },
+  {
+    "term": "component.third-party.manage-button",
+    "definition": "Gestionar cookies",
+    "context": "Manage cookies"
+  },
+  {
+    "term": "component.third-party.preferences-description",
+    "definition": "Utilizamos los datos recopilados por cookies y librerías JavaScript para mejorar tu experiencia de navegación, analizar el tráfico web de esta página, ofrecer anuncios personalizados y mejorar el rendimiento general de nuestra página.",
+    "context": "We use data collected by cookies and JavaScript libraries to improve your browsing experience, analyze site traffic, deliver personalized advertisements, and increase the overall performance of our site."
+  },
+  {
+    "term": "component.third-party.preferences-header",
+    "definition": "Preferencias de cookies en Parallel",
+    "context": "Parallel cookie preferences"
+  },
+  {
+    "term": "component.third-party.preferences-save",
+    "definition": "Guardar preferencias",
+    "context": "Save preferences"
   },
   {
     "term": "component.user-menu.log-out",

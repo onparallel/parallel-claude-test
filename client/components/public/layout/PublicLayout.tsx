@@ -8,7 +8,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
-import { CookieConsent } from "./CookieConsent";
+import { ThirdParty } from "./ThirdParty";
 import { PublicFooter } from "./PublicFooter";
 import { PublicHeader } from "./PublicHeader";
 
@@ -78,19 +78,13 @@ export function PublicLayout({
           />
         ))}
       </Head>
-      {process.env.NODE_ENV !== "development" ? (
-        <>
-          <Hubspot />
-          <Segment />
-        </>
-      ) : null}
       <Flex direction="column" minHeight="100vh">
         {hideHeader ? null : <PublicHeader position="sticky" top={0} zIndex={1} />}
         <Flex as="main" flex="1" direction="column">
           {children}
         </Flex>
         {hideFooter ? null : <PublicFooter />}
-        <CookieConsent />
+        <ThirdParty />
       </Flex>
     </>
   );
