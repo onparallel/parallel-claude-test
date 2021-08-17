@@ -129,7 +129,7 @@ export function ThirdParty() {
     [intl.locale]
   );
 
-  async function enableThirdParty() {
+  async function enableThirdParty(cookiePreferences: Record<CookieType, boolean> | null) {
     if (!cookiePreferences || !window.analytics || (window.analytics as any).initialized) {
       return;
     }
@@ -169,7 +169,7 @@ export function ThirdParty() {
   }
 
   useEffect(() => {
-    enableThirdParty().then();
+    enableThirdParty(cookiePreferences).then();
   }, []);
 
   function handleSavePreferences() {
@@ -178,8 +178,12 @@ export function ThirdParty() {
       updatedAt: new Date().toISOString(),
     });
     setShowCookiePreferences(null);
-    // reload to make sure new preferences are applied
-    setTimeout(() => document.location.reload());
+    if (cookiePreferences === null) {
+      enableThirdParty(tempCookiePreferences).then();
+    } else {
+      // reload to make sure new preferences are applied
+      setTimeout(() => document.location.reload());
+    }
   }
 
   function handleAcceptAllCookies() {
@@ -187,7 +191,7 @@ export function ThirdParty() {
       ...ACCEPT_ALL,
       updatedAt: new Date().toISOString(),
     });
-    enableThirdParty().then();
+    enableThirdParty(ACCEPT_ALL).then();
   }
 
   return (
