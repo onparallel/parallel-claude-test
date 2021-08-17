@@ -1,6 +1,4 @@
 import { Flex } from "@chakra-ui/react";
-import { Hubspot } from "@parallel/components/scripts/Hubspot";
-import { Segment } from "@parallel/components/scripts/Segment";
 import languages from "@parallel/lang/languages.json";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe } from "@parallel/utils/types";
@@ -8,9 +6,9 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
-import { ThirdParty } from "./ThirdParty";
 import { PublicFooter } from "./PublicFooter";
 import { PublicHeader } from "./PublicHeader";
+import { ThirdParty } from "./ThirdParty";
 
 export interface PublicLayoutProps {
   title: string;

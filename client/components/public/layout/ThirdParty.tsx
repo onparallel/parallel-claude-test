@@ -22,12 +22,11 @@ import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/query
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { useEffect } from "react";
-import { ReactNode, useMemo, useState } from "react";
+import { serialize as serializeCookie } from "cookie";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { PublicContainer } from "./PublicContainer";
-import { serialize as serializeCookie } from "cookie";
 
 type CookieType = "FUNCTIONAL" | "ANALYTICS" | "ADVERTISING";
 type CookiePreferences = Record<CookieType, boolean> & {
@@ -179,12 +178,8 @@ export function ThirdParty() {
       updatedAt: new Date().toISOString(),
     });
     setShowCookiePreferences(null);
-    if (cookiePreferences === null) {
-      enableThirdParty().then();
-    } else {
-      // reload to make sure new preferences are applied
-      setTimeout(() => document.location.reload());
-    }
+    // reload to make sure new preferences are applied
+    setTimeout(() => document.location.reload());
   }
 
   function handleAcceptAllCookies() {
