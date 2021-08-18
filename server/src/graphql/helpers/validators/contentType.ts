@@ -18,6 +18,12 @@ export function contentType<TypeName extends string, FieldName extends string>(
       const result = await fromStream(upload.createReadStream());
       if (result && match(result.mime, contentType)) {
         return;
+      } else {
+        throw new ArgValidationError(
+          info,
+          argName,
+          `Expected ${contentType}, got ${result?.mime ?? "Unknown"}`
+        );
       }
     }
     throw new ArgValidationError(info, argName, `Expected ${contentType}, got ${upload.mimetype}`);
