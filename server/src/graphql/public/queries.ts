@@ -46,6 +46,25 @@ export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
     slug: nonNull(stringArg()),
   },
   resolve: async (_, { slug }, ctx) => {
-    return await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
+    const publicPetitionLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
+    if (!publicPetitionLink) {
+      return null;
+    }
+    const [linkOwner] = await ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(
+      publicPetitionLink.id
+    );
+    if (!linkOwner) {
+      return null;
+    }
+    const [organization, orgLogoUrl] = await Promise.all([
+      ctx.organizations.loadOrg(linkOwner.org_id),
+      ctx.organizations.getOrgLogoUrl(linkOwner.org_id),
+    ]);
+
+    return {
+      ...publicPetitionLink,
+      orgName: organization!.name,
+      orgLogoUrl,
+    };
   },
 });

@@ -435,5 +435,7 @@ export const PublicPetitionLink = objectType({
     t.globalId("id");
     t.nonNull.string("title");
     t.nonNull.string("description");
+    t.nonNull.string("orgName");
+    t.nullable.string("orgLogoUrl");
   },
 });

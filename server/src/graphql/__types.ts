@@ -1243,6 +1243,8 @@ export interface NexusGenFieldTypes {
     // field return type
     description: string; // String!
     id: NexusGenScalars["GID"]; // GID!
+    orgLogoUrl: string | null; // String
+    orgName: string; // String!
     title: string; // String!
   };
   PublicPetitionMessage: {
@@ -2281,6 +2283,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     description: "String";
     id: "GID";
+    orgLogoUrl: "String";
+    orgName: "String";
     title: "String";
   };
   PublicPetitionMessage: {

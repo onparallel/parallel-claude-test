@@ -2851,6 +2851,8 @@ type PublicPetitionFieldReply implements Timestamps {
 type PublicPetitionLink {
   description: String!
   id: GID!
+  orgLogoUrl: String
+  orgName: String!
   title: String!
 }
 

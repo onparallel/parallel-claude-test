@@ -20,8 +20,6 @@ export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV";
 
-export type OrganizationUsageLimitPeriod = "month" | "year";
-
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export type PetitionContactNotificationType = "COMMENT_CREATED";
@@ -136,6 +134,8 @@ export interface TableTypes {
   petition_tag: PetitionTag;
   petition_user_notification: PetitionUserNotification;
   public_file_upload: PublicFileUpload;
+  public_petition_link: PublicPetitionLink;
+  public_petition_link_user: PublicPetitionLinkUser;
   system_event: SystemEvent;
   tag: Tag;
   temporary_file: TemporaryFile;
@@ -173,6 +173,8 @@ export interface TableCreateTypes {
   petition_tag: CreatePetitionTag;
   petition_user_notification: CreatePetitionUserNotification;
   public_file_upload: CreatePublicFileUpload;
+  public_petition_link: CreatePublicPetitionLink;
+  public_petition_link_user: CreatePublicPetitionLinkUser;
   system_event: CreateSystemEvent;
   tag: CreateTag;
   temporary_file: CreateTemporaryFile;
@@ -210,6 +212,8 @@ export interface TablePrimaryKeys {
   petition_tag: "id";
   petition_user_notification: "id";
   public_file_upload: "id";
+  public_petition_link: "id";
+  public_petition_link_user: "id";
   system_event: "id";
   tag: "id";
   temporary_file: "id";
@@ -791,6 +795,41 @@ export interface PublicFileUpload {
 
 export type CreatePublicFileUpload = PartialProps<
   Omit<PublicFileUpload, "id">,
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface PublicPetitionLink {
+  id: number; // int4
+  template_id: number; // int4
+  title: string; // varchar
+  description: string; // varchar
+  slug: string; // varchar
+  is_active: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+}
+
+export type CreatePublicPetitionLink = PartialProps<
+  Omit<PublicPetitionLink, "id">,
+  "is_active" | "created_at" | "created_by" | "updated_at" | "updated_by"
+>;
+
+export interface PublicPetitionLinkUser {
+  id: number; // int4
+  public_petition_link_id: number; // int4
+  user_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreatePublicPetitionLinkUser = PartialProps<
+  Omit<PublicPetitionLinkUser, "id">,
   "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
 >;
 
