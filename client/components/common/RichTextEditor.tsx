@@ -575,7 +575,6 @@ function HeadingButton({ ...props }: Pick<ToolbarButtonProps, "isDisabled">) {
         variant="ghost"
         tabIndex={-1}
         onMouseDown={getPreventDefaultHandler(() => {
-          console.log(editor.selection);
           selectionRef.current = editor.selection;
         })}
         label={intl.formatMessage({
