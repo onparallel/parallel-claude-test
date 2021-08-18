@@ -59,6 +59,29 @@ createQueueWorker(
           }),
         ]);
       }
+    } else if (event === "complaint") {
+      const [message, reminder] = await Promise.all([
+        context.petitions.loadMessageByEmailLogId(emailLogId),
+        context.petitions.loadReminderByEmailLogId(emailLogId),
+      ]);
+
+      if (message || reminder) {
+        const access = await context.petitions.loadAccess(
+          message?.petition_access_id ?? reminder!.petition_access_id
+        );
+        if (access && !access.reminders_opt_out) {
+          await context.petitions.optOutReminders([access.id]);
+          await context.petitions.createEvent({
+            type: "REMINDERS_OPT_OUT",
+            petition_id: access.petition_id,
+            data: {
+              petition_access_id: access!.id,
+              reason: "SPAM",
+              other: "",
+            },
+          });
+        }
+      }
     }
   },
   {

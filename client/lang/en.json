@@ -5465,6 +5465,11 @@
     "context": "Other"
   },
   {
+    "term": "public.opt-out.answer-spam",
+    "definition": "I consider this is SPAM",
+    "context": "I consider this is SPAM"
+  },
+  {
     "term": "public.opt-out.answer-wrong-person",
     "definition": "I am not the person to complete this information",
     "context": "I am not the person to complete this information"
