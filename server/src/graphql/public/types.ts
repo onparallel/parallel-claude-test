@@ -435,7 +435,31 @@ export const PublicPetitionLink = objectType({
     t.globalId("id");
     t.nonNull.string("title");
     t.nonNull.string("description");
-    t.nonNull.string("orgName");
-    t.nullable.string("orgLogoUrl");
+    t.nonNull.field("organization", {
+      type: objectType({
+        name: "PublicPetitionLinkOwnerOrganization",
+        definition(t) {
+          t.nonNull.string("name");
+          t.nullable.string("logoUrl");
+        },
+      }),
+      resolve: async (root, _, ctx) => {
+        const [linkOwner] = await ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(
+          root.id
+        );
+        if (!linkOwner) {
+          throw new Error(`Can't find owner of PublicPetitionLink:${root.id}`);
+        }
+        const organization = await ctx.organizations.loadOrg(linkOwner.org_id);
+        if (!organization) {
+          throw new Error(`Can't find organization of User:${linkOwner.id}`);
+        }
+
+        return {
+          name: organization.name,
+          logoUrl: await ctx.organizations.getOrgLogoUrl(organization.id),
+        };
+      },
+    });
   },
 });

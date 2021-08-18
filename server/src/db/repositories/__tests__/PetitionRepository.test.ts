@@ -466,10 +466,7 @@ describe("repositories/PetitionRepository", () => {
       test("should insert new permission for user without access to the petitions", async () => {
         const { newPermissions } = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
-          [users[1].id],
-          [],
-          "READ",
-          true,
+          [{ type: "User", id: users[1].id, isSubscribed: true, permissionType: "READ" }],
           users[0]
         );
 
@@ -495,19 +492,13 @@ describe("repositories/PetitionRepository", () => {
       test("should not set new permission for user with access to the petitions", async () => {
         const { newPermissions: firstPermissions } = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
-          [users[2].id],
-          [],
-          "WRITE",
-          true,
+          [{ type: "User", id: users[2].id, isSubscribed: true, permissionType: "READ" }],
           users[0]
         );
 
         const { newPermissions } = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
-          [users[2].id],
-          [],
-          "READ",
-          true,
+          [{ type: "User", id: users[2].id, isSubscribed: true, permissionType: "READ" }],
           users[0]
         );
         expect(firstPermissions).toHaveLength(1);
@@ -518,10 +509,7 @@ describe("repositories/PetitionRepository", () => {
         const petitionIds = user0Petitions.map((u) => u.id);
         const { newPermissions } = await petitions.addPetitionPermissions(
           petitionIds,
-          [users[3].id],
-          [],
-          "WRITE",
-          true,
+          [{ type: "User", id: users[3].id, isSubscribed: true, permissionType: "WRITE" }],
           users[0]
         );
 
@@ -550,10 +538,7 @@ describe("repositories/PetitionRepository", () => {
         const petitionId = user0Petitions[1].id;
         const { newPermissions } = await petitions.addPetitionPermissions(
           [petitionId],
-          userIds,
-          [],
-          "READ",
-          true,
+          userIds.map((id) => ({ type: "User", id, isSubscribed: true, permissionType: "READ" })),
           users[0]
         );
 
@@ -567,10 +552,7 @@ describe("repositories/PetitionRepository", () => {
         const petitionIds = user0Petitions.map((p) => p.id);
         const { newPermissions } = await petitions.addPetitionPermissions(
           petitionIds,
-          userIds,
-          [],
-          "WRITE",
-          true,
+          userIds.map((id) => ({ type: "User", id, isSubscribed: true, permissionType: "WRITE" })),
           users[0]
         );
 
@@ -585,7 +567,11 @@ describe("repositories/PetitionRepository", () => {
         await mocks.clearSharedPetitions();
         petitionId = user0Petitions[0].id;
         userId = users[1].id;
-        await petitions.addPetitionPermissions([petitionId], [userId], [], "READ", true, users[0]);
+        await petitions.addPetitionPermissions(
+          [petitionId],
+          [{ type: "User", id: userId, permissionType: "READ", isSubscribed: true }],
+          users[0]
+        );
       });
 
       test("should update permissions for users with shared petitions", async () => {
@@ -634,7 +620,11 @@ describe("repositories/PetitionRepository", () => {
         await mocks.clearSharedPetitions();
         petitionId = user0Petitions[0].id;
         userId = users[1].id;
-        await petitions.addPetitionPermissions([petitionId], [userId], [], "READ", true, users[0]);
+        await petitions.addPetitionPermissions(
+          [petitionId],
+          [{ type: "User", id: userId, permissionType: "READ", isSubscribed: true }],
+          users[0]
+        );
       });
 
       test("should remove access to a single petition for a single user", async () => {
@@ -653,10 +643,12 @@ describe("repositories/PetitionRepository", () => {
       test("should remove access to a single petition for multiple users", async () => {
         await petitions.addPetitionPermissions(
           [petitionId],
-          [users[2].id, users[3].id],
-          [],
-          "READ",
-          true,
+          [users[2].id, users[3].id].map((userId) => ({
+            type: "User",
+            id: userId,
+            isSubscribed: true,
+            permissionType: "READ",
+          })),
           users[0]
         );
 
@@ -687,10 +679,7 @@ describe("repositories/PetitionRepository", () => {
       test("should remove access to multiple petitions for a single user", async () => {
         await petitions.addPetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
-          [users[1].id],
-          [],
-          "WRITE",
-          true,
+          [{ type: "User", id: users[1].id, isSubscribed: true, permissionType: "WRITE" }],
           users[0]
         );
 
@@ -716,10 +705,7 @@ describe("repositories/PetitionRepository", () => {
       test("ignores the userIds array when passing removeAll = true arg", async () => {
         await petitions.addPetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
-          [users[1].id],
-          [],
-          "WRITE",
-          true,
+          [{ type: "User", id: users[1].id, isSubscribed: true, permissionType: "WRITE" }],
           users[0]
         );
 
@@ -744,10 +730,12 @@ describe("repositories/PetitionRepository", () => {
       test("should remove access to multiple petitions for multiple user", async () => {
         await petitions.addPetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id],
-          [users[1].id, users[2].id, users[3].id],
-          [],
-          "WRITE",
-          true,
+          [users[1].id, users[2].id, users[3].id].map((userId) => ({
+            type: "User",
+            id: userId,
+            isSubscribed: true,
+            permissionType: "WRITE",
+          })),
           users[0]
         );
 
@@ -812,7 +800,11 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user with READ or WRITE access", async () => {
         const petitionId = user0Petitions[2].id;
         const userId = users[2].id;
-        await petitions.addPetitionPermissions([petitionId], [userId], [], "READ", true, users[0]);
+        await petitions.addPetitionPermissions(
+          [petitionId],
+          [{ type: "User", id: userId, isSubscribed: true, permissionType: "READ" }],
+          users[0]
+        );
 
         await petitions.transferOwnership([petitionId], userId, true, users[0]);
         const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
@@ -833,7 +825,11 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user with READ or WRITE access and remove original permissions", async () => {
         const petitionId = user0Petitions[2].id;
         const userId = users[2].id;
-        await petitions.addPetitionPermissions([petitionId], [userId], [], "READ", true, users[0]);
+        await petitions.addPetitionPermissions(
+          [petitionId],
+          [{ type: "User", id: userId, permissionType: "READ", isSubscribed: true }],
+          users[0]
+        );
 
         await petitions.transferOwnership([petitionId], userId, false, users[0]);
 

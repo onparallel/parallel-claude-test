@@ -79,10 +79,20 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
     const { petitions, newPermissions } = await ctx.petitions.withTransaction(async (t) => {
       const { petitions, newPermissions } = await ctx.petitions.addPetitionPermissions(
         args.petitionIds,
-        args.userIds ?? [],
-        args.userGroupIds ?? [],
-        args.permissionType,
-        args.subscribe ?? true,
+        [
+          ...(args.userIds ?? []).map((userId) => ({
+            type: "User" as const,
+            id: userId,
+            isSubscribed: args.subscribe ?? true,
+            permissionType: args.permissionType,
+          })),
+          ...(args.userGroupIds ?? []).map((userGroupId) => ({
+            type: "UserGroup" as const,
+            id: userGroupId,
+            isSubscribed: args.subscribe ?? true,
+            permissionType: args.permissionType,
+          })),
+        ],
         ctx.user!,
         t
       );

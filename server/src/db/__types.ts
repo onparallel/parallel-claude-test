@@ -435,6 +435,7 @@ export interface Petition {
   skip_forward_security: boolean; // bool
   is_readonly: boolean; // bool
   public_metadata: Maybe<any>; // jsonb
+  from_public_petition_link_id: Maybe<number>; // int4
 }
 
 export type CreatePetition = PartialProps<
@@ -463,6 +464,7 @@ export type CreatePetition = PartialProps<
   | "skip_forward_security"
   | "is_readonly"
   | "public_metadata"
+  | "from_public_petition_link_id"
 >;
 
 export interface PetitionAccess {
@@ -802,7 +804,7 @@ export interface PublicPetitionLink {
   id: number; // int4
   template_id: number; // int4
   title: string; // varchar
-  description: string; // varchar
+  description: string; // text
   slug: string; // varchar
   is_active: boolean; // bool
   created_at: Date; // timestamptz
@@ -819,7 +821,11 @@ export type CreatePublicPetitionLink = PartialProps<
 export interface PublicPetitionLinkUser {
   id: number; // int4
   public_petition_link_id: number; // int4
-  user_id: number; // int4
+  user_id: Maybe<number>; // int4
+  type: PetitionPermissionType; // petition_permission_type
+  is_subscribed: boolean; // bool
+  user_group_id: Maybe<number>; // int4
+  from_user_group_id: Maybe<number>; // int4
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -830,7 +836,16 @@ export interface PublicPetitionLinkUser {
 
 export type CreatePublicPetitionLinkUser = PartialProps<
   Omit<PublicPetitionLinkUser, "id">,
-  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+  | "user_id"
+  | "is_subscribed"
+  | "user_group_id"
+  | "from_user_group_id"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface SystemEvent {

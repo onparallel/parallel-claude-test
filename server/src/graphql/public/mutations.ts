@@ -5,6 +5,7 @@ import {
   list,
   mutationField,
   nonNull,
+  nullable,
   objectType,
   stringArg,
 } from "@nexus/schema";
@@ -21,12 +22,12 @@ import { and, chain, checkClientServerToken } from "../helpers/authorize";
 import { ArgValidationError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { jsonArg } from "../helpers/json";
+import { presendPetition } from "../helpers/presendPetition";
 import { RESULT } from "../helpers/result";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { fieldAttachmentBelongsToField } from "../petition/authorizers";
-import { presendPetition } from "../petition/mutations";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -980,12 +981,29 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
       contactFirstName: nonNull(stringArg()),
       contactLastName: nonNull(stringArg()),
       contactEmail: nonNull(stringArg()),
+      force: nullable(
+        booleanArg({
+          description:
+            "Set to true to force the creation + send of a new petition if the contact already has an active access on this public link",
+        })
+      ),
     },
-
     authorize: isValidPublicPetitionLink("publicPetitionLinkId"),
     validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
     resolve: async (_, args, ctx) => {
-      // for now we can assume that the first user in the array is the owner of the link
+      if (
+        !args.force &&
+        (await ctx.petitions.contactHasAccessFromPublicPetitionLink(
+          args.contactEmail,
+          args.publicPetitionLinkId
+        ))
+      ) {
+        throw new WhitelistedError(
+          "Contact already has access on this link.",
+          "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
+        );
+      }
+
       const [publicPetitionLink, [linkOwner]] = await Promise.all([
         ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId),
         ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(args.publicPetitionLinkId),
@@ -999,8 +1017,9 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             {
               is_template: false,
               status: "DRAFT",
+              from_public_petition_link_id: args.publicPetitionLinkId,
             },
-            true,
+            false, // do not insert permissions for the cloned petition
             t
           ),
           ctx.contacts.loadOrCreate(
@@ -1015,18 +1034,25 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           ),
         ]);
 
-        // presend petition to contact
-        const { result, messages, error } = await presendPetition(
-          newPetition,
-          [contact.id],
-          {
-            subject: newPetition.email_subject!,
-            body: JSON.parse(newPetition.email_body!),
-          },
-          linkOwner!,
-          ctx,
-          t
-        );
+        // presend petition to contact and insert petition_permissions
+        const [{ result, messages, error }] = await Promise.all([
+          presendPetition(
+            newPetition,
+            [contact.id],
+            {
+              subject: newPetition.email_subject!,
+              body: JSON.parse(newPetition.email_body!),
+            },
+            linkOwner!,
+            ctx,
+            t
+          ),
+          ctx.petitions.clonePublicPetitionLinkUsersIntoPetitionPermission(
+            args.publicPetitionLinkId,
+            newPetition.id,
+            t
+          ),
+        ]);
 
         if (error) throw error; // transaction rollback
 

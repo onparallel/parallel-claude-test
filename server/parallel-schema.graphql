@@ -738,6 +738,11 @@ type Mutation {
     contactEmail: String!
     contactFirstName: String!
     contactLastName: String!
+
+    """
+    Set to true to force the creation + send of a new petition if the contact already has an active access on this public link
+    """
+    force: Boolean
     publicPetitionLinkId: GID!
   ): Result!
 
@@ -2851,9 +2856,13 @@ type PublicPetitionFieldReply implements Timestamps {
 type PublicPetitionLink {
   description: String!
   id: GID!
-  orgLogoUrl: String
-  orgName: String!
+  organization: PublicPetitionLinkOwnerOrganization!
   title: String!
+}
+
+type PublicPetitionLinkOwnerOrganization {
+  logoUrl: String
+  name: String!
 }
 
 """

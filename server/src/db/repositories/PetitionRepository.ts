@@ -2568,34 +2568,38 @@ export class PetitionRepository extends BaseRepository {
 
   async addPetitionPermissions(
     petitionIds: number[],
-    userIds: number[],
-    userGroupIds: number[],
-    permissionType: PetitionPermissionType,
-    subscribe: boolean,
-    user: User,
+    data: {
+      type: "User" | "UserGroup";
+      id: number;
+      permissionType: PetitionPermissionType;
+      isSubscribed: boolean;
+    }[],
+    creator: User,
     t?: Knex.Transaction
   ) {
+    const [newUsers, newUserGroups] = partition(data, (d) => d.type === "User");
     return this.withTransaction(async (t) => {
       const [
         directlyAssignedNewUserPermissions,
         userGroupNewPermissions,
         groupAssignedNewUserPermissions,
       ] = await Promise.all([
-        userIds.length > 0
+        newUsers.length > 0
           ? this.raw<PetitionPermission>(
               /* sql */ `
                 ? on conflict do nothing returning *;
               `,
               [
+                // directly-assigned user permissions
                 this.from("petition_permission").insert(
                   petitionIds.flatMap((petitionId) =>
-                    userIds.map((userId) => ({
+                    newUsers.map((user) => ({
                       petition_id: petitionId,
-                      user_id: userId,
-                      is_subscribed: subscribe,
-                      type: permissionType,
-                      created_by: `User:${user.id}`,
-                      updated_by: `User:${user.id}`,
+                      user_id: user.id,
+                      is_subscribed: user.isSubscribed,
+                      type: user.permissionType,
+                      created_by: `User:${creator.id}`,
+                      updated_by: `User:${creator.id}`,
                     }))
                   )
                 ),
@@ -2603,21 +2607,22 @@ export class PetitionRepository extends BaseRepository {
               t
             )
           : [],
-        userGroupIds.length > 0
+        newUserGroups.length > 0
           ? this.raw<PetitionPermission>(
               /* sql */ `
                 ? on conflict do nothing returning *;
               `,
               [
+                // group permissions
                 this.from("petition_permission").insert(
                   petitionIds.flatMap((petitionId) =>
-                    userGroupIds.map((userGroupId) => ({
+                    newUserGroups.map((userGroup) => ({
                       petition_id: petitionId,
-                      user_group_id: userGroupId,
-                      is_subscribed: subscribe,
-                      type: permissionType,
-                      created_by: `User:${user.id}`,
-                      updated_by: `User:${user.id}`,
+                      user_group_id: userGroup.id,
+                      is_subscribed: userGroup.isSubscribed,
+                      type: userGroup.permissionType,
+                      created_by: `User:${creator.id}`,
+                      updated_by: `User:${creator.id}`,
                     }))
                   )
                 ),
@@ -2625,13 +2630,20 @@ export class PetitionRepository extends BaseRepository {
               t
             )
           : [],
-        userGroupIds.length > 0
+        // user permissions through a user group
+        newUserGroups.length > 0
           ? this.raw<PetitionPermission>(
               /* sql */ `
               with gm as (
-                select user_id, user_group_id
-                from user_group_member 
-                where deleted_at is null and user_group_id in (${userGroupIds
+                select ugm.user_id, ugm.user_group_id, ugm_info.is_subscribed, ugm_info.permission_type
+                from user_group_member ugm
+                -- each user group may have different is_subscribed and permission_type values assigned
+                join (select user_group_id, is_subscribed, permission_type from (values ${newUserGroups
+                  .map(() => `(?::int, ?::bool, ?::petition_permission_type)`)
+                  .join(
+                    ","
+                  )}) as t(user_group_id, is_subscribed, permission_type)) as ugm_info on ugm_info.user_group_id = ugm.user_group_id
+                where ugm.deleted_at is null and ugm.user_group_id in (${newUserGroups
                   .map(() => `(?::int)`)
                   .join(", ")})),
               p as (
@@ -2639,10 +2651,16 @@ export class PetitionRepository extends BaseRepository {
                   values ${petitionIds.map(() => "(?::int)").join(", ")}
                 ) as t(petition_id))
               insert into petition_permission(petition_id, user_id, from_user_group_id, is_subscribed, type, created_by)
-              select p.petition_id, gm.user_id, gm.user_group_id, ?, ?, ? from gm cross join p
+              select p.petition_id, gm.user_id, gm.user_group_id, gm.is_subscribed, gm.permission_type, ? 
+              from gm cross join p
               on conflict do nothing returning *;
             `,
-              [...userGroupIds, ...petitionIds, subscribe, permissionType, `User:${user.id}`],
+              [
+                ...newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]).flat(),
+                ...newUserGroups.map((ug) => ug.id),
+                ...petitionIds,
+                `User:${creator.id}`,
+              ],
               t
             )
           : [],
@@ -3319,6 +3337,39 @@ export class PetitionRepository extends BaseRepository {
       .leftJoin("user", "public_petition_link_user.user_id", "user.id")
       .whereNull("user.deleted_at")
       .select("user.*")
-      .orderBy("public_petition_link_user.created_at", "asc");
+      .orderBy("public_petition_link_user.type", "asc"); // OWNER of the public link will be first on the list
+  }
+
+  async contactHasAccessFromPublicPetitionLink(contactEmail: string, publicPetitionLinkId: number) {
+    const [{ count }] = await this.knex
+      .from("petition_access")
+      .join("contact", "contact.id", "petition_access.contact_id")
+      .join("petition", "petition.id", "petition_access.petition_id")
+      .whereNull("petition.deleted_at")
+      .whereNull("contact.deleted_at")
+      .where("petition_access.status", "ACTIVE")
+      .where("petition.from_public_petition_link_id", publicPetitionLinkId)
+      .where("contact.email", contactEmail)
+      .select(this.count());
+
+    return count > 0;
+  }
+
+  async clonePublicPetitionLinkUsersIntoPetitionPermission(
+    publicPetitionLinkId: number,
+    petitionId: number,
+    t?: Knex.Transaction
+  ) {
+    await this.raw(
+      /* sql */ `
+      insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id)
+        (
+          select ?, pplu.user_id, pplu.type, pplu.is_subscribed, pplu.user_group_id, pplu.from_user_group_id 
+          from public_petition_link_user pplu where pplu.public_petition_link_id = ?
+        )
+    `,
+      [petitionId, publicPetitionLinkId],
+      t
+    );
   }
 }

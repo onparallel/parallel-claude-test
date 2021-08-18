@@ -420,6 +420,11 @@ export interface NexusGenObjects {
   PublicPetitionFieldComment: db.PetitionFieldComment;
   PublicPetitionFieldReply: db.PetitionFieldReply;
   PublicPetitionLink: db.PublicPetitionLink;
+  PublicPetitionLinkOwnerOrganization: {
+    // root type
+    logoUrl?: string | null; // String
+    name: string; // String!
+  };
   PublicPetitionMessage: db.PetitionMessage;
   PublicSignatureConfig: {
     contactIds: number[];
@@ -1243,9 +1248,13 @@ export interface NexusGenFieldTypes {
     // field return type
     description: string; // String!
     id: NexusGenScalars["GID"]; // GID!
-    orgLogoUrl: string | null; // String
-    orgName: string; // String!
+    organization: NexusGenRootTypes["PublicPetitionLinkOwnerOrganization"]; // PublicPetitionLinkOwnerOrganization!
     title: string; // String!
+  };
+  PublicPetitionLinkOwnerOrganization: {
+    // field return type
+    logoUrl: string | null; // String
+    name: string; // String!
   };
   PublicPetitionMessage: {
     // field return type
@@ -2283,9 +2292,13 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     description: "String";
     id: "GID";
-    orgLogoUrl: "String";
-    orgName: "String";
+    organization: "PublicPetitionLinkOwnerOrganization";
     title: "String";
+  };
+  PublicPetitionLinkOwnerOrganization: {
+    // field return type name
+    logoUrl: "String";
+    name: "String";
   };
   PublicPetitionMessage: {
     // field return type name
@@ -2891,6 +2904,7 @@ export interface NexusGenArgTypes {
       contactEmail: string; // String!
       contactFirstName: string; // String!
       contactLastName: string; // String!
+      force?: boolean | null; // Boolean
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
     };
     publicCreateCheckboxReply: {
