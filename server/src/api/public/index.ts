@@ -1,9 +1,8 @@
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { pick } from "remeda";
+import { isDefined, pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
-import { isDefined } from "../../util/remedaExtensions";
 import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
 import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";

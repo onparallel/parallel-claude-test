@@ -1,4 +1,4 @@
-import { isDefined } from "../../util/remedaExtensions";
+import { isDefined } from "remeda";
 import { RestBody } from "./core";
 import { InvalidRequestBodyError } from "./errors";
 import { buildValidateSchema, JsonSchemaFor } from "./schemas";

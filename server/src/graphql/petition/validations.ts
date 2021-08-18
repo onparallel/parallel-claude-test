@@ -1,12 +1,12 @@
-import { PetitionStatus, Petition, PetitionAccess, PetitionAccessStatus } from "../../db/__types";
-import { ArgValidationError } from "../helpers/errors";
-import { GraphQLResolveInfo } from "graphql";
-import { Maybe } from "../../util/types";
-import { toGlobalId } from "../../util/globalId";
 import { ArgsValue } from "@nexus/schema/dist/core";
-import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
+import { GraphQLResolveInfo } from "graphql";
 import { decode } from "jsonwebtoken";
-import { isDefined } from "../../util/remedaExtensions";
+import { isDefined } from "remeda";
+import { Petition, PetitionAccess, PetitionAccessStatus, PetitionStatus } from "../../db/__types";
+import { toGlobalId } from "../../util/globalId";
+import { Maybe } from "../../util/types";
+import { ArgValidationError } from "../helpers/errors";
+import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
 export function validatePetitionStatus(
   petition: Maybe<Petition>,

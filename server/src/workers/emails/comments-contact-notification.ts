@@ -1,11 +1,10 @@
 import pMap from "p-map";
-import { groupBy, sortBy, uniq } from "remeda";
+import { groupBy, isDefined, sortBy, uniq } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCommentsContactNotification from "../../emails/components/PetitionCommentsContactNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { isDefined } from "../../util/remedaExtensions";
 import { buildFieldWithComments } from "../helpers/getFieldWithComments";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 

@@ -1,12 +1,11 @@
 import AWS from "aws-sdk";
 import { createHash } from "crypto";
 import { inject, injectable, interfaces } from "inversify";
-import { chunk } from "remeda";
+import { chunk, isDefined } from "remeda";
 import { Memoize } from "typescript-memoize";
 import { Config, CONFIG } from "../config";
 import { PetitionEvent, SystemEvent } from "../db/events";
 import { unMaybeArray } from "../util/arrays";
-import { isDefined } from "../util/remedaExtensions";
 import { MaybeArray } from "../util/types";
 import { LOGGER, Logger } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";

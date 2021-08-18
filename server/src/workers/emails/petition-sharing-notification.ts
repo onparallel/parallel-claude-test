@@ -1,4 +1,4 @@
-import { indexBy, uniq } from "remeda";
+import { indexBy, isDefined, uniq } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
@@ -7,7 +7,6 @@ import TemplateSharingNotification from "../../emails/components/TemplateSharing
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { isDefined } from "../../util/remedaExtensions";
 import { Maybe } from "../../util/types";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 

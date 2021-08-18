@@ -12,7 +12,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import pMap from "p-map";
-import { omit, pick, zip } from "remeda";
+import { isDefined, omit, pick, zip } from "remeda";
 import { ApiContext } from "../../../context";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
@@ -25,7 +25,6 @@ import {
 import { unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { withError } from "../../../util/promises/withError";
-import { isDefined } from "../../../util/remedaExtensions";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import { random } from "../../../util/token";
 import { userHasAccessToContactGroups, userHasAccessToContacts } from "../../contact/authorizers";
@@ -77,8 +76,8 @@ import {
   userHasAccessToPetitions,
 } from "../authorizers";
 import {
-  validateAccessesRemindersLeft,
   petitionAccessesNotOptedOut,
+  validateAccessesRemindersLeft,
   validateAccessesStatus,
   validatePetitionStatus,
 } from "../validations";

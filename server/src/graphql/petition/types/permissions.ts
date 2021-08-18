@@ -1,5 +1,5 @@
 import { enumType, interfaceType, objectType } from "@nexus/schema";
-import { isDefined } from "../../../util/remedaExtensions";
+import { isDefined } from "remeda";
 
 export const PetitionPermissionTypeRW = enumType({
   name: "PetitionPermissionTypeRW",

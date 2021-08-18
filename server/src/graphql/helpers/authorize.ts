@@ -2,10 +2,10 @@ import { core } from "@nexus/schema";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { AuthenticationError } from "apollo-server-express";
 import pAll from "p-all";
+import { isDefined } from "remeda";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
-import { isDefined } from "../../util/remedaExtensions";
 import { KeysOfType, MaybeArray } from "../../util/types";
 
 export function authenticate<

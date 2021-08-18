@@ -1,7 +1,7 @@
 import { core } from "@nexus/schema";
-import { FieldValidateArgsResolver } from "../validateArgsPlugin";
+import { isDefined } from "remeda";
 import { ArgValidationError } from "../errors";
-import { isDefined } from "../../../util/remedaExtensions";
+import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validIsDefined<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any | null | undefined,

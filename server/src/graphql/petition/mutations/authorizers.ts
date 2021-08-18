@@ -1,8 +1,8 @@
 import { Arg } from "../../helpers/authorize";
 import { unMaybeArray } from "../../../util/arrays";
 import { MaybeArray } from "../../../util/types";
-import { isDefined } from "../../../util/remedaExtensions";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { isDefined } from "remeda";
 
 export function userHasAccessToUsers<
   TypeName extends string,

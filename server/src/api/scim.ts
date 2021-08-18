@@ -1,6 +1,6 @@
 import { json, Router } from "express";
+import { isDefined } from "remeda";
 import { CreateUser, User } from "../db/__types";
-import { isDefined } from "../util/remedaExtensions";
 import { Maybe } from "../util/types";
 
 export const scim = Router().use(

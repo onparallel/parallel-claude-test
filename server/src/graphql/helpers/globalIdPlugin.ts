@@ -6,9 +6,8 @@ import {
   isNonNullType,
   isScalarType,
 } from "graphql";
-import { mapValues, omit } from "remeda";
+import { isDefined, mapValues, omit } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { isDefined } from "../../util/remedaExtensions";
 import { If } from "../../util/types";
 
 export type GlobalIdConfig = {

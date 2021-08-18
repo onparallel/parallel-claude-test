@@ -1,4 +1,4 @@
-import { pick, zip } from "remeda";
+import { isDefined, pick, zip } from "remeda";
 import { WorkerContext } from "../../context";
 import { Contact, EmailLog, PetitionAccess } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
@@ -7,7 +7,6 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { isDefined } from "../../util/remedaExtensions";
 import { Maybe } from "../../util/types";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 

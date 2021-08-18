@@ -1,4 +1,4 @@
-import { purry } from "remeda";
+import { isDefined, purry } from "remeda";
 
 type ObjectPredicate<K extends string | number | symbol, V> = (entry: [K, V]) => boolean;
 
@@ -25,10 +25,6 @@ export function removeKeys<K extends string | number | symbol, V, R = Record<K, 
 export function removeKeys() {
   // eslint-disable-next-line prefer-rest-params
   return purry(_removeKeys, arguments);
-}
-
-export function isDefined<T>(value: T): value is Exclude<T, null | undefined> {
-  return value !== undefined && value !== null;
 }
 
 export function removeNotDefined<T extends {}>(

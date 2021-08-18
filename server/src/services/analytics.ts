@@ -1,10 +1,10 @@
 import Analytics from "analytics-node";
 import { inject, injectable } from "inversify";
+import { isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
 import { PetitionStatus, User } from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
-import { isDefined } from "../util/remedaExtensions";
 import { titleize } from "../util/strings";
 import { MaybeArray } from "../util/types";
 

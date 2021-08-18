@@ -1,6 +1,6 @@
 import { core } from "@nexus/schema";
+import { isDefined } from "remeda";
 import { fromGlobalIds } from "../../../util/globalId";
-import { isDefined } from "../../../util/remedaExtensions";
 import { isValidTimezone } from "../../../util/validators";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";

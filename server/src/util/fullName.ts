@@ -1,4 +1,4 @@
-import { isDefined } from "./remedaExtensions";
+import { isDefined } from "remeda";
 import { Maybe } from "./types";
 
 export function fullName(

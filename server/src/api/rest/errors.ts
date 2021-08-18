@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { isDefined } from "../../util/remedaExtensions";
+import { isDefined } from "remeda";
 import { ResponseWrapper } from "./core";
 
 interface ErrorBody {

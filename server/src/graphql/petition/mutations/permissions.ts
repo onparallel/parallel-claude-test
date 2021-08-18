@@ -1,9 +1,8 @@
 import { arg, booleanArg, list, mutationField, nonNull, stringArg } from "@nexus/schema";
 import pMap from "p-map";
-import { groupBy, uniq, zip } from "remeda";
+import { groupBy, isDefined, uniq, zip } from "remeda";
 import { Petition } from "../../../db/__types";
 import { partition } from "../../../util/arrays";
-import { isDefined } from "../../../util/remedaExtensions";
 import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
 import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";

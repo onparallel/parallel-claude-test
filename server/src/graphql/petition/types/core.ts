@@ -7,9 +7,8 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { extension } from "mime-types";
-import { minBy } from "remeda";
+import { isDefined, minBy } from "remeda";
 import { toGlobalId } from "../../../util/globalId";
-import { isDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
 import { or } from "../../helpers/authorize";

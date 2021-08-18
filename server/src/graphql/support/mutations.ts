@@ -1,7 +1,6 @@
 import { arg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "@nexus/schema";
-import { uniq } from "remeda";
+import { isDefined, uniq } from "remeda";
 import { fromGlobalId } from "../../util/globalId";
-import { isDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";

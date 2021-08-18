@@ -1,8 +1,8 @@
-import { arg, nonNull, list, objectType, queryField, stringArg } from "@nexus/schema";
+import { arg, list, nonNull, objectType, queryField, stringArg } from "@nexus/schema";
+import { isDefined } from "remeda";
 import { PetitionLocale } from "../../api/public/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { isDefined } from "../../util/remedaExtensions";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { toHtml } from "../../util/slate";
 

@@ -1,7 +1,7 @@
 import { core, interfaceType, objectType } from "@nexus/schema";
+import { isDefined } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionAccess, User } from "../../../db/__types";
-import { isDefined } from "../../../util/remedaExtensions";
 
 async function userOrPetitionAccessResolver(
   root: { data: { user_id?: number; petition_access_id?: number } },

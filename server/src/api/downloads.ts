@@ -1,14 +1,13 @@
 import contentDisposition from "content-disposition";
 import escapeStringRegexp from "escape-string-regexp";
 import { Router } from "express";
-import { indexBy, zip } from "remeda";
+import { indexBy, isDefined, zip } from "remeda";
 import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
 import { ApiContext } from "../context";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { fromGlobalId } from "../util/globalId";
-import { isDefined } from "../util/remedaExtensions";
 import { authenticate } from "./helpers/authenticate";
 import { PetitionExcelExport } from "./helpers/PetitionExcelExport";
 

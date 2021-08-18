@@ -1,14 +1,14 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { countBy, groupBy, indexBy, maxBy, omit, sortBy, uniq, zip } from "remeda";
+import { countBy, groupBy, indexBy, isDefined, maxBy, omit, sortBy, uniq, zip } from "remeda";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { partition, unMaybeArray } from "../../util/arrays";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId } from "../../util/globalId";
 import { keyBuilder } from "../../util/keyBuilder";
-import { isDefined, removeNotDefined } from "../../util/remedaExtensions";
+import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
