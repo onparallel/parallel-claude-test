@@ -99,9 +99,8 @@ export interface OperationResolver<
   ): PathResolver<TContext, TPath, TParams>;
 }
 
-type RestResponseReturnType<
-  TResponses extends RestResponses<any>
-> = TResponses[keyof TResponses] extends RestResponse<infer U> ? U : never;
+type RestResponseReturnType<TResponses extends RestResponses<any>> =
+  TResponses[keyof TResponses] extends RestResponse<infer U> ? U : never;
 
 const methods: RestMethod[] = ["get", "put", "post", "delete", "options", "head", "patch", "trace"];
 
