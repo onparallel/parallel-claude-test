@@ -203,6 +203,17 @@ export interface RichTextEditorInstance {
   focus(): void;
 }
 
+const formatList = (editor: CustomEditor, elementType: string) => {
+  if (editor.selection) {
+    const parentEntry = getParent(editor, editor.selection);
+    if (!parentEntry) return;
+    const [node] = parentEntry;
+    if (isElement(node)) {
+      toggleList(editor, { type: elementType });
+    }
+  }
+};
+
 export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
   function RichTextEditor(
     {
@@ -243,19 +254,18 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
         createAutoformatPlugin({
           rules: [
             {
-              type: "list-item" as any,
-              markup: ["*", "-"],
+              mode: "block",
+              type: "list-item",
+              match: ["* ", "- "],
               preFormat: (editor: CustomEditor) => unwrapList(editor),
-              format: (editor: CustomEditor) => {
-                if (editor.selection) {
-                  const parentEntry = getParent(editor, editor.selection);
-                  if (!parentEntry) return;
-                  const [node] = parentEntry;
-                  if (isElement(node)) {
-                    toggleList(editor, { type: "bulleted-list" });
-                  }
-                }
-              },
+              format: (editor) => formatList(editor, "bulleted-list"),
+            },
+            {
+              mode: "block",
+              type: "list-item",
+              match: ["1. ", "1) "],
+              preFormat: (editor: CustomEditor) => unwrapList(editor),
+              format: (editor) => formatList(editor, "numbered-list"),
             },
           ],
         }),

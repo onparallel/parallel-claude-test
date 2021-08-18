@@ -99,8 +99,9 @@ export interface OperationResolver<
   ): PathResolver<TContext, TPath, TParams>;
 }
 
-type RestResponseReturnType<TResponses extends RestResponses<any>> =
-  TResponses[keyof TResponses] extends RestResponse<infer U> ? U : never;
+type RestResponseReturnType<
+  TResponses extends RestResponses<any>
+> = TResponses[keyof TResponses] extends RestResponse<infer U> ? U : never;
 
 const methods: RestMethod[] = ["get", "put", "post", "delete", "options", "head", "patch", "trace"];
 
@@ -181,7 +182,7 @@ const _PathResolver: any = (function () {
             context.params = await pProps(
               this.pathOptions?.params ?? ({} as RestParameters<any>),
               async (param, name) => {
-                const value = req.params[name as keyof typeof req.params];
+                const value = req.params[name as keyof typeof req.params] as string;
                 try {
                   return await param.parse(value);
                 } catch (e) {
