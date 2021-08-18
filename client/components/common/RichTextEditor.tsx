@@ -566,70 +566,72 @@ function HeadingButton({ ...props }: Pick<ToolbarButtonProps, "isDisabled">) {
     ["heading", "subheading"].find((type) => someNode(editor, { match: { type } })) ?? "paragraph";
   const selectionRef = useRef<Selection>();
   return (
-    <Menu>
-      <MenuButton
-        as={IconButtonWithTooltip}
-        icon={<FontSizeIcon />}
-        size="sm"
-        placement="bottom"
-        variant="ghost"
-        tabIndex={-1}
-        onMouseDown={getPreventDefaultHandler(() => {
-          selectionRef.current = editor.selection;
-        })}
-        label={intl.formatMessage({
-          id: "component.rich-text-editor.font-size",
-          defaultMessage: "Font size",
-        })}
-        {...props}
-      />
-      <MenuList minWidth="fit-content">
-        <MenuOptionGroup
-          value={type}
-          onChange={(value) => {
-            toggleNodeType(editor, {
-              activeType: value as string,
-              inactiveType: "paragraph",
-            });
-            setTimeout(() => {
-              if (selectionRef.current) {
-                Transforms.select(editor, selectionRef.current);
-                ReactEditor.focus(editor as any);
-              }
-            }, 100);
-          }}
-        >
-          <MenuItemOption
-            icon={<CheckIcon fontSize="sm" />}
-            value="heading"
-            fontSize="xl"
-            fontWeight="bold"
+    <Box>
+      <Menu>
+        <MenuButton
+          as={IconButtonWithTooltip}
+          icon={<FontSizeIcon />}
+          size="sm"
+          placement="bottom"
+          variant="ghost"
+          tabIndex={-1}
+          onMouseDown={getPreventDefaultHandler(() => {
+            selectionRef.current = editor.selection;
+          })}
+          label={intl.formatMessage({
+            id: "component.rich-text-editor.font-size",
+            defaultMessage: "Font size",
+          })}
+          {...props}
+        />
+        <MenuList minWidth="fit-content">
+          <MenuOptionGroup
+            value={type}
+            onChange={(value) => {
+              toggleNodeType(editor, {
+                activeType: value as string,
+                inactiveType: "paragraph",
+              });
+              setTimeout(() => {
+                if (selectionRef.current) {
+                  Transforms.select(editor, selectionRef.current);
+                  ReactEditor.focus(editor as any);
+                }
+              }, 100);
+            }}
           >
-            <FormattedMessage
-              id="component.rich-text-editor.font-size-heading"
-              defaultMessage="Heading"
-            />
-          </MenuItemOption>
-          <MenuItemOption
-            icon={<CheckIcon fontSize="sm" />}
-            value="subheading"
-            fontSize="lg"
-            fontWeight="bold"
-          >
-            <FormattedMessage
-              id="component.rich-text-editor.font-size-subheading"
-              defaultMessage="Subheading"
-            />
-          </MenuItemOption>
-          <MenuItemOption icon={<CheckIcon fontSize="sm" />} value="paragraph">
-            <FormattedMessage
-              id="component.rich-text-editor.font-size-body"
-              defaultMessage="Body"
-            />
-          </MenuItemOption>
-        </MenuOptionGroup>
-      </MenuList>
-    </Menu>
+            <MenuItemOption
+              icon={<CheckIcon fontSize="sm" />}
+              value="heading"
+              fontSize="xl"
+              fontWeight="bold"
+            >
+              <FormattedMessage
+                id="component.rich-text-editor.font-size-heading"
+                defaultMessage="Heading"
+              />
+            </MenuItemOption>
+            <MenuItemOption
+              icon={<CheckIcon fontSize="sm" />}
+              value="subheading"
+              fontSize="lg"
+              fontWeight="bold"
+            >
+              <FormattedMessage
+                id="component.rich-text-editor.font-size-subheading"
+                defaultMessage="Subheading"
+              />
+            </MenuItemOption>
+            <MenuItemOption icon={<CheckIcon fontSize="sm" />} value="paragraph">
+              <FormattedMessage
+                id="component.rich-text-editor.font-size-body"
+                defaultMessage="Body"
+              />
+            </MenuItemOption>
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
+    </Box>
   );
 }
 
