@@ -25,7 +25,8 @@ import {
   usePetitionsQuery,
   usePetitionsUserQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { assignRef } from "@parallel/utils/assignRef";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
@@ -44,7 +45,7 @@ import {
 } from "@parallel/utils/queryState";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
+import { MouseEvent, PropsWithChildren, useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 
@@ -79,27 +80,31 @@ function Petitions() {
   const {
     data: { me },
   } = assertQuery(usePetitionsUserQuery());
-  const {
-    data: { petitions },
-    loading,
-    refetch,
-  } = useAssertQueryOrPreviousData(
-    usePetitionsQuery({
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
-        filters: {
-          status: state.status,
-          type: state.type,
-          tagIds: state.tags,
-          sharedWith: removeInvalidLines(state.sharedWith),
-        },
-        sortBy: [`${sort.field}_${sort.direction}`],
-        hasPetitionSignature: me.hasPetitionSignature,
+  const { data, loading, refetch } = usePetitionsQuery({
+    variables: {
+      offset: state.items * (state.page - 1),
+      limit: state.items,
+      search: state.search,
+      filters: {
+        status: state.status,
+        type: state.type,
+        tagIds: state.tags,
+        sharedWith: removeInvalidLines(state.sharedWith),
       },
-    })
-  );
+      sortBy: [`${sort.field}_${sort.direction}`],
+      hasPetitionSignature: me.hasPetitionSignature,
+    },
+  });
+  const previousRef = useRef<PetitionsQuery>();
+  if (data) {
+    assignRef(previousRef, data);
+  }
+
+  const petitions = data?.petitions ??
+    previousRef.current?.petitions ?? {
+      items: [],
+      totalCount: 0,
+    };
 
   const [selected, setSelected] = useState<string[]>([]);
 
