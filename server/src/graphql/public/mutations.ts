@@ -9,7 +9,7 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
-import { differenceInSeconds } from "date-fns";
+import { differenceInDays, differenceInSeconds } from "date-fns";
 import { prop } from "remeda";
 import { getClientIp } from "request-ip";
 import { ApiContext } from "../../context";
@@ -1075,3 +1075,65 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
     },
   }
 );
+
+export const publicSendReminder = mutationField("publicSendReminder", {
+  type: "Result",
+  args: {
+    publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
+    contactEmail: nonNull(stringArg()),
+  },
+  validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
+  resolve: async (_, args, ctx) => {
+    const [access, [linkOwner]] = await Promise.all([
+      ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(
+        args.publicPetitionLinkId,
+        args.contactEmail
+      ),
+      ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(args.publicPetitionLinkId),
+    ]);
+
+    if (!access || access.status === "INACTIVE" || access.reminders_left === 0 || !linkOwner) {
+      return RESULT.FAILURE;
+    }
+
+    if (access.reminders_opt_out) {
+      throw new WhitelistedError(`Contact has opted-out of reminders`, "REMINDER_OPTED_OUT_ERROR");
+    }
+
+    const [latestReminder] = await ctx.petitions.loadRemindersByAccessId(access.id);
+    if (latestReminder && differenceInDays(latestReminder.created_at, new Date()) < 1) {
+      throw new WhitelistedError(
+        `You can only send one reminder each 24 hours`,
+        "REMINDER_ALREADY_SENT_ERROR"
+      );
+    }
+
+    try {
+      const [reminder] = await ctx.petitions.createReminders([
+        {
+          type: "MANUAL",
+          status: "PROCESSING",
+          petition_access_id: access.id,
+          sender_id: linkOwner.id,
+          email_body: null,
+          created_by: `Contact:${access.contact_id}`,
+        },
+      ]);
+
+      await Promise.all([
+        ctx.petitions.createEvent({
+          type: "REMINDER_SENT",
+          petition_id: access.petition_id,
+          data: {
+            petition_reminder_id: reminder.id,
+          },
+        }),
+        ctx.emails.sendPetitionReminderEmail(reminder.id),
+      ]);
+
+      return RESULT.SUCCESS;
+    } catch (error) {
+      return RESULT.FAILURE;
+    }
+  },
+});

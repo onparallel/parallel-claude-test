@@ -3348,6 +3348,7 @@ export class PetitionRepository extends BaseRepository {
       .whereNull("petition.deleted_at")
       .whereNull("contact.deleted_at")
       .where("petition_access.status", "ACTIVE")
+      .where("petition.status", "PENDING")
       .where("petition.from_public_petition_link_id", publicPetitionLinkId)
       .where("contact.email", contactEmail)
       .select(this.count());
@@ -3371,5 +3372,23 @@ export class PetitionRepository extends BaseRepository {
       [petitionId, publicPetitionLinkId],
       t
     );
+  }
+
+  async getLatestPetitionAccessFromPublicPetitionLink(
+    publicPetitionLinkId: number,
+    contactEmail: string
+  ) {
+    const [access] = await this.from("petition_access")
+      .join("petition", "petition.id", "petition_access.petition_id")
+      .join("contact", "contact.id", "petition_access.contact_id")
+      .whereNull("petition.deleted_at")
+      .whereNull("contact.deleted_at")
+      .where("petition.from_public_petition_link_id", publicPetitionLinkId)
+      .where("contact.email", contactEmail)
+      .where("petition.status", "PENDING")
+      .select<PetitionAccess[]>("petition_access.*")
+      .orderBy("petition_access.created_at", "desc");
+
+    return access;
   }
 }

@@ -856,6 +856,7 @@ type Mutation {
     """
     preview: Boolean
   ): FileUploadDownloadLinkResult!
+  publicSendReminder(contactEmail: String!, publicPetitionLinkId: GID!): Result!
   publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
 
   """
