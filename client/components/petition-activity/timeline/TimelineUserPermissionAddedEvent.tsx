@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -28,7 +27,6 @@ export function TimelineUserPermissionAddedEvent({
         defaultMessage="{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
         values={{
           same: userId === event.user?.id,
-          b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
           other: <UserReference user={event.permissionUser} />,
           permissionType: (

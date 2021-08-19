@@ -213,9 +213,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           <FormattedMessage
                             id="recipient-view.petition-completed-alert-2"
                             defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
-                            values={{
-                              b: (chunks: any[]) => <b>{chunks}</b>,
-                            }}
                           />
                         </Text>
                       </>
@@ -256,18 +253,12 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           <FormattedMessage
                             id="recipient-view.petition-requires-signature-alert-1"
                             defaultMessage="This petition requires an <b>eSignature</b> to be completed."
-                            values={{
-                              b: (chunks: any[]) => <b>{chunks}</b>,
-                            }}
                           />
                         </Text>
                         <Text>
                           <FormattedMessage
                             id="recipient-view.petition-requires-signature-alert-2"
                             defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
-                            values={{
-                              b: (chunks: any[]) => <b>{chunks}</b>,
-                            }}
                           />
                         </Text>
                       </>
@@ -278,7 +269,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                             id="recipient-view.petition-signature-request-sent-alert"
                             defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
                             values={{
-                              b: (chunks: any[]) => <b>{chunks}</b>,
                               a: (chunks: any[]) => (
                                 <ContactListPopover
                                   contacts={petition.signature!.signers.map((c) => c!).slice(1)}
@@ -302,9 +292,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           <FormattedMessage
                             id="recipient-view.petition-signature-request-sent-alert.unknown-signer"
                             defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
-                            values={{
-                              b: (chunks: any[]) => <b>{chunks}</b>,
-                            }}
                           />
                         )}
                       </Text>
@@ -312,9 +299,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                     <FormattedMessage
                       id="recipient-view.petition-completed-alert-2"
                       defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
-                      values={{
-                        b: (chunks: any[]) => <b>{chunks}</b>,
-                      }}
                     />
                   </AlertDescription>
                 </Flex>
@@ -436,9 +420,6 @@ function ConfirmStartSignatureProcess({
           <FormattedMessage
             id="petition.finalize-start-signature.body-2"
             defaultMessage="After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:"
-            values={{
-              b: (chunks: any[]) => <b>{chunks}</b>,
-            }}
           />
           <Spacer marginTop={4} />
           <UnorderedList>
@@ -485,14 +466,12 @@ function ReviewBeforeSignDialog({
           <FormattedMessage
             id="recipient-view.review-before-sign.body-1"
             defaultMessage="This petition requires an <b>eSignature</b> in order to be completed."
-            values={{ b: (chunks: any[]) => <b>{chunks}</b> }}
           />
           <Spacer marginTop={2} />
           <FormattedMessage
             id="recipient-view.review-before-sign.body-2"
             defaultMessage="We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people."
             values={{
-              b: (chunks: any[]) => <b>{chunks}</b>,
               name: <b>{granter.fullName}</b>,
             }}
           />

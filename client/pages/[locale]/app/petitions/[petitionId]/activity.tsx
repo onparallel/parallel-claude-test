@@ -524,27 +524,18 @@ export default compose(
                 <FormattedMessage
                   id="tour.petition-activity.access-and-reminders-content-2"
                   defaultMessage="Manage who can <b>access</b> this petition."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
                   id="tour.petition-activity.access-and-reminders-content-3"
                   defaultMessage="Send an automatic or custom <b>reminder message</b> to your recipients."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
                   id="tour.petition-activity.access-and-reminders-content-4"
                   defaultMessage="Change <b>reminders settings</b>."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
                 />
               </ListItem>
             </Stack>

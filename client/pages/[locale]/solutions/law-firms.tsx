@@ -197,9 +197,6 @@ function LawFirms() {
             <FormattedMessage
               id="public.law-firms.speed-up-body"
               defaultMessage="Improves <b>control and monitoring of compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
             />
           </Text>
         </PublicShowcase>

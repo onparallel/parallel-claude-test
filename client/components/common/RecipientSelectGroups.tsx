@@ -291,7 +291,6 @@ export function RecipientSelectGroups({
               defaultMessage="All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively. Add a <b>recipient group</b> to send different petitions to each group."
               values={{
                 recipientCount: validRecipients(0).length,
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               }}
             />
           </Text>
@@ -332,9 +331,6 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
               <FormattedMessage
                 id="components.multiple-emails-pasted-dialog.message-2"
                 defaultMessage="Do you want to add them to <b>separate groups</b> (they will fill different petitions) or <b>group them in the same petition</b>?"
-                values={{
-                  b: (chunks: any) => <Text as="strong">{chunks}</Text>,
-                }}
               />
             </Text>
           </Stack>

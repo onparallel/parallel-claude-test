@@ -70,45 +70,30 @@ function BookDemo() {
                 <FormattedMessage
                   id="public.book-demo.basic-functions"
                   defaultMessage="<b>Basic functions of our platform:</b> petitions, contacts and document management."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
                   id="public.book-demo.checklist"
                   defaultMessage="<b>How to send a checklist:</b> to several recipients, types of information fields."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
                   id="public.book-demo.follow"
                   defaultMessage="<b>Follow the status of your petitions:</b> progress, delivery and read receipts."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
                   id="public.book-demo.review-and-download"
                   defaultMessage="<b>Reviewing and downloading received information:</b> review completed checklists and download documents."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
                   id="public.book-demo.other-functionalities"
                   defaultMessage="<b>Other functionalities:</b> additional security layers, reminders."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
                 />
               </ListItem>
             </List>

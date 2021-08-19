@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -40,7 +40,6 @@ export function TimelineReminderSentEvent({
               defaultMessage="{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
               values={{
                 same: userId === reminder.sender?.id,
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 user: <UserReference user={reminder.sender} />,
                 contact: <ContactLink contact={reminder.access.contact} />,
                 timeAgo: (

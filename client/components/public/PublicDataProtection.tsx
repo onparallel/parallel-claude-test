@@ -34,9 +34,6 @@ export function PublicDataProtection(props: BoxProps) {
             <FormattedMessage
               id="public.data-protection.description"
               defaultMessage="Parallel follows <b>ISO/IEC 27001 practices</b> on Information Security Management System and the principles of privacy and security by design."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
             />
           </Text>
           <Link href="/security" fontWeight="bold">

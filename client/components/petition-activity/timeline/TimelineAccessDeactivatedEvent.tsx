@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -27,7 +26,6 @@ export function TimelineAccessDeactivatedEvent({
         defaultMessage="{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
         values={{
           same: userId === event.user?.id,
-          b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
           contact: <ContactLink contact={event.access.contact} />,
           timeAgo: (

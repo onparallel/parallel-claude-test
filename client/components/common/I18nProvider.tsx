@@ -27,7 +27,13 @@ export function I18nProvider({ children, ...props }: I18nProps & { children: Rea
       : (props as I18nProps & { setLocale: undefined });
   return (
     <SetLocaleProvider.Provider value={setLocale}>
-      <IntlProvider locale={locale} messages={messages}>
+      <IntlProvider
+        locale={locale}
+        messages={messages}
+        defaultRichTextElements={{
+          b: (chunks: any) => <strong>{chunks}</strong>,
+        }}
+      >
         {children}
       </IntlProvider>
     </SetLocaleProvider.Provider>

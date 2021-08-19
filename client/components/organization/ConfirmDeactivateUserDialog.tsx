@@ -67,10 +67,7 @@ function ConfirmDeactivateUserDialog({
             <FormattedMessage
               id="organization.confirm-deactivate-user-dialog.body"
               defaultMessage="Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                count: selected.length,
-              }}
+              values={{ count: selected.length }}
             />
             <br />
             <FormattedMessage

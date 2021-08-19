@@ -294,7 +294,6 @@ function ConfirmDeleteContacts({
           values={{
             count,
             email,
-            b: (chunks: any[]) => <b>{chunks}</b>,
           }}
         />
       }

@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -27,7 +26,6 @@ export function TimelinePetitionReopenedEvent({
         defaultMessage="{same, select, true {You} other {{user}}} reopened the petition {timeAgo}"
         values={{
           same: userId === event.user?.id,
-          b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

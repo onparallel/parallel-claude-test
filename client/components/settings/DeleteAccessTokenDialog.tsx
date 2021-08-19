@@ -42,10 +42,7 @@ export function DeleteAccessTokenDialog({
             <FormattedMessage
               id="settings.api-tokens.confirm-delete-tokens-dialog.warning"
               defaultMessage="Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>."
-              values={{
-                count: selectedCount,
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
+              values={{ count: selectedCount }}
             />
           </Text>
           <Text>

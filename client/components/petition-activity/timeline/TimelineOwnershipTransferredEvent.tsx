@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment } from "@parallel/graphql/__types";
@@ -30,7 +29,6 @@ export function TimelineOwnershipTransferredEvent({
             event.previousOwner && userId !== event.previousOwner.id ? (
               <UserReference user={event.previousOwner} />
             ) : null,
-          b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
           owner: <UserReference user={event.owner} />,
           timeAgo: (

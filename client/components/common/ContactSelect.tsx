@@ -203,18 +203,13 @@ function useContactSelectReactSelectProps(
       },
       formatCreateLabel: (label) => {
         return (
-          <FormattedMessage
-            id="component.contact-select.create-new-contact"
-            defaultMessage="Create new contact for: <b>{email}</b>"
-            values={{
-              email: label,
-              b: (chunks: any[]) => (
-                <Text as="strong" style={{ marginLeft: "4px" }}>
-                  {chunks}
-                </Text>
-              ),
-            }}
-          />
+          <Text as="span">
+            <FormattedMessage
+              id="component.contact-select.create-new-contact"
+              defaultMessage="Create new contact for: <b>{email}</b>"
+              values={{ email: label }}
+            />
+          </Text>
         );
       },
     }),

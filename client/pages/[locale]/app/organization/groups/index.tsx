@@ -153,7 +153,6 @@ function OrganizationGroups() {
           {
             count: selected.length,
             name: selectedGroups[0].name,
-            b: (chunks: any[]) => <b>{chunks}</b>,
           }
         ),
         status: "success",
@@ -193,7 +192,6 @@ function OrganizationGroups() {
           {
             count: selected.length,
             name: selectedGroups[0].name,
-            b: (chunks: any[]) => <b>{chunks}</b>,
           }
         ),
         status: "success",
@@ -413,7 +411,6 @@ function ConfirmDeleteGroupsDialog({
           values={{
             count,
             name,
-            b: (chunks: any[]) => <b>{chunks}</b>,
           }}
         />
       }

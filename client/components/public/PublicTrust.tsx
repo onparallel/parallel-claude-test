@@ -83,7 +83,6 @@ export function PublicTrust(props: BoxProps) {
           <FormattedMessage
             id="public.who-trust-us.feedback-1"
             defaultMessage="Parallel has been <b>very agile in the execution</b> of our requirements and templates are flexible. Happy with the experience."
-            values={{ b: (chunks: any[]) => <Text as="strong">{chunks}</Text> }}
           />
         </PublicFeedback>
         <PublicFeedback
@@ -97,18 +96,12 @@ export function PublicTrust(props: BoxProps) {
             <FormattedMessage
               id="public.who-trust-us.feedback-2a"
               defaultMessage="It's a very <b>useful, easy-to-use and intuitive</b> platform, for both Cuatrecasas and for our clients."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
             />
           </Text>
           <Text marginTop={2}>
             <FormattedMessage
               id="public.who-trust-us.feedback-2b"
               defaultMessage="When we use Parallel for KYC we <b>save a lot of time</b> in both external and internal communications, and all doubts and comments from our clients are in the same place, so that we can forget about searching things in old email conversations."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
             />
           </Text>
         </PublicFeedback>
@@ -122,9 +115,6 @@ export function PublicTrust(props: BoxProps) {
           <FormattedMessage
             id="public.who-trust-us.feedback-3"
             defaultMessage="Reviewing documents from our clients is <b>twice as fast</b> than it was. It is mainly due to the ease of access to the documents and the information provided in the forms."
-            values={{
-              b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-            }}
           />
         </PublicFeedback>
       </Grid>

@@ -1061,18 +1061,12 @@ export default compose(
               <FormattedMessage
                 id="tour.petition-replies.review-items-content-2"
                 defaultMessage="Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons."
-                values={{
-                  b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                }}
               />
             </Text>
             <Text>
               <FormattedMessage
                 id="tour.petition-replies.review-items-content-3"
                 defaultMessage="If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses."
-                values={{
-                  b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                }}
               />
             </Text>
           </Stack>
@@ -1131,9 +1125,6 @@ export default compose(
               <FormattedMessage
                 id="tour.petition-replies.download-content-2"
                 defaultMessage="Try using <b>variables</b> to set how you want your filenames to appear."
-                values={{
-                  b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                }}
               />
             </Text>
           </Stack>

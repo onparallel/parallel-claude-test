@@ -243,7 +243,6 @@ export function ConfirmDeletePetitionsDialog({
       values={{
         count,
         name,
-        b: (chunks: any[]) => <b>{chunks}</b>,
       }}
     />
   ) : (
@@ -253,7 +252,6 @@ export function ConfirmDeletePetitionsDialog({
       values={{
         count,
         name,
-        b: (chunks: any[]) => <b>{chunks}</b>,
       }}
     />
   );

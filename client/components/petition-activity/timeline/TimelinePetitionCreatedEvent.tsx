@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
 import { ShinyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionCreatedEvent_PetitionCreatedEventFragment } from "@parallel/graphql/__types";
@@ -27,7 +26,6 @@ export function TimelinePetitionCreatedEvent({
         defaultMessage="{same, select, true {You} other {{user}}} created this petition {timeAgo}"
         values={{
           same: userId === user?.id,
-          b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={user} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}

@@ -937,7 +937,6 @@ export default compose(
               id="tour.petition-compose.next-content"
               defaultMessage="Once you have added all the fields that you need, click <b>{next}</b> to customize the email message."
               values={{
-                b: (chunks: any[]) => <strong>{chunks}</strong>,
                 next: <FormattedMessage id="generic.next" defaultMessage="Next" />,
               }}
             />
@@ -966,18 +965,12 @@ export default compose(
                 <FormattedMessage
                   id="tour.petition-compose.petition-settings-content-2"
                   defaultMessage="The <b>language</b> of the recipient view and the message we will send to them."
-                  values={{
-                    b: (chunks: any[]) => <strong>{chunks}</strong>,
-                  }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
                   id="tour.petition-compose.petition-settings-content-3"
                   defaultMessage="The <b>deadline</b> that you want to inform the recipients."
-                  values={{
-                    b: (chunks: any[]) => <strong>{chunks}</strong>,
-                  }}
                 />
               </ListItem>
             </Stack>

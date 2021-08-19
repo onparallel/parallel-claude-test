@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -41,7 +41,6 @@ export function TimelineMessageScheduledEvent({
             defaultMessage="{same, select, true {You} other {{user}}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
             values={{
               same: userId === message.sender?.id,
-              b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               user: <UserReference user={message.sender} />,
               subject: message.emailSubject,
               contact: <ContactLink contact={message.access.contact} />,

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -41,7 +41,6 @@ export function TimelineMessageSentEvent({
               defaultMessage="A message scheduled by {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
               values={{
                 same: userId === message.sender?.id,
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 user: <UserReference user={message.sender} />,
                 subject: message.emailSubject,
                 contact: <ContactLink contact={message.access.contact} />,
@@ -56,7 +55,6 @@ export function TimelineMessageSentEvent({
               defaultMessage="{same, select, true {You} other {{user}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
               values={{
                 same: userId === message.sender!.id,
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 user: message.sender!.fullName,
                 subject: message.emailSubject,
                 contact: <ContactLink contact={message.access.contact} />,

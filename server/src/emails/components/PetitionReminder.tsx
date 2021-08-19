@@ -95,14 +95,11 @@ const email: Email<PetitionReminderProps> = {
         missingFieldCount === 0
           ? outdent`
 
-          ${intl.formatMessage(
-            {
-              id: "reminder.click-finalize",
-              defaultMessage:
-                "If you already submitted all the information, click <b>Finalize</b> on the page.",
-            },
-            { b: (chunks: any[]) => chunks }
-          )}
+          ${intl.formatMessage({
+            id: "reminder.click-finalize",
+            defaultMessage:
+              "If you already submitted all the information, click <b>Finalize</b> on the page.",
+          })}
           
           `
           : ""

@@ -83,9 +83,6 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
             <FormattedMessage
               id="contacts.import-from-excel.attach-xlsx"
               defaultMessage="Attach an <b>.xlsx file</b> like the one in the model to add your contacts."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
             />
           </Text>
           <Dropzone

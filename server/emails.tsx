@@ -51,7 +51,13 @@ app.get("/:email", async (req, res, next) => {
     } = await import(`./src/emails/components/${email}.tsx`);
     const params = await parseArgs(req);
     const messages = await loadMessages(locale);
-    const intl = createIntl({ messages, locale });
+    const intl = createIntl({
+      messages,
+      locale,
+      defaultRichTextElements: {
+        b: (chunks: any) => <strong>{chunks}</strong>,
+      },
+    });
     if (type === "html") {
       const { html } = render(
         <IntlProvider locale={locale} messages={messages}>

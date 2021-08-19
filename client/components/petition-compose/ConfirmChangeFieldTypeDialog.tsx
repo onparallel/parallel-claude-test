@@ -16,9 +16,6 @@ export function ConfirmChangeFieldTypeDialog({ ...props }: DialogProps) {
         <FormattedMessage
           id="petition.confirm-change-field-type.body"
           defaultMessage="This field contains collected replies. If you change the type of this field you will lose those replies <b>forever</b>."
-          values={{
-            b: (chunks: any[]) => <b>{chunks}</b>,
-          }}
         />
       }
       confirm={
