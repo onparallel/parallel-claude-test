@@ -3265,7 +3265,7 @@ type RemindersOptOutEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
-  other: String!
+  other: String
   reason: String!
 }
 
@@ -3274,7 +3274,7 @@ type RemindersOptOutNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!
-  other: String!
+  other: String
   petition: PetitionBase!
   reason: String!
 }

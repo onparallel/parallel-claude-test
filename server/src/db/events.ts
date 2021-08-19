@@ -127,7 +127,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   REMINDERS_OPT_OUT: {
     petition_access_id: number;
     reason: string;
-    other: string;
+    other?: string;
   };
 }[TType];
 

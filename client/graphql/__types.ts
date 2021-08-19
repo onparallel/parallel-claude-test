@@ -2310,7 +2310,7 @@ export interface RemindersOptOutEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  other: Scalars["String"];
+  other?: Maybe<Scalars["String"]>;
   reason: Scalars["String"];
 }
 
@@ -2320,7 +2320,7 @@ export interface RemindersOptOutNotification extends PetitionUserNotification {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  other: Scalars["String"];
+  other?: Maybe<Scalars["String"]>;
   petition: PetitionBase;
   reason: Scalars["String"];
 }
@@ -3306,7 +3306,7 @@ export type NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUse
 export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment = {
   __typename?: "RemindersOptOutNotification";
   reason: string;
-  other: string;
+  other?: Maybe<string>;
   id: string;
   createdAt: string;
   isRead: boolean;
@@ -3474,7 +3474,7 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
         | {
             __typename?: "RemindersOptOutNotification";
             reason: string;
-            other: string;
+            other?: Maybe<string>;
             id: string;
             createdAt: string;
             isRead: boolean;
@@ -3620,7 +3620,7 @@ export type NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserN
 export type NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment = {
   __typename?: "RemindersOptOutNotification";
   reason: string;
-  other: string;
+  other?: Maybe<string>;
   id: string;
   createdAt: string;
   isRead: boolean;
@@ -3871,7 +3871,7 @@ export type ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotific
 export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
   __typename?: "RemindersOptOutNotification";
   reason: string;
-  other: string;
+  other?: Maybe<string>;
   id: string;
   createdAt: string;
   isRead: boolean;
@@ -4405,7 +4405,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           id: string;
           createdAt: string;
           reason: string;
-          other: string;
+          other?: Maybe<string>;
           access: {
             __typename?: "PetitionAccess";
             contact?: Maybe<{
@@ -4872,7 +4872,7 @@ export type PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment
   id: string;
   createdAt: string;
   reason: string;
-  other: string;
+  other?: Maybe<string>;
   access: {
     __typename?: "PetitionAccess";
     contact?: Maybe<{
@@ -5383,7 +5383,7 @@ export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
   __typename?: "RemindersOptOutEvent";
   createdAt: string;
   reason: string;
-  other: string;
+  other?: Maybe<string>;
   access: {
     __typename?: "PetitionAccess";
     contact?: Maybe<{
@@ -8413,7 +8413,7 @@ export type PetitionActivity_PetitionFragment = {
           id: string;
           createdAt: string;
           reason: string;
-          other: string;
+          other?: Maybe<string>;
           access: {
             __typename?: "PetitionAccess";
             contact?: Maybe<{
@@ -9026,7 +9026,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 id: string;
                 createdAt: string;
                 reason: string;
-                other: string;
+                other?: Maybe<string>;
                 access: {
                   __typename?: "PetitionAccess";
                   contact?: Maybe<{
@@ -9715,7 +9715,7 @@ export type PetitionActivityQuery = {
                 id: string;
                 createdAt: string;
                 reason: string;
-                other: string;
+                other?: Maybe<string>;
                 access: {
                   __typename?: "PetitionAccess";
                   contact?: Maybe<{

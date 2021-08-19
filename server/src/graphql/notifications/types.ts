@@ -175,17 +175,11 @@ export const RemindersOptOutNotification = createPetitionUserNotification(
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-    t.field("reason", {
-      type: "String",
-      resolve: async (root, _, ctx) => {
-        return root.data.reason;
-      },
+    t.string("reason", {
+      resolve: (o) => o.data.reason,
     });
-    t.field("other", {
-      type: "String",
-      resolve: async (root, _, ctx) => {
-        return root.data.other;
-      },
+    t.nullable.string("other", {
+      resolve: (o) => o.data.other ?? null,
     });
   }
 );

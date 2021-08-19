@@ -77,7 +77,6 @@ createQueueWorker(
             data: {
               petition_access_id: access!.id,
               reason: "SPAM",
-              other: "",
             },
           });
         }

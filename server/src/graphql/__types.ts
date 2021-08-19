@@ -1310,7 +1310,7 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    other: string; // String!
+    other: string | null; // String
     reason: string; // String!
   };
   RemindersOptOutNotification: {
@@ -1319,7 +1319,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
-    other: string; // String!
+    other: string | null; // String
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     reason: string; // String!
   };
