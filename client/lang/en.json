@@ -4415,6 +4415,86 @@
     "context": "Templates"
   },
   {
+    "term": "public-petition-email-exists.body",
+    "definition": "There is already an access associated with the mail (<b>{email}</b>). If you start a new request, a new access will be created to complete the information from scratch. What do you want to do?",
+    "context": "There is already an access associated with the mail (<b>{email}</b>). If you start a new request, a new access will be created to complete the information from scratch. What do you want to do?"
+  },
+  {
+    "term": "public-petition-email-exists.continue-existing-button",
+    "definition": "Continue existing",
+    "context": "Continue existing"
+  },
+  {
+    "term": "public-petition-email-exists.new-petition-button",
+    "definition": "Start a new petition",
+    "context": "Start a new petition"
+  },
+  {
+    "term": "public-petition-email-exists.title",
+    "definition": "Existing mail",
+    "context": "Existing mail"
+  },
+  {
+    "term": "public-petition-email-sended.body.parraf-1",
+    "definition": "We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure the privacy and security of your data",
+    "context": "We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure the privacy and security of your data"
+  },
+  {
+    "term": "public-petition-email-sended.body.parraf-2",
+    "definition": "Can't find our email? Check the spam tray and if it is not, contact the person who shared the link with you.",
+    "context": "Can't find our email? Check the spam tray and if it is not, contact the person who shared the link with you."
+  },
+  {
+    "term": "public-petition-email-sended.title",
+    "definition": "Check your inbox",
+    "context": "Check your inbox"
+  },
+  {
+    "term": "public-petition-reminder.body.parraf-1",
+    "definition": "We have sent a reminder to <b>{email}</b> with access to your request so that you can access it again and continue completing it.",
+    "context": "We have sent a reminder to <b>{email}</b> with access to your request so that you can access it again and continue completing it."
+  },
+  {
+    "term": "public-petition-reminder.body.parraf-2",
+    "definition": "Can't find our email? Check the spam tray and if it is not, contact the person who shared the link with you.",
+    "context": "Can't find our email? Check the spam tray and if it is not, contact the person who shared the link with you."
+  },
+  {
+    "term": "public-petition-reminder.title",
+    "definition": "Reminder sent",
+    "context": "Reminder sent"
+  },
+  {
+    "term": "public-petition.help.form-title",
+    "definition": "Enter your data to access",
+    "context": "Enter your data to access"
+  },
+  {
+    "term": "public-petition.help.more-faq",
+    "definition": "See more FAQ",
+    "context": "See more FAQ"
+  },
+  {
+    "term": "public-petition.help.parraf-1",
+    "definition": "If you have found this link or someone has sent it to you, it means that they will request information from you. For security, we need to identify you to <b>associate your email with a secure portal</b> where you can complete it.",
+    "context": "If you have found this link or someone has sent it to you, it means that they will request information from you. For security, we need to identify you to <b>associate your email with a secure portal</b> where you can complete it."
+  },
+  {
+    "term": "public-petition.help.parraf-2",
+    "definition": "In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want.",
+    "context": "In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want."
+  },
+  {
+    "term": "public-petition.help.request-access-button",
+    "definition": "Request access",
+    "context": "Request access"
+  },
+  {
+    "term": "public-petition.help.title",
+    "definition": "Why do we ask for this data?",
+    "context": "Why do we ask for this data?"
+  },
+  {
     "term": "public-templates.categories.administration",
     "definition": "Administration",
     "context": "Administration"
@@ -5873,6 +5953,16 @@
     "term": "public.product.team-collaboration.work-effectively",
     "definition": "Help them work more effectively, allowing them to review and sharing their thought around the information received.",
     "context": "Help them work more effectively, allowing them to review and sharing their thought around the information received."
+  },
+  {
+    "term": "public.public-petition.error-description",
+    "definition": "Please try again later",
+    "context": "Please try again later"
+  },
+  {
+    "term": "public.public-petition.error-title",
+    "definition": "Oops! An error happened",
+    "context": "Oops! An error happened"
   },
   {
     "term": "public.request-information.cta-title",

@@ -1,0 +1,80 @@
+import { Button, Img, Stack, Text } from "@chakra-ui/react";
+import { Logo } from "@parallel/components/common/Logo";
+import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
+import { FormattedMessage } from "react-intl";
+
+export type PublicPetitionEmailSendedProps = {
+  organization: PublicPetitionLinkOwnerOrganization;
+  email: string;
+  onNewPetition: () => void;
+  onContinue: () => void;
+  isNewRequestLoading: boolean;
+  isReminderLoading: boolean;
+};
+
+export function PublicPetitionEmailExists({
+  organization,
+  email,
+  onNewPetition,
+  onContinue,
+  isNewRequestLoading,
+  isReminderLoading,
+}: PublicPetitionEmailSendedProps) {
+  return (
+    <Stack spacing={{ base: 6, md: 8 }} maxWidth="container.sm" width="100%" margin="0 auto">
+      {organization.logoUrl ? (
+        <Img src={organization.logoUrl} aria-label={organization.name} width="auto" height="40px" />
+      ) : (
+        <Logo width="152px" height="40px" />
+      )}
+
+      <Stack spacing={4} width="100%">
+        <Text fontSize="2xl" fontWeight="bold">
+          <FormattedMessage
+            id="public-petition-email-exists.title"
+            defaultMessage="Existing mail"
+          />
+        </Text>
+        <Text>
+          <FormattedMessage
+            id="public-petition-email-exists.body"
+            defaultMessage="There is already an access associated with the mail (<b>{email}</b>). If you start a new request, a new access will be created to complete the information from scratch. What do you want to do?"
+            values={{
+              email,
+              b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
+            }}
+          />
+        </Text>
+
+        <Stack spacing={4} paddingTop={4} direction={{ base: "column", md: "row" }}>
+          <Button
+            width="100%"
+            variant="outline"
+            size="md"
+            fontSize="md"
+            onClick={onNewPetition}
+            isLoading={isNewRequestLoading}
+          >
+            <FormattedMessage
+              id="public-petition-email-exists.new-petition-button"
+              defaultMessage="Start a new petition"
+            />
+          </Button>
+          <Button
+            width="100%"
+            colorScheme="purple"
+            size="md"
+            fontSize="md"
+            onClick={onContinue}
+            isLoading={isReminderLoading}
+          >
+            <FormattedMessage
+              id="public-petition-email-exists.continue-existing-button"
+              defaultMessage="Continue existing"
+            />
+          </Button>
+        </Stack>
+      </Stack>
+    </Stack>
+  );
+}

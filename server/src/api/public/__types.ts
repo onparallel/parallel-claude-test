@@ -376,6 +376,8 @@ export type Mutation = {
    * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
+  /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */
+  publicCreateAndSendPetitionFromPublicLink: Result;
   /** Creates a reply to a checkbox field. */
   publicCreateCheckboxReply: PublicPetitionFieldReply;
   /** Creates a reply for a dynamic select field. */
@@ -743,6 +745,14 @@ export type MutationpublicCheckVerificationCodeArgs = {
 export type MutationpublicCompletePetitionArgs = {
   keycode: Scalars["ID"];
   signer?: Maybe<PublicPetitionSignerData>;
+};
+
+export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
+  contactEmail: Scalars["String"];
+  contactFirstName: Scalars["String"];
+  contactLastName: Scalars["String"];
+  force?: Maybe<Scalars["Boolean"]>;
+  publicPetitionLinkId: Scalars["GID"];
 };
 
 export type MutationpublicCreateCheckboxReplyArgs = {
@@ -1950,6 +1960,18 @@ export type PublicPetitionFieldReply = Timestamps & {
   updatedAt: Scalars["DateTime"];
 };
 
+export type PublicPetitionLink = {
+  description: Scalars["String"];
+  id: Scalars["GID"];
+  organization: PublicPetitionLinkOwnerOrganization;
+  title: Scalars["String"];
+};
+
+export type PublicPetitionLinkOwnerOrganization = {
+  logoUrl: Maybe<Scalars["String"]>;
+  name: Scalars["String"];
+};
+
 /** A public message in a petition */
 export type PublicPetitionMessage = {
   /** The ID of the message. */
@@ -2023,6 +2045,7 @@ export type Query = {
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
+  publicPetitionLinkBySlug: Maybe<PublicPetitionLink>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
   /** Search users and user groups */
@@ -2121,6 +2144,10 @@ export type QuerypetitionsByIdArgs = {
 
 export type QuerypublicOrgLogoUrlArgs = {
   id: Scalars["GID"];
+};
+
+export type QuerypublicPetitionLinkBySlugArgs = {
+  slug: Scalars["String"];
 };
 
 export type QuerypublicTemplatesArgs = {

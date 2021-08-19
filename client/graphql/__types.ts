@@ -407,6 +407,8 @@ export interface Mutation {
    * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
+  /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */
+  publicCreateAndSendPetitionFromPublicLink: Result;
   /** Creates a reply to a checkbox field. */
   publicCreateCheckboxReply: PublicPetitionFieldReply;
   /** Creates a reply for a dynamic select field. */
@@ -774,6 +776,14 @@ export interface MutationpublicCheckVerificationCodeArgs {
 export interface MutationpublicCompletePetitionArgs {
   keycode: Scalars["ID"];
   signer?: Maybe<PublicPetitionSignerData>;
+}
+
+export interface MutationpublicCreateAndSendPetitionFromPublicLinkArgs {
+  contactEmail: Scalars["String"];
+  contactFirstName: Scalars["String"];
+  contactLastName: Scalars["String"];
+  force?: Maybe<Scalars["Boolean"]>;
+  publicPetitionLinkId: Scalars["GID"];
 }
 
 export interface MutationpublicCreateCheckboxReplyArgs {
@@ -2021,6 +2031,20 @@ export interface PublicPetitionFieldReply extends Timestamps {
   updatedAt: Scalars["DateTime"];
 }
 
+export interface PublicPetitionLink {
+  __typename?: "PublicPetitionLink";
+  description: Scalars["String"];
+  id: Scalars["GID"];
+  organization: PublicPetitionLinkOwnerOrganization;
+  title: Scalars["String"];
+}
+
+export interface PublicPetitionLinkOwnerOrganization {
+  __typename?: "PublicPetitionLinkOwnerOrganization";
+  logoUrl?: Maybe<Scalars["String"]>;
+  name: Scalars["String"];
+}
+
 /** A public message in a petition */
 export interface PublicPetitionMessage {
   __typename?: "PublicPetitionMessage";
@@ -2098,6 +2122,7 @@ export interface Query {
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
+  publicPetitionLinkBySlug?: Maybe<PublicPetitionLink>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
   /** Search users and user groups */
@@ -2196,6 +2221,10 @@ export interface QuerypetitionsByIdArgs {
 
 export interface QuerypublicOrgLogoUrlArgs {
   id: Scalars["GID"];
+}
+
+export interface QuerypublicPetitionLinkBySlugArgs {
+  slug: Scalars["String"];
 }
 
 export interface QuerypublicTemplatesArgs {
@@ -12199,6 +12228,48 @@ export type PublicOptOutQuery = {
   }>;
 };
 
+export type PublicPetitionLink_PublicPetitionLinkFragment = {
+  __typename?: "PublicPetitionLink";
+  id: string;
+  title: string;
+  description: string;
+  organization: {
+    __typename?: "PublicPetitionLinkOwnerOrganization";
+    name: string;
+    logoUrl?: Maybe<string>;
+  };
+};
+
+export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables = Exact<{
+  publicPetitionLinkId: Scalars["GID"];
+  contactFirstName: Scalars["String"];
+  contactLastName: Scalars["String"];
+  contactEmail: Scalars["String"];
+  force?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation = {
+  publicCreateAndSendPetitionFromPublicLink: Result;
+};
+
+export type PublicTemplateLink_publicPetitionLinkBySlugQueryVariables = Exact<{
+  slug: Scalars["String"];
+}>;
+
+export type PublicTemplateLink_publicPetitionLinkBySlugQuery = {
+  publicPetitionLinkBySlug?: Maybe<{
+    __typename?: "PublicPetitionLink";
+    id: string;
+    title: string;
+    description: string;
+    organization: {
+      __typename?: "PublicPetitionLinkOwnerOrganization";
+      name: string;
+      logoUrl?: Maybe<string>;
+    };
+  }>;
+};
+
 export type PetitionPdf_PetitionFragment = {
   __typename?: "Petition";
   id: string;
@@ -15105,6 +15176,17 @@ export const OptOut_PublicPetitionAccessFragmentDoc = gql`
     }
   }
   ${OptOut_PublicUserFragmentDoc}
+`;
+export const PublicPetitionLink_PublicPetitionLinkFragmentDoc = gql`
+  fragment PublicPetitionLink_PublicPetitionLink on PublicPetitionLink {
+    id
+    title
+    description
+    organization {
+      name
+      logoUrl
+    }
+  }
 `;
 export const PetitionPdf_PetitionFieldFragmentDoc = gql`
   fragment PetitionPdf_PetitionField on PetitionField {
@@ -19410,6 +19492,75 @@ export function usePublicOptOutLazyQuery(
 }
 export type PublicOptOutQueryHookResult = ReturnType<typeof usePublicOptOutQuery>;
 export type PublicOptOutLazyQueryHookResult = ReturnType<typeof usePublicOptOutLazyQuery>;
+export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument = gql`
+  mutation PublicPetitionLink_publicCreateAndSendPetitionFromPublicLink(
+    $publicPetitionLinkId: GID!
+    $contactFirstName: String!
+    $contactLastName: String!
+    $contactEmail: String!
+    $force: Boolean
+  ) {
+    publicCreateAndSendPetitionFromPublicLink(
+      publicPetitionLinkId: $publicPetitionLinkId
+      contactFirstName: $contactFirstName
+      contactLastName: $contactLastName
+      contactEmail: $contactEmail
+      force: $force
+    )
+  }
+`;
+export function usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation,
+    PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation,
+    PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables
+  >(PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument, options);
+}
+export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationHookResult =
+  ReturnType<typeof usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation>;
+export const PublicTemplateLink_publicPetitionLinkBySlugDocument = gql`
+  query PublicTemplateLink_publicPetitionLinkBySlug($slug: String!) {
+    publicPetitionLinkBySlug(slug: $slug) {
+      ...PublicPetitionLink_PublicPetitionLink
+    }
+  }
+  ${PublicPetitionLink_PublicPetitionLinkFragmentDoc}
+`;
+export function usePublicTemplateLink_publicPetitionLinkBySlugQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    PublicTemplateLink_publicPetitionLinkBySlugQuery,
+    PublicTemplateLink_publicPetitionLinkBySlugQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PublicTemplateLink_publicPetitionLinkBySlugQuery,
+    PublicTemplateLink_publicPetitionLinkBySlugQueryVariables
+  >(PublicTemplateLink_publicPetitionLinkBySlugDocument, options);
+}
+export function usePublicTemplateLink_publicPetitionLinkBySlugLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PublicTemplateLink_publicPetitionLinkBySlugQuery,
+    PublicTemplateLink_publicPetitionLinkBySlugQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PublicTemplateLink_publicPetitionLinkBySlugQuery,
+    PublicTemplateLink_publicPetitionLinkBySlugQueryVariables
+  >(PublicTemplateLink_publicPetitionLinkBySlugDocument, options);
+}
+export type PublicTemplateLink_publicPetitionLinkBySlugQueryHookResult = ReturnType<
+  typeof usePublicTemplateLink_publicPetitionLinkBySlugQuery
+>;
+export type PublicTemplateLink_publicPetitionLinkBySlugLazyQueryHookResult = ReturnType<
+  typeof usePublicTemplateLink_publicPetitionLinkBySlugLazyQuery
+>;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($token: String!) {
     petitionAuthToken(token: $token) {

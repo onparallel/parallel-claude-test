@@ -1,0 +1,278 @@
+import {
+  Box,
+  Button,
+  Collapse,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
+  IconButton,
+  Img,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { QuestionOutlineIcon } from "@parallel/chakra/icons";
+import { NormalLink } from "@parallel/components/common/Link";
+import { Logo } from "@parallel/components/common/Logo";
+import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
+import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { FormattedMessage } from "react-intl";
+import ResizeObserver from "react-resize-observer";
+
+export type PublicPetitionInitialFormInputs = {
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+export type PublicPetitionInitialFormProps = {
+  organization: PublicPetitionLinkOwnerOrganization;
+  title: string;
+  description: string;
+  onSubmit: SubmitHandler<PublicPetitionInitialFormInputs>;
+  isLoading: boolean;
+};
+
+export function PublicPetitionInitialForm({
+  organization,
+  title,
+  description,
+  onSubmit,
+  isLoading,
+}: PublicPetitionInitialFormProps) {
+  const router = useRouter();
+
+  const supportUrl =
+    (
+      {
+        en: "https://support.onparallel.com/hc/en-us",
+        es: "https://support.onparallel.com/hc/es",
+      } as any
+    )[router.query.locale as string] ?? "https://support.onparallel.com/hc";
+
+  const [isDialogOpen, setDialogIsOpen] = useState(false);
+  const onCloseDialog = () => setDialogIsOpen(false);
+  const closeDialogRef = useRef<HTMLButtonElement>(null);
+
+  const [showMore, setShowMore] = useState(false);
+
+  const [canExpand, setCanExpand] = useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setCanExpand(descriptionRef.current!.scrollHeight > 300);
+    setShowMore(descriptionRef.current!.scrollHeight < 300);
+  }, []);
+
+  const handleResize = () => {
+    setCanExpand(descriptionRef.current!.scrollHeight > 300);
+    setShowMore(descriptionRef.current!.scrollHeight < 300);
+  };
+
+  const handleToggleShowMore = () => setShowMore(!showMore);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PublicPetitionInitialFormInputs>();
+
+  return (
+    <>
+      <Stack spacing={4} maxWidth="container.sm" width="100%" margin="0 auto">
+        {organization.logoUrl ? (
+          <Img
+            src={organization.logoUrl}
+            aria-label={organization.name}
+            width="auto"
+            height="40px"
+          />
+        ) : (
+          <Logo width="152px" height="40px" />
+        )}
+        <Stack spacing={0}>
+          <Text fontSize="sm" color="gray.500">
+            {organization.name}
+          </Text>
+          <Text fontSize="2xl" fontWeight="bold">
+            {title}
+          </Text>
+        </Stack>
+        <Box maxWidth={{ base: "auto", md: "460px" }} width="100%" position="relative">
+          <Collapse startingHeight={200} in={showMore}>
+            <Box ref={descriptionRef} dangerouslySetInnerHTML={{ __html: description }}></Box>
+            {canExpand ? (
+              <Box
+                opacity={!showMore ? "1" : "0"}
+                position="absolute"
+                bottom="48px"
+                width="100%"
+                height="50px"
+                transition="opacity 0.3s ease"
+                background="linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,1) 100%)"
+              ></Box>
+            ) : null}
+          </Collapse>
+          {canExpand ? (
+            <Button variant="outline" size="sm" onClick={handleToggleShowMore} marginTop={4}>
+              <FormattedMessage
+                id="generic.show-more-less"
+                defaultMessage="Show {more, select, true {more} other {less}}"
+                values={{ more: !showMore }}
+              />
+            </Button>
+          ) : null}
+        </Box>
+      </Stack>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <Stack spacing={6} width="100%" margin="0 auto" maxWidth="container.sm">
+          <Text fontWeight="bold" fontSize="xl">
+            <FormattedMessage
+              id="public-petition.help.form-title"
+              defaultMessage="Enter your data to access"
+            />
+            <IconButton
+              marginLeft={2}
+              rounded="full"
+              size="xs"
+              variant="ghost"
+              aria-label="help"
+              fontSize="md"
+              color="gray.400"
+              _hover={{ color: "gray.600" }}
+              _focus={{ color: "gray.600", outline: "none" }}
+              _focusVisible={{
+                color: "gray.600",
+                boxShadow: "var(--chakra-shadows-outline)",
+              }}
+              icon={<QuestionOutlineIcon />}
+              onClick={() => setDialogIsOpen(true)}
+            />
+          </Text>
+
+          <FormControl id="first-name" isInvalid={!!errors.firstName}>
+            <FormLabel>
+              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" /> *
+            </FormLabel>
+            <Input type="text" {...register("firstName", { required: true })} />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.required-first-name-error"
+                defaultMessage="First name is required"
+              />
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl id="last-name" isInvalid={!!errors.lastName}>
+            <FormLabel>
+              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" /> *
+            </FormLabel>
+            <Input type="text" {...register("lastName", { required: true })} />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.required-last-name-error"
+                defaultMessage="Last name is required"
+              />
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl id="first-name" isInvalid={!!errors.email}>
+            <FormLabel>
+              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" /> *
+            </FormLabel>
+            <Input
+              type="email"
+              autoComplete="email"
+              {...register("email", { required: true, pattern: EMAIL_REGEX })}
+            />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.invalid-email-error"
+                defaultMessage="Please, enter a valid email"
+              />
+            </FormErrorMessage>
+          </FormControl>
+          <Button type="submit" colorScheme="purple" size="md" isLoading={isLoading}>
+            <FormattedMessage
+              id="public-petition.help.request-access-button"
+              defaultMessage="Request access"
+            />
+          </Button>
+          <ResizeObserver onResize={handleResize} />
+        </Stack>
+        <Modal
+          motionPreset="slideInBottom"
+          initialFocusRef={closeDialogRef}
+          onClose={onCloseDialog}
+          isOpen={isDialogOpen}
+          isCentered
+        >
+          <ModalOverlay />
+          <ModalContent margin={2}>
+            <ModalHeader>
+              <HStack fontSize="xl" marginRight={4}>
+                <QuestionOutlineIcon fontSize="2xl" />
+                <Text>
+                  <FormattedMessage
+                    id="public-petition.help.title"
+                    defaultMessage="Why do we ask for this data?"
+                  />
+                </Text>
+              </HStack>
+            </ModalHeader>
+            <ModalCloseButton marginTop={2} />
+            <ModalBody>
+              <Stack spacing={4}>
+                <Text>
+                  <FormattedMessage
+                    id="public-petition.help.parraf-1"
+                    defaultMessage="If you have found this link or someone has sent it to you, it means that they will request information from you. For security, we need to identify you to <b>associate your email with a secure portal</b> where you can complete it."
+                    values={{
+                      b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
+                    }}
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="public-petition.help.parraf-2"
+                    defaultMessage="In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want."
+                    values={{
+                      b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
+                    }}
+                  />
+                </Text>
+              </Stack>
+            </ModalBody>
+            <ModalFooter justifyContent="space-between">
+              <NormalLink
+                href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
+              >
+                <FormattedMessage
+                  id="public-petition.help.more-faq"
+                  defaultMessage="See more FAQ"
+                />
+              </NormalLink>
+              <Button
+                marginLeft={4}
+                ref={closeDialogRef}
+                colorScheme="purple"
+                onClick={onCloseDialog}
+              >
+                <FormattedMessage id="generic.close" defaultMessage="Close" />
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </form>
+    </>
+  );
+}
