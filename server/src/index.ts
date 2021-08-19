@@ -67,7 +67,7 @@ const server = new ApolloServer({
   },
 });
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.TS_NODE_DEV) {
   process.on("SIGTERM", async function () {
     await server.stop();
     process.exit(0);
