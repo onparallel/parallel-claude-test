@@ -88,7 +88,7 @@ class MyDocument extends Document<MyDocumentProps> {
           <Main />
           {process.env.NODE_ENV === "production" ? (
             <script
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/compiled/${locale}.js?v=${process.env.BUILD_ID}`}
               crossOrigin="anonymous"
             />
           ) : (

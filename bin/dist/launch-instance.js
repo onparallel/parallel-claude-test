@@ -89,18 +89,14 @@ async function main() {
     await wait_1.wait(5000);
     await wait_1.waitFor(async () => {
         var _a, _b, _c;
-        const result = await ec2
-            .describeInstances({ InstanceIds: [instanceId] })
-            .promise();
+        const result = await ec2.describeInstances({ InstanceIds: [instanceId] }).promise();
         return ((_c = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0].State) === null || _c === void 0 ? void 0 : _c.Name) === "running";
     }, chalk_1.default `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
     console.log(chalk_1.default `Instance {green ✓ running}`);
     const targetGroupName = `${commit}-${env}`;
     let targetGroupArn;
     try {
-        const result = await elbv2
-            .describeTargetGroups({ Names: [targetGroupName] })
-            .promise();
+        const result = await elbv2.describeTargetGroups({ Names: [targetGroupName] }).promise();
         targetGroupArn = result.TargetGroups[0].TargetGroupArn;
     }
     catch (error) {

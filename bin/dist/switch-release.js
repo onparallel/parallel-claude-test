@@ -41,7 +41,8 @@ async function main() {
         LoadBalancerArn: loadBalancerArn,
     })
         .promise();
-    const oldTargetGroupArn = result2.Listeners.find((l) => l.Protocol === "HTTPS").DefaultActions[0].TargetGroupArn;
+    const oldTargetGroupArn = result2.Listeners.find((l) => l.Protocol === "HTTPS")
+        .DefaultActions[0].TargetGroupArn;
     const result3 = await getTargetGroupInstances(oldTargetGroupArn);
     for (const instance of result3.Reservations.flatMap((r) => r.Instances)) {
         const ipAddress = instance.PrivateIpAddress;
@@ -54,9 +55,7 @@ async function main() {
     }
     console.log("Getting new target group.");
     const targetGroupName = `${commit}-${env}`;
-    const result4 = await elbv2
-        .describeTargetGroups({ Names: [targetGroupName] })
-        .promise();
+    const result4 = await elbv2.describeTargetGroups({ Names: [targetGroupName] }).promise();
     const targetGroupArn = result4.TargetGroups[0].TargetGroupArn;
     const result5 = await getTargetGroupInstances(targetGroupArn);
     for (const instance of result5.Reservations.flatMap((r) => r.Instances)) {
@@ -94,11 +93,8 @@ async function main() {
     })
         .promise();
     console.log(chalk_1.default `Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`);
-    const result6 = await elbv2
-        .describeListeners({ LoadBalancerArn: loadBalancerArn })
-        .promise();
-    const listenerArn = result6.Listeners.find((l) => l.Protocol === "HTTPS")
-        .ListenerArn;
+    const result6 = await elbv2.describeListeners({ LoadBalancerArn: loadBalancerArn }).promise();
+    const listenerArn = result6.Listeners.find((l) => l.Protocol === "HTTPS").ListenerArn;
     await elbv2
         .modifyListener({
         ListenerArn: listenerArn,

@@ -40,10 +40,7 @@ async function main() {
             TargetGroupArn: tgArn,
         })
             .promise();
-        return [
-            lb.LoadBalancerName,
-            tgHealth.TargetHealthDescriptions[0],
-        ];
+        return [lb.LoadBalancerName, tgHealth.TargetHealthDescriptions[0]];
     }));
     const instanceToLb = remeda_1.indexBy(lbs, ([_, h]) => { var _a; return (_a = h.Target) === null || _a === void 0 ? void 0 : _a.Id; });
     const instances = (r1.Reservations || [])

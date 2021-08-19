@@ -33,7 +33,10 @@ async function main() {
     const buildId = `${commit}-${env}`;
     const buildDir = `${WORK_DIR}/${buildId}`;
     console.log(chalk_1.default `Checking out the code for commit {bold ${commit}}`);
-    child_process_1.execSync(`git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`, { cwd: WORK_DIR, encoding: "utf-8" });
+    child_process_1.execSync(`git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`, {
+        cwd: WORK_DIR,
+        encoding: "utf-8",
+    });
     child_process_1.execSync(`git checkout ${commit}`, { cwd: buildDir, encoding: "utf-8" });
     child_process_1.execSync(`rm -rf .git`, { cwd: buildDir, encoding: "utf-8" });
     console.log("Installing dependencies...");
@@ -44,7 +47,9 @@ async function main() {
         encoding: "utf-8",
     });
     // remove unused browsers to keep the artifact small
-    const contents = await fs_1.promises.readdir(`${buildDir}/node_modules/playwright/.local-browsers`, { withFileTypes: true });
+    const contents = await fs_1.promises.readdir(`${buildDir}/node_modules/playwright/.local-browsers`, {
+        withFileTypes: true,
+    });
     for (const content of contents) {
         if (content.isDirectory() &&
             ["firefox-", "webkit-"].some((prefix) => content.name.startsWith(prefix))) {
@@ -66,8 +71,14 @@ async function main() {
     // Generate tokens
     const CLIENT_SERVER_TOKEN = token_1.token(32);
     const SECURITY_SERVICE_JWT_SECRET = token_1.token(32);
-    child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, { cwd: WORK_DIR, encoding: "utf-8" });
-    child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
+    child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, {
+        cwd: WORK_DIR,
+        encoding: "utf-8",
+    });
+    child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, {
+        cwd: WORK_DIR,
+        encoding: "utf-8",
+    });
     child_process_1.execSync(`echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
     console.log("Building the client");
     child_process_1.execSync(`ENV=${env} yarn build`, {

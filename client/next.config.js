@@ -13,10 +13,6 @@ const config = {
   assetPrefix: process.env.NEXT_PUBLIC_ASSETS_URL,
   poweredByHeader: false,
   webpack(config, options) {
-    if (!options.isServer) {
-      config.resolve.alias["@sentry/node"] = "@sentry/browser";
-    }
-
     config.resolve.alias["@parallel"] = __dirname;
     config.plugins.push(
       new options.webpack.DefinePlugin({
@@ -24,6 +20,10 @@ const config = {
       })
     );
 
+    // Configure sentry
+    if (!options.isServer) {
+      config.resolve.alias["@sentry/node"] = "@sentry/browser";
+    }
     if (process.env.NODE_ENV === "production" && process.env.SENTRY_AUTH_TOKEN) {
       config.plugins.push(
         new SentryWebpackPlugin({
@@ -38,6 +38,8 @@ const config = {
         })
       );
     }
+
+    // Add the why did you render script on development
     const originalEntry = config.entry;
     config.entry = async () => {
       const entries = await originalEntry();
@@ -50,6 +52,11 @@ const config = {
       }
       return entries;
     };
+
+    // Configure formatjs to not include the parser on production
+    config.resolve.alias["@formatjs/icu-messageformat-parser"] =
+      "@formatjs/icu-messageformat-parser/no-parser";
+
     return config;
   },
   async redirects() {

@@ -58,7 +58,7 @@ function useTranslations() {
     let messages: IntlConfig["messages"];
     if (process.env.NODE_ENV === "production") {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.json?v=${process.env.BUILD_ID}`
+        `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/compiled/${locale}.json?v=${process.env.BUILD_ID}`
       );
       messages = await res.json();
     } else {

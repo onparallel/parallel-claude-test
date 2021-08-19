@@ -74,13 +74,10 @@ async function main() {
     }
     const result5 = await elbv2.describeTargetGroups().promise();
     for (const tg of result5.TargetGroups) {
-        if (tg.TargetGroupName.endsWith(`-${env}`) &&
-            tg.TargetGroupArn !== tgArn) {
+        if (tg.TargetGroupName.endsWith(`-${env}`) && tg.TargetGroupArn !== tgArn) {
             console.log(chalk_1.default `Deleting target group {red {bold ${tg.TargetGroupName}}}`);
             if (!dryRun) {
-                await elbv2
-                    .deleteTargetGroup({ TargetGroupArn: tg.TargetGroupArn })
-                    .promise();
+                await elbv2.deleteTargetGroup({ TargetGroupArn: tg.TargetGroupArn }).promise();
             }
         }
     }

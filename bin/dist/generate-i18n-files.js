@@ -26,8 +26,6 @@ async function generate(locales, input, rawOutput, compiledOutput) {
             if (definition === "") {
                 missing += 1;
             }
-            if (rawOutput) {
-            }
             raw[term] = definition;
             if (compiledOutput) {
                 compiled[term] = intl_messageformat_parser_1.parse(definition);
@@ -61,6 +59,10 @@ async function generate(locales, input, rawOutput, compiledOutput) {
         }
         if (compiledOutput) {
             await json_1.writeJson(path_1.default.join(compiledOutput, `${locale}.json`), compiled);
+            await fs_1.promises.writeFile(path_1.default.join(compiledOutput, `${locale}.js`), outdent_1.default `
+          window.__LOCALE__ = "${locale}";
+          window.__LOCALE_DATA__ = ${JSON.stringify(compiled)};
+        `, "utf-8");
         }
         if (missing > 0) {
             log_1.warn(`Locale ${chalk_1.default.bold(locale)} is missing ${missing} translations.`);
