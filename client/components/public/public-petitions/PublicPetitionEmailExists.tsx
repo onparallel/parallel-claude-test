@@ -1,11 +1,12 @@
 import { Button, Img, Stack, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
+import { HandleNewPublicPetitionProps } from "@parallel/pages/[locale]/pp/[linkId]";
 import { FormattedMessage } from "react-intl";
 
 export type PublicPetitionEmailSendedProps = {
   organization: PublicPetitionLinkOwnerOrganization;
-  onNewPetition: () => void;
+  onNewPetition: ({ formData, force }: HandleNewPublicPetitionProps) => void;
   onContinue: () => void;
   isNewRequestLoading: boolean;
   isReminderLoading: boolean;
@@ -46,7 +47,7 @@ export function PublicPetitionEmailExists({
             variant="outline"
             size="md"
             fontSize="md"
-            onClick={onNewPetition}
+            onClick={() => onNewPetition({ force: true })}
             isLoading={isNewRequestLoading}
           >
             <FormattedMessage

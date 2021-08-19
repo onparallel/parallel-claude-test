@@ -29,7 +29,14 @@ export type PublicPetitionLinkSteps =
   | "EMAIL_EXISTS"
   | "REMAINDER_SENDED";
 
-function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export type HandleNewPublicPetitionProps = {
+  formData?: PublicPetitionInitialFormInputs;
+  force: boolean;
+};
+
+function PublicPetitionLink({
+  publicPetitionLinkBySlug,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
 
   const toast = useToast();
@@ -37,8 +44,6 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
   const [step, setStep] = useState<PublicPetitionLinkSteps>("INITIAL");
 
   const [submittedData, setSubmittedData] = useState<PublicPetitionInitialFormInputs>();
-
-  const { publicPetitionLinkBySlug } = data;
 
   const { id, description, title, organization } =
     publicPetitionLinkBySlug as PublicPetitionLink_PublicPetitionLinkFragment;
@@ -51,54 +56,36 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
 
   const onSubmit: SubmitHandler<PublicPetitionInitialFormInputs> = async (formData) => {
     setSubmittedData(formData);
-
-    try {
-      const { data, errors } = await createPublicPetition({
-        variables: {
-          publicPetitionLinkId: id,
-          contactFirstName: formData.firstName,
-          contactLastName: formData.lastName,
-          contactEmail: formData.email,
-        },
-      });
-
-      if (errors) {
-        throw errors;
-      }
-
-      if (data?.publicCreateAndSendPetitionFromPublicLink === "SUCCESS") {
-        setStep("EMAIL_SENDED");
-      } else if (data?.publicCreateAndSendPetitionFromPublicLink === "FAILURE") {
-        toast({
-          title: intl.formatMessage({
-            id: "public.public-petition.error-title",
-            defaultMessage: "Oops! An error happened",
-          }),
-          description: intl.formatMessage({
-            id: "public.public-petition.error-description",
-            defaultMessage: "Please try again later",
-          }),
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      // PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR
-      setStep("EMAIL_EXISTS");
-    }
+    handleNewPublicPetition({ formData, force: false });
   };
 
-  const handleNewPetition = async () => {
+  const showErrorToast = () => {
+    toast({
+      title: intl.formatMessage({
+        id: "public.public-petition.error-title",
+        defaultMessage: "Oops! An error happened",
+      }),
+      description: intl.formatMessage({
+        id: "public.public-petition.error-description",
+        defaultMessage: "Please try again later",
+      }),
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
+  const handleNewPublicPetition = async ({ formData, force }: HandleNewPublicPetitionProps) => {
     try {
+      const _data = formData ?? submittedData;
+
       const { data, errors } = await createPublicPetition({
         variables: {
           publicPetitionLinkId: id,
-          contactFirstName: submittedData?.firstName ?? "",
-          contactLastName: submittedData?.lastName ?? "",
-          contactEmail: submittedData?.email ?? "",
-          force: true,
+          contactFirstName: _data?.firstName ?? "",
+          contactLastName: _data?.lastName ?? "",
+          contactEmail: _data?.email ?? "",
+          force,
         },
       });
 
@@ -109,22 +96,16 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
       if (data?.publicCreateAndSendPetitionFromPublicLink === "SUCCESS") {
         setStep("EMAIL_SENDED");
       } else if (data?.publicCreateAndSendPetitionFromPublicLink === "FAILURE") {
-        toast({
-          title: intl.formatMessage({
-            id: "public.public-petition.error-title",
-            defaultMessage: "Oops! An error happened",
-          }),
-          description: intl.formatMessage({
-            id: "public.public-petition.error-description",
-            defaultMessage: "Please try again later",
-          }),
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
+        showErrorToast();
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      if (
+        error?.graphQLErrors?.[0]?.extensions.code === "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
+      ) {
+        setStep("EMAIL_EXISTS");
+      } else {
+        showErrorToast();
+      }
     }
   };
 
@@ -144,22 +125,26 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
       if (data?.publicSendReminder === "SUCCESS") {
         setStep("REMAINDER_SENDED");
       } else if (data?.publicSendReminder === "FAILURE") {
+        showErrorToast();
+      }
+    } catch (error) {
+      if (error?.graphQLErrors?.[0]?.extensions.code === "REMINDER_ALREADY_SENT_ERROR") {
         toast({
           title: intl.formatMessage({
-            id: "public.public-petition.error-title",
-            defaultMessage: "Oops! An error happened",
+            id: "public.public-petition.error-reminder-title",
+            defaultMessage: "Reminder already sent",
           }),
           description: intl.formatMessage({
-            id: "public.public-petition.error-description",
-            defaultMessage: "Please try again later",
+            id: "public.public-petition.error--reminder-description",
+            defaultMessage: "You can only send one reminder each 24 hours",
           }),
           status: "error",
-          duration: 9000,
+          duration: 12000,
           isClosable: true,
         });
+      } else {
+        showErrorToast();
       }
-    } catch (err) {
-      console.log(err);
     }
   };
 
@@ -210,7 +195,7 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
               <PublicPetitionEmailExists
                 organization={organization}
                 onContinue={handleContinueExisting}
-                onNewPetition={handleNewPetition}
+                onNewPetition={handleNewPublicPetition}
                 isNewRequestLoading={loading}
                 isReminderLoading={reminderLoading}
               />
@@ -337,7 +322,7 @@ export async function getServerSideProps({
       };
     } else {
       return {
-        props: { data },
+        props: { publicPetitionLinkBySlug: data.publicPetitionLinkBySlug },
       };
     }
   } catch (err) {

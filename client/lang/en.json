@@ -5955,9 +5955,19 @@
     "context": "Help them work more effectively, allowing them to review and sharing their thought around the information received."
   },
   {
+    "term": "public.public-petition.error--reminder-description",
+    "definition": "You can only send one reminder each 24 hours",
+    "context": "You can only send one reminder each 24 hours"
+  },
+  {
     "term": "public.public-petition.error-description",
     "definition": "Please try again later",
     "context": "Please try again later"
+  },
+  {
+    "term": "public.public-petition.error-reminder-title",
+    "definition": "Reminder already sent",
+    "context": "Reminder already sent"
   },
   {
     "term": "public.public-petition.error-title",

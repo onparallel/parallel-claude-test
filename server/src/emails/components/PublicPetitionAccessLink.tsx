@@ -87,6 +87,7 @@ const email: Email<PublicPetitionAccessLinkProps> = {
               <FormattedMessage
                 id="public-petition-link.text-1"
                 defaultMessage="We send you the requested access to <b>{petitionTitle}</b>."
+                values={{ petitionTitle }}
               />
             </MjmlText>
             <MjmlText>
