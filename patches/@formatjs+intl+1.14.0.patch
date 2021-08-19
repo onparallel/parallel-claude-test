@@ -1,0 +1,26 @@
+diff --git a/node_modules/@formatjs/intl/lib/src/create-intl.js b/node_modules/@formatjs/intl/lib/src/create-intl.js
+index 2a3ee61..9d4a5a7 100755
+--- a/node_modules/@formatjs/intl/lib/src/create-intl.js
++++ b/node_modules/@formatjs/intl/lib/src/create-intl.js
+@@ -15,7 +15,7 @@ function messagesContainString(messages) {
+ function verifyConfigMessages(config) {
+     if (config.defaultRichTextElements &&
+         messagesContainString(config.messages || {})) {
+-        console.warn("[@formatjs/intl] \"defaultRichTextElements\" was specified but \"message\" was not pre-compiled. \nPlease consider using \"@formatjs/cli\" to pre-compile your messages for performance.\nFor more details see https://formatjs.io/docs/getting-started/message-distribution");
++        // console.warn("[@formatjs/intl] \"defaultRichTextElements\" was specified but \"message\" was not pre-compiled. \nPlease consider using \"@formatjs/cli\" to pre-compile your messages for performance.\nFor more details see https://formatjs.io/docs/getting-started/message-distribution");
+     }
+ }
+ /**
+diff --git a/node_modules/@formatjs/intl/src/create-intl.js b/node_modules/@formatjs/intl/src/create-intl.js
+index fb4d2bf..092cd65 100755
+--- a/node_modules/@formatjs/intl/src/create-intl.js
++++ b/node_modules/@formatjs/intl/src/create-intl.js
+@@ -18,7 +18,7 @@ function messagesContainString(messages) {
+ function verifyConfigMessages(config) {
+     if (config.defaultRichTextElements &&
+         messagesContainString(config.messages || {})) {
+-        console.warn("[@formatjs/intl] \"defaultRichTextElements\" was specified but \"message\" was not pre-compiled. \nPlease consider using \"@formatjs/cli\" to pre-compile your messages for performance.\nFor more details see https://formatjs.io/docs/getting-started/message-distribution");
++        // console.warn("[@formatjs/intl] \"defaultRichTextElements\" was specified but \"message\" was not pre-compiled. \nPlease consider using \"@formatjs/cli\" to pre-compile your messages for performance.\nFor more details see https://formatjs.io/docs/getting-started/message-distribution");
+     }
+ }
+ /**
