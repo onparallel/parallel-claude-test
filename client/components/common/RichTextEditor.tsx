@@ -38,6 +38,7 @@ import {
   usePlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { CustomEditor, CustomElement, LinkElement } from "@parallel/utils/slate/types";
+import { useConstant } from "@parallel/utils/useConstant";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
@@ -242,51 +243,48 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       target,
       values,
     } = usePlaceholderPlugin(placeholderOptions);
-    const plugins = useMemo(
-      () => [
-        createReactPlugin(),
-        createHistoryPlugin(),
-        createParagraphPlugin(),
-        createBoldPlugin(),
-        createItalicPlugin(),
-        createUnderlinePlugin(),
-        createListPlugin(),
-        createAutoformatPlugin({
-          rules: [
-            {
-              mode: "block",
-              type: "list-item",
-              match: ["* ", "- "],
-              preFormat: (editor: CustomEditor) => unwrapList(editor),
-              format: (editor) => formatList(editor, "bulleted-list"),
+    const plugins = useConstant(() => [
+      createReactPlugin(),
+      createHistoryPlugin(),
+      createParagraphPlugin(),
+      createBoldPlugin(),
+      createItalicPlugin(),
+      createUnderlinePlugin(),
+      createListPlugin(),
+      createAutoformatPlugin({
+        rules: [
+          {
+            mode: "block",
+            type: "list-item",
+            match: ["* ", "- "],
+            preFormat: (editor: CustomEditor) => unwrapList(editor),
+            format: (editor) => formatList(editor, "bulleted-list"),
+          },
+          {
+            mode: "block",
+            type: "list-item",
+            match: ["1. ", "1) "],
+            preFormat: (editor: CustomEditor) => unwrapList(editor),
+            format: (editor) => formatList(editor, "numbered-list"),
+          },
+        ],
+      }),
+      placholderPlugin,
+      createHeadingPlugin({ levels: 2 }),
+      createLinkPlugin(),
+      createExitBreakPlugin({
+        rules: [
+          {
+            hotkey: "enter",
+            query: {
+              start: true,
+              end: true,
+              allow: ["heading", "subheading"],
             },
-            {
-              mode: "block",
-              type: "list-item",
-              match: ["1. ", "1) "],
-              preFormat: (editor: CustomEditor) => unwrapList(editor),
-              format: (editor) => formatList(editor, "numbered-list"),
-            },
-          ],
-        }),
-        placholderPlugin,
-        createHeadingPlugin({ levels: 2 }),
-        createLinkPlugin(),
-        createExitBreakPlugin({
-          rules: [
-            {
-              hotkey: "enter",
-              query: {
-                start: true,
-                end: true,
-                allow: ["heading", "subheading"],
-              },
-            },
-          ],
-        }),
-      ],
-      [placholderPlugin]
-    );
+          },
+        ],
+      }),
+    ]);
     const formControl = useFormControl({
       id,
       isDisabled,
@@ -294,9 +292,8 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       isRequired,
       isReadOnly,
     });
-    const editor = useMemo<CustomEditor>(
-      () => pipe(createEditor(), withPlate({ id, plugins, options, components })),
-      []
+    const editor = useConstant<CustomEditor>(() =>
+      pipe(createEditor(), withPlate({ id, plugins, options, components }))
     );
 
     useImperativeHandle(

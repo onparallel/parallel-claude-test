@@ -2,19 +2,12 @@ import { Box } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { HighlightText } from "@parallel/components/common/HighlightText";
+import { useConstant } from "@parallel/utils/useConstant";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import useMergedRef from "@react-hook/merged-ref";
 import { getNodeDeserializer, getText } from "@udecode/plate-common";
 import { getPlatePluginTypes, PlatePlugin, TRenderElementProps } from "@udecode/plate-core";
-import {
-  KeyboardEvent,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-} from "react";
+import { KeyboardEvent, ReactNode, useCallback, useEffect, useReducer, useRef } from "react";
 import { Editor, Range, Transforms } from "slate";
 import { useFocused, useSelected } from "slate-react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -43,13 +36,15 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
       search: null,
     }
   );
-  const values = search
-    ? placeholders.filter((c) => c.label.toLowerCase().includes(search.toLowerCase()))
-    : placeholders;
 
-  const valuesRef = useUpdatingRef(values);
-  const indexRef = useUpdatingRef(index);
+  const placeholdersRef = useUpdatingRef(placeholders);
   const targetRef = useUpdatingRef(target);
+  const indexRef = useUpdatingRef(index);
+  const valuesRef = useUpdatingRef(
+    search
+      ? placeholders.filter((c) => c.label.toLowerCase().includes(search.toLowerCase()))
+      : placeholders
+  );
 
   const onAddPlaceholder = useCallback(
     (editor: Editor, placeholder: Placeholder) => {
@@ -134,52 +129,48 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
     search,
     selectedIndex: index,
     target,
-    values,
+    values: valuesRef.current,
     onChangePlaceholder,
     onKeyDownPlaceholder,
     onAddPlaceholder,
     onHighlightOption,
-    plugin: useMemo<PlatePlugin>(
-      () => ({
-        // withOverrides: ((editor: CustomEditor) => {
-        //   editor.insertData = (data) => {
-        //     const text = data.getData("text/plain");
-        //     editor.insertFragment(
-        //       textWithPlaceholderToSlateNodes(text, placeholders)
-        //     );
-        //   };
-        //   return editor;
-        // }) as any,
-        inlineTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
-        voidTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
-        renderElementDeps: [placeholders],
-        renderElement: () => (props: TRenderElementProps) => {
-          const { children, attributes } = props;
-          const element = props.element as PlaceholderElement;
-          const placeholder = placeholders.find((p) => p.value === element.placeholder);
-          return placeholder ? (
-            <PlaceholderToken
-              value={element.placeholder}
-              label={placeholder.label}
-              attributes={attributes}
-            >
-              {children}
-            </PlaceholderToken>
-          ) : undefined;
-        },
-        deserialize: () => ({
-          element: getNodeDeserializer({
-            type: ELEMENT_PLACEHOLDER,
-            getNode: (el) => ({
-              type: "placeholder",
-              value: el.getAttribute("data-placeholder"),
-            }),
-            rules: [{ className: "slate-placeholder" }],
+    plugin: useConstant<PlatePlugin>(() => ({
+      // withOverrides: ((editor: CustomEditor) => {
+      //   editor.insertData = (data) => {
+      //     const text = data.getData("text/plain");
+      //     editor.insertFragment(
+      //       textWithPlaceholderToSlateNodes(text, placeholders)
+      //     );
+      //   };
+      //   return editor;
+      // }) as any,
+      inlineTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
+      voidTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
+      renderElement: () => (props: TRenderElementProps) => {
+        const { children, attributes } = props;
+        const element = props.element as PlaceholderElement;
+        const placeholder = placeholdersRef.current.find((p) => p.value === element.placeholder);
+        return placeholder ? (
+          <PlaceholderToken
+            value={element.placeholder}
+            label={placeholder.label}
+            attributes={attributes}
+          >
+            {children}
+          </PlaceholderToken>
+        ) : undefined;
+      },
+      deserialize: () => ({
+        element: getNodeDeserializer({
+          type: ELEMENT_PLACEHOLDER,
+          getNode: (el) => ({
+            type: "placeholder",
+            value: el.getAttribute("data-placeholder"),
           }),
+          rules: [{ className: "slate-placeholder" }],
         }),
       }),
-      []
-    ),
+    })),
   };
 }
 

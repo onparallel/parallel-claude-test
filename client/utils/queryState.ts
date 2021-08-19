@@ -135,7 +135,7 @@ export interface ParseQueryOptions {
 
 export function parseQuery<T extends {}>(
   query: ParsedUrlQuery,
-  shape: { [P in keyof T]: QueryItem<T[P]> },
+  shape: QueryStateOf<T>,
   { prefix }: ParseQueryOptions = {}
 ): T {
   return Object.fromEntries(
@@ -149,8 +149,10 @@ export interface QueryStateOptions {
   prefix?: string;
 }
 
+export type QueryStateOf<T extends {}> = { [P in keyof T]: QueryItem<T[P]> };
+
 export function useQueryState<T extends {}>(
-  shape: { [P in keyof T]: QueryItem<T[P]> },
+  shape: QueryStateOf<T>,
   { prefix }: QueryStateOptions = {}
 ): [T, Dispatch<SetStateAction<Partial<T>>>] {
   const router = useRouter();
