@@ -25,7 +25,7 @@ export const NewPetitionEmptySearch = ({
               id="component.new-petition-empty-search.try-public-or-create"
               defaultMessage="Try on our <LinkPublic>public templates</LinkPublic> or <LinkTemplate>create your own</LinkTemplate>"
               values={{
-                LinkTemplate: (chunks: any[]) => (
+                LinkTemplate: (chunks: any) => (
                   <Text
                     as="strong"
                     color="purple.500"
@@ -35,7 +35,7 @@ export const NewPetitionEmptySearch = ({
                     {chunks}
                   </Text>
                 ),
-                LinkPublic: (chunks: any[]) => (
+                LinkPublic: (chunks: any) => (
                   <Text
                     as="strong"
                     color="purple.500"
@@ -52,7 +52,7 @@ export const NewPetitionEmptySearch = ({
               id="component.new-petition-empty-search.other-terms-or-create"
               defaultMessage="Try other terms or <LinkTemplate>create a new template</LinkTemplate>"
               values={{
-                LinkTemplate: (chunks: any[]) => (
+                LinkTemplate: (chunks: any) => (
                   <Text
                     as="strong"
                     color="purple.500"

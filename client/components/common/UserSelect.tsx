@@ -180,7 +180,7 @@ function useUserSelectReactSelectProps<IsMulti extends boolean, IncludeGroups ex
                       id="component.user-select.no-options-contact-us"
                       defaultMessage="Contact us via email on <a>support@onparallel.com</a> or the support chat and we will create them an account"
                       values={{
-                        a: (chunks: any[]) => (
+                        a: (chunks: any) => (
                           <NormalLink href={`mailto:${chunks[0]}`}>{chunks}</NormalLink>
                         ),
                       }}

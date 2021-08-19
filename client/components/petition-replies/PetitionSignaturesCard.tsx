@@ -285,7 +285,7 @@ export const PetitionSignaturesCard = Object.assign(
                 id="component.petition-signatures-card.no-signature-configured-2"
                 defaultMessage="If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
                 values={{
-                  a: (chunks: any[]) => (
+                  a: (chunks: any) => (
                     <Link href={`/app/petitions/${petition.id}/compose`}>{chunks}</Link>
                   ),
                 }}

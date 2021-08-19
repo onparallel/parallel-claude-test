@@ -209,7 +209,7 @@ export function PetitionTagListCellContent({
                 defaultMessage="and <b>{extra} more</b>"
                 values={{
                   extra: extra.length,
-                  b: (chunks: any[]) => (
+                  b: (chunks: any) => (
                     <SmallPopover
                       width="min-content"
                       placement="bottom-end"

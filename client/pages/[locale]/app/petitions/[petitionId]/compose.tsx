@@ -606,7 +606,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     id="petition.send-from-activity"
                     defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
                     values={{
-                      a: (chunks: any[]) => (
+                      a: (chunks: any) => (
                         <Link href={`/app/petitions/${petitionId}/activity`}>{chunks}</Link>
                       ),
                     }}

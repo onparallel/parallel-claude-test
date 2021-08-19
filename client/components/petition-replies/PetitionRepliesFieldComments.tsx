@@ -153,7 +153,7 @@ export function PetitionRepliesFieldComments({
                     id="petition-replies.field-comments.disabled-comments-1"
                     defaultMessage="Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab."
                     values={{
-                      a: (chunks: any[]) => (
+                      a: (chunks: any) => (
                         <Link href={`/app/petitions/${petitionId}/compose`}>{chunks}</Link>
                       ),
                     }}

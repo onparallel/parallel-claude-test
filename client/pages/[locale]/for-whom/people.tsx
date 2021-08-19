@@ -49,7 +49,7 @@ function People() {
                     id="public.case.laura.time-spent"
                     defaultMessage="Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work."
                     values={{
-                      a: (chunks: any[]) => (
+                      a: (chunks: any) => (
                         <Text as="em" fontStyle="normal" color="purple.500">
                           {chunks}
                         </Text>
@@ -75,7 +75,7 @@ function People() {
                   id="public.case.laura.non-billable"
                   defaultMessage="All these tasks add up to more than <a>20 hours a month</a> that Laura cannot bill to her clients."
                   values={{
-                    a: (chunks: any[]) => (
+                    a: (chunks: any) => (
                       <Text as="em" fontStyle="normal" color="purple.500">
                         {chunks}
                       </Text>
@@ -100,7 +100,7 @@ function People() {
                 id="public.case.laura.recently-discovered"
                 defaultMessage="Laura has recently discovered Parallel and is <a>regaining almost an hour a day</a>."
                 values={{
-                  a: (chunks: any[]) => (
+                  a: (chunks: any) => (
                     <Text as="em" fontStyle="normal" color="purple.500">
                       {chunks}
                     </Text>
@@ -124,7 +124,7 @@ function People() {
                   id="public.case.laura.increased-billing"
                   defaultMessage="In just one month, Laura has managed to increase her billable hours and an <a>additional net income of € 1,500 per month</a>."
                   values={{
-                    a: (chunks: any[]) => (
+                    a: (chunks: any) => (
                       <Text as="em" fontStyle="normal" color="purple.500">
                         {chunks}
                       </Text>

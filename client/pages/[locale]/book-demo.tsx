@@ -117,7 +117,7 @@ function BookDemo() {
                 id="public.invite.review-privacy"
                 defaultMessage="For more information, please review our <a>Privacy Policy</a>."
                 values={{
-                  a: (chunks: any[]) => <Link href="/legal/privacy">{chunks}</Link>,
+                  a: (chunks: any) => <Link href="/legal/privacy">{chunks}</Link>,
                 }}
               />
             </Text>

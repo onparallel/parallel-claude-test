@@ -24,7 +24,7 @@ export const NewPetitionEmptyTempaltes = ({
             id="component.new-petition-empty-templates.try-public-or-create"
             defaultMessage="Try one of our <LinkPublic>public templates</LinkPublic> or <LinkTemplate>create your own</LinkTemplate>!"
             values={{
-              LinkTemplate: (chunks: any[]) => (
+              LinkTemplate: (chunks: any) => (
                 <Text
                   as="strong"
                   color="purple.500"
@@ -34,7 +34,7 @@ export const NewPetitionEmptyTempaltes = ({
                   {chunks}
                 </Text>
               ),
-              LinkPublic: (chunks: any[]) => (
+              LinkPublic: (chunks: any) => (
                 <Text
                   as="strong"
                   color="purple.500"

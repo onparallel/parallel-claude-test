@@ -138,7 +138,7 @@ function Tokens() {
             id="settings.api-tokens.explainer"
             defaultMessage="Personal Access Tokens can be used to access the <a>Parallel API</a>."
             values={{
-              a: (chunks: any[]) => (
+              a: (chunks: any) => (
                 <NormalLink href="/developers/api" target="_blank">
                   {chunks}
                 </NormalLink>

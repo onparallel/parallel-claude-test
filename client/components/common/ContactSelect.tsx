@@ -231,7 +231,7 @@ const _components: AsyncCreatableSelectProps<ContactSelectSelection, true, never
                 defaultMessage="We could not find any existing contacts for <em>{search}</em>"
                 values={{
                   search,
-                  em: (chunks: any[]) => <em>{chunks}</em>,
+                  em: (chunks: any) => <em>{chunks}</em>,
                 }}
               />
             </Text>

@@ -269,7 +269,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                             id="recipient-view.petition-signature-request-sent-alert"
                             defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
                             values={{
-                              a: (chunks: any[]) => (
+                              a: (chunks: any) => (
                                 <ContactListPopover
                                   contacts={petition.signature!.signers.map((c) => c!).slice(1)}
                                 >

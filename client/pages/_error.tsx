@@ -66,7 +66,7 @@ export default function CustomError({
           id="error.unknown-error.text"
           defaultMessage="Please try again later and if the error persists <a>reach out to support</a> for help."
           values={{
-            a: (chunks: any[]) => (
+            a: (chunks: any) => (
               <NormalLink href={`mailto:support@onparallel.com`}>{chunks}</NormalLink>
             ),
           }}

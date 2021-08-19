@@ -92,7 +92,7 @@ export function RecipientSelectGroups({
                   id="component.recipient-select-groups.unknown-contacts-message-2"
                   defaultMessage="You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
                   values={{
-                    a: (chunks: any[]) => <Link href="/app/contacts">{chunks}</Link>,
+                    a: (chunks: any) => <Link href="/app/contacts">{chunks}</Link>,
                   }}
                 />
               </Text>

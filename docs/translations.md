@@ -28,11 +28,7 @@ If you have used any of these 2 methods to localize some text:
 Simple interpolations
 
 ```tsx
-<FormattedMessage
-  id="greeting"
-  defaultMessage="Hello {name}"
-  values={{ name }}
-/>
+<FormattedMessage id="greeting" defaultMessage="Hello {name}" values={{ name }} />
 ```
 
 ```json
@@ -64,8 +60,8 @@ Embeeding React
   id="marketing-cta"
   defaultMessage="Click <a>here</a> to get a <b>free prize</b>!"
   values={{
-    a: (chunks: any[]) => <Link href="foo">{chunks}</Link>,
-    b: (chunks: any[]) => <b>{chunks}</b>
+    a: (chunks: any) => <Link href="foo">{chunks}</Link>,
+    b: (chunks: any) => <b>{chunks}</b>,
   }}
 />
 ```
@@ -86,16 +82,16 @@ export function MyComponent() {
       link: "...",
       text: intl.formatMessage({
         id: "links.home",
-        defaultMessage: "Home"
-      })
+        defaultMessage: "Home",
+      }),
     },
     ...{
       link: "...",
       text: intl.formatMessage({
         id: "links.account",
-        defaultMessage: "Account"
-      })
-    }
+        defaultMessage: "Account",
+      }),
+    },
   ];
   return (
     <>

@@ -239,7 +239,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
                 id="component.petition-field-type-select-dropdown.text-description"
                 defaultMessage="Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
                 values={{
-                  i: (chunks: any[]) => (
+                  i: (chunks: any) => (
                     <Text mt={1} as="p">
                       <i>{chunks}</i>
                     </Text>
@@ -251,7 +251,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
                 id="component.petition-field-type-select-dropdown.short-text-description"
                 defaultMessage="Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
                 values={{
-                  i: (chunks: any[]) => (
+                  i: (chunks: any) => (
                     <Text mt={1} as="p">
                       <i>{chunks}</i>
                     </Text>
