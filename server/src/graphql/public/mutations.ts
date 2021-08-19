@@ -1082,6 +1082,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
     contactEmail: nonNull(stringArg()),
   },
+  authorize: isValidPublicPetitionLink("publicPetitionLinkId"),
   validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
   resolve: async (_, args, ctx) => {
     const [access, [linkOwner]] = await Promise.all([

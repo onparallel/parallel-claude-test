@@ -31,6 +31,8 @@ import {
   PetitionPermission,
   PetitionPermissionType,
   PetitionUserNotification,
+  PublicPetitionLink,
+  PublicPetitionLinkUser,
   Tag,
   User,
   UserAuthenticationToken,
@@ -490,6 +492,31 @@ export class Mocks {
         created_from: faker.internet.email(),
       })
       .returning("*");
+  }
+
+  async createRandomPublicPetitionLink(
+    templateId: number,
+    ownerId: number,
+    builder?: () => Partial<PublicPetitionLink>
+  ) {
+    const [data] = await this.knex<PublicPetitionLink>("public_petition_link")
+      .insert({
+        template_id: templateId,
+        description: faker.lorem.paragraph(),
+        title: faker.lorem.words(),
+        is_active: true,
+        slug: faker.lorem.words(3).replace(" ", "-").toLowerCase(),
+        ...builder?.(),
+      })
+      .returning("*");
+
+    await this.knex<PublicPetitionLinkUser>("public_petition_link_user").insert({
+      public_petition_link_id: data.id,
+      user_id: ownerId,
+      type: "OWNER",
+    });
+
+    return data;
   }
 }
 
