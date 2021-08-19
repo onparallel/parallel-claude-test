@@ -57,7 +57,7 @@ class MyDocument extends Document<MyDocumentProps> {
           {process.env.NODE_ENV === "production" ? (
             <link
               rel="preload"
-              href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
+              href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/compiled/${locale}.js?v=${process.env.BUILD_ID}`}
               as="script"
               crossOrigin="anonymous"
             />
