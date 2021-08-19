@@ -404,6 +404,7 @@ export type Mutation = {
   publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
   /** Updates a reply of checkbox field. */
   publicUpdateCheckboxReply: PublicPetitionFieldReply;
@@ -831,6 +832,11 @@ export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   preview?: Maybe<Scalars["Boolean"]>;
+};
+
+export type MutationpublicSendReminderArgs = {
+  contactEmail: Scalars["String"];
+  publicPetitionLinkId: Scalars["GID"];
 };
 
 export type MutationpublicSendVerificationCodeArgs = {

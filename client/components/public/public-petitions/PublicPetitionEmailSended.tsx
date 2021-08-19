@@ -28,17 +28,14 @@ export function PublicPetitionEmailSended({ organization, email }: PublicPetitio
           <Text>
             <FormattedMessage
               id="public-petition-email-sended.body.parraf-1"
-              defaultMessage="We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure the privacy and security of your data"
-              values={{
-                email,
-                b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
-              }}
+              defaultMessage="We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure your privacy and security."
+              values={{ email }}
             />
           </Text>
           <Text>
             <FormattedMessage
               id="public-petition-email-sended.body.parraf-2"
-              defaultMessage="Can't find our email? Check the spam tray and if it is not, contact the person who shared the link with you."
+              defaultMessage="Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link."
             />
           </Text>
         </Stack>

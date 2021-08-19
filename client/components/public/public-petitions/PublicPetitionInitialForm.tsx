@@ -214,6 +214,7 @@ export function PublicPetitionInitialForm({
           initialFocusRef={closeDialogRef}
           onClose={onCloseDialog}
           isOpen={isDialogOpen}
+          size="xl"
           isCentered
         >
           <ModalOverlay />
@@ -235,19 +236,13 @@ export function PublicPetitionInitialForm({
                 <Text>
                   <FormattedMessage
                     id="public-petition.help.parraf-1"
-                    defaultMessage="If you have found this link or someone has sent it to you, it means that they will request information from you. For security, we need to identify you to <b>associate your email with a secure portal</b> where you can complete it."
-                    values={{
-                      b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
-                    }}
+                    defaultMessage="If you have found this link or someone has sent it to you, it means that they need some information. For security, we need to identify you and so we can <b>associate your email to a secure portal</b> where you can complete it."
                   />
                 </Text>
                 <Text>
                   <FormattedMessage
                     id="public-petition.help.parraf-2"
                     defaultMessage="In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want."
-                    values={{
-                      b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
-                    }}
                   />
                 </Text>
               </Stack>
@@ -258,7 +253,7 @@ export function PublicPetitionInitialForm({
               >
                 <FormattedMessage
                   id="public-petition.help.more-faq"
-                  defaultMessage="See more FAQ"
+                  defaultMessage="See more frequently asked questions"
                 />
               </NormalLink>
               <Button

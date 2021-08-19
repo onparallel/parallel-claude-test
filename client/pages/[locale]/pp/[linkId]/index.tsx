@@ -14,6 +14,7 @@ import {
   PublicTemplateLink_publicPetitionLinkBySlugQuery,
   PublicTemplateLink_publicPetitionLinkBySlugQueryVariables,
   usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation,
+  usePublicPetitionLink_publicSendReminderMutation,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isInsecureBrowser } from "@parallel/utils/isInsecureBrowser";
@@ -44,7 +45,9 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
 
   const [createPublicPetition, { loading }] =
     usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation({});
-  const reminderLoading = false;
+
+  const [sendReminder, { loading: reminderLoading }] =
+    usePublicPetitionLink_publicSendReminderMutation({});
 
   const onSubmit: SubmitHandler<PublicPetitionInitialFormInputs> = async (formData) => {
     setSubmittedData(formData);
@@ -81,7 +84,7 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
         });
       }
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       // PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR
       setStep("EMAIL_EXISTS");
     }
@@ -125,8 +128,39 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
     }
   };
 
-  const handleContinueExisting = () => {
-    setStep("REMAINDER_SENDED");
+  const handleContinueExisting = async () => {
+    try {
+      const { data, errors } = await sendReminder({
+        variables: {
+          publicPetitionLinkId: id,
+          contactEmail: submittedData?.email ?? "",
+        },
+      });
+
+      if (errors) {
+        throw errors;
+      }
+
+      if (data?.publicSendReminder === "SUCCESS") {
+        setStep("REMAINDER_SENDED");
+      } else if (data?.publicSendReminder === "FAILURE") {
+        toast({
+          title: intl.formatMessage({
+            id: "public.public-petition.error-title",
+            defaultMessage: "Oops! An error happened",
+          }),
+          description: intl.formatMessage({
+            id: "public.public-petition.error-description",
+            defaultMessage: "Please try again later",
+          }),
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -175,7 +209,6 @@ function PublicPetitionLink({ data }: InferGetServerSidePropsType<typeof getServ
             ) : step === "EMAIL_EXISTS" ? (
               <PublicPetitionEmailExists
                 organization={organization}
-                email={submittedData?.email ?? ""}
                 onContinue={handleContinueExisting}
                 onNewPetition={handleNewPetition}
                 isNewRequestLoading={loading}
@@ -254,6 +287,14 @@ PublicPetitionLink.mutations = [
         contactEmail: $contactEmail
         force: $force
       )
+    }
+  `,
+  gql`
+    mutation PublicPetitionLink_publicSendReminder(
+      $publicPetitionLinkId: GID!
+      $contactEmail: String!
+    ) {
+      publicSendReminder(publicPetitionLinkId: $publicPetitionLinkId, contactEmail: $contactEmail)
     }
   `,
 ];

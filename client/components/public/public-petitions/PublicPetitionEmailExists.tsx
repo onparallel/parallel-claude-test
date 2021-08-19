@@ -5,7 +5,6 @@ import { FormattedMessage } from "react-intl";
 
 export type PublicPetitionEmailSendedProps = {
   organization: PublicPetitionLinkOwnerOrganization;
-  email: string;
   onNewPetition: () => void;
   onContinue: () => void;
   isNewRequestLoading: boolean;
@@ -14,7 +13,6 @@ export type PublicPetitionEmailSendedProps = {
 
 export function PublicPetitionEmailExists({
   organization,
-  email,
   onNewPetition,
   onContinue,
   isNewRequestLoading,
@@ -38,11 +36,7 @@ export function PublicPetitionEmailExists({
         <Text>
           <FormattedMessage
             id="public-petition-email-exists.body"
-            defaultMessage="There is already an access associated with the mail (<b>{email}</b>). If you start a new request, a new access will be created to complete the information from scratch. What do you want to do?"
-            values={{
-              email,
-              b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
-            }}
+            defaultMessage="There is already an access associated to this contact. If you start a new petition, new access will be created to complete the information afresh. What do you want to do?"
           />
         </Text>
 
@@ -57,7 +51,7 @@ export function PublicPetitionEmailExists({
           >
             <FormattedMessage
               id="public-petition-email-exists.new-petition-button"
-              defaultMessage="Start a new petition"
+              defaultMessage="Start new petition"
             />
           </Button>
           <Button
@@ -70,7 +64,7 @@ export function PublicPetitionEmailExists({
           >
             <FormattedMessage
               id="public-petition-email-exists.continue-existing-button"
-              defaultMessage="Continue existing"
+              defaultMessage="Continue the existing"
             />
           </Button>
         </Stack>

@@ -435,6 +435,7 @@ export interface Mutation {
   publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
   /** Updates a reply of checkbox field. */
   publicUpdateCheckboxReply: PublicPetitionFieldReply;
@@ -862,6 +863,11 @@ export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   preview?: Maybe<Scalars["Boolean"]>;
+}
+
+export interface MutationpublicSendReminderArgs {
+  contactEmail: Scalars["String"];
+  publicPetitionLinkId: Scalars["GID"];
 }
 
 export interface MutationpublicSendVerificationCodeArgs {
@@ -12252,6 +12258,13 @@ export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation
   publicCreateAndSendPetitionFromPublicLink: Result;
 };
 
+export type PublicPetitionLink_publicSendReminderMutationVariables = Exact<{
+  publicPetitionLinkId: Scalars["GID"];
+  contactEmail: Scalars["String"];
+}>;
+
+export type PublicPetitionLink_publicSendReminderMutation = { publicSendReminder: Result };
+
 export type PublicTemplateLink_publicPetitionLinkBySlugQueryVariables = Exact<{
   slug: Scalars["String"];
 }>;
@@ -19523,6 +19536,29 @@ export function usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkM
 }
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationHookResult =
   ReturnType<typeof usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation>;
+export const PublicPetitionLink_publicSendReminderDocument = gql`
+  mutation PublicPetitionLink_publicSendReminder(
+    $publicPetitionLinkId: GID!
+    $contactEmail: String!
+  ) {
+    publicSendReminder(publicPetitionLinkId: $publicPetitionLinkId, contactEmail: $contactEmail)
+  }
+`;
+export function usePublicPetitionLink_publicSendReminderMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PublicPetitionLink_publicSendReminderMutation,
+    PublicPetitionLink_publicSendReminderMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PublicPetitionLink_publicSendReminderMutation,
+    PublicPetitionLink_publicSendReminderMutationVariables
+  >(PublicPetitionLink_publicSendReminderDocument, options);
+}
+export type PublicPetitionLink_publicSendReminderMutationHookResult = ReturnType<
+  typeof usePublicPetitionLink_publicSendReminderMutation
+>;
 export const PublicTemplateLink_publicPetitionLinkBySlugDocument = gql`
   query PublicTemplateLink_publicPetitionLinkBySlug($slug: String!) {
     publicPetitionLinkBySlug(slug: $slug) {

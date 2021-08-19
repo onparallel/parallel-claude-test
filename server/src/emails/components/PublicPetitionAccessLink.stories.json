@@ -1,0 +1,31 @@
+{
+  "title": "Public Petition Access Link",
+  "stories": [
+    {
+      "name": "Public Petition Access Link",
+      "parameters": {
+        "server": {
+          "id": "PublicPetitionAccessLink"
+        }
+      },
+      "args": {
+        "fullName": "Derek Lou",
+        "petitionTitle": "Some petition title",
+        "keycode": "asdfghjkl",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://localhost/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "fullName": { "control": { "type": "text" } },
+        "petitionTitle": { "control": { "type": "text" } },
+        "keycode": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

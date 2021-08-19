@@ -285,6 +285,21 @@
     "context": "{ownerName} ({ownerEmail}) has shared the following petition with you."
   },
   {
+    "term": "public-petition-link.text-1",
+    "definition": "Le enviamos el acceso solicitado al formulario de <b>{petitionTitle}</b>.",
+    "context": "We send you the requested access to <b>{petitionTitle}</b>."
+  },
+  {
+    "term": "public-petition-link.text-2",
+    "definition": "La información se irá guardando automáticamente en la plataforma, pudiendo continuar el proceso más tarde a través del mismo enlace.",
+    "context": "The information will be automatically saved on the platform, and you can continue the process later through the same link."
+  },
+  {
+    "term": "public-petition-link.text-3",
+    "definition": "Para cualquier duda o comentario puede comunicarse con nosotros en los espacios señalados en la propia plataforma.",
+    "context": "If you have any questions or comments you can contact us in the designated spaces on the platform."
+  },
+  {
     "term": "reminder.click-finalize",
     "definition": "Si ya subiste toda la información, dale click a <b>Finalizar</b> en la página.",
     "context": "If you already submitted all the information, click <b>Finalize</b> on the page."

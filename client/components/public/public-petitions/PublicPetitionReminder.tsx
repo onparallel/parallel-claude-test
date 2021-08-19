@@ -25,17 +25,14 @@ export function PublicPetitionReminder({ organization, email }: PublicPetitionRe
           <Text>
             <FormattedMessage
               id="public-petition-reminder.body.parraf-1"
-              defaultMessage="We have sent a reminder to <b>{email}</b> with access to your request so that you can access it again and continue completing it."
-              values={{
-                email,
-                b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
-              }}
+              defaultMessage="We have sent a reminder to <b>{email}</b> with access to your previous request so you can get back and continue to complete it."
+              values={{ email }}
             />
           </Text>
           <Text>
             <FormattedMessage
               id="public-petition-reminder.body.parraf-2"
-              defaultMessage="Can't find our email? Check the spam tray and if it is not, contact the person who shared the link with you."
+              defaultMessage="Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link."
             />
           </Text>
         </Stack>
