@@ -54,8 +54,10 @@ const config = {
     };
 
     // Configure formatjs to not include the parser on production
-    config.resolve.alias["@formatjs/icu-messageformat-parser"] =
-      "@formatjs/icu-messageformat-parser/no-parser";
+    if (process.env.NODE_ENV === "production") {
+      config.resolve.alias["@formatjs/icu-messageformat-parser"] =
+        "@formatjs/icu-messageformat-parser/no-parser";
+    }
 
     return config;
   },
