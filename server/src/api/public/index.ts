@@ -93,6 +93,8 @@ import {
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
   PetitionFieldType,
+  PetitionFragment as PetitionFragmentType,
+  SubscriptionFragment as SubscriptionFragmentType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
   RemoveUserGroupPermission_removePetitionPermissionMutation,
@@ -107,7 +109,11 @@ import {
   TransferPetition_transferPetitionOwnershipMutationVariables,
   UpdatePetition_PetitionMutation,
   UpdatePetition_PetitionMutationVariables,
+  TemplateFragment as TemplateFragmentType,
 } from "./__types";
+
+function assert(condition: any): asserts condition {}
+function assertType<T>(value: any): asserts value is T {}
 
 export const api = new RestApi({
   openapi: "3.0.2",
@@ -257,7 +263,9 @@ api
         `,
         query
       );
-      return Ok(result.petitions);
+      const { items, totalCount } = result.petitions;
+      assertType<PetitionFragmentType[]>(items);
+      return Ok({ items, totalCount });
     }
   )
   .post(
@@ -289,7 +297,7 @@ api
         `,
         body
       );
-
+      assert("id" in result.createPetition);
       return Created(result.createPetition);
     }
   );
@@ -326,6 +334,7 @@ api
         `,
         { petitionId: params.petitionId }
       );
+      assert("id" in result.petition!);
       return Ok(result.petition!);
     }
   )
@@ -355,6 +364,7 @@ api
         `,
         { petitionId: params.petitionId, data: body }
       );
+      assert("id" in result.updatePetition!);
       return Ok(result.updatePetition!);
     }
   )
@@ -444,6 +454,7 @@ api
         `,
         { petitionId: params.petitionId }
       );
+      assert("accesses" in result.petition!);
       return Ok(result.petition!.accesses);
     }
   )
@@ -1012,6 +1023,7 @@ api
         `,
         { petitionId: params.petitionId }
       );
+      assert("subscriptions" in result.petition!);
       return Ok(result.petition!.subscriptions);
     }
   )
@@ -1082,7 +1094,7 @@ api
         }
       );
 
-      return Created(result.createPetitionSubscription);
+      return Created(result.createPetitionSubscription as SubscriptionFragmentType);
     }
   );
 
@@ -1166,7 +1178,9 @@ api.path("/templates").get(
       `,
       query
     );
-    return Ok(result.templates);
+    const { items, totalCount } = result.templates;
+    assertType<TemplateFragmentType[]>(items);
+    return Ok({ items, totalCount });
   }
 );
 
@@ -1204,6 +1218,7 @@ api
         `,
         { templateId: params.templateId }
       );
+      assert("id" in result.template!);
       return Ok(result.template!);
     }
   )
