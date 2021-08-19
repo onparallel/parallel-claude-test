@@ -67,6 +67,13 @@ const server = new ApolloServer({
   },
 });
 
+if (process.env.NODE_ENV === "development") {
+  process.on("SIGTERM", async function () {
+    await server.stop();
+    process.exit(0);
+  });
+}
+
 server.start().then(() => {
   server.applyMiddleware({ app });
 
