@@ -1008,7 +1008,6 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId),
         ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(args.publicPetitionLinkId),
       ]);
-      const template = await ctx.petitions.loadPetition(publicPetitionLink!.template_id);
 
       return await ctx.petitions.withTransaction(async (t) => {
         const [newPetition, contact] = await Promise.all([
@@ -1019,9 +1018,6 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
               is_template: false,
               status: "DRAFT",
               from_public_petition_link_id: args.publicPetitionLinkId,
-              name: (template!.locale === "es" ? "[Enlace] " : "[Link] ").concat(
-                publicPetitionLink!.title
-              ),
             },
             false, // do not insert permissions for the cloned petition
             t
