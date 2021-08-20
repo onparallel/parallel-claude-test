@@ -2126,8 +2126,8 @@
   },
   {
     "term": "component.third-party.accept-button",
-    "definition": "Aceptar cookies",
-    "context": "Accept cookies"
+    "definition": "Aceptar",
+    "context": "Accept"
   },
   {
     "term": "component.third-party.advertising-description",
@@ -2156,8 +2156,8 @@
   },
   {
     "term": "component.third-party.banner-text",
-    "definition": "Utilizamos cookies y otras tecnologías similares para ayudarnos a mejorar la tu experiencia y personalizar el contenido y los anuncios.",
-    "context": "We use cookies and other similar technologies to help us improve your experience and personalize the content and advertising."
+    "definition": "Utilizamos cookies para mejorar tu experiencia y personalizar el contenido y anuncios.",
+    "context": "We use cookies to improve your browsing experience and personalize the content and advertising."
   },
   {
     "term": "component.third-party.functional-description",
@@ -2171,8 +2171,8 @@
   },
   {
     "term": "component.third-party.manage-button",
-    "definition": "Gestionar cookies",
-    "context": "Manage cookies"
+    "definition": "Gestionar",
+    "context": "Manage"
   },
   {
     "term": "component.third-party.preferences-description",

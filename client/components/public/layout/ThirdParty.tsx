@@ -276,13 +276,13 @@ export function ThirdParty() {
           spacing={4}
           direction={{ base: "column", md: "row" }}
           alignItems="center"
-          paddingY={8}
+          paddingY={{ base: 4, md: 6 }}
         >
           <Stack flex="1" spacing={1}>
             <Text>
               <FormattedMessage
                 id="component.third-party.banner-text"
-                defaultMessage="We use cookies and other similar technologies to help us improve your experience and personalize the content and advertising."
+                defaultMessage="We use cookies to improve your browsing experience and personalize the content and advertising."
               />
             </Text>
             <Text>
@@ -302,43 +302,39 @@ export function ThirdParty() {
               </Link>
             </Text>
           </Stack>
-          <Button
-            borderColor="white"
-            borderWidth="2px"
-            variant="outline"
-            backgroundColor="transparent"
-            color="white"
-            _hover={{
-              backgroundColor: "purple.600",
-              color: "white",
-            }}
-            onClick={() => {
-              setShowCookiePreferences("1");
-            }}
-          >
-            <FormattedMessage
-              id="component.third-party.manage-button"
-              defaultMessage="Manage cookies"
-            />
-          </Button>
-          <Button
-            id="cookie-content-accept"
-            borderColor="white"
-            borderWidth="2px"
-            variant="outline"
-            backgroundColor="white"
-            color="purple.600"
-            _hover={{
-              color: "purple.700",
-            }}
-            rightIcon={<CheckIcon />}
-            onClick={handleAcceptAllCookies}
-          >
-            <FormattedMessage
-              id="component.third-party.accept-button"
-              defaultMessage="Accept cookies"
-            />
-          </Button>
+          <Stack spacing={4} direction={{ base: "column", sm: "row" }}>
+            <Button
+              borderColor="white"
+              borderWidth="2px"
+              variant="outline"
+              backgroundColor="transparent"
+              color="white"
+              _hover={{
+                backgroundColor: "purple.600",
+                color: "white",
+              }}
+              onClick={() => {
+                setShowCookiePreferences("1");
+              }}
+            >
+              <FormattedMessage id="component.third-party.manage-button" defaultMessage="Manage" />
+            </Button>
+            <Button
+              id="cookie-content-accept"
+              borderColor="white"
+              borderWidth="2px"
+              variant="outline"
+              backgroundColor="white"
+              color="purple.600"
+              _hover={{
+                color: "purple.700",
+              }}
+              rightIcon={<CheckIcon />}
+              onClick={handleAcceptAllCookies}
+            >
+              <FormattedMessage id="component.third-party.accept-button" defaultMessage="Accept" />
+            </Button>
+          </Stack>
         </PublicContainer>
       ) : null}
     </>
