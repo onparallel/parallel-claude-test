@@ -1,20 +1,7 @@
 import Head from "next/head";
-import Router from "next/router";
-import { memo, useEffect } from "react";
+import { memo } from "react";
 
 export const Segment = memo(() => {
-  useEffect(() => {
-    const handleRouteChange = () => {
-      window.analytics?.page({
-        pathname: Router.pathname,
-        params: Router.query,
-      });
-    };
-    handleRouteChange();
-    Router.events.on("routeChangeComplete", handleRouteChange);
-    return () => Router.events.off("routeChangeComplete", handleRouteChange);
-  }, []);
-
   return (
     <Head>
       <script
