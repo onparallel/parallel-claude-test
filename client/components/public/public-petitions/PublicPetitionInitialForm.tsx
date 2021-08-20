@@ -101,7 +101,7 @@ export function PublicPetitionInitialForm({
         ) : (
           <Logo width="152px" height="40px" />
         )}
-        <Stack spacing={0}>
+        <Stack spacing={0} maxWidth={{ base: "auto", md: "460px" }}>
           <Text fontSize="sm" color="gray.500">
             {organization.name}
           </Text>
