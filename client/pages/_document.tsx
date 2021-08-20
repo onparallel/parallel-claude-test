@@ -49,48 +49,56 @@ class MyDocument extends Document<MyDocumentProps> {
 
   render() {
     const { locale, messages } = this.props;
+    const polyfillsUrl = `https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
+      [
+        "matchMedia",
+        "requestAnimationFrame",
+        "Array.prototype.flat",
+        "Array.prototype.flatMap",
+        "Object.fromEntries",
+        ...[
+          "Intl.ListFormat",
+          "Intl.NumberFormat",
+          "Intl.DateTimeFormat",
+          "Intl.PluralRules",
+          "Intl.RelativeTimeFormat",
+        ].flatMap((polyfill) => [
+          polyfill,
+          ...languages.map((lang) => `${polyfill}.~locale.${lang.locale}`),
+        ]),
+      ].join(",")
+    )}`;
+    const localeDataUrl = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/compiled/${locale}.js?v=${process.env.BUILD_ID}`;
     return (
       <Html lang={locale}>
         <Head>
           <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
-          <link href="https://polyfill.io" rel="preconnect" />
+          <link href={polyfillsUrl} rel="preload" as="script" crossOrigin="anonymous" />
           {process.env.NODE_ENV === "production" ? (
-            <link
-              rel="preload"
-              href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/compiled/${locale}.js?v=${process.env.BUILD_ID}`}
-              as="script"
-              crossOrigin="anonymous"
-            />
+            <link href={localeDataUrl} rel="preload" as="script" crossOrigin="anonymous" />
           ) : null}
-          <script
-            src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
-              [
-                "matchMedia",
-                "requestAnimationFrame",
-                "Array.prototype.flat",
-                "Array.prototype.flatMap",
-                "Object.fromEntries",
-                ...[
-                  "Intl.ListFormat",
-                  "Intl.NumberFormat",
-                  "Intl.DateTimeFormat",
-                  "Intl.PluralRules",
-                  "Intl.RelativeTimeFormat",
-                ].flatMap((polyfill) => [
-                  polyfill,
-                  ...languages.map((lang) => `${polyfill}.~locale.${lang.locale}`),
-                ]),
-              ].join(",")
-            )}`}
-          />
+          {(
+            [
+              ["ibm-plex-sans-v8-latin", ["300", "regular", "500", "600"]],
+              ["source-sans-pro-v14-latin", ["regular", "600"]],
+            ] as [string, string[]][]
+          ).flatMap(([name, types]) =>
+            types.map((type) => (
+              <link
+                key={`${name}-${type}`}
+                rel="preload"
+                href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/${name}-${type}.woff2`}
+                as="font"
+                crossOrigin="anonymous"
+              />
+            ))
+          )}
         </Head>
         <body>
           <Main />
+          <script src={polyfillsUrl} crossOrigin="anonymous" />
           {process.env.NODE_ENV === "production" ? (
-            <script
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/compiled/${locale}.js?v=${process.env.BUILD_ID}`}
-              crossOrigin="anonymous"
-            />
+            <script src={localeDataUrl} crossOrigin="anonymous" />
           ) : (
             <script
               dangerouslySetInnerHTML={{
