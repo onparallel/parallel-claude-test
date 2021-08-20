@@ -97,6 +97,7 @@ export function PublicPetitionInitialForm({
             aria-label={organization.name}
             width="auto"
             height="40px"
+            objectFit="contain"
           />
         ) : (
           <Logo width="152px" height="40px" />

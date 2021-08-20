@@ -12,7 +12,13 @@ export function PublicPetitionReminder({ organization, email }: PublicPetitionRe
   return (
     <Stack spacing={{ base: 6, md: 8 }} maxWidth="container.sm" width="100%" margin="0 auto">
       {organization.logoUrl ? (
-        <Img src={organization.logoUrl} aria-label={organization.name} width="auto" height="40px" />
+        <Img
+          src={organization.logoUrl}
+          aria-label={organization.name}
+          width="auto"
+          height="40px"
+          objectFit="contain"
+        />
       ) : (
         <Logo width="152px" height="40px" />
       )}

@@ -43,8 +43,8 @@ export function NotificationsDrawer() {
   const isInitialLoading = loading && networkStatus !== NetworkStatus.fetchMore;
   const selectRef = useRef<Focusable>(null);
 
-  const notifications = data?.me.notifications.items ?? [];
-  const hasMore = data?.me.notifications.hasMore ?? true;
+  const notifications = data?.me.notifications?.items ?? [];
+  const hasMore = data?.me.notifications?.hasMore ?? true;
   const hasUnread = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
