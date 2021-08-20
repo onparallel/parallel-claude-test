@@ -11,6 +11,7 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 import { contactAuthenticationRequest } from "./emails/contact-authentication-request";
 import { petitionAccessDelegated } from "./emails/petition-access-delegated";
 import { developerWebhookFailed } from "./emails/developer-webhook-failed";
+import { publicPetitionLinkAccess } from "./emails/public-petition-link-access";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -24,6 +25,7 @@ const builders = {
   "contact-authentication-request": contactAuthenticationRequest,
   "petition-access-delegated": petitionAccessDelegated,
   "developer-webhook-failed": developerWebhookFailed,
+  "public-petition-link-access": publicPetitionLinkAccess,
 };
 
 export type EmailType = keyof typeof builders;

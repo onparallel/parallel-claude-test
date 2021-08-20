@@ -104,7 +104,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("creates a petition via a public link and sends it to the provided email", async () => {
       const emailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionMessageEmail"
+        "sendPublicPetitionLinkAccessEmail"
       );
 
       const { errors, data } = await testClient.mutate({

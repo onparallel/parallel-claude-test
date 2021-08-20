@@ -42,6 +42,7 @@ export interface IEmailsService {
   ): Promise<void>;
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
   sendContactAuthenticationRequestEmail(requestId: number): Promise<void>;
+  sendPublicPetitionLinkAccessEmail(messageIds: MaybeArray<number>): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -210,5 +211,15 @@ export class EmailsService implements IEmailsService {
       error_message: errorMessage,
       post_body: postBody,
     });
+  }
+
+  async sendPublicPetitionLinkAccessEmail(messageIds: MaybeArray<number>) {
+    return await this.enqueueEmail(
+      "public-petition-link-access",
+      unMaybeArray(messageIds).map((messageId) => ({
+        id: this.buildQueueId("PublicPetitionLinkAccess", messageId),
+        petition_message_id: messageId,
+      }))
+    );
   }
 }

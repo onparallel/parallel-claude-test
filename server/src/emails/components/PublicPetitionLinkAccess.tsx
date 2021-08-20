@@ -7,14 +7,14 @@ import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { greetingFormal } from "../common/texts";
 
-export type PublicPetitionAccessLinkProps = {
+export type PublicPetitionLinkAccessProps = {
   fullName: string | null;
   senderName: string;
   petitionTitle: string;
   keycode: string;
 } & LayoutProps;
 
-const email: Email<PublicPetitionAccessLinkProps> = {
+const email: Email<PublicPetitionLinkAccessProps> = {
   from({ fullName }, intl) {
     return intl.formatMessage(
       {
@@ -70,7 +70,7 @@ const email: Email<PublicPetitionAccessLinkProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-  }: PublicPetitionAccessLinkProps) {
+  }: PublicPetitionLinkAccessProps) {
     const { locale } = useIntl();
     return (
       <Layout

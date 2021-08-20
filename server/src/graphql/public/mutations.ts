@@ -1059,7 +1059,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         // trigger emails and events
         if (result === "SUCCESS") {
           await Promise.all([
-            ctx.emails.sendPetitionMessageEmail(messages!.map((s) => s.id)),
+            ctx.emails.sendPublicPetitionLinkAccessEmail(messages!.map((s) => s.id)),
             ctx.petitions.createEvent(
               messages!.map((message) => ({
                 type: "MESSAGE_SENT",
