@@ -44,7 +44,7 @@ function Login() {
         password,
       });
       await client.clearStore();
-      router.push(`/${router.query.locale}/app/petitions`);
+      window.location.href = `/${router.query.locale}/app/petitions`;
     } catch (error) {
       if (error.error === "NewPasswordRequired") {
         setPasswordChange({ type: "CHANGE", email, password });

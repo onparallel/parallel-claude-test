@@ -80,8 +80,11 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
     };
   }, []);
   useEffect(() => {
+    if (window.analytics && !(window.analytics as any).initialized) {
+      window.analytics?.load(process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY);
+    }
     window.analytics?.identify(user.id);
-  }, [user.id]);
+  }, []);
   useEffect(() => {
     const style = document.createElement("style");
     style.innerText = /* css */ `
