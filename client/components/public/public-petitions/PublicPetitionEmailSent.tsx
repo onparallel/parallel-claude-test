@@ -3,12 +3,12 @@ import { Logo } from "@parallel/components/common/Logo";
 import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-export type PublicPetitionEmailSendedProps = {
+export type PublicPetitionEmailSentProps = {
   organization: PublicPetitionLinkOwnerOrganization;
   email: string;
 };
 
-export function PublicPetitionEmailSended({ organization, email }: PublicPetitionEmailSendedProps) {
+export function PublicPetitionEmailSent({ organization, email }: PublicPetitionEmailSentProps) {
   return (
     <Stack spacing={{ base: 6, md: 8 }} maxWidth="container.sm" width="100%" margin="0 auto">
       {organization.logoUrl ? (
@@ -26,21 +26,21 @@ export function PublicPetitionEmailSended({ organization, email }: PublicPetitio
       <Stack spacing={4} width="100%">
         <Text fontSize="2xl" fontWeight="bold">
           <FormattedMessage
-            id="public-petition-email-sended.title"
+            id="public-petition-email-sent.title"
             defaultMessage="Check your inbox"
           />
         </Text>
         <Stack spacing={4}>
           <Text>
             <FormattedMessage
-              id="public-petition-email-sended.body.parraf-1"
+              id="public-petition-email-sent.body.parraf-1"
               defaultMessage="We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure your privacy and security."
               values={{ email }}
             />
           </Text>
           <Text>
             <FormattedMessage
-              id="public-petition-email-sended.body.parraf-2"
+              id="public-petition-email-sent.body.parraf-2"
               defaultMessage="Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link."
             />
           </Text>

@@ -4,7 +4,7 @@ import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
 import { HandleNewPublicPetitionProps } from "@parallel/pages/[locale]/pp/[linkId]";
 import { FormattedMessage } from "react-intl";
 
-export type PublicPetitionEmailSendedProps = {
+export type PublicPetitionEmailSentProps = {
   organization: PublicPetitionLinkOwnerOrganization;
   onNewPetition: ({ formData, force }: HandleNewPublicPetitionProps) => void;
   onContinue: () => void;
@@ -18,7 +18,7 @@ export function PublicPetitionEmailExists({
   onContinue,
   isNewRequestLoading,
   isReminderLoading,
-}: PublicPetitionEmailSendedProps) {
+}: PublicPetitionEmailSentProps) {
   return (
     <Stack spacing={{ base: 6, md: 8 }} maxWidth="container.sm" width="100%" margin="0 auto">
       {organization.logoUrl ? (

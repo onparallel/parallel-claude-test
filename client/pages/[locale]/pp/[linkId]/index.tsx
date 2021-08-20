@@ -3,7 +3,7 @@ import { Box, Center, Flex, SimpleGrid, Stack, Text, useToast } from "@chakra-ui
 import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicPetitionEmailExists } from "@parallel/components/public/public-petitions/PublicPetitionEmailExists";
-import { PublicPetitionEmailSended } from "@parallel/components/public/public-petitions/PublicPetitionEmailSended";
+import { PublicPetitionEmailSent } from "@parallel/components/public/public-petitions/PublicPetitionEmailSent";
 import {
   PublicPetitionInitialForm,
   PublicPetitionInitialFormInputs,
@@ -23,11 +23,7 @@ import Head from "next/head";
 import { useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-export type PublicPetitionLinkSteps =
-  | "INITIAL"
-  | "EMAIL_SENDED"
-  | "EMAIL_EXISTS"
-  | "REMAINDER_SENDED";
+export type PublicPetitionLinkSteps = "INITIAL" | "EMAIL_SENT" | "EMAIL_EXISTS" | "REMINDER_SENT";
 
 export type HandleNewPublicPetitionProps = {
   formData?: PublicPetitionInitialFormInputs;
@@ -94,7 +90,7 @@ function PublicPetitionLink({
       }
 
       if (data?.publicCreateAndSendPetitionFromPublicLink === "SUCCESS") {
-        setStep("EMAIL_SENDED");
+        setStep("EMAIL_SENT");
       } else if (data?.publicCreateAndSendPetitionFromPublicLink === "FAILURE") {
         showErrorToast();
       }
@@ -123,7 +119,7 @@ function PublicPetitionLink({
       }
 
       if (data?.publicSendReminder === "SUCCESS") {
-        setStep("REMAINDER_SENDED");
+        setStep("REMINDER_SENT");
       } else if (data?.publicSendReminder === "FAILURE") {
         showErrorToast();
       }
@@ -181,13 +177,13 @@ function PublicPetitionLink({
             gap={8}
             columns={{ base: 1, md: step !== "INITIAL" ? 1 : 2 }}
           >
-            {step === "REMAINDER_SENDED" ? (
+            {step === "REMINDER_SENT" ? (
               <PublicPetitionReminder
                 organization={organization}
                 email={submittedData?.email ?? ""}
               />
-            ) : step === "EMAIL_SENDED" ? (
-              <PublicPetitionEmailSended
+            ) : step === "EMAIL_SENT" ? (
+              <PublicPetitionEmailSent
                 organization={organization}
                 email={submittedData?.email ?? ""}
               />

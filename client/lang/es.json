@@ -4440,17 +4440,17 @@
     "context": "Existing mail"
   },
   {
-    "term": "public-petition-email-sended.body.parraf-1",
+    "term": "public-petition-email-sent.body.parraf-1",
     "definition": "Hemos mandado un correo a <b>{email}</b> con el acceso para completar la información. Esto nos ayudará a verificar tu correo electrónico y asegurar la privacidad y seguridad de tus datos.",
     "context": "We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure your privacy and security."
   },
   {
-    "term": "public-petition-email-sended.body.parraf-2",
+    "term": "public-petition-email-sent.body.parraf-2",
     "definition": "¿No encuentras nuestro mail? Revisa la bandeja de spam y si no está ponte en contacto con la persona que te haya compartido el enlace.",
     "context": "Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link."
   },
   {
-    "term": "public-petition-email-sended.title",
+    "term": "public-petition-email-sent.title",
     "definition": "Revisa tu bandeja de entrada",
     "context": "Check your inbox"
   },
