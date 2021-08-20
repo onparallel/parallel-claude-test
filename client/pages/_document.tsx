@@ -89,6 +89,7 @@ class MyDocument extends Document<MyDocumentProps> {
                 rel="preload"
                 href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/${name}-${type}.woff2`}
                 as="font"
+                type="font/woff2"
                 crossOrigin="anonymous"
               />
             ))
