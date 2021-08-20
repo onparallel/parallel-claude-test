@@ -15,6 +15,7 @@ const result: PossibleTypesResultData = {
     PetitionBaseAndField: ["PetitionAndField", "PetitionTemplateAndField"],
     PetitionEvent: [
       "AccessActivatedEvent",
+      "AccessActivatedFromPublicPetitionLinkEvent",
       "AccessDeactivatedEvent",
       "AccessDelegatedEvent",
       "AccessOpenedEvent",
@@ -49,6 +50,7 @@ const result: PossibleTypesResultData = {
     ],
     PetitionPermission: ["PetitionUserGroupPermission", "PetitionUserPermission"],
     PetitionUserNotification: [
+      "AccessActivatedFromPublicPetitionLinkUserNotification",
       "CommentCreatedUserNotification",
       "MessageEmailBouncedUserNotification",
       "PetitionCompletedUserNotification",

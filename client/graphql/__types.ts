@@ -38,6 +38,23 @@ export interface AccessActivatedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
+export interface AccessActivatedFromPublicPetitionLinkEvent extends PetitionEvent {
+  __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+}
+
+export interface AccessActivatedFromPublicPetitionLinkUserNotification
+  extends PetitionUserNotification {
+  __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
+  petition: PetitionBase;
+}
+
 export interface AccessDeactivatedEvent extends PetitionEvent {
   __typename?: "AccessDeactivatedEvent";
   access: PetitionAccess;
@@ -3235,6 +3252,26 @@ export type Notifications_UnreadPetitionUserNotificationIdsQuery = {
   me: { __typename?: "User"; id: string; unreadNotificationIds: Array<string> };
 };
 
+export type NotificationsDrawer_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment =
+  {
+    __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
+
 export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
   __typename?: "CommentCreatedUserNotification";
   id: string;
@@ -3382,6 +3419,7 @@ export type NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserN
   };
 
 export type NotificationsDrawer_PetitionUserNotificationFragment =
+  | NotificationsDrawer_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
@@ -3406,6 +3444,24 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
       __typename?: "UserNotifications_Pagination";
       hasMore: boolean;
       items: Array<
+        | {
+            __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
+            id: string;
+            createdAt: string;
+            isRead: boolean;
+            access: {
+              __typename?: "PetitionAccess";
+              contact?: Maybe<{
+                __typename?: "Contact";
+                id: string;
+                fullName?: Maybe<string>;
+                email: string;
+              }>;
+            };
+            petition:
+              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+          }
         | {
             __typename?: "CommentCreatedUserNotification";
             id: string;
@@ -3548,6 +3604,26 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
     };
   };
 };
+
+export type NotificationsList_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment =
+  {
+    __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
 
 export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
   __typename?: "CommentCreatedUserNotification";
@@ -3696,6 +3772,7 @@ export type NotificationsList_PetitionUserNotification_SignatureCompletedUserNot
   };
 
 export type NotificationsList_PetitionUserNotificationFragment =
+  | NotificationsList_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
@@ -3704,6 +3781,26 @@ export type NotificationsList_PetitionUserNotificationFragment =
   | NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment
   | NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
+
+export type AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragment =
+  {
+    __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
 
 export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragment = {
   __typename?: "CommentCreatedUserNotification";
@@ -3785,6 +3882,17 @@ export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragmen
     | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
     | { __typename?: "UserGroup"; id: string; name: string };
 };
+
+export type PetitionUserNotification_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment =
+  {
+    __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
 
 export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
   {
@@ -3875,6 +3983,7 @@ export type PetitionUserNotification_PetitionUserNotification_SignatureCompleted
   };
 
 export type PetitionUserNotification_PetitionUserNotificationFragment =
+  | PetitionUserNotification_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
@@ -4076,6 +4185,20 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: Maybe<string>;
             status: UserStatus;
           }>;
+          access: {
+            __typename?: "PetitionAccess";
+            contact?: Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+            }>;
+          };
+        }
+      | {
+          __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
+          id: string;
+          createdAt: string;
           access: {
             __typename?: "PetitionAccess";
             contact?: Maybe<{
@@ -4600,6 +4723,22 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   };
 };
 
+export type PetitionActivityTimeline_PetitionEvent_AccessActivatedFromPublicPetitionLinkEvent_Fragment =
+  {
+    __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
+    id: string;
+    createdAt: string;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+  };
+
 export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment = {
   __typename?: "AccessDeactivatedEvent";
   id: string;
@@ -5046,6 +5185,7 @@ export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fr
 
 export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_AccessActivatedFromPublicPetitionLinkEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment
@@ -5136,6 +5276,21 @@ export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
     }>;
   };
 };
+
+export type TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragment =
+  {
+    __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
+    createdAt: string;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+  };
 
 export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   __typename?: "AccessDeactivatedEvent";
@@ -8095,6 +8250,20 @@ export type PetitionActivity_PetitionFragment = {
           };
         }
       | {
+          __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
+          id: string;
+          createdAt: string;
+          access: {
+            __typename?: "PetitionAccess";
+            contact?: Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+            }>;
+          };
+        }
+      | {
           __typename?: "AccessDeactivatedEvent";
           id: string;
           createdAt: string;
@@ -8687,6 +8856,20 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: Maybe<string>;
                   status: UserStatus;
                 }>;
+                access: {
+                  __typename?: "PetitionAccess";
+                  contact?: Maybe<{
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: Maybe<string>;
+                    email: string;
+                  }>;
+                };
+              }
+            | {
+                __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
+                id: string;
+                createdAt: string;
                 access: {
                   __typename?: "PetitionAccess";
                   contact?: Maybe<{
@@ -9376,6 +9559,20 @@ export type PetitionActivityQuery = {
                   fullName?: Maybe<string>;
                   status: UserStatus;
                 }>;
+                access: {
+                  __typename?: "PetitionAccess";
+                  contact?: Maybe<{
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: Maybe<string>;
+                    email: string;
+                  }>;
+                };
+              }
+            | {
+                __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
+                id: string;
+                createdAt: string;
                 access: {
                   __typename?: "PetitionAccess";
                   contact?: Maybe<{
@@ -12631,6 +12828,11 @@ export type useUpdateIsReadNotificationMutationVariables = Exact<{
 export type useUpdateIsReadNotificationMutation = {
   updatePetitionUserNotificationReadStatus: Array<
     | {
+        __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
         __typename?: "CommentCreatedUserNotification";
         id: string;
         isRead: boolean;
@@ -12986,6 +13188,18 @@ export const RemindersOptOutNotification_RemindersOptOutNotificationFragmentDoc 
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
+export const AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragmentDoc = gql`
+  fragment AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotification on AccessActivatedFromPublicPetitionLinkUserNotification {
+    ...PetitionUserNotification_PetitionUserNotification
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+  }
+  ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
   fragment NotificationsList_PetitionUserNotification on PetitionUserNotification {
     ... on CommentCreatedUserNotification {
@@ -13012,6 +13226,9 @@ export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
     ... on RemindersOptOutNotification {
       ...RemindersOptOutNotification_RemindersOptOutNotification
     }
+    ... on AccessActivatedFromPublicPetitionLinkUserNotification {
+      ...AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotification
+    }
   }
   ${CommentCreatedUserNotification_CommentCreatedUserNotificationFragmentDoc}
   ${MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragmentDoc}
@@ -13021,6 +13238,7 @@ export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
   ${SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragmentDoc}
   ${SignatureCompletedUserNotification_SignatureCompletedUserNotificationFragmentDoc}
   ${RemindersOptOutNotification_RemindersOptOutNotificationFragmentDoc}
+  ${AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragmentDoc}
 `;
 export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   fragment NotificationsDrawer_PetitionUserNotification on PetitionUserNotification {
@@ -14148,6 +14366,17 @@ export const TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc = gql`
   }
   ${ContactLink_ContactFragmentDoc}
 `;
+export const TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc = gql`
+  fragment TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent on AccessActivatedFromPublicPetitionLinkEvent {
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -14244,6 +14473,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on RemindersOptOutEvent {
       ...TimelineRemindersOptOutEvent_RemindersOptOutEvent
     }
+    ... on AccessActivatedFromPublicPetitionLinkEvent {
+      ...TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -14275,6 +14507,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc}
   ${TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc}
   ${TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc}
+  ${TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {

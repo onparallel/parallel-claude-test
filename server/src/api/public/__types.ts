@@ -33,6 +33,20 @@ export type AccessActivatedEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
+export type AccessActivatedFromPublicPetitionLinkEvent = PetitionEvent & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+};
+
+export type AccessActivatedFromPublicPetitionLinkUserNotification = PetitionUserNotification & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
+  petition: PetitionBase;
+};
+
 export type AccessDeactivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];

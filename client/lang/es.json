@@ -775,6 +775,11 @@
     "context": "Shared with me"
   },
   {
+    "term": "component.notification-access-activated-link.body",
+    "definition": "{name} creó la petición desde un enlace público.",
+    "context": "{name} created the petition from a public link."
+  },
+  {
     "term": "component.notification-comment.body",
     "definition": "{name} ha escrito un comentario en el campo {field}.",
     "context": "{name} has written a comment in the field {field}."
@@ -6918,6 +6923,11 @@
     "term": "timeline.petition-reopened-description",
     "definition": "{same, select, true {Reabriste} other {{user} reabrió}} esta petición {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} reopened the petition {timeAgo}"
+  },
+  {
+    "term": "timeline.public-petition-link-created-description",
+    "definition": "{contact} creó la petición desde un enlace público {timeAgo}",
+    "context": "{contact} created the petition from a public link {timeAgo}"
   },
   {
     "term": "timeline.reminder-sent-description-automatic",

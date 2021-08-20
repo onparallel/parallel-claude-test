@@ -9,15 +9,16 @@ import { KeyboardEvent } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { AccessActivatedFromLinkNotification } from "./flavor/AccessActivatedFromLinkNotification";
 import { CommentCreatedUserNotification } from "./flavor/CommentCreatedUserNotification";
-import { RemindersOptOutNotification } from "./flavor/RemindersOptOutNotification";
 import { MessageEmailBouncedUserNotification } from "./flavor/MessageEmailBouncedUserNotification";
 import { PetitionCompletedUserNotification } from "./flavor/PetitionCompletedUserNotification";
 import { PetitionSharedUserNotification } from "./flavor/PetitionSharedUserNotification";
+import { ReminderEmailBouncedUserNotification } from "./flavor/ReminderEmailBouncedUserNotification";
+import { RemindersOptOutNotification } from "./flavor/RemindersOptOutNotification";
 import { SignatureCancelledUserNotification } from "./flavor/SignatureCancelledUserNotification";
 import { SignatureCompletedUserNotification } from "./flavor/SignatureCompletedUserNotification";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
-import { ReminderEmailBouncedUserNotification } from "./flavor/ReminderEmailBouncedUserNotification";
 
 export interface NotificationListProps {
   notifications: NotificationsDrawer_PetitionUserNotificationFragment[];
@@ -189,6 +190,9 @@ export function NotificationsList({
                 <CommentCreatedUserNotification notification={notification} {...props} />
               ) : notification.__typename === "RemindersOptOutNotification" ? (
                 <RemindersOptOutNotification notification={notification} {...props} />
+              ) : notification.__typename ===
+                "AccessActivatedFromPublicPetitionLinkUserNotification" ? (
+                <AccessActivatedFromLinkNotification notification={notification} {...props} />
               ) : null}
             </LinkBox>
           );
@@ -237,6 +241,9 @@ NotificationsList.fragments = {
       ... on RemindersOptOutNotification {
         ...RemindersOptOutNotification_RemindersOptOutNotification
       }
+      ... on AccessActivatedFromPublicPetitionLinkUserNotification {
+        ...AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotification
+      }
     }
     ${CommentCreatedUserNotification.fragments.CommentCreatedUserNotification}
     ${MessageEmailBouncedUserNotification.fragments.MessageEmailBouncedUserNotification}
@@ -246,5 +253,7 @@ NotificationsList.fragments = {
     ${SignatureCancelledUserNotification.fragments.SignatureCancelledUserNotification}
     ${SignatureCompletedUserNotification.fragments.SignatureCompletedUserNotification}
     ${RemindersOptOutNotification.fragments.RemindersOptOutNotification}
+    ${AccessActivatedFromLinkNotification.fragments
+      .AccessActivatedFromPublicPetitionLinkUserNotification}
   `,
 };
