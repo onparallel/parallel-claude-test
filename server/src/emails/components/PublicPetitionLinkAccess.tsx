@@ -36,7 +36,10 @@ const email: Email<PublicPetitionLinkAccessProps> = {
           id: "public-petition-link.text-1",
           defaultMessage: "We send you the requested access to <b>{petitionTitle}</b>.",
         },
-        { petitionTitle }
+        {
+          petitionTitle,
+          b: (chunks: any[]) => `<b>${chunks.toString()}</b>`,
+        }
       )}
 
       ${intl.formatMessage({
@@ -45,14 +48,11 @@ const email: Email<PublicPetitionLinkAccessProps> = {
           "The information will be automatically saved on the platform, and you can continue the process later through the same link.",
       })}
 
-      ${intl.formatMessage(
-        {
-          id: "public-petition-link.text-3",
-          defaultMessage:
-            "If you have any questions or comments you can contact us in the designated spaces on the platform.",
-        },
-        { petitionTitle }
-      )}
+      ${intl.formatMessage({
+        id: "public-petition-link.text-3",
+        defaultMessage:
+          "If you have any questions or comments you can contact us in the designated spaces on the platform.",
+      })}
 
       ${intl.formatMessage({
         id: "generic.complete-information-click-link",
@@ -87,7 +87,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
               <FormattedMessage
                 id="public-petition-link.text-1"
                 defaultMessage="We send you the requested access to <b>{petitionTitle}</b>."
-                values={{ petitionTitle }}
+                values={{ petitionTitle, b: (chunks: any[]) => <b>{chunks}</b> }}
               />
             </MjmlText>
             <MjmlText>
