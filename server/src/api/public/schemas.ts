@@ -1183,6 +1183,16 @@ export const PetitionEvent = schema({
         },
       },
     },
+    ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
+      description: "A contact started and sent itself a petition through a public petition link",
+      required: ["petitionAccessId"],
+      properties: {
+        petitionAccessId: {
+          description: "The ID of the petition access",
+          type: "string",
+        },
+      },
+    },
   } as Record<PetitionEventType, JsonSchema>).map(
     ([event, data]) =>
       ({

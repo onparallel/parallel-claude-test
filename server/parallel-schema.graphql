@@ -16,6 +16,20 @@ type AccessActivatedEvent implements PetitionEvent {
   user: User
 }
 
+type AccessActivatedFromPublicPetitionLinkEvent implements PetitionEvent {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+}
+
+type AccessActivatedFromPublicPetitionLinkUserNotification implements PetitionUserNotification {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+  isRead: Boolean!
+  petition: PetitionBase!
+}
+
 type AccessDeactivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!

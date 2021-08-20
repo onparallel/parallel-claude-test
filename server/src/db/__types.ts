@@ -20,14 +20,13 @@ export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV";
 
-export type OrganizationUsageLimitPeriod = "month" | "year";
-
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export type PetitionContactNotificationType = "COMMENT_CREATED";
 
 export type PetitionEventType =
   | "ACCESS_ACTIVATED"
+  | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
   | "ACCESS_DEACTIVATED"
   | "ACCESS_DELEGATED"
   | "ACCESS_OPENED"
@@ -89,6 +88,7 @@ export type PetitionSignatureStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "
 export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
 
 export type PetitionUserNotificationType =
+  | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
   | "COMMENT_CREATED"
   | "MESSAGE_EMAIL_BOUNCED"
   | "PETITION_COMPLETED"

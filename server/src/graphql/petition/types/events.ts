@@ -92,6 +92,8 @@ export const PetitionEvent = interfaceType({
         return "TemplateUsedEvent";
       case "REMINDERS_OPT_OUT":
         return "RemindersOptOutEvent";
+      case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
+        return "AccessActivatedFromPublicPetitionLinkEvent";
     }
   },
   rootTyping: "events.PetitionEvent",
@@ -552,3 +554,14 @@ export const RemindersOptOutEvent = createPetitionEvent("RemindersOptOutEvent", 
     resolve: (o) => o.data.other ?? null,
   });
 });
+
+export const AccessActivatedFromPublicPetitionLinkEvent = createPetitionEvent(
+  "AccessActivatedFromPublicPetitionLinkEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) =>
+        (await ctx.petitions.loadAccess(root.data.petition_access_id))!,
+    });
+  }
+);

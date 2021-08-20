@@ -108,6 +108,7 @@ createQueueWorker(
         "USER_PERMISSION_ADDED",
         "GROUP_PERMISSION_ADDED",
         "REMINDERS_OPT_OUT",
+        "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
       ],
       userNotificationsListener
     )

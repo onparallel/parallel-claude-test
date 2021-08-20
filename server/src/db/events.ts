@@ -129,6 +129,9 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     reason: string;
     other?: string;
   };
+  ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
+    petition_access_id: number;
+  };
 }[TType];
 
 type GenericPetitionEvent<TType extends PetitionEventType, IsCreate extends boolean = false> = Omit<
@@ -270,6 +273,9 @@ export type RemindersOptOutEvent<IsCreate extends boolean = false> = GenericPeti
   IsCreate
 >;
 
+export type AccessActivatedFromPublicPetitionLinkEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK", IsCreate>;
+
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -302,7 +308,8 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | TemplateUsedEvent<IsCreate>
   | PetitionClonedEvent<IsCreate>
   | PetitionDeletedEvent<IsCreate>
-  | RemindersOptOutEvent<IsCreate>;
+  | RemindersOptOutEvent<IsCreate>
+  | AccessActivatedFromPublicPetitionLinkEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;
 

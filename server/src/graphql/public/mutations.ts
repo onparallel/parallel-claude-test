@@ -1035,7 +1035,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         ]);
 
         // presend petition to contact and insert petition_permissions
-        const [{ result, messages, error }] = await Promise.all([
+        const [{ result, messages, accesses, error }] = await Promise.all([
           presendPetition(
             newPetition,
             [contact.id],
@@ -1061,11 +1061,18 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           await Promise.all([
             ctx.emails.sendPublicPetitionLinkAccessEmail(messages!.map((s) => s.id)),
             ctx.petitions.createEvent(
-              messages!.map((message) => ({
-                type: "MESSAGE_SENT",
-                data: { petition_message_id: message.id },
-                petition_id: message.petition_id,
-              })),
+              [
+                ...messages!.map((message) => ({
+                  type: "MESSAGE_SENT" as const,
+                  data: { petition_message_id: message.id },
+                  petition_id: message.petition_id,
+                })),
+                ...accesses!.map((access) => ({
+                  type: "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK" as const,
+                  data: { petition_access_id: access.id },
+                  petition_id: access.petition_id,
+                })),
+              ],
               t
             ),
           ]);

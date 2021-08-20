@@ -272,6 +272,8 @@ export interface NexusGenObjects {
     url: string; // String!
   };
   AccessActivatedEvent: events.AccessActivatedEvent;
+  AccessActivatedFromPublicPetitionLinkEvent: events.AccessActivatedFromPublicPetitionLinkEvent;
+  AccessActivatedFromPublicPetitionLinkUserNotification: notifications.AccessActivatedFromPublicPetitionLinkUserNotification;
   AccessDeactivatedEvent: events.AccessDeactivatedEvent;
   AccessDelegatedEvent: events.AccessDelegatedEvent;
   AccessOpenedEvent: events.AccessOpenedEvent;
@@ -565,6 +567,20 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     user: NexusGenRootTypes["User"] | null; // User
+  };
+  AccessActivatedFromPublicPetitionLinkEvent: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+  };
+  AccessActivatedFromPublicPetitionLinkUserNotification: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
   };
   AccessDeactivatedEvent: {
     // field return type
@@ -1610,6 +1626,20 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
     user: "User";
+  };
+  AccessActivatedFromPublicPetitionLinkEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+  };
+  AccessActivatedFromPublicPetitionLinkUserNotification: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    isRead: "Boolean";
+    petition: "PetitionBase";
   };
   AccessDeactivatedEvent: {
     // field return type name
@@ -3450,6 +3480,7 @@ export interface NexusGenAbstractTypeMembers {
   PetitionBaseAndField: "PetitionAndField" | "PetitionTemplateAndField";
   PetitionEvent:
     | "AccessActivatedEvent"
+    | "AccessActivatedFromPublicPetitionLinkEvent"
     | "AccessDeactivatedEvent"
     | "AccessDelegatedEvent"
     | "AccessOpenedEvent"
@@ -3483,6 +3514,7 @@ export interface NexusGenAbstractTypeMembers {
     | "UserPermissionRemovedEvent";
   PetitionPermission: "PetitionUserGroupPermission" | "PetitionUserPermission";
   PetitionUserNotification:
+    | "AccessActivatedFromPublicPetitionLinkUserNotification"
     | "CommentCreatedUserNotification"
     | "MessageEmailBouncedUserNotification"
     | "PetitionCompletedUserNotification"
@@ -3508,6 +3540,8 @@ export interface NexusGenAbstractTypeMembers {
 
 export interface NexusGenTypeInterfaces {
   AccessActivatedEvent: "PetitionEvent";
+  AccessActivatedFromPublicPetitionLinkEvent: "PetitionEvent";
+  AccessActivatedFromPublicPetitionLinkUserNotification: "PetitionUserNotification";
   AccessDeactivatedEvent: "PetitionEvent";
   AccessDelegatedEvent: "PetitionEvent";
   AccessOpenedEvent: "PetitionEvent";

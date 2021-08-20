@@ -35,6 +35,9 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
     reason: string;
     other?: string;
   };
+  ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
+    petition_access_id: number;
+  };
 }[TType];
 
 type GenericPetitionUserNotification<
@@ -61,6 +64,9 @@ export type SignatureCompletedUserNotification<IsCreate extends boolean = false>
   GenericPetitionUserNotification<"SIGNATURE_COMPLETED", IsCreate>;
 export type RemindersOptOutNotification<IsCreate extends boolean = false> =
   GenericPetitionUserNotification<"REMINDERS_OPT_OUT", IsCreate>;
+export type AccessActivatedFromPublicPetitionLinkUserNotification<
+  IsCreate extends boolean = false
+> = GenericPetitionUserNotification<"ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK", IsCreate>;
 
 export type PetitionUserNotification<IsCreate extends boolean = false> =
   | CommentCreatedUserNotification<IsCreate>
@@ -70,6 +76,7 @@ export type PetitionUserNotification<IsCreate extends boolean = false> =
   | PetitionSharedUserNotification<IsCreate>
   | SignatureCancelledUserNotification<IsCreate>
   | SignatureCompletedUserNotification<IsCreate>
-  | RemindersOptOutNotification<IsCreate>;
+  | RemindersOptOutNotification<IsCreate>
+  | AccessActivatedFromPublicPetitionLinkUserNotification<IsCreate>;
 
 export type CreatePetitionUserNotification = PetitionUserNotification<true>;

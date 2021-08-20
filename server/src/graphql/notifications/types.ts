@@ -59,6 +59,8 @@ export const PetitionUserNotification = interfaceType({
         return "SignatureCompletedUserNotification";
       case "REMINDERS_OPT_OUT":
         return "RemindersOptOutNotification";
+      case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
+        return "AccessActivatedFromPublicPetitionLinkUserNotification";
     }
   },
 });
@@ -180,6 +182,18 @@ export const RemindersOptOutNotification = createPetitionUserNotification(
     });
     t.nullable.string("other", {
       resolve: (o) => o.data.other ?? null,
+    });
+  }
+);
+
+export const AccessActivatedFromPublicPetitionLinkUserNotification = createPetitionUserNotification(
+  "AccessActivatedFromPublicPetitionLinkUserNotification",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
     });
   }
 );

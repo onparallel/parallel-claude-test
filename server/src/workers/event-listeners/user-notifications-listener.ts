@@ -1,5 +1,6 @@
 import { WorkerContext } from "../../context";
 import {
+  AccessActivatedFromPublicPetitionLinkEvent,
   CommentPublishedEvent,
   GroupPermissionAddedEvent,
   PetitionCompletedEvent,
@@ -227,6 +228,25 @@ async function createRemindersOptOutNotifications(event: RemindersOptOutEvent, c
   );
 }
 
+async function createAccessActivatedFromPublicPetitionLinkUserNotifications(
+  event: AccessActivatedFromPublicPetitionLinkEvent,
+  ctx: WorkerContext
+) {
+  const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
+  await ctx.petitions.createPetitionUserNotification(
+    users.map((user) => ({
+      type: "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+      petition_id: event.petition_id,
+      user_id: user.id,
+      is_read: false,
+      processed_at: null,
+      data: {
+        petition_access_id: event.data.petition_access_id,
+      },
+    }))
+  );
+}
+
 export const userNotificationsListener: EventListener = async (event, ctx) => {
   switch (event.type) {
     case "PETITION_COMPLETED":
@@ -253,6 +273,9 @@ export const userNotificationsListener: EventListener = async (event, ctx) => {
       break;
     case "REMINDERS_OPT_OUT":
       await createRemindersOptOutNotifications(event, ctx);
+      break;
+    case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
+      await createAccessActivatedFromPublicPetitionLinkUserNotifications(event, ctx);
       break;
     default:
       break;

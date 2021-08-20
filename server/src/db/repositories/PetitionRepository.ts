@@ -1890,6 +1890,7 @@ export class PetitionRepository extends BaseRepository {
             "REMINDER_EMAIL_BOUNCED",
             "SIGNATURE_CANCELLED",
             "REMINDERS_OPT_OUT",
+            "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
           ]);
         }
         if (opts.before) {
@@ -1998,6 +1999,7 @@ export class PetitionRepository extends BaseRepository {
             "REMINDER_EMAIL_BOUNCED",
             "SIGNATURE_CANCELLED",
             "REMINDERS_OPT_OUT",
+            "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
           ]);
         }
       })
