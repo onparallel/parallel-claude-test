@@ -36,12 +36,14 @@ export function PublicDataProtection(props: BoxProps) {
               defaultMessage="Parallel follows <b>ISO/IEC 27001 practices</b> on Information Security Management System and the principles of privacy and security by design."
             />
           </Text>
-          <Link href="/security" fontWeight="bold">
-            <FormattedMessage
-              id="public.data-protection.security-link"
-              defaultMessage="More information"
-            />
-          </Link>
+          <Box>
+            <Link href="/security" fontWeight="bold">
+              <FormattedMessage
+                id="public.data-protection.security-link"
+                defaultMessage="Read more about security at Parallel"
+              />
+            </Link>
+          </Box>
         </Stack>
         <Stack
           justifyContent="space-evenly"
