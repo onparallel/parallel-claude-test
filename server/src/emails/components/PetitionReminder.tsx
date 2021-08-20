@@ -182,9 +182,6 @@ const email: Email<PetitionReminderProps> = {
                 <FormattedMessage
                   id="reminder.click-finalize"
                   defaultMessage="If you already submitted all the information, click <b>Finalize</b> on the page."
-                  values={{
-                    b: (chunks: any) => <strong>{chunks}</strong>,
-                  }}
                 />
               </MjmlText>
             ) : null}

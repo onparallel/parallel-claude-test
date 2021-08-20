@@ -36,10 +36,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
           id: "public-petition-link.text-1",
           defaultMessage: "We send you the requested access to <b>{petitionTitle}</b>.",
         },
-        {
-          petitionTitle,
-          b: (chunks: any[]) => `<b>${chunks.toString()}</b>`,
-        }
+        { petitionTitle }
       )}
 
       ${intl.formatMessage({
@@ -87,7 +84,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
               <FormattedMessage
                 id="public-petition-link.text-1"
                 defaultMessage="We send you the requested access to <b>{petitionTitle}</b>."
-                values={{ petitionTitle, b: (chunks: any[]) => <b>{chunks}</b> }}
+                values={{ petitionTitle }}
               />
             </MjmlText>
             <MjmlText>
