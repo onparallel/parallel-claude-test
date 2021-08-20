@@ -99,69 +99,73 @@ export function PublicHeader(props: BoxProps) {
 function PublicHeaderMenu(props: StackProps) {
   return (
     <Stack {...props}>
-      <Menu placement="bottom" matchWidth={true}>
-        <PublicHeaderMenuButton variant="ghost" urlPrefix="/product">
-          <FormattedMessage id="public.product-link" defaultMessage="Product" />
-        </PublicHeaderMenuButton>
-        <Portal>
-          <MenuList>
-            <PublicHeaderMenuItemLink href="/product/request-information">
-              <FormattedMessage
-                id="public.product.request-information-link"
-                defaultMessage="Request information"
-              />
-            </PublicHeaderMenuItemLink>
-            <PublicHeaderMenuItemLink href="/product/monitor-progress">
-              <FormattedMessage
-                id="public.product.monitor-link"
-                defaultMessage="Monitor progress"
-              />
-            </PublicHeaderMenuItemLink>
-            <PublicHeaderMenuItemLink href="/product/review-files">
-              <FormattedMessage
-                id="public.product.review-files-link"
-                defaultMessage="Review your files"
-              />
-            </PublicHeaderMenuItemLink>
-            <PublicHeaderMenuItemLink href="/product/team-collaboration">
-              <FormattedMessage
-                id="public.product.team-collaboration-link"
-                defaultMessage="Collaborate with your team"
-              />
-            </PublicHeaderMenuItemLink>
-            <PublicHeaderMenuItemLink href="/security">
-              <FormattedMessage
-                id="public.product.security-link"
-                defaultMessage="A secure environment"
-              />
-            </PublicHeaderMenuItemLink>
-          </MenuList>
-        </Portal>
-      </Menu>
-      <Menu placement="bottom" matchWidth={true}>
-        <PublicHeaderMenuButton variant="ghost" urlPrefix="/solutions">
-          <FormattedMessage id="public.solutions-link" defaultMessage="Solutions" />
-        </PublicHeaderMenuButton>
-        <Portal>
-          <MenuList>
-            <PublicHeaderMenuItemLink href="/solutions/law-firms">
-              <FormattedMessage id="public.solutions.law-firms-link" defaultMessage="Law firms" />
-            </PublicHeaderMenuItemLink>
-            <PublicHeaderMenuItemLink href="/solutions/consultancy">
-              <FormattedMessage
-                id="public.solutions.consultancy-link"
-                defaultMessage="Consultancy"
-              />
-            </PublicHeaderMenuItemLink>
-            <PublicHeaderMenuItemLink href="/solutions/accounting">
-              <FormattedMessage
-                id="public.solutions.accounting-link"
-                defaultMessage="BPO and accounting"
-              />
-            </PublicHeaderMenuItemLink>
-          </MenuList>
-        </Portal>
-      </Menu>
+      <Flex>
+        <Menu placement="bottom" matchWidth={true}>
+          <PublicHeaderMenuButton flex="1" variant="ghost" urlPrefix="/product">
+            <FormattedMessage id="public.product-link" defaultMessage="Product" />
+          </PublicHeaderMenuButton>
+          <Portal>
+            <MenuList>
+              <PublicHeaderMenuItemLink href="/product/request-information">
+                <FormattedMessage
+                  id="public.product.request-information-link"
+                  defaultMessage="Request information"
+                />
+              </PublicHeaderMenuItemLink>
+              <PublicHeaderMenuItemLink href="/product/monitor-progress">
+                <FormattedMessage
+                  id="public.product.monitor-link"
+                  defaultMessage="Monitor progress"
+                />
+              </PublicHeaderMenuItemLink>
+              <PublicHeaderMenuItemLink href="/product/review-files">
+                <FormattedMessage
+                  id="public.product.review-files-link"
+                  defaultMessage="Review your files"
+                />
+              </PublicHeaderMenuItemLink>
+              <PublicHeaderMenuItemLink href="/product/team-collaboration">
+                <FormattedMessage
+                  id="public.product.team-collaboration-link"
+                  defaultMessage="Collaborate with your team"
+                />
+              </PublicHeaderMenuItemLink>
+              <PublicHeaderMenuItemLink href="/security">
+                <FormattedMessage
+                  id="public.product.security-link"
+                  defaultMessage="A secure environment"
+                />
+              </PublicHeaderMenuItemLink>
+            </MenuList>
+          </Portal>
+        </Menu>
+      </Flex>
+      <Flex>
+        <Menu placement="bottom" matchWidth={true}>
+          <PublicHeaderMenuButton flex="1" variant="ghost" urlPrefix="/solutions">
+            <FormattedMessage id="public.solutions-link" defaultMessage="Solutions" />
+          </PublicHeaderMenuButton>
+          <Portal>
+            <MenuList>
+              <PublicHeaderMenuItemLink href="/solutions/law-firms">
+                <FormattedMessage id="public.solutions.law-firms-link" defaultMessage="Law firms" />
+              </PublicHeaderMenuItemLink>
+              <PublicHeaderMenuItemLink href="/solutions/consultancy">
+                <FormattedMessage
+                  id="public.solutions.consultancy-link"
+                  defaultMessage="Consultancy"
+                />
+              </PublicHeaderMenuItemLink>
+              <PublicHeaderMenuItemLink href="/solutions/accounting">
+                <FormattedMessage
+                  id="public.solutions.accounting-link"
+                  defaultMessage="BPO and accounting"
+                />
+              </PublicHeaderMenuItemLink>
+            </MenuList>
+          </Portal>
+        </Menu>
+      </Flex>
       <PublicHeaderLink href="/templates" variant="ghost">
         <FormattedMessage id="public.templates-link" defaultMessage="Templates" />
       </PublicHeaderLink>
