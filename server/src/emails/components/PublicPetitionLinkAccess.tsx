@@ -34,7 +34,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
       ${intl.formatMessage(
         {
           id: "public-petition-link.text-1",
-          defaultMessage: "We send you the requested access to <b>{petitionTitle}</b>.",
+          defaultMessage: "We send you the requested access to {petitionTitle}.",
         },
         { petitionTitle }
       )}
@@ -83,8 +83,8 @@ const email: Email<PublicPetitionLinkAccessProps> = {
             <MjmlText>
               <FormattedMessage
                 id="public-petition-link.text-1"
-                defaultMessage="We send you the requested access to <b>{petitionTitle}</b>."
-                values={{ petitionTitle }}
+                defaultMessage="We send you the requested access to {petitionTitle}."
+                values={{ petitionTitle: <b>{petitionTitle}</b> }}
               />
             </MjmlText>
             <MjmlText>

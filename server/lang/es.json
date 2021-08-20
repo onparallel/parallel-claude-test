@@ -286,8 +286,8 @@
   },
   {
     "term": "public-petition-link.text-1",
-    "definition": "Le enviamos el acceso solicitado al formulario de <b>{petitionTitle}</b>.",
-    "context": "We send you the requested access to <b>{petitionTitle}</b>."
+    "definition": "Le enviamos el acceso solicitado al formulario de {petitionTitle}.",
+    "context": "We send you the requested access to {petitionTitle}."
   },
   {
     "term": "public-petition-link.text-2",

@@ -70,15 +70,16 @@ export function PublicPetitionInitialForm({
   const [canExpand, setCanExpand] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setCanExpand(descriptionRef.current!.scrollHeight > 300);
-    setShowMore(descriptionRef.current!.scrollHeight < 300);
-  }, []);
-
   const handleResize = () => {
-    setCanExpand(descriptionRef.current!.scrollHeight > 300);
-    setShowMore(descriptionRef.current!.scrollHeight < 300);
+    if (descriptionRef?.current) {
+      setCanExpand(descriptionRef.current!.scrollHeight > 300);
+      setShowMore(descriptionRef.current!.scrollHeight < 300);
+    }
   };
+
+  useEffect(() => {
+    handleResize();
+  }, []);
 
   const handleToggleShowMore = () => setShowMore(!showMore);
 
@@ -109,6 +110,7 @@ export function PublicPetitionInitialForm({
           <Text fontSize="2xl" fontWeight="bold">
             {title}
           </Text>
+          <ResizeObserver onResize={handleResize} />
         </Stack>
         <Box maxWidth={{ base: "auto", md: "460px" }} width="100%" position="relative">
           <Collapse startingHeight={200} in={showMore}>
@@ -166,7 +168,15 @@ export function PublicPetitionInitialForm({
             <FormLabel>
               <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" /> *
             </FormLabel>
-            <Input type="text" {...register("firstName", { required: true })} />
+            <Input
+              type="text"
+              {...register("firstName", {
+                required: true,
+                validate: (value) => {
+                  return !!value.trim();
+                },
+              })}
+            />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.required-first-name-error"
@@ -178,7 +188,15 @@ export function PublicPetitionInitialForm({
             <FormLabel>
               <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" /> *
             </FormLabel>
-            <Input type="text" {...register("lastName", { required: true })} />
+            <Input
+              type="text"
+              {...register("lastName", {
+                required: true,
+                validate: (value) => {
+                  return !!value.trim();
+                },
+              })}
+            />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.required-last-name-error"
@@ -208,7 +226,6 @@ export function PublicPetitionInitialForm({
               defaultMessage="Request access"
             />
           </Button>
-          <ResizeObserver onResize={handleResize} />
         </Stack>
         <Modal
           motionPreset="slideInBottom"
