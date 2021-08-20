@@ -83,15 +83,20 @@ export function PublicFooter(props: BoxProps) {
         </PublicFooterBox>
         <PublicFooterBox
           heading={intl.formatMessage({
-            id: "public.footer.support",
-            defaultMessage: "Support",
+            id: "public.footer.resources",
+            defaultMessage: "Resources",
           })}
         >
           <List spacing={2}>
             <ListItem>
+              <NormalLink href={`${process.env.NEXT_PUBLIC_PARALLEL_URL}/blog`}>
+                <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
+              </NormalLink>
+            </ListItem>
+            <ListItem>
               <NormalLink href={supportUrl}>
                 <FormattedMessage
-                  id="public.support.support-center"
+                  id="public.resources.support-center"
                   defaultMessage="Support center"
                 />
               </NormalLink>
@@ -100,7 +105,12 @@ export function PublicFooter(props: BoxProps) {
               <NormalLink
                 href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
               >
-                <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
+                <FormattedMessage id="public.resources.faq" defaultMessage="FAQ" />
+              </NormalLink>
+            </ListItem>
+            <ListItem>
+              <NormalLink href="https://trello.com/b/iiG1jVp5/parallel-public-roadmap" isExternal>
+                <FormattedMessage id="public.resources.roadmap" defaultMessage="Roadmap" />
               </NormalLink>
             </ListItem>
           </List>
@@ -121,11 +131,6 @@ export function PublicFooter(props: BoxProps) {
               <Link href="/careers">
                 <FormattedMessage id="public.careers" defaultMessage="Careers" />
               </Link>
-            </ListItem>
-            <ListItem>
-              <NormalLink href={`${process.env.NEXT_PUBLIC_PARALLEL_URL}/blog`}>
-                <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
-              </NormalLink>
             </ListItem>
             <ListItem>
               <NormalLink href="mailto:hello@onparallel.com">

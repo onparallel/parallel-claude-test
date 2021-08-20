@@ -3315,6 +3315,11 @@
     "context": "Contacts"
   },
   {
+    "term": "navbar.give-feedback",
+    "definition": "Danos tu opinión",
+    "context": "Give us your feedback"
+  },
+  {
     "term": "navbar.help-center",
     "definition": "Centro de ayuda",
     "context": "Help center"
@@ -5075,9 +5080,9 @@
     "context": "Product"
   },
   {
-    "term": "public.footer.support",
-    "definition": "Soporte",
-    "context": "Support"
+    "term": "public.footer.resources",
+    "definition": "Recursos",
+    "context": "Resources"
   },
   {
     "term": "public.footer.twitter-profile",
@@ -5983,6 +5988,21 @@
     "term": "public.request-information.cta-title",
     "definition": "Empieza a agilizar tus peticiones de información",
     "context": "Start streamlining your petitions for information"
+  },
+  {
+    "term": "public.resources.faq",
+    "definition": "FAQ - Preguntas más frecuentes",
+    "context": "FAQ"
+  },
+  {
+    "term": "public.resources.roadmap",
+    "definition": "Roadmap",
+    "context": "Roadmap"
+  },
+  {
+    "term": "public.resources.support-center",
+    "definition": "Centro de soporte",
+    "context": "Support center"
   },
   {
     "term": "public.review-files.cta-title",

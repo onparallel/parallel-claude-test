@@ -21,13 +21,14 @@ import {
   LogOutIcon,
   MapIcon,
   UserIcon,
+  CommentIcon,
 } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
-import { NakedLink } from "../common/Link";
+import { NakedLink, NormalLink } from "../common/Link";
 
 export interface UserMenuProps {
   placement?: UsePopperProps["placement"];
@@ -128,6 +129,11 @@ export function UserMenu({ placement, user, onLocaleChange, onOnboardingClick }:
           ) : null}
           <MenuItem icon={<MapIcon display="block" boxSize={4} />} onClick={onOnboardingClick}>
             <FormattedMessage id="navbar.start-tour" defaultMessage="Guide me around" />
+          </MenuItem>
+          <MenuItem icon={<CommentIcon display="block" boxSize={4} />}>
+            <NormalLink href="https://airtable.com/shre0IJzqOWlZCrkf" isExternal>
+              <FormattedMessage id="navbar.give-feedback" defaultMessage="Give us your feedback" />
+            </NormalLink>
           </MenuItem>
           <MenuDivider />
 
