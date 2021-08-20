@@ -473,6 +473,7 @@ export class PetitionRepository extends BaseRepository {
       "contact_id" | "next_reminder_at" | "reminders_active" | "reminders_config" | "reminders_left"
     >[],
     user: User,
+    fromPublicPetitionLink: boolean,
     t?: Knex.Transaction
   ) {
     const rows =
@@ -491,18 +492,28 @@ export class PetitionRepository extends BaseRepository {
             })),
             t
           );
-
-    await this.createEvent(
-      rows.map((access) => ({
-        type: "ACCESS_ACTIVATED",
-        petition_id: petitionId,
-        data: {
-          petition_access_id: access.id,
-          user_id: user.id,
-        },
-      })),
-      t
-    );
+    fromPublicPetitionLink
+      ? await this.createEvent(
+          rows.map((access) => ({
+            type: "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK" as const,
+            petition_id: petitionId,
+            data: {
+              petition_access_id: access.id,
+            },
+          })),
+          t
+        )
+      : await this.createEvent(
+          rows.map((access) => ({
+            type: "ACCESS_ACTIVATED",
+            petition_id: petitionId,
+            data: {
+              petition_access_id: access.id,
+              user_id: user.id,
+            },
+          })),
+          t
+        );
 
     return rows;
   }

@@ -13,7 +13,6 @@ import {
 } from "@nexus/schema";
 import pMap from "p-map";
 import { isDefined, omit, pick, zip } from "remeda";
-import { ApiContext } from "../../../context";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
 import {
@@ -25,7 +24,6 @@ import {
 import { unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { withError } from "../../../util/promises/withError";
-import { calculateNextReminder } from "../../../util/reminderUtils";
 import { random } from "../../../util/token";
 import { userHasAccessToContactGroups, userHasAccessToContacts } from "../../contact/authorizers";
 import {
@@ -1082,7 +1080,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     const results = await pMap(
       zip([petition, ...clonedPetitions], args.contactIdGroups),
       async ([petition, contactIds]) =>
-        await presendPetition(petition, contactIds, args, ctx.user!, ctx),
+        await presendPetition(petition, contactIds, args, ctx.user!, false, ctx),
       { concurrency: 5 }
     );
 
@@ -1140,7 +1138,7 @@ export const sendPetition = mutationField("sendPetition", {
       accesses,
       messages,
       petition: updatedPetition,
-    } = await presendPetition(petition, args.contactIds, args, ctx.user!, ctx);
+    } = await presendPetition(petition, args.contactIds, args, ctx.user!, false, ctx);
 
     if (result === "FAILURE" && error.constraint === "petition_access__petition_id_contact_id") {
       throw new WhitelistedError(

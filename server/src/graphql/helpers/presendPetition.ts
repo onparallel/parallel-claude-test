@@ -17,6 +17,7 @@ export async function presendPetition(
     body: any;
   },
   user: User,
+  fromPublicPetitionLink: boolean,
   ctx: ApiContext,
   t?: Knex.Transaction
 ) {
@@ -34,6 +35,7 @@ export async function presendPetition(
           : null,
       })),
       user,
+      fromPublicPetitionLink,
       t
     );
 
