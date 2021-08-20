@@ -39,7 +39,10 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
       >
         <Feature
           image={
-            <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-aml.svg`} />
+            <Image
+              role="presentation"
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-aml.svg`}
+            />
           }
           header={
             <FormattedMessage
@@ -56,7 +59,10 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         />
         <Feature
           image={
-            <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-tax.svg`} />
+            <Image
+              role="presentation"
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-tax.svg`}
+            />
           }
           header={
             <FormattedMessage id="public.parallel-use-cases.tax-title" defaultMessage="Tax" />
@@ -71,6 +77,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         <Feature
           image={
             <Image
+              role="presentation"
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-real-estate.svg`}
             />
           }
@@ -90,6 +97,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         <Feature
           image={
             <Image
+              role="presentation"
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-corporate.svg`}
             />
           }
@@ -109,6 +117,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         <Feature
           image={
             <Image
+              role="presentation"
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-litigation.svg`}
             />
           }
