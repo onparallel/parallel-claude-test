@@ -9,9 +9,9 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
     <Box sx={{ pageBreakInside: "avoid" }} marginY="4mm">
       {field.type === "HEADING" ? (
         <Stack>
-          <Heading size="lg">{field.title ?? "-"}</Heading>
+          {field.title ? <Heading size="lg">{field.title ?? "-"}</Heading> : null}
           {field.description ? (
-            <Text paddingLeft="2mm" fontStyle="italic">
+            <Text paddingLeft="2mm">
               <BreakLines>{field.description}</BreakLines>
             </Text>
           ) : null}
@@ -20,7 +20,7 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
         <Stack borderRadius="md" border="1px solid" borderColor="gray.400" padding="4mm">
           <Text fontWeight="bold">{field.title ?? "-"}</Text>
           {field.description ? (
-            <Text paddingLeft="2mm" fontStyle="italic">
+            <Text paddingLeft="2mm">
               <BreakLines>{field.description}</BreakLines>
             </Text>
           ) : null}

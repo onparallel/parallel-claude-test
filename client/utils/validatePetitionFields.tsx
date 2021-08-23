@@ -32,7 +32,7 @@ export function validatePetitionFields<T extends PartialField>(fields: T[]): Val
       ),
     };
   }
-  const fieldWithoutTitle = fields.find((f) => !f.title);
+  const fieldWithoutTitle = fields.find((f) => f.type !== "HEADING" && !f.title);
   if (fieldWithoutTitle) {
     return {
       error: "FIELD_WITHOUT_TITLE",
