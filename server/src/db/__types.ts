@@ -20,6 +20,8 @@ export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV" | "ROOT";
 
+export type OrganizationUsageLimitName = "PETITION_SEND";
+
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export type PetitionContactNotificationType = "COMMENT_CREATED";
@@ -122,6 +124,7 @@ export interface TableTypes {
   feature_flag_override: FeatureFlagOverride;
   file_upload: FileUpload;
   organization: Organization;
+  organization_usage_limit: OrganizationUsageLimit;
   org_integration: OrgIntegration;
   petition: Petition;
   petition_access: PetitionAccess;
@@ -161,6 +164,7 @@ export interface TableCreateTypes {
   feature_flag_override: CreateFeatureFlagOverride;
   file_upload: CreateFileUpload;
   organization: CreateOrganization;
+  organization_usage_limit: CreateOrganizationUsageLimit;
   org_integration: CreateOrgIntegration;
   petition: CreatePetition;
   petition_access: CreatePetitionAccess;
@@ -200,6 +204,7 @@ export interface TablePrimaryKeys {
   feature_flag_override: "id";
   file_upload: "id";
   organization: "id";
+  organization_usage_limit: "id";
   org_integration: "id";
   petition: "id";
   petition_access: "id";
@@ -372,6 +377,7 @@ export type CreateFileUpload = PartialProps<
 export interface Organization {
   id: number; // int4
   name: string; // varchar
+  identifier: Maybe<string>; // varchar
   status: OrganizationStatus; // organization_status
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
@@ -382,11 +388,12 @@ export interface Organization {
   custom_host: Maybe<string>; // varchar
   custom_email_from: Maybe<string>; // varchar
   logo_public_file_id: Maybe<number>; // int4
-  identifier: Maybe<string>; // varchar
+  usage_details: Maybe<any>; // jsonb
 }
 
 export type CreateOrganization = PartialProps<
   Omit<Organization, "id">,
+  | "identifier"
   | "created_at"
   | "created_by"
   | "updated_at"
@@ -396,7 +403,23 @@ export type CreateOrganization = PartialProps<
   | "custom_host"
   | "custom_email_from"
   | "logo_public_file_id"
-  | "identifier"
+  | "usage_details"
+>;
+
+export interface OrganizationUsageLimit {
+  id: number; // int4
+  org_id: number; // int4
+  limit_name: OrganizationUsageLimitName; // organization_usage_limit_name
+  limit: number; // int4
+  used: number; // int4
+  period: string; // interval
+  period_start_date: Date; // timestamptz
+  period_end_date: Maybe<Date>; // timestamptz
+}
+
+export type CreateOrganizationUsageLimit = PartialProps<
+  Omit<OrganizationUsageLimit, "id">,
+  "used" | "period_start_date" | "period_end_date"
 >;
 
 export interface OrgIntegration {
@@ -644,8 +667,8 @@ export interface PetitionFieldReply {
   deleted_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   status: PetitionFieldReplyStatus; // petition_field_reply_status
-  user_id: Maybe<number>; // int4
   metadata: any; // jsonb
+  user_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -658,8 +681,8 @@ export type CreatePetitionFieldReply = PartialProps<
   | "deleted_by"
   | "petition_access_id"
   | "status"
-  | "user_id"
   | "metadata"
+  | "user_id"
 >;
 
 export interface PetitionMessage {
