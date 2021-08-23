@@ -3,7 +3,7 @@ import { Logo } from "@parallel/components/common/Logo";
 import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-export type PublicPetitionReminderProps = {
+type PublicPetitionReminderProps = {
   organization: PublicPetitionLinkOwnerOrganization;
   email: string;
 };

@@ -4446,8 +4446,8 @@
   },
   {
     "term": "public-petition-email-sent.body.parraf-2",
-    "definition": "Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link.",
-    "context": "Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link."
+    "definition": "Can’t find our email? Check your spam folder and if you don’t find it contact with the person who shared you the link.",
+    "context": "Can’t find our email? Check your spam folder and if you don’t find it contact with the person who shared you the link."
   },
   {
     "term": "public-petition-email-sent.title",

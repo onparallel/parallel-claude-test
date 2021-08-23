@@ -20,7 +20,7 @@ import { SignatureCancelledUserNotification } from "./flavor/SignatureCancelledU
 import { SignatureCompletedUserNotification } from "./flavor/SignatureCompletedUserNotification";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
 
-export interface NotificationListProps {
+interface NotificationListProps {
   notifications: NotificationsDrawer_PetitionUserNotificationFragment[];
   onFetchMore: () => void;
   onRefresh: () => void;

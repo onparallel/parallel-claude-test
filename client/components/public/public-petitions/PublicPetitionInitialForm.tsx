@@ -36,7 +36,7 @@ export type PublicPetitionInitialFormInputs = {
   email: string;
 };
 
-export type PublicPetitionInitialFormProps = {
+type PublicPetitionInitialFormProps = {
   organization: PublicPetitionLinkOwnerOrganization;
   title: string;
   description: string;

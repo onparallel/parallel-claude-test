@@ -8,7 +8,7 @@ import { FormattedMessage } from "react-intl";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
-export type TimelineAccessActivatedEventProps = {
+type TimelineAccessActivatedEventProps = {
   userId: string;
   event: TimelineAccessActivatedEvent_AccessActivatedEventFragment;
 };

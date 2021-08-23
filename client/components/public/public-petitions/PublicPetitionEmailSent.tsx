@@ -3,7 +3,7 @@ import { Logo } from "@parallel/components/common/Logo";
 import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-export type PublicPetitionEmailSentProps = {
+type PublicPetitionEmailSentProps = {
   organization: PublicPetitionLinkOwnerOrganization;
   email: string;
 };
@@ -41,7 +41,7 @@ export function PublicPetitionEmailSent({ organization, email }: PublicPetitionE
           <Text>
             <FormattedMessage
               id="public-petition-email-sent.body.parraf-2"
-              defaultMessage="Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link."
+              defaultMessage="Can’t find our email? Check your spam folder and if you don’t find it contact with the person who shared you the link."
             />
           </Text>
         </Stack>

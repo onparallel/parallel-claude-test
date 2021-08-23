@@ -7,7 +7,7 @@ import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
-export interface AccessActivatedFromLinkNotificationProps {
+interface AccessActivatedFromLinkNotificationProps {
   isFirst?: boolean;
   notification: AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragment;
 }
