@@ -6,7 +6,7 @@ import { FileSize } from "../common/FileSize";
 
 export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFieldFragment }) {
   return (
-    <Box sx={{ pageBreakInside: "avoid" }} marginY="4mm">
+    <Box sx={{ pageBreakInside: field.type === "HEADING" ? "auto" : "avoid" }} marginY="4mm">
       {field.type === "HEADING" ? (
         <Stack>
           {field.title ? <Heading size="lg">{field.title ?? "-"}</Heading> : null}
