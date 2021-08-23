@@ -206,30 +206,32 @@ function PublicPetitionLink({
             )}
           </SimpleGrid>
           <Flex justifyContent="flex-end" alignItems="flex-end" flex="1">
-            <NakedLink href="/" passHref>
-              <Box
-                backgroundColor="gray.200"
-                borderTopLeftRadius="xl"
-                paddingX={4}
-                paddingY={1.5}
-                width="min-content"
-                cursor="pointer"
-                height="min-content"
-              >
-                <Text as="span" fontSize="sm" whiteSpace="nowrap">
-                  <FormattedMessage
-                    id="recipient-view.powered-by"
-                    defaultMessage="Powered by {parallel}"
-                    values={{
-                      parallel: (
-                        <Text as="a" fontWeight="bold" fontFamily="hero">
-                          Parallel
-                        </Text>
-                      ),
-                    }}
-                  />
-                </Text>
-              </Box>
+            <NakedLink href="/?ref=parallel_public_link" passHref>
+              <a target="_blank">
+                <Box
+                  backgroundColor="gray.200"
+                  borderTopLeftRadius="xl"
+                  paddingX={4}
+                  paddingY={1.5}
+                  width="min-content"
+                  cursor="pointer"
+                  height="min-content"
+                >
+                  <Text as="span" fontSize="sm" whiteSpace="nowrap">
+                    <FormattedMessage
+                      id="recipient-view.powered-by"
+                      defaultMessage="Powered by {parallel}"
+                      values={{
+                        parallel: (
+                          <Text as="a" fontWeight="bold" fontFamily="hero">
+                            Parallel
+                          </Text>
+                        ),
+                      }}
+                    />
+                  </Text>
+                </Box>
+              </a>
             </NakedLink>
           </Flex>
         </Stack>

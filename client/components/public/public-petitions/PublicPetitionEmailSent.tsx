@@ -10,7 +10,13 @@ type PublicPetitionEmailSentProps = {
 
 export function PublicPetitionEmailSent({ organization, email }: PublicPetitionEmailSentProps) {
   return (
-    <Stack spacing={{ base: 6, md: 8 }} maxWidth="container.sm" width="100%" margin="0 auto">
+    <Stack
+      spacing={{ base: 6, md: 8 }}
+      maxWidth="container.sm"
+      width="100%"
+      margin="0 auto"
+      alignItems="flex-start"
+    >
       {organization.logoUrl ? (
         <Img
           src={organization.logoUrl}

@@ -91,7 +91,13 @@ export function PublicPetitionInitialForm({
 
   return (
     <>
-      <Stack spacing={4} maxWidth="container.sm" width="100%" margin="0 auto">
+      <Stack
+        spacing={4}
+        maxWidth="container.sm"
+        width="100%"
+        margin="0 auto"
+        alignItems="flex-start"
+      >
         {organization.logoUrl ? (
           <Img
             src={organization.logoUrl}
@@ -170,6 +176,7 @@ export function PublicPetitionInitialForm({
             </FormLabel>
             <Input
               type="text"
+              autoComplete="given-name"
               {...register("firstName", {
                 required: true,
                 validate: (value) => {
@@ -190,6 +197,7 @@ export function PublicPetitionInitialForm({
             </FormLabel>
             <Input
               type="text"
+              autoComplete="family-name"
               {...register("lastName", {
                 required: true,
                 validate: (value) => {
