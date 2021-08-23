@@ -130,11 +130,17 @@ export function UserMenu({ placement, user, onLocaleChange, onOnboardingClick }:
           <MenuItem icon={<MapIcon display="block" boxSize={4} />} onClick={onOnboardingClick}>
             <FormattedMessage id="navbar.start-tour" defaultMessage="Guide me around" />
           </MenuItem>
-          <MenuItem icon={<CommentIcon display="block" boxSize={4} />}>
-            <NormalLink href="https://airtable.com/shre0IJzqOWlZCrkf" isExternal>
+          <NormalLink
+            href="https://airtable.com/shre0IJzqOWlZCrkf"
+            aria-label="Feedback"
+            isExternal
+            color="inherit"
+            _hover={{ color: "inherit" }}
+          >
+            <MenuItem icon={<CommentIcon display="block" boxSize={4} />}>
               <FormattedMessage id="navbar.give-feedback" defaultMessage="Give us your feedback" />
-            </NormalLink>
-          </MenuItem>
+            </MenuItem>
+          </NormalLink>
           <MenuDivider />
 
           <MenuItem onClick={handleLogoutClick} icon={<LogOutIcon display="block" boxSize={4} />}>
