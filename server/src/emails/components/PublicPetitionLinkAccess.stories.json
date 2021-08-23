@@ -9,6 +9,7 @@
         }
       },
       "args": {
+        "emailSubject": "First email subject",
         "fullName": "Derek Lou",
         "petitionTitle": "Some petition title",
         "keycode": "asdfghjkl",
@@ -18,6 +19,7 @@
         "logoAlt": "Parallel"
       },
       "argsTypes": {
+        "emailSubject": { "control": { "type": "text" } },
         "fullName": { "control": { "type": "text" } },
         "petitionTitle": { "control": { "type": "text" } },
         "keycode": { "control": { "type": "text" } },

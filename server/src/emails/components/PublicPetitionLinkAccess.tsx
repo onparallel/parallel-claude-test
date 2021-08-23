@@ -1,6 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Maybe } from "../../util/types";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { GreetingFormal } from "../common/Greeting";
@@ -8,6 +9,7 @@ import { Layout, LayoutProps } from "../common/Layout";
 import { greetingFormal } from "../common/texts";
 
 export type PublicPetitionLinkAccessProps = {
+  emailSubject: Maybe<string>;
   fullName: string | null;
   senderName: string;
   petitionTitle: string;
@@ -15,17 +17,17 @@ export type PublicPetitionLinkAccessProps = {
 } & LayoutProps;
 
 const email: Email<PublicPetitionLinkAccessProps> = {
-  from({ fullName }, intl) {
+  from({ senderName }, intl) {
     return intl.formatMessage(
       {
         id: "from.via-parallel",
         defaultMessage: "{senderName} (via Parallel)",
       },
-      { senderName: fullName }
+      { senderName }
     );
   },
-  subject({ petitionTitle }) {
-    return petitionTitle;
+  subject({ emailSubject, petitionTitle }) {
+    return emailSubject || petitionTitle;
   },
   text({ fullName, petitionTitle, keycode, parallelUrl }, intl) {
     return outdent`

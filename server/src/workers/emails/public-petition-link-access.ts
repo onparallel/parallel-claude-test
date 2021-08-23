@@ -49,6 +49,7 @@ export async function publicPetitionLinkAccess(
     {
       fullName: fullName(contact.first_name, contact.last_name)!,
       senderName: fullName(sender.first_name, sender.last_name)!,
+      emailSubject: petition.email_subject,
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
       ...layoutProps,
