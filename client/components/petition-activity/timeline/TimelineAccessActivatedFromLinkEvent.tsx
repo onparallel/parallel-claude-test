@@ -17,6 +17,7 @@ export function TimelineAccessActivatedFromLinkEvent({
   return (
     <TimelineItem
       icon={<TimelineIcon icon={<LinkIcon />} color="white" backgroundColor="purple.500" />}
+      paddingBottom={0}
     >
       <FormattedMessage
         id="timeline.public-petition-link-created-description"

@@ -1009,7 +1009,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(args.publicPetitionLinkId),
       ]);
 
-      return await ctx.petitions.withTransaction(async (t) => {
+      const { messages, result } = await ctx.petitions.withTransaction(async (t) => {
         const [newPetition, contact] = await Promise.all([
           ctx.petitions.clonePetition(
             publicPetitionLink!.template_id,
@@ -1057,22 +1057,24 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
 
         if (error) throw error; // transaction rollback
 
-        // trigger emails and events
-        if (result === "SUCCESS") {
-          await Promise.all([
-            ctx.emails.sendPublicPetitionLinkAccessEmail(messages!.map((s) => s.id)),
-            ctx.petitions.createEvent(
-              messages!.map((message) => ({
-                type: "MESSAGE_SENT" as const,
-                data: { petition_message_id: message.id },
-                petition_id: message.petition_id,
-              })),
-              t
-            ),
-          ]);
-        }
-        return result;
+        return { messages, result };
       });
+
+      // trigger emails and events
+      if (result === "SUCCESS") {
+        await Promise.all([
+          ctx.emails.sendPublicPetitionLinkAccessEmail(messages!.map((s) => s.id)),
+          ctx.petitions.createEvent(
+            messages!.map((message) => ({
+              type: "MESSAGE_SENT" as const,
+              data: { petition_message_id: message.id },
+              petition_id: message.petition_id,
+            }))
+          ),
+        ]);
+      }
+
+      return result;
     },
   }
 );
