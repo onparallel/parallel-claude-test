@@ -193,7 +193,7 @@ function SelectLogoInput({ logo, setLogo }: { logo: Maybe<File>; setLogo: (arg0:
           />
         </Text>
       )}
-      {process.browser && logo && (
+      {Object.prototype.isPrototypeOf(window) && logo && (
         <Center
           paddingX={6}
           paddingY={2}
