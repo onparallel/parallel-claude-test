@@ -30,6 +30,7 @@ import {
 } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionSettings } from "@parallel/components/petition-common/PetitionSettings";
+import { usePublicLinkSettingsDialog } from "@parallel/components/petition-common/PublicLinkSettingsDialog";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
@@ -335,15 +336,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const showErrorDialog = useErrorDialog();
-  const [batchSendPetition] = usePetitionCompose_batchSendPetitionMutation();
-  const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
-  const showLongBatchSendDialog = useBlockingDialog();
-  const handleNextClick = useCallback(async () => {
-    if (petition?.__typename !== "Petition") {
-      throw new Error("Can't send a template");
-    }
-
+  const validPetitionFields = async () => {
+    if (!petition) return false;
     const { error, errorMessage, field } = validatePetitionFields(petition.fields);
     if (error) {
       setShowErrors(true);
@@ -354,8 +348,21 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         const node = document.querySelector(`#field-${field.id}`);
         await scrollIntoView(node!, { block: "center", behavior: "smooth" });
       }
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const showErrorDialog = useErrorDialog();
+  const [batchSendPetition] = usePetitionCompose_batchSendPetitionMutation();
+  const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
+  const showLongBatchSendDialog = useBlockingDialog();
+  const handleNextClick = useCallback(async () => {
+    if (petition?.__typename !== "Petition") {
+      throw new Error("Can't send a template");
+    }
+
+    if (!(await validPetitionFields())) return;
 
     try {
       const {
@@ -495,6 +502,21 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     minHeight: 0,
   } as const;
 
+  const publicLinkSettingDialog = usePublicLinkSettingsDialog();
+  const handleShareByLink = async () => {
+    try {
+      if (petition && petition.__typename === "PetitionTemplate") {
+        if (!(await validPetitionFields())) return;
+
+        const data = await publicLinkSettingDialog({
+          owner: petition.__typename === "PetitionTemplate" ? petition.owner.id : "",
+        });
+
+        console.log("publicLinkSettingDialog data: ", data);
+      }
+    } catch {}
+  };
+
   return (
     <PetitionLayout
       key={petition!.id}
@@ -560,6 +582,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                         user={me}
                         petition={petition!}
                         onUpdatePetition={handleUpdatePetition}
+                        onShareByLink={handleShareByLink}
                       />
                     </TabPanel>
                   </TabPanels>
@@ -644,6 +667,9 @@ PetitionCompose.fragments = {
         }
         ... on PetitionTemplate {
           isPublic
+          owner {
+            id
+          }
         }
       }
       ${PetitionLayout.fragments.PetitionBase}

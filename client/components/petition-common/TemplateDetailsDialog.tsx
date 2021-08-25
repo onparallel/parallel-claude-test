@@ -18,7 +18,13 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, CopyIcon, EditIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
+import {
+  ChevronDownIcon,
+  CopyIcon,
+  EditIcon,
+  LinkIcon,
+  PaperPlaneIcon,
+} from "@parallel/chakra/icons";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   TemplateDetailsDialog_PetitionTemplateFragment,
@@ -30,6 +36,7 @@ import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
@@ -110,6 +117,16 @@ export function TemplateDetailsDialog({
   );
 
   const indices = useFieldIndices(template.fields);
+
+  const { onCopy: onCopyPublicLink } = useClipboardWithToast({
+    value:
+      "https://cuatrecasas.onparallel.com/xxx/?email=derek@onparallel.com&name=Derek&lastname=Lou",
+    text: "Link copied to clipboard",
+  });
+
+  const handleCopyPublicLink = () => {
+    onCopyPublicLink();
+  };
 
   return (
     <BaseDialog size="4xl" {...props}>
@@ -209,6 +226,18 @@ export function TemplateDetailsDialog({
                         <FormattedMessage
                           id="template-details.edit-template"
                           defaultMessage="Edit template"
+                        />
+                      </MenuItem>
+                    )}
+                    {true && (
+                      <MenuItem
+                        justifyContent="left"
+                        icon={<LinkIcon display="block" boxSize={4} />}
+                        onClick={handleCopyPublicLink}
+                      >
+                        <FormattedMessage
+                          id="template-details.copy-public-link"
+                          defaultMessage="Copy link"
                         />
                       </MenuItem>
                     )}

@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Avatar, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { LinkIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -58,6 +59,7 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
       <Spacer />
       <Flex alignItems="center">
         <LocaleBadge locale={template.locale} />
+        <LinkIcon marginLeft={2} color="gray.500" boxSize={3.5} />
         <Spacer />
         <Avatar name={template.owner.fullName!} size="xs" role="presentation" />
         <Text fontSize="xs" marginLeft={2}>

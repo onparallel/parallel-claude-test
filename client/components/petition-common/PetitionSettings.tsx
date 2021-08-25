@@ -7,8 +7,11 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  HStack,
+  IconButton,
   Input,
   InputGroup,
+  InputRightAddon,
   InputRightElement,
   Select,
   Stack,
@@ -17,9 +20,11 @@ import {
 } from "@chakra-ui/react";
 import {
   CommentIcon,
+  LinkIcon,
   ListIcon,
   LockClosedIcon,
   LockOpenIcon,
+  SettingsIcon,
   ShieldIcon,
   SignatureIcon,
   TimeIcon,
@@ -34,8 +39,9 @@ import {
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
+import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { memo, ReactNode } from "react";
+import { memo, ReactNode, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
@@ -48,9 +54,15 @@ export type PetitionSettingsProps = {
   user: PetitionSettings_UserFragment;
   petition: PetitionSettings_PetitionBaseFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
+  onShareByLink: () => void;
 };
 
-function _PetitionSettings({ user, petition, onUpdatePetition }: PetitionSettingsProps) {
+function _PetitionSettings({
+  user,
+  petition,
+  onUpdatePetition,
+  onShareByLink,
+}: PetitionSettingsProps) {
   const locales = useSupportedLocales();
   const hasSignature =
     petition.__typename === "Petition" &&
@@ -136,6 +148,26 @@ function _PetitionSettings({ user, petition, onUpdatePetition }: PetitionSetting
       await onUpdatePetition({ skipForwardSecurity: value });
     } catch {}
   }
+
+  const [linkValue, setLinkValue] = useState(
+    "https://cuatrecasas.onparallel.com/xxx/?email=derek@onparallel.com&name=Derek&lastname=Lou"
+  );
+
+  const { onCopy: onCopyPublicLink } = useClipboardWithToast({
+    value: linkValue,
+    text: "Link copied to clipboard",
+  });
+
+  const handleCopyPublicLink = () => {
+    onCopyPublicLink();
+  };
+
+  const [sharedByLink, setSharedByLink] = useState(false);
+
+  const handleGeneratePublicLink = async () => {
+    onShareByLink();
+    setSharedByLink((v) => !v);
+  };
 
   return (
     <Stack padding={4} spacing={4}>
@@ -245,6 +277,45 @@ function _PetitionSettings({ user, petition, onUpdatePetition }: PetitionSetting
           await onUpdatePetition({ isReadOnly: value });
         }}
       />
+      {petition.__typename === "PetitionTemplate" ? (
+        <SwitchSetting
+          icon={<LinkIcon />}
+          title={
+            <FormattedMessage
+              id="component.petition-settings.share-by-link"
+              defaultMessage="Share by link"
+            />
+          }
+          help={
+            <FormattedMessage
+              id="component.petition-settings.share-by-link-description"
+              defaultMessage="Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
+            />
+          }
+          isChecked={sharedByLink}
+          onChange={handleGeneratePublicLink}
+        />
+      ) : null}
+      {sharedByLink ? (
+        <HStack paddingLeft={5}>
+          <InputGroup>
+            <Input
+              type="text"
+              value={linkValue}
+              onChange={(evt) => setLinkValue(evt.target.value)}
+            />
+            <InputRightAddon padding={0}>
+              <Button onClick={handleCopyPublicLink}>Copy link</Button>
+            </InputRightAddon>
+          </InputGroup>
+          <IconButton
+            variant="outline"
+            aria-label="public link settings"
+            onClick={handleGeneratePublicLink}
+            icon={<SettingsIcon boxSize={"1.125rem"} />}
+          />
+        </HStack>
+      ) : null}
       {user.hasSkipForwardSecurity ? (
         <SwitchSetting
           isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}

@@ -1555,6 +1555,16 @@
     "context": "Enable this option to prevent users from accidentally making changes to this petition."
   },
   {
+    "term": "component.petition-settings.share-by-link",
+    "definition": "Share by link",
+    "context": "Share by link"
+  },
+  {
+    "term": "component.petition-settings.share-by-link-description",
+    "definition": "Share an open link that allows your clients create petitions by themselves. They will be managed by the owner.",
+    "context": "Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
+  },
+  {
     "term": "component.petition-settings.skip-forward-security",
     "definition": "Disable Forward Security",
     "context": "Disable Forward Security"
@@ -1958,6 +1968,61 @@
     "term": "component.sent-petition-reminder-dialog.message-sent",
     "definition": "Reminder sent to {recipient} on {date}",
     "context": "Reminder sent to {recipient} on {date}"
+  },
+  {
+    "term": "component.settings-public-link-dialog.description",
+    "definition": "Complete the information for users who access the link and define who will have access to the created petitions.",
+    "context": "Complete the information for users who access the link and define who will have access to the created petitions."
+  },
+  {
+    "term": "component.settings-public-link-dialog.description-label",
+    "definition": "Description",
+    "context": "Description"
+  },
+  {
+    "term": "component.settings-public-link-dialog.description-placeholder",
+    "definition": "Explain what the service is and what kind of information you will need",
+    "context": "Explain what the service is and what kind of information you will need"
+  },
+  {
+    "term": "component.settings-public-link-dialog.editors-label",
+    "definition": "Editors:",
+    "context": "Editors:"
+  },
+  {
+    "term": "component.settings-public-link-dialog.editors-placeholder",
+    "definition": "Add users and teams from your organization",
+    "context": "Add users and teams from your organization"
+  },
+  {
+    "term": "component.settings-public-link-dialog.generate-link",
+    "definition": "Generate link",
+    "context": "Generate link"
+  },
+  {
+    "term": "component.settings-public-link-dialog.owner-label",
+    "definition": "Owner:",
+    "context": "Owner:"
+  },
+  {
+    "term": "component.settings-public-link-dialog.owner-placeholder",
+    "definition": "Select an owner",
+    "context": "Select an owner"
+  },
+  {
+    "term": "component.settings-public-link-dialog.page-title-label",
+    "definition": "Title of the page",
+    "context": "Title of the page"
+  },
+  {
+    "term": "component.settings-public-link-dialog.page-title-placeholder",
+    "definition": "Include the title your recipients will see",
+    "context": "Include the title your recipients will see"
+  },
+  {
+    "term": "component.settings-public-link-dialog.title",
+    "definition": "Public link configuration",
+    "context": "Public link configuration"
   },
   {
     "term": "component.share-button.petition-not-shared",
