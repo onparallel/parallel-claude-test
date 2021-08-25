@@ -3365,7 +3365,25 @@ export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotif
     | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
 };
 
-export type Notifications_UnreadPetitionUserNotificationIdsQuery = { me: { __typename?: 'User', id: string, unreadNotificationIds: Array<string> } };
+export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
+  {
+    __typename?: "MessageEmailBouncedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
 
 export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
   {
@@ -3700,7 +3718,25 @@ export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotific
     | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
 };
 
-export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment = { __typename?: 'CommentCreatedUserNotification', id: string, createdAt: string, isRead: boolean, field: { __typename?: 'PetitionField', id: string, title?: Maybe<string> }, comment: { __typename?: 'PetitionFieldComment', id: string, isInternal: boolean, author?: Maybe<{ __typename?: 'PetitionAccess', contact?: Maybe<{ __typename?: 'Contact', id: string, fullName?: Maybe<string>, email: string }> } | { __typename?: 'User', id: string, fullName?: Maybe<string>, status: UserStatus }> }, petition: { __typename?: 'Petition', id: string, name?: Maybe<string> } | { __typename?: 'PetitionTemplate', id: string, name?: Maybe<string> } };
+export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
+  {
+    __typename?: "MessageEmailBouncedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
 
 export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
   {
@@ -3859,7 +3895,24 @@ export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragmen
     | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
 };
 
-export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragment = { __typename?: 'CommentCreatedUserNotification', id: string, createdAt: string, isRead: boolean, field: { __typename?: 'PetitionField', id: string, title?: Maybe<string> }, comment: { __typename?: 'PetitionFieldComment', id: string, isInternal: boolean, author?: Maybe<{ __typename?: 'PetitionAccess', contact?: Maybe<{ __typename?: 'Contact', id: string, fullName?: Maybe<string>, email: string }> } | { __typename?: 'User', id: string, fullName?: Maybe<string>, status: UserStatus }> }, petition: { __typename?: 'Petition', id: string, name?: Maybe<string> } | { __typename?: 'PetitionTemplate', id: string, name?: Maybe<string> } };
+export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment = {
+  __typename?: "MessageEmailBouncedUserNotification";
+  id: string;
+  createdAt: string;
+  isRead: boolean;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+    }>;
+  };
+  petition:
+    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+};
 
 export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment = {
   __typename?: "PetitionCompletedUserNotification";
@@ -3917,7 +3970,16 @@ export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUser
       | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
-export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment = { __typename?: 'CommentCreatedUserNotification', id: string, createdAt: string, isRead: boolean, petition: { __typename?: 'Petition', id: string, name?: Maybe<string> } | { __typename?: 'PetitionTemplate', id: string, name?: Maybe<string> } };
+export type PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
+  {
+    __typename?: "MessageEmailBouncedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
 
 export type PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
   {
@@ -4758,7 +4820,29 @@ export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragme
   };
 };
 
-export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment = { __typename?: 'AccessDeactivatedEvent', id: string, createdAt: string, user?: Maybe<{ __typename?: 'User', id: string, fullName?: Maybe<string>, status: UserStatus }>, access: { __typename?: 'PetitionAccess', contact?: Maybe<{ __typename?: 'Contact', id: string, fullName?: Maybe<string>, email: string }> } };
+export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment = {
+  __typename?: "AccessDelegatedEvent";
+  id: string;
+  createdAt: string;
+  originalAccess: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+    }>;
+  };
+  newAccess: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+    }>;
+  };
+};
 
 export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = {
   __typename?: "AccessOpenedEvent";
@@ -5288,7 +5372,28 @@ export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   };
 };
 
-export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = { __typename?: 'AccessDeactivatedEvent', createdAt: string, user?: Maybe<{ __typename?: 'User', id: string, fullName?: Maybe<string>, status: UserStatus }>, access: { __typename?: 'PetitionAccess', contact?: Maybe<{ __typename?: 'Contact', id: string, fullName?: Maybe<string>, email: string }> } };
+export type TimelineAccessDelegatedEvent_AccessDelegatedEventFragment = {
+  __typename?: "AccessDelegatedEvent";
+  createdAt: string;
+  originalAccess: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+    }>;
+  };
+  newAccess: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+    }>;
+  };
+};
 
 export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
   __typename?: "AccessOpenedEvent";
@@ -12633,7 +12738,21 @@ export type PetitionPdf_PetitionFragment = {
   }>;
 };
 
-export type PetitionPdf_PetitionFragment = { __typename?: 'Petition', id: string, name?: Maybe<string>, fields: Array<{ __typename?: 'PetitionField', id: string, type: PetitionFieldType, title?: Maybe<string>, options: { [key: string]: any }, description?: Maybe<string>, validated: boolean, visibility?: Maybe<{ [key: string]: any }>, replies: Array<{ __typename?: 'PetitionFieldReply', id: string, content: { [key: string]: any } }> }>, organization: { __typename?: 'Organization', name: string, logoUrl?: Maybe<string> }, currentSignatureRequest?: Maybe<{ __typename?: 'PetitionSignatureRequest', signatureConfig: { __typename?: 'SignatureConfig', timezone: string, contacts: Array<Maybe<{ __typename?: 'Contact', id: string, fullName?: Maybe<string>, email: string }>> } }> };
+export type PetitionPdf_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+  options: { [key: string]: any };
+  description?: Maybe<string>;
+  validated: boolean;
+  visibility?: Maybe<{ [key: string]: any }>;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+  }>;
+};
 
 export type PdfViewPetitionQueryVariables = Exact<{
   token: Scalars["String"];
