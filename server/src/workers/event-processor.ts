@@ -60,6 +60,7 @@ createQueueWorker(
         "USER_LOGGED_IN",
         "USER_CREATED",
         "ACCESS_ACTIVATED",
+        "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
       ],
       analyticsEventListener
     )

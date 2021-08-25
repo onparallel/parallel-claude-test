@@ -51,12 +51,13 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     template_id: number;
     new_petition_id: number;
   };
-  /** User sends petition to accesses */
+  /** User sends petition to accesses, or contact starts a petition from a public link */
   PETITION_SENT: {
     petition_id: number;
     petition_access_id: number;
     org_id: number;
     user_id: number;
+    from_public_link: boolean;
   };
   /** User closes the petition */
   PETITION_CLOSED: {

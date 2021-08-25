@@ -283,6 +283,13 @@ export const PetitionTemplate = objectType({
         return null;
       },
     });
+    t.nullable.field("publicLink", {
+      type: "PublicPetitionLink",
+      description: "The public link linked to this template",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPublicPetitionLinkByTemplateId(root.id);
+      },
+    });
   },
   rootTyping: "db.Petition",
 });
@@ -689,5 +696,13 @@ export const AWSPresignedPostData = objectType({
   definition(t) {
     t.string("url");
     t.jsonObject("fields");
+  },
+});
+
+export const UserOrUserGroupPublicLinkPermission = inputObjectType({
+  name: "UserOrUserGroupPublicLinkPermission",
+  definition(t) {
+    t.nonNull.id("id");
+    t.nonNull.field("permissionType", { type: "PetitionPermissionTypeRW" });
   },
 });

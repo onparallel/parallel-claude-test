@@ -193,6 +193,10 @@ export function isValidPublicPetitionLink<
       return false;
     }
 
+    // every repliable field has a title
+    if (fields.find((f) => f.type !== "HEADING" && !isDefined(f.title))) {
+      return false;
+    }
     return true;
   };
 }

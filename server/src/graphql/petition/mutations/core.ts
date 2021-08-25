@@ -18,6 +18,7 @@ import { isValueCompatible } from "../../../db/helpers/utils";
 import {
   CreatePetition,
   CreatePetitionField,
+  CreatePublicPetitionLink,
   Petition,
   PetitionPermission,
 } from "../../../db/__types";
@@ -69,6 +70,7 @@ import {
   petitionsAreEditable,
   petitionsAreNotPublicTemplates,
   petitionsAreOfTypePetition,
+  petitionsAreOfTypeTemplate,
   petitionsArePublicTemplates,
   repliesBelongsToField,
   repliesBelongsToPetition,
@@ -81,6 +83,11 @@ import {
   validatePetitionStatus,
 } from "../validations";
 import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
+import {
+  userHasAccessToPublicPetitionLink,
+  userHasAccessToUserOrUserGroupPublicLinkPermission,
+  userHasAccessToUsers,
+} from "./authorizers";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -1461,5 +1468,111 @@ export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFie
   })((args) => args.metadata, "metadata"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReplyMetadata(args.replyId, args.metadata);
+  },
+});
+
+export const createPublicPetitionLink = mutationField("createPublicPetitionLink", {
+  description: "Creates a public link from a user's template",
+  type: "PublicPetitionLink",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("templateId"),
+    petitionsAreOfTypeTemplate("templateId"),
+    userHasAccessToUsers("ownerId"),
+    userHasAccessToUserOrUserGroupPublicLinkPermission("otherPermissions" as never)
+  ),
+  args: {
+    templateId: nonNull(globalIdArg("Petition")),
+    title: nonNull(stringArg()),
+    description: nonNull(stringArg()),
+    ownerId: nonNull(globalIdArg("User")),
+    otherPermissions: nullable(list(nonNull("UserOrUserGroupPublicLinkPermission"))),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.withTransaction(async (t) => {
+      const publicPetitionLink = await ctx.petitions.createPublicPetitionLink(
+        {
+          template_id: args.templateId,
+          title: args.title,
+          description: args.description,
+          slug: random(10),
+          is_active: true,
+        },
+        `User:${ctx.user!.id}`,
+        t
+      );
+
+      await ctx.petitions.createPublicPetitionLinkUser(
+        publicPetitionLink.id,
+        [
+          {
+            id: args.ownerId,
+            type: "User",
+            isSubscribed: true,
+            permissionType: "OWNER",
+          },
+          ...(args.otherPermissions ?? []).map(({ id: gid, permissionType }) => {
+            const { id, type } = fromGlobalId(gid);
+            return {
+              id,
+              type: type as "User" | "UserGroup",
+              isSubscribed: true,
+              permissionType,
+            };
+          }),
+        ],
+        `User:${ctx.user!.id}`,
+        t
+      );
+
+      return publicPetitionLink;
+    });
+  },
+});
+
+export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink", {
+  description: "Updates the info and permissions of a public link",
+  type: nullable("PublicPetitionLink"),
+  authorize: authenticateAnd(
+    userHasAccessToPublicPetitionLink("publicPetitionLinkId"),
+    ifArgDefined((args) => args.ownerId, userHasAccessToUsers("ownerId" as never)),
+    ifArgDefined(
+      (args) => args.otherPermissions,
+      userHasAccessToUserOrUserGroupPublicLinkPermission("otherPermissions" as never)
+    )
+  ),
+  args: {
+    publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
+    publicPetitionLinkData: inputObjectType({
+      name: "UpdatePublicPetitionLinkData",
+      definition(t) {
+        t.nullable.boolean("isActive");
+        t.nullable.string("title");
+        t.nullable.string("description");
+      },
+    }).asArg(),
+    ownerId: globalIdArg("User"),
+    otherPermissions: list(nonNull("UserOrUserGroupPublicLinkPermission")),
+  },
+  resolve: async (_, args, ctx) => {
+    const publicPetitionLinkData: Partial<CreatePublicPetitionLink> = {};
+    if (isDefined(args.publicPetitionLinkData?.title)) {
+      publicPetitionLinkData.title = args.publicPetitionLinkData!.title!;
+    }
+    if (isDefined(args.publicPetitionLinkData?.description)) {
+      publicPetitionLinkData.description = args.publicPetitionLinkData!.description!;
+    }
+    if (isDefined(args.publicPetitionLinkData?.isActive)) {
+      publicPetitionLinkData.is_active = args.publicPetitionLinkData!.isActive!;
+    }
+
+    const publicPetitionLink = await ctx.petitions.updatePublicPetitionLink(
+      args.publicPetitionLinkId,
+      publicPetitionLinkData,
+      `User:${ctx.user!.id}`
+    );
+
+    // TODO update link users
+
+    return publicPetitionLink;
   },
 });

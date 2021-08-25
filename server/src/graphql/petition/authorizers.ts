@@ -117,6 +117,21 @@ export function petitionsAreOfTypePetition<
   };
 }
 
+export function petitionsAreOfTypeTemplate<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const petitionIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      const petitions = await ctx.petitions.loadPetition(petitionIds);
+      return petitions.every((p) => p && p.is_template);
+    } catch {}
+    return false;
+  };
+}
+
 export function fieldIsNotFixed<
   TypeName extends string,
   FieldName extends string,

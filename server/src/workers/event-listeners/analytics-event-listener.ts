@@ -1,6 +1,7 @@
 import { WorkerContext } from "../../context";
 import {
   AccessActivatedEvent,
+  AccessActivatedFromPublicPetitionLinkEvent,
   AccessOpenedEvent,
   PetitionClonedEvent,
   PetitionClosedEvent,
@@ -24,6 +25,14 @@ async function loadPetition(petitionId: number, ctx: WorkerContext) {
     throw new Error(`Petition not found with id ${petitionId}`);
   }
   return petition;
+}
+
+async function loadPetitionOwner(petitionId: number, ctx: WorkerContext) {
+  const user = await ctx.petitions.loadPetitionOwner(petitionId);
+  if (!user) {
+    throw new Error(`Owner user not found for Petition:${petitionId}`);
+  }
+  return user;
 }
 
 async function loadPetitionAccess(petitionAccessId: number, ctx: WorkerContext) {
@@ -98,6 +107,29 @@ async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: Worke
       user_id: event.data.user_id,
       org_id: petition.org_id,
       petition_id: event.petition_id,
+      from_public_link: false,
+    },
+  });
+}
+
+async function trackAccessActivatedFromPublicLinkEvent(
+  event: AccessActivatedFromPublicPetitionLinkEvent,
+  ctx: WorkerContext
+) {
+  const [petition, owner] = await Promise.all([
+    loadPetition(event.petition_id, ctx),
+    loadPetitionOwner(event.petition_id, ctx),
+  ]);
+
+  await ctx.analytics.trackEvent({
+    type: "PETITION_SENT",
+    user_id: owner.id,
+    data: {
+      petition_access_id: event.data.petition_access_id,
+      user_id: owner.id,
+      org_id: petition.org_id,
+      petition_id: event.petition_id,
+      from_public_link: true,
     },
   });
 }
@@ -249,6 +281,9 @@ export const analyticsEventListener: EventListener = async (event, ctx) => {
       break;
     case "ACCESS_ACTIVATED":
       await trackAccessActivatedEvent(event, ctx);
+      break;
+    case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
+      await trackAccessActivatedFromPublicLinkEvent(event, ctx);
       break;
     default:
       throw new Error(`Tracking to analytics not implemented for event ${JSON.stringify(event)}`);

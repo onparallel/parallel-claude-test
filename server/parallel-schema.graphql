@@ -583,6 +583,17 @@ type Mutation {
   ): Subscription!
 
   """
+  Creates a public link from a user's template
+  """
+  createPublicPetitionLink(
+    description: String!
+    otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+    ownerId: GID!
+    templateId: GID!
+    title: String!
+  ): PublicPetitionLink!
+
+  """
   Creates a reply to a text or select field.
   """
   createSimpleReply(fieldId: GID!, petitionId: GID!, reply: String!): PetitionFieldReply!
@@ -1169,6 +1180,16 @@ type Mutation {
     petitionIds: [GID!]
     petitionUserNotificationIds: [GID!]
   ): [PetitionUserNotification!]!
+
+  """
+  Updates the info and permissions of a public link
+  """
+  updatePublicPetitionLink(
+    otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+    ownerId: GID
+    publicPetitionLinkData: UpdatePublicPetitionLinkData
+    publicPetitionLinkId: GID!
+  ): PublicPetitionLink
   updateSignatureRequestMetadata(
     metadata: JSONObject!
     petitionSignatureRequestId: GID!
@@ -2474,6 +2495,11 @@ type PetitionTemplate implements PetitionBase {
   permissions: [PetitionPermission!]!
 
   """
+  The public link linked to this template
+  """
+  publicLink: PublicPetitionLink
+
+  """
   Whether to skip the forward security check on the recipient view.
   """
   skipForwardSecurity: Boolean!
@@ -2871,13 +2897,59 @@ type PublicPetitionFieldReply implements Timestamps {
 type PublicPetitionLink {
   description: String!
   id: GID!
+  linkPermissions: [PublicPetitionLinkPermission!]!
   organization: PublicPetitionLinkOwnerOrganization!
+  slug: String!
   title: String!
 }
 
 type PublicPetitionLinkOwnerOrganization {
   logoUrl: String
   name: String!
+}
+
+interface PublicPetitionLinkPermission implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  isSubscribed: Boolean!
+  permissionType: PetitionPermissionType!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+type PublicPetitionLinkUserGroupPermission implements PublicPetitionLinkPermission & Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  group: UserGroup!
+  isSubscribed: Boolean!
+  permissionType: PetitionPermissionType!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+type PublicPetitionLinkUserPermission implements PublicPetitionLinkPermission & Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  isSubscribed: Boolean!
+  permissionType: PetitionPermissionType!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+  user: User!
 }
 
 """
@@ -3547,6 +3619,12 @@ input UpdatePetitionInput {
   skipForwardSecurity: Boolean
 }
 
+input UpdatePublicPetitionLinkData {
+  description: String
+  isActive: Boolean
+  title: String
+}
+
 input UpdateTagInput {
   color: String
   name: String
@@ -3753,6 +3831,11 @@ union UserOrContact = Contact | User
 union UserOrPetitionAccess = PetitionAccess | User
 
 union UserOrUserGroup = User | UserGroup
+
+input UserOrUserGroupPublicLinkPermission {
+  id: ID!
+  permissionType: PetitionPermissionTypeRW!
+}
 
 type UserPagination {
   """

@@ -28,6 +28,7 @@ import {
   CreatePetitionFieldReply,
   CreatePetitionMessage,
   CreatePetitionReminder,
+  CreatePublicPetitionLink,
   Petition,
   PetitionAccess,
   PetitionContactNotification,
@@ -41,6 +42,8 @@ import {
   PetitionPermissionType,
   PetitionSignatureRequest,
   PetitionStatus,
+  PublicPetitionLink,
+  PublicPetitionLinkUser,
   User,
 } from "../__types";
 
@@ -2591,7 +2594,7 @@ export class PetitionRepository extends BaseRepository {
     t?: Knex.Transaction
   ) {
     const [newUsers, newUserGroups] = partition(data, (d) => d.type === "User");
-    return this.withTransaction(async (t) => {
+    return await this.withTransaction(async (t) => {
       const [
         directlyAssignedNewUserPermissions,
         userGroupNewPermissions,
@@ -3340,6 +3343,139 @@ export class PetitionRepository extends BaseRepository {
   readonly loadPublicPetitionLinkBySlug = this.buildLoadBy("public_petition_link", "slug", (q) =>
     q.where("is_active", true)
   );
+
+  readonly loadPublicPetitionLinkByTemplateId = this.buildLoadBy(
+    "public_petition_link",
+    "template_id",
+    (q) => q.where("is_active", true)
+  );
+
+  readonly loadPublicPetitionLinkUserByPublicPetitionLinkId = this.buildLoadMultipleBy(
+    "public_petition_link_user",
+    "public_petition_link_id",
+    (q) => q.whereNull("deleted_at")
+  );
+
+  async createPublicPetitionLink(
+    data: CreatePublicPetitionLink,
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [row] = await this.insert(
+      "public_petition_link",
+      {
+        ...data,
+        created_by: createdBy,
+      },
+      t
+    ).select("*");
+
+    return row;
+  }
+
+  async updatePublicPetitionLink(
+    publicPetitionLinkId: number,
+    data: Partial<PublicPetitionLink>,
+    updatedBy: string
+  ) {
+    const [row] = await this.from("public_petition_link")
+      .where("id", publicPetitionLinkId)
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
+
+    return row;
+  }
+
+  async createPublicPetitionLinkUser(
+    publicPetitionLinkId: number,
+    data: {
+      type: "User" | "UserGroup";
+      id: number;
+      permissionType: PetitionPermissionType;
+      isSubscribed: boolean;
+    }[],
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [users, userGroups] = partition(data, (d) => d.type === "User");
+    await Promise.all([
+      users.length > 0
+        ? this.raw<PublicPetitionLinkUser>(
+            /* sql */ `
+                ? on conflict do nothing returning *;
+        `,
+            [
+              // directly-assigned user permissions
+              this.from("public_petition_link_user").insert(
+                users.map((user) => ({
+                  public_petition_link_id: publicPetitionLinkId,
+                  user_id: user.id,
+                  is_subscribed: user.isSubscribed,
+                  type: user.permissionType,
+                  created_by: createdBy,
+                }))
+              ),
+            ],
+            t
+          )
+        : [],
+      userGroups.length > 0
+        ? this.raw<PublicPetitionLinkUser>(
+            /* sql */ `
+              ? on conflict do nothing returning *;
+            `,
+            [
+              // group permissions
+              this.from("public_petition_link_user").insert(
+                userGroups.map((userGroup) => ({
+                  public_petition_link_id: publicPetitionLinkId,
+                  user_group_id: userGroup.id,
+                  is_subscribed: userGroup.isSubscribed,
+                  type: userGroup.permissionType,
+                  created_by: createdBy,
+                }))
+              ),
+            ],
+            t
+          )
+        : [],
+      userGroups.length > 0
+        ? this.raw<PublicPetitionLinkUser>(
+            /* sql */ `
+            with gm as (
+              select ugm.user_id, ugm.user_group_id, ugm_info.is_subscribed, ugm_info.permission_type
+              from user_group_member ugm
+              join (select user_group_id, is_subscribed, permission_type from (values ${userGroups
+                .map(() => `(?::int, ?::bool, ?::petition_permission_type)`)
+                .join(
+                  ","
+                )}) as t(user_group_id, is_subscribed, permission_type)) as ugm_info on ugm_info.user_group_id = ugm.user_group_id
+                where ugm.deleted_at is null and ugm.user_group_id in (${userGroups
+                  .map(() => `(?::int)`)
+                  .join(", ")})
+            )
+            insert into public_petition_link_user(public_petition_link_id, user_id, from_user_group_id, is_subscribed, type, created_by)
+            select ?, gm.user_id, gm.user_group_id, gm.is_subscribed, gm.permission_type, ?
+            from gm 
+            on conflict do nothing returning *;
+          `,
+            [
+              ...userGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]).flat(),
+              ...userGroups.map((ug) => ug.id),
+              publicPetitionLinkId,
+              createdBy,
+            ],
+            t
+          )
+        : [],
+    ]);
+  }
 
   async getPublicPetitionLinkUsersByPublicPetitionLinkId(
     publicPetitionLinkId: number
