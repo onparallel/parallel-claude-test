@@ -105,10 +105,13 @@ export function userHasAccessToPublicPetitionLink<
   return async (_, args, ctx) => {
     try {
       const publicPetitionLinkIds = unMaybeArray(args[argName] as MaybeArray<number>);
-      const publicLinkUsersByPublicPetitionLinkId =
-        await ctx.petitions.loadPublicPetitionLinkUserByPublicPetitionLinkId(publicPetitionLinkIds);
-      return publicLinkUsersByPublicPetitionLinkId.every((publicLinkUsers) =>
-        publicLinkUsers.some((plu) => plu.user_id === ctx.user!.id)
+      const publicPetitionLinks = (
+        await ctx.petitions.loadPublicPetitionLink(publicPetitionLinkIds)
+      ).filter(isDefined);
+
+      return await ctx.petitions.userHasAccessToPetitions(
+        ctx.user!.id,
+        publicPetitionLinks.map((ppl) => ppl.template_id)
       );
     } catch {}
     return false;

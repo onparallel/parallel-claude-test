@@ -3345,15 +3345,20 @@ export class PetitionRepository extends BaseRepository {
     q.where("is_active", true)
   );
 
-  readonly loadPublicPetitionLinkByTemplateId = this.buildLoadBy(
+  readonly loadPublicPetitionLinksByTemplateId = this.buildLoadMultipleBy(
     "public_petition_link",
-    "template_id"
+    "template_id",
+    (q) => q.orderBy("created_at", "asc")
   );
 
   readonly loadPublicPetitionLinkUserByPublicPetitionLinkId = this.buildLoadMultipleBy(
     "public_petition_link_user",
     "public_petition_link_id",
-    (q) => q.whereNull("deleted_at")
+    (q) =>
+      q
+        .whereNull("deleted_at")
+        .whereNull("from_user_group_id")
+        .orderByRaw("type asc, user_group_id nulls first, created_at")
   );
 
   async createPublicPetitionLink(
@@ -3530,7 +3535,9 @@ export class PetitionRepository extends BaseRepository {
         ...(otherPermissions ?? []),
       ].filter(isDefined);
 
-      await this.createPublicPetitionLinkUser(publicPetitionLinkId, newPermissions, updatedBy, t);
+      if (newPermissions.length > 0) {
+        await this.createPublicPetitionLinkUser(publicPetitionLinkId, newPermissions, updatedBy, t);
+      }
     }, t);
   }
 

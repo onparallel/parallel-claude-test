@@ -74,6 +74,7 @@ import {
   petitionsArePublicTemplates,
   repliesBelongsToField,
   repliesBelongsToPetition,
+  templateDoesNotHavePublicPetitionLink,
   userHasAccessToPetitions,
 } from "../authorizers";
 import {
@@ -1477,6 +1478,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
+    templateDoesNotHavePublicPetitionLink("templateId"),
     userHasAccessToUsers("ownerId"),
     userHasAccessToUserOrUserGroupPublicLinkPermission("otherPermissions" as never)
   ),
@@ -1531,7 +1533,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
 
 export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink", {
   description: "Updates the info and permissions of a public link",
-  type: nullable("PublicPetitionLink"),
+  type: "PublicPetitionLink",
   authorize: authenticateAnd(
     userHasAccessToPublicPetitionLink("publicPetitionLinkId"),
     ifArgDefined((args) => args.ownerId, userHasAccessToUsers("ownerId" as never)),

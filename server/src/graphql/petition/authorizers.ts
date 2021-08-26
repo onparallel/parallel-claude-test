@@ -342,3 +342,17 @@ export function petitionsAreNotPublicTemplates<
     return false;
   };
 }
+
+export function templateDoesNotHavePublicPetitionLink<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const publicLinks = await ctx.petitions.loadPublicPetitionLinksByTemplateId(args[argName]);
+      return publicLinks.length === 0;
+    } catch {}
+    return false;
+  };
+}

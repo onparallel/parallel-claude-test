@@ -1,8 +1,16 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
+import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Contact, Organization, Petition, PublicPetitionLink, User } from "../../db/__types";
+import {
+  Contact,
+  Organization,
+  Petition,
+  PublicPetitionLink,
+  User,
+  UserGroup,
+} from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
@@ -25,7 +33,11 @@ describe("GraphQL/PublicPetitionLink", () => {
 
     [organization] = await mocks.createRandomOrganizations(1, () => ({ name: "Parallel" }));
     [contact] = await mocks.createRandomContacts(organization.id, 1);
-    [user] = await mocks.createRandomUsers(organization.id, 1);
+
+    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
+      cognito_id: USER_COGNITO_ID,
+    }));
+
     [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
       is_template: true,
       status: null,
@@ -97,6 +109,32 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(errors).toBeUndefined();
       expect(data?.publicPetitionLinkBySlug).toBeNull();
+    });
+
+    it("should return null if the link is inactive", async () => {
+      await knex
+        .from("public_petition_link")
+        .where("id", publicPetitionLink.id)
+        .update("is_active", false);
+
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($slug: String!) {
+            publicPetitionLinkBySlug(slug: $slug) {
+              id
+            }
+          }
+        `,
+        variables: { slug: publicPetitionLink.slug },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.publicPetitionLinkBySlug).toBeNull();
+
+      await knex
+        .from("public_petition_link")
+        .where("id", publicPetitionLink.id)
+        .update("is_active", true);
     });
   });
 
@@ -647,6 +685,386 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       expect(errors).toContainGraphQLError("REMINDER_ALREADY_SENT_ERROR");
       expect(data).toBeNull();
+    });
+  });
+
+  describe("createPublicPetitionLink", () => {
+    let otherOrganization: Organization;
+    let otherOrganizationUser: User;
+
+    let otherUsers: User[];
+    let privateTemplate: Petition;
+    let petition: Petition;
+
+    let userGroup: UserGroup;
+
+    beforeAll(async () => {
+      await mocks.knex
+        .from("petition")
+        .whereNotNull("from_public_petition_link_id")
+        .update("from_public_petition_link_id", null);
+      await mocks.knex.from("public_petition_link_user").delete();
+      await mocks.knex.from("public_petition_link").delete();
+
+      [otherOrganization] = await mocks.createRandomOrganizations(1);
+      [otherOrganizationUser] = await mocks.createRandomUsers(otherOrganization.id, 1);
+
+      otherUsers = await mocks.createRandomUsers(organization.id, 2);
+      [privateTemplate] = await mocks.createRandomPetitions(
+        organization.id,
+        otherUsers[0].id,
+        1,
+        () => ({
+          is_template: true,
+          status: null,
+        })
+      );
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      [userGroup] = await mocks.createUserGroups(1, organization.id);
+      await mocks.insertUserGroupMembers(userGroup.id, [otherUsers[0].id, otherUsers[1].id]);
+    });
+
+    it("sends error if user does not have access to the template", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($templateId: GID!, $title: String!, $description: String!, $ownerId: GID!) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+              ownerId: $ownerId
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", privateTemplate.id),
+          title: "link title",
+          description: "link description",
+          ownerId: toGlobalId("User", otherUsers[0].id),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if trying to pass a petition", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($templateId: GID!, $title: String!, $description: String!, $ownerId: GID!) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+              ownerId: $ownerId
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", petition.id),
+          title: "link title",
+          description: "link description",
+          ownerId: toGlobalId("User", user.id),
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have access to all the users in otherPermissions", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $ownerId: GID!
+            $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+          ) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+              ownerId: $ownerId
+              otherPermissions: $otherPermissions
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", template.id),
+          title: "link title",
+          description: "link description",
+          ownerId: toGlobalId("User", user.id),
+          otherPermissions: [
+            { id: toGlobalId("User", otherOrganizationUser.id), permissionType: "READ" },
+          ],
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("creates a public link with user as owner and other permissions", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $ownerId: GID!
+            $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+          ) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+              ownerId: $ownerId
+              otherPermissions: $otherPermissions
+            ) {
+              isActive
+              linkPermissions {
+                isSubscribed
+                permissionType
+                ... on PublicPetitionLinkUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PublicPetitionLinkUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", template.id),
+          title: "link title",
+          description: "link description",
+          ownerId: toGlobalId("User", user.id),
+          otherPermissions: [
+            { id: toGlobalId("User", otherUsers[0].id), permissionType: "READ" },
+            { id: toGlobalId("UserGroup", userGroup.id), permissionType: "WRITE" },
+          ],
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.createPublicPetitionLink).toEqual({
+        isActive: true,
+        linkPermissions: [
+          {
+            isSubscribed: true,
+            permissionType: "OWNER",
+            user: { id: toGlobalId("User", user.id) },
+          },
+          {
+            isSubscribed: true,
+            permissionType: "WRITE",
+            group: { id: toGlobalId("UserGroup", userGroup.id) },
+          },
+          {
+            isSubscribed: true,
+            permissionType: "READ",
+            user: { id: toGlobalId("User", otherUsers[0].id) },
+          },
+        ],
+      });
+    });
+
+    it("sends error if trying to create a second public link on the same template", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($templateId: GID!, $title: String!, $description: String!, $ownerId: GID!) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+              ownerId: $ownerId
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", template.id),
+          title: "link title",
+          description: "link description",
+          ownerId: toGlobalId("User", user.id),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("updatePublicPetitionLink", () => {
+    let privateTemplate: Petition;
+    let otherUser: User;
+    let privatePublicPetitionLink: PublicPetitionLink;
+    let template: Petition;
+    let publicPetitionLink: PublicPetitionLink;
+
+    beforeAll(async () => {
+      [otherUser] = await mocks.createRandomUsers(organization.id, 1);
+      [privateTemplate] = await mocks.createRandomPetitions(
+        organization.id,
+        otherUser.id,
+        1,
+        () => ({ is_template: true, status: null })
+      );
+      privatePublicPetitionLink = await mocks.createRandomPublicPetitionLink(
+        privateTemplate.id,
+        otherUser.id,
+        () => ({ slug: "aaaaa" })
+      );
+
+      [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        is_template: true,
+        status: null,
+      }));
+      publicPetitionLink = await mocks.createRandomPublicPetitionLink(template.id, user.id, () => ({
+        slug: "bbbb",
+      }));
+    });
+
+    it("sends error if user does not have access to the template with the public link", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($publicPetitionLinkId: GID!, $isActive: Boolean) {
+            updatePublicPetitionLink(
+              publicPetitionLinkId: $publicPetitionLinkId
+              isActive: $isActive
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", privatePublicPetitionLink.id),
+          isActive: false,
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("updates the owner of the public link", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($publicPetitionLinkId: GID!, $ownerId: GID) {
+            updatePublicPetitionLink(
+              publicPetitionLinkId: $publicPetitionLinkId
+              ownerId: $ownerId
+            ) {
+              id
+              linkPermissions {
+                permissionType
+                ... on PublicPetitionLinkUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PublicPetitionLinkUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          ownerId: toGlobalId("User", otherUser.id),
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.updatePublicPetitionLink).toEqual({
+        id: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+        linkPermissions: [
+          { permissionType: "OWNER", user: { id: toGlobalId("User", otherUser.id) } },
+        ],
+      });
+    });
+
+    it("updates all the permissions of the public link", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $publicPetitionLinkId: GID!
+            $ownerId: GID
+            $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+          ) {
+            updatePublicPetitionLink(
+              publicPetitionLinkId: $publicPetitionLinkId
+              ownerId: $ownerId
+              otherPermissions: $otherPermissions
+            ) {
+              id
+              linkPermissions {
+                permissionType
+                ... on PublicPetitionLinkUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PublicPetitionLinkUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          ownerId: toGlobalId("User", user.id),
+          otherPermissions: [{ id: toGlobalId("User", otherUser.id), permissionType: "READ" }],
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.updatePublicPetitionLink).toEqual({
+        id: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+        linkPermissions: [
+          { permissionType: "OWNER", user: { id: toGlobalId("User", user.id) } },
+          { permissionType: "READ", user: { id: toGlobalId("User", otherUser.id) } },
+        ],
+      });
+    });
+
+    it("sets the public link as inactive", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($publicPetitionLinkId: GID!, $isActive: Boolean) {
+            updatePublicPetitionLink(
+              publicPetitionLinkId: $publicPetitionLinkId
+              isActive: $isActive
+            ) {
+              id
+              isActive
+            }
+          }
+        `,
+        variables: {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          isActive: false,
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.updatePublicPetitionLink).toEqual({
+        id: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+        isActive: false,
+      });
     });
   });
 });
