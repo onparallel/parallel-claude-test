@@ -827,18 +827,21 @@ describe("GraphQL/PublicPetitionLink", () => {
               ownerId: $ownerId
               otherPermissions: $otherPermissions
             ) {
-              isActive
-              linkPermissions {
-                isSubscribed
-                permissionType
-                ... on PublicPetitionLinkUserPermission {
-                  user {
-                    id
+              id
+              publicLink {
+                isActive
+                linkPermissions {
+                  isSubscribed
+                  permissionType
+                  ... on PublicPetitionLinkUserPermission {
+                    user {
+                      id
+                    }
                   }
-                }
-                ... on PublicPetitionLinkUserGroupPermission {
-                  group {
-                    id
+                  ... on PublicPetitionLinkUserGroupPermission {
+                    group {
+                      id
+                    }
                   }
                 }
               }
@@ -858,24 +861,27 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(errors).toBeUndefined();
       expect(data?.createPublicPetitionLink).toEqual({
-        isActive: true,
-        linkPermissions: [
-          {
-            isSubscribed: true,
-            permissionType: "OWNER",
-            user: { id: toGlobalId("User", user.id) },
-          },
-          {
-            isSubscribed: true,
-            permissionType: "WRITE",
-            group: { id: toGlobalId("UserGroup", userGroup.id) },
-          },
-          {
-            isSubscribed: true,
-            permissionType: "READ",
-            user: { id: toGlobalId("User", otherUsers[0].id) },
-          },
-        ],
+        id: toGlobalId("Petition", template.id),
+        publicLink: {
+          isActive: true,
+          linkPermissions: [
+            {
+              isSubscribed: true,
+              permissionType: "OWNER",
+              user: { id: toGlobalId("User", user.id) },
+            },
+            {
+              isSubscribed: true,
+              permissionType: "WRITE",
+              group: { id: toGlobalId("UserGroup", userGroup.id) },
+            },
+            {
+              isSubscribed: true,
+              permissionType: "READ",
+              user: { id: toGlobalId("User", otherUsers[0].id) },
+            },
+          ],
+        },
       });
     });
 

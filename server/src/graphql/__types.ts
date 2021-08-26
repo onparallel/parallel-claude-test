@@ -790,7 +790,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["CreateFileUploadFieldAttachment"]; // CreateFileUploadFieldAttachment!
     createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionSubscription: NexusGenRootTypes["Subscription"]; // Subscription!
-    createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
+    createPublicPetitionLink: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -865,7 +865,7 @@ export interface NexusGenFieldTypes {
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionUserNotificationReadStatus: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
-    updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
+    updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     updateSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateTag: NexusGenRootTypes["Tag"]; // Tag!
@@ -1878,7 +1878,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldAttachmentUploadLink: "CreateFileUploadFieldAttachment";
     createPetitionFieldComment: "PetitionField";
     createPetitionSubscription: "Subscription";
-    createPublicPetitionLink: "PublicPetitionLink";
+    createPublicPetitionLink: "PetitionTemplate";
     createSimpleReply: "PetitionFieldReply";
     createTag: "Tag";
     createUser: "SupportMethodResponse";

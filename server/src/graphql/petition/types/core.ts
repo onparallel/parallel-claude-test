@@ -288,7 +288,9 @@ export const PetitionTemplate = objectType({
       description: "The public link linked to this template",
       resolve: async (root, _, ctx) => {
         // for now we just expose only the first created
-        const [publicLink] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id);
+        const [publicLink] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id, {
+          refresh: true,
+        });
         return publicLink;
       },
     });

@@ -1474,7 +1474,7 @@ export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFie
 
 export const createPublicPetitionLink = mutationField("createPublicPetitionLink", {
   description: "Creates a public link from a user's template",
-  type: "PublicPetitionLink",
+  type: "PetitionTemplate",
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
@@ -1526,7 +1526,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
         t
       );
 
-      return publicPetitionLink;
+      return (await ctx.petitions.loadPetition(args.templateId))!;
     });
   },
 });
