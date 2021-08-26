@@ -702,7 +702,7 @@ export const AWSPresignedPostData = objectType({
 export const UserOrUserGroupPublicLinkPermission = inputObjectType({
   name: "UserOrUserGroupPublicLinkPermission",
   definition(t) {
-    t.nonNull.id("id");
+    t.nonNull.id("id", { description: "Global ID of the User or UserGroup" });
     t.nonNull.field("permissionType", { type: "PetitionPermissionTypeRW" });
   },
 });

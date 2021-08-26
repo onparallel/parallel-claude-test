@@ -490,6 +490,9 @@ export const PublicPetitionLink = objectType({
     t.nonNull.string("title");
     t.nonNull.string("description");
     t.nonNull.string("slug");
+    t.nonNull.boolean("isActive", {
+      resolve: (o) => o.is_active,
+    });
     t.nonNull.list.field("linkPermissions", {
       type: "PublicPetitionLinkPermission",
       resolve: async (root, _, ctx) => {

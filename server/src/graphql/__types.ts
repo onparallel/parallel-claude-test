@@ -157,12 +157,6 @@ export interface NexusGenInputs {
     signatureConfig?: NexusGenInputs["SignatureConfigInput"] | null; // SignatureConfigInput
     skipForwardSecurity?: boolean | null; // Boolean
   };
-  UpdatePublicPetitionLinkData: {
-    // input type
-    description?: string | null; // String
-    isActive?: boolean | null; // Boolean
-    title?: string | null; // String
-  };
   UpdateTagInput: {
     // input type
     color?: string | null; // String
@@ -1282,6 +1276,7 @@ export interface NexusGenFieldTypes {
     // field return type
     description: string; // String!
     id: NexusGenScalars["GID"]; // GID!
+    isActive: boolean; // Boolean!
     linkPermissions: NexusGenRootTypes["PublicPetitionLinkPermission"][]; // [PublicPetitionLinkPermission!]!
     organization: NexusGenRootTypes["PublicPetitionLinkOwnerOrganization"]; // PublicPetitionLinkOwnerOrganization!
     slug: string; // String!
@@ -2369,6 +2364,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     description: "String";
     id: "GID";
+    isActive: "Boolean";
     linkPermissions: "PublicPetitionLinkPermission";
     organization: "PublicPetitionLinkOwnerOrganization";
     slug: "String";
@@ -3314,10 +3310,12 @@ export interface NexusGenArgTypes {
     };
     updatePublicPetitionLink: {
       // args
+      description?: string | null; // String
+      isActive?: boolean | null; // Boolean
       otherPermissions?: NexusGenInputs["UserOrUserGroupPublicLinkPermission"][] | null; // [UserOrUserGroupPublicLinkPermission!]
       ownerId?: NexusGenScalars["GID"] | null; // GID
-      publicPetitionLinkData?: NexusGenInputs["UpdatePublicPetitionLinkData"] | null; // UpdatePublicPetitionLinkData
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
+      title?: string | null; // String
     };
     updateSignatureRequestMetadata: {
       // args

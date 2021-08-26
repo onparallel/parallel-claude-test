@@ -1542,37 +1542,54 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
   ),
   args: {
     publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
-    publicPetitionLinkData: inputObjectType({
-      name: "UpdatePublicPetitionLinkData",
-      definition(t) {
-        t.nullable.boolean("isActive");
-        t.nullable.string("title");
-        t.nullable.string("description");
-      },
-    }).asArg(),
+    isActive: booleanArg(),
+    title: stringArg(),
+    description: stringArg(),
     ownerId: globalIdArg("User"),
     otherPermissions: list(nonNull("UserOrUserGroupPublicLinkPermission")),
   },
   resolve: async (_, args, ctx) => {
     const publicPetitionLinkData: Partial<CreatePublicPetitionLink> = {};
-    if (isDefined(args.publicPetitionLinkData?.title)) {
-      publicPetitionLinkData.title = args.publicPetitionLinkData!.title!;
+    if (isDefined(args.title)) {
+      publicPetitionLinkData.title = args.title;
     }
-    if (isDefined(args.publicPetitionLinkData?.description)) {
-      publicPetitionLinkData.description = args.publicPetitionLinkData!.description!;
+    if (isDefined(args.description)) {
+      publicPetitionLinkData.description = args.description;
     }
-    if (isDefined(args.publicPetitionLinkData?.isActive)) {
-      publicPetitionLinkData.is_active = args.publicPetitionLinkData!.isActive!;
+    if (isDefined(args.isActive)) {
+      publicPetitionLinkData.is_active = args.isActive;
     }
 
-    const publicPetitionLink = await ctx.petitions.updatePublicPetitionLink(
-      args.publicPetitionLinkId,
-      publicPetitionLinkData,
-      `User:${ctx.user!.id}`
-    );
+    return await ctx.petitions.withTransaction(async (t) => {
+      await ctx.petitions.replacePublicPetitionLinkPermissions(
+        args.publicPetitionLinkId,
+        args.ownerId
+          ? {
+              userId: args.ownerId,
+              isSubscribed: true,
+            }
+          : null,
+        args.otherPermissions
+          ? args.otherPermissions.map((p) => {
+              const { id, type } = fromGlobalId(p.id);
+              return {
+                id,
+                type: type as "User" | "UserGroup",
+                permissionType: p.permissionType,
+                isSubscribed: true,
+              };
+            })
+          : null,
+        `User:${ctx.user!.id}`,
+        t
+      );
 
-    // TODO update link users
-
-    return publicPetitionLink;
+      return await ctx.petitions.updatePublicPetitionLink(
+        args.publicPetitionLinkId,
+        publicPetitionLinkData,
+        `User:${ctx.user!.id}`,
+        t
+      );
+    });
   },
 });

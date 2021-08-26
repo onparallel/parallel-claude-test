@@ -3,7 +3,7 @@ import { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
     -- search public links by template_id
-    create index "public_petition_link__template_id" on "public_petition_link" ("template_id") where "is_active" = true;
+    create index "public_petition_link__template_id" on "public_petition_link" ("template_id");
     -- search link users by public_petition_link_id
     create index "public_petition_link_user__public_petition_link_id" on "public_petition_link_user" ("public_petition_link_id") where "deleted_at" is null;
   `);

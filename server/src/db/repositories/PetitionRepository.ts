@@ -2,6 +2,7 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { countBy, groupBy, indexBy, isDefined, maxBy, omit, sortBy, uniq, zip } from "remeda";
+import { PetitionPermissionTypeRW } from "../../api/public/__types";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { partition, unMaybeArray } from "../../util/arrays";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
@@ -3346,8 +3347,7 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadPublicPetitionLinkByTemplateId = this.buildLoadBy(
     "public_petition_link",
-    "template_id",
-    (q) => q.where("is_active", true)
+    "template_id"
   );
 
   readonly loadPublicPetitionLinkUserByPublicPetitionLinkId = this.buildLoadMultipleBy(
@@ -3376,9 +3376,10 @@ export class PetitionRepository extends BaseRepository {
   async updatePublicPetitionLink(
     publicPetitionLinkId: number,
     data: Partial<PublicPetitionLink>,
-    updatedBy: string
+    updatedBy: string,
+    t?: Knex.Transaction
   ) {
-    const [row] = await this.from("public_petition_link")
+    const [row] = await this.from("public_petition_link", t)
       .where("id", publicPetitionLinkId)
       .update(
         {
@@ -3475,6 +3476,62 @@ export class PetitionRepository extends BaseRepository {
           )
         : [],
     ]);
+  }
+
+  async replacePublicPetitionLinkPermissions(
+    publicPetitionLinkId: number,
+    newOwner: Maybe<{ userId: number; isSubscribed: boolean }>,
+    otherPermissions: Maybe<
+      {
+        id: number;
+        type: "User" | "UserGroup";
+        permissionType: PetitionPermissionTypeRW;
+        isSubscribed: boolean;
+      }[]
+    >,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    await this.withTransaction(async (t) => {
+      if (newOwner) {
+        await this.from("public_petition_link_user", t)
+          .where({
+            public_petition_link_id: publicPetitionLinkId,
+            type: "OWNER",
+          })
+          .update({
+            deleted_at: this.now(),
+            deleted_by: updatedBy,
+            updated_at: this.now(),
+            updated_by: updatedBy,
+          });
+      }
+      if (otherPermissions) {
+        await this.from("public_petition_link_user", t)
+          .where("public_petition_link_id", publicPetitionLinkId)
+          .whereNot("type", "OWNER")
+          .update({
+            deleted_at: this.now(),
+            deleted_by: updatedBy,
+            updated_at: this.now(),
+            updated_by: updatedBy,
+          });
+      }
+
+      const newPermissions: any[] = [
+        newOwner
+          ? {
+              id: newOwner.userId,
+              type: "User",
+              isSubscribed: newOwner.isSubscribed,
+              permissionType: "OWNER",
+            }
+          : null,
+        ...(otherPermissions ?? []),
+      ].filter(isDefined);
+
+      await this.createPublicPetitionLinkUser(publicPetitionLinkId, newPermissions, updatedBy, t);
+    }, t);
   }
 
   async getPublicPetitionLinkUsersByPublicPetitionLinkId(
