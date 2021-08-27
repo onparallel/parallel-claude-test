@@ -659,9 +659,6 @@ PetitionCompose.fragments = {
         }
         ... on PetitionTemplate {
           isPublic
-          owner {
-            id
-          }
         }
       }
       ${PetitionLayout.fragments.PetitionBase}

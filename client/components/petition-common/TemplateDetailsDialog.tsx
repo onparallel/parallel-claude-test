@@ -131,10 +131,6 @@ export function TemplateDetailsDialog({
     }),
   });
 
-  const handleCopyPublicLink = () => {
-    onCopyPublicLink();
-  };
-
   return (
     <BaseDialog size="4xl" {...props}>
       <ModalContent>
@@ -240,7 +236,7 @@ export function TemplateDetailsDialog({
                       <MenuItem
                         justifyContent="left"
                         icon={<LinkIcon display="block" boxSize={4} />}
-                        onClick={handleCopyPublicLink}
+                        onClick={onCopyPublicLink}
                       >
                         <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
                       </MenuItem>

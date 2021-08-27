@@ -168,10 +168,6 @@ function _PetitionSettings({
     }),
   });
 
-  const handleCopyPublicLink = () => {
-    onCopyPublicLink();
-  };
-
   const [createPublicPetitionLink] = usePetitionSettings_createPublicPetitionLinkMutation();
   const [updatePublicPetitionLink] = usePetitionSettings_updatePublicPetitionLinkMutation();
 
@@ -189,7 +185,7 @@ function _PetitionSettings({
           variables: { publicPetitionLinkId: publicLink.id, isActive: !publicLink.isActive },
         });
       } else {
-        const _ownerId = petition.__typename === "PetitionTemplate" ? petition.owner.id : "";
+        const _ownerId = petition.owner.id ?? "";
 
         const publicLinkSettings = await publicLinkSettingDialog({ ownerId: _ownerId });
 
@@ -355,7 +351,7 @@ function _PetitionSettings({
           <InputGroup>
             <Input type="text" value={publicLinkURL} readOnly />
             <InputRightAddon padding={0}>
-              <Button onClick={handleCopyPublicLink}>
+              <Button onClick={onCopyPublicLink}>
                 <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
               </Button>
             </InputRightAddon>
@@ -437,6 +433,9 @@ const fragments = {
       skipForwardSecurity
       isRecipientViewContentsHidden
       isReadOnly
+      owner {
+        id
+      }
       ... on Petition {
         status
         deadline
@@ -448,9 +447,6 @@ const fragments = {
       }
       ... on PetitionTemplate {
         isPublic
-        owner {
-          id
-        }
         publicLink {
           ...PublicLinkSettingsDialog_PublicPetitionLink
         }

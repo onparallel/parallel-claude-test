@@ -5801,6 +5801,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   }>;
+  owner: { __typename?: "User"; id: string };
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
     provider: string;
@@ -5821,7 +5822,6 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
   isReadOnly: boolean;
-  owner: { __typename?: "User"; id: string };
   publicLink?: Maybe<{
     __typename?: "PublicPetitionLink";
     id: string;
@@ -5842,6 +5842,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
         }
     >;
   }>;
+  owner: { __typename?: "User"; id: string };
 };
 
 export type PetitionSettings_PetitionBaseFragment =
@@ -10400,6 +10401,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   }>;
+  owner: { __typename?: "User"; id: string };
   myEffectivePermission?: Maybe<{
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -10550,6 +10552,7 @@ export type PetitionCompose_updatePetitionMutation = {
           id: string;
           status: PetitionSignatureRequestStatus;
         }>;
+        owner: { __typename?: "User"; id: string };
         signatureConfig?: Maybe<{
           __typename?: "SignatureConfig";
           provider: string;
@@ -10585,7 +10588,6 @@ export type PetitionCompose_updatePetitionMutation = {
         emailBody?: Maybe<any>;
         description?: Maybe<any>;
         updatedAt: string;
-        owner: { __typename?: "User"; id: string };
         publicLink?: Maybe<{
           __typename?: "PublicPetitionLink";
           id: string;
@@ -10606,6 +10608,7 @@ export type PetitionCompose_updatePetitionMutation = {
               }
           >;
         }>;
+        owner: { __typename?: "User"; id: string };
       };
 };
 
@@ -11144,6 +11147,7 @@ export type PetitionComposeQuery = {
           id: string;
           status: PetitionSignatureRequestStatus;
         }>;
+        owner: { __typename?: "User"; id: string };
         myEffectivePermission?: Maybe<{
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -14922,6 +14926,9 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     skipForwardSecurity
     isRecipientViewContentsHidden
     isReadOnly
+    owner {
+      id
+    }
     ... on Petition {
       status
       deadline
@@ -14933,9 +14940,6 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     }
     ... on PetitionTemplate {
       isPublic
-      owner {
-        id
-      }
       publicLink {
         ...PublicLinkSettingsDialog_PublicPetitionLink
       }
