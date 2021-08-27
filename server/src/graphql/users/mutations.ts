@@ -8,9 +8,12 @@ import {
   stringArg,
 } from "@nexus/schema";
 import pMap from "p-map";
-import { zip } from "remeda";
+import { isDefined, zip } from "remeda";
+import { PublicFileUpload } from "../../db/__types";
 import { partition } from "../../util/arrays";
 import { removeNotDefined } from "../../util/remedaExtensions";
+import { random } from "../../util/token";
+import { Maybe } from "../../util/types";
 import {
   and,
   argIsContextUserId,
@@ -20,11 +23,16 @@ import {
 } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { RESULT } from "../helpers/result";
+import { uploadArg } from "../helpers/upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { maxLength } from "../helpers/validators/maxLength";
+import { minLength } from "../helpers/validators/minLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
+import { organizationNameIsAvailable } from "../helpers/validators/organizationNameIsAvailable";
+import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { orgDoesNotHaveSsoProvider } from "../organization/authorizers";
@@ -277,5 +285,145 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
     );
 
     return user;
+  },
+});
+
+export const userSignUp = mutationField("userSignUp", {
+  description: "Triggered by new users that want to sign up into Parallel",
+  type: "User",
+  args: {
+    email: nonNull(stringArg()),
+    password: nonNull(stringArg()),
+    firstName: nonNull(stringArg()),
+    lastName: nonNull(stringArg()),
+    organizationName: nonNull(stringArg()),
+    locale: stringArg({
+      description: "Preferred locale for AWS Cognito CustomMessages.",
+    }),
+    organizationLogo: uploadArg(),
+    industry: stringArg(),
+    role: stringArg(),
+    position: stringArg(),
+  },
+  validateArgs: validateAnd(
+    minLength((args) => args.password, "password", 8),
+    validEmail((args) => args.email, "email"),
+    emailIsAvailable((args) => args.email, "email"),
+    organizationNameIsAvailable((args) => args.organizationName, "organizationName"),
+    validateIf(
+      (args) => isDefined(args.organizationLogo),
+      validateFile(
+        (args) => args.organizationLogo!,
+        { contentType: "image/*", maxSize: 1024 * 1024 * 10 },
+        "organizationLogo"
+      )
+    )
+  ),
+  resolve: async (_, args, ctx) => {
+    return await ctx.users.withTransaction(async (t) => {
+      const cognitoId = await ctx.aws.signUpUser(
+        args.email,
+        args.password,
+        args.firstName,
+        args.lastName,
+        args.locale || "en"
+      );
+
+      try {
+        let logoFile: Maybe<PublicFileUpload> = null;
+        if (args.organizationLogo) {
+          const { mimetype, createReadStream } = await args.organizationLogo;
+          const filename = random(16);
+          const path = `uploads/${filename}`;
+          const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
+          logoFile = await ctx.files.createPublicFile(
+            {
+              path,
+              filename,
+              content_type: mimetype,
+              size: res["ContentLength"]!.toString(),
+            },
+            undefined,
+            t
+          );
+        }
+
+        const org = await ctx.organizations.createOrganization(
+          {
+            name: args.organizationName,
+            identifier: args.organizationName.trim().toLowerCase().replace(/ /g, "-"),
+            status: "ACTIVE",
+            logo_public_file_id: logoFile?.id ?? null,
+          },
+          undefined,
+          t
+        );
+
+        const user = await ctx.users.createUser(
+          {
+            cognito_id: cognitoId,
+            email: args.email,
+            org_id: org.id,
+            first_name: args.firstName,
+            last_name: args.lastName,
+            organization_role: "OWNER",
+            status: "ACTIVE",
+            details: { industry: args.industry, role: args.role, position: args.position },
+          },
+          undefined,
+          t
+        );
+
+        // once the user is created, we need to update the created_by column on the different entries
+        await Promise.all([
+          logoFile
+            ? ctx.files.updatePublicFile(
+                logoFile.id,
+                { created_by: `User:${user.id}` },
+                `User:${user.id}`,
+                t
+              )
+            : null,
+          ctx.organizations.updateOrganization(
+            org.id,
+            {
+              created_by: `User:${user.id}`,
+            },
+            `User:${user.id}`,
+            t
+          ),
+          ctx.users.updateUserById(
+            user.id,
+            { created_by: `User:${user.id}` },
+            `User:${user.id}`,
+            t
+          ),
+        ]);
+
+        return user;
+      } catch (error) {
+        // delete user in aws cognito before rolling back the db transaction
+        // no need to await
+        ctx.aws.deleteUser(args.email).catch((e) => {
+          console.error(e);
+        });
+        throw error;
+      }
+    });
+  },
+});
+
+export const resendVerificationCode = mutationField("resendVerificationCode", {
+  description: "Sends an email with confirmation code to unconfirmed user emails",
+  type: "Result",
+  args: {
+    email: nonNull(stringArg()),
+  },
+  validateArgs: validEmail((args) => args.email, "email"),
+  resolve: async (_, { email }, ctx) => {
+    return await ctx.aws
+      .resendVerificationCode(email)
+      .then(() => RESULT.SUCCESS)
+      .catch(() => RESULT.FAILURE);
   },
 });

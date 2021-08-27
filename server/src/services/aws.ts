@@ -157,4 +157,48 @@ export class Aws implements IAws {
       })
       .promise();
   }
+
+  /**
+    signs up a user in AWS Cognito, and returns the new user's cognito_id
+  */
+  async signUpUser(
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    locale: string
+  ) {
+    const res = await this.cognitoIdP
+      .signUp({
+        Username: email,
+        Password: password,
+        ClientId: this.config.cognito.clientId,
+        UserAttributes: [
+          { Name: "given_name", Value: firstName },
+          { Name: "family_name", Value: lastName },
+          { Name: "locale", Value: locale }, // used to choose correct language on Cognito CustomMessages
+        ],
+      })
+      .promise();
+
+    return res.UserSub;
+  }
+
+  async deleteUser(email: string) {
+    return await this.cognitoIdP
+      .adminDeleteUser({
+        Username: email,
+        UserPoolId: this.config.cognito.defaultPoolId,
+      })
+      .promise();
+  }
+
+  async resendVerificationCode(email: string) {
+    return await this.cognitoIdP
+      .resendConfirmationCode({
+        ClientId: this.config.cognito.clientId,
+        Username: email,
+      })
+      .promise();
+  }
 }

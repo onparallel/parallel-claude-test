@@ -13,13 +13,13 @@ export class SystemRepository extends BaseRepository {
     super(knex);
   }
 
-  async createEvent(events: MaybeArray<CreateSystemEvent>) {
+  async createEvent(events: MaybeArray<CreateSystemEvent>, t?: Knex.Transaction) {
     const eventsArray = unMaybeArray(events);
     if (eventsArray.length === 0) {
       return [];
     }
 
-    const systemEvents = await this.insert("system_event", eventsArray);
+    const systemEvents = await this.insert("system_event", eventsArray, t);
 
     // dont await this. we may be inside a transaction
     this.aws.enqueueEvents(systemEvents);

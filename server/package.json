@@ -26,7 +26,7 @@
     "worker:scheduled-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/scheduled-trigger.ts",
     "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/signature-worker.ts",
     "worker:petition-notifications": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/petition-notifications.ts",
-    "localtunnel": "ts-node ./bin/launch-localtunnel.ts",
+    "localtunnel": "cross-env DEBUG=* ts-node ./bin/launch-localtunnel.ts",
     "emails": "concurrently \"ts-node-dev --watch ./emails.tsx --ignore-watch ./src --files ./emails.tsx --respawn\" \"start-storybook --port 60000 --quiet\"",
     "postinstall": "cd .. && yarn patch-package",
     "generate-graphql-types": "graphql-codegen",

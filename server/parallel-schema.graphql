@@ -952,6 +952,11 @@ type Mutation {
   reopenPetition(petitionId: GID!): Petition!
 
   """
+  Sends an email with confirmation code to unconfirmed user emails
+  """
+  resendVerificationCode(email: String!): Result!
+
+  """
   Removes the Signaturit Branding Ids of selected organization.
   """
   resetSignaturitOrganizationBranding(orgId: Int!): SupportMethodResponse!
@@ -1238,6 +1243,26 @@ type Mutation {
     """
     userId: Int!
   ): SupportMethodResponse!
+
+  """
+  Triggered by new users that want to sign up into Parallel
+  """
+  userSignUp(
+    email: String!
+    firstName: String!
+    industry: String
+    lastName: String!
+
+    """
+    Preferred locale for AWS Cognito CustomMessages.
+    """
+    locale: String
+    organizationLogo: Upload
+    organizationName: String!
+    password: String!
+    position: String
+    role: String
+  ): User!
 
   """
   Updates the validation of a field and sets the petition as closed if all fields are validated.
@@ -3118,6 +3143,11 @@ type Query {
   landingTemplatesSamples: [LandingTemplateSample!]!
   me: User!
   organization(id: GID!): Organization
+
+  """
+  Checks if the provided organization name is available to be registered on Parallel
+  """
+  organizationNameIsAvailable(name: String!): Boolean!
 
   """
   The organizations registered in Parallel.

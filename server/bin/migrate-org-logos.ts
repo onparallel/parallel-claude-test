@@ -87,7 +87,7 @@ const identifiers = [
           {
             logo_public_file_id: file.id,
           },
-          user
+          `User:${user.id}`
         );
 
         console.log(org.identifier, "migrated.");

@@ -1,14 +1,21 @@
-import { WorkerContext } from "../../context";
+import { Config } from "../../config";
+import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 
-export async function getLayoutProps(orgId: number, context: WorkerContext) {
+export async function getLayoutProps(
+  orgId: number,
+  ctx: {
+    organizations: OrganizationRepository;
+    config: Config;
+  }
+) {
   const [org, logoUrl] = await Promise.all([
-    context.organizations.loadOrg(orgId),
-    context.organizations.getOrgLogoUrl(orgId),
+    ctx.organizations.loadOrg(orgId),
+    ctx.organizations.getOrgLogoUrl(orgId),
   ]);
   if (!org) {
     throw new Error(`Org not found for org_id ${orgId}`);
   }
-  const { assetsUrl, parallelUrl, emailFrom } = context.config.misc;
+  const { assetsUrl, parallelUrl, emailFrom } = ctx.config.misc;
   return {
     assetsUrl,
     parallelUrl: org.custom_host ? `https://${org.custom_host}` : parallelUrl,

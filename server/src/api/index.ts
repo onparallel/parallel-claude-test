@@ -3,7 +3,9 @@ import { Container } from "inversify";
 import morgan from "morgan";
 import { ApiContext } from "../context";
 import { LOGGER, Logger } from "../services/logger";
+import { auth } from "./auth";
 import { downloads } from "./downloads";
+import { lambdas } from "./lambdas";
 import { api as publicApi } from "./public";
 import { webhooks } from "./webhooks";
 
@@ -30,26 +32,10 @@ export function api(container: Container) {
         skip: (req, res) => res.statusCode >= 500,
       }) as any
     )
-    .use(
-      "/auth",
-      Router()
-        .post("/guess-login", (req, res, next) => req.context.auth.guessLogin(req, res, next))
-        .get("/callback", (req, res, next) => req.context.auth.callback(req, res, next))
-        .post("/login", (req, res, next) => req.context.auth.login(req, res, next))
-        .get("/logout", (req, res, next) => req.context.auth.logout(req, res, next))
-        .get("/logout/callback", (req, res, next) =>
-          req.context.auth.logoutCallback(req, res, next)
-        )
-        .post("/new-password", (req, res, next) => req.context.auth.newPassword(req, res, next))
-        .post("/forgot-password", (req, res, next) =>
-          req.context.auth.forgotPassword(req, res, next)
-        )
-        .post("/confirm-forgot-password", (req, res, next) =>
-          req.context.auth.confirmForgotPassword(req, res, next)
-        )
-    )
+    .use("/auth", auth)
     .use("/downloads", downloads)
     .use("/webhooks", webhooks)
+    .use("/lambda", lambdas)
     .use("/v1", publicApi.handler())
     .use("/docs", publicApi.spec());
 }

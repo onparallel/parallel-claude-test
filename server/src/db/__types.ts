@@ -912,6 +912,7 @@ export interface User {
   is_sso_user: boolean; // bool
   external_id: Maybe<string>; // varchar
   avatar_public_file_id: Maybe<number>; // int4
+  details: Maybe<any>; // jsonb
 }
 
 export type CreateUser = PartialProps<
@@ -931,6 +932,7 @@ export type CreateUser = PartialProps<
   | "is_sso_user"
   | "external_id"
   | "avatar_public_file_id"
+  | "details"
 >;
 
 export interface UserAuthenticationToken {

@@ -113,19 +113,26 @@ export class UserRepository extends BaseRepository {
     return rows[0];
   }
 
-  async createUser(data: CreateUser, createdBy: string) {
-    const [user] = await this.insert("user", {
-      ...data,
-      created_by: createdBy,
-      updated_by: createdBy,
-    });
-
-    await this.system.createEvent({
-      type: "USER_CREATED",
-      data: {
-        user_id: user.id,
+  async createUser(data: CreateUser, createdBy?: string, t?: Knex.Transaction) {
+    const [user] = await this.insert(
+      "user",
+      {
+        ...data,
+        created_by: createdBy,
+        updated_by: createdBy,
       },
-    });
+      t
+    );
+
+    await this.system.createEvent(
+      {
+        type: "USER_CREATED",
+        data: {
+          user_id: user.id,
+        },
+      },
+      t
+    );
 
     return user;
   }

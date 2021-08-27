@@ -487,4 +487,16 @@ export class Auth implements IAuth {
       })
       .promise();
   }
+
+  async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    const { email, code, locale } = req.query as { email: string; code: string; locale: string };
+    await this.cognito
+      .confirmSignUp({
+        ClientId: this.config.cognito.clientId,
+        ConfirmationCode: code,
+        Username: email,
+      })
+      .promise();
+    res.redirect(`${process.env.PARALLEL_URL}/${locale}/login`);
+  }
 }

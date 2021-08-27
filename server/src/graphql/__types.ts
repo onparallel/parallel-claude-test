@@ -838,6 +838,7 @@ export interface NexusGenFieldTypes {
     removePetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
+    resendVerificationCode: NexusGenEnums["Result"]; // Result!
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
@@ -874,6 +875,7 @@ export interface NexusGenFieldTypes {
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    userSignUp: NexusGenRootTypes["User"]; // User!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
@@ -1337,6 +1339,7 @@ export interface NexusGenFieldTypes {
     landingTemplatesSamples: NexusGenRootTypes["LandingTemplateSample"][]; // [LandingTemplateSample!]!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
+    organizationNameIsAvailable: boolean; // Boolean!
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
@@ -1926,6 +1929,7 @@ export interface NexusGenFieldTypeNames {
     removePetitionPermission: "Petition";
     removeUsersFromGroup: "UserGroup";
     reopenPetition: "Petition";
+    resendVerificationCode: "Result";
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
     resetUserPassword: "SupportMethodResponse";
     revokeUserAuthToken: "Result";
@@ -1962,6 +1966,7 @@ export interface NexusGenFieldTypeNames {
     updateUserStatus: "User";
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
+    userSignUp: "User";
     validatePetitionFields: "PetitionAndPartialFields";
     verifyPublicAccess: "PublicAccessVerification";
   };
@@ -2425,6 +2430,7 @@ export interface NexusGenFieldTypeNames {
     landingTemplatesSamples: "LandingTemplateSample";
     me: "User";
     organization: "Organization";
+    organizationNameIsAvailable: "Boolean";
     organizations: "OrganizationPagination";
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
@@ -3152,6 +3158,10 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    resendVerificationCode: {
+      // args
+      email: string; // String!
+    };
     resetSignaturitOrganizationBranding: {
       // args
       orgId: number; // Int!
@@ -3360,6 +3370,19 @@ export interface NexusGenArgTypes {
       image: NexusGenScalars["Upload"]; // Upload!
       userId: number; // Int!
     };
+    userSignUp: {
+      // args
+      email: string; // String!
+      firstName: string; // String!
+      industry?: string | null; // String
+      lastName: string; // String!
+      locale?: string | null; // String
+      organizationLogo?: NexusGenScalars["Upload"] | null; // Upload
+      organizationName: string; // String!
+      password: string; // String!
+      position?: string | null; // String
+      role?: string | null; // String
+    };
     validatePetitionFields: {
       // args
       fieldIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -3453,6 +3476,10 @@ export interface NexusGenArgTypes {
     organization: {
       // args
       id: NexusGenScalars["GID"]; // GID!
+    };
+    organizationNameIsAvailable: {
+      // args
+      name: string; // String!
     };
     organizations: {
       // args

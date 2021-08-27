@@ -90,10 +90,14 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
    * - by support methods
    * - by organization admin
    * - by logging the first time with SSO
+   * - by signing up
    */
   USER_CREATED: {
     user_id: number;
     org_id: number;
+    industry?: string;
+    position?: string;
+    role?: string;
   };
   /** a petition has been opened by any recipient */
   ACCESS_OPENED: {

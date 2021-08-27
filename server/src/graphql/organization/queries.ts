@@ -1,7 +1,8 @@
-import { arg, nonNull, nullable, queryField } from "@nexus/schema";
-import { authenticate, chain, or, userIsSuperAdmin } from "../helpers/authorize";
+import { arg, nonNull, nullable, queryField, stringArg } from "@nexus/schema";
+import { authenticateAnd, or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
+import { contextUserIsAdmin } from "../users/authorizers";
 import { contextUserBelongsToOrg } from "./authorizers";
 
 export const organizationQueries = queryField((t) => {
@@ -10,16 +11,31 @@ export const organizationQueries = queryField((t) => {
     args: {
       id: nonNull(globalIdArg()),
     },
-    authorize: chain(authenticate(), or(contextUserBelongsToOrg("id"), userIsSuperAdmin())),
+    authorize: authenticateAnd(or(contextUserBelongsToOrg("id"), userIsSuperAdmin())),
     resolve: async (_, args, ctx) => {
       return await ctx.organizations.loadOrg(args.id);
+    },
+  });
+
+  t.field("organizationNameIsAvailable", {
+    description:
+      "Checks if the provided organization name is available to be registered on Parallel",
+    type: "Boolean",
+    args: {
+      name: nonNull(stringArg()),
+    },
+    authorize: authenticateAnd(contextUserIsAdmin()),
+    resolve: async (_, { name }, ctx) => {
+      return !(await ctx.organizations.loadOrgByIdentifier(
+        name.trim().toLowerCase().replace(/ /g, "-")
+      ));
     },
   });
 
   t.paginationField("organizations", {
     type: "Organization",
     description: "The organizations registered in Parallel.",
-    authorize: chain(authenticate(), userIsSuperAdmin()),
+    authorize: authenticateAnd(userIsSuperAdmin()),
     searchable: true,
     sortableBy: ["name", "createdAt"],
     extendArgs: {

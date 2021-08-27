@@ -41,7 +41,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     return await ctx.organizations.updateOrganization(
       args.orgId,
       { logo_public_file_id: logoFile.id },
-      ctx.user!
+      `User:${ctx.user!.id}`
     );
   },
 });

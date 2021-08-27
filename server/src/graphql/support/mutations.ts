@@ -95,7 +95,7 @@ export const createOrganization = mutationField("createOrganization", {
           identifier,
           status: args.status,
         },
-        ctx.user!
+        `User:${ctx.user!.id}`
       );
       return {
         result: RESULT.SUCCESS,

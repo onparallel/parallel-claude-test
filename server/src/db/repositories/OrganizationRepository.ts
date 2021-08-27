@@ -18,6 +18,10 @@ export class OrganizationRepository extends BaseRepository {
 
   readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
 
+  readonly loadOrgByIdentifier = this.buildLoadBy("organization", "identifier", (q) =>
+    q.whereNull("deleted_at")
+  );
+
   async loadOrgUsers(
     orgId: number,
     opts: {
@@ -76,24 +80,33 @@ export class OrganizationRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async updateOrganization(id: number, data: Partial<CreateOrganization>, user: User) {
-    const [org] = await this.from("organization")
+  async updateOrganization(
+    id: number,
+    data: Partial<CreateOrganization>,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [org] = await this.from("organization", t)
       .where("id", id)
       .update({
         ...data,
         updated_at: this.now(),
-        updated_by: `User:${user.id}`,
+        updated_by: updatedBy,
       })
       .returning("*");
     return org;
   }
 
-  async createOrganization(data: CreateOrganization, user: User) {
-    const [org] = await this.insert("organization", {
-      ...data,
-      created_by: `User:${user.id}`,
-      updated_by: `User:${user.id}`,
-    });
+  async createOrganization(data: CreateOrganization, createdBy?: string, t?: Knex.Transaction) {
+    const [org] = await this.insert(
+      "organization",
+      {
+        ...data,
+        created_by: createdBy,
+        updated_by: createdBy,
+      },
+      t
+    );
     return org;
   }
 
