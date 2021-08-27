@@ -379,6 +379,8 @@ export interface Mutation {
   createPetitionFieldComment: PetitionField;
   /** Creates a new subscription on a petition */
   createPetitionSubscription: Subscription;
+  /** Creates a public link from a user's template */
+  createPublicPetitionLink: PetitionTemplate;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
@@ -535,6 +537,8 @@ export interface Mutation {
    *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
+  /** Updates the info and permissions of a public link */
+  updatePublicPetitionLink: PublicPetitionLink;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
@@ -677,6 +681,14 @@ export interface MutationcreatePetitionFieldCommentArgs {
 export interface MutationcreatePetitionSubscriptionArgs {
   endpoint: Scalars["String"];
   petitionId: Scalars["GID"];
+}
+
+export interface MutationcreatePublicPetitionLinkArgs {
+  description: Scalars["String"];
+  otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
+  ownerId: Scalars["GID"];
+  templateId: Scalars["GID"];
+  title: Scalars["String"];
 }
 
 export interface MutationcreateSimpleReplyArgs {
@@ -1097,6 +1109,15 @@ export interface MutationupdatePetitionUserNotificationReadStatusArgs {
   petitionFieldCommentIds?: Maybe<Array<Scalars["GID"]>>;
   petitionIds?: Maybe<Array<Scalars["GID"]>>;
   petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]>>;
+}
+
+export interface MutationupdatePublicPetitionLinkArgs {
+  description?: Maybe<Scalars["String"]>;
+  isActive?: Maybe<Scalars["Boolean"]>;
+  otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
+  ownerId?: Maybe<Scalars["GID"]>;
+  publicPetitionLinkId: Scalars["GID"];
+  title?: Maybe<Scalars["String"]>;
 }
 
 export interface MutationupdateSignatureRequestMetadataArgs {
@@ -1834,6 +1855,8 @@ export interface PetitionTemplate extends PetitionBase {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The public link linked to this template */
+  publicLink?: Maybe<PublicPetitionLink>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
@@ -2058,7 +2081,10 @@ export interface PublicPetitionLink {
   __typename?: "PublicPetitionLink";
   description: Scalars["String"];
   id: Scalars["GID"];
+  isActive: Scalars["Boolean"];
+  linkPermissions: Array<PublicPetitionLinkPermission>;
   organization: PublicPetitionLinkOwnerOrganization;
+  slug: Scalars["String"];
   title: Scalars["String"];
 }
 
@@ -2066,6 +2092,39 @@ export interface PublicPetitionLinkOwnerOrganization {
   __typename?: "PublicPetitionLinkOwnerOrganization";
   logoUrl?: Maybe<Scalars["String"]>;
   name: Scalars["String"];
+}
+
+export interface PublicPetitionLinkPermission {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  isSubscribed: Scalars["Boolean"];
+  permissionType: PetitionPermissionType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+}
+
+export interface PublicPetitionLinkUserGroupPermission
+  extends PublicPetitionLinkPermission,
+    Timestamps {
+  __typename?: "PublicPetitionLinkUserGroupPermission";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  group: UserGroup;
+  isSubscribed: Scalars["Boolean"];
+  permissionType: PetitionPermissionType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+}
+
+export interface PublicPetitionLinkUserPermission extends PublicPetitionLinkPermission, Timestamps {
+  __typename?: "PublicPetitionLinkUserPermission";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  isSubscribed: Scalars["Boolean"];
+  permissionType: PetitionPermissionType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+  user: User;
 }
 
 /** A public message in a petition */
@@ -2694,6 +2753,12 @@ export type UserOrContact = Contact | User;
 export type UserOrPetitionAccess = PetitionAccess | User;
 
 export type UserOrUserGroup = User | UserGroup;
+
+export interface UserOrUserGroupPublicLinkPermission {
+  /** Global ID of the User or UserGroup */
+  id: Scalars["ID"];
+  permissionType: PetitionPermissionTypeRW;
+}
 
 export interface UserPagination {
   __typename?: "UserPagination";
@@ -5756,6 +5821,27 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
   isReadOnly: boolean;
+  owner: { __typename?: "User"; id: string };
+  publicLink?: Maybe<{
+    __typename?: "PublicPetitionLink";
+    id: string;
+    title: string;
+    isActive: boolean;
+    description: string;
+    slug: string;
+    linkPermissions: Array<
+      | {
+          __typename?: "PublicPetitionLinkUserGroupPermission";
+          permissionType: PetitionPermissionType;
+          group: { __typename?: "UserGroup"; id: string };
+        }
+      | {
+          __typename?: "PublicPetitionLinkUserPermission";
+          permissionType: PetitionPermissionType;
+          user: { __typename?: "User"; id: string };
+        }
+    >;
+  }>;
 };
 
 export type PetitionSettings_PetitionBaseFragment =
@@ -5783,6 +5869,69 @@ export type PetitionSettings_startPetitionSignatureRequestMutation = {
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
+  };
+};
+
+export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
+  templateId: Scalars["GID"];
+  title: Scalars["String"];
+  description: Scalars["String"];
+  ownerId: Scalars["GID"];
+  otherPermissions?: Maybe<
+    Array<UserOrUserGroupPublicLinkPermission> | UserOrUserGroupPublicLinkPermission
+  >;
+}>;
+
+export type PetitionSettings_createPublicPetitionLinkMutation = {
+  createPublicPetitionLink: {
+    __typename?: "PetitionTemplate";
+    id: string;
+    publicLink?: Maybe<{
+      __typename?: "PublicPetitionLink";
+      id: string;
+      title: string;
+      description: string;
+      slug: string;
+      linkPermissions: Array<
+        | {
+            __typename?: "PublicPetitionLinkUserGroupPermission";
+            permissionType: PetitionPermissionType;
+          }
+        | {
+            __typename?: "PublicPetitionLinkUserPermission";
+            permissionType: PetitionPermissionType;
+          }
+      >;
+    }>;
+  };
+};
+
+export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
+  publicPetitionLinkId: Scalars["GID"];
+  isActive?: Maybe<Scalars["Boolean"]>;
+  title?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
+  ownerId?: Maybe<Scalars["GID"]>;
+  otherPermissions?: Maybe<
+    Array<UserOrUserGroupPublicLinkPermission> | UserOrUserGroupPublicLinkPermission
+  >;
+}>;
+
+export type PetitionSettings_updatePublicPetitionLinkMutation = {
+  updatePublicPetitionLink: {
+    __typename?: "PublicPetitionLink";
+    id: string;
+    title: string;
+    description: string;
+    slug: string;
+    isActive: boolean;
+    linkPermissions: Array<
+      | {
+          __typename?: "PublicPetitionLinkUserGroupPermission";
+          permissionType: PetitionPermissionType;
+        }
+      | { __typename?: "PublicPetitionLinkUserPermission"; permissionType: PetitionPermissionType }
+    >;
   };
 };
 
@@ -6055,6 +6204,27 @@ export type PetitionSharingModal_PetitionsQuery = {
   >;
 };
 
+export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
+  __typename?: "PublicPetitionLink";
+  id: string;
+  title: string;
+  isActive: boolean;
+  description: string;
+  slug: string;
+  linkPermissions: Array<
+    | {
+        __typename?: "PublicPetitionLinkUserGroupPermission";
+        permissionType: PetitionPermissionType;
+        group: { __typename?: "UserGroup"; id: string };
+      }
+    | {
+        __typename?: "PublicPetitionLinkUserPermission";
+        permissionType: PetitionPermissionType;
+        user: { __typename?: "User"; id: string };
+      }
+  >;
+};
+
 export type SignatureConfigDialog_PetitionFragment = {
   __typename?: "Petition";
   name?: Maybe<string>;
@@ -6106,6 +6276,12 @@ export type useTemplateDetailsDialogPetitionQuery = {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
         }>;
+        publicLink?: Maybe<{
+          __typename?: "PublicPetitionLink";
+          id: string;
+          isActive: boolean;
+          slug: string;
+        }>;
       }
   >;
 };
@@ -6132,6 +6308,12 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
   myEffectivePermission?: Maybe<{
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
+  }>;
+  publicLink?: Maybe<{
+    __typename?: "PublicPetitionLink";
+    id: string;
+    isActive: boolean;
+    slug: string;
   }>;
 };
 
@@ -6404,6 +6586,7 @@ export type NewPetitionTemplatesList_PetitionTemplateFragment = {
   descriptionExcerpt?: Maybe<string>;
   locale: PetitionLocale;
   owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
 };
 
 export type TemplateCard_PetitionTemplateFragment = {
@@ -6412,6 +6595,7 @@ export type TemplateCard_PetitionTemplateFragment = {
   descriptionExcerpt?: Maybe<string>;
   locale: PetitionLocale;
   owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
 };
 
 export type ExportRepliesDialog_UserFragment = {
@@ -10265,6 +10449,26 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
     replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
   }>;
+  publicLink?: Maybe<{
+    __typename?: "PublicPetitionLink";
+    id: string;
+    title: string;
+    isActive: boolean;
+    description: string;
+    slug: string;
+    linkPermissions: Array<
+      | {
+          __typename?: "PublicPetitionLinkUserGroupPermission";
+          permissionType: PetitionPermissionType;
+          group: { __typename?: "UserGroup"; id: string };
+        }
+      | {
+          __typename?: "PublicPetitionLinkUserPermission";
+          permissionType: PetitionPermissionType;
+          user: { __typename?: "User"; id: string };
+        }
+    >;
+  }>;
 };
 
 export type PetitionCompose_PetitionBaseFragment =
@@ -10381,6 +10585,27 @@ export type PetitionCompose_updatePetitionMutation = {
         emailBody?: Maybe<any>;
         description?: Maybe<any>;
         updatedAt: string;
+        owner: { __typename?: "User"; id: string };
+        publicLink?: Maybe<{
+          __typename?: "PublicPetitionLink";
+          id: string;
+          title: string;
+          isActive: boolean;
+          description: string;
+          slug: string;
+          linkPermissions: Array<
+            | {
+                __typename?: "PublicPetitionLinkUserGroupPermission";
+                permissionType: PetitionPermissionType;
+                group: { __typename?: "UserGroup"; id: string };
+              }
+            | {
+                __typename?: "PublicPetitionLinkUserPermission";
+                permissionType: PetitionPermissionType;
+                user: { __typename?: "User"; id: string };
+              }
+          >;
+        }>;
       };
 };
 
@@ -10966,6 +11191,26 @@ export type PetitionComposeQuery = {
           }>;
           comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        }>;
+        publicLink?: Maybe<{
+          __typename?: "PublicPetitionLink";
+          id: string;
+          title: string;
+          isActive: boolean;
+          description: string;
+          slug: string;
+          linkPermissions: Array<
+            | {
+                __typename?: "PublicPetitionLinkUserGroupPermission";
+                permissionType: PetitionPermissionType;
+                group: { __typename?: "UserGroup"; id: string };
+              }
+            | {
+                __typename?: "PublicPetitionLinkUserPermission";
+                permissionType: PetitionPermissionType;
+                user: { __typename?: "User"; id: string };
+              }
+          >;
         }>;
       }
   >;
@@ -11803,6 +12048,7 @@ export type NewPetition_PetitionTemplateFragment = {
   descriptionExcerpt?: Maybe<string>;
   locale: PetitionLocale;
   owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
 };
 
 export type NewPetition_UserFragment = {
@@ -11832,6 +12078,7 @@ export type NewPetitionPublicTemplatesQuery = {
       descriptionExcerpt?: Maybe<string>;
       locale: PetitionLocale;
       owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+      publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
     }>;
   };
 };
@@ -11856,6 +12103,7 @@ export type NewPetitionTemplatesQuery = {
           descriptionExcerpt?: Maybe<string>;
           locale: PetitionLocale;
           owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+          publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
         }
     >;
   };
@@ -13349,6 +13597,11 @@ export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
     myEffectivePermission {
       permissionType
     }
+    publicLink {
+      id
+      isActive
+      slug
+    }
     updatedAt
   }
 `;
@@ -14639,6 +14892,28 @@ export const SignatureConfigDialog_PetitionFragmentDoc = gql`
   }
   ${ContactSelect_ContactFragmentDoc}
 `;
+export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
+  fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
+    id
+    title
+    isActive
+    description
+    slug
+    linkPermissions {
+      ... on PublicPetitionLinkUserPermission {
+        user {
+          id
+        }
+      }
+      ... on PublicPetitionLinkUserGroupPermission {
+        group {
+          id
+        }
+      }
+      permissionType
+    }
+  }
+`;
 export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
     id
@@ -14658,9 +14933,16 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     }
     ... on PetitionTemplate {
       isPublic
+      owner {
+        id
+      }
+      publicLink {
+        ...PublicLinkSettingsDialog_PublicPetitionLink
+      }
     }
   }
   ${SignatureConfigDialog_PetitionFragmentDoc}
+  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 `;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
@@ -15090,6 +15372,10 @@ export const TemplateCard_PetitionTemplateFragmentDoc = gql`
     owner {
       id
       fullName
+    }
+    publicLink {
+      id
+      isActive
     }
   }
 `;
@@ -16199,6 +16485,92 @@ export function usePetitionSettings_startPetitionSignatureRequestMutation(
 }
 export type PetitionSettings_startPetitionSignatureRequestMutationHookResult = ReturnType<
   typeof usePetitionSettings_startPetitionSignatureRequestMutation
+>;
+export const PetitionSettings_createPublicPetitionLinkDocument = gql`
+  mutation PetitionSettings_createPublicPetitionLink(
+    $templateId: GID!
+    $title: String!
+    $description: String!
+    $ownerId: GID!
+    $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+  ) {
+    createPublicPetitionLink(
+      templateId: $templateId
+      title: $title
+      description: $description
+      ownerId: $ownerId
+      otherPermissions: $otherPermissions
+    ) {
+      id
+      publicLink {
+        id
+        title
+        description
+        slug
+        linkPermissions {
+          permissionType
+        }
+      }
+    }
+  }
+`;
+export function usePetitionSettings_createPublicPetitionLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSettings_createPublicPetitionLinkMutation,
+    PetitionSettings_createPublicPetitionLinkMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionSettings_createPublicPetitionLinkMutation,
+    PetitionSettings_createPublicPetitionLinkMutationVariables
+  >(PetitionSettings_createPublicPetitionLinkDocument, options);
+}
+export type PetitionSettings_createPublicPetitionLinkMutationHookResult = ReturnType<
+  typeof usePetitionSettings_createPublicPetitionLinkMutation
+>;
+export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
+  mutation PetitionSettings_updatePublicPetitionLink(
+    $publicPetitionLinkId: GID!
+    $isActive: Boolean
+    $title: String
+    $description: String
+    $ownerId: GID
+    $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+  ) {
+    updatePublicPetitionLink(
+      publicPetitionLinkId: $publicPetitionLinkId
+      isActive: $isActive
+      title: $title
+      description: $description
+      ownerId: $ownerId
+      otherPermissions: $otherPermissions
+    ) {
+      id
+      title
+      description
+      slug
+      isActive
+      linkPermissions {
+        permissionType
+      }
+    }
+  }
+`;
+export function usePetitionSettings_updatePublicPetitionLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSettings_updatePublicPetitionLinkMutation,
+    PetitionSettings_updatePublicPetitionLinkMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionSettings_updatePublicPetitionLinkMutation,
+    PetitionSettings_updatePublicPetitionLinkMutationVariables
+  >(PetitionSettings_updatePublicPetitionLinkDocument, options);
+}
+export type PetitionSettings_updatePublicPetitionLinkMutationHookResult = ReturnType<
+  typeof usePetitionSettings_updatePublicPetitionLinkMutation
 >;
 export const PetitionSharingModal_addPetitionPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionPermission(

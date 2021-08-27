@@ -1525,6 +1525,11 @@
     "context": "By enabling this, the contents card in the recipient view will be hidden."
   },
   {
+    "term": "component.petition-settings.link-copied-toast",
+    "definition": "Link copied to clipboard",
+    "context": "Link copied to clipboard"
+  },
+  {
     "term": "component.petition-settings.locale-label",
     "definition": "Language of the petition",
     "context": "Language of the petition"
@@ -1975,6 +1980,11 @@
     "context": "Complete the information for users who access the link and define who will have access to the created petitions."
   },
   {
+    "term": "component.settings-public-link-dialog.description-error",
+    "definition": "Description is required",
+    "context": "Description is required"
+  },
+  {
     "term": "component.settings-public-link-dialog.description-label",
     "definition": "Description",
     "context": "Description"
@@ -2008,6 +2018,11 @@
     "term": "component.settings-public-link-dialog.owner-placeholder",
     "definition": "Select an owner",
     "context": "Select an owner"
+  },
+  {
+    "term": "component.settings-public-link-dialog.page-title-error",
+    "definition": "Title is required",
+    "context": "Title is required"
   },
   {
     "term": "component.settings-public-link-dialog.page-title-label",
@@ -2178,6 +2193,11 @@
     "term": "component.tag.remove-tag",
     "definition": "Remove tag \"{tag}\"",
     "context": "Remove tag \"{tag}\""
+  },
+  {
+    "term": "component.template-card.active-link",
+    "definition": "Enabled link",
+    "context": "Enabled link"
   },
   {
     "term": "component.template-header.clone-label",
@@ -2778,6 +2798,11 @@
     "term": "generic.continue",
     "definition": "Continue",
     "context": "Continue"
+  },
+  {
+    "term": "generic.copy-link",
+    "definition": "Copy link",
+    "context": "Copy link"
   },
   {
     "term": "generic.created-at",
@@ -6046,8 +6071,8 @@
   },
   {
     "term": "public.public-petition.error-title",
-    "definition": "Oops! An error happened",
-    "context": "Oops! An error happened"
+    "definition": "An error happened",
+    "context": "An error happened"
   },
   {
     "term": "public.request-information.cta-title",

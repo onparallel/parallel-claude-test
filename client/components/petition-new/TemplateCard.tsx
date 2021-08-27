@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
-import { Avatar, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { Avatar, Flex, Heading, Stack, Text, Tooltip } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export interface TemplateCardProps {
   template: TemplateCard_PetitionTemplateFragment;
@@ -14,6 +14,7 @@ export interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, onPress }: TemplateCardProps) {
+  const intl = useIntl();
   const buttonProps = useRoleButton(onPress, [onPress]);
 
   return (
@@ -59,7 +60,16 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
       <Spacer />
       <Flex alignItems="center">
         <LocaleBadge locale={template.locale} />
-        <LinkIcon marginLeft={2} color="gray.500" boxSize={3.5} />
+        {template.publicLink?.isActive ? (
+          <Tooltip
+            label={intl.formatMessage({
+              id: "component.template-card.active-link",
+              defaultMessage: "Enabled link",
+            })}
+          >
+            <LinkIcon marginLeft={2} color="gray.500" boxSize={3.5} />
+          </Tooltip>
+        ) : null}
         <Spacer />
         <Avatar name={template.owner.fullName!} size="xs" role="presentation" />
         <Text fontSize="xs" marginLeft={2}>
@@ -83,6 +93,10 @@ TemplateCard.fragments = {
       owner {
         id
         fullName
+      }
+      publicLink {
+        id
+        isActive
       }
     }
   `,

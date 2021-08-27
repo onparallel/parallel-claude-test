@@ -60,6 +60,10 @@ const result: PossibleTypesResultData = {
       "SignatureCancelledUserNotification",
       "SignatureCompletedUserNotification",
     ],
+    PublicPetitionLinkPermission: [
+      "PublicPetitionLinkUserGroupPermission",
+      "PublicPetitionLinkUserPermission",
+    ],
     PublicUserOrContact: ["PublicContact", "PublicUser"],
     Timestamps: [
       "Contact",
@@ -71,6 +75,8 @@ const result: PossibleTypesResultData = {
       "PetitionUserPermission",
       "PublicPetition",
       "PublicPetitionFieldReply",
+      "PublicPetitionLinkUserGroupPermission",
+      "PublicPetitionLinkUserPermission",
       "Subscription",
       "User",
       "UserGroup",

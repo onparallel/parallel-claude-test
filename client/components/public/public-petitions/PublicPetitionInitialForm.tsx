@@ -109,7 +109,7 @@ export function PublicPetitionInitialForm({
         ) : (
           <Logo width="152px" height="40px" />
         )}
-        <Stack spacing={0} maxWidth={{ base: "auto", md: "460px" }}>
+        <Stack spacing={0} maxWidth={{ base: "auto", md: "25rem" }}>
           <Text fontSize="sm" color="gray.500">
             {organization.name}
           </Text>
@@ -118,7 +118,7 @@ export function PublicPetitionInitialForm({
           </Text>
           <ResizeObserver onResize={handleResize} />
         </Stack>
-        <Box maxWidth={{ base: "auto", md: "460px" }} width="100%" position="relative">
+        <Box maxWidth={{ base: "auto", md: "25rem" }} width="100%" position="relative">
           <Collapse startingHeight={200} in={showMore}>
             <Box ref={descriptionRef} dangerouslySetInnerHTML={{ __html: description }}></Box>
             {canExpand ? (

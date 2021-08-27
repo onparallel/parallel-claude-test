@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   FormControl,
@@ -10,36 +11,62 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
+import {
+  PublicLinkSettingsDialog_PublicPetitionLinkFragment,
+  UserOrUserGroupPublicLinkPermission,
+} from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { UserSelect, UserSelectSelection, useSearchUsers } from "../common/UserSelect";
+import { UserSelect, useSearchUsers } from "../common/UserSelect";
 
-interface AddMemberGroupDialogData {
+interface PublicLinkSettingsData {
   title: string;
   description: string;
-  owner: string;
-  editors: UserSelectSelection<true>[];
+  ownerId: string;
+  otherPermissions: UserOrUserGroupPublicLinkPermission[];
 }
 
 export function PublicLinkSettingsDialog({
-  owner = "",
+  publicLink,
+  ownerId,
   ...props
-}: DialogProps<{ owner: string }, AddMemberGroupDialogData>) {
+}: DialogProps<
+  { ownerId?: string; publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment },
+  PublicLinkSettingsData
+>) {
+  const owner = publicLink?.linkPermissions.find((p) => p.permissionType === "OWNER");
+
   const {
     handleSubmit,
     register,
     watch,
     control,
     formState: { errors },
-  } = useForm<AddMemberGroupDialogData>({
+  } = useForm<PublicLinkSettingsData>({
     mode: "onChange",
     defaultValues: {
-      title: "",
-      description: "",
-      owner: owner,
-      editors: [],
+      title: publicLink?.title ?? "",
+      description: publicLink?.description ?? "",
+      ownerId:
+        owner?.__typename === "PublicPetitionLinkUserPermission" ? owner.user.id : ownerId ?? "",
+      otherPermissions:
+        (publicLink?.linkPermissions
+          ?.filter((p) => p.permissionType !== "OWNER")
+          ?.map((p) => {
+            if (p.__typename === "PublicPetitionLinkUserGroupPermission") {
+              return {
+                id: p.group.id,
+                permissionType: p.permissionType,
+              };
+            } else if (p.__typename === "PublicPetitionLinkUserPermission") {
+              return {
+                id: p.user.id,
+                permissionType: p.permissionType,
+              };
+            }
+          }) as UserOrUserGroupPublicLinkPermission[]) ?? [],
     },
   });
 
@@ -60,15 +87,15 @@ export function PublicLinkSettingsDialog({
     [_handleSearchUsers]
   );
 
-  const watchOwner = watch("owner");
+  const watchOwnerId = watch("ownerId");
 
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers, watchOwner],
+        excludeUsers: [...excludeUsers, watchOwnerId],
       });
     },
-    [_handleSearchUsers, watchOwner]
+    [_handleSearchUsers, watchOwnerId]
   );
 
   return (
@@ -115,7 +142,7 @@ export function PublicLinkSettingsDialog({
             <FormErrorMessage>
               <FormattedMessage
                 id="component.settings-public-link-dialog.page-title-error"
-                defaultMessage="The title is a required field"
+                defaultMessage="Title is required"
               />
             </FormErrorMessage>
           </FormControl>
@@ -139,7 +166,7 @@ export function PublicLinkSettingsDialog({
             <FormErrorMessage>
               <FormattedMessage
                 id="component.settings-public-link-dialog.description-error"
-                defaultMessage="The description is a required field"
+                defaultMessage="Description is required"
               />
             </FormErrorMessage>
           </FormControl>
@@ -151,7 +178,7 @@ export function PublicLinkSettingsDialog({
               />
             </FormLabel>
             <Controller
-              name="owner"
+              name="ownerId"
               control={control}
               rules={{ minLength: 1 }}
               render={({ field: { onChange, onBlur, value } }) => (
@@ -184,21 +211,26 @@ export function PublicLinkSettingsDialog({
               />
             </FormLabel>
             <Controller
-              name="editors"
+              name="otherPermissions"
               control={control}
               rules={{ minLength: 1 }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <UserSelect
                   isMulti
                   includeGroups
-                  value={value}
+                  value={value.map((v) => v.id)}
                   onKeyDown={(e: KeyboardEvent) => {
                     if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
                       e.preventDefault();
                     }
                   }}
-                  onChange={(users) => {
-                    onChange(users);
+                  onChange={(usersOrGroups) => {
+                    onChange(
+                      usersOrGroups.map((value) => ({
+                        id: value.id,
+                        permissionType: "WRITE",
+                      }))
+                    );
                   }}
                   onBlur={onBlur}
                   onSearch={handleSearchUsers}
@@ -214,16 +246,45 @@ export function PublicLinkSettingsDialog({
       }
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
-          <FormattedMessage
-            id="component.settings-public-link-dialog.generate-link"
-            defaultMessage="Generate link"
-          />
+          {publicLink ? (
+            <FormattedMessage id="generic.save" defaultMessage="Save" />
+          ) : (
+            <FormattedMessage
+              id="component.settings-public-link-dialog.generate-link"
+              defaultMessage="Generate link"
+            />
+          )}
         </Button>
       }
       {...props}
     />
   );
 }
+
+PublicLinkSettingsDialog.fragments = {
+  PublicPetitionLink: gql`
+    fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
+      id
+      title
+      isActive
+      description
+      slug
+      linkPermissions {
+        ... on PublicPetitionLinkUserPermission {
+          user {
+            id
+          }
+        }
+        ... on PublicPetitionLinkUserGroupPermission {
+          group {
+            id
+          }
+        }
+        permissionType
+      }
+    }
+  `,
+};
 
 export function usePublicLinkSettingsDialog() {
   return useDialog(PublicLinkSettingsDialog);

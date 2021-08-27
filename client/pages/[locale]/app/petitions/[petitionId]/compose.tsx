@@ -30,7 +30,6 @@ import {
 } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionSettings } from "@parallel/components/petition-common/PetitionSettings";
-import { usePublicLinkSettingsDialog } from "@parallel/components/petition-common/PublicLinkSettingsDialog";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
@@ -110,6 +109,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const isReadOnly = petition!.isReadOnly;
   const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
 
+  const isSharedByLink =
+    (petition?.__typename === "PetitionTemplate" && petition.publicLink?.isActive) ?? false;
+
   const indices = useFieldIndices(petition!.fields);
   const petitionDataRef = useUpdatingRef({ fields: petition!.fields, indices });
 
@@ -136,6 +138,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       showPublicTemplateDialog({});
     }
   }, []);
+
+  useEffect(() => {
+    setShowErrors(isSharedByLink);
+  }, [setShowErrors, isSharedByLink]);
 
   const [updatePetition] = usePetitionCompose_updatePetitionMutation();
   const handleUpdatePetition = useCallback(
@@ -362,7 +368,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       throw new Error("Can't send a template");
     }
 
-    if (!(await validPetitionFields())) return;
+    const isFieldsValid = await validPetitionFields();
+    if (!isFieldsValid) return;
 
     try {
       const {
@@ -502,21 +509,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     minHeight: 0,
   } as const;
 
-  const publicLinkSettingDialog = usePublicLinkSettingsDialog();
-  const handleShareByLink = async () => {
-    try {
-      if (petition && petition.__typename === "PetitionTemplate") {
-        if (!(await validPetitionFields())) return;
-
-        const data = await publicLinkSettingDialog({
-          owner: petition.__typename === "PetitionTemplate" ? petition.owner.id : "",
-        });
-
-        console.log("publicLinkSettingDialog data: ", data);
-      }
-    } catch {}
-  };
-
   return (
     <PetitionLayout
       key={petition!.id}
@@ -582,7 +574,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                         user={me}
                         petition={petition!}
                         onUpdatePetition={handleUpdatePetition}
-                        onShareByLink={handleShareByLink}
+                        validPetitionFields={validPetitionFields}
                       />
                     </TabPanel>
                   </TabPanels>

@@ -32,38 +32,45 @@ import {
 import {
   PetitionSettings_PetitionBaseFragment,
   PetitionSettings_UserFragment,
+  PublicLinkSettingsDialog_PublicPetitionLinkFragment,
   UpdatePetitionInput,
   usePetitionSettings_cancelPetitionSignatureRequestMutation,
+  usePetitionSettings_createPublicPetitionLinkMutation,
   usePetitionSettings_startPetitionSignatureRequestMutation,
+  usePetitionSettings_updatePublicPetitionLinkMutation,
 } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { memo, ReactNode, useState } from "react";
+import { useRouter } from "next/router";
+import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { Spacer } from "../common/Spacer";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
+import { PublicLinkSettingsDialog, usePublicLinkSettingsDialog } from "./PublicLinkSettingsDialog";
 import { SignatureConfigDialog, useSignatureConfigDialog } from "./SignatureConfigDialog";
 
 export type PetitionSettingsProps = {
   user: PetitionSettings_UserFragment;
   petition: PetitionSettings_PetitionBaseFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  onShareByLink: () => void;
+  validPetitionFields: () => Promise<boolean>;
 };
 
 function _PetitionSettings({
   user,
   petition,
   onUpdatePetition,
-  onShareByLink,
+  validPetitionFields,
 }: PetitionSettingsProps) {
   const locales = useSupportedLocales();
+  const { query } = useRouter();
+  const intl = useIntl();
   const hasSignature =
     petition.__typename === "Petition" &&
     user.hasPetitionSignature &&
@@ -77,6 +84,8 @@ function _PetitionSettings({
       : null;
 
   const isReadOnly = petition.isReadOnly;
+
+  const publicLink = petition.__typename === "PetitionTemplate" ? petition.publicLink : null;
 
   const showSignatureConfigDialog = useSignatureConfigDialog();
 
@@ -149,25 +158,72 @@ function _PetitionSettings({
     } catch {}
   }
 
-  const [linkValue, setLinkValue] = useState(
-    "https://cuatrecasas.onparallel.com/xxx/?email=derek@onparallel.com&name=Derek&lastname=Lou"
-  );
+  const publicLinkURL = `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${query.locale}/pp/${publicLink?.slug}`;
 
   const { onCopy: onCopyPublicLink } = useClipboardWithToast({
-    value: linkValue,
-    text: "Link copied to clipboard",
+    value: publicLinkURL,
+    text: intl.formatMessage({
+      id: "component.petition-settings.link-copied-toast",
+      defaultMessage: "Link copied to clipboard",
+    }),
   });
 
   const handleCopyPublicLink = () => {
     onCopyPublicLink();
   };
 
-  const [sharedByLink, setSharedByLink] = useState(false);
+  const [createPublicPetitionLink] = usePetitionSettings_createPublicPetitionLinkMutation();
+  const [updatePublicPetitionLink] = usePetitionSettings_updatePublicPetitionLinkMutation();
 
-  const handleGeneratePublicLink = async () => {
-    onShareByLink();
-    setSharedByLink((v) => !v);
+  const publicLinkSettingDialog = usePublicLinkSettingsDialog();
+
+  const handleToggleShareByLink = async () => {
+    try {
+      if (publicLink) {
+        if (!publicLink.isActive) {
+          const isFieldsValid = await validPetitionFields();
+          if (!isFieldsValid) return;
+        }
+
+        await updatePublicPetitionLink({
+          variables: { publicPetitionLinkId: publicLink.id, isActive: !publicLink.isActive },
+        });
+      } else {
+        const _ownerId = petition.__typename === "PetitionTemplate" ? petition.owner.id : "";
+
+        const publicLinkSettings = await publicLinkSettingDialog({ ownerId: _ownerId });
+
+        const { title, description, ownerId, otherPermissions } = publicLinkSettings;
+        await createPublicPetitionLink({
+          variables: { templateId: petition.id, title, description, ownerId, otherPermissions },
+        });
+      }
+    } catch {}
   };
+
+  const handleEditPublicPetitionLink = async () => {
+    if (!publicLink) return;
+    try {
+      const publicLinkSettings = await publicLinkSettingDialog({
+        publicLink: publicLink as PublicLinkSettingsDialog_PublicPetitionLinkFragment,
+      });
+
+      const { title, description, ownerId, otherPermissions } = publicLinkSettings;
+      const { data } = await updatePublicPetitionLink({
+        variables: {
+          publicPetitionLinkId: publicLink.id,
+          title,
+          description,
+          ownerId,
+          otherPermissions,
+        },
+      });
+
+      console.log("update updatePublicPetitionLink data: ", data);
+    } catch {}
+  };
+
+  const isSharedByLink = !!publicLink?.isActive;
 
   return (
     <Stack padding={4} spacing={4}>
@@ -292,26 +348,24 @@ function _PetitionSettings({
               defaultMessage="Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
             />
           }
-          isChecked={sharedByLink}
-          onChange={handleGeneratePublicLink}
+          isChecked={isSharedByLink}
+          onChange={handleToggleShareByLink}
         />
       ) : null}
-      {sharedByLink ? (
+      {isSharedByLink ? (
         <HStack paddingLeft={5}>
           <InputGroup>
-            <Input
-              type="text"
-              value={linkValue}
-              onChange={(evt) => setLinkValue(evt.target.value)}
-            />
+            <Input type="text" value={publicLinkURL} readOnly />
             <InputRightAddon padding={0}>
-              <Button onClick={handleCopyPublicLink}>Copy link</Button>
+              <Button onClick={handleCopyPublicLink}>
+                <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
+              </Button>
             </InputRightAddon>
           </InputGroup>
           <IconButton
             variant="outline"
             aria-label="public link settings"
-            onClick={handleGeneratePublicLink}
+            onClick={handleEditPublicPetitionLink}
             icon={<SettingsIcon boxSize={"1.125rem"} />}
           />
         </HStack>
@@ -396,8 +450,15 @@ const fragments = {
       }
       ... on PetitionTemplate {
         isPublic
+        owner {
+          id
+        }
+        publicLink {
+          ...PublicLinkSettingsDialog_PublicPetitionLink
+        }
       }
     }
+    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
     ${SignatureConfigDialog.fragments.Petition}
   `,
 };
@@ -415,6 +476,62 @@ const mutations = [
       startSignatureRequest(petitionId: $petitionId) {
         id
         status
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSettings_createPublicPetitionLink(
+      $templateId: GID!
+      $title: String!
+      $description: String!
+      $ownerId: GID!
+      $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+    ) {
+      createPublicPetitionLink(
+        templateId: $templateId
+        title: $title
+        description: $description
+        ownerId: $ownerId
+        otherPermissions: $otherPermissions
+      ) {
+        id
+        publicLink {
+          id
+          title
+          description
+          slug
+          linkPermissions {
+            permissionType
+          }
+        }
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSettings_updatePublicPetitionLink(
+      $publicPetitionLinkId: GID!
+      $isActive: Boolean
+      $title: String
+      $description: String
+      $ownerId: GID
+      $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+    ) {
+      updatePublicPetitionLink(
+        publicPetitionLinkId: $publicPetitionLinkId
+        isActive: $isActive
+        title: $title
+        description: $description
+        ownerId: $ownerId
+        otherPermissions: $otherPermissions
+      ) {
+        id
+        title
+        description
+        slug
+        isActive
+        linkPermissions {
+          permissionType
+        }
       }
     }
   `,

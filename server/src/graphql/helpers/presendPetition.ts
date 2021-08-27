@@ -46,7 +46,7 @@ export async function presendPetition(
         petition_access_id: access.id,
         status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
         email_subject: args.subject,
-        email_body: JSON.stringify(args.body),
+        email_body: JSON.stringify(args.body ?? []),
       })),
       user,
       t

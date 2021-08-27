@@ -37,6 +37,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
+import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
@@ -111,6 +112,8 @@ export function TemplateDetailsDialog({
   "CREATE_PETITION" | "CLONE_TEMPLATE" | "EDIT_TEMPLATE"
 >) {
   const intl = useIntl();
+  const { query } = useRouter();
+
   const canEdit = Boolean(
     template.myEffectivePermission &&
       ["OWNER", "WRITE"].includes(template.myEffectivePermission.permissionType)
@@ -118,10 +121,14 @@ export function TemplateDetailsDialog({
 
   const indices = useFieldIndices(template.fields);
 
+  const publicLinkURL = `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${query.locale}/pp/${template.publicLink?.slug}`;
+
   const { onCopy: onCopyPublicLink } = useClipboardWithToast({
-    value:
-      "https://cuatrecasas.onparallel.com/xxx/?email=derek@onparallel.com&name=Derek&lastname=Lou",
-    text: "Link copied to clipboard",
+    value: publicLinkURL,
+    text: intl.formatMessage({
+      id: "component.petition-settings.link-copied-toast",
+      defaultMessage: "Link copied to clipboard",
+    }),
   });
 
   const handleCopyPublicLink = () => {
@@ -229,16 +236,13 @@ export function TemplateDetailsDialog({
                         />
                       </MenuItem>
                     )}
-                    {true && (
+                    {template.publicLink?.isActive && (
                       <MenuItem
                         justifyContent="left"
                         icon={<LinkIcon display="block" boxSize={4} />}
                         onClick={handleCopyPublicLink}
                       >
-                        <FormattedMessage
-                          id="template-details.copy-public-link"
-                          defaultMessage="Copy link"
-                        />
+                        <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
                       </MenuItem>
                     )}
                   </MenuList>
@@ -332,6 +336,11 @@ TemplateDetailsDialog.fragments = {
       }
       myEffectivePermission {
         permissionType
+      }
+      publicLink {
+        id
+        isActive
+        slug
       }
       updatedAt
     }

@@ -66,9 +66,11 @@ export function TimelineMessageSentEvent({
           )}
           <MessageEventsIndicator message={message} marginLeft={2} />
         </Box>
-        <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
-          <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />
-        </Button>
+        {message.emailBody ? (
+          <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
+            <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />
+          </Button>
+        ) : null}
       </Flex>
     </TimelineItem>
   );

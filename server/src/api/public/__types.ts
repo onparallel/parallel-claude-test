@@ -345,6 +345,8 @@ export type Mutation = {
   createPetitionFieldComment: PetitionField;
   /** Creates a new subscription on a petition */
   createPetitionSubscription: Subscription;
+  /** Creates a public link from a user's template */
+  createPublicPetitionLink: PetitionTemplate;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
@@ -501,6 +503,8 @@ export type Mutation = {
    *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
+  /** Updates the info and permissions of a public link */
+  updatePublicPetitionLink: PublicPetitionLink;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
@@ -643,6 +647,14 @@ export type MutationcreatePetitionFieldCommentArgs = {
 export type MutationcreatePetitionSubscriptionArgs = {
   endpoint: Scalars["String"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationcreatePublicPetitionLinkArgs = {
+  description: Scalars["String"];
+  otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
+  ownerId: Scalars["GID"];
+  templateId: Scalars["GID"];
+  title: Scalars["String"];
 };
 
 export type MutationcreateSimpleReplyArgs = {
@@ -1063,6 +1075,15 @@ export type MutationupdatePetitionUserNotificationReadStatusArgs = {
   petitionFieldCommentIds?: Maybe<Array<Scalars["GID"]>>;
   petitionIds?: Maybe<Array<Scalars["GID"]>>;
   petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]>>;
+};
+
+export type MutationupdatePublicPetitionLinkArgs = {
+  description?: Maybe<Scalars["String"]>;
+  isActive?: Maybe<Scalars["Boolean"]>;
+  otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
+  ownerId?: Maybe<Scalars["GID"]>;
+  publicPetitionLinkId: Scalars["GID"];
+  title?: Maybe<Scalars["String"]>;
 };
 
 export type MutationupdateSignatureRequestMetadataArgs = {
@@ -1771,6 +1792,8 @@ export type PetitionTemplate = PetitionBase & {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The public link linked to this template */
+  publicLink: Maybe<PublicPetitionLink>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
@@ -1983,7 +2006,10 @@ export type PublicPetitionFieldReply = Timestamps & {
 export type PublicPetitionLink = {
   description: Scalars["String"];
   id: Scalars["GID"];
+  isActive: Scalars["Boolean"];
+  linkPermissions: Array<PublicPetitionLinkPermission>;
   organization: PublicPetitionLinkOwnerOrganization;
+  slug: Scalars["String"];
   title: Scalars["String"];
 };
 
@@ -1991,6 +2017,37 @@ export type PublicPetitionLinkOwnerOrganization = {
   logoUrl: Maybe<Scalars["String"]>;
   name: Scalars["String"];
 };
+
+export type PublicPetitionLinkPermission = {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  isSubscribed: Scalars["Boolean"];
+  permissionType: PetitionPermissionType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+};
+
+export type PublicPetitionLinkUserGroupPermission = PublicPetitionLinkPermission &
+  Timestamps & {
+    /** Time when the resource was created. */
+    createdAt: Scalars["DateTime"];
+    group: UserGroup;
+    isSubscribed: Scalars["Boolean"];
+    permissionType: PetitionPermissionType;
+    /** Time when the resource was last updated. */
+    updatedAt: Scalars["DateTime"];
+  };
+
+export type PublicPetitionLinkUserPermission = PublicPetitionLinkPermission &
+  Timestamps & {
+    /** Time when the resource was created. */
+    createdAt: Scalars["DateTime"];
+    isSubscribed: Scalars["Boolean"];
+    permissionType: PetitionPermissionType;
+    /** Time when the resource was last updated. */
+    updatedAt: Scalars["DateTime"];
+    user: User;
+  };
 
 /** A public message in a petition */
 export type PublicPetitionMessage = {
@@ -2587,6 +2644,12 @@ export type UserOrContact = Contact | User;
 export type UserOrPetitionAccess = PetitionAccess | User;
 
 export type UserOrUserGroup = User | UserGroup;
+
+export type UserOrUserGroupPublicLinkPermission = {
+  /** Global ID of the User or UserGroup */
+  id: Scalars["ID"];
+  permissionType: PetitionPermissionTypeRW;
+};
 
 export type UserPagination = {
   /** The requested slice of items. */
