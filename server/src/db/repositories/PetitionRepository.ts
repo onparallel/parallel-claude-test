@@ -3579,7 +3579,7 @@ export class PetitionRepository extends BaseRepository {
       insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id)
         (
           select ?, pplu.user_id, pplu.type, pplu.is_subscribed, pplu.user_group_id, pplu.from_user_group_id 
-          from public_petition_link_user pplu where pplu.public_petition_link_id = ?
+          from public_petition_link_user pplu where pplu.public_petition_link_id = ? and deleted_at is null
         )
     `,
       [petitionId, publicPetitionLinkId],
