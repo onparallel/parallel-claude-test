@@ -20,8 +20,6 @@ export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV";
 
-export type OrganizationUsageLimitPeriod = "month" | "year";
-
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export type PetitionContactNotificationType = "COMMENT_CREATED";

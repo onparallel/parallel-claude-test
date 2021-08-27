@@ -93,6 +93,7 @@ export function PublicLinkSettingsDialog({
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, {
         excludeUsers: [...excludeUsers, watchOwnerId],
+        includeGroups: true,
       });
     },
     [_handleSearchUsers, watchOwnerId]
