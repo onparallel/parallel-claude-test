@@ -209,7 +209,7 @@ function _PetitionSettings({
       });
 
       const { title, description, ownerId, otherPermissions } = publicLinkSettings;
-      const { data } = await updatePublicPetitionLink({
+      await updatePublicPetitionLink({
         variables: {
           publicPetitionLinkId: publicLink.id,
           title,
@@ -218,8 +218,6 @@ function _PetitionSettings({
           otherPermissions,
         },
       });
-
-      console.log("update updatePublicPetitionLink data: ", data);
     } catch {}
   };
 
