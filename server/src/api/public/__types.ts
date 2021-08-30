@@ -440,6 +440,8 @@ export type Mutation = {
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
   reopenPetition: Petition;
+  /** Sends an email with confirmation code to unconfirmed user emails */
+  resendVerificationCode: Result;
   /** Removes the Signaturit Branding Ids of selected organization. */
   resetSignaturitOrganizationBranding: SupportMethodResponse;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
@@ -520,6 +522,8 @@ export type Mutation = {
   uploadDynamicSelectFieldFile: PetitionField;
   /** Uploads a user avatar image */
   uploadUserAvatar: SupportMethodResponse;
+  /** Triggered by new users that want to sign up into Parallel */
+  userSignUp: User;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
@@ -921,6 +925,10 @@ export type MutationreopenPetitionArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationresendVerificationCodeArgs = {
+  email: Scalars["String"];
+};
+
 export type MutationresetSignaturitOrganizationBrandingArgs = {
   orgId: Scalars["Int"];
 };
@@ -1127,6 +1135,19 @@ export type MutationuploadDynamicSelectFieldFileArgs = {
 export type MutationuploadUserAvatarArgs = {
   image: Scalars["Upload"];
   userId: Scalars["Int"];
+};
+
+export type MutationuserSignUpArgs = {
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  industry?: Maybe<Scalars["String"]>;
+  lastName: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
+  organizationLogo?: Maybe<Scalars["Upload"]>;
+  organizationName: Scalars["String"];
+  password: Scalars["String"];
+  position?: Maybe<Scalars["String"]>;
+  role?: Maybe<Scalars["String"]>;
 };
 
 export type MutationvalidatePetitionFieldsArgs = {
@@ -2112,6 +2133,8 @@ export type Query = {
   landingTemplatesSamples: Array<LandingTemplateSample>;
   me: User;
   organization: Maybe<Organization>;
+  /** Checks if the provided organization name is available to be registered on Parallel */
+  organizationNameIsAvailable: Scalars["Boolean"];
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
   petition: Maybe<PetitionBase>;
@@ -2184,6 +2207,10 @@ export type QuerylandingTemplatesArgs = {
 
 export type QueryorganizationArgs = {
   id: Scalars["GID"];
+};
+
+export type QueryorganizationNameIsAvailableArgs = {
+  name: Scalars["String"];
 };
 
 export type QueryorganizationsArgs = {

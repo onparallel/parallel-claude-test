@@ -474,6 +474,8 @@ export interface Mutation {
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
   reopenPetition: Petition;
+  /** Sends an email with confirmation code to unconfirmed user emails */
+  resendVerificationCode: Result;
   /** Removes the Signaturit Branding Ids of selected organization. */
   resetSignaturitOrganizationBranding: SupportMethodResponse;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
@@ -554,6 +556,8 @@ export interface Mutation {
   uploadDynamicSelectFieldFile: PetitionField;
   /** Uploads a user avatar image */
   uploadUserAvatar: SupportMethodResponse;
+  /** Triggered by new users that want to sign up into Parallel */
+  userSignUp: User;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
@@ -955,6 +959,10 @@ export interface MutationreopenPetitionArgs {
   petitionId: Scalars["GID"];
 }
 
+export interface MutationresendVerificationCodeArgs {
+  email: Scalars["String"];
+}
+
 export interface MutationresetSignaturitOrganizationBrandingArgs {
   orgId: Scalars["Int"];
 }
@@ -1161,6 +1169,19 @@ export interface MutationuploadDynamicSelectFieldFileArgs {
 export interface MutationuploadUserAvatarArgs {
   image: Scalars["Upload"];
   userId: Scalars["Int"];
+}
+
+export interface MutationuserSignUpArgs {
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  industry?: Maybe<Scalars["String"]>;
+  lastName: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
+  organizationLogo?: Maybe<Scalars["Upload"]>;
+  organizationName: Scalars["String"];
+  password: Scalars["String"];
+  position?: Maybe<Scalars["String"]>;
+  role?: Maybe<Scalars["String"]>;
 }
 
 export interface MutationvalidatePetitionFieldsArgs {
@@ -2194,6 +2215,8 @@ export interface Query {
   landingTemplatesSamples: Array<LandingTemplateSample>;
   me: User;
   organization?: Maybe<Organization>;
+  /** Checks if the provided organization name is available to be registered on Parallel */
+  organizationNameIsAvailable: Scalars["Boolean"];
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
   petition?: Maybe<PetitionBase>;
@@ -2266,6 +2289,10 @@ export interface QuerylandingTemplatesArgs {
 
 export interface QueryorganizationArgs {
   id: Scalars["GID"];
+}
+
+export interface QueryorganizationNameIsAvailableArgs {
+  name: Scalars["String"];
 }
 
 export interface QueryorganizationsArgs {
@@ -5962,7 +5989,31 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
   >;
 };
 
-export type PetitionSharingModal_Petition_Petition_Fragment = { __typename?: 'Petition', id: string, name?: Maybe<string>, permissions: Array<{ __typename?: 'PetitionUserGroupPermission', permissionType: PetitionPermissionType, group: { __typename?: 'UserGroup', id: string, name: string, members: Array<{ __typename?: 'UserGroupMember', user: { __typename?: 'User', id: string, email: string, fullName?: Maybe<string> } }> } } | { __typename?: 'PetitionUserPermission', permissionType: PetitionPermissionType, user: { __typename?: 'User', id: string, email: string, fullName?: Maybe<string> } }> };
+export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: Maybe<string>;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionPermissionType;
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          members: Array<{
+            __typename?: "UserGroupMember";
+            user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+          }>;
+        };
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionPermissionType;
+        user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+      }
+  >;
+};
 
 export type PetitionSharingModal_PetitionFragment =
   | PetitionSharingModal_Petition_Petition_Fragment
@@ -6217,7 +6268,11 @@ export type SignatureConfigDialog_PetitionFragment = {
   }>;
 };
 
-export type SignatureConfigDialog_PetitionFragment = { __typename?: 'Petition', name?: Maybe<string>, status: PetitionStatus, signatureConfig?: Maybe<{ __typename?: 'SignatureConfig', provider: string, title: string, review: boolean, contacts: Array<Maybe<{ __typename?: 'Contact', id: string, fullName?: Maybe<string>, email: string }>> }> };
+export type SignatureConfigDialog_OrgIntegrationFragment = {
+  __typename?: "OrgIntegration";
+  label: string;
+  value: string;
+};
 
 export type useTemplateDetailsDialogPetitionQueryVariables = Exact<{
   templateId: Scalars["GID"];
