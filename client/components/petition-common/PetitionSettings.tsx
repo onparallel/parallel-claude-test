@@ -185,6 +185,9 @@ function _PetitionSettings({
           variables: { publicPetitionLinkId: publicLink.id, isActive: !publicLink.isActive },
         });
       } else {
+        const isFieldsValid = await validPetitionFields();
+        if (!isFieldsValid) return;
+
         const _ownerId = petition.owner.id ?? "";
 
         const publicLinkSettings = await publicLinkSettingDialog({ ownerId: _ownerId });

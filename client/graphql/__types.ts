@@ -10422,7 +10422,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
   updatedAt: string;
-  owner: { __typename?: "User"; id: string };
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -10471,6 +10470,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         }
     >;
   }>;
+  owner: { __typename?: "User"; id: string };
 };
 
 export type PetitionCompose_PetitionBaseFragment =
@@ -11167,7 +11167,6 @@ export type PetitionComposeQuery = {
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
         updatedAt: string;
-        owner: { __typename?: "User"; id: string };
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -11216,6 +11215,7 @@ export type PetitionComposeQuery = {
               }
           >;
         }>;
+        owner: { __typename?: "User"; id: string };
       }
   >;
 };
@@ -15009,9 +15009,6 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     }
     ... on PetitionTemplate {
       isPublic
-      owner {
-        id
-      }
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
