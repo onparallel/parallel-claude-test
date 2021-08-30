@@ -1935,32 +1935,37 @@
     "context": "Please, enter a company name"
   },
   {
-    "term": "component.public-signup-form-organization.logo-label",
+    "term": "component.public-signup-form-organization.organization-name-not-available",
+    "definition": "This company name is not available",
+    "context": "This company name is not available"
+  },
+  {
+    "term": "component.public-signup-form-organization.organizationLogo-label",
     "definition": "Logo",
     "context": "Logo"
   },
   {
-    "term": "component.public-signup-form-organization.logo-label-help",
+    "term": "component.public-signup-form-organization.organizationLogo-label-help",
     "definition": "Attach an image you want to show in your emails.",
     "context": "Attach an image you want to show in your emails."
   },
   {
-    "term": "component.public-signup-form-organization.upload-logo-button",
+    "term": "component.public-signup-form-organization.upload-organizationLogo-button",
     "definition": "Upload logo",
     "context": "Upload logo"
   },
   {
-    "term": "component.public-signup-form-organization.upload-logo-size-error",
+    "term": "component.public-signup-form-organization.upload-organizationLogo-size-error",
     "definition": "File too heavy. Attach a file up to 50kB",
     "context": "File too heavy. Attach a file up to 50kB"
   },
   {
-    "term": "component.public-signup-form-organization.upload-logo-text",
+    "term": "component.public-signup-form-organization.upload-organizationLogo-text",
     "definition": "(PNG file of size up 50kB)",
     "context": "(PNG file of size up 50kB)"
   },
   {
-    "term": "component.public-signup-form-organization.upload-other-logo-button",
+    "term": "component.public-signup-form-organization.upload-other-organizationLogo-button",
     "definition": "Upload other logo",
     "context": "Upload other logo"
   },
@@ -1968,6 +1973,11 @@
     "term": "component.public-signup-form.description",
     "definition": "Create your free account now and automate your workflow agilely and safety.",
     "context": "Create your free account now and automate your workflow agilely and safety."
+  },
+  {
+    "term": "component.public-signup-form.email-placeholder",
+    "definition": "example@company.com",
+    "context": "example@company.com"
   },
   {
     "term": "component.public-signup-form.experience.industry-label",

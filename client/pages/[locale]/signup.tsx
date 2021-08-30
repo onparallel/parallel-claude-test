@@ -1,7 +1,9 @@
+import { gql } from "@apollo/client";
 import { Box, Center, Flex, Image, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { SimpleWizard } from "@parallel/components/common/SimpleWizard";
+import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicSignupForm } from "@parallel/components/public/signup/PublicSignupForm";
 import { PublicSignupFormExperience } from "@parallel/components/public/signup/PublicSignupFormExperience";
@@ -9,24 +11,28 @@ import { PublicSignupFormInbox } from "@parallel/components/public/signup/Public
 import { PublicSignupFormName } from "@parallel/components/public/signup/PublicSignupFormName";
 import { PublicSignupFormOrganization } from "@parallel/components/public/signup/PublicSignupFormOrganization";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
+import { useSignup_userSignUpMutation } from "@parallel/graphql/__types";
+import styles from "@parallel/styles/Signup.module.css";
+import { Maybe } from "@parallel/utils/types";
 import { useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import styles from "@parallel/styles/Signup.module.css";
 
 type FormDataType = {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
-  companyName: string;
-  logo?: File;
-  industry?: string;
-  role?: string;
-  position?: string;
+  organizationName: string;
+  organizationLogo?: Maybe<File> | undefined;
+  industry?: Maybe<string> | undefined;
+  role?: Maybe<string> | undefined;
+  position?: Maybe<string> | undefined;
 };
 
 function Signup() {
   const intl = useIntl();
+
+  const finishStep = 3;
   const [index, setIndex] = useState(0);
 
   const formData = useRef<FormDataType>();
@@ -39,14 +45,40 @@ function Signup() {
     setIndex((i) => i - 1);
   };
 
-  const handleNextPage = (data: any) => {
-    formData.current = { ...(formData?.current ?? {}), ...data };
-    nextPage();
-  };
+  const [userSignUp] = useSignup_userSignUpMutation();
 
-  const handleFinish = (data: any) => {
+  const handleNextPage = async (data: any) => {
     formData.current = { ...(formData?.current ?? {}), ...data };
-    nextPage();
+    console.log("handleNextPage: ", formData.current);
+    if (index === finishStep) {
+      const currentData = formData.current;
+      if (currentData) {
+        try {
+          const res = await userSignUp({
+            variables: {
+              email: currentData.email,
+              password: currentData.password,
+              firstName: currentData.firstName,
+              lastName: currentData.lastName,
+              organizationName: currentData.organizationName,
+              locale: intl.locale,
+              organizationLogo: currentData.organizationLogo,
+              industry: currentData.industry,
+              role: currentData.role,
+              position: currentData.position,
+            },
+          });
+
+          console.log("userSignUp: ", res);
+          nextPage();
+        } catch (error) {
+          console.log("error: ", error);
+          console.log("graphQL error: ", error?.graphQLErrors?.[0]?.extensions.code);
+        }
+      }
+    } else {
+      nextPage();
+    }
   };
 
   return (
@@ -92,15 +124,13 @@ function Signup() {
             </NakedLink>
           </Box>
           <Center className="form-container" flex="1" maxWidth="md" paddingY={10}>
-            <form>
-              <SimpleWizard index={index} direction="column">
-                <PublicSignupForm onNext={handleNextPage} />
-                <PublicSignupFormName onNext={handleNextPage} />
-                <PublicSignupFormOrganization onBack={handlePreviousPage} onNext={handleNextPage} />
-                <PublicSignupFormExperience onBack={handlePreviousPage} onFinish={handleFinish} />
-                <PublicSignupFormInbox email={formData?.current?.email ?? ""} />
-              </SimpleWizard>
-            </form>
+            <SimpleWizard index={index} direction="column">
+              <PublicSignupForm onNext={handleNextPage} />
+              <PublicSignupFormName onNext={handleNextPage} />
+              <PublicSignupFormOrganization onBack={handlePreviousPage} onNext={handleNextPage} />
+              <PublicSignupFormExperience onBack={handlePreviousPage} onFinish={handleNextPage} />
+              <PublicSignupFormInbox email={formData?.current?.email ?? ""} />
+            </SimpleWizard>
           </Center>
         </Flex>
         <Box
@@ -196,4 +226,39 @@ function Signup() {
   );
 }
 
-export default Signup;
+Signup.mutations = [
+  gql`
+    mutation Signup_userSignUp(
+      $email: String!
+      $password: String!
+      $firstName: String!
+      $lastName: String!
+      $organizationName: String!
+      $locale: String
+      $organizationLogo: Upload
+      $industry: String
+      $role: String
+      $position: String
+    ) {
+      userSignUp(
+        email: $email
+        password: $password
+        firstName: $firstName
+        lastName: $lastName
+        organizationName: $organizationName
+        locale: $locale
+        organizationLogo: $organizationLogo
+        industry: $industry
+        role: $role
+        position: $position
+      ) {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+  `,
+];
+
+export default withApolloData(Signup);

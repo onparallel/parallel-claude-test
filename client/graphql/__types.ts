@@ -7029,6 +7029,20 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   };
 };
 
+export type PublicSignupForm_emailIsAvailableQueryVariables = Exact<{
+  email: Scalars["String"];
+}>;
+
+export type PublicSignupForm_emailIsAvailableQuery = { emailIsAvailable: boolean };
+
+export type PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables = Exact<{
+  name: Scalars["String"];
+}>;
+
+export type PublicSignupFormOrganization_organizationNameIsAvailableQuery = {
+  organizationNameIsAvailable: boolean;
+};
+
 export type PublicTemplateCard_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
   id: string;
@@ -12847,6 +12861,29 @@ export type PdfViewPetitionQuery = {
   }>;
 };
 
+export type Signup_userSignUpMutationVariables = Exact<{
+  email: Scalars["String"];
+  password: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  organizationName: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
+  organizationLogo?: Maybe<Scalars["Upload"]>;
+  industry?: Maybe<Scalars["String"]>;
+  role?: Maybe<Scalars["String"]>;
+  position?: Maybe<Scalars["String"]>;
+}>;
+
+export type Signup_userSignUpMutation = {
+  userSignUp: {
+    __typename?: "User";
+    id: string;
+    email: string;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+  };
+};
+
 export type LandingTemplateDetails_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
   id: string;
@@ -17270,6 +17307,75 @@ export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
 >;
+export const PublicSignupForm_emailIsAvailableDocument = gql`
+  query PublicSignupForm_emailIsAvailable($email: String!) {
+    emailIsAvailable(email: $email)
+  }
+`;
+export function usePublicSignupForm_emailIsAvailableQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    PublicSignupForm_emailIsAvailableQuery,
+    PublicSignupForm_emailIsAvailableQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PublicSignupForm_emailIsAvailableQuery,
+    PublicSignupForm_emailIsAvailableQueryVariables
+  >(PublicSignupForm_emailIsAvailableDocument, options);
+}
+export function usePublicSignupForm_emailIsAvailableLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PublicSignupForm_emailIsAvailableQuery,
+    PublicSignupForm_emailIsAvailableQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PublicSignupForm_emailIsAvailableQuery,
+    PublicSignupForm_emailIsAvailableQueryVariables
+  >(PublicSignupForm_emailIsAvailableDocument, options);
+}
+export type PublicSignupForm_emailIsAvailableQueryHookResult = ReturnType<
+  typeof usePublicSignupForm_emailIsAvailableQuery
+>;
+export type PublicSignupForm_emailIsAvailableLazyQueryHookResult = ReturnType<
+  typeof usePublicSignupForm_emailIsAvailableLazyQuery
+>;
+export const PublicSignupFormOrganization_organizationNameIsAvailableDocument = gql`
+  query PublicSignupFormOrganization_organizationNameIsAvailable($name: String!) {
+    organizationNameIsAvailable(name: $name)
+  }
+`;
+export function usePublicSignupFormOrganization_organizationNameIsAvailableQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    PublicSignupFormOrganization_organizationNameIsAvailableQuery,
+    PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PublicSignupFormOrganization_organizationNameIsAvailableQuery,
+    PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
+  >(PublicSignupFormOrganization_organizationNameIsAvailableDocument, options);
+}
+export function usePublicSignupFormOrganization_organizationNameIsAvailableLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PublicSignupFormOrganization_organizationNameIsAvailableQuery,
+    PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PublicSignupFormOrganization_organizationNameIsAvailableQuery,
+    PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
+  >(PublicSignupFormOrganization_organizationNameIsAvailableDocument, options);
+}
+export type PublicSignupFormOrganization_organizationNameIsAvailableQueryHookResult = ReturnType<
+  typeof usePublicSignupFormOrganization_organizationNameIsAvailableQuery
+>;
+export type PublicSignupFormOrganization_organizationNameIsAvailableLazyQueryHookResult =
+  ReturnType<typeof usePublicSignupFormOrganization_organizationNameIsAvailableLazyQuery>;
 export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   mutation RecipientViewHeader_publicDelegateAccessToContact(
     $keycode: ID!
@@ -20263,6 +20369,51 @@ export function usePdfViewPetitionLazyQuery(
 }
 export type PdfViewPetitionQueryHookResult = ReturnType<typeof usePdfViewPetitionQuery>;
 export type PdfViewPetitionLazyQueryHookResult = ReturnType<typeof usePdfViewPetitionLazyQuery>;
+export const Signup_userSignUpDocument = gql`
+  mutation Signup_userSignUp(
+    $email: String!
+    $password: String!
+    $firstName: String!
+    $lastName: String!
+    $organizationName: String!
+    $locale: String
+    $organizationLogo: Upload
+    $industry: String
+    $role: String
+    $position: String
+  ) {
+    userSignUp(
+      email: $email
+      password: $password
+      firstName: $firstName
+      lastName: $lastName
+      organizationName: $organizationName
+      locale: $locale
+      organizationLogo: $organizationLogo
+      industry: $industry
+      role: $role
+      position: $position
+    ) {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+`;
+export function useSignup_userSignUpMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    Signup_userSignUpMutation,
+    Signup_userSignUpMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<Signup_userSignUpMutation, Signup_userSignUpMutationVariables>(
+    Signup_userSignUpDocument,
+    options
+  );
+}
+export type Signup_userSignUpMutationHookResult = ReturnType<typeof useSignup_userSignUpMutation>;
 export const LandingTemplateDetails_landingTemplateBySlugDocument = gql`
   query LandingTemplateDetails_landingTemplateBySlug($slug: String!) {
     landingTemplateBySlug(slug: $slug) {

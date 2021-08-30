@@ -1935,39 +1935,49 @@
     "context": "Please, enter a company name"
   },
   {
-    "term": "component.public-signup-form-organization.logo-label",
+    "term": "component.public-signup-form-organization.organization-name-not-available",
+    "definition": "Este nombre de empresa no está disponible",
+    "context": "This company name is not available"
+  },
+  {
+    "term": "component.public-signup-form-organization.organizationLogo-label",
     "definition": "Logotipo",
     "context": "Logo"
   },
   {
-    "term": "component.public-signup-form-organization.logo-label-help",
+    "term": "component.public-signup-form-organization.organizationLogo-label-help",
     "definition": "Adjunta una imagen que quieras que mostremos en tus correos.",
     "context": "Attach an image you want to show in your emails."
   },
   {
-    "term": "component.public-signup-form-organization.upload-logo-button",
+    "term": "component.public-signup-form-organization.upload-organizationLogo-button",
     "definition": "Subir logotipo",
     "context": "Upload logo"
   },
   {
-    "term": "component.public-signup-form-organization.upload-logo-size-error",
-    "definition": "archivo demasiado pesado. Adjunte un archivo de hasta 50kB",
+    "term": "component.public-signup-form-organization.upload-organizationLogo-size-error",
+    "definition": "Archivo demasiado pesado. Adjunte un archivo de hasta 50kB",
     "context": "File too heavy. Attach a file up to 50kB"
   },
   {
-    "term": "component.public-signup-form-organization.upload-logo-text",
-    "definition": "(Imagen PNG máx. 50kB) ",
+    "term": "component.public-signup-form-organization.upload-organizationLogo-text",
+    "definition": "(Archivo PNG de hasta 50 kB)",
     "context": "(PNG file of size up 50kB)"
   },
   {
-    "term": "component.public-signup-form-organization.upload-other-logo-button",
-    "definition": "Subir otro logo",
+    "term": "component.public-signup-form-organization.upload-other-organizationLogo-button",
+    "definition": "Subir otro logotipo",
     "context": "Upload other logo"
   },
   {
     "term": "component.public-signup-form.description",
     "definition": "Crea ya tu cuenta gratuita y automatiza tus procesos de una forma ágil y segura.",
     "context": "Create your free account now and automate your workflow agilely and safety."
+  },
+  {
+    "term": "component.public-signup-form.email-placeholder",
+    "definition": "ejemplo@companía.com",
+    "context": "example@company.com"
   },
   {
     "term": "component.public-signup-form.experience.industry-label",

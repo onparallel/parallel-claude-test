@@ -1,7 +1,9 @@
+import { gql, useApolloClient } from "@apollo/client";
 import {
   Button,
   Center,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   HStack,
   Image,
@@ -10,38 +12,91 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import {
+  PublicSignupFormOrganization_organizationNameIsAvailableQuery,
+  PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables,
+} from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 export type PublicSignupFormOrganizationProps = {
   onBack: () => void;
-  onNext: ({ companyName, logo }: { companyName: string; logo: Maybe<File> }) => void;
+  onNext: ({
+    organizationName,
+    organizationLogo,
+  }: {
+    organizationName: string;
+    organizationLogo: Maybe<File> | undefined;
+  }) => void;
 };
 
 export function PublicSignupFormOrganization({
   onBack,
   onNext,
 }: PublicSignupFormOrganizationProps) {
-  const [companyName, setCompanyName] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
   const [isInvalidCompanyName, setIsInvalidCompanyName] = useState(false);
-  const [logo, setLogo] = useState<Maybe<File>>(null);
+  const [organizationNameIsAvailable, setOrganizationNameIsAvailable] = useState(true);
+
+  const [organizationLogo, setOrganizationLogo] = useState<Maybe<File> | undefined>(undefined);
 
   useEffect(() => {
     if (isInvalidCompanyName) setIsInvalidCompanyName(false);
-  }, [companyName]);
+  }, [organizationName]);
 
   const handleNext = () => {
-    if (!companyName) {
+    if (!organizationName) {
       setIsInvalidCompanyName(true);
     } else {
-      onNext({ companyName, logo });
+      onNext({ organizationName, organizationLogo });
+    }
+  };
+
+  const apollo = useApolloClient();
+  const debouncedOrganizationIsAvailable = useDebouncedAsync(
+    async (name: string) => {
+      const { data } = await apollo.query<
+        PublicSignupFormOrganization_organizationNameIsAvailableQuery,
+        PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
+      >({
+        query: gql`
+          query PublicSignupFormOrganization_organizationNameIsAvailable($name: String!) {
+            organizationNameIsAvailable(name: $name)
+          }
+        `,
+        variables: { name },
+        fetchPolicy: "no-cache",
+      });
+      return data.organizationNameIsAvailable;
+    },
+    300,
+    []
+  );
+
+  const handleCompanyNameValidate = async () => {
+    try {
+      const data = await debouncedOrganizationIsAvailable(organizationName);
+      setOrganizationNameIsAvailable(data);
+    } catch (e) {
+      // "DEBOUNCED" error means the search was cancelled because user kept typing
+      if (e === "DEBOUNCED") {
+        return "DEBOUNCED";
+      } else {
+        throw e;
+      }
     }
   };
 
   const MemoizedLogoInput = useMemo(() => {
-    return <SelectLogoInput logo={logo} setLogo={setLogo} />;
-  }, [logo, setLogo]);
+    return (
+      <SelectLogoInput
+        organizationLogo={organizationLogo}
+        setOrganizationLogo={setOrganizationLogo}
+      />
+    );
+  }, [organizationLogo, setOrganizationLogo]);
 
   return (
     <>
@@ -61,7 +116,10 @@ export function PublicSignupFormOrganization({
             defaultMessage="Fill out your organization’s profile that your customers will see in your communications."
           />
         </Text>
-        <FormControl id="company-name">
+        <FormControl
+          id="company-name"
+          isInvalid={isInvalidCompanyName || !organizationNameIsAvailable}
+        >
           <FormLabel>
             <FormattedMessage
               id="component.public-signup-form-organization.company-name-label"
@@ -80,18 +138,23 @@ export function PublicSignupFormOrganization({
             name="company-name"
             type="text"
             autoComplete="off"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            isInvalid={isInvalidCompanyName}
+            value={organizationName}
+            onChange={(e) => setOrganizationName(e.target.value)}
+            onBlur={handleCompanyNameValidate}
           />
-          {isInvalidCompanyName && (
-            <Text fontSize="sm" color="red.600" paddingTop={1}>
+          <FormErrorMessage>
+            {organizationNameIsAvailable ? (
               <FormattedMessage
                 id="component.public-signup-form-organization.invalid-company-name-error"
                 defaultMessage="Please, enter a company name"
               />
-            </Text>
-          )}
+            ) : (
+              <FormattedMessage
+                id="component.public-signup-form-organization.organization-name-not-available"
+                defaultMessage="This company name is not available"
+              />
+            )}
+          </FormErrorMessage>
         </FormControl>
         {MemoizedLogoInput}
         <Stack spacing={4} paddingTop={4} direction={{ base: "column-reverse", md: "row" }}>
@@ -113,15 +176,21 @@ export function PublicSignupFormOrganization({
   );
 }
 
-function SelectLogoInput({ logo, setLogo }: { logo: Maybe<File>; setLogo: (arg0: File) => void }) {
+function SelectLogoInput({
+  organizationLogo,
+  setOrganizationLogo,
+}: {
+  organizationLogo: Maybe<File> | undefined;
+  setOrganizationLogo: (arg0: File) => void;
+}) {
   const [isMaxSizeExceeded, setIsMaxSizeExceeded] = useState(false);
-  const logoInputRef = useRef<HTMLInputElement>(null);
+  const organizationLogoInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (files: Maybe<FileList>) => {
     const maxSize = 50000; //50 kB
     if (files?.length) {
       if (files[0].size <= maxSize) {
-        setLogo(files[0] as any);
+        setOrganizationLogo(files[0] as any);
         setIsMaxSizeExceeded(false);
       } else {
         setIsMaxSizeExceeded(true);
@@ -132,15 +201,15 @@ function SelectLogoInput({ logo, setLogo }: { logo: Maybe<File>; setLogo: (arg0:
   };
 
   return (
-    <FormControl id="logo">
+    <FormControl id="organizationLogo">
       <FormLabel marginBottom={3}>
         <FormattedMessage
-          id="component.public-signup-form-organization.logo-label"
+          id="component.public-signup-form-organization.organizationLogo-label"
           defaultMessage="Logo"
         />
         <Text fontSize="sm" color="gray.600" fontWeight="normal">
           <FormattedMessage
-            id="component.public-signup-form-organization.logo-label-help"
+            id="component.public-signup-form-organization.organizationLogo-label-help"
             defaultMessage="Attach an image you want to show in your emails."
           />
         </Text>
@@ -148,9 +217,9 @@ function SelectLogoInput({ logo, setLogo }: { logo: Maybe<File>; setLogo: (arg0:
 
       <HStack position="relative">
         <Input
-          ref={logoInputRef}
+          ref={organizationLogoInputRef}
           position="absolute"
-          name="logo"
+          name="organizationLogo"
           type="file"
           hidden
           onChange={(e) => handleFileChange(e.target.files)}
@@ -160,26 +229,26 @@ function SelectLogoInput({ logo, setLogo }: { logo: Maybe<File>; setLogo: (arg0:
           size="sm"
           fontSize="md"
           fontWeight="normal"
-          onClick={() => logoInputRef?.current?.click()}
+          onClick={() => organizationLogoInputRef?.current?.click()}
         >
-          {logo ? (
+          {organizationLogo ? (
             <FormattedMessage
-              id="component.public-signup-form-organization.upload-other-logo-button"
+              id="component.public-signup-form-organization.upload-other-organizationLogo-button"
               defaultMessage="Upload other logo"
             />
           ) : (
             <FormattedMessage
-              id="component.public-signup-form-organization.upload-logo-button"
+              id="component.public-signup-form-organization.upload-organizationLogo-button"
               defaultMessage="Upload logo"
             />
           )}
         </Button>
         <Text fontSize="sm" color="gray.600">
-          {logo?.name ? (
-            logo.name
+          {organizationLogo?.name ? (
+            organizationLogo.name
           ) : (
             <FormattedMessage
-              id="component.public-signup-form-organization.upload-logo-text"
+              id="component.public-signup-form-organization.upload-organizationLogo-text"
               defaultMessage="(PNG file of size up 50kB)"
             />
           )}
@@ -188,12 +257,12 @@ function SelectLogoInput({ logo, setLogo }: { logo: Maybe<File>; setLogo: (arg0:
       {isMaxSizeExceeded && (
         <Text fontSize="sm" color="red.600" paddingTop={4}>
           <FormattedMessage
-            id="component.public-signup-form-organization.upload-logo-size-error"
+            id="component.public-signup-form-organization.upload-organizationLogo-size-error"
             defaultMessage="File too heavy. Attach a file up to 50kB"
           />
         </Text>
       )}
-      {Object.prototype.isPrototypeOf(window) && logo && (
+      {typeof window !== "undefined" && organizationLogo && (
         <Center
           paddingX={6}
           paddingY={2}
@@ -203,7 +272,11 @@ function SelectLogoInput({ logo, setLogo }: { logo: Maybe<File>; setLogo: (arg0:
           marginTop={4}
           width="fit-content"
         >
-          <Image maxHeight="140px" width="min-content" src={URL.createObjectURL(logo)} />
+          <Image
+            maxHeight="140px"
+            width="min-content"
+            src={URL.createObjectURL(organizationLogo)}
+          />
         </Center>
       )}
     </FormControl>

@@ -1,4 +1,5 @@
 import { Button, FormControl, FormLabel, Input, Select, Stack, Text } from "@chakra-ui/react";
+import { Maybe } from "@parallel/utils/types";
 import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -9,9 +10,9 @@ export type PublicSignupFormExperienceProps = {
     role,
     position,
   }: {
-    industry?: string;
-    role?: string;
-    position?: string;
+    industry?: Maybe<string> | undefined;
+    role?: Maybe<string> | undefined;
+    position?: Maybe<string> | undefined;
   }) => void;
 };
 
@@ -22,7 +23,11 @@ export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFor
   const [position, setPosition] = useState("");
 
   const handleComplete = () => {
-    onFinish({ industry, role, position });
+    onFinish({
+      industry: industry || undefined,
+      role: role || undefined,
+      position: position || undefined,
+    });
   };
 
   const industryOptions = useMemo(

@@ -1,39 +1,87 @@
-import { Box, Button, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
+import { gql, useApolloClient } from "@apollo/client";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  InputGroup,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import {
+  PublicSignupForm_emailIsAvailableQuery,
+  PublicSignupForm_emailIsAvailableQueryVariables,
+} from "@parallel/graphql/__types";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useEffect } from "react";
-import { useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
 
-export type PublicSignupFormProps = {
-  onNext: ({ email, password }: { email: string; password: string }) => void;
+type PublicSignupFormData = {
+  email: string;
+  password: string;
+};
+
+type PublicSignupFormProps = {
+  onNext: ({ email, password }: PublicSignupFormData) => void;
 };
 export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
-  const [email, setEmail] = useState("");
-  const [isInvalidEmail, setIsInvalidEmail] = useState(false);
-  const [password, setPassword] = useState("");
-  const [isInvalidPassword, setIsInvalidPassword] = useState(false);
+  const intl = useIntl();
 
-  const handleNext = () => {
-    if (!email || !EMAIL_REGEX.test(email)) setIsInvalidEmail(true);
-    if (!password) setIsInvalidPassword(true);
+  const { handleSubmit, register, formState } = useForm<PublicSignupFormData>({
+    mode: "onBlur",
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-    if (email && EMAIL_REGEX.test(email) && password) {
-      onNext({ email, password });
+  const { errors } = formState;
+
+  const apollo = useApolloClient();
+  const debouncedEmailIsAvailable = useDebouncedAsync(
+    async (email: string) => {
+      const { data } = await apollo.query<
+        PublicSignupForm_emailIsAvailableQuery,
+        PublicSignupForm_emailIsAvailableQueryVariables
+      >({
+        query: gql`
+          query PublicSignupForm_emailIsAvailable($email: String!) {
+            emailIsAvailable(email: $email)
+          }
+        `,
+        variables: { email },
+        fetchPolicy: "no-cache",
+      });
+      return data.emailIsAvailable;
+    },
+    300,
+    []
+  );
+
+  const emailIsAvailable = async (value: string) => {
+    try {
+      return await debouncedEmailIsAvailable(value);
+    } catch (e) {
+      // "DEBOUNCED" error means the search was cancelled because user kept typing
+      if (e === "DEBOUNCED") {
+        return "DEBOUNCED";
+      } else {
+        throw e;
+      }
     }
   };
 
-  useEffect(() => {
-    if (isInvalidEmail && EMAIL_REGEX.test(email)) setIsInvalidEmail(false);
-  }, [email]);
-
-  useEffect(() => {
-    if (isInvalidPassword) setIsInvalidPassword(false);
-  }, [password]);
-
   return (
-    <>
+    <form
+      onSubmit={handleSubmit(({ email, password }) => {
+        onNext({ email, password });
+      })}
+    >
       <Stack spacing={4}>
         <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
           <FormattedMessage
@@ -47,32 +95,46 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             defaultMessage="Create your free account now and automate your workflow agilely and safety."
           />
         </Text>
-        <FormControl id="email">
+        <FormControl id="email" isInvalid={!!errors.email}>
           <FormLabel>
             <FormattedMessage
               id="component.public-signup-form.work-email-label"
               defaultMessage="Work email"
             />
           </FormLabel>
-          <Input
-            name="email"
-            type="email"
-            autoComplete="email"
-            placeholder="example@company.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            isInvalid={isInvalidEmail}
-          />
-          {isInvalidEmail && (
-            <Text fontSize="sm" color="red.600" paddingTop={1}>
-              <FormattedMessage
-                id="generic.forms.invalid-email-error"
-                defaultMessage="Please, enter a valid email"
-              />
-            </Text>
-          )}
+          <InputGroup>
+            <Input
+              {...register("email", {
+                required: true,
+                pattern: EMAIL_REGEX,
+                validate: { emailIsAvailable },
+              })}
+              autoComplete="email"
+              placeholder={intl.formatMessage({
+                id: "component.public-signup-form.email-placeholder",
+                defaultMessage: "example@company.com",
+              })}
+            />
+          </InputGroup>
+          {errors.email?.message !== "DEBOUNCED" ? (
+            errors.email?.type === "emailIsAvailable" ? (
+              <Text color="red.500" fontSize="sm" marginTop={2}>
+                <FormattedMessage
+                  id="generic.forms.email-already-registered-error"
+                  defaultMessage="This email is already registered"
+                />
+              </Text>
+            ) : (
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.invalid-email-error"
+                  defaultMessage="Please, enter a valid email"
+                />
+              </FormErrorMessage>
+            )
+          ) : null}
         </FormControl>
-        <FormControl id="password">
+        <FormControl id="password" isInvalid={!!errors.password}>
           <FormLabel>
             <FormattedMessage
               id="component.public-signup-form.password-label"
@@ -80,19 +142,17 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             />
           </FormLabel>
           <PasswordInput
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            isInvalid={isInvalidPassword}
+            {...register("password", {
+              required: true,
+            })}
             autoComplete="current-password"
           />
-          {isInvalidPassword && (
-            <Text fontSize="sm" color="red.600" paddingTop={1}>
-              <FormattedMessage
-                id="generic.forms.required-password-error"
-                defaultMessage="Please, enter a password"
-              />
-            </Text>
-          )}
+          <FormErrorMessage>
+            <FormattedMessage
+              id="generic.forms.required-password-error"
+              defaultMessage="Please, enter a password"
+            />
+          </FormErrorMessage>
         </FormControl>
 
         <Box>
@@ -102,7 +162,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             size="md"
             fontSize="md"
             marginTop={4}
-            onClick={handleNext}
+            type="submit"
           >
             <FormattedMessage
               id="component.public-signup-form.signup-button"
@@ -142,6 +202,6 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
           />
         </Text>
       </Stack>
-    </>
+    </form>
   );
 }
