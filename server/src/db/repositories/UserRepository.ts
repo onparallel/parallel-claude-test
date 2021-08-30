@@ -129,6 +129,7 @@ export class UserRepository extends BaseRepository {
         type: "USER_CREATED",
         data: {
           user_id: user.id,
+          from: createdBy ? "invitation" : "sign-up",
         },
       },
       t

@@ -229,6 +229,7 @@ async function trackUserCreatedEvent(event: UserCreatedEvent, ctx: WorkerContext
       industry: user.details?.industry ?? null,
       position: user.details?.position ?? null,
       role: user.details?.role ?? null,
+      from: event.data.from,
     },
   });
 }

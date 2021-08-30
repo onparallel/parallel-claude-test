@@ -98,6 +98,7 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     industry?: string;
     position?: string;
     role?: string;
+    from: string;
   };
   /** a petition has been opened by any recipient */
   ACCESS_OPENED: {

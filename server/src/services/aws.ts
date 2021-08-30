@@ -166,17 +166,20 @@ export class Aws implements IAws {
     password: string,
     firstName: string,
     lastName: string,
-    locale: string
+    metadata: {
+      // this is the info required for lambda CustomMessage to build the emails
+      locale: string;
+    }
   ) {
     const res = await this.cognitoIdP
       .signUp({
         Username: email,
         Password: password,
         ClientId: this.config.cognito.clientId,
+        ClientMetadata: metadata,
         UserAttributes: [
           { Name: "given_name", Value: firstName },
           { Name: "family_name", Value: lastName },
-          { Name: "locale", Value: locale }, // used to choose correct language on Cognito CustomMessages
         ],
       })
       .promise();

@@ -319,6 +319,7 @@ export type SystemEventPayload<TType extends SystemEventType> = {
   };
   USER_CREATED: {
     user_id: number;
+    from: "sign-up" | "invitation";
   };
   PETITION_MESSAGE_BOUNCED: {
     petition_message_id: number;

@@ -136,7 +136,7 @@ export const Layout: FC<LayoutProps> = function Layout({
                   defaultMessage="Terms and conditions"
                 />
               </a>
-              <span>&nbsp;|&nbsp;</span>
+              <span> | </span>
               <a
                 className="link"
                 href={`https://www.onparallel.com/${locale}/legal/privacy?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
