@@ -1,4 +1,3 @@
-import { gql, useApolloClient } from "@apollo/client";
 import {
   Button,
   Center,
@@ -12,12 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import {
-  PublicSignupFormOrganization_organizationNameIsAvailableQuery,
-  PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables,
-} from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
@@ -38,8 +32,6 @@ export function PublicSignupFormOrganization({
 }: PublicSignupFormOrganizationProps) {
   const [organizationName, setOrganizationName] = useState("");
   const [isInvalidCompanyName, setIsInvalidCompanyName] = useState(false);
-  const [organizationNameIsAvailable, setOrganizationNameIsAvailable] = useState(true);
-
   const [organizationLogo, setOrganizationLogo] = useState<Maybe<File> | undefined>(undefined);
 
   useEffect(() => {
@@ -51,41 +43,6 @@ export function PublicSignupFormOrganization({
       setIsInvalidCompanyName(true);
     } else {
       onNext({ organizationName, organizationLogo });
-    }
-  };
-
-  const apollo = useApolloClient();
-  const debouncedOrganizationIsAvailable = useDebouncedAsync(
-    async (name: string) => {
-      const { data } = await apollo.query<
-        PublicSignupFormOrganization_organizationNameIsAvailableQuery,
-        PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
-      >({
-        query: gql`
-          query PublicSignupFormOrganization_organizationNameIsAvailable($name: String!) {
-            organizationNameIsAvailable(name: $name)
-          }
-        `,
-        variables: { name },
-        fetchPolicy: "no-cache",
-      });
-      return data.organizationNameIsAvailable;
-    },
-    300,
-    []
-  );
-
-  const handleCompanyNameValidate = async () => {
-    try {
-      const data = await debouncedOrganizationIsAvailable(organizationName);
-      setOrganizationNameIsAvailable(data);
-    } catch (e) {
-      // "DEBOUNCED" error means the search was cancelled because user kept typing
-      if (e === "DEBOUNCED") {
-        return "DEBOUNCED";
-      } else {
-        throw e;
-      }
     }
   };
 
@@ -116,10 +73,7 @@ export function PublicSignupFormOrganization({
             defaultMessage="Fill out your organization’s profile that your customers will see in your communications."
           />
         </Text>
-        <FormControl
-          id="company-name"
-          isInvalid={isInvalidCompanyName || !organizationNameIsAvailable}
-        >
+        <FormControl id="company-name" isInvalid={isInvalidCompanyName}>
           <FormLabel>
             <FormattedMessage
               id="component.public-signup-form-organization.company-name-label"
@@ -140,20 +94,12 @@ export function PublicSignupFormOrganization({
             autoComplete="off"
             value={organizationName}
             onChange={(e) => setOrganizationName(e.target.value)}
-            onBlur={handleCompanyNameValidate}
           />
           <FormErrorMessage>
-            {organizationNameIsAvailable ? (
-              <FormattedMessage
-                id="component.public-signup-form-organization.invalid-company-name-error"
-                defaultMessage="Please, enter a company name"
-              />
-            ) : (
-              <FormattedMessage
-                id="component.public-signup-form-organization.organization-name-not-available"
-                defaultMessage="This company name is not available"
-              />
-            )}
+            <FormattedMessage
+              id="component.public-signup-form-organization.invalid-company-name-error"
+              defaultMessage="Please, enter a company name"
+            />
           </FormErrorMessage>
         </FormControl>
         {MemoizedLogoInput}

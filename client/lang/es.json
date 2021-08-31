@@ -1935,11 +1935,6 @@
     "context": "Please, enter a company name"
   },
   {
-    "term": "component.public-signup-form-organization.organization-name-not-available",
-    "definition": "Este nombre de empresa no está disponible",
-    "context": "This company name is not available"
-  },
-  {
     "term": "component.public-signup-form-organization.organizationLogo-label",
     "definition": "Logotipo",
     "context": "Logo"

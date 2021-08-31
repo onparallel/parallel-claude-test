@@ -7035,14 +7035,6 @@ export type PublicSignupForm_emailIsAvailableQueryVariables = Exact<{
 
 export type PublicSignupForm_emailIsAvailableQuery = { emailIsAvailable: boolean };
 
-export type PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables = Exact<{
-  name: Scalars["String"];
-}>;
-
-export type PublicSignupFormOrganization_organizationNameIsAvailableQuery = {
-  organizationNameIsAvailable: boolean;
-};
-
 export type PublicTemplateCard_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
   id: string;
@@ -17342,40 +17334,6 @@ export type PublicSignupForm_emailIsAvailableQueryHookResult = ReturnType<
 export type PublicSignupForm_emailIsAvailableLazyQueryHookResult = ReturnType<
   typeof usePublicSignupForm_emailIsAvailableLazyQuery
 >;
-export const PublicSignupFormOrganization_organizationNameIsAvailableDocument = gql`
-  query PublicSignupFormOrganization_organizationNameIsAvailable($name: String!) {
-    organizationNameIsAvailable(name: $name)
-  }
-`;
-export function usePublicSignupFormOrganization_organizationNameIsAvailableQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PublicSignupFormOrganization_organizationNameIsAvailableQuery,
-    PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    PublicSignupFormOrganization_organizationNameIsAvailableQuery,
-    PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
-  >(PublicSignupFormOrganization_organizationNameIsAvailableDocument, options);
-}
-export function usePublicSignupFormOrganization_organizationNameIsAvailableLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PublicSignupFormOrganization_organizationNameIsAvailableQuery,
-    PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PublicSignupFormOrganization_organizationNameIsAvailableQuery,
-    PublicSignupFormOrganization_organizationNameIsAvailableQueryVariables
-  >(PublicSignupFormOrganization_organizationNameIsAvailableDocument, options);
-}
-export type PublicSignupFormOrganization_organizationNameIsAvailableQueryHookResult = ReturnType<
-  typeof usePublicSignupFormOrganization_organizationNameIsAvailableQuery
->;
-export type PublicSignupFormOrganization_organizationNameIsAvailableLazyQueryHookResult =
-  ReturnType<typeof usePublicSignupFormOrganization_organizationNameIsAvailableLazyQuery>;
 export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   mutation RecipientViewHeader_publicDelegateAccessToContact(
     $keycode: ID!
