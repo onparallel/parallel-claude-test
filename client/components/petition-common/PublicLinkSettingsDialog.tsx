@@ -43,7 +43,7 @@ export function PublicLinkSettingsDialog({
     register,
     watch,
     control,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<PublicLinkSettingsData>({
     mode: "onChange",
     defaultValues: {
@@ -105,7 +105,12 @@ export function PublicLinkSettingsDialog({
       hasCloseButton
       content={{
         as: "form",
-        onSubmit: handleSubmit((data) => props.onResolve(data)),
+        onSubmit: isDirty
+          ? handleSubmit((data) => props.onResolve(data))
+          : (evnt) => {
+              evnt.preventDefault();
+              props.onReject();
+            },
       }}
       initialFocusRef={titleRef}
       header={

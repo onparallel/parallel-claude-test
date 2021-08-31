@@ -1,9 +1,10 @@
 import { Box, useClipboard, useToast } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const useClipboardWithToast = ({ value, text }: { value: string; text: string }) => {
   const toast = useToast();
-  const { hasCopied, onCopy } = useClipboard(value);
+  const [copyValue, setCopyValue] = useState(value);
+  const { hasCopied, onCopy } = useClipboard(copyValue);
 
   useEffect(() => {
     if (hasCopied) {
@@ -27,5 +28,13 @@ export const useClipboardWithToast = ({ value, text }: { value: string; text: st
     }
   }, [hasCopied]);
 
-  return { hasCopied, onCopy };
+  useEffect(() => {
+    if (copyValue !== value) onCopy();
+  }, [copyValue]);
+
+  const onCopyValue = (value: string) => {
+    setCopyValue(value);
+  };
+
+  return { hasCopied, onCopy, onCopyValue };
 };

@@ -160,7 +160,7 @@ function _PetitionSettings({
 
   const publicLinkURL = `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${query.locale}/pp/${publicLink?.slug}`;
 
-  const { onCopy: onCopyPublicLink } = useClipboardWithToast({
+  const { onCopy: onCopyPublicLink, onCopyValue } = useClipboardWithToast({
     value: publicLinkURL,
     text: intl.formatMessage({
       id: "component.petition-settings.link-copied-toast",
@@ -193,9 +193,16 @@ function _PetitionSettings({
         const publicLinkSettings = await publicLinkSettingDialog({ ownerId: _ownerId });
 
         const { title, description, ownerId, otherPermissions } = publicLinkSettings;
-        await createPublicPetitionLink({
+        const { data } = await createPublicPetitionLink({
           variables: { templateId: petition.id, title, description, ownerId, otherPermissions },
         });
+
+        if (data) {
+          const { publicLink } = data.createPublicPetitionLink;
+          onCopyValue(
+            `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${query.locale}/pp/${publicLink?.slug}`
+          );
+        }
       }
     } catch {}
   };
