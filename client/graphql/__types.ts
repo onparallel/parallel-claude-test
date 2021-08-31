@@ -652,6 +652,7 @@ export interface MutationcreateOrganizationUserArgs {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
   role: OrganizationRole;
 }
 
@@ -710,6 +711,7 @@ export interface MutationcreateUserArgs {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
   organizationId: Scalars["Int"];
   password: Scalars["String"];
   role: OrganizationRole;
@@ -8314,6 +8316,7 @@ export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
   lastName: Scalars["String"];
   email: Scalars["String"];
   role: OrganizationRole;
+  locale?: Maybe<Scalars["String"]>;
 }>;
 
 export type OrganizationUsers_createOrganizationUserMutation = {
@@ -18570,8 +18573,15 @@ export const OrganizationUsers_createOrganizationUserDocument = gql`
     $lastName: String!
     $email: String!
     $role: OrganizationRole!
+    $locale: String
   ) {
-    createOrganizationUser(email: $email, firstName: $firstName, lastName: $lastName, role: $role) {
+    createOrganizationUser(
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      role: $role
+      locale: $locale
+    ) {
       ...OrganizationUsers_User
     }
   }

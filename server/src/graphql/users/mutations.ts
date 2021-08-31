@@ -43,6 +43,7 @@ import {
   userIsNotContextUser,
   userIsNotSSO,
 } from "./authorizers";
+import { fullName } from "../../util/fullName";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -145,6 +146,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     firstName: nonNull(stringArg()),
     lastName: nonNull(stringArg()),
     role: nonNull(arg({ type: "OrganizationRole" })),
+    locale: stringArg(),
   },
   validateArgs: validateAnd(
     validEmail((args) => args.email, "email"),
@@ -156,8 +158,20 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     }
   ),
   resolve: async (_, args, ctx) => {
+    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
     const email = args.email.trim().toLowerCase();
-    const cognitoId = await ctx.aws.createCognitoUser(email, undefined, true);
+    const cognitoId = await ctx.aws.createCognitoUser(
+      email,
+      null,
+      args.firstName,
+      args.lastName,
+      {
+        locale: args.locale ?? "en",
+        organizationName: organization!.name,
+        organizationUser: fullName(ctx.user!.first_name, ctx.user!.last_name),
+      },
+      true
+    );
     return await ctx.users.createUser(
       {
         cognito_id: cognitoId!,

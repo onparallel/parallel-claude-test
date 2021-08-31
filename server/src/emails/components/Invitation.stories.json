@@ -1,0 +1,35 @@
+{
+  "title": "Invitation",
+  "stories": [
+    {
+      "name": "Invitation",
+      "parameters": {
+        "server": {
+          "id": "Invitation"
+        }
+      },
+      "args": {
+        "email": "mariano@onparallel.com",
+        "password": "password",
+        "organizationUser": "Derek Lou",
+        "organizationName": "Parallel",
+        "userName": "Mariano",
+        "parallelUrl": "https://www.onparallel.com",
+        "assetsUrl": "https://static.onparallel.com",
+        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "email": { "control": { "type": "text" } },
+        "password": { "control": { "type": "text" } },
+        "organizationUser": { "control": { "type": "text" } },
+        "organizationName": { "control": { "type": "text" } },
+        "userName": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

@@ -160,6 +160,11 @@
     "context": "Log in"
   },
   {
+    "term": "invitation.subject",
+    "definition": "{organizationUser} te ha invitado a unirte a {organizationName}",
+    "context": "{organizationUser} has invited you to join {organizationName}"
+  },
+  {
     "term": "invitation.website",
     "definition": "Puedes acceder a través de nuestra página.",
     "context": "You can login through our website."

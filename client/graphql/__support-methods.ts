@@ -138,6 +138,14 @@ export const supportMethods: {
           deprecationReason: null,
         },
         {
+          name: "locale",
+          description: null,
+          type: { kind: "SCALAR", name: "String", ofType: null },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
           name: "organizationId",
           description: "ID of the organization",
           type: {

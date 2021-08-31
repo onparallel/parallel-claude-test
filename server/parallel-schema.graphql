@@ -518,6 +518,7 @@ type Mutation {
     email: String!
     firstName: String!
     lastName: String!
+    locale: String
     role: OrganizationRole!
   ): User!
 
@@ -621,6 +622,7 @@ type Mutation {
     Last name of the user
     """
     lastName: String!
+    locale: String
 
     """
     ID of the organization

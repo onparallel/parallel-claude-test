@@ -2850,6 +2850,7 @@ export interface NexusGenArgTypes {
       email: string; // String!
       firstName: string; // String!
       lastName: string; // String!
+      locale?: string | null; // String
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     };
     createPetition: {
@@ -2908,6 +2909,7 @@ export interface NexusGenArgTypes {
       email: string; // String!
       firstName: string; // String!
       lastName: string; // String!
+      locale?: string | null; // String
       organizationId: number; // Int!
       password: string; // String!
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!

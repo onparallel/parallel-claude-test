@@ -1,5 +1,6 @@
 import { arg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "@nexus/schema";
 import { isDefined, uniq } from "remeda";
+import { fullName } from "../../util/fullName";
 import { fromGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
@@ -117,6 +118,7 @@ export const createUser = mutationField("createUser", {
     lastName: nonNull(stringArg({ description: "Last name of the user" })),
     role: nonNull(arg({ type: "OrganizationRole", description: "Role of the user" })),
     organizationId: nonNull(intArg({ description: "ID of the organization" })),
+    locale: stringArg(),
   },
   validateArgs: validateAnd(
     validEmail((args) => args.email, "email"),
@@ -130,7 +132,17 @@ export const createUser = mutationField("createUser", {
       if (!org) {
         throw new Error(`Organization with id ${args.organizationId} does not exist.`);
       }
-      const cognitoId = await ctx.aws.createCognitoUser(email, args.password);
+      const cognitoId = await ctx.aws.createCognitoUser(
+        email,
+        args.password,
+        args.firstName,
+        args.lastName,
+        {
+          locale: args.locale ?? "en",
+          organizationName: org.name,
+          organizationUser: fullName(ctx.user!.first_name, ctx.user!.last_name),
+        }
+      );
       const user = await ctx.users.createUser(
         {
           cognito_id: cognitoId!,

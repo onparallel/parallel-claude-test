@@ -1,7 +1,9 @@
-import { Router, json, Handler } from "express";
+import { ClientMetadataType } from "aws-sdk/clients/cognitoidentityserviceprovider";
+import { Handler, json, Router } from "express";
 import { Config } from "../config";
 import { buildEmail } from "../emails/buildEmail";
 import AccountVerification from "../emails/components/AccountVerification";
+import Invitation from "../emails/components/Invitation";
 import { fullName } from "../util/fullName";
 
 interface CustomMessageRequest {
@@ -16,7 +18,7 @@ interface CustomMessageRequest {
   codeParameter: string;
   linkParameter: string;
   usernameParameter: string | null;
-  clientMetadata: { locale: string };
+  clientMetadata: ClientMetadataType;
 }
 
 function layoutProps(config: Config["misc"]) {
@@ -42,37 +44,56 @@ export const lambdas = Router()
   .use(json())
   .use(authenticateLambdaRequest())
   .post("/CustomMessage_SignUp", async (req, res, next) => {
-    try {
-      const {
-        userAttributes: { given_name: firstName, family_name: lastName, email },
-        clientMetadata: { locale },
-        codeParameter,
-      } = req.body as CustomMessageRequest;
+    const {
+      userAttributes: { given_name: firstName, family_name: lastName, email },
+      clientMetadata: { locale },
+      codeParameter,
+    } = req.body as CustomMessageRequest;
 
-      const { subject, html } = await buildEmail(
-        AccountVerification,
-        {
-          userName: fullName(firstName, lastName) || email,
-          activationUrl: `${
-            process.env.PARALLEL_URL
-          }/api/auth/verify-email?email=${encodeURIComponent(email)}&code=${codeParameter}&locale=${
-            locale || "en"
-          }`,
-          ...layoutProps(req.context.config.misc),
-        },
-        { locale: locale ?? "en" }
-      );
+    const { subject, html } = await buildEmail(
+      AccountVerification,
+      {
+        userName: fullName(firstName, lastName) || email,
+        activationUrl: `${
+          process.env.PARALLEL_URL
+        }/api/auth/verify-email?email=${encodeURIComponent(email)}&code=${codeParameter}&locale=${
+          locale || "en"
+        }`,
+        ...layoutProps(req.context.config.misc),
+      },
+      { locale: locale ?? "en" }
+    );
 
-      res.json({
-        emailSubject: subject,
-        emailMessage: html,
-      });
-    } catch (error) {
-      next(error);
-    }
+    res.json({
+      emailSubject: subject,
+      emailMessage: html,
+    });
   })
   .post("/CustomMessage_AdminCreateUser", async (req, res) => {
-    res.json({ emailSubject: "CustomMessage_AdminCreateUser", emailMessage: req.body });
+    const {
+      userAttributes: { given_name: firstName },
+      clientMetadata: { organizationName, organizationUser, locale },
+      usernameParameter,
+      codeParameter,
+    } = req.body as CustomMessageRequest;
+
+    const { subject, html } = await buildEmail(
+      Invitation,
+      {
+        email: usernameParameter!,
+        password: codeParameter,
+        userName: firstName!,
+        organizationName: organizationName!,
+        organizationUser: organizationUser!,
+        ...layoutProps(req.context.config.misc),
+      },
+      { locale: locale ?? "en" }
+    );
+
+    res.json({
+      emailSubject: subject,
+      emailMessage: html,
+    });
   })
   .post("/CustomMessage_ResendCode", async (req, res) => {
     res.json({ emailSubject: "CustomMessage_ResendCode", emailMessage: req.body });

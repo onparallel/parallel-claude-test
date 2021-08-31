@@ -20,9 +20,26 @@ export interface IAws {
   enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>): void;
   createCognitoUser(
     email: string,
-    password?: string,
+    password: string | null,
+    firstName: string,
+    lastName: string,
+    clientMetadata: {
+      organizationName: string;
+      organizationUser: string;
+      locale: string;
+    },
     sendEmail?: boolean
   ): Promise<string | undefined>;
+  resetUserPassword(email: string): Promise<void>;
+  signUpUser(
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    clientMetadata: { locale: string }
+  ): Promise<string>;
+  deleteUser(email: string): Promise<void>;
+  resendVerificationCode(email: string): Promise<void>;
 }
 
 export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
@@ -125,29 +142,37 @@ export class Aws implements IAws {
   /**
    * Creates a user in Cognito and returns the cognito Id
    */
-  async createCognitoUser(email: string, password?: string, sendEmail?: boolean) {
+  async createCognitoUser(
+    email: string,
+    password: string | null,
+    firstName: string,
+    lastName: string,
+    clientMetadata: {
+      organizationName: string;
+      organizationUser: string;
+      locale: string;
+    },
+    sendEmail?: boolean
+  ) {
     const res = await this.cognitoIdP
       .adminCreateUser({
         UserPoolId: this.config.cognito.defaultPoolId,
         Username: email,
-        TemporaryPassword: password,
+        TemporaryPassword: password ?? undefined,
         MessageAction: sendEmail ? undefined : "SUPPRESS",
         UserAttributes: [
-          {
-            Name: "email",
-            Value: email,
-          },
-          {
-            Name: "email_verified",
-            Value: "True",
-          },
+          { Name: "email", Value: email },
+          { Name: "email_verified", Value: "True" },
+          { Name: "given_name", Value: firstName },
+          { Name: "family_name", Value: lastName },
         ],
+        ClientMetadata: clientMetadata,
       })
       .promise();
     return res.User!.Username;
   }
 
-  /** resends the email with temporary email to an already existing user */
+  /** resends the email with temporary password to an already existing user */
   async resetUserPassword(email: string) {
     await this.cognitoIdP
       .adminCreateUser({
@@ -166,17 +191,14 @@ export class Aws implements IAws {
     password: string,
     firstName: string,
     lastName: string,
-    metadata: {
-      // this is the info required for lambda CustomMessage to build the emails
-      locale: string;
-    }
+    clientMetadata: { locale: string }
   ) {
     const res = await this.cognitoIdP
       .signUp({
         Username: email,
         Password: password,
         ClientId: this.config.cognito.clientId,
-        ClientMetadata: metadata,
+        ClientMetadata: clientMetadata,
         UserAttributes: [
           { Name: "given_name", Value: firstName },
           { Name: "family_name", Value: lastName },
@@ -188,7 +210,7 @@ export class Aws implements IAws {
   }
 
   async deleteUser(email: string) {
-    return await this.cognitoIdP
+    await this.cognitoIdP
       .adminDeleteUser({
         Username: email,
         UserPoolId: this.config.cognito.defaultPoolId,
@@ -197,7 +219,7 @@ export class Aws implements IAws {
   }
 
   async resendVerificationCode(email: string) {
-    return await this.cognitoIdP
+    await this.cognitoIdP
       .resendConfirmationCode({
         ClientId: this.config.cognito.clientId,
         Username: email,

@@ -117,7 +117,7 @@ function OrganizationUsers() {
     try {
       const newUser = await showCreateOrUpdateUserDialog({ type: "create" });
       await createOrganizationUser({
-        variables: newUser,
+        variables: { ...newUser, locale: intl.locale },
         update: () => {
           refetch();
         },
@@ -423,12 +423,14 @@ OrganizationUsers.mutations = [
       $lastName: String!
       $email: String!
       $role: OrganizationRole!
+      $locale: String
     ) {
       createOrganizationUser(
         email: $email
         firstName: $firstName
         lastName: $lastName
         role: $role
+        locale: $locale
       ) {
         ...OrganizationUsers_User
       }
