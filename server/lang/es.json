@@ -75,19 +75,19 @@
     "context": "Work better with"
   },
   {
-    "term": "forgot-password.click-to-reset",
-    "definition": "Accede a este enlace para resetear tu contraseña:",
-    "context": "Click on this link to reset your password:"
-  },
-  {
     "term": "forgot-password.ignore-text",
     "definition": "Si no has solicitado el cambio de tu contraseña ignora por favor este email.",
     "context": "If you didn't request to change your password please ignore this email."
   },
   {
-    "term": "forgot-password.reset-button",
-    "definition": "Restablecer mi contraseña",
-    "context": "Reset my password"
+    "term": "forgot-password.subject",
+    "definition": "Tu código de verificación es {verificationCode}",
+    "context": "Your verification code is {verificationCode}"
+  },
+  {
+    "term": "forgot-password.verification-code-1",
+    "definition": "Este es el código de verificación que has solicitado para cambiar tu contraseña:",
+    "context": "This is the verification code you requested to change your password:"
   },
   {
     "term": "from.parallel-team",
