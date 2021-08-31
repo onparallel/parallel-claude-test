@@ -8,9 +8,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import { PASSWORD_REGEX } from "@parallel/utils/validation";
 import { ReactElement } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { PasswordStrengthIndicator } from "../common/PasswordStrengthIndicator";
 
 export interface PasswordChangeData {
   password: string;
@@ -24,6 +26,7 @@ export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: Passwor
   const {
     handleSubmit,
     register,
+    watch,
     formState: { errors },
   } = useForm<PasswordChangeData>({
     mode: "onBlur",
@@ -52,9 +55,10 @@ export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: Passwor
           <PasswordInput
             {...register("password", {
               required: true,
-              validate: (value) => value.length >= 8,
+              pattern: PASSWORD_REGEX,
             })}
           />
+          <PasswordStrengthIndicator watch={watch} />
           <FormErrorMessage>
             <FormattedMessage
               id="generic.forms.password-policy-error"

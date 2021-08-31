@@ -45,7 +45,7 @@ function Signup() {
     setIndex((i) => i - 1);
   };
 
-  const [userSignUp] = useSignup_userSignUpMutation();
+  const [userSignUp, { loading }] = useSignup_userSignUpMutation();
 
   const handleNextPage = async (data: any) => {
     formData.current = { ...(formData?.current ?? {}), ...data };
@@ -128,7 +128,11 @@ function Signup() {
               <PublicSignupForm onNext={handleNextPage} />
               <PublicSignupFormName onNext={handleNextPage} />
               <PublicSignupFormOrganization onBack={handlePreviousPage} onNext={handleNextPage} />
-              <PublicSignupFormExperience onBack={handlePreviousPage} onFinish={handleNextPage} />
+              <PublicSignupFormExperience
+                onBack={handlePreviousPage}
+                onFinish={handleNextPage}
+                loading={loading}
+              />
               <PublicSignupFormInbox email={formData?.current?.email ?? ""} />
             </SimpleWizard>
           </Center>

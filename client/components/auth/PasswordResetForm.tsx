@@ -9,9 +9,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import { PASSWORD_REGEX } from "@parallel/utils/validation";
 import { ReactElement, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { PasswordStrengthIndicator } from "../common/PasswordStrengthIndicator";
 
 export interface PasswordResetData {
   verificationCode: string;
@@ -40,6 +42,7 @@ export function PasswordResetForm({
     formState: { errors },
     getValues,
     setError,
+    watch,
     clearErrors,
   } = useForm<PasswordResetData>({ mode: "onBlur" });
   useEffect(() => {
@@ -96,9 +99,10 @@ export function PasswordResetForm({
           <PasswordInput
             {...register("password", {
               required: true,
-              validate: (value) => value.length >= 8,
+              pattern: PASSWORD_REGEX,
             })}
           />
+          <PasswordStrengthIndicator watch={watch} />
           <FormErrorMessage>
             {errors.password && (
               <FormattedMessage

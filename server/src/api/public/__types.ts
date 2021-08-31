@@ -618,6 +618,7 @@ export type MutationcreateOrganizationUserArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
   role: OrganizationRole;
 };
 
@@ -676,6 +677,7 @@ export type MutationcreateUserArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
   organizationId: Scalars["Int"];
   password: Scalars["String"];
   role: OrganizationRole;

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export type PublicSignupFormExperienceProps = {
+  loading: boolean;
   onBack: () => void;
   onFinish: ({
     industry,
@@ -16,7 +17,11 @@ export type PublicSignupFormExperienceProps = {
   }) => void;
 };
 
-export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFormExperienceProps) {
+export function PublicSignupFormExperience({
+  onBack,
+  onFinish,
+  loading,
+}: PublicSignupFormExperienceProps) {
   const intl = useIntl();
   const [industry, setIndustry] = useState("");
   const [role, setRole] = useState("");
@@ -341,6 +346,7 @@ export function PublicSignupFormExperience({ onBack, onFinish }: PublicSignupFor
             size="md"
             fontSize="md"
             onClick={handleComplete}
+            isLoading={loading}
           >
             <FormattedMessage
               id="component.public-signup-form-experience.complete-button"
