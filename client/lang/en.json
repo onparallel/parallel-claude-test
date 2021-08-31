@@ -2030,6 +2030,11 @@
     "context": "Password"
   },
   {
+    "term": "component.public-signup-form.password-requirements",
+    "definition": "Use 8 or more characters with a mix of letters and numbers.",
+    "context": "Use 8 or more characters with a mix of letters and numbers."
+  },
+  {
     "term": "component.public-signup-form.signup-button",
     "definition": "Sign up",
     "context": "Sign up"
@@ -3433,6 +3438,11 @@
     "term": "generic.forms.sso-user-error",
     "definition": "Your account uses SSO. To reset your password, please contact your team admin.",
     "context": "Your account uses SSO. To reset your password, please contact your team admin."
+  },
+  {
+    "term": "generic.forms.valid-password-error",
+    "definition": "Please, enter a valid password",
+    "context": "Please, enter a valid password"
   },
   {
     "term": "generic.forms.verification-code-label",

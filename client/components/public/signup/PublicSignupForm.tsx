@@ -7,6 +7,8 @@ import {
   FormLabel,
   Input,
   InputGroup,
+  Progress,
+  SimpleGrid,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -18,7 +20,8 @@ import {
 } from "@parallel/graphql/__types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm, UseFormWatch } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 type PublicSignupFormData = {
@@ -26,14 +29,17 @@ type PublicSignupFormData = {
   password: string;
 };
 
+const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/; // lowercase, uppercase, numbers and 8 chars
+const PSW_REGEX = [".*[0-9].*", "^(?=.*[a-z]).{1,}$", "^(?=.*[A-Z]).{1,}$", "^.{8,}$"]; // Same regex splitted for the strength component
+
 type PublicSignupFormProps = {
   onNext: ({ email, password }: PublicSignupFormData) => void;
 };
 export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
   const intl = useIntl();
 
-  const { handleSubmit, register, formState } = useForm<PublicSignupFormData>({
-    mode: "onBlur",
+  const { handleSubmit, register, formState, watch } = useForm<PublicSignupFormData>({
+    mode: "onSubmit",
     defaultValues: {
       email: "",
       password: "",
@@ -144,13 +150,15 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
           <PasswordInput
             {...register("password", {
               required: true,
+              pattern: PASSWORD_REGEX,
             })}
             autoComplete="current-password"
           />
+          <PasswordStrengthIndicator watch={watch} />
           <FormErrorMessage>
             <FormattedMessage
-              id="generic.forms.required-password-error"
-              defaultMessage="Please, enter a password"
+              id="generic.forms.valid-password-error"
+              defaultMessage="Please, enter a valid password"
             />
           </FormErrorMessage>
         </FormControl>
@@ -205,3 +213,34 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
     </form>
   );
 }
+
+const PasswordStrengthIndicator = ({ watch }: { watch: UseFormWatch<PublicSignupFormData> }) => {
+  const password = watch("password");
+  const [strength, setStrength] = useState(0);
+
+  useEffect(() => {
+    const res = PSW_REGEX.reduce((acc, value) => {
+      const re = new RegExp(value);
+      const test = re.test(password);
+      return acc + Number(test);
+    }, 0);
+    setStrength(res);
+  }, [password]);
+
+  return (
+    <>
+      <SimpleGrid columns={4} gap={2} mt={2} mb={1.5}>
+        <Progress value={strength >= 1 ? 100 : 0} colorScheme="green" size="xs" rounded="sm" />
+        <Progress value={strength >= 2 ? 100 : 0} colorScheme="green" size="xs" rounded="sm" />
+        <Progress value={strength >= 3 ? 100 : 0} colorScheme="green" size="xs" rounded="sm" />
+        <Progress value={strength === 4 ? 100 : 0} colorScheme="green" size="xs" rounded="sm" />
+      </SimpleGrid>
+      <Text textStyle="muted" fontSize="sm">
+        <FormattedMessage
+          id="component.public-signup-form.password-requirements"
+          defaultMessage="Use 8 or more characters with a mix of letters and numbers."
+        />
+      </Text>
+    </>
+  );
+};
