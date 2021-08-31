@@ -253,11 +253,14 @@ export class Auth implements IAuth {
 
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { email } = req.body;
+      const { email, locale } = req.body;
       await this.cognito
         .forgotPassword({
           ClientId: this.config.cognito.clientId,
           Username: email,
+          ClientMetadata: {
+            locale,
+          },
         })
         .promise();
       res.status(204).send();

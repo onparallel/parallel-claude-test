@@ -4,19 +4,16 @@ import { Config } from "../config";
 import { buildEmail } from "../emails/buildEmail";
 import AccountVerification from "../emails/components/AccountVerification";
 import Invitation from "../emails/components/Invitation";
+import ForgotPassword from "../emails/components/ForgotPassword";
 import { fullName } from "../util/fullName";
 
 interface CustomMessageRequest {
   userAttributes: {
-    sub: string;
-    email_verified: "True" | "false";
-    "cognito:user_status": "CONFIRMED" | "UNCONFIRMED" | "FORCE_CHANGE_PASSWORD";
     email: string;
     given_name?: string;
     family_name?: string;
   };
   codeParameter: string;
-  linkParameter: string;
   usernameParameter: string | null;
   clientMetadata: ClientMetadataType;
 }
@@ -40,15 +37,13 @@ function authenticateLambdaRequest(): Handler {
   };
 }
 
-export const lambdas = Router()
-  .use(json())
-  .use(authenticateLambdaRequest())
-  .post("/CustomMessage_SignUp", async (req, res, next) => {
+function customMessageAccountVerificationResponse(): Handler {
+  return async (req, res) => {
     const {
       userAttributes: { given_name: firstName, family_name: lastName, email },
       clientMetadata: { locale },
       codeParameter,
-    } = req.body as CustomMessageRequest;
+    } = req.body;
 
     const { subject, html } = await buildEmail(
       AccountVerification,
@@ -56,20 +51,23 @@ export const lambdas = Router()
         userName: fullName(firstName, lastName) || email,
         activationUrl: `${
           process.env.PARALLEL_URL
-        }/api/auth/verify-email?email=${encodeURIComponent(email)}&code=${codeParameter}&locale=${
-          locale || "en"
-        }`,
+        }/api/auth/verify-email?email=${encodeURIComponent(
+          email
+        )}&code=${codeParameter}&locale=${locale}`,
         ...layoutProps(req.context.config.misc),
       },
-      { locale: locale ?? "en" }
+      { locale }
     );
 
     res.json({
       emailSubject: subject,
       emailMessage: html,
     });
-  })
-  .post("/CustomMessage_AdminCreateUser", async (req, res) => {
+  };
+}
+
+function customMessageUserInviteResponse(): Handler {
+  return async (req, res) => {
     const {
       userAttributes: { given_name: firstName },
       clientMetadata: { organizationName, organizationUser, locale },
@@ -87,17 +85,45 @@ export const lambdas = Router()
         organizationUser: organizationUser!,
         ...layoutProps(req.context.config.misc),
       },
-      { locale: locale ?? "en" }
+      { locale }
     );
 
     res.json({
       emailSubject: subject,
       emailMessage: html,
     });
-  })
-  .post("/CustomMessage_ResendCode", async (req, res) => {
-    res.json({ emailSubject: "CustomMessage_ResendCode", emailMessage: req.body });
-  })
-  .post("/CustomMessage_ForgotPassword", async (req, res) => {
-    res.json({ emailSubject: "CustomMessage_ForgotPassword", emailMessage: req.body });
-  });
+  };
+}
+
+function customMessageForgotPasswordResponse(): Handler {
+  return async (req, res) => {
+    const {
+      userAttributes: { given_name: firstName },
+      clientMetadata: { locale },
+      codeParameter,
+    } = req.body as CustomMessageRequest;
+
+    const { subject, html } = await buildEmail(
+      ForgotPassword,
+      {
+        name: firstName!,
+        verificationCode: codeParameter,
+        ...layoutProps(req.context.config.misc),
+      },
+      { locale }
+    );
+
+    res.json({
+      emailSubject: subject,
+      emailMessage: html,
+    });
+  };
+}
+
+export const lambdas = Router()
+  .use(authenticateLambdaRequest())
+  .use(json())
+  .post("/CustomMessage_SignUp", customMessageAccountVerificationResponse())
+  .post("/CustomMessage_ResendCode", customMessageAccountVerificationResponse())
+  .post("/CustomMessage_AdminCreateUser", customMessageUserInviteResponse())
+  .post("/CustomMessage_ForgotPassword", customMessageForgotPasswordResponse());

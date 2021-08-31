@@ -63,6 +63,7 @@ function Login() {
         });
         await postJSON("/api/auth/forgot-password", {
           email,
+          locale: intl.locale,
         });
         setPasswordChange({ type: "RESET", email });
       } else {

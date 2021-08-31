@@ -31,6 +31,7 @@ function Forgot() {
     try {
       await postJSON("/api/auth/forgot-password", {
         email,
+        locale: intl.locale,
       });
       setVerification({ sent: true, email });
       toast({
