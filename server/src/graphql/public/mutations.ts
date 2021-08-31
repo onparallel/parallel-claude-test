@@ -1040,7 +1040,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             newPetition,
             [contact.id],
             {
-              subject: newPetition.email_subject!,
+              subject: newPetition.email_subject ?? publicPetitionLink!.title,
               body: JSON.parse(newPetition.email_body!),
             },
             linkOwner!,
