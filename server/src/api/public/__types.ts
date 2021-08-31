@@ -2133,8 +2133,6 @@ export type Query = {
   landingTemplatesSamples: Array<LandingTemplateSample>;
   me: User;
   organization: Maybe<Organization>;
-  /** Checks if the provided organization name is available to be registered on Parallel */
-  organizationNameIsAvailable: Scalars["Boolean"];
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
   petition: Maybe<PetitionBase>;
@@ -2207,10 +2205,6 @@ export type QuerylandingTemplatesArgs = {
 
 export type QueryorganizationArgs = {
   id: Scalars["GID"];
-};
-
-export type QueryorganizationNameIsAvailableArgs = {
-  name: Scalars["String"];
 };
 
 export type QueryorganizationsArgs = {

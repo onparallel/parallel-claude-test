@@ -31,7 +31,6 @@ import { maxLength } from "../helpers/validators/maxLength";
 import { validPassword } from "../helpers/validators/validPassword";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
-import { organizationNameIsAvailable } from "../helpers/validators/organizationNameIsAvailable";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
@@ -306,10 +305,9 @@ export const userSignUp = mutationField("userSignUp", {
     position: stringArg(),
   },
   validateArgs: validateAnd(
-    validPassword((args) => args.password, 8),
+    validPassword((args) => args.password),
     validEmail((args) => args.email, "email"),
     emailIsAvailable((args) => args.email, "email"),
-    organizationNameIsAvailable((args) => args.organizationName, "organizationName"),
     validateIf(
       (args) => isDefined(args.organizationLogo),
       validateFile(
@@ -342,7 +340,13 @@ export const userSignUp = mutationField("userSignUp", {
       const org = await ctx.organizations.createOrganization(
         {
           name: args.organizationName,
-          identifier: args.organizationName.trim().toLowerCase().replace(/ /g, "-"),
+          identifier: args.organizationName
+            .trim()
+            .toLowerCase()
+            .replace(/ /g, "-")
+            // make sure the identifier is unique on organizations with the same name
+            // TODO maybe we can drop this column in db
+            .concat(random(6)),
           status: "ACTIVE",
           logo_public_file_id: logoFile?.id ?? null,
         },

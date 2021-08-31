@@ -3145,11 +3145,6 @@ type Query {
   organization(id: GID!): Organization
 
   """
-  Checks if the provided organization name is available to be registered on Parallel
-  """
-  organizationNameIsAvailable(name: String!): Boolean!
-
-  """
   The organizations registered in Parallel.
   """
   organizations(

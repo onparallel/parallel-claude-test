@@ -12,7 +12,7 @@ async function post(url, data) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Content-Length": dataString.length,
+          Authorization: `Bearer ${process.env.AWS_LAMBDA_PARALLEL_SECRET}`,
         },
       },
       (res) => {
@@ -43,10 +43,14 @@ async function post(url, data) {
 }
 
 exports.handler = async (event, context, callback) => {
-  event.response = await post(
-    `${process.env.PARALLEL_BASE_URL}/api/lambda/${event.triggerSource}`,
-    event.request
-  );
+  try {
+    event.response = await post(
+      `${process.env.PARALLEL_BASE_URL}/api/lambda/${event.triggerSource}`,
+      event.request
+    );
+  } catch (e) {
+    console.error(e);
+  }
 
   callback(null, event);
 };

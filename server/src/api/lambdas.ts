@@ -1,4 +1,4 @@
-import { json, Router } from "express";
+import { Router, json, Handler } from "express";
 import { Config } from "../config";
 import { buildEmail } from "../emails/buildEmail";
 import AccountVerification from "../emails/components/AccountVerification";
@@ -28,8 +28,19 @@ function layoutProps(config: Config["misc"]) {
   };
 }
 
+function authenticateLambdaRequest(): Handler {
+  return (req, res, next) => {
+    if (req.headers.authorization !== `Bearer ${process.env.AWS_LAMBDA_PARALLEL_SECRET}`) {
+      res.sendStatus(401).end();
+    } else {
+      next();
+    }
+  };
+}
+
 export const lambdas = Router()
   .use(json())
+  .use(authenticateLambdaRequest())
   .post("/CustomMessage_SignUp", async (req, res, next) => {
     try {
       const {
@@ -54,13 +65,7 @@ export const lambdas = Router()
 
       res.json({
         emailSubject: subject,
-        emailMessage: html
-          //TODO improve this. This chars make Cognito CustomMessage's to throw error
-          .replace(/à/g, "a")
-          .replace(/è/g, "e")
-          .replace(/ì/g, "i")
-          .replace(/ò/g, "o")
-          .replace(/ù/g, "u"),
+        emailMessage: html,
       });
     } catch (error) {
       next(error);

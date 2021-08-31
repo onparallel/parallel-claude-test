@@ -1339,7 +1339,6 @@ export interface NexusGenFieldTypes {
     landingTemplatesSamples: NexusGenRootTypes["LandingTemplateSample"][]; // [LandingTemplateSample!]!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
-    organizationNameIsAvailable: boolean; // Boolean!
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
@@ -2430,7 +2429,6 @@ export interface NexusGenFieldTypeNames {
     landingTemplatesSamples: "LandingTemplateSample";
     me: "User";
     organization: "Organization";
-    organizationNameIsAvailable: "Boolean";
     organizations: "OrganizationPagination";
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
@@ -3476,10 +3474,6 @@ export interface NexusGenArgTypes {
     organization: {
       // args
       id: NexusGenScalars["GID"]; // GID!
-    };
-    organizationNameIsAvailable: {
-      // args
-      name: string; // String!
     };
     organizations: {
       // args

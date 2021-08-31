@@ -6,7 +6,6 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validEmail } from "../helpers/validators/validEmail";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
-import { contextUserIsAdmin } from "./authorizers";
 
 export const userQueries = queryField((t) => {
   t.field("me", {
@@ -24,7 +23,6 @@ export const userQueries = queryField((t) => {
       email: nonNull(stringArg()),
     },
     validateArgs: validEmail((args) => args.email, "email"),
-    authorize: authenticateAnd(contextUserIsAdmin()),
     resolve: async (_, { email }, ctx) => {
       return !(await ctx.users.loadUserByEmail(email.trim().toLowerCase()));
     },
