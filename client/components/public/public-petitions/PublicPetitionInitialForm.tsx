@@ -120,7 +120,12 @@ export function PublicPetitionInitialForm({
         </Stack>
         <Box maxWidth={{ base: "auto", md: "25rem" }} width="100%" position="relative">
           <Collapse startingHeight={200} in={showMore}>
-            <Box ref={descriptionRef} dangerouslySetInnerHTML={{ __html: description }}></Box>
+            <Box
+              ref={descriptionRef}
+              whiteSpace="pre-wrap"
+              overflowWrap="break-word"
+              dangerouslySetInnerHTML={{ __html: description }}
+            ></Box>
             {canExpand ? (
               <Box
                 opacity={!showMore ? "1" : "0"}
