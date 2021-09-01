@@ -12292,6 +12292,12 @@ export type TokensQuery = {
   };
 };
 
+export type Login_resendVerificationCodeMutationVariables = Exact<{
+  email: Scalars["String"];
+}>;
+
+export type Login_resendVerificationCodeMutation = { resendVerificationCode: Result };
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
@@ -20004,6 +20010,26 @@ export function useTokensLazyQuery(
 }
 export type TokensQueryHookResult = ReturnType<typeof useTokensQuery>;
 export type TokensLazyQueryHookResult = ReturnType<typeof useTokensLazyQuery>;
+export const Login_resendVerificationCodeDocument = gql`
+  mutation Login_resendVerificationCode($email: String!) {
+    resendVerificationCode(email: $email)
+  }
+`;
+export function useLogin_resendVerificationCodeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    Login_resendVerificationCodeMutation,
+    Login_resendVerificationCodeMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    Login_resendVerificationCodeMutation,
+    Login_resendVerificationCodeMutationVariables
+  >(Login_resendVerificationCodeDocument, options);
+}
+export type Login_resendVerificationCodeMutationHookResult = ReturnType<
+  typeof useLogin_resendVerificationCodeMutation
+>;
 export const CurrentUserDocument = gql`
   query CurrentUser {
     me {

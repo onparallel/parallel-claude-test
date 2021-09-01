@@ -5880,6 +5880,21 @@
     "context": "Login"
   },
   {
+    "term": "public.login.activation-pending-body",
+    "definition": "Por favor, active su cuenta a través del enlace de activación que se envió a su correo electrónico.",
+    "context": "Please activate your account through the activation link that was sent to your email."
+  },
+  {
+    "term": "public.login.activation-pending-resend",
+    "definition": "¿No lo encuentras? <a>Reenviar correo</a>",
+    "context": "Can't find it? <a>Resend email.</a>"
+  },
+  {
+    "term": "public.login.activation-pending-title",
+    "definition": "Activación pendiente",
+    "context": "Activation pending"
+  },
+  {
     "term": "public.login.already-logged-in.continue-button",
     "definition": "Continuar como {name}",
     "context": "Continue as {name}"
@@ -6438,6 +6453,26 @@
     "term": "public.request-information.cta-title",
     "definition": "Empieza a agilizar tus peticiones de información",
     "context": "Start streamlining your petitions for information"
+  },
+  {
+    "term": "public.resend-activation-email.error-description",
+    "definition": "Por favor, inténtelo de nuevo más tarde",
+    "context": "Please try again later"
+  },
+  {
+    "term": "public.resend-activation-email.error-title",
+    "definition": "Algo ha fallado",
+    "context": "Something went wrong"
+  },
+  {
+    "term": "public.resend-activation-email.success-description",
+    "definition": "Por favor, revisa su correo.",
+    "context": "Please, check your email."
+  },
+  {
+    "term": "public.resend-activation-email.success-title",
+    "definition": "Enlace de activación enviado",
+    "context": "Activation link sent"
   },
   {
     "term": "public.resources.faq",

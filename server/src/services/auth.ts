@@ -215,6 +215,9 @@ export class Auth implements IAuth {
         case "PasswordResetRequiredException":
           res.status(401).send({ error: "PasswordResetRequired" });
           return;
+        case "UserNotConfirmedException":
+          res.status(401).send({ error: "UserNotConfirmedException" });
+          return;
         case "UserNotFoundException":
         case "NotAuthorizedException":
           res.status(401).send({ error: "InvalidUsernameOrPassword" });

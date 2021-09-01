@@ -1,5 +1,15 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { useToast } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  CloseButton,
+  Flex,
+  Stack,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { AlreadyLoggedIn } from "@parallel/components/auth/AlreadyLoggedIn";
 import { LoginData, LoginForm } from "@parallel/components/auth/LoginForm";
 import {
@@ -11,10 +21,14 @@ import { NormalLink } from "@parallel/components/common/Link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
-import { useCurrentUserQuery } from "@parallel/graphql/__types";
+import {
+  useCurrentUserQuery,
+  useLogin_resendVerificationCodeMutation,
+} from "@parallel/graphql/__types";
 import { postJSON } from "@parallel/utils/rest";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function Login() {
@@ -23,6 +37,8 @@ function Login() {
   const { data } = useCurrentUserQuery();
   const [showContinueAs, setShowContinueAs] = useState(Boolean(data?.me));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const inactiveEmail = useRef("");
   const [passwordChange, setPasswordChange] = useState<{
     type: "CHANGE" | "RESET";
     email: string;
@@ -48,6 +64,9 @@ function Login() {
     } catch (error: any) {
       if (error.error === "NewPasswordRequired") {
         setPasswordChange({ type: "CHANGE", email, password });
+      } else if (error.error === "UserNotConfirmedException") {
+        inactiveEmail.current = email;
+        setShowAlert(true);
       } else if (error.error === "PasswordResetRequired") {
         toast({
           title: intl.formatMessage({
@@ -134,6 +153,67 @@ function Login() {
     }
   }
 
+  const errorToast = () => {
+    toast({
+      title: intl.formatMessage({
+        id: "public.resend-activation-email.error-title",
+        defaultMessage: "Something went wrong",
+      }),
+      description: intl.formatMessage({
+        id: "public.resend-activation-email.error-description",
+        defaultMessage: "Please try again later",
+      }),
+      status: "error",
+      isClosable: true,
+    });
+  };
+
+  const [resendVerificationCode] = useLogin_resendVerificationCodeMutation();
+  const debouncedResendVerificationCode = useDebouncedAsync(
+    async () => {
+      try {
+        const { data } = await resendVerificationCode({
+          variables: {
+            email: inactiveEmail.current,
+          },
+        });
+        if (data?.resendVerificationCode === "SUCCESS") {
+          toast({
+            title: intl.formatMessage({
+              id: "public.resend-activation-email.success-title",
+              defaultMessage: "Activation link sent",
+            }),
+            description: intl.formatMessage({
+              id: "public.resend-activation-email.success-description",
+              defaultMessage: "Please, check your email.",
+            }),
+            status: "success",
+            isClosable: true,
+          });
+        } else {
+          errorToast();
+        }
+      } catch (error) {
+        errorToast();
+      }
+    },
+    400,
+    [inactiveEmail.current]
+  );
+
+  const handleResendActivationEmail = async () => {
+    try {
+      return await debouncedResendVerificationCode();
+    } catch (e) {
+      // "DEBOUNCED" error means the search was cancelled because user kept trying
+      if (e === "DEBOUNCED") {
+        return "DEBOUNCED";
+      } else {
+        throw e;
+      }
+    }
+  };
+
   return (
     <PublicLayout
       title={intl.formatMessage({
@@ -145,6 +225,59 @@ function Login() {
         defaultMessage: "Login to your Parallel account",
       })}
     >
+      {showAlert ? (
+        <Alert status="error" variant="subtle" zIndex={2}>
+          <Flex
+            maxWidth="container.lg"
+            alignItems="center"
+            justifyContent="flex-start"
+            marginX="auto"
+            width="100%"
+            paddingLeft={4}
+            paddingRight={12}
+          >
+            <AlertIcon />
+            <Stack spacing={1}>
+              <AlertTitle>
+                <FormattedMessage
+                  id="public.login.activation-pending-title"
+                  defaultMessage="Activation pending"
+                />
+              </AlertTitle>
+              <AlertDescription>
+                <Text>
+                  <FormattedMessage
+                    id="public.login.activation-pending-body"
+                    defaultMessage="Please activate your account through the activation link that was sent to your email."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="public.login.activation-pending-resend"
+                    defaultMessage="Can't find it? <a>Resend email.</a>"
+                    values={{
+                      a: (chunks: any) => (
+                        <strong>
+                          <Text as="a" cursor="pointer" onClick={handleResendActivationEmail}>
+                            {chunks}
+                          </Text>
+                        </strong>
+                      ),
+                    }}
+                  />
+                </Text>
+              </AlertDescription>
+            </Stack>
+          </Flex>
+          <CloseButton
+            position="absolute"
+            right="8px"
+            top="8px"
+            onClick={() => setShowAlert(false)}
+          />
+        </Alert>
+      ) : null}
+
       <PublicUserFormContainer>
         {showContinueAs ? (
           <AlreadyLoggedIn
@@ -187,6 +320,14 @@ function Login() {
     </PublicLayout>
   );
 }
+
+Login.mutations = [
+  gql`
+    mutation Login_resendVerificationCode($email: String!) {
+      resendVerificationCode(email: $email)
+    }
+  `,
+];
 
 Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   try {

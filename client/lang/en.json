@@ -5880,6 +5880,21 @@
     "context": "Login"
   },
   {
+    "term": "public.login.activation-pending-body",
+    "definition": "Please activate your account through the activation link that was sent to your email.",
+    "context": "Please activate your account through the activation link that was sent to your email."
+  },
+  {
+    "term": "public.login.activation-pending-resend",
+    "definition": "Can't find it? <a>Resend email.</a>",
+    "context": "Can't find it? <a>Resend email.</a>"
+  },
+  {
+    "term": "public.login.activation-pending-title",
+    "definition": "Activation pending",
+    "context": "Activation pending"
+  },
+  {
     "term": "public.login.already-logged-in.continue-button",
     "definition": "Continue as {name}",
     "context": "Continue as {name}"
@@ -6438,6 +6453,26 @@
     "term": "public.request-information.cta-title",
     "definition": "Start streamlining your petitions for information",
     "context": "Start streamlining your petitions for information"
+  },
+  {
+    "term": "public.resend-activation-email.error-description",
+    "definition": "Please try again later",
+    "context": "Please try again later"
+  },
+  {
+    "term": "public.resend-activation-email.error-title",
+    "definition": "Something went wrong",
+    "context": "Something went wrong"
+  },
+  {
+    "term": "public.resend-activation-email.success-description",
+    "definition": "Please, check your email.",
+    "context": "Please, check your email."
+  },
+  {
+    "term": "public.resend-activation-email.success-title",
+    "definition": "Activation link sent",
+    "context": "Activation link sent"
   },
   {
     "term": "public.resources.faq",
