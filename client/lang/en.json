@@ -1945,6 +1945,11 @@
     "context": "Attach an image you want to show in your emails."
   },
   {
+    "term": "component.public-signup-form-organization.remove-image",
+    "definition": "Remove image",
+    "context": "Remove image"
+  },
+  {
     "term": "component.public-signup-form-organization.upload-organizationLogo-button",
     "definition": "Upload logo",
     "context": "Upload logo"
@@ -3580,6 +3585,11 @@
     "context": "Petitions"
   },
   {
+    "term": "generic.please-try-again-later",
+    "definition": "Please try again later",
+    "context": "Please try again later"
+  },
+  {
     "term": "generic.previous-page",
     "definition": "Previous page",
     "context": "Previous page"
@@ -3643,6 +3653,11 @@
     "term": "generic.skip",
     "definition": "Skip",
     "context": "Skip"
+  },
+  {
+    "term": "generic.something-went-wrong",
+    "definition": "Something went wrong",
+    "context": "Something went wrong"
   },
   {
     "term": "generic.start",
@@ -6453,16 +6468,6 @@
     "term": "public.request-information.cta-title",
     "definition": "Start streamlining your petitions for information",
     "context": "Start streamlining your petitions for information"
-  },
-  {
-    "term": "public.resend-activation-email.error-description",
-    "definition": "Please try again later",
-    "context": "Please try again later"
-  },
-  {
-    "term": "public.resend-activation-email.error-title",
-    "definition": "Something went wrong",
-    "context": "Something went wrong"
   },
   {
     "term": "public.resend-activation-email.success-description",

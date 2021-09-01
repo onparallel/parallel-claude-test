@@ -5,15 +5,17 @@ import {
   FormErrorMessage,
   FormLabel,
   HStack,
+  IconButton,
   Image,
   Input,
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { CloseIcon } from "@parallel/chakra/icons";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Maybe } from "@parallel/utils/types";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export type PublicSignupFormOrganizationProps = {
   onBack: () => void;
@@ -127,11 +129,11 @@ function SelectLogoInput({
   setOrganizationLogo,
 }: {
   organizationLogo: Maybe<File> | undefined;
-  setOrganizationLogo: (arg0: File) => void;
+  setOrganizationLogo: (arg0: File | undefined) => void;
 }) {
+  const intl = useIntl();
   const [isMaxSizeExceeded, setIsMaxSizeExceeded] = useState(false);
   const organizationLogoInputRef = useRef<HTMLInputElement>(null);
-
   const handleFileChange = (files: Maybe<FileList>) => {
     const maxSize = 50000; //50 kB
     if (files?.length) {
@@ -144,6 +146,10 @@ function SelectLogoInput({
     } else {
       setIsMaxSizeExceeded(false);
     }
+  };
+
+  const handleRemoveLogo = () => {
+    setOrganizationLogo(undefined);
   };
 
   return (
@@ -217,11 +223,28 @@ function SelectLogoInput({
           borderColor="gray.200"
           marginTop={4}
           width="fit-content"
+          position="relative"
         >
           <Image
             maxHeight="140px"
             width="min-content"
             src={URL.createObjectURL(organizationLogo)}
+          />
+          <IconButton
+            pos="absolute"
+            size="sm"
+            variant="outline"
+            backgroundColor="white"
+            rounded="full"
+            top="-1rem"
+            right="-1rem"
+            fontSize="0.75rem"
+            aria-label={intl.formatMessage({
+              id: "component.public-signup-form-organization.remove-image",
+              defaultMessage: "Remove image",
+            })}
+            onClick={handleRemoveLogo}
+            icon={<CloseIcon />}
           />
         </Center>
       )}

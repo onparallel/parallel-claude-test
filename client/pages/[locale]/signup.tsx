@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Image, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, Stack, useToast } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { SimpleWizard } from "@parallel/components/common/SimpleWizard";
@@ -31,6 +31,7 @@ type FormDataType = {
 
 function Signup() {
   const intl = useIntl();
+  const toast = useToast();
 
   const finishStep = 3;
   const [index, setIndex] = useState(0);
@@ -49,12 +50,11 @@ function Signup() {
 
   const handleNextPage = async (data: any) => {
     formData.current = { ...(formData?.current ?? {}), ...data };
-    console.log("handleNextPage: ", formData.current);
     if (index === finishStep) {
       const currentData = formData.current;
       if (currentData) {
         try {
-          const res = await userSignUp({
+          await userSignUp({
             variables: {
               email: currentData.email,
               password: currentData.password,
@@ -68,12 +68,20 @@ function Signup() {
               position: currentData.position,
             },
           });
-
-          console.log("userSignUp: ", res);
           nextPage();
         } catch (error) {
-          console.log("error: ", error);
-          console.log("graphQL error: ", error?.graphQLErrors?.[0]?.extensions.code);
+          toast({
+            title: intl.formatMessage({
+              id: "generic.something-went-wrong",
+              defaultMessage: "Something went wrong",
+            }),
+            description: intl.formatMessage({
+              id: "generic.please-try-again-later",
+              defaultMessage: "Please try again later",
+            }),
+            status: "error",
+            isClosable: true,
+          });
         }
       }
     } else {

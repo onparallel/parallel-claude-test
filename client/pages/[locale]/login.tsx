@@ -157,11 +157,11 @@ function Login() {
   const resendErrorToast = () => {
     toast({
       title: intl.formatMessage({
-        id: "public.resend-activation-email.error-title",
+        id: "generic.something-went-wrong",
         defaultMessage: "Something went wrong",
       }),
       description: intl.formatMessage({
-        id: "public.resend-activation-email.error-description",
+        id: "generic.please-try-again-later",
         defaultMessage: "Please try again later",
       }),
       status: "error",

@@ -1945,6 +1945,11 @@
     "context": "Attach an image you want to show in your emails."
   },
   {
+    "term": "component.public-signup-form-organization.remove-image",
+    "definition": "Quitar imagen",
+    "context": "Remove image"
+  },
+  {
     "term": "component.public-signup-form-organization.upload-organizationLogo-button",
     "definition": "Subir logotipo",
     "context": "Upload logo"
@@ -3580,6 +3585,11 @@
     "context": "Petitions"
   },
   {
+    "term": "generic.please-try-again-later",
+    "definition": "Por favor, inténtelo de nuevo más tarde",
+    "context": "Please try again later"
+  },
+  {
     "term": "generic.previous-page",
     "definition": "Página anterior",
     "context": "Previous page"
@@ -3643,6 +3653,11 @@
     "term": "generic.skip",
     "definition": "Omitir",
     "context": "Skip"
+  },
+  {
+    "term": "generic.something-went-wrong",
+    "definition": "Algo ha fallado",
+    "context": "Something went wrong"
   },
   {
     "term": "generic.start",
@@ -6453,16 +6468,6 @@
     "term": "public.request-information.cta-title",
     "definition": "Empieza a agilizar tus peticiones de información",
     "context": "Start streamlining your petitions for information"
-  },
-  {
-    "term": "public.resend-activation-email.error-description",
-    "definition": "Por favor, inténtelo de nuevo más tarde",
-    "context": "Please try again later"
-  },
-  {
-    "term": "public.resend-activation-email.error-title",
-    "definition": "Algo ha fallado",
-    "context": "Something went wrong"
   },
   {
     "term": "public.resend-activation-email.success-description",

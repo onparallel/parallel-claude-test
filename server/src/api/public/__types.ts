@@ -929,6 +929,7 @@ export type MutationreopenPetitionArgs = {
 
 export type MutationresendVerificationCodeArgs = {
   email: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
 };
 
 export type MutationresetSignaturitOrganizationBrandingArgs = {
