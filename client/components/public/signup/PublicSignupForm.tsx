@@ -167,10 +167,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             marginTop={4}
             type="submit"
           >
-            <FormattedMessage
-              id="component.public-signup-form.signup-button"
-              defaultMessage="Sign up"
-            />
+            <FormattedMessage id="generic.continue" defaultMessage="Continue" />
           </Button>
         </Box>
         <Text align="center" fontSize="sm">

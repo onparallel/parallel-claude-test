@@ -1962,7 +1962,7 @@
   {
     "term": "component.public-signup-form-organization.upload-other-organizationLogo-button",
     "definition": "Subir otro logotipo",
-    "context": "Upload other logo"
+    "context": "Upload another logo"
   },
   {
     "term": "component.public-signup-form.description",
@@ -2026,13 +2026,8 @@
   },
   {
     "term": "component.public-signup-form.password-requirements",
-    "definition": "Utiliza 8 o más caracteres con diferentes tipos de letra y números.",
-    "context": "Use 8 or more characters with a mix of letters and numbers."
-  },
-  {
-    "term": "component.public-signup-form.signup-button",
-    "definition": "Registrarme",
-    "context": "Sign up"
+    "definition": "Utiliza 8 o más caracteres con mayúsculas, minúsculas y números.",
+    "context": "Use 8 or more characters with uppercase, lowercase and numbers."
   },
   {
     "term": "component.public-signup-form.work-email-label",

@@ -180,7 +180,7 @@ function SelectLogoInput({
           {organizationLogo ? (
             <FormattedMessage
               id="component.public-signup-form-organization.upload-other-organizationLogo-button"
-              defaultMessage="Upload other logo"
+              defaultMessage="Upload another logo"
             />
           ) : (
             <FormattedMessage

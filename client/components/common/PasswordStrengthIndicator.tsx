@@ -29,7 +29,7 @@ export const PasswordStrengthIndicator = ({ watch }: { watch: UseFormWatch<any> 
       <Text textStyle="muted" fontSize="sm">
         <FormattedMessage
           id="component.public-signup-form.password-requirements"
-          defaultMessage="Use 8 or more characters with a mix of letters and numbers."
+          defaultMessage="Use 8 or more characters with uppercase, lowercase and numbers."
         />
       </Text>
     </>

@@ -326,7 +326,7 @@ export const userSignUp = mutationField("userSignUp", {
       (args) => isDefined(args.organizationLogo),
       validateFile(
         (args) => args.organizationLogo!,
-        { contentType: "image/*", maxSize: 1024 * 1024 * 10 },
+        { contentType: "image/png", maxSize: 1024 * 50 },
         "organizationLogo"
       )
     )
@@ -360,7 +360,7 @@ export const userSignUp = mutationField("userSignUp", {
             .replace(/ /g, "-")
             // make sure the identifier is unique on organizations with the same name
             // TODO maybe we can drop this column in db
-            .concat(random(6)),
+            .concat(`-${random(6)}`),
           status: "ACTIVE",
           logo_public_file_id: logoFile?.id ?? null,
         },
