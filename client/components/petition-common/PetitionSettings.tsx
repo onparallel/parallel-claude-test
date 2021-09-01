@@ -44,7 +44,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { useRouter } from "next/router";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
@@ -69,7 +68,6 @@ function _PetitionSettings({
   validPetitionFields,
 }: PetitionSettingsProps) {
   const locales = useSupportedLocales();
-  const { query } = useRouter();
   const intl = useIntl();
   const hasSignature =
     petition.__typename === "Petition" &&
@@ -158,7 +156,7 @@ function _PetitionSettings({
     } catch {}
   }
 
-  const publicLinkURL = `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${query.locale}/pp/${publicLink?.slug}`;
+  const publicLinkURL = `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${petition.locale}/pp/${publicLink?.slug}`;
 
   const { onCopy: onCopyPublicLink, onCopyValue } = useClipboardWithToast({
     value: publicLinkURL,
@@ -200,7 +198,7 @@ function _PetitionSettings({
         if (data) {
           const { publicLink } = data.createPublicPetitionLink;
           onCopyValue(
-            `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${query.locale}/pp/${publicLink?.slug}`
+            `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${petition.locale}/pp/${publicLink?.slug}`
           );
         }
       }

@@ -29,6 +29,10 @@ export const useClipboardWithToast = ({ value, text }: { value: string; text: st
   }, [hasCopied]);
 
   useEffect(() => {
+    setCopyValue(value);
+  }, [value]);
+
+  useEffect(() => {
     if (copyValue !== value) onCopy();
   }, [copyValue]);
 
