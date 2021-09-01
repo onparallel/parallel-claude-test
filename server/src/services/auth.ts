@@ -496,13 +496,15 @@ export class Auth implements IAuth {
 
   async verifyEmail(req: Request, res: Response, next: NextFunction) {
     const { email, code, locale } = req.query as { email: string; code: string; locale: string };
-    await this.cognito
-      .confirmSignUp({
-        ClientId: this.config.cognito.clientId,
-        ConfirmationCode: code,
-        Username: email,
-      })
-      .promise();
+    try {
+      await this.cognito
+        .confirmSignUp({
+          ClientId: this.config.cognito.clientId,
+          ConfirmationCode: code,
+          Username: email,
+        })
+        .promise();
+    } catch {}
     res.redirect(`${process.env.PARALLEL_URL}/${locale}/login`);
   }
 }

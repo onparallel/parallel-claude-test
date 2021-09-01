@@ -84,12 +84,12 @@ function Signup() {
   return (
     <PublicLayout
       title={intl.formatMessage({
-        id: "public.login.title",
-        defaultMessage: "Login",
+        id: "public.login.signup",
+        defaultMessage: "Sign Up",
       })}
       description={intl.formatMessage({
-        id: "public.login.meta-description",
-        defaultMessage: "Login to your Parallel account",
+        id: "public.signup.meta-description",
+        defaultMessage: "Signup on Parallel",
       })}
       hideHeader
       hideFooter

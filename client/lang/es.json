@@ -5980,6 +5980,11 @@
     "context": "Update your password"
   },
   {
+    "term": "public.login.signup",
+    "definition": "Registro",
+    "context": "Sign Up"
+  },
+  {
     "term": "public.login.sso-enabled",
     "definition": "SSO activado",
     "context": "Single sign-on enabled"
@@ -6678,6 +6683,11 @@
     "term": "public.showcase-hero-alt",
     "definition": "Una imagen de la aplicación mostrando la información recibida utilizando Parallel",
     "context": "A screenshot of the app showcasing the information received using Parallel"
+  },
+  {
+    "term": "public.signup.meta-description",
+    "definition": "Regístrate en Parallel",
+    "context": "Signup on Parallel"
   },
   {
     "term": "public.solutions-link",
