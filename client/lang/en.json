@@ -4551,8 +4551,8 @@
   },
   {
     "term": "public-petition-reminder.body.parraf-1",
-    "definition": "We have sent a reminder to <b>{email}</b> with access to your previous request so you can get back and continue to complete it.",
-    "context": "We have sent a reminder to <b>{email}</b> with access to your previous request so you can get back and continue to complete it."
+    "definition": "We have sent a reminder to <b>{email}</b> with access to your previous petition so you can get back and continue to complete it.",
+    "context": "We have sent a reminder to <b>{email}</b> with access to your previous petition so you can get back and continue to complete it."
   },
   {
     "term": "public-petition-reminder.body.parraf-2",
@@ -5656,8 +5656,8 @@
   },
   {
     "term": "public.opt-out.done-body",
-    "definition": "We have informed the sender and you will not receive reminders anymore from this request.",
-    "context": "We have informed the sender and you will not receive reminders anymore from this request."
+    "definition": "We have informed the sender and you will not receive reminders anymore from this petition.",
+    "context": "We have informed the sender and you will not receive reminders anymore from this petition."
   },
   {
     "term": "public.opt-out.done-title",

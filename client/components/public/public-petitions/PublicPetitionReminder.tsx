@@ -37,7 +37,7 @@ export function PublicPetitionReminder({ organization, email }: PublicPetitionRe
           <Text>
             <FormattedMessage
               id="public-petition-reminder.body.parraf-1"
-              defaultMessage="We have sent a reminder to <b>{email}</b> with access to your previous request so you can get back and continue to complete it."
+              defaultMessage="We have sent a reminder to <b>{email}</b> with access to your previous petition so you can get back and continue to complete it."
               values={{ email }}
             />
           </Text>

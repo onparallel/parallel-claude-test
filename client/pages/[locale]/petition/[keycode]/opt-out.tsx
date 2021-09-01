@@ -106,7 +106,7 @@ function OptOut({ keycode, access }: OptOutProps) {
               <Text>
                 <FormattedMessage
                   id="public.opt-out.done-body"
-                  defaultMessage="We have informed the sender and you will not receive reminders anymore from this request."
+                  defaultMessage="We have informed the sender and you will not receive reminders anymore from this petition."
                 />
               </Text>
             </Stack>
