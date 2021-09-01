@@ -38,6 +38,7 @@ function Login() {
   const [showContinueAs, setShowContinueAs] = useState(Boolean(data?.me));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [activationLinkSent, setActivationLinkSent] = useState(false);
   const inactiveEmail = useRef("");
   const [passwordChange, setPasswordChange] = useState<{
     type: "CHANGE" | "RESET";
@@ -153,7 +154,7 @@ function Login() {
     }
   }
 
-  const errorToast = () => {
+  const resendErrorToast = () => {
     toast({
       title: intl.formatMessage({
         id: "public.resend-activation-email.error-title",
@@ -168,9 +169,28 @@ function Login() {
     });
   };
 
+  const resendSuccessToast = () => {
+    toast({
+      title: intl.formatMessage({
+        id: "public.resend-activation-email.success-title",
+        defaultMessage: "Activation link sent",
+      }),
+      description: intl.formatMessage({
+        id: "public.resend-activation-email.success-description",
+        defaultMessage: "Please, check your email.",
+      }),
+      status: "success",
+      isClosable: true,
+    });
+  };
+
   const [resendVerificationCode] = useLogin_resendVerificationCodeMutation();
   const debouncedResendVerificationCode = useDebouncedAsync(
     async () => {
+      if (activationLinkSent) {
+        resendSuccessToast();
+        return;
+      }
       try {
         const { data } = await resendVerificationCode({
           variables: {
@@ -179,27 +199,17 @@ function Login() {
           },
         });
         if (data?.resendVerificationCode === "SUCCESS") {
-          toast({
-            title: intl.formatMessage({
-              id: "public.resend-activation-email.success-title",
-              defaultMessage: "Activation link sent",
-            }),
-            description: intl.formatMessage({
-              id: "public.resend-activation-email.success-description",
-              defaultMessage: "Please, check your email.",
-            }),
-            status: "success",
-            isClosable: true,
-          });
+          resendSuccessToast();
+          setActivationLinkSent(true);
         } else {
-          errorToast();
+          resendErrorToast();
         }
       } catch (error) {
-        errorToast();
+        resendErrorToast();
       }
     },
-    400,
-    [inactiveEmail.current]
+    300,
+    [inactiveEmail.current, activationLinkSent]
   );
 
   const handleResendActivationEmail = async () => {
