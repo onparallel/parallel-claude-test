@@ -963,6 +963,7 @@ export interface MutationreopenPetitionArgs {
 
 export interface MutationresendVerificationCodeArgs {
   email: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
 }
 
 export interface MutationresetSignaturitOrganizationBrandingArgs {
@@ -12294,6 +12295,7 @@ export type TokensQuery = {
 
 export type Login_resendVerificationCodeMutationVariables = Exact<{
   email: Scalars["String"];
+  locale?: Maybe<Scalars["String"]>;
 }>;
 
 export type Login_resendVerificationCodeMutation = { resendVerificationCode: Result };
@@ -20011,8 +20013,8 @@ export function useTokensLazyQuery(
 export type TokensQueryHookResult = ReturnType<typeof useTokensQuery>;
 export type TokensLazyQueryHookResult = ReturnType<typeof useTokensLazyQuery>;
 export const Login_resendVerificationCodeDocument = gql`
-  mutation Login_resendVerificationCode($email: String!) {
-    resendVerificationCode(email: $email)
+  mutation Login_resendVerificationCode($email: String!, $locale: String) {
+    resendVerificationCode(email: $email, locale: $locale)
   }
 `;
 export function useLogin_resendVerificationCodeMutation(

@@ -956,7 +956,7 @@ type Mutation {
   """
   Sends an email with confirmation code to unconfirmed user emails
   """
-  resendVerificationCode(email: String!): Result!
+  resendVerificationCode(email: String!, locale: String): Result!
 
   """
   Removes the Signaturit Branding Ids of selected organization.

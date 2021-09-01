@@ -427,11 +427,12 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
   type: "Result",
   args: {
     email: nonNull(stringArg()),
+    locale: stringArg(),
   },
   validateArgs: validEmail((args) => args.email, "email"),
-  resolve: async (_, { email }, ctx) => {
+  resolve: async (_, { email, locale }, ctx) => {
     return await ctx.aws
-      .resendVerificationCode(email)
+      .resendVerificationCode(email, { locale: locale ?? "en" })
       .then(() => RESULT.SUCCESS)
       .catch(() => RESULT.FAILURE);
   },

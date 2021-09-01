@@ -3161,6 +3161,7 @@ export interface NexusGenArgTypes {
     resendVerificationCode: {
       // args
       email: string; // String!
+      locale?: string | null; // String
     };
     resetSignaturitOrganizationBranding: {
       // args

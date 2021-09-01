@@ -39,7 +39,7 @@ export interface IAws {
     clientMetadata: { locale: string }
   ): Promise<string>;
   deleteUser(email: string): Promise<void>;
-  resendVerificationCode(email: string): Promise<void>;
+  resendVerificationCode(email: string, clientMetadata: { locale: string }): Promise<void>;
 }
 
 export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
@@ -218,11 +218,12 @@ export class Aws implements IAws {
       .promise();
   }
 
-  async resendVerificationCode(email: string) {
+  async resendVerificationCode(email: string, clientMetadata: { locale: string }) {
     await this.cognitoIdP
       .resendConfirmationCode({
         ClientId: this.config.cognito.clientId,
         Username: email,
+        ClientMetadata: clientMetadata,
       })
       .promise();
   }

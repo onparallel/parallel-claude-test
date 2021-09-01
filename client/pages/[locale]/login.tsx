@@ -175,6 +175,7 @@ function Login() {
         const { data } = await resendVerificationCode({
           variables: {
             email: inactiveEmail.current,
+            locale: intl.locale,
           },
         });
         if (data?.resendVerificationCode === "SUCCESS") {
@@ -323,8 +324,8 @@ function Login() {
 
 Login.mutations = [
   gql`
-    mutation Login_resendVerificationCode($email: String!) {
-      resendVerificationCode(email: $email)
+    mutation Login_resendVerificationCode($email: String!, $locale: String) {
+      resendVerificationCode(email: $email, locale: $locale)
     }
   `,
 ];
