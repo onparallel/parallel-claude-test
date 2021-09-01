@@ -19,14 +19,11 @@ const email: Email<ForgotPasswordProps> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ verificationCode }, intl) {
-    return intl.formatMessage(
-      {
-        id: "forgot-password.subject",
-        defaultMessage: "Your verification code is {verificationCode}",
-      },
-      { verificationCode }
-    );
+  subject({}, intl) {
+    return intl.formatMessage({
+      id: "forgot-password.subject",
+      defaultMessage: "Your verification code",
+    });
   },
   text({ name, verificationCode }: ForgotPasswordProps, intl: IntlShape) {
     return outdent`

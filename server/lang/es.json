@@ -76,8 +76,8 @@
   },
   {
     "term": "forgot-password.subject",
-    "definition": "Tu código de verificación es {verificationCode}",
-    "context": "Your verification code is {verificationCode}"
+    "definition": "Tu código de verificación",
+    "context": "Your verification code"
   },
   {
     "term": "forgot-password.verification-code-1",

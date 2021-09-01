@@ -11,7 +11,7 @@ export function closing({}, intl: IntlShape) {
     })}
     ${intl.formatMessage({
       id: "closing.sender",
-      defaultMessage: "The Parallel team",
+      defaultMessage: "The Parallel team.",
     })}
     `;
 }
