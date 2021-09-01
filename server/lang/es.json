@@ -15,14 +15,14 @@
     "context": "Activate my account"
   },
   {
-    "term": "account-verification.ignore",
-    "definition": "Si no has solicitado este correo, simplemente ignóralo.",
-    "context": "If you did not ask for this email just ignore it."
+    "term": "account-verification.intro-text.html",
+    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente dale al botón para activar tu cuenta.",
+    "context": "You are almost on Parallel, to start using Parallel just click on the activate account button below."
   },
   {
-    "term": "account-verification.intro-text",
-    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente dale al botón para verificar tu cuenta.  ",
-    "context": "You are almost on Parallel, to start using Parallel just click the verify email button below."
+    "term": "account-verification.intro-text.plain",
+    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente haz click en el siguiente enlace:",
+    "context": "You are almost on Parallel, to start using Parallel just click on the link below."
   },
   {
     "term": "account-verification.subject",
@@ -41,12 +41,12 @@
   },
   {
     "term": "closing.sender",
-    "definition": "El equipo de Parallel",
-    "context": "The Parallel team"
+    "definition": "El equipo de Parallel.",
+    "context": "The Parallel team."
   },
   {
     "term": "closing.text",
-    "definition": "Saludos",
+    "definition": "Saludos,",
     "context": "Regards,"
   },
   {
@@ -73,11 +73,6 @@
     "term": "footer.slogan",
     "definition": "Trabaja mejor con",
     "context": "Work better with"
-  },
-  {
-    "term": "forgot-password.ignore-text",
-    "definition": "Si no has solicitado el cambio de tu contraseña ignora por favor este email.",
-    "context": "If you didn't request to change your password please ignore this email."
   },
   {
     "term": "forgot-password.subject",
@@ -161,8 +156,18 @@
   },
   {
     "term": "invitation.subject",
-    "definition": "{organizationUser} te ha invitado a unirte a {organizationName}",
-    "context": "{organizationUser} has invited you to join {organizationName}"
+    "definition": "{organizationUser} te ha invitado a unirte a Parallel",
+    "context": "{organizationUser} has invited you to join Parallel"
+  },
+  {
+    "term": "invitation.text",
+    "definition": "{organizationUser} the ha invitado a unirte a la organización {organizationName} en Parallel.",
+    "context": "{organizationUser} has invited you to join {organizationName} organization in Parallel."
+  },
+  {
+    "term": "invitation.tmp-password-expiry",
+    "definition": "Esta contraseña caducará en 30 días, intenta utilizarla lo antes posible.",
+    "context": "This password will expire in 30 days, try to use it as soon as possible."
   },
   {
     "term": "invitation.website",

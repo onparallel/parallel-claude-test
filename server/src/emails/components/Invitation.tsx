@@ -22,13 +22,13 @@ const email: Email<InvitationProps> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ organizationUser, organizationName }, intl) {
+  subject({ organizationUser }, intl) {
     return intl.formatMessage(
       {
         id: "invitation.subject",
-        defaultMessage: "{organizationUser} has invited you to join {organizationName}",
+        defaultMessage: "{organizationUser} has invited you to join Parallel",
       },
-      { organizationName, organizationUser }
+      { organizationUser }
     );
   },
   text(
@@ -43,8 +43,9 @@ const email: Email<InvitationProps> = {
     
     ${intl.formatMessage(
       {
-        id: "invitation.subject",
-        defaultMessage: "{organizationUser} has invited you to join {organizationName}",
+        id: "invitation.text",
+        defaultMessage:
+          "{organizationUser} has invited you to join {organizationName} organization in Parallel.",
       },
       { organizationName, organizationUser }
     )}
@@ -58,6 +59,11 @@ const email: Email<InvitationProps> = {
     )}
 
     ${password}
+
+    ${intl.formatMessage({
+      id: "invitation.tmp-password-expiry",
+      defaultMessage: "This password will expire in 30 days, try to use it as soon as possible.",
+    })}
 
     ${intl.formatMessage({
       id: "invitation.website",
@@ -86,8 +92,8 @@ const email: Email<InvitationProps> = {
             <Greeting name={userName} />
             <MjmlText>
               <FormattedMessage
-                id="invitation.subject"
-                defaultMessage="{organizationUser} has invited you to join {organizationName}"
+                id="invitation.text"
+                defaultMessage="{organizationUser} has invited you to join {organizationName} organization in Parallel."
                 values={{ organizationUser, organizationName }}
               />
             </MjmlText>
@@ -100,6 +106,12 @@ const email: Email<InvitationProps> = {
             </MjmlText>
             <MjmlText>
               <b>{password}</b>
+            </MjmlText>
+            <MjmlText>
+              <FormattedMessage
+                id="invitation.tmp-password-expiry"
+                defaultMessage="This password will expire in 30 days, try to use it as soon as possible."
+              />
             </MjmlText>
             <MjmlText>
               <FormattedMessage

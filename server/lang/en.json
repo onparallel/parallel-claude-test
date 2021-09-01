@@ -15,14 +15,14 @@
     "context": "Activate my account"
   },
   {
-    "term": "account-verification.ignore",
-    "definition": "If you did not ask for this email just ignore it.",
-    "context": "If you did not ask for this email just ignore it."
+    "term": "account-verification.intro-text.html",
+    "definition": "You are almost on Parallel, to start using Parallel just click on the activate account button below.",
+    "context": "You are almost on Parallel, to start using Parallel just click on the activate account button below."
   },
   {
-    "term": "account-verification.intro-text",
-    "definition": "You are almost on Parallel, to start using Parallel just click the verify email button below.",
-    "context": "You are almost on Parallel, to start using Parallel just click the verify email button below."
+    "term": "account-verification.intro-text.plain",
+    "definition": "You are almost on Parallel, to start using Parallel just click on the link below.",
+    "context": "You are almost on Parallel, to start using Parallel just click on the link below."
   },
   {
     "term": "account-verification.subject",
@@ -41,8 +41,8 @@
   },
   {
     "term": "closing.sender",
-    "definition": "The Parallel team",
-    "context": "The Parallel team"
+    "definition": "The Parallel team.",
+    "context": "The Parallel team."
   },
   {
     "term": "closing.text",
@@ -73,11 +73,6 @@
     "term": "footer.slogan",
     "definition": "Work better with",
     "context": "Work better with"
-  },
-  {
-    "term": "forgot-password.ignore-text",
-    "definition": "If you didn't request to change your password please ignore this email.",
-    "context": "If you didn't request to change your password please ignore this email."
   },
   {
     "term": "forgot-password.subject",
@@ -161,8 +156,18 @@
   },
   {
     "term": "invitation.subject",
-    "definition": "{organizationUser} has invited you to join {organizationName}",
-    "context": "{organizationUser} has invited you to join {organizationName}"
+    "definition": "{organizationUser} has invited you to join Parallel",
+    "context": "{organizationUser} has invited you to join Parallel"
+  },
+  {
+    "term": "invitation.text",
+    "definition": "{organizationUser} has invited you to join {organizationName} organization in Parallel.",
+    "context": "{organizationUser} has invited you to join {organizationName} organization in Parallel."
+  },
+  {
+    "term": "invitation.tmp-password-expiry",
+    "definition": "This password will expire in 30 days, try to use it as soon as possible.",
+    "context": "This password will expire in 30 days, try to use it as soon as possible."
   },
   {
     "term": "invitation.website",

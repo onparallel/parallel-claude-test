@@ -39,11 +39,6 @@ const email: Email<ForgotPasswordProps> = {
 
     ${verificationCode}
 
-    ${intl.formatMessage({
-      id: "forgot-password.ignore-text",
-      defaultMessage: "If you didn't request to change your password please ignore this email.",
-    })}
-
     ${closing({}, intl)}
     `;
   },
@@ -68,12 +63,6 @@ const email: Email<ForgotPasswordProps> = {
                 </MjmlText>
               </MjmlColumn>
             </MjmlSection>
-            <MjmlText>
-              <FormattedMessage
-                id="forgot-password.ignore-text"
-                defaultMessage="If you didn't request to change your password please ignore this email."
-              />
-            </MjmlText>
             <Closing />
           </MjmlColumn>
         </MjmlSection>

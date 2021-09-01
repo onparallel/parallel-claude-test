@@ -1,11 +1,12 @@
-import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
+import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { greeting } from "../common/texts";
+import { closing, greeting } from "../common/texts";
 
 export type AccountVerificationProps = {
   userName: string | null;
@@ -30,18 +31,14 @@ const email: Email<AccountVerificationProps> = {
       ${greeting({ name: userName }, intl)}
 
       ${intl.formatMessage({
-        id: "account-verification.intro-text",
+        id: "account-verification.intro-text.plain",
         defaultMessage:
-          "You are almost on Parallel, to start using Parallel just click the verify email button below.",
+          "You are almost on Parallel, to start using Parallel just click on the link below.",
       })}
 
       ${activationUrl}
 
-      ${intl.formatMessage({
-        id: "account-verification.ignore",
-        defaultMessage: "If you did not ask for this email just ignore it.",
-      })}
-
+      ${closing({}, intl)}
     `;
   },
   html({
@@ -59,8 +56,8 @@ const email: Email<AccountVerificationProps> = {
             <Greeting name={userName} />
             <MjmlText>
               <FormattedMessage
-                id="account-verification.intro-text"
-                defaultMessage="You are almost on Parallel, to start using Parallel just click the verify email button below."
+                id="account-verification.intro-text.html"
+                defaultMessage="You are almost on Parallel, to start using Parallel just click on the activate account button below."
               />
             </MjmlText>
           </MjmlColumn>
@@ -73,13 +70,7 @@ const email: Email<AccountVerificationProps> = {
                 defaultMessage="Activate my account"
               />
             </Button>
-            <MjmlSpacer height="20px" />
-            <MjmlText>
-              <FormattedMessage
-                id="account-verification.ignore"
-                defaultMessage="If you did not ask for this email just ignore it."
-              />
-            </MjmlText>
+            <Closing />
           </MjmlColumn>
         </MjmlSection>
       </Layout>
