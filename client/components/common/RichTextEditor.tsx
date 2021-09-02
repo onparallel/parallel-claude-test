@@ -67,7 +67,6 @@ import {
   withProps,
 } from "@udecode/plate-common";
 import {
-  createHistoryPlugin,
   createReactPlugin,
   isElement,
   Plate,
@@ -104,7 +103,8 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick, pipe } from "remeda";
 import { createEditor, Editor, Selection, Transforms } from "slate";
-import { ReactEditor, useSlate } from "slate-react";
+import { withHistory } from "slate-history";
+import { ReactEditor, useSlate, withReact } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
@@ -245,7 +245,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     } = usePlaceholderPlugin(placeholderOptions);
     const plugins = useConstant(() => [
       createReactPlugin(),
-      createHistoryPlugin(),
+      // createHistoryPlugin(), //This crashes when undo goes to new line
       createParagraphPlugin(),
       createBoldPlugin(),
       createItalicPlugin(),
@@ -293,7 +293,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       isReadOnly,
     });
     const editor = useConstant<CustomEditor>(() =>
-      pipe(createEditor(), withPlate({ id, plugins, options, components }))
+      pipe(withHistory(withReact(createEditor())), withPlate({ id, plugins, options, components }))
     );
 
     useImperativeHandle(
