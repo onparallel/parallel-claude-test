@@ -7540,6 +7540,16 @@
     "context": "{same, select, true {You} other {{user}}} created this petition {timeAgo}"
   },
   {
+    "term": "timeline.petition-message-bounced-description",
+    "definition": "We could not deliver the petition to contact {contactName} {timeAgo}",
+    "context": "We could not deliver the petition to contact {contactName} {timeAgo}"
+  },
+  {
+    "term": "timeline.petition-reminder-bounced-description",
+    "definition": "We could not send a reminder to contact {contactName} {timeAgo}",
+    "context": "We could not send a reminder to contact {contactName} {timeAgo}"
+  },
+  {
     "term": "timeline.petition-reopened-description",
     "definition": "{same, select, true {You} other {{user}}} reopened the petition {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} reopened the petition {timeAgo}"

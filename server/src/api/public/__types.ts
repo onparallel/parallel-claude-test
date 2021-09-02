@@ -1683,6 +1683,12 @@ export type PetitionMessage = CreatedAt & {
   status: PetitionMessageStatus;
 };
 
+export type PetitionMessageBouncedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  message: PetitionMessage;
+};
+
 /** The status of a petition message. */
 export type PetitionMessageStatus =
   /** The message was scheduled but has been cancelled. */
@@ -1737,6 +1743,12 @@ export type PetitionReminder = CreatedAt & {
   sender: Maybe<User>;
   /** The type of the reminder. */
   type: PetitionReminderType;
+};
+
+export type PetitionReminderBouncedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  reminder: PetitionReminder;
 };
 
 /** The type of a petition reminder. */

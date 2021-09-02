@@ -581,10 +581,24 @@ export const RecipientSignedEvent = createPetitionEvent("RecipientSignedEvent", 
 
 export const PetitionMessageBouncedEvent = createPetitionEvent(
   "PetitionMessageBouncedEvent",
-  (t) => {}
+  (t) => {
+    t.field("message", {
+      type: "PetitionMessage",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadMessage(root.data.petition_message_id))!;
+      },
+    });
+  }
 );
 
 export const PetitionReminderBouncedEvent = createPetitionEvent(
   "PetitionReminderBouncedEvent",
-  (t) => {}
+  (t) => {
+    t.field("reminder", {
+      type: "PetitionReminder",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadReminder(root.data.petition_reminder_id))!;
+      },
+    });
+  }
 );

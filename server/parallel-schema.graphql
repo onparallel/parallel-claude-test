@@ -2246,6 +2246,7 @@ type PetitionMessage implements CreatedAt {
 type PetitionMessageBouncedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  message: PetitionMessage!
 }
 
 """
@@ -2373,6 +2374,7 @@ type PetitionReminder implements CreatedAt {
 type PetitionReminderBouncedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  reminder: PetitionReminder!
 }
 
 """

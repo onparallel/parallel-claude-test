@@ -34,6 +34,8 @@ import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermis
 import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermissionRemovedEvent";
 import { TimelineAccessActivatedFromLinkEvent } from "./timeline/TimelineAccessActivatedFromLinkEvent";
 import { TimelineRecipientSignedEvent } from "./timeline/TimelineRecipientSignedEvent";
+import { TimelinePetitionMessageBouncedEvent } from "./timeline/TimelinePetitionMessageBouncedEvent";
+import { TimelinePetitionReminderBouncedEvent } from "./timeline/TimelinePetitionReminderBouncedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -124,6 +126,10 @@ export function PetitionActivityTimeline({
               <TimelineAccessActivatedFromLinkEvent event={event} />
             ) : event.__typename === "RecipientSignedEvent" ? (
               <TimelineRecipientSignedEvent event={event} />
+            ) : event.__typename === "PetitionMessageBouncedEvent" ? (
+              <TimelinePetitionMessageBouncedEvent event={event} />
+            ) : event.__typename === "PetitionReminderBouncedEvent" ? (
+              <TimelinePetitionReminderBouncedEvent event={event} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -238,12 +244,17 @@ PetitionActivityTimeline.fragments = {
       ... on RemindersOptOutEvent {
         ...TimelineRemindersOptOutEvent_RemindersOptOutEvent
       }
-
       ... on AccessActivatedFromPublicPetitionLinkEvent {
         ...TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent
       }
       ... on RecipientSignedEvent {
         ...TimelineRecipientSignedEvent_RecipientSignedEvent
+      }
+      ... on PetitionMessageBouncedEvent {
+        ...TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent
+      }
+      ... on PetitionReminderBouncedEvent {
+        ...TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEvent
       }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
@@ -278,5 +289,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelineRemindersOptOutEvent.fragments.RemindersOptOutEvent}
     ${TimelineAccessActivatedFromLinkEvent.fragments.AccessActivatedFromPublicPetitionLinkEvent}
     ${TimelineRecipientSignedEvent.fragments.RecipientSignedEvent}
+    ${TimelinePetitionMessageBouncedEvent.fragments.PetitionMessageBouncedEvent}
+    ${TimelinePetitionReminderBouncedEvent.fragments.PetitionReminderBouncedEvent}
   `,
 };

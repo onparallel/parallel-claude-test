@@ -1140,6 +1140,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
   };
   PetitionProgress: {
     // field return type
@@ -1161,6 +1162,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    reminder: NexusGenRootTypes["PetitionReminder"]; // PetitionReminder!
   };
   PetitionReopenedEvent: {
     // field return type
@@ -2279,6 +2281,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    message: "PetitionMessage";
   };
   PetitionProgress: {
     // field return type name
@@ -2300,6 +2303,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    reminder: "PetitionReminder";
   };
   PetitionReopenedEvent: {
     // field return type name
