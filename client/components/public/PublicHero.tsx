@@ -1,5 +1,16 @@
-import { AspectRatio, Box, BoxProps, Button, Center, Flex, Heading, Stack } from "@chakra-ui/react";
+import {
+  AspectRatio,
+  Box,
+  BoxProps,
+  Button,
+  Center,
+  Flex,
+  Heading,
+  HStack,
+  Stack,
+} from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
+import { FormattedMessage } from "react-intl";
 
 export interface PublicHeroProps extends BoxProps {
   image: string;
@@ -56,19 +67,23 @@ export function PublicHero({
           <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="150%">
             {subtitle}
           </Heading>
-          <Box paddingTop={8}>
+          <HStack
+            paddingTop={8}
+            marginBottom={{ base: 2, [breakpoint]: 0 }}
+            marginRight={{ base: 0, [breakpoint]: 2 }}
+            spacing={4}
+          >
             <NakedLink href={url}>
-              <Button
-                as="a"
-                size="lg"
-                colorScheme="purple"
-                marginBottom={{ base: 2, [breakpoint]: 0 }}
-                marginRight={{ base: 0, [breakpoint]: 2 }}
-              >
+              <Button as="a" size="lg" variant="outline" borderColor="gray.500">
                 {buttonText}
               </Button>
             </NakedLink>
-          </Box>
+            <NakedLink href="/signup">
+              <Button as="a" colorScheme="purple" size="lg">
+                <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
+              </Button>
+            </NakedLink>
+          </HStack>
         </Flex>
       </Center>
       <AspectRatio

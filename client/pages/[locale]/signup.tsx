@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Image, Stack, useToast } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { SimpleWizard } from "@parallel/components/common/SimpleWizard";
@@ -14,6 +14,7 @@ import { PublicSignupRightHeading } from "@parallel/components/public/signup/Pub
 import { useSignup_userSignUpMutation } from "@parallel/graphql/__types";
 import styles from "@parallel/styles/Signup.module.css";
 import { Maybe } from "@parallel/utils/types";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
@@ -31,10 +32,10 @@ type FormDataType = {
 
 function Signup() {
   const intl = useIntl();
-  const toast = useToast();
 
   const finishStep = 3;
   const [index, setIndex] = useState(0);
+  const genericErrorToast = useGenericErrorToast();
 
   const formData = useRef<FormDataType>();
 
@@ -56,32 +57,13 @@ function Signup() {
         try {
           await userSignUp({
             variables: {
-              email: currentData.email,
-              password: currentData.password,
-              firstName: currentData.firstName,
-              lastName: currentData.lastName,
-              organizationName: currentData.organizationName,
+              ...currentData,
               locale: intl.locale,
-              organizationLogo: currentData.organizationLogo,
-              industry: currentData.industry,
-              role: currentData.role,
-              position: currentData.position,
             },
           });
           nextPage();
         } catch (error) {
-          toast({
-            title: intl.formatMessage({
-              id: "generic.something-went-wrong",
-              defaultMessage: "Something went wrong",
-            }),
-            description: intl.formatMessage({
-              id: "generic.please-try-again-later",
-              defaultMessage: "Please try again later",
-            }),
-            status: "error",
-            isClosable: true,
-          });
+          genericErrorToast();
         }
       }
     } else {
@@ -139,7 +121,7 @@ function Signup() {
               <PublicSignupFormExperience
                 onBack={handlePreviousPage}
                 onFinish={handleNextPage}
-                loading={loading}
+                isLoading={loading}
               />
               <PublicSignupFormInbox email={formData?.current?.email ?? ""} />
             </SimpleWizard>

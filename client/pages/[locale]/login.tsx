@@ -27,6 +27,7 @@ import {
 } from "@parallel/graphql/__types";
 import { postJSON } from "@parallel/utils/rest";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -154,20 +155,7 @@ function Login() {
     }
   }
 
-  const resendErrorToast = () => {
-    toast({
-      title: intl.formatMessage({
-        id: "generic.something-went-wrong",
-        defaultMessage: "Something went wrong",
-      }),
-      description: intl.formatMessage({
-        id: "generic.please-try-again-later",
-        defaultMessage: "Please try again later",
-      }),
-      status: "error",
-      isClosable: true,
-    });
-  };
+  const genericErrorToast = useGenericErrorToast();
 
   const resendSuccessToast = () => {
     toast({
@@ -202,10 +190,10 @@ function Login() {
           resendSuccessToast();
           setActivationLinkSent(true);
         } else {
-          resendErrorToast();
+          genericErrorToast();
         }
       } catch (error) {
-        resendErrorToast();
+        genericErrorToast();
       }
     },
     300,

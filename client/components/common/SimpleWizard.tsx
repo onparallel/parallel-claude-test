@@ -8,12 +8,12 @@ export interface SimpleWizardProps extends FlexProps {
 
 export const SimpleWizard = ({ index, children, ...props }: SimpleWizardProps) => {
   const pages = React.Children.toArray(children);
-  const indexToDispaly = index <= pages.length ? index : 0;
+  const indexToDisplay = index <= pages.length ? index : 0;
   return (
     <>
       {pages.map((page, i) => {
         return (
-          <Flex key={i} {...props} display={i === indexToDispaly ? "flex" : "none"}>
+          <Flex key={i} {...props} display={i === indexToDisplay ? "flex" : "none"}>
             {page}
           </Flex>
         );

@@ -135,7 +135,7 @@ function SelectLogoInput({
   const [isMaxSizeExceeded, setIsMaxSizeExceeded] = useState(false);
   const organizationLogoInputRef = useRef<HTMLInputElement>(null);
   const handleFileChange = (files: Maybe<FileList>) => {
-    const maxSize = 50000; //50 kB
+    const maxSize = 1024 * 50; //50 kB
     if (files?.length) {
       if (files[0].size <= maxSize) {
         setOrganizationLogo(files[0] as any);
