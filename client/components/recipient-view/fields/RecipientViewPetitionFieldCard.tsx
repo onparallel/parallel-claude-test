@@ -79,11 +79,7 @@ export function RecipientViewPetitionFieldCard({
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
               </Text>
             )}
-            {field.optional ? (
-              <Text as="span" marginLeft={2} color="gray.400" fontSize="sm" fontWeight="normal">
-                <FormattedMessage id="generic.optional-field" defaultMessage="Optional" />
-              </Text>
-            ) : (
+            {field.optional ? null : (
               <Tooltip
                 placement="right"
                 label={intl.formatMessage({
@@ -247,8 +243,8 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
       breakpoint="sm"
       hideIconOnDesktop={true}
       label={intl.formatMessage({
-        id: "recipient-view.questions-button",
-        defaultMessage: "Questions?",
+        id: "recipient-view.doubts-button",
+        defaultMessage: "Doubts?",
       })}
       {...common}
     />

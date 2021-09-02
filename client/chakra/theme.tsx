@@ -23,6 +23,7 @@ export const theme = extendTheme({
   },
   shadows: {
     inline: "inset 0 0 0 3px rgba(66, 153, 225, 0.6)",
+    soft: "0px 4px 8px rgba(203, 213, 224, 0.2), 0px 8px 24px rgba(112, 144, 176, 0.15)",
   },
   fontSizes: {
     "2xs": "0.6rem",

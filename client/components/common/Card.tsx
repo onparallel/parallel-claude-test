@@ -15,7 +15,7 @@ export const Card = chakraForwardRef<"section", {}>(function Card({ children, ..
       border="1px solid"
       borderColor="gray.200"
       backgroundColor="white"
-      boxShadow="md"
+      boxShadow="soft"
       borderRadius="md"
       {...props}
     >

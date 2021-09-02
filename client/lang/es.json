@@ -3190,11 +3190,6 @@
     "context": "Omit"
   },
   {
-    "term": "generic.optional-field",
-    "definition": "Opcional",
-    "context": "Optional"
-  },
-  {
     "term": "generic.page-break",
     "definition": "Salto de página",
     "context": "Page break"
@@ -6535,6 +6530,11 @@
     "context": "Contents"
   },
   {
+    "term": "recipient-view.doubts-button",
+    "definition": "¿Dudas?",
+    "context": "Doubts?"
+  },
+  {
     "term": "recipient-view.expired-code-description",
     "definition": "El código ha caducado. Por favor, vuelva a intentarlo.",
     "context": "The code has expired. Please try again."
@@ -6678,11 +6678,6 @@
     "term": "recipient-view.progress",
     "definition": "Progreso",
     "context": "Progress"
-  },
-  {
-    "term": "recipient-view.questions-button",
-    "definition": "¿Preguntas?",
-    "context": "Questions?"
   },
   {
     "term": "recipient-view.remaining-attempts",

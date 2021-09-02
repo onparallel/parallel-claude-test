@@ -3190,11 +3190,6 @@
     "context": "Omit"
   },
   {
-    "term": "generic.optional-field",
-    "definition": "Optional",
-    "context": "Optional"
-  },
-  {
     "term": "generic.page-break",
     "definition": "Page break",
     "context": "Page break"
@@ -6535,6 +6530,11 @@
     "context": "Contents"
   },
   {
+    "term": "recipient-view.doubts-button",
+    "definition": "Doubts?",
+    "context": "Doubts?"
+  },
+  {
     "term": "recipient-view.expired-code-description",
     "definition": "The code has expired. Please try again.",
     "context": "The code has expired. Please try again."
@@ -6678,11 +6678,6 @@
     "term": "recipient-view.progress",
     "definition": "Progress",
     "context": "Progress"
-  },
-  {
-    "term": "recipient-view.questions-button",
-    "definition": "Questions?",
-    "context": "Questions?"
   },
   {
     "term": "recipient-view.remaining-attempts",
