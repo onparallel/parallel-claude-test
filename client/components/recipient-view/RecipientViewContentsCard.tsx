@@ -1,16 +1,20 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { CommentIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
   RecipientViewContentsCard_PublicUserFragment,
 } from "@parallel/graphql/__types";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
-import { FormattedMessage } from "react-intl";
+import { createElement } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { Card, CardProps } from "../common/Card";
+import { Divider } from "../common/Divider";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
@@ -31,102 +35,130 @@ export function RecipientViewContentsCard({
   const { query } = useRouter();
   const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
   return (
-    <Card padding={4} display="flex" flexDirection="column" {...props}>
-      <Heading display="flex" as="h3" fontSize="lg" marginBottom={2} alignItems="center">
-        <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
-      </Heading>
-      <Stack as={List} spacing={1} marginBottom={4}>
+    <Card display="flex" flexDirection="column" {...props}>
+      <Box paddingX={4} paddingY={3}>
+        <Heading display="flex" as="h3" fontSize="lg" alignItems="center">
+          <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
+        </Heading>
+      </Box>
+      <Divider />
+      <Stack as={List} spacing={1} paddingX={4} paddingY={3}>
         {pages.map(({ title, hasUnreadComments }, index) => (
           <ListItem key={index}>
-            <Text
-              as="h2"
-              display="flex"
-              paddingLeft={4}
-              position="relative"
-              fontWeight="bold"
-              isTruncated
-            >
-              {hasCommentsEnabled && index + 1 !== currentPage ? (
-                <RecipientViewCommentsBadge
-                  hasUnreadComments={hasUnreadComments}
-                  position="absolute"
-                  left="0"
-                  top="50%"
-                  transform="translate(0, -50%)"
-                />
-              ) : null}
+            <Text as="h2" display="flex" position="relative" fontWeight="bold" isTruncated>
               <NakedLink href={`/petition/${query.keycode}/${index + 1}`}>
                 <Box
+                  paddingX={4}
+                  paddingY={1}
+                  paddingLeft={1}
+                  rounded="md"
                   as="a"
                   display="block"
-                  flex="1"
-                  cursor="pointer"
-                  isTruncated
-                  {...(title
-                    ? {}
-                    : {
-                        color: "gray.500",
-                        fontWeight: "normal",
-                        fontStyle: "italic",
-                      })}
+                  w="100%"
                 >
-                  {title || (
-                    <FormattedMessage
-                      id="generic.empty-heading"
-                      defaultMessage="Untitled heading"
-                    />
-                  )}
+                  <HStack spacing={1}>
+                    <Box
+                      width="0"
+                      height="0"
+                      borderLeft="5px solid transparent"
+                      borderRight="5px solid transparent"
+                      borderTop="8px solid"
+                      borderTopColor="gray.500"
+                      transform={index + 1 !== currentPage ? "rotate(-90deg)" : undefined}
+                      transition="transform 0.2s ease"
+                      marginLeft={-0.5}
+                    ></Box>
+                    <Box
+                      flex="1"
+                      cursor="pointer"
+                      isTruncated
+                      {...(title
+                        ? {}
+                        : {
+                            color: "gray.500",
+                            fontWeight: "normal",
+                            fontStyle: "italic",
+                          })}
+                    >
+                      {title || (
+                        <FormattedMessage
+                          id="generic.empty-heading"
+                          defaultMessage="Untitled heading"
+                        />
+                      )}
+                    </Box>
+
+                    {hasUnreadComments && index + 1 !== currentPage ? (
+                      <Stack
+                        as="span"
+                        direction="row"
+                        display="inline-flex"
+                        alignItems="center"
+                        position="relative"
+                      >
+                        <RecipientViewCommentsBadge hasUnreadComments={hasUnreadComments} />
+                        <CommentIcon fontSize="sm" opacity="0.8" />
+                      </Stack>
+                    ) : null}
+                  </HStack>
                 </Box>
               </NakedLink>
             </Text>
             {index + 1 === currentPage ? (
-              <Stack as={List} spacing={1} paddingLeft={pages.length > 1 ? 2 : 0}>
+              <Stack as={List} spacing={1}>
                 {fields.slice(1).map((field) => (
                   <ListItem key={field.id} position="relative">
                     <Text
                       as={field.type === "HEADING" ? "h3" : "div"}
                       display="flex"
                       position="relative"
-                      paddingLeft={4}
                       fontWeight={field.type === "HEADING" ? "bold" : "normal"}
                     >
-                      {hasCommentsEnabled ? (
-                        <RecipientViewCommentsBadge
-                          hasUnreadComments={field.unreadCommentCount > 0}
-                          position="absolute"
-                          left="0"
-                          top="50%"
-                          transform="translate(0, -50%)"
-                        />
-                      ) : null}
-
                       <NakedLink href={`/petition/${query.keycode}/${index + 1}#field-${field.id}`}>
                         <Box
+                          _hover={{ backgroundColor: "gray.75" }}
+                          paddingX={4}
+                          paddingY={1}
+                          rounded="md"
                           as="a"
                           display="block"
-                          flex="1"
-                          cursor="pointer"
-                          isTruncated
-                          {...(field.title
-                            ? {}
-                            : {
-                                color: "gray.500",
-                                fontWeight: "normal",
-                                fontStyle: "italic",
-                              })}
+                          w="100%"
                         >
-                          {field.title ||
-                            (field.type === "HEADING" ? (
-                              <FormattedMessage
-                                id="generic.empty-heading"
-                                defaultMessage="Untitled heading"
-                              />
-                            ) : (
-                              <FormattedMessage
-                                id="generic.untitled-field"
-                                defaultMessage="Untitled field"
-                              />
-                            ))}
+                          <HStack spacing={1}>
+                            <Box
+                              flex="1"
+                              isTruncated
+                              {...(field.title
+                                ? {
+                                    color: field.replies.some((r) => r.status === "REJECTED")
+                                      ? "red.600"
+                                      : completedFieldReplies(field).length !== 0
+                                      ? "gray.400"
+                                      : "inherit",
+                                  }
+                                : {
+                                    color: field.validated ? "gray.500" : "red.600",
+                                    fontWeight: "normal",
+                                    fontStyle: "italic",
+                                  })}
+                            >
+                              {field.title ||
+                                (field.type === "HEADING" ? (
+                                  <FormattedMessage
+                                    id="generic.empty-heading"
+                                    defaultMessage="Untitled heading"
+                                  />
+                                ) : (
+                                  <FormattedMessage
+                                    id="generic.untitled-field"
+                                    defaultMessage="Untitled field"
+                                  />
+                                ))}
+                            </Box>
+                            {field.commentCount
+                              ? createElement(RecipientViewContentsIndicators, { field })
+                              : null}
+                          </HStack>
                         </Box>
                       </NakedLink>
                     </Text>
@@ -138,6 +170,48 @@ export function RecipientViewContentsCard({
         ))}
       </Stack>
     </Card>
+  );
+}
+
+function RecipientViewContentsIndicators({
+  field,
+}: {
+  field: RecipientViewContentsCard_PublicPetitionFieldFragment;
+}) {
+  const intl = useIntl();
+  return (
+    <>
+      {field.commentCount ? (
+        <Stack as="span" direction="row-reverse" display="inline-flex" alignItems="center">
+          <Stack
+            as="span"
+            direction="row-reverse"
+            spacing={1.5}
+            display="inline-flex"
+            alignItems="center"
+            color={!!field.unreadCommentCount ? "inherit" : "gray.500"}
+          >
+            <CommentIcon fontSize="sm" opacity="0.8" />
+            <Text
+              as="span"
+              fontSize="xs"
+              role="img"
+              aria-label={intl.formatMessage(
+                {
+                  id: "generic.comments-button-label",
+                  defaultMessage:
+                    "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+                },
+                { commentCount: field.commentCount }
+              )}
+            >
+              {intl.formatNumber(field.commentCount)}
+            </Text>
+          </Stack>
+          <RecipientViewCommentsBadge hasUnreadComments={!!field.unreadCommentCount} />
+        </Stack>
+      ) : null}
+    </>
   );
 }
 
@@ -194,9 +268,11 @@ RecipientViewContentsCard.fragments = {
         title
         options
         optional
+        validated
         isReadOnly
         replies {
           id
+          status
         }
         commentCount
         unreadCommentCount
