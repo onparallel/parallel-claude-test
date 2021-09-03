@@ -93,7 +93,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
         <Text marginBottom={2}>
           <FormattedMessage
             id="component.public-signup-form.description"
-            defaultMessage="Create your free account now and automate your workflow agilely and safety."
+            defaultMessage="Create your free account now and automate your workflow agilely and safely."
           />
         </Text>
         <FormControl id="email" isInvalid={!!errors.email}>
@@ -173,7 +173,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
         <Text align="center" fontSize="sm">
           <FormattedMessage
             id="component.public-signup-form.legal-text"
-            defaultMessage="By signing up you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
+            defaultMessage="By continuing you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
             values={{
               Terms: (chunks: any[]) => (
                 <NormalLink role="a" href="legal/terms" target="_blank">

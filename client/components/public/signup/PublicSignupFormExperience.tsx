@@ -42,91 +42,91 @@ export function PublicSignupFormExperience({
           id: "component.public-signup-form-experience.industry-advisory",
           defaultMessage: "Advisory",
         }),
-        value: "Advisory",
+        value: "advisory",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-consulting",
           defaultMessage: "Consulting",
         }),
-        value: "Consulting",
+        value: "consulting",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-e-commerce",
           defaultMessage: "E-commerce",
         }),
-        value: "E-commerce",
+        value: "e-commerce",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-education",
           defaultMessage: "Education",
         }),
-        value: "Education",
+        value: "education",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-entertainment",
           defaultMessage: "Entertainment",
         }),
-        value: "Entertainment",
+        value: "entertainment",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-financial-services",
           defaultMessage: "Financial Services",
         }),
-        value: "Financial Services",
+        value: "financial-services",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-government",
           defaultMessage: "Government",
         }),
-        value: "Government",
+        value: "government",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-healthcare",
           defaultMessage: "Healthcare",
         }),
-        value: "Healthcare",
+        value: "healthcare",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-legal",
           defaultMessage: "Legal",
         }),
-        value: "Legal",
+        value: "legal",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-outsourcing",
           defaultMessage: "Outsourcing",
         }),
-        value: "Outsourcing",
+        value: "outsourcing",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-real-estate",
           defaultMessage: "Real Estate",
         }),
-        value: "Real Estate",
+        value: "real-estate",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-software",
           defaultMessage: "Software",
         }),
-        value: "Software",
+        value: "software",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.industry-other",
           defaultMessage: "Other",
         }),
-        value: "Other",
+        value: "other",
       },
     ],
     [intl.locale]
@@ -139,42 +139,42 @@ export function PublicSignupFormExperience({
           id: "component.public-signup-form-experience.role-administration",
           defaultMessage: "Administration",
         }),
-        value: "Administration",
+        value: "administration",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-business-development",
           defaultMessage: "Business development",
         }),
-        value: "Business development",
+        value: "business-development",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-compliance",
           defaultMessage: "Compliance",
         }),
-        value: "Compliance",
+        value: "compliance",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-customer-service",
           defaultMessage: "Customer service",
         }),
-        value: "Customer service",
+        value: "customer-service",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-engineering",
           defaultMessage: "Engineering",
         }),
-        value: "Engineering",
+        value: "engineering",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-finance",
           defaultMessage: "Finance",
         }),
-        value: "Finance",
+        value: "finance",
       },
       {
         label: intl.formatMessage({
@@ -188,63 +188,63 @@ export function PublicSignupFormExperience({
           id: "component.public-signup-form-experience.role-hr",
           defaultMessage: "HR",
         }),
-        value: "HR",
+        value: "hr",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-it",
           defaultMessage: "IT",
         }),
-        value: "IT",
+        value: "it",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-legal",
           defaultMessage: "Legal",
         }),
-        value: "Legal",
+        value: "legal",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-marketing",
           defaultMessage: "Marketing",
         }),
-        value: "Marketing",
+        value: "marketing",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-operations",
           defaultMessage: "Operations",
         }),
-        value: "Operations",
+        value: "operations",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-procurement",
           defaultMessage: "Procurement",
         }),
-        value: "Procurement",
+        value: "procurement",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-product",
           defaultMessage: "Product",
         }),
-        value: "Product",
+        value: "product",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-sales",
           defaultMessage: "Sales",
         }),
-        value: "Sales",
+        value: "sales",
       },
       {
         label: intl.formatMessage({
           id: "component.public-signup-form-experience.role-other",
           defaultMessage: "Other",
         }),
-        value: "Other",
+        value: "other",
       },
     ],
     [intl.locale]

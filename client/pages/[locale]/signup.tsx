@@ -52,12 +52,11 @@ function Signup() {
   const handleNextPage = async (data: any) => {
     formData.current = { ...(formData?.current ?? {}), ...data };
     if (index === finishStep) {
-      const currentData = formData.current;
-      if (currentData) {
+      if (formData.current) {
         try {
           await userSignUp({
             variables: {
-              ...currentData,
+              ...formData.current,
               locale: intl.locale,
             },
           });

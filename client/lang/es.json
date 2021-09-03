@@ -1972,7 +1972,7 @@
   {
     "term": "component.public-signup-form.description",
     "definition": "Crea ya tu cuenta gratuita y automatiza tus procesos de una forma ágil y segura.",
-    "context": "Create your free account now and automate your workflow agilely and safety."
+    "context": "Create your free account now and automate your workflow agilely and safely."
   },
   {
     "term": "component.public-signup-form.email-placeholder",
@@ -2016,8 +2016,8 @@
   },
   {
     "term": "component.public-signup-form.legal-text",
-    "definition": "Haciéndo click en “Registrarme” aceptas nuestros <Terms>Términos y Condiciones</Terms> y la <Policy>Política de Privacidad</Policy>",
-    "context": "By signing up you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
+    "definition": "Al continuar aceptas nuestros <Terms>Términos y Condiciones</Terms> y la <Policy>Política de Privacidad</Policy>",
+    "context": "By continuing you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
   },
   {
     "term": "component.public-signup-form.login-text",
