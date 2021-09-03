@@ -15,6 +15,7 @@ import {
   Stack,
   Switch,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon, CommentIcon, PaperclipIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -139,7 +140,39 @@ export const PetitionRepliesField = Object.assign(
         {...props}
       >
         <Flex flexWrap="wrap" justifyContent="space-between">
-          <Flex width={{ base: "100%", lg: "auto" }} flex="1">
+          <Flex
+            width={{ base: "100%", lg: "auto" }}
+            flex="1"
+            position="relative"
+            paddingLeft={{ base: 2, md: 0 }}
+          >
+            {!field.optional ? (
+              <Tooltip
+                placement="bottom"
+                label={intl.formatMessage({
+                  id: "generic.required-field",
+                  defaultMessage: "Required field",
+                })}
+              >
+                <Box
+                  paddingLeft={{ base: 2.5, md: 0 }}
+                  width={4}
+                  height={4}
+                  textAlign="center"
+                  fontSize="xl"
+                  color="red.600"
+                  userSelect="none"
+                  position="absolute"
+                  left={0}
+                  top={0}
+                  transform="translate(-1.125rem, 50%)"
+                >
+                  <Box position="relative" bottom={2} pointerEvents="none">
+                    *
+                  </Box>
+                </Box>
+              </Tooltip>
+            ) : null}
             <PetitionFieldTypeIndicator marginTop="2px" type={field.type} fieldIndex={fieldIndex} />
             <Box marginLeft={4} flex="1">
               {field.title ? (
@@ -281,6 +314,7 @@ export const PetitionRepliesField = Object.assign(
           type
           title
           description
+          optional
           validated
           replies {
             ...PetitionRepliesField_PetitionFieldReply
