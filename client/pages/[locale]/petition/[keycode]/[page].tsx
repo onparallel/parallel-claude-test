@@ -635,7 +635,7 @@ function isLocalStorageAvailable() {
   try {
     localStorage.getItem("");
     return true;
-  } catch (e) {
+  } catch (e: any) {
     return false;
   }
 }

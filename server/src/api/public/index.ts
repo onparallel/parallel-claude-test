@@ -409,7 +409,7 @@ api
           { petitionId: params.petitionId, force: query.force ?? false }
         );
         return NoContent();
-      } catch (error) {
+      } catch (error: any) {
         if (
           error instanceof ClientError &&
           containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")
@@ -615,7 +615,7 @@ api
           }
         );
         return Ok(result.sendPetition.accesses!);
-      } catch (error) {
+      } catch (error: any) {
         if (
           error instanceof ClientError &&
           containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
@@ -746,7 +746,7 @@ api
           params
         );
         return Redirect(response.fileUploadReplyDownloadLink.url!);
-      } catch (error) {
+      } catch (error: any) {
         if (error instanceof ClientError && containsGraphQLError(error, "INVALID_FIELD_TYPE")) {
           throw new BadRequestError(`Reply "${params.replyId}" is not of "FILE" type`);
         }
@@ -1255,7 +1255,7 @@ api
           { templateId: params.templateId, force: query.force ?? false }
         );
         return NoContent();
-      } catch (error) {
+      } catch (error: any) {
         if (
           error instanceof ClientError &&
           containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")
@@ -1343,7 +1343,7 @@ api
           { data: body }
         );
         return Created(result.createContact!);
-      } catch (error) {
+      } catch (error: any) {
         if (error instanceof ClientError && containsGraphQLError(error, "EXISTING_CONTACT")) {
           throw new ConflictError("A contact with this email already exists");
         }

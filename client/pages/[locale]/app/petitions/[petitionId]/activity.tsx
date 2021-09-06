@@ -112,7 +112,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           await sendReminders({
             variables: { petitionId, accessIds, body: message },
           });
-        } catch (error) {
+        } catch (error: any) {
           const extra = error?.graphQLErrors?.[0]?.extensions?.extra;
           switch (extra?.errorCode) {
             case "NO_REMINDERS_LEFT": {
@@ -276,7 +276,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           isClosable: true,
           status: "success",
         });
-      } catch (e) {
+      } catch (e: any) {
         const extra = e?.graphQLErrors?.[0]?.extensions?.extra;
         if (e && !["CLOSE", "CANCEL"].includes(e.reason)) {
           switch (extra?.errorCode) {

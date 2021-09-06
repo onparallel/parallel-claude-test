@@ -175,7 +175,7 @@ export function validFieldVisibilityJson<TypeName extends string, FieldName exte
       const petitionId = petitionIdProp(args);
       const fieldId = fieldIdProp(args);
       await validateFieldVisibilityConditions(json, petitionId, fieldId, ctx);
-    } catch (e) {
+    } catch (e: any) {
       throw new ArgValidationError(info, argName, e.message);
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

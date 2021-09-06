@@ -54,7 +54,7 @@ async function extractTerms(input: string) {
     const terms = await readJson<Record<string, MessageDescriptor>>(tmpFileName);
     await fs.unlink(tmpFileName);
     return terms;
-  } catch (error) {
+  } catch (error: any) {
     console.log(chalk`[ {red error} ]`, error.stderr);
     throw error;
   }
@@ -68,7 +68,7 @@ async function loadLocaleData(dir: string, locale: string) {
       data.set(term, { term, definition, context });
     }
     return data;
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === "ENOENT") {
       return new Map<string, Term>();
     } else {

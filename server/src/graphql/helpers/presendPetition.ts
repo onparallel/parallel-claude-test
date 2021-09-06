@@ -65,7 +65,7 @@ export async function presendPetition(
       messages,
       result: RESULT.SUCCESS,
     };
-  } catch (error) {
+  } catch (error: any) {
     ctx.logger.error(error);
     return { result: RESULT.FAILURE, error };
   }

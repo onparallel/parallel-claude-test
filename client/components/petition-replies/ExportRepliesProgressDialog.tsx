@@ -73,7 +73,7 @@ function exportFile(
         } else {
           reject(result);
         }
-      } catch (e) {
+      } catch (e: any) {
         reject(e);
       }
     };
@@ -185,7 +185,7 @@ export function ExportRepliesProgressDialog({
               },
             },
           });
-        } catch (e) {
+        } catch (e: any) {
           return await processError(e);
         }
         uploaded += 1;
@@ -240,7 +240,7 @@ export function ExportRepliesProgressDialog({
               ),
             },
           });
-        } catch (e) {
+        } catch (e: any) {
           return await processError(e);
         }
         uploaded += 1;

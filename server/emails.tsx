@@ -95,7 +95,7 @@ app.get("/:email", async (req, res, next) => {
         </html>
       `);
     }
-  } catch (error) {
+  } catch (error: any) {
     const convert = new Convert();
     console.log(">>>>", error);
     res.status(500).send(/* html */ `

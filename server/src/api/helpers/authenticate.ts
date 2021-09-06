@@ -6,7 +6,7 @@ export function authenticate(): Handler {
     try {
       await authenticateFromRequest(req, req.context);
       next();
-    } catch (error) {
+    } catch (error: any) {
       next(new Error("Invalid session"));
     }
   };

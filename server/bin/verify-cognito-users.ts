@@ -32,7 +32,7 @@ const config = container.get<Config>(CONFIG);
             ],
           })
           .promise();
-      } catch (e) {
+      } catch (e: any) {
         console.error(`error updating ${email}:`);
         console.error(e);
       }

@@ -154,9 +154,9 @@ const _PathResolver: any = (function () {
         TBody
       >
     ) {
-      const { body, query, responses, excludeFromSpec, ...spec } = operationOptions;
+      const { body, query, excludeFromSpec, responses = {}, ...spec } = operationOptions;
       if (!excludeFromSpec) {
-        this.spec[method] = spec;
+        this.spec[method] = { ...spec, responses };
         if (body?.spec) {
           this.spec[method]!.requestBody = body?.spec;
         }
@@ -167,9 +167,6 @@ const _PathResolver: any = (function () {
             ...parameter.spec,
           })
         );
-        if (responses) {
-          this.spec[method]!.responses = responses;
-        }
       }
       this.router[method](this.path, async (req, res, next) => {
         const response: ResponseWrapper<any> = await (async () => {
@@ -184,7 +181,7 @@ const _PathResolver: any = (function () {
                 const value = req.params[name as keyof typeof req.params] as string;
                 try {
                   return await param.parse(value);
-                } catch (e) {
+                } catch (e: any) {
                   if (e instanceof ParseError) {
                     throw new InvalidParameterError(name as string, value, "path", e.message);
                   }
@@ -206,7 +203,7 @@ const _PathResolver: any = (function () {
                 }
                 try {
                   return await param.parse(value);
-                } catch (e) {
+                } catch (e: any) {
                   if (e instanceof ParseError) {
                     throw new InvalidParameterError(name as string, value, "query", e.message);
                   }
@@ -219,13 +216,13 @@ const _PathResolver: any = (function () {
             }
             context.body = req.body;
             return await resolver(context);
-          } catch (error) {
+          } catch (error: any) {
             if (error instanceof HttpError) {
               return error;
             } else if (this.apiOptions.errorHandler) {
               try {
                 return await this.apiOptions.errorHandler(error);
-              } catch (error) {
+              } catch (error: any) {
                 if (error instanceof HttpError) {
                   return error;
                 }

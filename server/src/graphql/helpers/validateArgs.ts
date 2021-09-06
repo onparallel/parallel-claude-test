@@ -20,8 +20,8 @@ export function validateOr<TypeName extends string, FieldName extends string>(
         try {
           await validator(root, args, ctx, info);
           return null;
-        } catch ({ message }) {
-          return message;
+        } catch (error) {
+          return error instanceof Error ? error.message : "";
         }
       })
     );

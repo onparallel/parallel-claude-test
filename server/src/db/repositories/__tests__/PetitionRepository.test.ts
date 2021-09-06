@@ -599,7 +599,7 @@ describe("repositories/PetitionRepository", () => {
         expect.assertions(1);
         try {
           await petitions.editPetitionPermissions([petitionId], [userId], [], "OWNER", users[0]);
-        } catch (e) {
+        } catch (e: any) {
           expect(e.constraint).toBe("petition_permission__owner");
         }
       });

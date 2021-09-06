@@ -23,7 +23,7 @@ export const webhooks = Router()
         const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
         handler?.(req.context, body, petitionId);
         res.sendStatus(200).end();
-      } catch (error) {
+      } catch (error: any) {
         req.context.logger.error(error);
         next(error);
       }

@@ -386,7 +386,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           });
           toast(petitionClosedNotificationToast);
         }
-      } catch (error) {
+      } catch (error: any) {
         // rethrow error to avoid continuing flow on function handleClosePetition
         if (["CANCEL", "CLOSE"].includes(error.reason)) {
           throw error;

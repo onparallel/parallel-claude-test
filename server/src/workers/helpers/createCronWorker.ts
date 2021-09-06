@@ -24,7 +24,7 @@ export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
       async () => {
         try {
           await handler(container.get<WorkerContext>(WorkerContext), config["cronWorkers"][name]);
-        } catch (error) {
+        } catch (error: any) {
           console.log(error);
           process.exit(1);
         }
@@ -54,7 +54,7 @@ export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
               `Successful execution in ${duration}ms. Next execution on ${nextExecution}`,
               { duration }
             );
-          } catch (error) {
+          } catch (error: any) {
             logger.error(error.stack);
           } finally {
             running = false;

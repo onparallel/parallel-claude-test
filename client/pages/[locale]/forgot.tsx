@@ -45,7 +45,7 @@ function Forgot() {
         status: "success",
         isClosable: true,
       });
-    } catch (error) {
+    } catch (error: any) {
       if (error.error === "ExternalUser") {
         setVerification({
           sent: false,
@@ -82,7 +82,7 @@ function Forgot() {
         isClosable: true,
       });
       router.push(`/${router.query.locale}/login`);
-    } catch (error) {
+    } catch (error: any) {
       setVerification({
         ...verification,
         hasVerificationCodeError: error.error === "InvalidVerificationCode",

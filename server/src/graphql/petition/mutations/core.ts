@@ -354,7 +354,7 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   resolve: async (_, args, ctx) => {
     try {
       return await ctx.petitions.updateFieldPositions(args.petitionId, args.fieldIds, ctx.user!);
-    } catch (e) {
+    } catch (e: any) {
       if (e.message === "INVALID_PETITION_FIELD_IDS") {
         throw new WhitelistedError("Invalid petition field ids", "INVALID_PETITION_FIELD_IDS");
       } else if (e.message === "INVALID_FIELD_CONDITIONS_ORDER") {
@@ -683,7 +683,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           options,
         });
         data.options = { ...field.options, ...options };
-      } catch (e) {
+      } catch (e: any) {
         throw new ArgValidationError(info, "data.options", e.toString());
       }
     }
@@ -971,7 +971,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
           args.preview ? "inline" : "attachment"
         ),
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof WhitelistedError) {
         throw error;
       }
@@ -1226,7 +1226,7 @@ export const sendReminders = mutationField("sendReminders", {
       await ctx.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
 
       return RESULT.SUCCESS;
-    } catch (error) {
+    } catch (error: any) {
       return RESULT.FAILURE;
     }
   },
@@ -1357,7 +1357,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
         args.type,
         ctx.user!
       );
-    } catch (e) {
+    } catch (e: any) {
       if (e.message === "UPDATE_FIXED_FIELD_ERROR") {
         throw new WhitelistedError(
           "Can't change type of a fixed field",

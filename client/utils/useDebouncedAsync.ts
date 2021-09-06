@@ -26,7 +26,7 @@ export function useDebouncedAsync<TReturn, T extends (...args: any[]) => Promise
         timeout.current = setTimeout(async () => {
           try {
             resolve(await callback(...args));
-          } catch (error) {
+          } catch (error: any) {
             reject(error);
           } finally {
             timeout.current = null;

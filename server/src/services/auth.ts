@@ -89,7 +89,7 @@ export class Auth implements IAuth {
       } else {
         res.json({ type: "PASSWORD" });
       }
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   }
@@ -190,7 +190,7 @@ export class Auth implements IAuth {
       });
       this.setSession(res, token);
       res.redirect(302, `/?url=${encodeURIComponent("/app/petitions")}`);
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   }
@@ -210,7 +210,7 @@ export class Auth implements IAuth {
       } else {
         res.status(401).send({ error: "UnknownError" });
       }
-    } catch (error) {
+    } catch (error: any) {
       switch (error.code) {
         case "PasswordResetRequiredException":
           res.status(401).send({ error: "PasswordResetRequired" });
@@ -246,7 +246,7 @@ export class Auth implements IAuth {
       } else {
         res.status(401).send({ error: "UnknownError" });
       }
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   }
@@ -261,7 +261,7 @@ export class Auth implements IAuth {
         })
         .promise();
       res.status(204).send();
-    } catch (error) {
+    } catch (error: any) {
       switch (error.code) {
         case "NotAuthorizedException":
           res.status(401).send({ error: "ExternalUser" });
@@ -287,7 +287,7 @@ export class Auth implements IAuth {
         })
         .promise();
       res.status(204).send();
-    } catch (error) {
+    } catch (error: any) {
       switch (error.code) {
         case "InvalidPasswordException":
           res.status(400).send({ error: "InvalidPassword" });
@@ -471,7 +471,7 @@ export class Auth implements IAuth {
         }
       }
       return this.users.loadUserByCognitoId(cognitoId);
-    } catch (error) {
+    } catch (error: any) {
       return null;
     }
   }

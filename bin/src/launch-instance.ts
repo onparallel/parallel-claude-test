@@ -102,7 +102,7 @@ async function main() {
   try {
     const result = await elbv2.describeTargetGroups({ Names: [targetGroupName] }).promise();
     targetGroupArn = result.TargetGroups![0].TargetGroupArn!;
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === "TargetGroupNotFound") {
       const result = await elbv2
         .createTargetGroup({

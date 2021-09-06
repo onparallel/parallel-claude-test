@@ -24,7 +24,7 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
   resolve: async (_, { tokenName }, ctx) => {
     try {
       return await ctx.userAuthentication.createUserAuthenticationToken(tokenName, ctx.user!);
-    } catch (e) {
+    } catch (e: any) {
       if (e.constraint === "user_authentication_token__token_name_user_id") {
         throw new WhitelistedError("Token name must be unique", "UNIQUE_TOKEN_NAME_ERROR");
       } else {

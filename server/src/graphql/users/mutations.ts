@@ -87,7 +87,7 @@ export const changePassword = mutationField("changePassword", {
     try {
       await ctx.auth.changePassword(ctx.req, password, newPassword);
       return "SUCCESS";
-    } catch (error) {
+    } catch (error: any) {
       switch (error.code) {
         case "NotAuthorizedException":
           return "INCORRECT_PASSWORD";

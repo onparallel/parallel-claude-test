@@ -44,7 +44,7 @@ export const createContact = mutationField("createContact", {
         ctx.user!,
         `User:${ctx.user!.id}`
       );
-    } catch (error) {
+    } catch (error: any) {
       if (error?.constraint === "contact__org_id__email") {
         throw new WhitelistedError("Contact already exists.", "EXISTING_CONTACT");
       } else {

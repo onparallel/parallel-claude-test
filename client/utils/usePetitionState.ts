@@ -17,7 +17,7 @@ export function usePetitionState() {
           const result = await updater(...args);
           setState("SAVED");
           return result;
-        } catch (error) {
+        } catch (error: any) {
           setState("ERROR");
           console.error(error);
           try {

@@ -18,7 +18,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
         body: JSON.stringify(mappedEvent),
         headers: { "Content-Type": "application/json" },
       });
-    } catch (e) {
+    } catch (e: any) {
       await ctx.emails.sendDeveloperWebhookFailedEmail(
         subscription.id,
         e.message ?? "",

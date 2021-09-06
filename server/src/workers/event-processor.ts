@@ -34,7 +34,7 @@ class EventProcessor {
         for (const listener of this.listeners.get(event.type)!) {
           try {
             await listener(event, ctx);
-          } catch (e) {
+          } catch (e: any) {
             // log error and continue to other listeners
             ctx.logger.error(e.stack);
           }

@@ -91,7 +91,7 @@ const identifiers = [
         );
 
         console.log(org.identifier, "migrated.");
-      } catch (e) {
+      } catch (e: any) {
         console.error(`Error processing ${org.identifier}`);
         console.error(e);
       }

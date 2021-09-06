@@ -213,7 +213,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           result: result.success ? RESULT.SUCCESS : RESULT.FAILURE,
           remainingAttempts: result.remainingAttempts,
         };
-      } catch (e) {
+      } catch (e: any) {
         throw new WhitelistedError("INVALID_TOKEN", "The token is no longer valid");
       }
     }, 2000);
@@ -425,7 +425,7 @@ export const publicCreateCheckboxReply = mutationField("publicCreateCheckboxRepl
     try {
       const field = (await ctx.petitions.loadField(args.fieldId))!;
       validateCheckboxReplyValues(field, args.values);
-    } catch (error) {
+    } catch (error: any) {
       throw new ArgValidationError(info, "values", error.message);
     }
   },
@@ -458,7 +458,7 @@ export const publicUpdateCheckboxReply = mutationField("publicUpdateCheckboxRepl
     try {
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       validateCheckboxReplyValues(field, args.values);
-    } catch (error) {
+    } catch (error: any) {
       throw new ArgValidationError(info, "values", error.message);
     }
   },
@@ -510,7 +510,7 @@ export const publicCreateDynamicSelectReply = mutationField("publicCreateDynamic
     try {
       const field = (await ctx.petitions.loadField(args.fieldId))!;
       validateDynamicSelectReplyValues(field, args.value);
-    } catch (error) {
+    } catch (error: any) {
       throw new ArgValidationError(info, "value", error.message);
     }
   },
@@ -543,7 +543,7 @@ export const publicUpdateDynamicSelectReply = mutationField("publicUpdateDynamic
     try {
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       validateDynamicSelectReplyValues(field, args.value);
-    } catch (error) {
+    } catch (error: any) {
       throw new ArgValidationError(info, "reply", error.message);
     }
   },
@@ -821,7 +821,7 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
       ]);
 
       return newAccess;
-    } catch (error) {
+    } catch (error: any) {
       // if the access already exists, just send the email
       if (error.constraint === "petition_access__petition_id_contact_id") {
         const petitionAccesses = await ctx.petitions.loadAccessesForPetition(petitionId);
@@ -1136,7 +1136,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
       ]);
 
       return RESULT.SUCCESS;
-    } catch (error) {
+    } catch (error: any) {
       return RESULT.FAILURE;
     }
   },

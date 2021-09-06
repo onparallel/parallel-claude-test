@@ -37,7 +37,7 @@ export const createTag = mutationField("createTag", {
         },
         ctx.user!
       );
-    } catch (error) {
+    } catch (error: any) {
       if (error.constraint === "tag__organization_id__name__unique") {
         throw new WhitelistedError(
           "The organization already has a tag with this name",
@@ -82,7 +82,7 @@ export const updateTag = mutationField("updateTag", {
     }
     try {
       return await ctx.tags.updateTag(args.id, data, ctx.user!);
-    } catch (error) {
+    } catch (error: any) {
       if (error.constraint === "tag__organization_id__name__unique") {
         throw new WhitelistedError(
           "The organization already has a tag with this name",
@@ -132,7 +132,7 @@ export const tagPetition = mutationField("tagPetition", {
     try {
       await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
       return (await ctx.petitions.loadPetition(args.petitionId))!;
-    } catch (error) {
+    } catch (error: any) {
       if (error.constraint === "petition_tag__petition_id__tag_id__unique") {
         throw new WhitelistedError(
           `Petition ${args.petitionId} is already tagged with tag ${args.tagId}`,

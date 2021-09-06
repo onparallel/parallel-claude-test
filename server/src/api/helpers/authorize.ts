@@ -9,7 +9,7 @@ export function authorize(): Handler {
         return res.status(401).send({ error: "InvalidUsernameOrPassword" });
       }
       next();
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   };

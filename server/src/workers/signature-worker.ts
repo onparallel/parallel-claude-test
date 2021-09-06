@@ -110,7 +110,7 @@ async function startSignatureProcess(
         },
       }),
     ]);
-  } catch (error) {
+  } catch (error: any) {
     const cancelData = { error: error.stack ?? JSON.stringify(error) } as {
       error: any;
       file?: string;

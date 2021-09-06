@@ -136,7 +136,7 @@ ThanksForSigning.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
         }
       );
     }
-  } catch (error) {
+  } catch (error: any) {
     return {};
   }
 };

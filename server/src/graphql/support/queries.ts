@@ -14,7 +14,7 @@ export const globalIdDecode = queryField("globalIdDecode", {
     try {
       const { id, type } = fromGlobalId(args.id);
       return { result: RESULT.SUCCESS, message: `${type}:${id}` };
-    } catch (e) {
+    } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.toString() };
     }
   },
@@ -41,7 +41,7 @@ export const globalIdEncode = queryField("globalIdEncode", {
         result: RESULT.SUCCESS,
         message: toGlobalId(args.type, args.id),
       };
-    } catch (e) {
+    } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.toString() };
     }
   },

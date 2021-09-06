@@ -43,7 +43,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
             container.get<WorkerContext>(WorkerContext),
             config.queueWorkers[name]
           );
-        } catch (error) {
+        } catch (error: any) {
           console.log(error);
           process.exit(1);
         }

@@ -115,7 +115,7 @@ export function withApolloData<P = {}>(
                 [SERVER_STATE]: apollo.cache.extract(),
               };
             }
-          } catch (error) {
+          } catch (error: any) {
             if (error instanceof RedirectError) {
               return redirect(context, error.location);
             }

@@ -45,7 +45,7 @@ function Login() {
       });
       await client.clearStore();
       window.location.href = `/${router.query.locale}/app/petitions`;
-    } catch (error) {
+    } catch (error: any) {
       if (error.error === "NewPasswordRequired") {
         setPasswordChange({ type: "CHANGE", email, password });
       } else if (error.error === "PasswordResetRequired") {
@@ -94,7 +94,7 @@ function Login() {
         newPassword,
       });
       router.push(`/${router.query.locale}/app/petitions`);
-    } catch (error) {}
+    } catch (error: any) {}
     setIsSubmitting(false);
   }
 
@@ -124,7 +124,7 @@ function Login() {
       });
       setPasswordChange(null);
       setIsSubmitting(false);
-    } catch (error) {
+    } catch (error: any) {
       setVerificationCodeStatus({
         hasVerificationCodeError: error.error === "InvalidVerificationCode",
         isInvalidPassword: error.error === "InvalidPassword",
@@ -204,7 +204,7 @@ Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
       `,
       { ignoreCache: true }
     );
-  } catch (error) {
+  } catch (error: any) {
     return {};
   }
 };

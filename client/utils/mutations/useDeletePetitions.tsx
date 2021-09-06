@@ -71,7 +71,7 @@ export function useDeletePetitions() {
         await deletePetitions({
           variables: { ids: petitionIds! },
         });
-      } catch (error) {
+      } catch (error: any) {
         const conflictingPetitionIds: string[] =
           error?.graphQLErrors?.[0]?.extensions?.petitionIds ?? [];
 

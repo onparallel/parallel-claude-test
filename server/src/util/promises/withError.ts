@@ -8,7 +8,7 @@ export async function withError<E = Error, T = any>(
 ): Promise<AsyncResult<T, E>> {
   try {
     return [null, isPromiseLike(value) ? await value : await value()];
-  } catch (e) {
+  } catch (e: any) {
     return [e];
   }
 }

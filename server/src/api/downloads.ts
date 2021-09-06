@@ -36,7 +36,7 @@ export const downloads = Router()
       );
       const zipFile = createZipFile(getPetitionFiles(ctx, petitionId, pattern, petition?.locale));
       zipFile.pipe(res);
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   })
@@ -94,7 +94,7 @@ export const downloads = Router()
         .header("content-type", "application/pdf")
         .send(buffer)
         .end();
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   });

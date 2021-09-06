@@ -77,7 +77,7 @@ function CreateOrUpdateUserDialog({
   const emailIsAvailable = async (value: string) => {
     try {
       return await debouncedEmailIsAvailable(value);
-    } catch (e) {
+    } catch (e: any) {
       // "DEBOUNCED" error means the search was cancelled because user kept typing
       if (e === "DEBOUNCED") {
         return "DEBOUNCED";

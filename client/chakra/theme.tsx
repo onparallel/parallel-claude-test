@@ -108,7 +108,7 @@ export const theme = extendTheme({
         },
       },
       variants: {
-        link: (props) => {
+        link: (props: any) => {
           return {
             fontWeight: "normal",
             borderRadius: "sm",

@@ -86,7 +86,7 @@ export const ContactSelect = Object.assign(
         ]);
         setIsCreating(false);
         return true;
-      } catch (error) {
+      } catch (error: any) {
         if (error?.graphQLErrors?.[0]?.extensions.code === "EXISTING_CONTACT") {
           errorToast();
         }

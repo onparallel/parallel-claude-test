@@ -86,7 +86,7 @@ function _all<TypeName extends string, FieldName extends string>(
         }),
         { concurrency }
       );
-    } catch (e) {
+    } catch (e: any) {
       // recapture "Not authorized" error, rethrow otherwise
       if (e.message === "Not authorized") {
         return false;

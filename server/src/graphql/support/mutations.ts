@@ -37,7 +37,7 @@ export const assignPetitionToUser = mutationField("assignPetitionToUser", {
         result: RESULT.SUCCESS,
         message: `Petition successfully assigned to ${user.first_name} ${user.last_name}, new id: ${newPetition.id}`,
       };
-    } catch (e) {
+    } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
     }
   },
@@ -67,7 +67,7 @@ export const deletePetition = mutationField("deletePetition", {
         result: RESULT.SUCCESS,
         message: `Petition ${args.petitionId} deleted.`,
       };
-    } catch (e) {
+    } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
     }
   },
@@ -101,7 +101,7 @@ export const createOrganization = mutationField("createOrganization", {
         result: RESULT.SUCCESS,
         message: `Organization created with id ${org.id}`,
       };
-    } catch (e) {
+    } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
     }
   },
@@ -146,7 +146,7 @@ export const createUser = mutationField("createUser", {
         result: RESULT.SUCCESS,
         message: `User with email ${user.email} created in org ${org.name}`,
       };
-    } catch (e) {
+    } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
     }
   },
@@ -175,7 +175,7 @@ export const resetSignaturitOrganizationBranding = mutationField(
           result: RESULT.SUCCESS,
           message: `Brandings resetted successfully`,
         };
-      } catch (e) {
+      } catch (e: any) {
         return { result: RESULT.FAILURE, message: e.message };
       }
     },
@@ -198,7 +198,7 @@ export const resetUserPassword = mutationField("resetUserPassword", {
         result: RESULT.SUCCESS,
         message: "User will receive an email with new temporary password.",
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         result: RESULT.FAILURE,
         message: error.message,
@@ -344,7 +344,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
         result: RESULT.SUCCESS,
         message: "Metadata successfully updated.",
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         result: RESULT.FAILURE,
         message: error.message,
@@ -391,7 +391,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
         result: RESULT.SUCCESS,
         message: "User avatar updated successfully",
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         result: RESULT.FAILURE,
         message: error.message,

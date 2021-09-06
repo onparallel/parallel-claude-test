@@ -71,22 +71,21 @@ const config = {
     ];
   },
   async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers:
-          process.env.NODE_ENV === "production"
-            ? createSecureHeaders({
-                forceHTTPSRedirect: [true, { maxAge: 60 * 60 * 24 * 30, includeSubDomains: true }],
-                referrerPolicy: "same-origin",
-                frameGuard: "sameorigin",
-                xssProtection: "sanitize",
-                nosniff: "nosniff",
-                noopen: "noopen",
-              })
-            : [],
-      },
-    ];
+    return process.env.NODE_ENV === "production"
+      ? [
+          {
+            source: "/(.*)",
+            headers: createSecureHeaders({
+              forceHTTPSRedirect: [true, { maxAge: 60 * 60 * 24 * 30, includeSubDomains: true }],
+              referrerPolicy: "same-origin",
+              frameGuard: "sameorigin",
+              xssProtection: "sanitize",
+              nosniff: "nosniff",
+              noopen: "noopen",
+            }),
+          },
+        ]
+      : [];
   },
 };
 

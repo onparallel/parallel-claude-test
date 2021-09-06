@@ -30,7 +30,7 @@ export const scim = Router().use(
       }
       req.context.organization = await req.context.organizations.loadOrg(integration.org_id);
       next();
-    } catch (error) {
+    } catch (error: any) {
       return res.sendStatus(401);
     }
   }

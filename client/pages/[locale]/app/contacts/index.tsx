@@ -102,7 +102,7 @@ function Contacts() {
     try {
       await createContact({});
       refetch();
-    } catch (error) {
+    } catch (error: any) {
       if (error?.graphQLErrors?.[0]?.extensions.code === "EXISTING_CONTACT") {
         errorToast();
       }

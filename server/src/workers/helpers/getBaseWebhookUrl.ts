@@ -22,7 +22,7 @@ async function tunnelUrl() {
       );
     }
     return tunnelUrl;
-  } catch (e) {
+  } catch (e: any) {
     if (e.code === "ENOENT") {
       throw new Error(
         `localtunnel-dev.url file not found at path ${e.path}. Run 'yarn localtunnel' on a separate terminal and try again.`

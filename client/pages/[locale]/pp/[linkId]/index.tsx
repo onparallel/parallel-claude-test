@@ -94,7 +94,7 @@ function PublicPetitionLink({
       } else if (data?.publicCreateAndSendPetitionFromPublicLink === "FAILURE") {
         showErrorToast();
       }
-    } catch (error) {
+    } catch (error: any) {
       if (
         error?.graphQLErrors?.[0]?.extensions.code === "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
       ) {
@@ -123,7 +123,7 @@ function PublicPetitionLink({
       } else if (data?.publicSendReminder === "FAILURE") {
         showErrorToast();
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error?.graphQLErrors?.[0]?.extensions.code === "REMINDER_ALREADY_SENT_ERROR") {
         toast({
           title: intl.formatMessage({

@@ -265,7 +265,7 @@ function getColumnType(type: string, enums: Map<string, DbEnum>): string {
 async function main() {
   try {
     await generateTypes(path.join(__dirname, "../src/db/__types.ts"));
-  } catch (e) {
+  } catch (e: any) {
     console.log(e);
   } finally {
     await instance.destroy();

@@ -94,7 +94,7 @@ export async function petitionReminder(
 
     await context.petitions.processReminder(reminder.id, email.id);
     return email;
-  } catch (error) {
+  } catch (error: any) {
     await context.petitions.reminderFailed(reminderId);
     throw error;
   }

@@ -196,7 +196,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
         args.permissionType,
         ctx.user!
       );
-    } catch (e) {
+    } catch (e: any) {
       if (e.constraint === "petition_permission__owner") {
         throw new WhitelistedError(
           "A petition can't have more than one owner.",

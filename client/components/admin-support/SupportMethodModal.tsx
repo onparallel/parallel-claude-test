@@ -111,7 +111,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
               variables,
             });
       setStatus({ loading: false, data: data[field.name] });
-    } catch (e) {
+    } catch (e: any) {
       setStatus({
         loading: false,
         data: {
