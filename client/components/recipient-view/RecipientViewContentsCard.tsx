@@ -34,6 +34,16 @@ export function RecipientViewContentsCard({
 }: RecipientViewContentsCardProps) {
   const { query } = useRouter();
   const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
+
+  const handleFocusField = (field: RecipientViewContentsCard_PublicPetitionFieldFragment) => {
+    const ID = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
+    const element = document?.getElementById(ID) as HTMLInputElement;
+    if (element) {
+      element.focus();
+      element.setSelectionRange(element.value.length, element.value.length);
+    }
+  };
+
   return (
     <Card display="flex" flexDirection="column" {...props}>
       <Box paddingX={4} paddingY={3}>
@@ -123,6 +133,7 @@ export function RecipientViewContentsCard({
                           as="a"
                           display="block"
                           w="100%"
+                          onClick={() => handleFocusField(field)}
                         >
                           <HStack spacing={1}>
                             <Box
