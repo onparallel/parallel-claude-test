@@ -39,6 +39,7 @@ import {
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { CustomEditor, CustomElement, LinkElement } from "@parallel/utils/slate/types";
 import { useConstant } from "@parallel/utils/useConstant";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
@@ -67,11 +68,12 @@ import {
   withProps,
 } from "@udecode/plate-common";
 import {
+  createHistoryPlugin,
   createReactPlugin,
   isElement,
   Plate,
   PlatePluginOptions,
-  withPlate,
+  useStoreEditorState,
 } from "@udecode/plate-core";
 import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
 import { createLinkPlugin, ELEMENT_LINK, upsertLinkAtSelection } from "@udecode/plate-link";
@@ -101,10 +103,9 @@ import React, {
 } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit, pick, pipe } from "remeda";
-import { createEditor, Editor, Selection, Transforms } from "slate";
-import { withHistory } from "slate-history";
-import { ReactEditor, useSlate, withReact } from "slate-react";
+import { omit, pick } from "remeda";
+import { Editor, Selection, Transforms } from "slate";
+import { ReactEditor, useSlate } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
@@ -245,7 +246,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     } = usePlaceholderPlugin(placeholderOptions);
     const plugins = useConstant(() => [
       createReactPlugin(),
-      // createHistoryPlugin(), //This crashes when undo goes to new line
+      createHistoryPlugin(),
       createParagraphPlugin(),
       createBoldPlugin(),
       createItalicPlugin(),
@@ -292,19 +293,13 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       isRequired,
       isReadOnly,
     });
-    const editor = useConstant<CustomEditor>(() =>
-      pipe(withHistory(withReact(createEditor())), withPlate({ id, plugins, options, components }))
-    );
+    const editorRef = useUpdatingRef(useStoreEditorState(id));
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        focus: () => {
-          ReactEditor.focus(editor);
-        },
-      }),
-      [editor]
-    );
+    useImperativeHandle(ref, () => ({
+      focus: () => {
+        ReactEditor.focus(editorRef.current!);
+      },
+    }));
 
     const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
     const inputStyles = {
@@ -330,7 +325,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
 
     const handleChange = useCallback(
       (value: CustomElement[]) => {
-        onChangePlaceholder(editor);
+        onChangePlaceholder(editorRef.current!);
         onChange(value);
       },
       [onChange, onChangePlaceholder]
@@ -338,10 +333,10 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
 
     const handleKeyDown = useCallback(
       (event: KeyboardEvent<HTMLDivElement>) => {
-        onKeyDownPlaceholder(event, editor);
+        onKeyDownPlaceholder(event, editorRef.current!);
         onKeyDown?.(event);
       },
-      [onKeyDown, onKeyDownPlaceholder, editor]
+      [onKeyDown, onKeyDownPlaceholder]
     );
 
     const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
@@ -386,7 +381,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
          * children which we will use to create a popper virtual element.
          */
         const { path, offset } = target!.anchor;
-
+        const editor = editorRef.current!;
         const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
         const parentRect = (node.parentNode! as HTMLElement).getBoundingClientRect();
         const fake = document.createElement("div");
@@ -426,7 +421,6 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       >
         <Plate
           id={id}
-          editor={editor}
           plugins={plugins}
           options={options}
           components={components}
@@ -450,7 +444,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
             values={values}
             selectedIndex={selectedIndex}
             hidden={!isMenuOpen}
-            onAddPlaceholder={(placeholder) => onAddPlaceholder(editor, placeholder)}
+            onAddPlaceholder={(placeholder) => onAddPlaceholder(editorRef.current!, placeholder)}
             onHighlightOption={onHighlightOption}
             width="fit-content"
             position="relative"
