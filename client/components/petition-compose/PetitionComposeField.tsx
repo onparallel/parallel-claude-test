@@ -345,7 +345,7 @@ const _PetitionComposeField = chakraForwardRef<
         {field.optional ? null : (
           <Box marginX={-2} position="relative">
             <Tooltip
-              placement="top"
+              placement="bottom"
               label={intl.formatMessage({
                 id: "generic.required-field",
                 defaultMessage: "Required field",
