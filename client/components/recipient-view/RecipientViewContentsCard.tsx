@@ -42,16 +42,16 @@ export function RecipientViewContentsCard({
         </Heading>
       </Box>
       <Divider />
-      <Stack as={List} spacing={1} paddingX={4} paddingY={3}>
+      <Stack as={List} spacing={1} paddingY={3}>
         {pages.map(({ title, hasUnreadComments }, index) => (
           <ListItem key={index}>
             <Text as="h2" display="flex" position="relative" fontWeight="bold" isTruncated>
               <NakedLink href={`/petition/${query.keycode}/${index + 1}`}>
                 <Box
-                  paddingX={4}
+                  _hover={{ backgroundColor: "gray.75" }}
+                  paddingX={5}
                   paddingY={1}
-                  paddingLeft={1}
-                  rounded="md"
+                  paddingLeft={5}
                   as="a"
                   display="block"
                   w="100%"
@@ -71,6 +71,7 @@ export function RecipientViewContentsCard({
                     <Box
                       flex="1"
                       cursor="pointer"
+                      paddingRight={3}
                       isTruncated
                       {...(title
                         ? {}
@@ -117,9 +118,8 @@ export function RecipientViewContentsCard({
                       <NakedLink href={`/petition/${query.keycode}/${index + 1}#field-${field.id}`}>
                         <Box
                           _hover={{ backgroundColor: "gray.75" }}
-                          paddingX={4}
+                          paddingX={8}
                           paddingY={1}
-                          rounded="md"
                           as="a"
                           display="block"
                           w="100%"

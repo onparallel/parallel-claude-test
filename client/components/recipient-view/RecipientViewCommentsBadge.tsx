@@ -19,11 +19,7 @@ export function RecipientViewCommentsBadge({
   return hasUnreadComments ? (
     <Box display="inline-block" aria-label={label} role="img" {...props}>
       <Tooltip label={label}>
-        <Circle
-          boxSize={2}
-          backgroundColor={isReversedPurple ? "white" : "purple.500"}
-          marginRight="2px"
-        />
+        <Circle boxSize={2} backgroundColor={isReversedPurple ? "white" : "purple.500"} />
       </Tooltip>
     </Box>
   ) : null;
