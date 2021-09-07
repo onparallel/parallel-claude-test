@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Image, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, keyframes, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { SimpleWizard } from "@parallel/components/common/SimpleWizard";
@@ -12,7 +12,6 @@ import { PublicSignupFormName } from "@parallel/components/public/signup/PublicS
 import { PublicSignupFormOrganization } from "@parallel/components/public/signup/PublicSignupFormOrganization";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
 import { useSignup_userSignUpMutation } from "@parallel/graphql/__types";
-import styles from "@parallel/styles/Signup.module.css";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useRef, useState } from "react";
@@ -145,67 +144,54 @@ function Signup() {
             <Center height="100%">
               <Flex width="100%">
                 <SimpleWizard index={index} width="100%">
-                  <Stack spacing={10}>
-                    <Image
-                      opacity="0"
-                      animation={`${styles.fadeInLeft} 1.2s ease 0.2s forwards`}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-1.svg`}
-                    />
-                    <Image
-                      opacity="0"
-                      animation={`${styles.fadeInLeftOffset96} 1.4s ease 0.36s forwards `}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-2.svg`}
-                    />
-                    <Image
-                      opacity="0"
-                      animation={`${styles.fadeInLeft} 1.6s ease 0.68s forwards `}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-3.svg`}
-                    />
-                  </Stack>
-
-                  <Stack spacing={10}>
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/checked-field-1.svg`}
-                    />
-                    <Image
-                      transform={"translateX(-96px)"}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-2.svg`}
-                    />
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-3.svg`}
-                    />
-                  </Stack>
-
-                  <Stack spacing={10}>
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/checked-field-1.svg`}
-                    />
-                    <Image
-                      transform={"translateX(-96px)"}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/checked-field-2.svg`}
-                    />
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/unchecked-field-3.svg`}
-                    />
-                  </Stack>
-
-                  <Stack spacing={10}>
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/checked-field-1.svg`}
-                    />
-                    <Image
-                      transform={"translateX(-96px)"}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/checked-field-2.svg`}
-                    />
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/checked-field-3.svg`}
-                    />
-                  </Stack>
-
+                  {[0, 1, 2, 3].map((step) => (
+                    <Stack key={step} spacing={10}>
+                      {[0, 1, 2].map((i) => {
+                        const imageName = `${step > i ? "checked" : "unchecked"}-field-${
+                          i + 1
+                        }.svg`;
+                        const animation =
+                          index === 0
+                            ? `${keyframes`
+                            from {
+                              opacity: 0;
+                              transform: translateX(60px);
+                            }
+                            to {
+                              transform: translateX(0px);
+                              opacity: 1;
+                            }
+                          `} ${1.2 + 0.2 * i}s ease ${0.2 + 0.2 * i}s forwards`
+                            : undefined;
+                        return (
+                          <Box key={i}>
+                            <Image
+                              width="460"
+                              heigth="100"
+                              role="presentation"
+                              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/${imageName}`}
+                              opacity={step === 0 ? 0 : 1}
+                              marginLeft={i === 1 ? "-96px" : 0}
+                              animation={animation}
+                            />
+                          </Box>
+                        );
+                      })}
+                    </Stack>
+                  ))}
                   <Box paddingX={6} margin="0 auto">
                     <Image
                       opacity="0"
-                      animation={`${styles.fadeInUp} 1.2s ease 0.12s forwards`}
+                      animation={`${keyframes`
+                        from {
+                          opacity: 0;
+                          transform: translateY(32px);
+                        }
+                        to {
+                          transform: translateX(0px);
+                          opacity: 1;
+                        }
+                      `} 1.2s ease 0.12s forwards`}
                       src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/check-inbox.svg`}
                     />
                   </Box>
