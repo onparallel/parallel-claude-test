@@ -285,8 +285,8 @@ export function PublicSignupFormExperience({
               "&": {
                 color: industry === "" ? "gray.400" : "inherit",
               },
+              "& option": { color: "gray.800" },
               "& option[value='']": { color: "gray.400" },
-              "& :not(option[value=''])": { color: "inherit" },
             }}
             iconColor="gray.800"
           >
@@ -312,10 +312,10 @@ export function PublicSignupFormExperience({
             })}
             sx={{
               "&": {
-                color: role === "" ? "gray.400" : "current",
+                color: role === "" ? "gray.400" : "inherit",
               },
+              "& option": { color: "gray.800" },
               "& option[value='']": { color: "gray.400" },
-              "& :not(option[value=''])": { color: "gray.800" },
             }}
             iconColor="gray.800"
           >
