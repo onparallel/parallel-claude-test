@@ -63,6 +63,10 @@ createQueueWorker(
         "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
         "EMAIL_VERIFIED",
         "INVITE_SENT",
+        "REMINDERS_OPT_OUT",
+        "REPLY_CREATED",
+        "COMMENT_PUBLISHED",
+        "EMAIL_OPENED",
       ],
       analyticsEventListener
     )

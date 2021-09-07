@@ -9,7 +9,7 @@ export interface MessageEventsIndicatorProps extends BoxProps {
   message: MessageEventsIndicator_PetitionMessageFragment;
 }
 
-function rountToNearestSecond(value: Date | string | number) {
+function roundToNearestSecond(value: Date | string | number) {
   const date = new Date(value);
   date.setMilliseconds(0);
   return date;
@@ -47,7 +47,7 @@ export function MessageEventsIndicator({
                     defaultMessage: "The email was delivered on {date}",
                   },
                   {
-                    date: intl.formatDate(rountToNearestSecond(deliveredAt), FORMATS.FULL),
+                    date: intl.formatDate(roundToNearestSecond(deliveredAt), FORMATS.FULL),
                   }
                 )
               : intl.formatMessage({
@@ -72,7 +72,7 @@ export function MessageEventsIndicator({
                     defaultMessage: "The email was opened on {date}",
                   },
                   {
-                    date: intl.formatDate(rountToNearestSecond(openedAt), FORMATS.FULL),
+                    date: intl.formatDate(roundToNearestSecond(openedAt), FORMATS.FULL),
                   }
                 )
               : intl.formatMessage({

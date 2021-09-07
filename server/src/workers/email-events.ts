@@ -23,19 +23,21 @@ createQueueWorker(
         Complaint: "complaint",
       } as any
     )[payload.eventType];
+
+    const eventPayload = (payload as any)[event];
     await context.emailLogs.createEmailEvent({
       email_log_id: emailLogId,
       event,
-      payload: JSON.stringify((payload as any)[event]),
+      payload: JSON.stringify(eventPayload),
     });
+
+    const [message, reminder] = await Promise.all([
+      context.petitions.loadMessageByEmailLogId(emailLogId),
+      context.petitions.loadReminderByEmailLogId(emailLogId),
+    ]);
 
     if (event === "bounce") {
       // bounce can come from a PetitionMessage or a PetitionReminder
-      const [message, reminder] = await Promise.all([
-        context.petitions.loadMessageByEmailLogId(emailLogId),
-        context.petitions.loadReminderByEmailLogId(emailLogId),
-      ]);
-
       if (message) {
         await Promise.all([
           context.emails.sendPetitionMessageBouncedEmail(message.id),
@@ -60,11 +62,6 @@ createQueueWorker(
         ]);
       }
     } else if (event === "complaint") {
-      const [message, reminder] = await Promise.all([
-        context.petitions.loadMessageByEmailLogId(emailLogId),
-        context.petitions.loadReminderByEmailLogId(emailLogId),
-      ]);
-
       if (message || reminder) {
         const access = await context.petitions.loadAccess(
           message?.petition_access_id ?? reminder!.petition_access_id
@@ -80,6 +77,21 @@ createQueueWorker(
             },
           });
         }
+      }
+    } else if (event === "open") {
+      if (message || reminder) {
+        const petitionId = (message?.petition_id ??
+          (await context.petitions.loadAccess(reminder!.petition_access_id))?.petition_id)!;
+        await context.system.createEvent({
+          type: "EMAIL_OPENED",
+          data: {
+            type: message ? "petition-message" : "petition-reminder",
+            petition_id: petitionId,
+            petition_message_id: message?.id,
+            petition_reminder_id: reminder?.id,
+            user_agent: eventPayload["userAgent"],
+          },
+        });
       }
     }
   },

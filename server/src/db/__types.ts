@@ -101,6 +101,7 @@ export type PetitionUserNotificationType =
 export type SystemEventType =
   | "EMAIL_VERIFIED"
   | "INVITE_SENT"
+  | "EMAIL_OPENED"
   | "PETITION_MESSAGE_BOUNCED"
   | "PETITION_REMINDER_BOUNCED"
   | "USER_CREATED"

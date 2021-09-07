@@ -1,4 +1,5 @@
 import DataLoader from "dataloader";
+import { subSeconds } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { countBy, groupBy, indexBy, isDefined, maxBy, omit, sortBy, uniq, zip } from "remeda";
@@ -12,8 +13,8 @@ import { keyBuilder } from "../../util/keyBuilder";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { random } from "../../util/token";
-import { Maybe, MaybeArray } from "../../util/types";
-import { CreatePetitionEvent, PetitionEvent } from "../events";
+import { Maybe, MaybeArray, UnwrapArray } from "../../util/types";
+import { CreatePetitionEvent, PetitionEvent, PetitionEventPayload } from "../events";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
@@ -1692,16 +1693,22 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async loadLastEventsByType(
+  async loadLastEventsByType<EventTypes extends PetitionEventType[]>(
     petitionId: number,
-    eventTypes: MaybeArray<PetitionEventType>
-  ): Promise<{ type: PetitionEventType; last_used_at: Date }[]> {
+    eventTypes: EventTypes
+  ): Promise<
+    {
+      type: UnwrapArray<EventTypes>;
+      last_used_at: Date;
+      data: PetitionEventPayload<UnwrapArray<EventTypes>>;
+    }[]
+  > {
     const types = unMaybeArray(eventTypes);
     return await this.from("petition_event")
       .where("petition_id", petitionId)
       .whereIn("type", types)
       .groupBy("type")
-      .select("type", this.knex.raw("MAX(created_at) as last_used_at"));
+      .select("type", this.knex.raw("MAX(created_at) as last_used_at"), "data");
   }
 
   async shouldNotifyPetitionClosed(petitionId: number) {
@@ -3603,5 +3610,45 @@ export class PetitionRepository extends BaseRepository {
       .orderBy("petition_access.created_at", "desc");
 
     return access;
+  }
+
+  async loadPetitionStatsForUser(userId: number) {
+    const petitions = await this.raw<{ status: PetitionStatus; sent_at: Date }>(
+      /* sql */ `
+      select p.status, pa.created_at sent_at from petition p 
+      join petition_permission pp on pp.petition_id = p.id 
+      join petition_access pa on pa.petition_id = p.id
+      where p.is_template = false
+      and p.deleted_at is null
+      and pp."type" = 'OWNER' 
+      and pp.deleted_at is null
+      and pp.user_id = ?;
+    `,
+      [userId]
+    );
+
+    function isFromCurrentMonth(date: Date) {
+      const today = new Date();
+      const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+      const currentMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      return (
+        currentMonthStart.getTime() <= date.getTime() && date.getTime() <= currentMonthEnd.getTime()
+      );
+    }
+
+    function isFromLastMonth(date: Date) {
+      const today = new Date();
+      const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastMonthEnd = subSeconds(currentMonthStart, 1);
+      const lastMonthStart = new Date(lastMonthEnd.getFullYear(), lastMonthEnd.getMonth(), 1);
+      return lastMonthStart.getTime() <= date.getTime() && date.getTime() <= lastMonthEnd.getTime();
+    }
+
+    return {
+      petitions_sent: petitions.length,
+      petitions_sent_this_month: petitions.filter((s) => isFromCurrentMonth(s.sent_at)).length,
+      petitions_sent_last_month: petitions.filter((s) => isFromLastMonth(s.sent_at)).length,
+      petitions_pending: petitions.filter((s) => s.status === "PENDING").length,
+    };
   }
 }

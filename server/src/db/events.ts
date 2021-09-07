@@ -338,6 +338,13 @@ export type SystemEventPayload<TType extends SystemEventType> = {
     last_name: string;
     role: string;
   };
+  EMAIL_OPENED: {
+    type: "petition-message" | "petition-reminder";
+    petition_id: number;
+    petition_message_id?: number;
+    petition_reminder_id?: number;
+    user_agent: string;
+  };
 }[TType];
 
 type GenericSystemEvent<TType extends SystemEventType, IsCreate extends boolean = false> = Omit<
@@ -374,12 +381,18 @@ export type InviteSentSystemEvent<IsCreate extends boolean = false> = GenericSys
   "INVITE_SENT",
   IsCreate
 >;
+export type EmailOpenedSystemEvent<IsCreate extends boolean = false> = GenericSystemEvent<
+  "EMAIL_OPENED",
+  IsCreate
+>;
+
 export type SystemEvent<IsCreate extends boolean = false> =
   | UserLoggedInEvent<IsCreate>
   | UserCreatedEvent<IsCreate>
   | PetitionMessageBouncedEvent<IsCreate>
   | PetitionReminderBouncedEvent<IsCreate>
   | EmailVerifiedSystemEvent<IsCreate>
-  | InviteSentSystemEvent<IsCreate>;
+  | InviteSentSystemEvent<IsCreate>
+  | EmailOpenedSystemEvent<IsCreate>;
 
 export type CreateSystemEvent = SystemEvent<true>;

@@ -1,3 +1,4 @@
+import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import {
   AccessActivatedEvent,
@@ -5,12 +6,16 @@ import {
   AccessOpenedEvent,
   EmailVerifiedSystemEvent,
   InviteSentSystemEvent,
+  CommentPublishedEvent,
+  EmailOpenedSystemEvent,
   PetitionClonedEvent,
   PetitionClosedEvent,
   PetitionCompletedEvent,
   PetitionCreatedEvent,
   PetitionDeletedEvent,
   ReminderSentEvent,
+  RemindersOptOutEvent,
+  ReplyCreatedEvent,
   TemplateUsedEvent,
   UserCreatedEvent,
   UserLoggedInEvent,
@@ -61,6 +66,25 @@ async function loadUser(userId: number, ctx: WorkerContext) {
   return user;
 }
 
+async function loadUserStats(userId: number, ctx: WorkerContext) {
+  const [logins, stats] = await Promise.all([
+    ctx.system.loadUserLoggedInEventsCount(userId),
+    ctx.petitions.loadPetitionStatsForUser(userId),
+  ]);
+  return {
+    logins,
+    ...stats,
+  };
+}
+
+async function loadPetitionFieldComment(petitionFieldCommentId: number, ctx: WorkerContext) {
+  const comment = await ctx.petitions.loadPetitionFieldComment(petitionFieldCommentId);
+  if (!comment) {
+    throw new Error(`PetitionFieldComment:${petitionFieldCommentId} not found`);
+  }
+  return comment;
+}
+
 async function trackPetitionCreatedEvent(event: PetitionCreatedEvent, ctx: WorkerContext) {
   const petition = await loadPetition(event.petition_id, ctx);
   await ctx.analytics.trackEvent({
@@ -100,7 +124,12 @@ async function trackPetitionClosedEvent(event: PetitionClosedEvent, ctx: WorkerC
 }
 
 async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: WorkerContext) {
-  const petition = await loadPetition(event.petition_id, ctx);
+  const [petition, user, contact] = await Promise.all([
+    loadPetition(event.petition_id, ctx),
+    loadPetitionOwner(event.petition_id, ctx),
+    loadContactByAccessId(event.data.petition_access_id, ctx),
+  ]);
+
   await ctx.analytics.trackEvent({
     type: "PETITION_SENT",
     user_id: event.data.user_id,
@@ -110,6 +139,8 @@ async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: Worke
       org_id: petition.org_id,
       petition_id: event.petition_id,
       from_public_link: false,
+      same_domain: user.email.split("@")[1] === contact.email.split("@")[1],
+      from_template_id: petition.from_template_id,
     },
   });
 }
@@ -118,32 +149,34 @@ async function trackAccessActivatedFromPublicLinkEvent(
   event: AccessActivatedFromPublicPetitionLinkEvent,
   ctx: WorkerContext
 ) {
-  const [petition, owner] = await Promise.all([
+  const [petition, user, contact] = await Promise.all([
     loadPetition(event.petition_id, ctx),
     loadPetitionOwner(event.petition_id, ctx),
+    loadContactByAccessId(event.data.petition_access_id, ctx),
   ]);
 
   await ctx.analytics.trackEvent({
     type: "PETITION_SENT",
-    user_id: owner.id,
+    user_id: user.id,
     data: {
       petition_access_id: event.data.petition_access_id,
-      user_id: owner.id,
+      user_id: user.id,
       org_id: petition.org_id,
       petition_id: event.petition_id,
       from_public_link: true,
+      same_domain: user.email.split("@")[1] === contact.email.split("@")[1],
+      from_template_id: petition.from_template_id,
     },
   });
 }
 
 async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: WorkerContext) {
-  const [access, contact, petition] = await Promise.all([
-    loadPetitionAccess(event.data.petition_access_id, ctx),
+  const [contact, petition, user] = await Promise.all([
     loadContactByAccessId(event.data.petition_access_id, ctx),
     loadPetition(event.petition_id, ctx),
+    loadPetitionOwner(event.petition_id, ctx),
   ]);
 
-  const user = await loadUser(access.granter_id, ctx);
   await ctx.analytics.trackEvent({
     type: "PETITION_COMPLETED",
     user_id: user.id,
@@ -172,8 +205,11 @@ async function trackPetitionDeletedEvent(event: PetitionDeletedEvent, ctx: Worke
 }
 
 async function trackUserLoggedInEvent(event: UserLoggedInEvent, ctx: WorkerContext) {
-  const user = await loadUser(event.data.user_id, ctx);
-  await ctx.analytics.identifyUser(user);
+  const [user, stats] = await Promise.all([
+    loadUser(event.data.user_id, ctx),
+    loadUserStats(event.data.user_id, ctx),
+  ]);
+  await ctx.analytics.identifyUser(user, stats);
   await ctx.analytics.trackEvent({
     type: "USER_LOGGED_IN",
     user_id: event.data.user_id,
@@ -242,7 +278,6 @@ async function trackAccessOpenedEvent(event: AccessOpenedEvent, ctx: WorkerConte
     loadPetitionAccess(event.data.petition_access_id, ctx),
     loadPetition(event.petition_id, ctx),
   ]);
-
   await ctx.analytics.trackEvent({
     type: "ACCESS_OPENED",
     user_id: access.granter_id,
@@ -265,6 +300,20 @@ async function trackEmailVerifiedEvent(event: EmailVerifiedSystemEvent, ctx: Wor
   });
 }
 
+async function trackRemindersOptOutEvent(event: RemindersOptOutEvent, ctx: WorkerContext) {
+  const access = await loadPetitionAccess(event.data.petition_access_id, ctx);
+  await ctx.analytics.trackEvent({
+    type: "REMINDER_OPTED_OUT",
+    user_id: access.granter_id,
+    data: {
+      petition_id: access.petition_id,
+      petition_access_id: access.id,
+      reason: event.data.reason,
+      other: event.data.other,
+    },
+  });
+}
+
 async function trackInviteSentEvent(event: InviteSentSystemEvent, ctx: WorkerContext) {
   await ctx.analytics.trackEvent({
     type: "INVITE_SENT",
@@ -275,6 +324,54 @@ async function trackInviteSentEvent(event: InviteSentSystemEvent, ctx: WorkerCon
       invitee_last_name: event.data.last_name,
       invitee_role: event.data.role,
     },
+  });
+}
+
+async function trackFirstReplyCreatedEvent(event: ReplyCreatedEvent, ctx: WorkerContext) {
+  const [replyCreatedEvents, petitionOwner] = await Promise.all([
+    ctx.petitions.loadLastEventsByType(event.petition_id, ["REPLY_CREATED"]),
+    loadPetitionOwner(event.petition_id, ctx),
+  ]);
+
+  /* make sure it's the first reply of a recipient (users can submit replies too) */
+  const recipientEvents = replyCreatedEvents.filter((e) => isDefined(e.data.petition_access_id));
+  if (recipientEvents.length === 1) {
+    await ctx.analytics.trackEvent({
+      type: "FIRST_REPLY_CREATED",
+      user_id: petitionOwner.id,
+      data: {
+        petition_access_id: event.data.petition_access_id!,
+        petition_id: event.petition_id,
+      },
+    });
+  }
+}
+
+async function trackCommentPublishedEvent(event: CommentPublishedEvent, ctx: WorkerContext) {
+  const [user, comment] = await Promise.all([
+    loadPetitionOwner(event.petition_id, ctx),
+    loadPetitionFieldComment(event.data.petition_field_comment_id, ctx),
+  ]);
+
+  const from = isDefined(comment.petition_access_id) ? "recipient" : "user";
+  await ctx.analytics.trackEvent({
+    type: "COMMENT_PUBLISHED",
+    user_id: user.id,
+    data: {
+      petition_id: event.petition_id,
+      petition_field_comment_id: event.data.petition_field_comment_id,
+      from,
+      to: from === "recipient" ? "user" : comment.is_internal ? "user" : "recipient",
+    },
+  });
+}
+
+async function trackEmailOpenedEvent(event: EmailOpenedSystemEvent, ctx: WorkerContext) {
+  const user = await loadPetitionOwner(event.data.petition_id, ctx);
+  await ctx.analytics.trackEvent({
+    type: "EMAIL_OPENED",
+    user_id: user.id,
+    data: event.data,
   });
 }
 
@@ -321,6 +418,18 @@ export const analyticsEventListener: EventListener = async (event, ctx) => {
       break;
     case "INVITE_SENT":
       await trackInviteSentEvent(event, ctx);
+      break;
+    case "REMINDERS_OPT_OUT":
+      await trackRemindersOptOutEvent(event, ctx);
+      break;
+    case "REPLY_CREATED":
+      await trackFirstReplyCreatedEvent(event, ctx);
+      break;
+    case "COMMENT_PUBLISHED":
+      await trackCommentPublishedEvent(event, ctx);
+      break;
+    case "EMAIL_OPENED":
+      await trackEmailOpenedEvent(event, ctx);
       break;
     default:
       throw new Error(`Tracking to analytics not implemented for event ${JSON.stringify(event)}`);

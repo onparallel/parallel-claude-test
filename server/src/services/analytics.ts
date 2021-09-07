@@ -6,7 +6,7 @@ import { PetitionStatus, User } from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { titleize } from "../util/strings";
-import { MaybeArray } from "../util/types";
+import { Maybe, MaybeArray } from "../util/types";
 
 export type AnalyticsEventType =
   | "PETITION_CREATED"
@@ -21,7 +21,11 @@ export type AnalyticsEventType =
   | "USER_CREATED"
   | "ACCESS_OPENED"
   | "EMAIL_VERIFIED"
-  | "INVITE_SENT";
+  | "INVITE_SENT"
+  | "REMINDER_OPTED_OUT"
+  | "FIRST_REPLY_CREATED"
+  | "COMMENT_PUBLISHED"
+  | "EMAIL_OPENED";
 
 export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User creates a petition/template from scratch */
@@ -60,6 +64,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     org_id: number;
     user_id: number;
     from_public_link: boolean;
+    same_domain: boolean;
+    from_template_id: Maybe<number>;
   };
   /** User closes the petition */
   PETITION_CLOSED: {
@@ -118,6 +124,29 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     invitee_last_name: string;
     invitee_role: string;
   };
+  REMINDER_OPTED_OUT: {
+    reason: string;
+    other?: string;
+    petition_id: number;
+    petition_access_id: number;
+  };
+  FIRST_REPLY_CREATED: {
+    petition_id: number;
+    petition_access_id: number;
+  };
+  COMMENT_PUBLISHED: {
+    petition_id: number;
+    petition_field_comment_id: number;
+    from: "recipient" | "user";
+    to: "recipient" | "user";
+  };
+  EMAIL_OPENED: {
+    type: "petition-message" | "petition-reminder";
+    petition_message_id?: number;
+    petition_reminder_id?: number;
+    petition_id: number;
+    user_agent: string;
+  };
 }[TType];
 
 export type GenericAnalyticsEvent<TType extends AnalyticsEventType> = {
@@ -140,13 +169,18 @@ export type AnalyticsEvent =
   | GenericAnalyticsEvent<"USER_CREATED">
   | GenericAnalyticsEvent<"ACCESS_OPENED">
   | GenericAnalyticsEvent<"EMAIL_VERIFIED">
-  | GenericAnalyticsEvent<"INVITE_SENT">;
+  | GenericAnalyticsEvent<"INVITE_SENT">
+  | GenericAnalyticsEvent<"REMINDER_OPTED_OUT">
+  | GenericAnalyticsEvent<"FIRST_REPLY_CREATED">
+  | GenericAnalyticsEvent<"COMMENT_PUBLISHED">
+  | GenericAnalyticsEvent<"EMAIL_OPENED">;
 
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
 export interface IAnalyticsService {
   identifyUser(
-    user: Pick<User, "id" | "email" | "created_at" | "last_active_at" | "details">
+    user: Pick<User, "id" | "email" | "created_at" | "last_active_at" | "details">,
+    extraTraits?: any
   ): void;
 
   trackEvent(events: MaybeArray<AnalyticsEvent>): void;
@@ -164,7 +198,10 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  identifyUser(user: Pick<User, "id" | "email" | "created_at" | "last_active_at" | "details">) {
+  identifyUser(
+    user: Pick<User, "id" | "email" | "created_at" | "last_active_at" | "details">,
+    extraTraits?: any
+  ) {
     this.analytics?.identify({
       userId: toGlobalId("User", user.id),
       traits: {
@@ -175,6 +212,7 @@ export class AnalyticsService implements IAnalyticsService {
         role: user.details?.role,
         position: user.details?.position,
         source: user.details?.source,
+        ...extraTraits,
       },
     });
   }
