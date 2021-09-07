@@ -61,15 +61,6 @@ const config = {
 
     return config;
   },
-  async redirects() {
-    return [
-      {
-        source: "/:locale/app",
-        destination: "/:locale/app/petitions",
-        permanent: false,
-      },
-    ];
-  },
   async headers() {
     return process.env.NODE_ENV === "production"
       ? [
