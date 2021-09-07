@@ -13,6 +13,7 @@ export function PublicSignupRightHeading(props: BoxProps) {
         />
       </Heading>
       <Image
+        alt="Parallel"
         onLoad={() => setShow(true)}
         maxWidth="180px"
         src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-logo-white.svg`}
