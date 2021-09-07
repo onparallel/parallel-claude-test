@@ -43,7 +43,7 @@ export function PublicHeader(props: BoxProps) {
       wrapper={{
         as: "header",
         backgroundColor: "white",
-        boxShadow: "md",
+        boxShadow: "short",
         ...props,
       }}
     >

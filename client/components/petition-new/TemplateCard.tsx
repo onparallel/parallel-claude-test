@@ -26,7 +26,7 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
       transition="all 150ms ease"
       _hover={{
         borderColor: "gray.300",
-        boxShadow: "lg",
+        boxShadow: "long",
         transform: "scale(1.025)",
       }}
       _focus={{
