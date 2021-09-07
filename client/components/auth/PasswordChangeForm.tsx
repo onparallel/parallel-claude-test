@@ -31,6 +31,8 @@ export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: Passwor
   } = useForm<PasswordChangeData>({
     mode: "onBlur",
   });
+
+  const password = watch("password");
   return (
     <>
       <Box marginBottom={6} textAlign="center">
@@ -58,7 +60,7 @@ export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: Passwor
               pattern: PASSWORD_REGEX,
             })}
           />
-          <PasswordStrengthIndicator watch={watch} />
+          <PasswordStrengthIndicator password={password} />
           <FormErrorMessage>
             <FormattedMessage
               id="generic.forms.password-policy-error"

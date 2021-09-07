@@ -1,10 +1,8 @@
-import { Progress, SimpleGrid, Text } from "@chakra-ui/react";
+import { Box, SimpleGrid, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { UseFormWatch } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
-export const PasswordStrengthIndicator = ({ watch }: { watch: UseFormWatch<any> }) => {
-  const password = watch("password");
+export const PasswordStrengthIndicator = ({ password }: { password: string }) => {
   const [strength, setStrength] = useState(0);
 
   const PSW_REGEX = [".*[0-9].*", "^(?=.*[a-z]).{1,}$", "^(?=.*[A-Z]).{1,}$", "^.{8,}$"]; // Min 1 uppercase, lowercase, number and 8 chars splited to validate strength
@@ -20,11 +18,11 @@ export const PasswordStrengthIndicator = ({ watch }: { watch: UseFormWatch<any> 
 
   return (
     <>
-      <SimpleGrid columns={4} gap={2} mt={2} mb={1.5}>
-        <Progress value={strength >= 1 ? 100 : 0} colorScheme="green" size="xs" rounded="sm" />
-        <Progress value={strength >= 2 ? 100 : 0} colorScheme="green" size="xs" rounded="sm" />
-        <Progress value={strength >= 3 ? 100 : 0} colorScheme="green" size="xs" rounded="sm" />
-        <Progress value={strength === 4 ? 100 : 0} colorScheme="green" size="xs" rounded="sm" />
+      <SimpleGrid columns={4} gap={2} mt={2} mb={1.5} height={1}>
+        <Box rounded="sm" backgroundColor={strength ? "green.500" : "gray.200"} />
+        <Box rounded="sm" backgroundColor={strength >= 2 ? "green.500" : "gray.200"} />
+        <Box rounded="sm" backgroundColor={strength >= 3 ? "green.500" : "gray.200"} />
+        <Box rounded="sm" backgroundColor={strength === 4 ? "green.500" : "gray.200"} />
       </SimpleGrid>
       <Text textStyle="muted" fontSize="sm">
         <FormattedMessage

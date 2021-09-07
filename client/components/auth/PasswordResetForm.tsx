@@ -45,6 +45,9 @@ export function PasswordResetForm({
     watch,
     clearErrors,
   } = useForm<PasswordResetData>({ mode: "onBlur" });
+
+  const password = watch("password");
+
   useEffect(() => {
     if (hasVerificationCodeError) {
       setError("verificationCode", { type: "validate" });
@@ -102,7 +105,7 @@ export function PasswordResetForm({
               pattern: PASSWORD_REGEX,
             })}
           />
-          <PasswordStrengthIndicator watch={watch} />
+          <PasswordStrengthIndicator password={password} />
           <FormErrorMessage>
             {errors.password && (
               <FormattedMessage

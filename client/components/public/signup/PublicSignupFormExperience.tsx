@@ -281,7 +281,13 @@ export function PublicSignupFormExperience({
               id: "component.public-signup-form.experience.industry-placeholder",
               defaultMessage: "Select an industry",
             })}
-            color={industry ? "gray.800" : "gray.400"}
+            sx={{
+              "&": {
+                color: industry === "" ? "gray.400" : "inherit",
+              },
+              "& option[value='']": { color: "gray.400" },
+              "& :not(option[value=''])": { color: "inherit" },
+            }}
             iconColor="gray.800"
           >
             {industryOptions.map((industry, index) => (
@@ -304,7 +310,13 @@ export function PublicSignupFormExperience({
               id: "component.public-signup-form.experience.role-placeholder",
               defaultMessage: "Select a role",
             })}
-            color={role ? "gray.800" : "gray.400"}
+            sx={{
+              "&": {
+                color: role === "" ? "gray.400" : "current",
+              },
+              "& option[value='']": { color: "gray.400" },
+              "& :not(option[value=''])": { color: "gray.800" },
+            }}
             iconColor="gray.800"
           >
             {roleOptions.map((role, index) => (

@@ -74,7 +74,7 @@ export function PublicHero({
             spacing={4}
           >
             <NakedLink href={url}>
-              <Button as="a" size="lg" variant="outline" borderColor="gray.500">
+              <Button as="a" size="lg" variant="outline">
                 {buttonText}
               </Button>
             </NakedLink>

@@ -41,6 +41,8 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
     },
   });
 
+  const password = watch("password");
+
   const { errors } = formState;
 
   const apollo = useApolloClient();
@@ -147,9 +149,9 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
               required: true,
               pattern: PASSWORD_REGEX,
             })}
-            autoComplete="current-password"
+            autoComplete="new-password"
           />
-          <PasswordStrengthIndicator watch={watch} />
+          <PasswordStrengthIndicator password={password} />
           <FormErrorMessage>
             <FormattedMessage
               id="generic.forms.valid-password-error"
@@ -175,12 +177,12 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             id="component.public-signup-form.legal-text"
             defaultMessage="By continuing you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
             values={{
-              Terms: (chunks: any[]) => (
+              Terms: (chunks: any) => (
                 <NormalLink role="a" href="legal/terms" target="_blank">
                   {chunks}
                 </NormalLink>
               ),
-              Policy: (chunks: any[]) => (
+              Policy: (chunks: any) => (
                 <NormalLink role="a" href="legal/privacy" target="_blank">
                   {chunks}
                 </NormalLink>
@@ -193,7 +195,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             id="component.public-signup-form.login-text"
             defaultMessage="Already have an account? <Link>Login</Link>"
             values={{
-              Link: (chunks: any[]) => (
+              Link: (chunks: any) => (
                 <NormalLink role="a" href="login">
                   {chunks}
                 </NormalLink>

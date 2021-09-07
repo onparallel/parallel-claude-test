@@ -197,7 +197,7 @@ function Login() {
       }
     },
     300,
-    [inactiveEmail.current, activationLinkSent]
+    [activationLinkSent]
   );
 
   const handleResendActivationEmail = async () => {
