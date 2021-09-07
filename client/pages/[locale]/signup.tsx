@@ -84,7 +84,7 @@ function Signup() {
       hideFooter
     >
       <Flex
-        height="100vh"
+        minHeight="100vh"
         sx={{
           "@media only screen and (max-width: 62em)": {
             ".form-container": {
