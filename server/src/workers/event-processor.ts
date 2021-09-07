@@ -61,6 +61,8 @@ createQueueWorker(
         "USER_CREATED",
         "ACCESS_ACTIVATED",
         "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+        "EMAIL_VERIFIED",
+        "INVITE_SENT",
       ],
       analyticsEventListener
     )

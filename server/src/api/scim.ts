@@ -107,6 +107,7 @@ scim
             last_name: familyName,
             status: active ? "ACTIVE" : "INACTIVE",
             external_id: externalId,
+            details: { source: "SCIM" },
           },
           `Provisioning:${req.context.organization!.id}`
         );

@@ -173,17 +173,31 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
       },
       true
     );
-    return await ctx.users.createUser(
-      {
-        cognito_id: cognitoId!,
-        org_id: ctx.user!.org_id,
-        organization_role: args.role,
-        email,
-        first_name: args.firstName,
-        last_name: args.lastName,
-      },
-      `User:${ctx.user!.id}`
-    );
+    const [user] = await Promise.all([
+      ctx.users.createUser(
+        {
+          cognito_id: cognitoId!,
+          org_id: ctx.user!.org_id,
+          organization_role: args.role,
+          email,
+          first_name: args.firstName,
+          last_name: args.lastName,
+          details: { source: "org-invitation" },
+        },
+        `User:${ctx.user!.id}`
+      ),
+      ctx.system.createEvent({
+        type: "INVITE_SENT",
+        data: {
+          invited_by: ctx.user!.id,
+          email,
+          first_name: args.firstName,
+          last_name: args.lastName,
+          role: args.role,
+        },
+      }),
+    ]);
+    return user;
   },
 });
 
@@ -384,7 +398,12 @@ export const userSignUp = mutationField("userSignUp", {
           last_name: args.lastName,
           organization_role: "OWNER",
           status: "ACTIVE",
-          details: { industry: args.industry, role: args.role, position: args.position },
+          details: {
+            source: "self-service",
+            industry: args.industry,
+            role: args.role,
+            position: args.position,
+          },
         },
         undefined,
         t

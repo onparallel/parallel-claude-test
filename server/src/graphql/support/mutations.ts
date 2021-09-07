@@ -151,6 +151,7 @@ export const createUser = mutationField("createUser", {
           email,
           first_name: args.firstName,
           last_name: args.lastName,
+          details: { source: "parallel" },
         },
         `User:${ctx.user!.id}`
       );

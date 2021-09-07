@@ -56,7 +56,8 @@ export class ApiContext {
     public readonly userAuthentication: UserAuthenticationRepository,
     public readonly userGroups: UserGroupRepository,
     public readonly subscriptions: PetitionEventSubscriptionRepository,
-    public readonly tags: TagRepository
+    public readonly tags: TagRepository,
+    public readonly system: SystemRepository
   ) {}
 }
 

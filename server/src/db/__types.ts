@@ -99,6 +99,8 @@ export type PetitionUserNotificationType =
   | "SIGNATURE_COMPLETED";
 
 export type SystemEventType =
+  | "EMAIL_VERIFIED"
+  | "INVITE_SENT"
   | "PETITION_MESSAGE_BOUNCED"
   | "PETITION_REMINDER_BOUNCED"
   | "USER_CREATED"

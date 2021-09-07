@@ -3,6 +3,8 @@ import {
   AccessActivatedEvent,
   AccessActivatedFromPublicPetitionLinkEvent,
   AccessOpenedEvent,
+  EmailVerifiedSystemEvent,
+  InviteSentSystemEvent,
   PetitionClonedEvent,
   PetitionClosedEvent,
   PetitionCompletedEvent,
@@ -226,6 +228,7 @@ async function trackUserCreatedEvent(event: UserCreatedEvent, ctx: WorkerContext
     data: {
       user_id: event.data.user_id,
       org_id: user.org_id,
+      email: user.email,
       industry: user.details?.industry ?? null,
       position: user.details?.position ?? null,
       role: user.details?.role ?? null,
@@ -247,6 +250,30 @@ async function trackAccessOpenedEvent(event: AccessOpenedEvent, ctx: WorkerConte
       contact_id: access.contact_id,
       org_id: petition.org_id,
       petition_id: event.petition_id,
+    },
+  });
+}
+
+async function trackEmailVerifiedEvent(event: EmailVerifiedSystemEvent, ctx: WorkerContext) {
+  const user = await loadUser(event.data.user_id, ctx);
+  await ctx.analytics.trackEvent({
+    type: "EMAIL_VERIFIED",
+    user_id: user.id,
+    data: {
+      email: user.email,
+    },
+  });
+}
+
+async function trackInviteSentEvent(event: InviteSentSystemEvent, ctx: WorkerContext) {
+  await ctx.analytics.trackEvent({
+    type: "INVITE_SENT",
+    user_id: event.data.invited_by,
+    data: {
+      invitee_email: event.data.email,
+      invitee_first_name: event.data.first_name,
+      invitee_last_name: event.data.last_name,
+      invitee_role: event.data.role,
     },
   });
 }
@@ -288,6 +315,12 @@ export const analyticsEventListener: EventListener = async (event, ctx) => {
       break;
     case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
       await trackAccessActivatedFromPublicLinkEvent(event, ctx);
+      break;
+    case "EMAIL_VERIFIED":
+      await trackEmailVerifiedEvent(event, ctx);
+      break;
+    case "INVITE_SENT":
+      await trackInviteSentEvent(event, ctx);
       break;
     default:
       throw new Error(`Tracking to analytics not implemented for event ${JSON.stringify(event)}`);

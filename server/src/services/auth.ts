@@ -159,6 +159,7 @@ export class Auth implements IAuth {
             org_id: org.id,
             is_sso_user: true,
             external_id: externalId,
+            details: { source: "SSO" },
           },
           `OrganizationSSO:${org.id}`
         );
@@ -497,13 +498,22 @@ export class Auth implements IAuth {
   async verifyEmail(req: Request, res: Response, next: NextFunction) {
     const { email, code, locale } = req.query as { email: string; code: string; locale: string };
     try {
-      await this.cognito
-        .confirmSignUp({
-          ClientId: this.config.cognito.clientId,
-          ConfirmationCode: code,
-          Username: email,
-        })
-        .promise();
+      const user = await req.context.users.loadUserByEmail(email);
+      if (user) {
+        await this.cognito
+          .confirmSignUp({
+            ClientId: this.config.cognito.clientId,
+            ConfirmationCode: code,
+            Username: email,
+          })
+          .promise();
+        await req.context.system.createEvent({
+          type: "EMAIL_VERIFIED",
+          data: {
+            user_id: user.id,
+          },
+        });
+      }
     } catch {}
     res.redirect(`${process.env.PARALLEL_URL}/${locale}/login`);
   }

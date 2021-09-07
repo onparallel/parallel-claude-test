@@ -14,6 +14,7 @@ import { PublicSignupRightHeading } from "@parallel/components/public/signup/Pub
 import { useSignup_userSignUpMutation } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useEffect } from "react";
 import { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
@@ -63,6 +64,14 @@ function Signup() {
       nextStep();
     }
   };
+
+  useEffect(() => {
+    // track current step of registration process into analytics
+    window.analytics?.track("Register Steps", {
+      step: currentStep,
+      email: formData.current?.email,
+    });
+  }, [currentStep]);
 
   return (
     <PublicLayout
@@ -115,7 +124,7 @@ function Signup() {
                 onFinish={handleNextPage}
                 isLoading={loading}
               />
-              <PublicSignupFormInbox email={formData?.current?.email ?? ""} />
+              <PublicSignupFormInbox email={formData.current.email ?? ""} />
             </SimpleWizard>
           </Center>
         </Flex>

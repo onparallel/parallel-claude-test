@@ -96,6 +96,10 @@ export function PublicHeader(props: BoxProps) {
   );
 }
 
+function trackCTAClick() {
+  window.analytics?.track("Register CTA Clicked", { from: "public-header" });
+}
+
 function PublicHeaderMenu(props: StackProps) {
   return (
     <Stack {...props}>
@@ -175,7 +179,12 @@ function PublicHeaderMenu(props: StackProps) {
       <PublicHeaderLink href="/login" variant="outline" id="pw-public-login">
         <FormattedMessage id="public.login-button" defaultMessage="Login" />
       </PublicHeaderLink>
-      <PublicHeaderLink href="/signup" colorScheme="purple" _activeLink={{}}>
+      <PublicHeaderLink
+        href="/signup"
+        colorScheme="purple"
+        _activeLink={{}}
+        onClick={trackCTAClick}
+      >
         <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
       </PublicHeaderLink>
     </Stack>

@@ -19,7 +19,9 @@ export type AnalyticsEventType =
   | "REMINDER_EMAIL_SENT"
   | "TEMPLATE_USED"
   | "USER_CREATED"
-  | "ACCESS_OPENED";
+  | "ACCESS_OPENED"
+  | "EMAIL_VERIFIED"
+  | "INVITE_SENT";
 
 export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User creates a petition/template from scratch */
@@ -95,6 +97,7 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   USER_CREATED: {
     user_id: number;
     org_id: number;
+    email: string;
     industry?: string;
     position?: string;
     role?: string;
@@ -105,6 +108,15 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     contact_id: number;
     petition_id: number;
     org_id: number;
+  };
+  EMAIL_VERIFIED: {
+    email: string;
+  };
+  INVITE_SENT: {
+    invitee_email: string;
+    invitee_first_name: string;
+    invitee_last_name: string;
+    invitee_role: string;
   };
 }[TType];
 
@@ -126,7 +138,9 @@ export type AnalyticsEvent =
   | GenericAnalyticsEvent<"REMINDER_EMAIL_SENT">
   | GenericAnalyticsEvent<"TEMPLATE_USED">
   | GenericAnalyticsEvent<"USER_CREATED">
-  | GenericAnalyticsEvent<"ACCESS_OPENED">;
+  | GenericAnalyticsEvent<"ACCESS_OPENED">
+  | GenericAnalyticsEvent<"EMAIL_VERIFIED">
+  | GenericAnalyticsEvent<"INVITE_SENT">;
 
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
@@ -160,6 +174,7 @@ export class AnalyticsService implements IAnalyticsService {
         industry: user.details?.industry,
         role: user.details?.role,
         position: user.details?.position,
+        source: user.details?.source,
       },
     });
   }

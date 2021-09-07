@@ -35,6 +35,11 @@ export function PublicHero({
   ...props
 }: PublicHeroProps) {
   const breakpoint = "lg";
+
+  function trackCTAClick() {
+    window.analytics?.track("Register CTA Clicked", { from: "public-hero" });
+  }
+
   return (
     <Stack spacing={12} direction={{ base: "column-reverse", [breakpoint]: "row" }} {...props}>
       <Center
@@ -79,7 +84,7 @@ export function PublicHero({
               </Button>
             </NakedLink>
             <NakedLink href="/signup">
-              <Button as="a" colorScheme="purple" size="lg">
+              <Button as="a" colorScheme="purple" size="lg" onClick={trackCTAClick}>
                 <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
               </Button>
             </NakedLink>
