@@ -3176,6 +3176,8 @@ export type AppLayout_UserFragment = {
 
 export type AppLayoutNavbar_UserFragment = {
   __typename?: "User";
+  id: string;
+  email: string;
   fullName?: Maybe<string>;
   isSuperAdmin: boolean;
   role: OrganizationRole;
@@ -13884,6 +13886,8 @@ export const UserMenu_UserFragmentDoc = gql`
 `;
 export const AppLayoutNavbar_UserFragmentDoc = gql`
   fragment AppLayoutNavbar_User on User {
+    id
+    email
     ...UserMenu_User
   }
   ${UserMenu_UserFragmentDoc}

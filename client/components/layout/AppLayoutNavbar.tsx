@@ -77,6 +77,7 @@ export const AppLayoutNavbar = Object.assign(
       [intl.locale, pathname, query]
     );
     function handleLocaleChange(locale: string) {
+      window.analytics?.identify(user.id, { email: user.email, locale });
       router.push(
         resolveUrl(pathname, {
           ...query,
@@ -190,6 +191,8 @@ export const AppLayoutNavbar = Object.assign(
     fragments: {
       User: gql`
         fragment AppLayoutNavbar_User on User {
+          id
+          email
           ...UserMenu_User
         }
         ${UserMenu.fragments.User}

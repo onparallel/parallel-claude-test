@@ -64,7 +64,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
     if (window.analytics && !(window.analytics as any).initialized) {
       window.analytics?.load(process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY);
     }
-    window.analytics?.identify(user.id, { email: user.email });
+    window.analytics?.identify(user.id, { email: user.email, locale: Router.query.locale });
   }, [user.id]);
 
   // Initialize userflow
