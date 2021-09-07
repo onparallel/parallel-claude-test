@@ -190,7 +190,7 @@ export class Auth implements IAuth {
         RefreshToken: tokens["refresh_token"],
       });
       this.setSession(res, token);
-      res.redirect(302, `/?url=${encodeURIComponent("/app/petitions")}`);
+      res.redirect(302, `/?url=${encodeURIComponent("/app")}`);
     } catch (error: any) {
       next(error);
     }

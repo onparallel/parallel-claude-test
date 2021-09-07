@@ -7994,6 +7994,12 @@ export type ContactsUserQuery = {
   };
 };
 
+export type AppPetitionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type AppPetitionsQuery = {
+  petitions: { __typename?: "PetitionBasePagination"; totalCount: number };
+};
+
 export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
   orgId: Scalars["GID"];
   file: Scalars["Upload"];
@@ -18152,6 +18158,33 @@ export function useContactsUserLazyQuery(
 }
 export type ContactsUserQueryHookResult = ReturnType<typeof useContactsUserQuery>;
 export type ContactsUserLazyQueryHookResult = ReturnType<typeof useContactsUserLazyQuery>;
+export const AppPetitionsDocument = gql`
+  query AppPetitions {
+    petitions {
+      totalCount
+    }
+  }
+`;
+export function useAppPetitionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<AppPetitionsQuery, AppPetitionsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<AppPetitionsQuery, AppPetitionsQueryVariables>(
+    AppPetitionsDocument,
+    options
+  );
+}
+export function useAppPetitionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<AppPetitionsQuery, AppPetitionsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<AppPetitionsQuery, AppPetitionsQueryVariables>(
+    AppPetitionsDocument,
+    options
+  );
+}
+export type AppPetitionsQueryHookResult = ReturnType<typeof useAppPetitionsQuery>;
+export type AppPetitionsLazyQueryHookResult = ReturnType<typeof useAppPetitionsLazyQuery>;
 export const OrganizationBranding_updateOrgLogoDocument = gql`
   mutation OrganizationBranding_updateOrgLogo($orgId: GID!, $file: Upload!) {
     updateOrganizationLogo(orgId: $orgId, file: $file) {

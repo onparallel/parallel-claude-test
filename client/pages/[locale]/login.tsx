@@ -62,7 +62,7 @@ function Login() {
         password,
       });
       await client.clearStore();
-      window.location.href = `/${router.query.locale}/app/petitions`;
+      window.location.href = `/${router.query.locale}/app`;
     } catch (error: any) {
       if (error.error === "NewPasswordRequired") {
         setPasswordChange({ type: "CHANGE", email, password });
@@ -115,7 +115,7 @@ function Login() {
         password,
         newPassword,
       });
-      router.push(`/${router.query.locale}/app/petitions`);
+      router.push(`/${router.query.locale}/app`);
     } catch (error: any) {}
     setIsSubmitting(false);
   }
@@ -282,7 +282,7 @@ function Login() {
           <AlreadyLoggedIn
             me={data!.me}
             onRelogin={() => setShowContinueAs(false)}
-            onContinueAs={() => router.push(`/${router.query.locale}/app/petitions`)}
+            onContinueAs={() => router.push(`/${router.query.locale}/app`)}
           />
         ) : passwordChange?.type === "CHANGE" ? (
           <PasswordChangeForm
