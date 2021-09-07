@@ -254,4 +254,10 @@ Signup.mutations = [
   `,
 ];
 
+/* 
+  not including this empty function will trigger two Router.routeChangeComplete events,
+  causing analytics to track the pageview twice
+ */
+Signup.getInitialProps = () => ({});
+
 export default withApolloData(Signup);
