@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Image, keyframes, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, keyframes, Stack, useCounter } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { SimpleWizard } from "@parallel/components/common/SimpleWizard";
@@ -17,7 +17,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
-type FormDataType = {
+type SignupFormData = {
   email: string;
   password: string;
   firstName: string;
@@ -32,40 +32,35 @@ type FormDataType = {
 function Signup() {
   const intl = useIntl();
 
-  const finishStep = 3;
-  const [index, setIndex] = useState(0);
   const genericErrorToast = useGenericErrorToast();
 
-  const formData = useRef<FormDataType>();
+  const formData = useRef<Partial<SignupFormData>>({});
 
-  const nextPage = () => {
-    setIndex((i) => i + 1);
-  };
-
-  const handlePreviousPage = () => {
-    setIndex((i) => i - 1);
-  };
+  const {
+    value: currentStep,
+    increment: nextStep,
+    decrement: prevStep,
+  } = useCounter({ min: 0, max: 4, value: 0 });
 
   const [userSignUp, { loading }] = useSignup_userSignUpMutation();
 
-  const handleNextPage = async (data: any) => {
-    formData.current = { ...(formData?.current ?? {}), ...data };
-    if (index === finishStep) {
-      if (formData.current) {
-        try {
-          await userSignUp({
-            variables: {
-              ...formData.current,
-              locale: intl.locale,
-            },
-          });
-          nextPage();
-        } catch (error) {
-          genericErrorToast();
-        }
+  const SUBMIT_STEP = 3;
+  const handleNextPage = async (data: Partial<SignupFormData>) => {
+    formData.current = { ...formData.current, ...data };
+    if (currentStep === SUBMIT_STEP) {
+      try {
+        await userSignUp({
+          variables: {
+            ...(formData.current as SignupFormData),
+            locale: intl.locale,
+          },
+        });
+        nextStep();
+      } catch (error) {
+        genericErrorToast();
       }
     } else {
-      nextPage();
+      nextStep();
     }
   };
 
@@ -82,21 +77,7 @@ function Signup() {
       hideHeader
       hideFooter
     >
-      <Flex
-        minHeight="100vh"
-        sx={{
-          "@media only screen and (max-width: 62em)": {
-            ".form-container": {
-              margin: "auto",
-            },
-          },
-          "@media only screen and (min-width: 96em)": {
-            ".form-container": {
-              margin: "auto",
-            },
-          },
-        }}
-      >
+      <Flex minHeight="100vh">
         <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
           <Box paddingTop={5} marginLeft={-1}>
             <NakedLink href="/">
@@ -111,13 +92,26 @@ function Signup() {
               </Box>
             </NakedLink>
           </Box>
-          <Center className="form-container" flex="1" maxWidth="md" paddingY={10}>
-            <SimpleWizard index={index} direction="column">
+          <Center
+            flex="1"
+            maxWidth="md"
+            paddingY={10}
+            marginX="auto"
+            sx={{
+              "@media only screen and (min-width: 62em)": {
+                marginX: 0,
+              },
+              "@media only screen and (min-width: 96em)": {
+                margin: "auto",
+              },
+            }}
+          >
+            <SimpleWizard index={currentStep as number} direction="column">
               <PublicSignupForm onNext={handleNextPage} />
               <PublicSignupFormName onNext={handleNextPage} />
-              <PublicSignupFormOrganization onBack={handlePreviousPage} onNext={handleNextPage} />
+              <PublicSignupFormOrganization onBack={prevStep} onNext={handleNextPage} />
               <PublicSignupFormExperience
-                onBack={handlePreviousPage}
+                onBack={prevStep}
                 onFinish={handleNextPage}
                 isLoading={loading}
               />
@@ -140,10 +134,10 @@ function Signup() {
             height="100%"
             padding={16}
           >
-            <PublicSignupRightHeading display={index === 4 ? "none" : "block"} />
+            <PublicSignupRightHeading display={currentStep === 4 ? "none" : "block"} />
             <Center height="100%">
               <Flex width="100%">
-                <SimpleWizard index={index} width="100%">
+                <SimpleWizard index={currentStep as number} width="100%">
                   {[0, 1, 2, 3].map((step) => (
                     <Stack key={step} spacing={10}>
                       {[0, 1, 2].map((i) => {
@@ -151,7 +145,7 @@ function Signup() {
                           i + 1
                         }.svg`;
                         const animation =
-                          index === 0
+                          currentStep === 0
                             ? `${keyframes`
                             from {
                               opacity: 0;

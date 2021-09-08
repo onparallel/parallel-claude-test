@@ -17,7 +17,7 @@ type PublicSignupFormNameData = {
 };
 
 type PublicSignupFormNameProps = {
-  onNext: ({ firstName, lastName }: PublicSignupFormNameData) => void;
+  onNext: (data: PublicSignupFormNameData) => void;
 };
 
 export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {

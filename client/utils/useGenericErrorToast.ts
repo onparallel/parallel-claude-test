@@ -1,11 +1,12 @@
 import { useToast } from "@chakra-ui/react";
+import { useCallback } from "react";
 import { useIntl } from "react-intl";
 
 export const useGenericErrorToast = () => {
   const intl = useIntl();
   const toast = useToast();
 
-  const showToast = () => {
+  const showToast = useCallback(() => {
     toast({
       title: intl.formatMessage({
         id: "generic.something-went-wrong",
@@ -18,7 +19,7 @@ export const useGenericErrorToast = () => {
       status: "error",
       isClosable: true,
     });
-  };
+  }, [intl.locale]);
 
   return showToast;
 };

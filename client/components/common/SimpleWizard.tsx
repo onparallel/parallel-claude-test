@@ -1,5 +1,5 @@
 import { Flex, FlexProps } from "@chakra-ui/react";
-import React, { ReactNode } from "react";
+import { Children, ReactNode } from "react";
 
 export interface SimpleWizardProps extends FlexProps {
   index: number;
@@ -7,13 +7,11 @@ export interface SimpleWizardProps extends FlexProps {
 }
 
 export const SimpleWizard = ({ index, children, ...props }: SimpleWizardProps) => {
-  const pages = React.Children.toArray(children);
-  const indexToDisplay = index <= pages.length ? index : 0;
   return (
     <>
-      {pages.map((page, i) => {
+      {Children.toArray(children).map((page, i) => {
         return (
-          <Flex key={i} {...props} display={i === indexToDisplay ? "flex" : "none"}>
+          <Flex key={i} {...props} display={i === index ? "flex" : "none"}>
             {page}
           </Flex>
         );

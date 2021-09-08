@@ -28,7 +28,7 @@ type PublicSignupFormData = {
 };
 
 type PublicSignupFormProps = {
-  onNext: ({ email, password }: PublicSignupFormData) => void;
+  onNext: (data: PublicSignupFormData) => void;
 };
 export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
   const intl = useIntl();
