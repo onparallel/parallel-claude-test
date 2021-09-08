@@ -33,7 +33,7 @@ const email: Email<AccountVerificationProps> = {
       ${intl.formatMessage({
         id: "account-verification.intro-text.plain",
         defaultMessage:
-          "You are almost on Parallel, to start using Parallel just click on the link below.",
+          "You are almost ready, to start using Parallel just click on the link below.",
       })}
 
       ${activationUrl}
@@ -57,7 +57,7 @@ const email: Email<AccountVerificationProps> = {
             <MjmlText>
               <FormattedMessage
                 id="account-verification.intro-text.html"
-                defaultMessage="You are almost on Parallel, to start using Parallel just click on the activate account button below."
+                defaultMessage="You are almost ready, to start using Parallel just click on the activate account button below."
               />
             </MjmlText>
           </MjmlColumn>

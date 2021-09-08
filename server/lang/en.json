@@ -16,13 +16,13 @@
   },
   {
     "term": "account-verification.intro-text.html",
-    "definition": "You are almost on Parallel, to start using Parallel just click on the activate account button below.",
-    "context": "You are almost on Parallel, to start using Parallel just click on the activate account button below."
+    "definition": "You are almost ready, to start using Parallel just click on the activate account button below.",
+    "context": "You are almost ready, to start using Parallel just click on the activate account button below."
   },
   {
     "term": "account-verification.intro-text.plain",
-    "definition": "You are almost on Parallel, to start using Parallel just click on the link below.",
-    "context": "You are almost on Parallel, to start using Parallel just click on the link below."
+    "definition": "You are almost ready, to start using Parallel just click on the link below.",
+    "context": "You are almost ready, to start using Parallel just click on the link below."
   },
   {
     "term": "account-verification.subject",

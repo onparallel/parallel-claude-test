@@ -16,13 +16,13 @@
   },
   {
     "term": "account-verification.intro-text.html",
-    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente dale al botón para activar tu cuenta.",
-    "context": "You are almost on Parallel, to start using Parallel just click on the activate account button below."
+    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente haz click en el siguiente botón para activar tu cuenta.",
+    "context": "You are almost ready, to start using Parallel just click on the activate account button below."
   },
   {
     "term": "account-verification.intro-text.plain",
     "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente haz click en el siguiente enlace:",
-    "context": "You are almost on Parallel, to start using Parallel just click on the link below."
+    "context": "You are almost ready, to start using Parallel just click on the link below."
   },
   {
     "term": "account-verification.subject",
