@@ -13,7 +13,7 @@ import { keyBuilder } from "../../util/keyBuilder";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { random } from "../../util/token";
-import { Maybe, MaybeArray, UnwrapArray } from "../../util/types";
+import { Maybe, MaybeArray } from "../../util/types";
 import { CreatePetitionEvent, PetitionEvent, PetitionEventPayload } from "../events";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
@@ -80,6 +80,7 @@ type EffectivePetitionPermission = Pick<
   PetitionPermission,
   "petition_id" | "user_id" | "type" | "is_subscribed"
 >;
+
 @injectable()
 export class PetitionRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
@@ -1693,22 +1694,26 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async loadLastEventsByType<EventTypes extends PetitionEventType[]>(
+  async loadLastEventsByType<T extends PetitionEventType>(
     petitionId: number,
-    eventTypes: EventTypes
+    eventTypes: T[]
   ): Promise<
-    {
-      type: UnwrapArray<EventTypes>;
-      last_used_at: Date;
-      data: PetitionEventPayload<UnwrapArray<EventTypes>>;
-    }[]
+    // Distribute union type
+    (T extends any
+      ? {
+          type: T;
+          last_used_at: Date;
+          data: PetitionEventPayload<T>;
+        }
+      : never)[]
   > {
     const types = unMaybeArray(eventTypes);
-    return await this.from("petition_event")
+    const events = await this.from("petition_event")
       .where("petition_id", petitionId)
       .whereIn("type", types)
       .groupBy("type")
       .select("type", this.knex.raw("MAX(created_at) as last_used_at"), "data");
+    return events as any[];
   }
 
   async shouldNotifyPetitionClosed(petitionId: number) {
@@ -1718,7 +1723,7 @@ export class PetitionRepository extends BaseRepository {
     ]);
 
     const lastEvent = maxBy(events, (e) => e.last_used_at.valueOf());
-    if (lastEvent && lastEvent.type === "PETITION_CLOSED_NOTIFIED") {
+    if (lastEvent?.type === "PETITION_CLOSED_NOTIFIED") {
       return false;
     }
 
