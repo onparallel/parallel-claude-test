@@ -7,5 +7,6 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_SENTRY_ENVIRONMENT: string;
     readonly NEXT_PUBLIC_SENTRY_DSN: string;
     readonly NEXT_PUBLIC_SEGMENT_WRITE_KEY: string;
+    readonly NEXT_PUBLIC_USERFLOW_TOKEN: string;
   }
 }

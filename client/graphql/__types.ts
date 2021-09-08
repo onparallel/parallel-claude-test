@@ -2861,11 +2861,6 @@ export type ContactSelect_ContactFragment = {
   email: string;
 };
 
-export type OnboardingTour_UserFragment = {
-  __typename?: "User";
-  onboardingStatus: { [key: string]: any };
-};
-
 export type PetitionFieldSelect_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -3172,23 +3167,11 @@ export type ImportContactsDialog_bulkCreateContactsMutation = {
 export type AppLayout_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-};
-
-export type AppLayout_updateOnboardingStatusMutationVariables = Exact<{
-  key: OnboardingKey;
-  status: OnboardingStatus;
-}>;
-
-export type AppLayout_updateOnboardingStatusMutation = {
-  updateOnboardingStatus: {
-    __typename?: "User";
-    id: string;
-    onboardingStatus: { [key: string]: any };
-  };
 };
 
 export type AppLayoutNavbar_UserFragment = {
@@ -3298,8 +3281,9 @@ export type PetitionLayout_PetitionBaseFragment =
 export type PetitionLayout_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   hasPetitionPdfExport: boolean;
@@ -3320,8 +3304,9 @@ export type PetitionTemplateHeader_UserFragment = { __typename?: "User"; id: str
 export type SettingsLayout_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
@@ -7614,8 +7599,9 @@ export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
 export type Admin_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
@@ -7626,8 +7612,9 @@ export type AdminQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
   };
@@ -7647,8 +7634,9 @@ export type AdminOrganizations_OrganizationFragment = {
 export type AdminOrganizations_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
@@ -7684,8 +7672,9 @@ export type AdminOrganizationsUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
   };
@@ -7694,8 +7683,9 @@ export type AdminOrganizationsUserQuery = {
 export type AdminSupportMethods_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
@@ -7706,8 +7696,9 @@ export type AdminSupportMethodsUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
   };
@@ -7840,8 +7831,9 @@ export type Contact_PetitionFragment = {
 export type Contact_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   hasPetitionSignature: boolean;
@@ -7869,8 +7861,9 @@ export type ContactUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasPetitionSignature: boolean;
@@ -7948,8 +7941,9 @@ export type Contacts_ContactsListFragment = {
 export type Contacts_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
@@ -7989,8 +7983,9 @@ export type ContactsUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
   };
@@ -8011,8 +8006,9 @@ export type OrganizationBrandingQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     organization: {
@@ -8047,8 +8043,9 @@ export type OrganizationGroup_UserGroupMemberFragment = {
 export type OrganizationGroup_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
@@ -8165,8 +8162,9 @@ export type OrganizationGroupUserQuery = {
     __typename?: "User";
     id: string;
     role: OrganizationRole;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
   };
 };
@@ -8200,8 +8198,9 @@ export type OrganizationGroups_UserGroupFragment = {
 export type OrganizationGroups_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
@@ -8279,8 +8278,9 @@ export type OrganizationGroupsUserQuery = {
     __typename?: "User";
     id: string;
     role: OrganizationRole;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
   };
 };
@@ -8291,8 +8291,9 @@ export type OrganizationSettingsQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
   };
@@ -8379,8 +8380,9 @@ export type OrganizationUsersQuery = {
     __typename?: "User";
     id: string;
     role: OrganizationRole;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     organization: {
       __typename?: "Organization";
@@ -9010,8 +9012,9 @@ export type PetitionActivity_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   hasPetitionPdfExport: boolean;
@@ -10361,8 +10364,9 @@ export type PetitionActivityUserQuery = {
     __typename?: "User";
     id: string;
     unreadNotificationIds: Array<string>;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasPetitionPdfExport: boolean;
@@ -10541,8 +10545,9 @@ export type PetitionCompose_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   hasPetitionSignature: boolean;
@@ -11092,8 +11097,9 @@ export type PetitionComposeUserQuery = {
     __typename?: "User";
     id: string;
     unreadNotificationIds: Array<string>;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasPetitionSignature: boolean;
@@ -11427,8 +11433,9 @@ export type PetitionReplies_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   hasPetitionSignature: boolean;
@@ -11678,8 +11685,9 @@ export type PetitionRepliesUserQuery = {
     __typename?: "User";
     id: string;
     unreadNotificationIds: Array<string>;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasPetitionSignature: boolean;
@@ -11969,8 +11977,9 @@ export type Petitions_PetitionBaseFragment =
 export type Petitions_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   hasPetitionSignature: boolean;
@@ -11982,8 +11991,9 @@ export type PetitionsUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasPetitionSignature: boolean;
@@ -12089,8 +12099,9 @@ export type NewPetition_PetitionTemplateFragment = {
 export type NewPetition_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
@@ -12151,8 +12162,9 @@ export type NewPetitionUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
   };
@@ -12164,8 +12176,9 @@ export type Account_UserFragment = {
   lastName?: Maybe<string>;
   isSsoUser: boolean;
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   hasApiTokens: boolean;
@@ -12195,8 +12208,9 @@ export type AccountQuery = {
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     isSsoUser: boolean;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasApiTokens: boolean;
@@ -12206,8 +12220,9 @@ export type AccountQuery = {
 export type Settings_UserFragment = {
   __typename?: "User";
   id: string;
-  onboardingStatus: { [key: string]: any };
   fullName?: Maybe<string>;
+  email: string;
+  createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   hasApiTokens: boolean;
@@ -12219,8 +12234,9 @@ export type SettingsQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasApiTokens: boolean;
@@ -12241,8 +12257,9 @@ export type SecurityQuery = {
     __typename?: "User";
     isSsoUser: boolean;
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasApiTokens: boolean;
@@ -12274,8 +12291,9 @@ export type TokensQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     hasApiTokens: boolean;
@@ -13870,19 +13888,15 @@ export const AppLayoutNavbar_UserFragmentDoc = gql`
   }
   ${UserMenu_UserFragmentDoc}
 `;
-export const OnboardingTour_UserFragmentDoc = gql`
-  fragment OnboardingTour_User on User {
-    onboardingStatus
-  }
-`;
 export const AppLayout_UserFragmentDoc = gql`
   fragment AppLayout_User on User {
     id
+    fullName
+    email
+    createdAt
     ...AppLayoutNavbar_User
-    ...OnboardingTour_User
   }
   ${AppLayoutNavbar_UserFragmentDoc}
-  ${OnboardingTour_UserFragmentDoc}
 `;
 export const Admin_UserFragmentDoc = gql`
   fragment Admin_User on User {
@@ -16266,29 +16280,6 @@ export function useImportContactsDialog_bulkCreateContactsMutation(
 }
 export type ImportContactsDialog_bulkCreateContactsMutationHookResult = ReturnType<
   typeof useImportContactsDialog_bulkCreateContactsMutation
->;
-export const AppLayout_updateOnboardingStatusDocument = gql`
-  mutation AppLayout_updateOnboardingStatus($key: OnboardingKey!, $status: OnboardingStatus!) {
-    updateOnboardingStatus(key: $key, status: $status) {
-      id
-      onboardingStatus
-    }
-  }
-`;
-export function useAppLayout_updateOnboardingStatusMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    AppLayout_updateOnboardingStatusMutation,
-    AppLayout_updateOnboardingStatusMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    AppLayout_updateOnboardingStatusMutation,
-    AppLayout_updateOnboardingStatusMutationVariables
-  >(AppLayout_updateOnboardingStatusDocument, options);
-}
-export type AppLayout_updateOnboardingStatusMutationHookResult = ReturnType<
-  typeof useAppLayout_updateOnboardingStatusMutation
 >;
 export const PetitionHeader_reopenPetitionDocument = gql`
   mutation PetitionHeader_reopenPetition($petitionId: GID!) {

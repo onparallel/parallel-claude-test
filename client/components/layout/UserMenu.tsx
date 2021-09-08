@@ -34,12 +34,11 @@ export interface UserMenuProps {
   placement?: UsePopperProps["placement"];
   user: UserMenu_UserFragment;
   onLocaleChange?: (locale: string) => void;
-  onOnboardingClick: () => void;
 }
 
 declare const zE: any;
 
-export function UserMenu({ placement, user, onLocaleChange, onOnboardingClick }: UserMenuProps) {
+export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -127,7 +126,7 @@ export function UserMenu({ placement, user, onLocaleChange, onOnboardingClick }:
               <FormattedMessage id="navbar.help-center" defaultMessage="Help center" />
             </MenuItem>
           ) : null}
-          <MenuItem icon={<MapIcon display="block" boxSize={4} />} onClick={onOnboardingClick}>
+          <MenuItem data-action="start-tour" icon={<MapIcon display="block" boxSize={4} />}>
             <FormattedMessage id="navbar.start-tour" defaultMessage="Guide me around" />
           </MenuItem>
           <NormalLink

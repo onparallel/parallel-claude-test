@@ -1,22 +1,17 @@
 import { gql } from "@apollo/client";
 import { BoxProps, Center, Flex, Spinner } from "@chakra-ui/react";
-import {
-  AppLayout_UserFragment,
-  OnboardingKey,
-  OnboardingStatus,
-  useAppLayout_updateOnboardingStatusMutation,
-} from "@parallel/graphql/__types";
+import { AppLayout_UserFragment } from "@parallel/graphql/__types";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
 import Router from "next/router";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { OnboardingTour, OnboardingTourContext } from "../common/OnboardingTour";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
 import { Zendesk } from "../scripts/Zendesk";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
+import userflow from "userflow.js";
 
 export interface AppLayoutProps extends BoxProps {
   title: string;
@@ -26,28 +21,11 @@ export interface AppLayoutProps extends BoxProps {
 declare const zE: any;
 
 export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
-  /* Onboarding tour callbacks */
-  const [updateOnboardingStatus] = useAppLayout_updateOnboardingStatusMutation();
-  const handleUpdateTour = async function (key: OnboardingKey, status: OnboardingStatus) {
-    await updateOnboardingStatus({ variables: { key, status } });
-  };
-  const { isRunning, toggle } = useContext(OnboardingTourContext);
-  const handleOnboardingClick = useCallback(
-    function () {
-      if (isRunning) {
-        document.querySelector<HTMLElement>(".react-joyride__beacon")?.click();
-      } else {
-        toggle(true);
-      }
-      (window as any).zE?.(() => zE.hide());
-    },
-    [isRunning, toggle]
-  );
   const rehydrated = useRehydrated();
   const [isLoading, setIsLoading] = useState(false);
   const timeoutRef = useRef<number>();
+  // Show spinner if a page takes more than 1s to load
   useEffect(() => {
-    // show spinner if a page takes more than 1s to load
     Router.events.on("routeChangeStart", handleRouteChangeStart);
     Router.events.on("routeChangeComplete", handleRouteChangeComplete);
     return () => {
@@ -69,8 +47,9 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       }
     }
   }, []);
+
+  // Hide zendesk launcher on route changes
   useEffect(() => {
-    // Hide zendesk launcher on route changes
     const hide = () => (window as any).zE?.(() => zE.hide());
     Router.events.on("routeChangeStart", hide);
     window.addEventListener("load", hide);
@@ -79,12 +58,28 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       window.removeEventListener("load", hide);
     };
   }, []);
+
+  // Load Segment analytics and identify user
   useEffect(() => {
     if (window.analytics && !(window.analytics as any).initialized) {
       window.analytics?.load(process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY);
     }
     window.analytics?.identify(user.id);
-  }, []);
+  }, [user.id]);
+
+  // Initialize userflow
+  useEffect(() => {
+    if (!userflow.isIdentified()) {
+      userflow.init(process.env.NEXT_PUBLIC_USERFLOW_TOKEN);
+      userflow.identify(user.id, {
+        name: user.fullName,
+        email: user.email,
+        signed_up_at: user.createdAt,
+      });
+    }
+  }, [user.id]);
+
+  // Hide Hubspot
   useEffect(() => {
     const style = document.createElement("style");
     style.innerText = /* css */ `
@@ -135,12 +130,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
             borderColor="gray.200"
             overflow={{ base: "auto hidden", sm: "hidden auto" }}
           >
-            <AppLayoutNavbar
-              user={user}
-              onOnboardingClick={handleOnboardingClick}
-              flex="1"
-              zIndex="2"
-            />
+            <AppLayoutNavbar user={user} flex="1" zIndex="2" />
           </Flex>
           <Flex
             flex="1"
@@ -166,7 +156,6 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
             </Flex>
           </Flex>
         </Flex>
-        <OnboardingTour onUpdateTour={handleUpdateTour} status={user.onboardingStatus as any} />
         <NotificationsDrawer />
       </DndProvider>
     </>
@@ -177,21 +166,11 @@ AppLayout.fragments = {
   User: gql`
     fragment AppLayout_User on User {
       id
+      fullName
+      email
+      createdAt
       ...AppLayoutNavbar_User
-      ...OnboardingTour_User
     }
     ${AppLayoutNavbar.fragments.User}
-    ${OnboardingTour.fragments.User}
   `,
 };
-
-AppLayout.mutations = [
-  gql`
-    mutation AppLayout_updateOnboardingStatus($key: OnboardingKey!, $status: OnboardingStatus!) {
-      updateOnboardingStatus(key: $key, status: $status) {
-        id
-        onboardingStatus
-      }
-    }
-  `,
-];

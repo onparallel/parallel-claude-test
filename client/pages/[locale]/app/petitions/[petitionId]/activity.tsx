@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, ListItem, Stack, Text, UnorderedList, useToast } from "@chakra-ui/react";
+import { Box, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
@@ -41,7 +40,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useCallback, useEffect } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { omit } from "remeda";
 
 type PetitionActivityProps = UnwrapPromise<ReturnType<typeof PetitionActivity.getInitialProps>>;
@@ -486,91 +485,4 @@ PetitionActivity.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
   };
 };
 
-export default compose(
-  withOnboarding({
-    key: "PETITION_ACTIVITY",
-    steps: [
-      {
-        title: (
-          <FormattedMessage id="tour.petition-activity.page-title" defaultMessage="Activity" />
-        ),
-        content: (
-          <FormattedMessage
-            id="tour.petition-activity.page-content"
-            defaultMessage="Here you can view and manage your petitions' access, messages, follow-ups, and event history."
-          />
-        ),
-        placement: "center",
-        target: "#__next",
-      },
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petition-activity.access-and-reminders-title"
-            defaultMessage="Access and reminders"
-          />
-        ),
-        content: (
-          <Stack>
-            <Text>
-              <FormattedMessage
-                id="tour.petition-activity.access-and-reminders-content-1"
-                defaultMessage="In this section, you will be able to:"
-              />
-            </Text>
-            <Stack as={UnorderedList} paddingLeft={5}>
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-activity.access-and-reminders-content-2"
-                  defaultMessage="Manage who can <b>access</b> this petition."
-                />
-              </ListItem>
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-activity.access-and-reminders-content-3"
-                  defaultMessage="Send an automatic or custom <b>reminder message</b> to your recipients."
-                />
-              </ListItem>
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-activity.access-and-reminders-content-4"
-                  defaultMessage="Change <b>reminders settings</b>."
-                />
-              </ListItem>
-            </Stack>
-          </Stack>
-        ),
-        placement: "right",
-        target: "#petition-accesses",
-      },
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petition-activity.events-title"
-            defaultMessage="Monitor your petitions"
-          />
-        ),
-        content: (
-          <Stack>
-            <Text>
-              <FormattedMessage
-                id="tour.petition-activity.events-content-1"
-                defaultMessage="Are you wondering if your recipients read the emails or opened the recipient replies page?"
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="tour.petition-activity.events-content-2"
-                defaultMessage="Have a better overview of what is happening around your petition with the activity timeline."
-              />
-            </Text>
-          </Stack>
-        ),
-        placement: "top-end",
-        target: "#petition-activity-timeline",
-      },
-    ],
-  }),
-  withDialogs,
-  withApolloData
-)(PetitionActivity);
+export default compose(withDialogs, withApolloData)(PetitionActivity);

@@ -3,7 +3,6 @@ import { Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
-import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -376,36 +375,4 @@ Contacts.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) 
   ]);
 };
 
-export default compose(
-  withOnboarding({
-    key: "CONTACT_LIST",
-    steps: [
-      {
-        title: <FormattedMessage id="tour.contacts.page-title" defaultMessage="Contacts" />,
-        content: (
-          <FormattedMessage
-            id="tour.contacts.page-content"
-            defaultMessage="Here you can find a list with every contact that you have sent a petition to or that you have created from this page."
-          />
-        ),
-        placement: "center",
-        target: "#__next",
-      },
-      {
-        title: (
-          <FormattedMessage id="tour.contacts.add-contact-title" defaultMessage="Add contact" />
-        ),
-        content: (
-          <FormattedMessage
-            id="tour.contacts.add-contact-content"
-            defaultMessage="Here you can create a contact before sending any petition to them."
-          />
-        ),
-        placement: "bottom-end",
-        target: "#pw-new-contact",
-      },
-    ],
-  }),
-  withDialogs,
-  withApolloData
-)(Contacts);
+export default compose(withDialogs, withApolloData)(Contacts);

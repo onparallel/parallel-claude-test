@@ -1,8 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Select, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Select, Text } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -456,64 +455,4 @@ Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext)
   );
 };
 
-export default compose(
-  withOnboarding({
-    key: "PETITIONS_LIST",
-    steps: [
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petitions-list.welcome-title"
-            defaultMessage="Welcome to Parallel!"
-          />
-        ),
-        content: (
-          <Stack>
-            <Text>
-              <FormattedMessage
-                id="tour.petitions-list.welcome-content-1"
-                defaultMessage="We are here to help you collect and organize the documents and information you need, keeping everything under control."
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="tour.petitions-list.welcome-content-2"
-                defaultMessage="If this is your first time here, let us show you around!"
-              />
-            </Text>
-          </Stack>
-        ),
-        placement: "center",
-        target: "#__next",
-      },
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petitions-list.create-petition-title"
-            defaultMessage="Let's start by creating a petition!"
-          />
-        ),
-        content: (
-          <Stack>
-            <Text>
-              <FormattedMessage
-                id="tour.petitions-list.create-petition-content-1"
-                defaultMessage="We want you to focus on what matters, so let us collect the information for you."
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="tour.petitions-list.create-petition-content-2"
-                defaultMessage="We will let you know when the recipients complete everything."
-              />
-            </Text>
-          </Stack>
-        ),
-        placement: "right-start",
-        target: "#menu-button-create-petition",
-      },
-    ],
-  }),
-  withDialogs,
-  withApolloData
-)(Petitions);
+export default compose(withDialogs, withApolloData)(Petitions);

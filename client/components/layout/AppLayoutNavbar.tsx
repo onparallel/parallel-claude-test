@@ -31,13 +31,12 @@ import { UserMenu } from "./UserMenu";
 
 export interface AppLayoutNavbarProps extends BoxProps {
   user: AppLayoutNavbar_UserFragment;
-  onOnboardingClick: () => void;
 }
 
 declare const zE: any;
 
 export const AppLayoutNavbar = Object.assign(
-  memo(function AppLayoutNavbar({ user, onOnboardingClick, ...props }: AppLayoutNavbarProps) {
+  memo(function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
     const intl = useIntl();
     const router = useRouter();
     const { pathname, query } = router;
@@ -181,7 +180,6 @@ export const AppLayoutNavbar = Object.assign(
           <UserMenu
             placement={isMobile ? "top-end" : "right-end"}
             user={user}
-            onOnboardingClick={onOnboardingClick}
             onLocaleChange={handleLocaleChange}
           />
         </Stack>

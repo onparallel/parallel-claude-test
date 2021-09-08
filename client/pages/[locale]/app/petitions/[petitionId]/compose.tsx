@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  ListItem,
   Progress,
   Stack,
   Tab,
@@ -10,7 +9,6 @@ import {
   TabPanels,
   Tabs,
   Text,
-  UnorderedList,
   useToast,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon, ListIcon, SettingsIcon } from "@parallel/chakra/icons";
@@ -19,7 +17,6 @@ import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
-import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
@@ -896,106 +893,4 @@ PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   };
 };
 
-export default compose(
-  withOnboarding({
-    key: "PETITION_COMPOSE",
-    steps: [
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petition-compose.initial-title"
-            defaultMessage="Let's fill out your first petition"
-          />
-        ),
-        content: (
-          <>
-            <Text>
-              <FormattedMessage
-                id="tour.petition-compose.initial-content-1"
-                defaultMessage="On this page, you can set up the information that you need from your recipients."
-              />
-            </Text>
-            <Text marginTop={4}>
-              <FormattedMessage
-                id="tour.petition-compose.initial-content-2"
-                defaultMessage="Let us show you step by step!"
-              />
-            </Text>
-          </>
-        ),
-        placement: "center",
-        target: "#__next",
-        disableScrolling: true,
-      },
-      {
-        content: (
-          <Text>
-            <FormattedMessage
-              id="tour.petition-compose.fields-content"
-              defaultMessage="Here you can add what you need from your recipients and choose the type of information it is (files or written replies)."
-            />
-          </Text>
-        ),
-        placement: "right-start",
-        target: "#petition-fields",
-      },
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petition-compose.next-title"
-            defaultMessage="Send the petition"
-          />
-        ),
-        content: (
-          <Text>
-            <FormattedMessage
-              id="tour.petition-compose.next-content"
-              defaultMessage="Once you have added all the fields that you need, click <b>{next}</b> to customize the email message."
-              values={{
-                next: <FormattedMessage id="generic.next" defaultMessage="Next" />,
-              }}
-            />
-          </Text>
-        ),
-        placement: "bottom-end",
-        target: "#petition-next",
-      },
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petition-compose.petition-settings-title"
-            defaultMessage="Need more customization?"
-          />
-        ),
-        content: (
-          <Stack>
-            <Text>
-              <FormattedMessage
-                id="tour.petition-compose.petition-settings-content-1"
-                defaultMessage="Here you will be able to change settings like:"
-              />
-            </Text>
-            <Stack as={UnorderedList} paddingLeft={5}>
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-compose.petition-settings-content-2"
-                  defaultMessage="The <b>language</b> of the recipient view and the message we will send to them."
-                />
-              </ListItem>
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-compose.petition-settings-content-3"
-                  defaultMessage="The <b>deadline</b> that you want to inform the recipients."
-                />
-              </ListItem>
-            </Stack>
-          </Stack>
-        ),
-        placement: "left",
-        target: ".petition-settings",
-      },
-    ],
-  }),
-  withDialogs,
-  withApolloData
-)(PetitionCompose);
+export default compose(withDialogs, withApolloData)(PetitionCompose);
