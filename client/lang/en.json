@@ -2101,13 +2101,13 @@
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-message-1",
-    "definition": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first.",
-    "context": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
+    "definition": "We couldn't find the following {count, plural, =1{contact} other{contacts}}:",
+    "context": "We couldn't find the following {count, plural, =1{contact} other{contacts}}:"
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-message-2",
-    "definition": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one.",
-    "context": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
+    "definition": "Import {count, plural, =1{it} other{them}} first in the <a>contacts page</a>, or add {count, plural, =1{it} other{them}} individually here with {count, plural, =1{its} other{their}} contact email.",
+    "context": "Import {count, plural, =1{it} other{them}} first in the <a>contacts page</a>, or add {count, plural, =1{it} other{them}} individually here with {count, plural, =1{its} other{their}} contact email."
   },
   {
     "term": "component.recipient-select-groups.unknown-recipients",

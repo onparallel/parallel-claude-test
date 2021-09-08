@@ -2101,13 +2101,13 @@
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-message-1",
-    "definition": "Se ha pegado desde el portapapeles un correo electrónico desconocido. Cuando pegues contactos desde el portapapeles, asegúrate de que estos contactos existan primero.",
-    "context": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
+    "definition": "No hemos encontrado {count, plural, =1{el siguiente contacto} other{los siguientes contactos}}:",
+    "context": "We couldn't find the following {count, plural, =1{contact} other{contacts}}:"
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-message-2",
-    "definition": "Puedes importarlos vía Excel en la <a>página de contactos</a>. También puedes añadirlos aquí introduciendo sus correos uno a uno.",
-    "context": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
+    "definition": "{count, plural, =1{Impórtalo} other{Impórtalos}} antes en la <a>página de contactos</a>, o {count, plural, =1{anádelo} other{añádelos uno a uno}} aquí introduciendo {count, plural, =1{su correo electrónico} other{sus correos electrónicos}}.",
+    "context": "Import {count, plural, =1{it} other{them}} first in the <a>contacts page</a>, or add {count, plural, =1{it} other{them}} individually here with {count, plural, =1{its} other{their}} contact email."
   },
   {
     "term": "component.recipient-select-groups.unknown-recipients",

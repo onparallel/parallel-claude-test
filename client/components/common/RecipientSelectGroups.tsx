@@ -20,7 +20,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { uniqBy } from "remeda";
+import { isDefined, uniq, uniqBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { ConfirmDialog } from "./ConfirmDialog";
 import {
@@ -70,7 +70,14 @@ export function RecipientSelectGroups({
   const showMultipleEmailsDialog = useDialog(MultipleEmailsPastedDialog);
   async function handlePasteEmails(groupNumber: number, emails: string[]) {
     const contacts = await onSearchContactsByEmail(emails);
-    if (contacts.some((c) => c === null)) {
+
+    const unknownEmails = uniq(
+      zip(contacts, emails)
+        .map(([contact, email]) => (!contact ? email : null))
+        .filter(isDefined)
+    );
+
+    if (unknownEmails.length > 0) {
       await withError(
         showErrorDialog({
           header: (
@@ -84,15 +91,30 @@ export function RecipientSelectGroups({
               <Text>
                 <FormattedMessage
                   id="component.recipient-select-groups.unknown-contacts-message-1"
-                  defaultMessage="An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
+                  defaultMessage="We couldn't find the following {count, plural, =1{contact} other{contacts}}:"
+                  values={{ count: unknownEmails.length }}
                 />
               </Text>
+
+              <Stack as="ul" paddingX={6} spacing={0}>
+                {unknownEmails.map((email, i) => (
+                  <Text as="li" key={i}>
+                    {email}
+                  </Text>
+                ))}
+              </Stack>
+
               <Text>
                 <FormattedMessage
                   id="component.recipient-select-groups.unknown-contacts-message-2"
-                  defaultMessage="You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
+                  defaultMessage="Import {count, plural, =1{it} other{them}} first in the <a>contacts page</a>, or add {count, plural, =1{it} other{them}} individually here with {count, plural, =1{its} other{their}} contact email."
                   values={{
-                    a: (chunks: any) => <Link href="/app/contacts">{chunks}</Link>,
+                    a: (chunks: any) => (
+                      <Link href="/app/contacts" target="_blank">
+                        {chunks}
+                      </Link>
+                    ),
+                    count: unknownEmails.length,
                   }}
                 />
               </Text>
