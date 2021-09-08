@@ -1,19 +1,11 @@
 import { Box, SimpleGrid, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 
 export const PasswordStrengthIndicator = ({ password }: { password: string }) => {
-  const [strength, setStrength] = useState(0);
-
-  const PSW_REGEX = [".*[0-9].*", "^(?=.*[a-z]).{1,}$", "^(?=.*[A-Z]).{1,}$", "^.{8,}$"]; // Min 1 uppercase, lowercase, number and 8 chars splited to validate strength
-
-  useEffect(() => {
-    const res = PSW_REGEX.reduce((acc, value) => {
-      const re = new RegExp(value);
-      const test = re.test(password);
-      return acc + Number(test);
-    }, 0);
-    setStrength(res);
+  const strength = useMemo(() => {
+    const PSW_REGEX = [/\d/, /[a-z]/, /[A-Z]/, /^.{8,}$/]; // Min 1 uppercase, lowercase, number and 8 chars splited to validate strength
+    return PSW_REGEX.reduce((acc, re) => acc + (re.test(password) ? 1 : 0), 0);
   }, [password]);
 
   return (
