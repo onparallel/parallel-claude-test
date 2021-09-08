@@ -18,10 +18,6 @@ export class OrganizationRepository extends BaseRepository {
 
   readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadOrgByIdentifier = this.buildLoadBy("organization", "identifier", (q) =>
-    q.whereNull("deleted_at")
-  );
-
   async loadOrgUsers(
     orgId: number,
     opts: {

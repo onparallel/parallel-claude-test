@@ -337,6 +337,15 @@ export const userSignUp = mutationField("userSignUp", {
     validPassword((args) => args.password),
     validEmail((args) => args.email, "email"),
     emailIsAvailable((args) => args.email, "email"),
+    (_, args, ctx, info) => {
+      if (args.organizationName.trim().toLowerCase() === "parallel") {
+        throw new ArgValidationError(
+          info,
+          "name",
+          `Organization name cannot be '${args.organizationName}'`
+        );
+      }
+    },
     validateIf(
       (args) => isDefined(args.organizationLogo),
       validateFile(
@@ -375,13 +384,6 @@ export const userSignUp = mutationField("userSignUp", {
       const org = await ctx.organizations.createOrganization(
         {
           name: args.organizationName,
-          identifier: args.organizationName
-            .trim()
-            .toLowerCase()
-            .replace(/ /g, "-")
-            // make sure the identifier is unique on organizations with the same name
-            // TODO maybe we can drop this column in db
-            .concat(`-${random(6)}`),
           status: "ACTIVE",
           logo_public_file_id: logoFile?.id ?? null,
         },

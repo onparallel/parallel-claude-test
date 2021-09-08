@@ -1950,6 +1950,11 @@
     "context": "Remove image"
   },
   {
+    "term": "component.public-signup-form-organization.taken-company-name-error",
+    "definition": "You can't use this as your company name",
+    "context": "You can't use this as your company name"
+  },
+  {
     "term": "component.public-signup-form-organization.upload-organizationLogo-button",
     "definition": "Upload logo",
     "context": "Upload logo"
