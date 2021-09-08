@@ -20,7 +20,7 @@ import { createSingleLinePlugin, useSingleLine } from "@parallel/utils/slate/Sin
 import { CustomEditor, CustomElement } from "@parallel/utils/slate/types";
 import { createReactPlugin, createHistoryPlugin, withPlate, Plate } from "@udecode/plate-core";
 import { ELEMENT_PARAGRAPH, createParagraphPlugin } from "@udecode/plate-paragraph";
-import React, {
+import {
   CSSProperties,
   KeyboardEvent,
   MouseEvent,

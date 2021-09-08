@@ -87,7 +87,7 @@ import {
   unwrapList,
 } from "@udecode/plate-list";
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import React, {
+import {
   CSSProperties,
   forwardRef,
   KeyboardEvent,

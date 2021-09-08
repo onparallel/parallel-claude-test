@@ -40,8 +40,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { useEffect } from "react";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 

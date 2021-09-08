@@ -1,5 +1,4 @@
-import React, { Fragment, ReactNode } from "react";
-import { createElement } from "react";
+import { createElement, Fragment, ReactNode } from "react";
 import { renderToString } from "react-dom/server";
 import { Contact, Petition, User } from "../db/__types";
 import { fullName } from "./fullName";

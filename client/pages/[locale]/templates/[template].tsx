@@ -34,8 +34,7 @@ import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { Assert } from "@parallel/utils/types";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
 
