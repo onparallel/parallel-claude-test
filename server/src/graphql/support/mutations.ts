@@ -79,21 +79,19 @@ export const createOrganization = mutationField("createOrganization", {
   type: "SupportMethodResponse",
   args: {
     name: nonNull(stringArg({ description: "Name of the organization" })),
-    identifier: nonNull(stringArg({ description: "Identifier of the organization" })),
     status: nonNull(arg({ type: "OrganizationStatus" })),
   },
   authorize: supportMethodAccess(),
+  validateArgs: (_, args, ctx, info) => {
+    if (args.name.trim().toLowerCase() === "parallel") {
+      throw new ArgValidationError(info, "name", `Organization name cannot be '${args.name}'`);
+    }
+  },
   resolve: async (_, args, ctx) => {
     try {
-      const identifier = args.identifier.trim().toLowerCase();
-      if (identifier.indexOf(" ") > -1) {
-        throw new Error("Identifier must not contain spaces.");
-      }
-
       const org = await ctx.organizations.createOrganization(
         {
           name: args.name.trim(),
-          identifier,
           status: args.status,
         },
         `User:${ctx.user!.id}`

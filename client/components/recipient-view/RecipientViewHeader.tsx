@@ -273,7 +273,6 @@ RecipientViewHeader.fragments = {
       email
       organization {
         name
-        identifier
         logoUrl
       }
     }

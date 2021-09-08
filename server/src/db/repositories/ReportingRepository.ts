@@ -13,12 +13,7 @@ export class ReportingRepository extends BaseRepository {
   }
 
   async loadReportingData() {
-    const organizations = await this.from("organization").select(
-      "id",
-      "name",
-      "identifier",
-      "status"
-    );
+    const organizations = await this.from("organization").select("id", "name", "status");
     const users = await this.from("user").select(
       "id",
       "email",

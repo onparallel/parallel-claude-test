@@ -100,7 +100,7 @@ scim
         const user = await req.context.users.createUser(
           {
             // fake unique cognitoId, should update when user logs in
-            cognito_id: `${req.context.organization!.identifier}_${externalId}`,
+            cognito_id: `${req.context.organization!.id}_${externalId}`,
             org_id: orgId,
             email: email.toLowerCase(),
             first_name: givenName,

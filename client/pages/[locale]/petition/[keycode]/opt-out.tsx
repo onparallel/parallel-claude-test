@@ -221,7 +221,6 @@ OptOut.fragments = {
         id
         organization {
           name
-          identifier
           logoUrl
         }
       }

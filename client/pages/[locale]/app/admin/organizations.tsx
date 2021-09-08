@@ -171,14 +171,6 @@ function useOrganizationColumns() {
         CellContent: ({ row }) => <>{row.name}</>,
       },
       {
-        key: "identifier",
-        header: intl.formatMessage({
-          id: "organizations.header.identifier",
-          defaultMessage: "Identifier",
-        }),
-        CellContent: ({ row }) => <>{row.identifier}</>,
-      },
-      {
         key: "status",
         header: intl.formatMessage({
           id: "organizations.header.status",
@@ -243,7 +235,6 @@ AdminOrganizations.fragments = {
         id
         _id
         name
-        identifier
         status
         userCount
         createdAt

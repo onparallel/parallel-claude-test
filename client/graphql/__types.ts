@@ -643,7 +643,6 @@ export interface MutationcreateFileUploadReplyArgs {
 }
 
 export interface MutationcreateOrganizationArgs {
-  identifier: Scalars["String"];
   name: Scalars["String"];
   status: OrganizationStatus;
 }
@@ -1232,8 +1231,6 @@ export interface Organization extends Timestamps {
   hasSsoProvider: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
-  /** The unique text identifier of the organization. */
-  identifier: Scalars["String"];
   integrations: Array<OrgIntegration>;
   /** URL of the organization logo */
   logoUrl?: Maybe<Scalars["String"]>;
@@ -1990,8 +1987,6 @@ export interface PublicOrganization {
   __typename?: "PublicOrganization";
   /** The ID of the organization. */
   id: Scalars["GID"];
-  /** The identifier of the organization. */
-  identifier: Scalars["String"];
   /** The logo of the organization. */
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
@@ -7102,12 +7097,7 @@ export type RecipientViewHeader_PublicUserFragment = {
   firstName?: Maybe<string>;
   fullName?: Maybe<string>;
   email: string;
-  organization: {
-    __typename?: "PublicOrganization";
-    name: string;
-    identifier: string;
-    logoUrl?: Maybe<string>;
-  };
+  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
 };
 
 export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables = Exact<{
@@ -7632,7 +7622,6 @@ export type AdminOrganizations_OrganizationFragment = {
   id: string;
   _id: number;
   name: string;
-  identifier: string;
   status: OrganizationStatus;
   userCount: number;
   createdAt: string;
@@ -7665,7 +7654,6 @@ export type AdminOrganizationsQuery = {
       id: string;
       _id: number;
       name: string;
-      identifier: string;
       status: OrganizationStatus;
       userCount: number;
       createdAt: string;
@@ -12412,12 +12400,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
     id: string;
     firstName?: Maybe<string>;
     email: string;
-    organization: {
-      __typename?: "PublicOrganization";
-      name: string;
-      identifier: string;
-      logoUrl?: Maybe<string>;
-    };
+    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
   }>;
   contact?: Maybe<{
     __typename?: "PublicContact";
@@ -12542,12 +12525,7 @@ export type RecipientView_PublicUserFragment = {
   firstName?: Maybe<string>;
   fullName?: Maybe<string>;
   email: string;
-  organization: {
-    __typename?: "PublicOrganization";
-    name: string;
-    identifier: string;
-    logoUrl?: Maybe<string>;
-  };
+  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
 };
 
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
@@ -12634,12 +12612,7 @@ export type PublicPetitionQuery = {
       id: string;
       firstName?: Maybe<string>;
       email: string;
-      organization: {
-        __typename?: "PublicOrganization";
-        name: string;
-        identifier: string;
-        logoUrl?: Maybe<string>;
-      };
+      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
     }>;
     contact?: Maybe<{
       __typename?: "PublicContact";
@@ -12717,24 +12690,14 @@ export type OptOut_PublicPetitionAccessFragment = {
   granter?: Maybe<{
     __typename?: "PublicUser";
     id: string;
-    organization: {
-      __typename?: "PublicOrganization";
-      name: string;
-      identifier: string;
-      logoUrl?: Maybe<string>;
-    };
+    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
   }>;
 };
 
 export type OptOut_PublicUserFragment = {
   __typename?: "PublicUser";
   id: string;
-  organization: {
-    __typename?: "PublicOrganization";
-    name: string;
-    identifier: string;
-    logoUrl?: Maybe<string>;
-  };
+  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
 };
 
 export type PublicOptOutQueryVariables = Exact<{
@@ -12747,12 +12710,7 @@ export type PublicOptOutQuery = {
     granter?: Maybe<{
       __typename?: "PublicUser";
       id: string;
-      organization: {
-        __typename?: "PublicOrganization";
-        name: string;
-        identifier: string;
-        logoUrl?: Maybe<string>;
-      };
+      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
     }>;
   }>;
 };
@@ -13927,7 +13885,6 @@ export const AdminOrganizations_OrganizationFragmentDoc = gql`
     id
     _id
     name
-    identifier
     status
     userCount
     createdAt
@@ -15716,7 +15673,6 @@ export const RecipientViewHeader_PublicUserFragmentDoc = gql`
     email
     organization {
       name
-      identifier
       logoUrl
     }
   }
@@ -15798,7 +15754,6 @@ export const OptOut_PublicUserFragmentDoc = gql`
     id
     organization {
       name
-      identifier
       logoUrl
     }
   }

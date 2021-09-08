@@ -891,7 +891,6 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     hasSsoProvider: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
-    identifier: string; // String!
     integrations: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
     logoUrl: string | null; // String
     name: string; // String!
@@ -1214,7 +1213,6 @@ export interface NexusGenFieldTypes {
   PublicOrganization: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
-    identifier: string; // String!
     logoUrl: string | null; // String
     name: string; // String!
   };
@@ -1981,7 +1979,6 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     hasSsoProvider: "Boolean";
     id: "GID";
-    identifier: "String";
     integrations: "OrgIntegration";
     logoUrl: "String";
     name: "String";
@@ -2304,7 +2301,6 @@ export interface NexusGenFieldTypeNames {
   PublicOrganization: {
     // field return type name
     id: "GID";
-    identifier: "String";
     logoUrl: "String";
     name: "String";
   };
@@ -2841,7 +2837,6 @@ export interface NexusGenArgTypes {
     };
     createOrganization: {
       // args
-      identifier: string; // String!
       name: string; // String!
       status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     };

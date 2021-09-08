@@ -609,7 +609,6 @@ export type MutationcreateFileUploadReplyArgs = {
 };
 
 export type MutationcreateOrganizationArgs = {
-  identifier: Scalars["String"];
   name: Scalars["String"];
   status: OrganizationStatus;
 };
@@ -1196,8 +1195,6 @@ export type Organization = Timestamps & {
   hasSsoProvider: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
-  /** The unique text identifier of the organization. */
-  identifier: Scalars["String"];
   integrations: Array<OrgIntegration>;
   /** URL of the organization logo */
   logoUrl: Maybe<Scalars["String"]>;
@@ -1921,8 +1918,6 @@ export type PublicContact = {
 export type PublicOrganization = {
   /** The ID of the organization. */
   id: Scalars["GID"];
-  /** The identifier of the organization. */
-  identifier: Scalars["String"];
   /** The logo of the organization. */
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */

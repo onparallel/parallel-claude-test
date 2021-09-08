@@ -71,7 +71,6 @@ export class Mocks {
         range(0, amount).map<CreateOrganization>((index) => {
           return {
             name: faker.company.companyName(),
-            identifier: faker.random.alphaNumeric(10),
             status: "DEV",
             ...builder?.(index),
           };

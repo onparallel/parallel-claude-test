@@ -500,11 +500,6 @@ type Mutation {
   """
   createOrganization(
     """
-    Identifier of the organization
-    """
-    identifier: String!
-
-    """
     Name of the organization
     """
     name: String!
@@ -1334,11 +1329,6 @@ type Organization implements Timestamps {
   The ID of the organization.
   """
   id: GID!
-
-  """
-  The unique text identifier of the organization.
-  """
-  identifier: String!
   integrations(
     """
     Filter by integration type.
@@ -2703,11 +2693,6 @@ type PublicOrganization {
   The ID of the organization.
   """
   id: GID!
-
-  """
-  The identifier of the organization.
-  """
-  identifier: String!
 
   """
   The logo of the organization.

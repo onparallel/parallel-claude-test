@@ -20,7 +20,7 @@ describe("GraphQL/Users", () => {
     mocks = new Mocks(knex);
 
     [organization] = await mocks.createRandomOrganizations(1, () => ({
-      identifier: "parallel",
+      name: "Parallel",
       status: "DEV",
     }));
 
@@ -48,7 +48,7 @@ describe("GraphQL/Users", () => {
               id
               fullName
               organization {
-                identifier
+                name
               }
             }
           }
@@ -59,7 +59,7 @@ describe("GraphQL/Users", () => {
         id: sessionUserGID,
         fullName: "Harvey Specter",
         organization: {
-          identifier: "parallel",
+          name: "Parallel",
         },
       });
     });

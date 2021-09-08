@@ -75,7 +75,7 @@ describe("GraphQL/Petitions", () => {
 
     // main organization
     [organization] = await mocks.createRandomOrganizations(1, () => ({
-      identifier: "parallel",
+      name: "Parallel",
       status: "DEV",
     }));
 
@@ -563,7 +563,6 @@ describe("GraphQL/Petitions", () => {
               items {
                 owner {
                   organization {
-                    identifier
                     users {
                       totalCount
                     }

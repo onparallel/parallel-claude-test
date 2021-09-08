@@ -34,7 +34,7 @@ describe("GraphQL/Petition Field Replies", () => {
     mocks = new Mocks(knex);
 
     [organization] = await mocks.createRandomOrganizations(1, () => ({
-      identifier: "parallel",
+      name: "Parallel",
       status: "DEV",
     }));
 

@@ -285,9 +285,6 @@ export const PublicOrganization = objectType({
     t.string("name", {
       description: "The name of the organization.",
     });
-    t.string("identifier", {
-      description: "The identifier of the organization.",
-    });
     t.nullable.string("logoUrl", {
       description: "The logo of the organization.",
       resolve: async (root, _, ctx) => {

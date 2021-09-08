@@ -23,7 +23,7 @@ describe("GraphQL/Public", () => {
     contactRepository = testClient.container.get<ContactRepository>(ContactRepository);
     mocks = new Mocks(knex);
     const [org] = await mocks.createRandomOrganizations(1, () => ({
-      identifier: "parallel",
+      name: "Parallel",
       status: "DEV",
     }));
     const [user] = await mocks.createRandomUsers(org.id, 1);

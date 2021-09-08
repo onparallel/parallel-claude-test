@@ -4040,11 +4040,6 @@
     "context": "Users"
   },
   {
-    "term": "organizations.header.identifier",
-    "definition": "Identifier",
-    "context": "Identifier"
-  },
-  {
     "term": "organizations.header.organization-name",
     "definition": "Organization name",
     "context": "Organization name"

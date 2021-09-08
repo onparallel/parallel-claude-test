@@ -55,10 +55,6 @@ export const Organization = objectType({
     t.string("name", {
       description: "The name of the organization.",
     });
-    t.string("identifier", {
-      description: "The unique text identifier of the organization.",
-      authorize: isOwnOrgOrSuperAdmin(),
-    });
     t.nullable.string("logoUrl", {
       description: "URL of the organization logo",
       resolve: async (root, args, ctx) => {

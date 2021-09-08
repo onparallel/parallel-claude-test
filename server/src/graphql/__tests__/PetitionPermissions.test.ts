@@ -31,7 +31,7 @@ describe("GraphQL/Petition Permissions", () => {
     await deleteAllData(knex);
 
     [organization] = await mocks.createRandomOrganizations(1, () => ({
-      identifier: "parallel",
+      name: "Parallel",
       status: "DEV",
     }));
 

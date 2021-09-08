@@ -50,18 +50,6 @@ export const supportMethods: {
       description: "Creates a new organization.",
       args: [
         {
-          name: "identifier",
-          description: "Identifier of the organization",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
           name: "name",
           description: "Name of the organization",
           type: {

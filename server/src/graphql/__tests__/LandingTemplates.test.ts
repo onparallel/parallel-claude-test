@@ -20,7 +20,7 @@ describe("GraphQL/LandingTemplates", () => {
     knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
     const [org] = await mocks.createRandomOrganizations(1, () => ({
-      identifier: "parallel",
+      name: "Parallel",
       status: "DEV",
     }));
     const [sessionUser] = await mocks.createRandomUsers(org.id, 1, () => ({

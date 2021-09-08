@@ -19,7 +19,6 @@ createCronWorker("reporting", async (context) => {
   organizations.columns = [
     { header: "ID", key: "id" },
     { header: "Name", key: "name" },
-    { header: "Identifier", key: "identifier" },
     { header: "Status", key: "status" },
   ];
   const users = wb.addWorksheet("Users");

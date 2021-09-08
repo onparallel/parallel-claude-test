@@ -25,7 +25,7 @@ describe("GraphQL/Petition Event Subscriptions", () => {
     mocks = new Mocks(knex);
 
     [organization] = await mocks.createRandomOrganizations(1, () => ({
-      identifier: "parallel",
+      name: "Parallel",
       status: "DEV",
     }));
 

@@ -372,7 +372,6 @@ export type CreateFileUpload = PartialProps<
 export interface Organization {
   id: number; // int4
   name: string; // varchar
-  identifier: string; // varchar
   status: OrganizationStatus; // organization_status
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
