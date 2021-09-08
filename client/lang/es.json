@@ -2610,7 +2610,7 @@
     "context": "For example:"
   },
   {
-    "term": "field-settings.file-checbox-description",
+    "term": "field-settings.file-checkbox-description",
     "definition": "Esta opción permite limitar el número de opciones que puede escoger el destinarario.",
     "context": "This option allows you to limit the number of options that the recipient can choose."
   },
@@ -7412,7 +7412,7 @@
   {
     "term": "view.groups.delete-success-description",
     "definition": "{count, plural, =1 {Grupo <b>{name}</b> eliminado} other{<b>#</b> grupos eliminados}} correctamente.",
-    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} successfully deleted."
+    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully deleted."
   },
   {
     "term": "view.groups.delete-success-title",

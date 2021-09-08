@@ -209,7 +209,7 @@ export function CheckboxSettings({
         description={
           <Text fontSize="sm">
             <FormattedMessage
-              id="field-settings.file-checbox-description"
+              id="field-settings.file-checkbox-description"
               defaultMessage="This option allows you to limit the number of options that the recipient can choose."
             />
           </Text>

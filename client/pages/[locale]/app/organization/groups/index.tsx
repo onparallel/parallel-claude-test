@@ -187,7 +187,7 @@ function OrganizationGroups() {
           {
             id: "view.groups.delete-success-description",
             defaultMessage:
-              "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} successfully deleted.",
+              "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully deleted.",
           },
           {
             count: selected.length,
