@@ -128,10 +128,10 @@ export const theme = extendTheme({
             },
           };
         },
-        outline: {
-          border: "1px solid",
-          borderColor: "gray.300",
-        },
+        // outline: {
+        //   border: "1px solid",
+        //   borderColor: "gray.300",
+        // },
       },
     },
     Checkbox: {
