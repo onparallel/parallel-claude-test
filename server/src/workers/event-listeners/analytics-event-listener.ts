@@ -4,10 +4,10 @@ import {
   AccessActivatedEvent,
   AccessActivatedFromPublicPetitionLinkEvent,
   AccessOpenedEvent,
-  EmailVerifiedSystemEvent,
-  InviteSentSystemEvent,
   CommentPublishedEvent,
   EmailOpenedSystemEvent,
+  EmailVerifiedSystemEvent,
+  InviteSentSystemEvent,
   PetitionClonedEvent,
   PetitionClosedEvent,
   PetitionCompletedEvent,
@@ -329,7 +329,7 @@ async function trackInviteSentEvent(event: InviteSentSystemEvent, ctx: WorkerCon
 
 async function trackFirstReplyCreatedEvent(event: ReplyCreatedEvent, ctx: WorkerContext) {
   const [replyCreatedEvents, petitionOwner] = await Promise.all([
-    ctx.petitions.loadLastEventsByType(event.petition_id, ["REPLY_CREATED"]),
+    ctx.petitions.getPetitionEventsByType(event.petition_id, "REPLY_CREATED"),
     loadPetitionOwner(event.petition_id, ctx),
   ]);
 

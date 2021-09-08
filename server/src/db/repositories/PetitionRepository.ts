@@ -1,5 +1,5 @@
 import DataLoader from "dataloader";
-import { subSeconds } from "date-fns";
+import { isSameMonth, isThisMonth, subMonths } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { countBy, groupBy, indexBy, isDefined, maxBy, omit, sortBy, uniq, zip } from "remeda";
@@ -1707,12 +1707,31 @@ export class PetitionRepository extends BaseRepository {
         }
       : never)[]
   > {
-    const types = unMaybeArray(eventTypes);
     const events = await this.from("petition_event")
       .where("petition_id", petitionId)
-      .whereIn("type", types)
+      .whereIn("type", eventTypes)
       .groupBy("type")
       .select("type", this.knex.raw("MAX(created_at) as last_used_at"), "data");
+    return events as any[];
+  }
+
+  async getPetitionEventsByType<T extends PetitionEventType>(
+    petitionId: number,
+    eventType: T
+  ): Promise<
+    // Distribute union type
+    (T extends any
+      ? {
+          type: T;
+          last_used_at: Date;
+          data: PetitionEventPayload<T>;
+        }
+      : never)[]
+  > {
+    const events = await this.from("petition_event")
+      .where("petition_id", petitionId)
+      .where("type", eventType)
+      .select("*");
     return events as any[];
   }
 
@@ -3632,27 +3651,12 @@ export class PetitionRepository extends BaseRepository {
       [userId]
     );
 
-    function isFromCurrentMonth(date: Date) {
-      const today = new Date();
-      const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-      const currentMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      return (
-        currentMonthStart.getTime() <= date.getTime() && date.getTime() <= currentMonthEnd.getTime()
-      );
-    }
-
-    function isFromLastMonth(date: Date) {
-      const today = new Date();
-      const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-      const lastMonthEnd = subSeconds(currentMonthStart, 1);
-      const lastMonthStart = new Date(lastMonthEnd.getFullYear(), lastMonthEnd.getMonth(), 1);
-      return lastMonthStart.getTime() <= date.getTime() && date.getTime() <= lastMonthEnd.getTime();
-    }
-
     return {
       petitions_sent: petitions.length,
-      petitions_sent_this_month: petitions.filter((s) => isFromCurrentMonth(s.sent_at)).length,
-      petitions_sent_last_month: petitions.filter((s) => isFromLastMonth(s.sent_at)).length,
+      petitions_sent_this_month: countBy(petitions, (p) => isThisMonth(p.sent_at)),
+      petitions_sent_last_month: countBy(petitions, (p) =>
+        isSameMonth(p.sent_at, subMonths(new Date(), 1))
+      ),
       petitions_pending: petitions.filter((s) => s.status === "PENDING").length,
     };
   }
