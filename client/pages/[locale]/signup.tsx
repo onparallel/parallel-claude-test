@@ -14,8 +14,7 @@ import { PublicSignupRightHeading } from "@parallel/components/public/signup/Pub
 import { useSignup_userSignUpMutation } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { useEffect } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 
 type SignupFormData = {
