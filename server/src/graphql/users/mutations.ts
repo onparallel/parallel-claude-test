@@ -11,6 +11,8 @@ import pMap from "p-map";
 import { isDefined, zip } from "remeda";
 import { PublicFileUpload } from "../../db/__types";
 import { partition } from "../../util/arrays";
+import { withError } from "../../util/promises/withError";
+import { fullName } from "../../util/fullName";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
@@ -21,19 +23,19 @@ import {
   authenticateAnd,
   ifArgDefined,
 } from "../helpers/authorize";
-import { ArgValidationError, WhitelistedError } from "../helpers/errors";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { maxLength } from "../helpers/validators/maxLength";
-import { validPassword } from "../helpers/validators/validPassword";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
+import { validPassword } from "../helpers/validators/validPassword";
 import { orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import {
@@ -43,7 +45,6 @@ import {
   userIsNotContextUser,
   userIsNotSSO,
 } from "./authorizers";
-import { fullName } from "../../util/fullName";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -332,25 +333,31 @@ export const userSignUp = mutationField("userSignUp", {
     )
   ),
   resolve: async (_, args, ctx) => {
-    return await ctx.users.withTransaction(async (t) => {
-      let logoFile: Maybe<PublicFileUpload> = null;
-      if (args.organizationLogo) {
-        const { mimetype, createReadStream } = await args.organizationLogo;
-        const filename = random(16);
-        const path = `uploads/${filename}`;
-        const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
-        logoFile = await ctx.files.createPublicFile(
-          {
-            path,
-            filename,
-            content_type: mimetype,
-            size: res["ContentLength"]!.toString(),
-          },
-          undefined,
-          t
-        );
-      }
+    const [error, cognitoId] = await withError(
+      ctx.aws.signUpUser(args.email, args.password, args.firstName, args.lastName, {
+        locale: args.locale ?? "en",
+      })
+    );
+    if (error) {
+      await withError(ctx.aws.deleteUser(args.email));
+      throw error;
+    }
 
+    let logoFile: Maybe<PublicFileUpload> = null;
+    if (args.organizationLogo) {
+      const { mimetype, createReadStream } = await args.organizationLogo;
+      const filename = random(16);
+      const path = `uploads/${filename}`;
+      const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
+      logoFile = await ctx.files.createPublicFile({
+        path,
+        filename,
+        content_type: mimetype,
+        size: res["ContentLength"]!.toString(),
+      });
+    }
+
+    return await ctx.users.withTransaction(async (t) => {
       const org = await ctx.organizations.createOrganization(
         {
           name: args.organizationName,
@@ -368,23 +375,9 @@ export const userSignUp = mutationField("userSignUp", {
         t
       );
 
-      const cognitoId = await ctx.aws
-        .signUpUser(args.email, args.password, args.firstName, args.lastName, {
-          locale: args.locale ?? "en",
-        })
-        .catch(async (e) => {
-          // delete user from AWS Cognito, then throw the error to do a transaction rollback
-          await ctx.aws.deleteUser(args.email).catch(() => {});
-          if (e.code === "InvalidPasswordException") {
-            throw new WhitelistedError(e.message, "INVALID_PASSWORD_ERROR");
-          } else {
-            throw e;
-          }
-        });
-
       const user = await ctx.users.createUser(
         {
-          cognito_id: cognitoId,
+          cognito_id: cognitoId!,
           email: args.email,
           org_id: org.id,
           first_name: args.firstName,
