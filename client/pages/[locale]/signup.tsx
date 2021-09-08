@@ -37,10 +37,10 @@ function Signup() {
   const formData = useRef<Partial<SignupFormData>>({});
 
   const {
-    value: currentStep,
+    valueAsNumber: currentStep,
     increment: nextStep,
     decrement: prevStep,
-  } = useCounter({ min: 0, max: 4, value: 0 });
+  } = useCounter({ min: 0, max: 4, defaultValue: 0 });
 
   const [userSignUp, { loading }] = useSignup_userSignUpMutation();
 
@@ -55,13 +55,11 @@ function Signup() {
             locale: intl.locale,
           },
         });
-        nextStep();
       } catch (error) {
         genericErrorToast();
       }
-    } else {
-      nextStep();
     }
+    nextStep();
   };
 
   useEffect(() => {
