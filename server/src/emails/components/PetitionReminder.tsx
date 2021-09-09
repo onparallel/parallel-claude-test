@@ -122,6 +122,12 @@ const email: Email<PetitionReminderProps> = {
       ${parallelUrl}/${intl.locale}/petition/${keycode}
 
       ${disclaimer({ email: senderEmail }, intl)}
+
+      ${intl.formatMessage({
+        id: "layout.stop-reminders",
+        defaultMessage: "Stop receibing reminders",
+      })}:
+      ${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=reminder
     `;
   },
   html({
@@ -138,7 +144,6 @@ const email: Email<PetitionReminderProps> = {
     logoUrl,
     logoAlt,
   }: PetitionReminderProps) {
-    const { locale } = useIntl();
     const intl = useIntl();
 
     return (
@@ -148,7 +153,7 @@ const email: Email<PetitionReminderProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        optOutUrl={`${parallelUrl}/${locale}/petition/${keycode}/opt-out?ref=reminder`}
+        optOutUrl={`${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=reminder`}
         optOutText={intl.formatMessage({
           id: "layout.stop-reminders",
           defaultMessage: "Stop receibing reminders",
@@ -207,7 +212,7 @@ const email: Email<PetitionReminderProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton href={`${parallelUrl}/${locale}/petition/${keycode}`} />
+            <CompleteInfoButton href={`${parallelUrl}/${intl.locale}/petition/${keycode}`} />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

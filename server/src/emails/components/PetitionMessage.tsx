@@ -68,6 +68,13 @@ const email: Email<PetitionMessageProps> = {
       ${parallelUrl}/${intl.locale}/petition/${keycode}
       
       ${disclaimer({ email: senderEmail }, intl)}
+
+
+      ${intl.formatMessage({
+        id: "layout.stop-receiving-emails",
+        defaultMessage: "Stop receiving this emails",
+      })}:
+      ${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=petition-access
     `;
   },
   html({
@@ -81,7 +88,6 @@ const email: Email<PetitionMessageProps> = {
     logoUrl,
     logoAlt,
   }: PetitionMessageProps) {
-    const { locale } = useIntl();
     const intl = useIntl();
 
     return (
@@ -91,7 +97,7 @@ const email: Email<PetitionMessageProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        optOutUrl={`${parallelUrl}/${locale}/petition/${keycode}/opt-out?ref=petition-access`}
+        optOutUrl={`${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=petition-access`}
         optOutText={intl.formatMessage({
           id: "layout.stop-receiving-emails",
           defaultMessage: "Stop receiving this emails",
@@ -132,7 +138,7 @@ const email: Email<PetitionMessageProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton href={`${parallelUrl}/${locale}/petition/${keycode}`} />
+            <CompleteInfoButton href={`${parallelUrl}/${intl.locale}/petition/${keycode}`} />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
