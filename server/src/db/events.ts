@@ -128,6 +128,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_access_id: number;
     reason: string;
     other?: string;
+    referer?: string | null;
   };
   ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
     petition_access_id: number;

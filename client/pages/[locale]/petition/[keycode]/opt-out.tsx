@@ -52,7 +52,7 @@ function OptOut({ keycode, access }: OptOutProps) {
 
   const handleOptOut = async (event: FormEvent) => {
     event.preventDefault();
-    await optOut({ variables: { keycode, reason, other } });
+    await optOut({ variables: { keycode, reason, other, referer: ref as string } });
     setOptedOut(true);
   };
 
@@ -200,8 +200,13 @@ function OptOut({ keycode, access }: OptOutProps) {
 
 OptOut.mutations = [
   gql`
-    mutation OptOut_publicOptOutReminders($keycode: ID!, $reason: String!, $other: String!) {
-      publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other) {
+    mutation OptOut_publicOptOutReminders(
+      $keycode: ID!
+      $reason: String!
+      $other: String!
+      $referer: String
+    ) {
+      publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other, referer: $referer) {
         petition {
           id
         }

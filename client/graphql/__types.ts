@@ -890,6 +890,7 @@ export interface MutationpublicOptOutRemindersArgs {
   keycode: Scalars["ID"];
   other: Scalars["String"];
   reason: Scalars["String"];
+  referer?: Maybe<Scalars["String"]>;
 }
 
 export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
@@ -13439,6 +13440,7 @@ export type OptOut_publicOptOutRemindersMutationVariables = Exact<{
   keycode: Scalars["ID"];
   reason: Scalars["String"];
   other: Scalars["String"];
+  referer?: Maybe<Scalars["String"]>;
 }>;
 
 export type OptOut_publicOptOutRemindersMutation = {
@@ -21053,8 +21055,13 @@ export type publicCheckVerificationCodeMutationHookResult = ReturnType<
   typeof usepublicCheckVerificationCodeMutation
 >;
 export const OptOut_publicOptOutRemindersDocument = gql`
-  mutation OptOut_publicOptOutReminders($keycode: ID!, $reason: String!, $other: String!) {
-    publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other) {
+  mutation OptOut_publicOptOutReminders(
+    $keycode: ID!
+    $reason: String!
+    $other: String!
+    $referer: String
+  ) {
+    publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other, referer: $referer) {
       petition {
         id
       }

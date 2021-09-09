@@ -233,6 +233,7 @@ function mapEventPayload(event: PetitionEvent) {
         petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
         reason: event.data.reason,
         other: event.data.other,
+        referer: event.data.referer,
       };
     }
     case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK": {

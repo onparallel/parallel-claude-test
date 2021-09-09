@@ -856,6 +856,7 @@ export type MutationpublicOptOutRemindersArgs = {
   keycode: Scalars["ID"];
   other: Scalars["String"];
   reason: Scalars["String"];
+  referer?: Maybe<Scalars["String"]>;
 };
 
 export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
@@ -1245,7 +1246,9 @@ export type OrganizationStatus =
   /** Used for demoing the product */
   | "DEMO"
   /** Used for development or testing purposes */
-  | "DEV";
+  | "DEV"
+  /** Root client */
+  | "ROOT";
 
 export type OrganizationUsageLimit = {
   petitions: OrganizationUsagePetitionLimit;
@@ -2581,6 +2584,8 @@ export type User = Timestamps & {
   hasFeatureFlag: Scalars["Boolean"];
   /** The ID of the user. */
   id: Scalars["GID"];
+  /** The initials of the user. */
+  initials: Maybe<Scalars["String"]>;
   isSsoUser: Scalars["Boolean"];
   isSuperAdmin: Scalars["Boolean"];
   lastActiveAt: Maybe<Scalars["DateTime"]>;
@@ -2646,6 +2651,7 @@ export type UserGroup = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  initials: Scalars["String"];
   members: Array<UserGroupMember>;
   name: Scalars["String"];
   /** Time when the resource was last updated. */

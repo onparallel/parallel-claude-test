@@ -949,6 +949,7 @@ export const publicOptOutReminders = mutationField("publicOptOutReminders", {
     keycode: nonNull(idArg()),
     reason: nonNull(stringArg()),
     other: nonNull(stringArg()),
+    referer: nullable(stringArg()),
   },
   resolve: async (_, args, ctx) => {
     const petitionId = ctx.access!.petition_id;
@@ -962,6 +963,7 @@ export const publicOptOutReminders = mutationField("publicOptOutReminders", {
           petition_access_id: access!.id,
           reason: args.reason,
           other: args.other,
+          referer: args.referer,
         },
       });
     }

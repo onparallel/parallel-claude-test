@@ -863,7 +863,12 @@ type Mutation {
   """
   Cancel a reminder for a contact.
   """
-  publicOptOutReminders(keycode: ID!, other: String!, reason: String!): PublicPetitionAccess!
+  publicOptOutReminders(
+    keycode: ID!
+    other: String!
+    reason: String!
+    referer: String
+  ): PublicPetitionAccess!
 
   """
   Generates a download link for a field attachment on a public context.

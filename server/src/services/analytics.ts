@@ -129,6 +129,7 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     other?: string;
     petition_id: number;
     petition_access_id: number;
+    referer?: string | null;
   };
   FIRST_REPLY_CREATED: {
     petition_id: number;

@@ -310,6 +310,7 @@ async function trackRemindersOptOutEvent(event: RemindersOptOutEvent, ctx: Worke
       petition_access_id: access.id,
       reason: event.data.reason,
       other: event.data.other,
+      referer: event.data.referer,
     },
   });
 }

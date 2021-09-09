@@ -3138,6 +3138,7 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       other: string; // String!
       reason: string; // String!
+      referer?: string | null; // String
     };
     publicPetitionFieldAttachmentDownloadLink: {
       // args
