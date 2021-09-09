@@ -3217,27 +3217,7 @@ type Query {
   petitionsById(ids: [GID!]!): [PetitionBase]!
   publicOrgLogoUrl(id: GID!): String
   publicPetitionLinkBySlug(slug: String!): PublicPetitionLink
-
-  """
-  The publicly available templates
-  """
-  publicTemplates(
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-    locale: PetitionLocale
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-
-    """
-    Optional text to search in the collection.
-    """
-    search: String
-  ): PetitionTemplatePagination!
+  publicTemplateCategories: [String!]!
 
   """
   Search users and user groups
@@ -3269,6 +3249,31 @@ type Query {
     """
     search: String
   ): TagPagination!
+
+  """
+  The available templates
+  """
+  templates(
+    category: String
+    isOwner: Boolean
+    isPublic: Boolean!
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    locale: PetitionLocale
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+  ): PetitionTemplatePagination!
   userGroup(id: GID!): UserGroup
 
   """

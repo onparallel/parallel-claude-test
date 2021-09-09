@@ -3080,6 +3080,11 @@
     "context": "Added at"
   },
   {
+    "term": "generic.all-categories-short",
+    "definition": "All",
+    "context": "All"
+  },
+  {
     "term": "generic.attached-file",
     "definition": "Attached file: {filename}",
     "context": "Attached file: {filename}"
@@ -3118,16 +3123,6 @@
     "term": "generic.clear",
     "definition": "Clear",
     "context": "Clear"
-  },
-  {
-    "term": "generic.click-to-show-less",
-    "definition": "Click to show less",
-    "context": "Click to show less"
-  },
-  {
-    "term": "generic.click-to-show-more",
-    "definition": "Click to show more",
-    "context": "Click to show more"
   },
   {
     "term": "generic.close",
@@ -3868,36 +3863,6 @@
     "term": "new-petition.search-placeholder",
     "definition": "What are you looking for?",
     "context": "What are you looking for?"
-  },
-  {
-    "term": "new-petition.suggested-searches",
-    "definition": "Suggested searches:",
-    "context": "Suggested searches:"
-  },
-  {
-    "term": "new-petition.suggestion-corporate",
-    "definition": "corporate",
-    "context": "corporate"
-  },
-  {
-    "term": "new-petition.suggestion-due",
-    "definition": "due diligence",
-    "context": "due diligence"
-  },
-  {
-    "term": "new-petition.suggestion-kyc",
-    "definition": "KYC",
-    "context": "KYC"
-  },
-  {
-    "term": "new-petition.suggestion-sales",
-    "definition": "sales",
-    "context": "sales"
-  },
-  {
-    "term": "new-petition.suggestion-tax",
-    "definition": "tax",
-    "context": "tax"
   },
   {
     "term": "new-petition.title",

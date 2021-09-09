@@ -88,6 +88,21 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         Query: {
           fields: {
             petitionFieldComments: { merge: false },
+            templates: {
+              keyArgs: ["isOwner", "isPublic", "locale", "search", "category"],
+              merge(existing, incoming, { readField }) {
+                if (existing === undefined) {
+                  return incoming;
+                } else {
+                  return {
+                    items: uniqBy([...incoming.items, ...existing.items], (obj) =>
+                      readField("id", obj)
+                    ),
+                    totalCount: incoming.totalCount,
+                  };
+                }
+              },
+            },
           },
         },
         PetitionBase: {

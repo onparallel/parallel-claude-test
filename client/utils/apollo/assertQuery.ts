@@ -15,13 +15,13 @@ export function assertQuery<T extends QueryResult>(
   } as any;
 }
 
-export function useAssertQueryOrPreviousData<TData, TVariables>(
-  result: QueryResult<TData, TVariables>
-): Omit<QueryResult<TData, TVariables>, "data"> & {
-  data: Assert<QueryResult<TData, TVariables>["data"]>;
+export function useAssertQueryOrPreviousData<T extends QueryResult<any, any>>(
+  result: T
+): T & {
+  data: Assert<T["data"]>;
 } {
   const { data, ...rest } = result;
-  const previous = useRef<TData>();
+  const previous = useRef<any>();
   if (!data) {
     if (!previous.current) {
       throw new Error("Expected data to be present on the Apollo cache");
@@ -29,13 +29,13 @@ export function useAssertQueryOrPreviousData<TData, TVariables>(
       return {
         data: previous.current!,
         ...rest,
-      };
+      } as any;
     }
   } else {
     previous.current = data!;
     return {
       data: data!,
       ...rest,
-    };
+    } as any;
   }
 }

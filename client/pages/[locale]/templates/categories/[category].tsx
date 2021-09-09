@@ -33,13 +33,6 @@ function LandingTemplatesCategory({
 
   const currentCategory = categories.find((c) => c.slug === category)!;
 
-  const description =
-    currentCategory?.description ||
-    intl.formatMessage({
-      id: "public.templates.meta-description",
-      defaultMessage: "Learn more about Parallel templates",
-    });
-
   return (
     <PublicLayout
       title={intl.formatMessage(
@@ -49,7 +42,10 @@ function LandingTemplatesCategory({
         },
         { category: currentCategory.label }
       )}
-      description={description}
+      description={intl.formatMessage({
+        id: "public.templates.meta-description",
+        defaultMessage: "Learn more about Parallel templates",
+      })}
     >
       <PublicTemplatesHero />
       <PublicTemplatesContainer categories={filteredCategories}>

@@ -2244,12 +2244,13 @@ export interface Query {
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   publicPetitionLinkBySlug?: Maybe<PublicPetitionLink>;
-  /** The publicly available templates */
-  publicTemplates: PetitionTemplatePagination;
+  publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
+  /** The available templates */
+  templates: PetitionTemplatePagination;
   userGroup?: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
@@ -2348,13 +2349,6 @@ export interface QuerypublicPetitionLinkBySlugArgs {
   slug: Scalars["String"];
 }
 
-export interface QuerypublicTemplatesArgs {
-  limit?: Maybe<Scalars["Int"]>;
-  locale?: Maybe<PetitionLocale>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-}
-
 export interface QuerysearchUsersArgs {
   excludeUserGroups?: Maybe<Array<Scalars["GID"]>>;
   excludeUsers?: Maybe<Array<Scalars["GID"]>>;
@@ -2365,6 +2359,16 @@ export interface QuerysearchUsersArgs {
 
 export interface QuerytagsArgs {
   limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+}
+
+export interface QuerytemplatesArgs {
+  category?: Maybe<Scalars["String"]>;
+  isOwner?: Maybe<Scalars["Boolean"]>;
+  isPublic: Scalars["Boolean"];
+  limit?: Maybe<Scalars["Int"]>;
+  locale?: Maybe<PetitionLocale>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
 }
@@ -6453,11 +6457,11 @@ export type SignatureConfigDialog_OrgIntegrationFragment = {
   value: string;
 };
 
-export type useTemplateDetailsDialogPetitionQueryVariables = Exact<{
+export type useTemplateDetailsModalPetitionQueryVariables = Exact<{
   templateId: Scalars["GID"];
 }>;
 
-export type useTemplateDetailsDialogPetitionQuery = {
+export type useTemplateDetailsModalPetitionQuery = {
   petition?: Maybe<
     | { __typename?: "Petition" }
     | {
@@ -6493,7 +6497,7 @@ export type useTemplateDetailsDialogPetitionQuery = {
   >;
 };
 
-export type TemplateDetailsDialog_PetitionTemplateFragment = {
+export type TemplateDetailsModal_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   descriptionHtml?: Maybe<string>;
@@ -12765,15 +12769,18 @@ export type NewPetition_UserFragment = {
   };
 };
 
-export type NewPetitionPublicTemplatesQueryVariables = Exact<{
+export type NewPetitionTemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
   locale?: Maybe<PetitionLocale>;
+  isPublic: Scalars["Boolean"];
+  isOwner?: Maybe<Scalars["Boolean"]>;
+  category?: Maybe<Scalars["String"]>;
 }>;
 
-export type NewPetitionPublicTemplatesQuery = {
-  publicTemplates: {
+export type NewPetitionTemplatesQuery = {
+  templates: {
     __typename?: "PetitionTemplatePagination";
     totalCount: number;
     items: Array<{
@@ -12794,42 +12801,10 @@ export type NewPetitionPublicTemplatesQuery = {
   };
 };
 
-export type NewPetitionTemplatesQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  search?: Maybe<Scalars["String"]>;
-  filters?: Maybe<PetitionFilter>;
-}>;
-
-export type NewPetitionTemplatesQuery = {
-  templates: {
-    __typename?: "PetitionBasePagination";
-    totalCount: number;
-    items: Array<
-      | { __typename?: "Petition" }
-      | {
-          __typename?: "PetitionTemplate";
-          id: string;
-          name?: Maybe<string>;
-          descriptionExcerpt?: Maybe<string>;
-          locale: PetitionLocale;
-          owner: {
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
-          };
-          publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
-        }
-    >;
-  };
-  hasTemplates: { __typename?: "PetitionBasePagination"; totalCount: number };
-};
-
 export type NewPetitionUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type NewPetitionUserQuery = {
+  publicTemplateCategories: Array<string>;
   me: {
     __typename?: "User";
     id: string;
@@ -12849,6 +12824,47 @@ export type NewPetitionUserQuery = {
       };
     };
   };
+  hasTemplates: { __typename?: "PetitionBasePagination"; totalCount: number };
+};
+
+export type NewPetitionUserTemplateQueryVariables = Exact<{
+  templateId: Scalars["GID"];
+}>;
+
+export type NewPetitionUserTemplateQuery = {
+  petition?: Maybe<
+    | { __typename?: "Petition" }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        descriptionHtml?: Maybe<string>;
+        name?: Maybe<string>;
+        updatedAt: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          title?: Maybe<string>;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+        }>;
+        owner: {
+          __typename?: "User";
+          id: string;
+          fullName?: Maybe<string>;
+          organization: { __typename?: "Organization"; id: string; name: string };
+        };
+        myEffectivePermission?: Maybe<{
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        }>;
+        publicLink?: Maybe<{
+          __typename?: "PublicPetitionLink";
+          id: string;
+          isActive: boolean;
+          slug: string;
+        }>;
+      }
+  >;
 };
 
 export type Account_UserFragment = {
@@ -14390,8 +14406,8 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
   ${PetitionSharingModal_PetitionUserPermissionFragmentDoc}
   ${PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc}
 `;
-export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
-  fragment TemplateDetailsDialog_PetitionTemplate on PetitionTemplate {
+export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
+  fragment TemplateDetailsModal_PetitionTemplate on PetitionTemplate {
     id
     descriptionHtml
     name
@@ -17542,43 +17558,43 @@ export type PetitionSharingModal_PetitionsQueryHookResult = ReturnType<
 export type PetitionSharingModal_PetitionsLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionsLazyQuery
 >;
-export const useTemplateDetailsDialogPetitionDocument = gql`
-  query useTemplateDetailsDialogPetition($templateId: GID!) {
+export const useTemplateDetailsModalPetitionDocument = gql`
+  query useTemplateDetailsModalPetition($templateId: GID!) {
     petition(id: $templateId) {
-      ...TemplateDetailsDialog_PetitionTemplate
+      ...TemplateDetailsModal_PetitionTemplate
     }
   }
-  ${TemplateDetailsDialog_PetitionTemplateFragmentDoc}
+  ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
 `;
-export function useuseTemplateDetailsDialogPetitionQuery(
+export function useuseTemplateDetailsModalPetitionQuery(
   baseOptions: Apollo.QueryHookOptions<
-    useTemplateDetailsDialogPetitionQuery,
-    useTemplateDetailsDialogPetitionQueryVariables
+    useTemplateDetailsModalPetitionQuery,
+    useTemplateDetailsModalPetitionQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    useTemplateDetailsDialogPetitionQuery,
-    useTemplateDetailsDialogPetitionQueryVariables
-  >(useTemplateDetailsDialogPetitionDocument, options);
+    useTemplateDetailsModalPetitionQuery,
+    useTemplateDetailsModalPetitionQueryVariables
+  >(useTemplateDetailsModalPetitionDocument, options);
 }
-export function useuseTemplateDetailsDialogPetitionLazyQuery(
+export function useuseTemplateDetailsModalPetitionLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    useTemplateDetailsDialogPetitionQuery,
-    useTemplateDetailsDialogPetitionQueryVariables
+    useTemplateDetailsModalPetitionQuery,
+    useTemplateDetailsModalPetitionQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    useTemplateDetailsDialogPetitionQuery,
-    useTemplateDetailsDialogPetitionQueryVariables
-  >(useTemplateDetailsDialogPetitionDocument, options);
+    useTemplateDetailsModalPetitionQuery,
+    useTemplateDetailsModalPetitionQueryVariables
+  >(useTemplateDetailsModalPetitionDocument, options);
 }
-export type useTemplateDetailsDialogPetitionQueryHookResult = ReturnType<
-  typeof useuseTemplateDetailsDialogPetitionQuery
+export type useTemplateDetailsModalPetitionQueryHookResult = ReturnType<
+  typeof useuseTemplateDetailsModalPetitionQuery
 >;
-export type useTemplateDetailsDialogPetitionLazyQueryHookResult = ReturnType<
-  typeof useuseTemplateDetailsDialogPetitionLazyQuery
+export type useTemplateDetailsModalPetitionLazyQueryHookResult = ReturnType<
+  typeof useuseTemplateDetailsModalPetitionLazyQuery
 >;
 export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
   mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
@@ -20562,72 +20578,28 @@ export function usePetitionsLazyQuery(
 }
 export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
 export type PetitionsLazyQueryHookResult = ReturnType<typeof usePetitionsLazyQuery>;
-export const NewPetitionPublicTemplatesDocument = gql`
-  query NewPetitionPublicTemplates(
-    $offset: Int!
-    $limit: Int!
-    $search: String
-    $locale: PetitionLocale
-  ) {
-    publicTemplates(offset: $offset, limit: $limit, search: $search, locale: $locale) {
-      items {
-        ...NewPetition_PetitionTemplate
-      }
-      totalCount
-    }
-  }
-  ${NewPetition_PetitionTemplateFragmentDoc}
-`;
-export function useNewPetitionPublicTemplatesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    NewPetitionPublicTemplatesQuery,
-    NewPetitionPublicTemplatesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<NewPetitionPublicTemplatesQuery, NewPetitionPublicTemplatesQueryVariables>(
-    NewPetitionPublicTemplatesDocument,
-    options
-  );
-}
-export function useNewPetitionPublicTemplatesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    NewPetitionPublicTemplatesQuery,
-    NewPetitionPublicTemplatesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    NewPetitionPublicTemplatesQuery,
-    NewPetitionPublicTemplatesQueryVariables
-  >(NewPetitionPublicTemplatesDocument, options);
-}
-export type NewPetitionPublicTemplatesQueryHookResult = ReturnType<
-  typeof useNewPetitionPublicTemplatesQuery
->;
-export type NewPetitionPublicTemplatesLazyQueryHookResult = ReturnType<
-  typeof useNewPetitionPublicTemplatesLazyQuery
->;
 export const NewPetitionTemplatesDocument = gql`
   query NewPetitionTemplates(
     $offset: Int!
     $limit: Int!
     $search: String
-    $filters: PetitionFilter
+    $locale: PetitionLocale
+    $isPublic: Boolean!
+    $isOwner: Boolean
+    $category: String
   ) {
-    templates: petitions(
+    templates(
       offset: $offset
       limit: $limit
       search: $search
-      sortBy: [lastUsedAt_DESC]
-      filters: $filters
+      isPublic: $isPublic
+      isOwner: $isOwner
+      locale: $locale
+      category: $category
     ) {
       items {
         ...NewPetition_PetitionTemplate
       }
-      totalCount
-    }
-    hasTemplates: petitions(filters: { type: TEMPLATE }) {
       totalCount
     }
   }
@@ -20666,6 +20638,10 @@ export const NewPetitionUserDocument = gql`
     me {
       ...NewPetition_User
     }
+    hasTemplates: petitions(filters: { type: TEMPLATE }) {
+      totalCount
+    }
+    publicTemplateCategories
   }
   ${NewPetition_UserFragmentDoc}
 `;
@@ -20689,6 +20665,44 @@ export function useNewPetitionUserLazyQuery(
 }
 export type NewPetitionUserQueryHookResult = ReturnType<typeof useNewPetitionUserQuery>;
 export type NewPetitionUserLazyQueryHookResult = ReturnType<typeof useNewPetitionUserLazyQuery>;
+export const NewPetitionUserTemplateDocument = gql`
+  query NewPetitionUserTemplate($templateId: GID!) {
+    petition(id: $templateId) {
+      ...TemplateDetailsModal_PetitionTemplate
+    }
+  }
+  ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
+`;
+export function useNewPetitionUserTemplateQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    NewPetitionUserTemplateQuery,
+    NewPetitionUserTemplateQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<NewPetitionUserTemplateQuery, NewPetitionUserTemplateQueryVariables>(
+    NewPetitionUserTemplateDocument,
+    options
+  );
+}
+export function useNewPetitionUserTemplateLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    NewPetitionUserTemplateQuery,
+    NewPetitionUserTemplateQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<NewPetitionUserTemplateQuery, NewPetitionUserTemplateQueryVariables>(
+    NewPetitionUserTemplateDocument,
+    options
+  );
+}
+export type NewPetitionUserTemplateQueryHookResult = ReturnType<
+  typeof useNewPetitionUserTemplateQuery
+>;
+export type NewPetitionUserTemplateLazyQueryHookResult = ReturnType<
+  typeof useNewPetitionUserTemplateLazyQuery
+>;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
     updateUser(id: $id, data: $data) {

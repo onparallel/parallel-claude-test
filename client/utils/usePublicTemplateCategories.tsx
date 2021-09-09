@@ -4,7 +4,6 @@ import { useIntl } from "react-intl";
 export type PublicTemplateCategory = {
   label: string;
   slug: string;
-  description: string;
 };
 
 export function usePublicTemplateCategories(): PublicTemplateCategory[] {
@@ -17,7 +16,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Administration",
         }),
         slug: "administration",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -25,7 +23,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Business development",
         }),
         slug: "business-development",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -33,7 +30,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Compliance",
         }),
         slug: "compliance",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -41,7 +37,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Customer service",
         }),
         slug: "customer-service",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -49,7 +44,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Engineering",
         }),
         slug: "engineering",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -57,7 +51,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Finance",
         }),
         slug: "finance",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -65,7 +58,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "General Management",
         }),
         slug: "general-management",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -73,7 +65,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "IT",
         }),
         slug: "it",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -81,7 +72,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "HR",
         }),
         slug: "hr",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -89,7 +79,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Legal",
         }),
         slug: "legal",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -97,7 +86,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Marketing",
         }),
         slug: "marketing",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -105,7 +93,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Operations",
         }),
         slug: "operations",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -113,7 +100,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Procurement",
         }),
         slug: "procurement",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -121,7 +107,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Product",
         }),
         slug: "product",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -129,7 +114,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Sales",
         }),
         slug: "sales",
-        description: "",
       },
       {
         label: intl.formatMessage({
@@ -137,7 +121,6 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
           defaultMessage: "Other",
         }),
         slug: "other",
-        description: "",
       },
     ],
     [intl.locale]

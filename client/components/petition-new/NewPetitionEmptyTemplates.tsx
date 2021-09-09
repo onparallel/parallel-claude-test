@@ -2,7 +2,7 @@ import { Center, Stack, Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { EmptyTemplatesIcon } from "./icons/EmptyTemplatesIcon";
 
-export const NewPetitionEmptyTempaltes = ({
+export const NewPetitionEmptyTemplates = ({
   onClickPublicTemplates,
   onClickNewTemplate,
 }: {

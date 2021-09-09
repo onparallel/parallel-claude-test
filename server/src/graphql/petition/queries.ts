@@ -1,5 +1,6 @@
 import {
   arg,
+  booleanArg,
   enumType,
   inputObjectType,
   list,
@@ -9,7 +10,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { decode } from "jsonwebtoken";
-import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { toGlobalId, fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -134,26 +135,65 @@ export const petitionsByIdQuery = queryField("petitionsById", {
   },
 });
 
+export const publicTemplateCategoriesQuery = queryField((t) => {
+  t.list.string("publicTemplateCategories", {
+    authorize: authenticate(),
+    resolve: async (root, _, ctx) => {
+      return await ctx.petitions.getPublicTemplatesCategories();
+    },
+  });
+});
+
 export const publicTemplatesQuery = queryField((t) => {
-  t.paginationField("publicTemplates", {
+  t.paginationField("templates", {
     type: "PetitionTemplate",
-    description: "The publicly available templates",
+    description: "The available templates",
     authorize: authenticate(),
     extendArgs: {
       locale: arg({ type: "PetitionLocale" }),
+      isPublic: nonNull(booleanArg()),
+      isOwner: booleanArg(),
+      category: stringArg(),
     },
     searchable: true,
-    resolve: async (_, { limit, offset, locale, search }, ctx) => {
-      return await ctx.petitions.loadPublicTemplates(
-        {
+    resolve: async (_, { limit, offset, locale, search, isPublic, isOwner, category }, ctx) => {
+      const userId = ctx.user!.id;
+      if (isPublic) {
+        return await ctx.petitions.loadPublicTemplates(
+          {
+            search,
+            locale,
+            limit,
+            offset,
+            sortBy: "last_used_at",
+            categories: category ? [category] : null,
+          },
+          userId
+        );
+      } else {
+        return await ctx.petitions.loadPetitionsForUser(userId, {
           search,
-          locale,
           limit,
           offset,
-          sortBy: "last_used_at",
-        },
-        ctx.user!.id
-      );
+          sortBy: [{ column: "last_used_at", order: "desc" }],
+          filters: {
+            type: "TEMPLATE",
+            locale,
+            sharedWith:
+              isOwner === true
+                ? {
+                    operator: "AND",
+                    filters: [{ operator: "IS_OWNER", value: toGlobalId("User", userId) }],
+                  }
+                : isOwner === false
+                ? {
+                    operator: "AND",
+                    filters: [{ operator: "NOT_IS_OWNER", value: toGlobalId("User", userId) }],
+                  }
+                : null,
+          },
+        });
+      }
     },
   });
 });

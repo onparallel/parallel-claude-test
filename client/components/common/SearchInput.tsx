@@ -5,6 +5,7 @@ import {
   InputLeftElement,
   InputProps,
   InputRightElement,
+  layoutPropNames,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -13,6 +14,7 @@ import { useFocus } from "@parallel/utils/useFocus";
 import useMergedRef from "@react-hook/merged-ref";
 import { useRef } from "react";
 import { useIntl } from "react-intl";
+import { pick, omit } from "remeda";
 
 export const SearchInput = chakraForwardRef<"input", InputProps>(function SearchInput(props, ref) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,8 +29,10 @@ export const SearchInput = chakraForwardRef<"input", InputProps>(function Search
     input.focus();
   }
 
+  const layoutProps = pick(props, layoutPropNames as any);
+  const otherProps = omit(props, layoutPropNames as any);
   return (
-    <InputGroup size="md">
+    <InputGroup size="md" {...layoutProps}>
       <InputLeftElement>
         <SearchIcon color={isActive ? "gray.800" : "gray.400"} />
       </InputLeftElement>
@@ -44,7 +48,7 @@ export const SearchInput = chakraForwardRef<"input", InputProps>(function Search
             defaultMessage: "Search...",
           })
         }
-        {...props}
+        {...otherProps}
         {...bind}
         sx={{
           "::-ms-clear, ::-ms-reveal": {

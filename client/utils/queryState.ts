@@ -60,6 +60,11 @@ export function string() {
     return typeof value === "string" ? value : null;
   });
 }
+export function boolean() {
+  return new QueryItem<boolean | null>((value) => {
+    return value === "true" ? true : value === "false" ? false : null;
+  });
+}
 
 export function values<T>(values: T[]): QueryItem<T | null>;
 export function values<T extends string>(values: T[]): QueryItem<T | null>;
@@ -168,6 +173,10 @@ export function useQueryState<T extends {}>(
       const { query, pathname } = ref.current;
       const newState =
         typeof state === "function" ? state(parseQuery(query, shape, { prefix })) : state;
+      const invalid = Object.keys(newState).find((k) => !shape.hasOwnProperty(k));
+      if (invalid) {
+        console.error(`Invalid key "${invalid}" in setQueryState`);
+      }
       const fromPath = pathParams(pathname);
       const fromState = Object.keys(shape).map((key) => (prefix ? prefix + key : key));
       const newQuery = qs.stringify(

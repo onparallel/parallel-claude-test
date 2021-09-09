@@ -1,4 +1,5 @@
 import { core, dynamicOutputMethod, plugin } from "@nexus/schema";
+import { ForbiddenError } from "apollo-server-errors";
 import {
   GraphQLInputType,
   GraphQLResolveInfo,
@@ -75,8 +76,12 @@ const PREFIX_NAME = Symbol.for("PREFIX_NAME");
 function mapGlobalIds(type: GraphQLInputType, value: any, argConfig: core.AllNexusArgsDefs): any {
   if (isScalarType(type)) {
     if (type.name === "GID" && isDefined(value)) {
-      return fromGlobalId(value, ((argConfig as core.NexusArgDef<any>).value as any)[PREFIX_NAME])
-        .id;
+      try {
+        return fromGlobalId(value, ((argConfig as core.NexusArgDef<any>).value as any)[PREFIX_NAME])
+          .id;
+      } catch {
+        throw new ForbiddenError("Invalid ID");
+      }
     } else {
       return value;
     }

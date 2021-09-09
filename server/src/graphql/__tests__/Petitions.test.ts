@@ -443,7 +443,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query {
-            publicTemplates {
+            templates(isPublic: true) {
               totalCount
             }
           }
@@ -451,14 +451,14 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.publicTemplates.totalCount).toBe(3);
+      expect(data!.templates.totalCount).toBe(3);
     });
 
     it("orders public templates by last used", async () => {
-      const { data: templates } = await testClient.query({
+      const { data } = await testClient.query({
         query: gql`
           query {
-            publicTemplates(limit: 100) {
+            templates(limit: 100, isPublic: true) {
               items {
                 id
               }
@@ -467,8 +467,8 @@ describe("GraphQL/Petitions", () => {
         `,
       });
 
-      expect(templates).not.toBeNull();
-      const { items } = templates!.publicTemplates;
+      expect(data).not.toBeNull();
+      const { items } = data!.templates;
 
       // pick a random templateId that is not on first position of items array
       const index = datatype.number({ min: 1, max: items.length - 1 });
@@ -488,11 +488,11 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      // templateId should be in first position for publicTemplates query
-      const { errors, data } = await testClient.query({
+      // templateId should be in first position for templates query
+      const { errors, data: data2 } = await testClient.query({
         query: gql`
           query {
-            publicTemplates(limit: 100) {
+            templates(limit: 100, isPublic: true) {
               items {
                 id
               }
@@ -502,7 +502,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.publicTemplates).toEqual({
+      expect(data2!.templates).toEqual({
         // first the recently used template, then the rest
         items: [{ id: templateId }].concat(
           items.filter(({ id }: { id: string }) => id !== templateId)
@@ -514,7 +514,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query ($search: String) {
-            publicTemplates(search: $search) {
+            templates(search: $search, isPublic: true) {
               totalCount
             }
           }
@@ -522,14 +522,14 @@ describe("GraphQL/Petitions", () => {
         variables: { search: "Know your Client" },
       });
       expect(errors).toBeUndefined();
-      expect(data!.publicTemplates.totalCount).toBe(1);
+      expect(data!.templates.totalCount).toBe(1);
     });
 
     it("fetches all public templates with description matching search query", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query ($search: String) {
-            publicTemplates(search: $search) {
+            templates(search: $search, isPublic: true) {
               totalCount
             }
           }
@@ -538,7 +538,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.publicTemplates.totalCount).toBe(1);
+      expect(data!.templates.totalCount).toBe(1);
     });
 
     it("sends error when trying to fetch a private petition from other user", async () => {
@@ -561,7 +561,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query {
-            publicTemplates(limit: 100) {
+            templates(limit: 100, isPublic: true) {
               items {
                 owner {
                   organization {

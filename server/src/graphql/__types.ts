@@ -1378,9 +1378,10 @@ export interface NexusGenFieldTypes {
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     publicOrgLogoUrl: string | null; // String
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
-    publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
+    publicTemplateCategories: string[]; // [String!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
+    templates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
   };
@@ -2483,9 +2484,10 @@ export interface NexusGenFieldTypeNames {
     petitionsById: "PetitionBase";
     publicOrgLogoUrl: "String";
     publicPetitionLinkBySlug: "PublicPetitionLink";
-    publicTemplates: "PetitionTemplatePagination";
+    publicTemplateCategories: "String";
     searchUsers: "UserOrUserGroup";
     tags: "TagPagination";
+    templates: "PetitionTemplatePagination";
     userGroup: "UserGroup";
     userGroups: "UserGroupPagination";
   };
@@ -3566,13 +3568,6 @@ export interface NexusGenArgTypes {
       // args
       slug: string; // String!
     };
-    publicTemplates: {
-      // args
-      limit?: number | null; // Int
-      locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
-      offset?: number | null; // Int
-      search?: string | null; // String
-    };
     searchUsers: {
       // args
       excludeUserGroups?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -3584,6 +3579,16 @@ export interface NexusGenArgTypes {
     tags: {
       // args
       limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
+    };
+    templates: {
+      // args
+      category?: string | null; // String
+      isOwner?: boolean | null; // Boolean
+      isPublic: boolean; // Boolean!
+      limit?: number | null; // Int
+      locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
       offset?: number | null; // Int
       search?: string | null; // String
     };

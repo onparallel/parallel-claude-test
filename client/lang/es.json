@@ -3080,6 +3080,11 @@
     "context": "Added at"
   },
   {
+    "term": "generic.all-categories-short",
+    "definition": "Todas",
+    "context": "All"
+  },
+  {
     "term": "generic.attached-file",
     "definition": "Archivo adjunto: {filename}",
     "context": "Attached file: {filename}"
@@ -3118,16 +3123,6 @@
     "term": "generic.clear",
     "definition": "Vaciar",
     "context": "Clear"
-  },
-  {
-    "term": "generic.click-to-show-less",
-    "definition": "Haz click para ver menos",
-    "context": "Click to show less"
-  },
-  {
-    "term": "generic.click-to-show-more",
-    "definition": "Haz click para ver más",
-    "context": "Click to show more"
   },
   {
     "term": "generic.close",
@@ -3868,36 +3863,6 @@
     "term": "new-petition.search-placeholder",
     "definition": "¿Qué estás buscando?",
     "context": "What are you looking for?"
-  },
-  {
-    "term": "new-petition.suggested-searches",
-    "definition": "Búsquedas sugeridas:",
-    "context": "Suggested searches:"
-  },
-  {
-    "term": "new-petition.suggestion-corporate",
-    "definition": "mercantil",
-    "context": "corporate"
-  },
-  {
-    "term": "new-petition.suggestion-due",
-    "definition": "due diligence",
-    "context": "due diligence"
-  },
-  {
-    "term": "new-petition.suggestion-kyc",
-    "definition": "KYC",
-    "context": "KYC"
-  },
-  {
-    "term": "new-petition.suggestion-sales",
-    "definition": "ventas",
-    "context": "sales"
-  },
-  {
-    "term": "new-petition.suggestion-tax",
-    "definition": "fiscal",
-    "context": "tax"
   },
   {
     "term": "new-petition.title",
