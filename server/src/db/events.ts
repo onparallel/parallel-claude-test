@@ -134,10 +134,10 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
 }[TType];
 
-type GenericPetitionEvent<TType extends PetitionEventType, IsCreate extends boolean = false> = Omit<
-  DbPetitionEvent,
-  "type" | "data" | If<IsCreate, "id" | "created_at">
-> & {
+export type GenericPetitionEvent<
+  TType extends PetitionEventType,
+  IsCreate extends boolean = false
+> = Omit<DbPetitionEvent, "type" | "data" | If<IsCreate, "id" | "created_at">> & {
   type: TType;
   data: PetitionEventPayload<TType>;
 };

@@ -14,7 +14,12 @@ import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
-import { CreatePetitionEvent, PetitionEvent, PetitionEventPayload } from "../events";
+import {
+  CreatePetitionEvent,
+  GenericPetitionEvent,
+  PetitionEvent,
+  PetitionEventPayload,
+} from "../events";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
@@ -1718,21 +1723,12 @@ export class PetitionRepository extends BaseRepository {
   async getPetitionEventsByType<T extends PetitionEventType>(
     petitionId: number,
     eventType: T
-  ): Promise<
-    // Distribute union type
-    (T extends any
-      ? {
-          type: T;
-          last_used_at: Date;
-          data: PetitionEventPayload<T>;
-        }
-      : never)[]
-  > {
+  ): Promise<GenericPetitionEvent<T>[]> {
     const events = await this.from("petition_event")
       .where("petition_id", petitionId)
       .where("type", eventType)
       .select("*");
-    return events as any[];
+    return events as any;
   }
 
   async shouldNotifyPetitionClosed(petitionId: number) {
