@@ -34,19 +34,16 @@ export function PublicSignupFormOrganization({
 }: PublicSignupFormOrganizationProps) {
   const [organizationName, setOrganizationName] = useState("");
   const [isEmptyOrganizationName, setIsEmptyOrganizationName] = useState(false);
-  const [isTakenOrganizationName, setIsTakenOrganizationName] = useState(false);
+
   const [organizationLogo, setOrganizationLogo] = useState<Maybe<File> | undefined>(undefined);
 
   useEffect(() => {
     if (isEmptyOrganizationName) setIsEmptyOrganizationName(false);
-    if (isTakenOrganizationName) setIsTakenOrganizationName(false);
   }, [organizationName]);
 
   const handleNext = () => {
     if (!organizationName) {
       setIsEmptyOrganizationName(true);
-    } else if (organizationName.trim().toLowerCase() === "parallel") {
-      setIsTakenOrganizationName(true);
     } else {
       onNext({ organizationName, organizationLogo });
     }
@@ -79,10 +76,7 @@ export function PublicSignupFormOrganization({
             defaultMessage="Fill out your organization’s profile that your customers will see in your communications."
           />
         </Text>
-        <FormControl
-          id="company-name"
-          isInvalid={isEmptyOrganizationName || isTakenOrganizationName}
-        >
+        <FormControl id="company-name" isInvalid={isEmptyOrganizationName}>
           <FormLabel>
             <FormattedMessage
               id="component.public-signup-form-organization.company-name-label"
@@ -105,18 +99,10 @@ export function PublicSignupFormOrganization({
             onChange={(e) => setOrganizationName(e.target.value)}
           />
           <FormErrorMessage>
-            {isEmptyOrganizationName ? (
-              <FormattedMessage
-                id="component.public-signup-form-organization.invalid-company-name-error"
-                defaultMessage="Please, enter a company name"
-              />
-            ) : null}
-            {isTakenOrganizationName ? (
-              <FormattedMessage
-                id="component.public-signup-form-organization.taken-company-name-error"
-                defaultMessage="You can't use this as your company name"
-              />
-            ) : null}
+            <FormattedMessage
+              id="component.public-signup-form-organization.invalid-company-name-error"
+              defaultMessage="Please, enter a company name"
+            />
           </FormErrorMessage>
         </FormControl>
         {MemoizedLogoInput}

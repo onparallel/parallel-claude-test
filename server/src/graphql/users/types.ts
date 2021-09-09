@@ -50,7 +50,7 @@ export const User = objectType({
     t.boolean("isSuperAdmin", {
       resolve: async (o, _, ctx) => {
         const org = await ctx.organizations.loadOrg(o.org_id);
-        return org?.name === "Parallel" && ["OWNER", "ADMIN"].includes(o.organization_role);
+        return org?.status === "ROOT" && ["OWNER", "ADMIN"].includes(o.organization_role);
       },
     });
     t.boolean("isSsoUser", {

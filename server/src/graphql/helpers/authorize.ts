@@ -192,7 +192,7 @@ export function userIsSuperAdmin<
     try {
       const user = ctx.user!;
       const org = await ctx.organizations.loadOrg(user.org_id);
-      return org?.name === "Parallel" && ["OWNER", "ADMIN"].includes(user.organization_role);
+      return org?.status === "ROOT" && ["OWNER", "ADMIN"].includes(user.organization_role);
     } catch {}
     return false;
   };

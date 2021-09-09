@@ -82,11 +82,6 @@ export const createOrganization = mutationField("createOrganization", {
     status: nonNull(arg({ type: "OrganizationStatus" })),
   },
   authorize: supportMethodAccess(),
-  validateArgs: (_, args, ctx, info) => {
-    if (args.name.trim().toLowerCase() === "parallel") {
-      throw new ArgValidationError(info, "name", `Organization name cannot be '${args.name}'`);
-    }
-  },
   resolve: async (_, args, ctx) => {
     try {
       const org = await ctx.organizations.createOrganization(

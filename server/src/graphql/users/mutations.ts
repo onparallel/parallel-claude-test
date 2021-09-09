@@ -337,15 +337,6 @@ export const userSignUp = mutationField("userSignUp", {
     validPassword((args) => args.password),
     validEmail((args) => args.email, "email"),
     emailIsAvailable((args) => args.email, "email"),
-    (_, args, ctx, info) => {
-      if (args.organizationName.trim().toLowerCase() === "parallel") {
-        throw new ArgValidationError(
-          info,
-          "name",
-          `Organization name cannot be '${args.organizationName}'`
-        );
-      }
-    },
     validateIf(
       (args) => isDefined(args.organizationLogo),
       validateFile(

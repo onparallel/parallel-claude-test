@@ -18,7 +18,7 @@ export type FeatureFlagName =
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
-export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV";
+export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV" | "ROOT";
 
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
@@ -99,9 +99,9 @@ export type PetitionUserNotificationType =
   | "SIGNATURE_COMPLETED";
 
 export type SystemEventType =
+  | "EMAIL_OPENED"
   | "EMAIL_VERIFIED"
   | "INVITE_SENT"
-  | "EMAIL_OPENED"
   | "PETITION_MESSAGE_BOUNCED"
   | "PETITION_REMINDER_BOUNCED"
   | "USER_CREATED"
