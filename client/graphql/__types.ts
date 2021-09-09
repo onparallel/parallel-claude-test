@@ -6741,6 +6741,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   type: PetitionFieldType;
   title?: Maybe<string>;
   description?: Maybe<string>;
+  optional: boolean;
   validated: boolean;
   replies: Array<{
     __typename?: "PetitionFieldReply";
@@ -11287,6 +11288,7 @@ export type PetitionReplies_PetitionFragment = {
     type: PetitionFieldType;
     title?: Maybe<string>;
     description?: Maybe<string>;
+    optional: boolean;
     validated: boolean;
     options: { [key: string]: any };
     visibility?: Maybe<{ [key: string]: any }>;
@@ -11385,6 +11387,7 @@ export type PetitionReplies_PetitionFieldFragment = {
   type: PetitionFieldType;
   title?: Maybe<string>;
   description?: Maybe<string>;
+  optional: boolean;
   validated: boolean;
   options: { [key: string]: any };
   visibility?: Maybe<{ [key: string]: any }>;
@@ -11728,6 +11731,7 @@ export type PetitionRepliesQuery = {
           type: PetitionFieldType;
           title?: Maybe<string>;
           description?: Maybe<string>;
+          optional: boolean;
           validated: boolean;
           options: { [key: string]: any };
           visibility?: Maybe<{ [key: string]: any }>;
@@ -15162,6 +15166,7 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     type
     title
     description
+    optional
     validated
     replies {
       ...PetitionRepliesField_PetitionFieldReply
