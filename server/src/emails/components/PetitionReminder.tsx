@@ -139,6 +139,8 @@ const email: Email<PetitionReminderProps> = {
     logoAlt,
   }: PetitionReminderProps) {
     const { locale } = useIntl();
+    const intl = useIntl();
+
     return (
       <Layout
         useAlternativeSlogan
@@ -146,7 +148,11 @@ const email: Email<PetitionReminderProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        optOutUrl={`${parallelUrl}/${locale}/petition/${keycode}/opt-out`}
+        optOutUrl={`${parallelUrl}/${locale}/petition/${keycode}/opt-out?ref=reminder`}
+        optOutText={intl.formatMessage({
+          id: "layout.stop-reminders",
+          defaultMessage: "Stop receibing reminders",
+        })}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

@@ -82,6 +82,7 @@ const email: Email<PetitionMessageProps> = {
     logoAlt,
   }: PetitionMessageProps) {
     const { locale } = useIntl();
+    const intl = useIntl();
 
     return (
       <Layout
@@ -90,6 +91,11 @@ const email: Email<PetitionMessageProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        optOutUrl={`${parallelUrl}/${locale}/petition/${keycode}/opt-out?ref=petition-access`}
+        optOutText={intl.formatMessage({
+          id: "layout.stop-receiving-emails",
+          defaultMessage: "Stop receiving this emails",
+        })}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

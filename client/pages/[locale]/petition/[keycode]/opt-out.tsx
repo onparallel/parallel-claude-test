@@ -27,6 +27,7 @@ import {
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useReminderOptOutReasons } from "@parallel/utils/useReminderOptOutReasons";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -34,6 +35,10 @@ type OptOutProps = UnwrapPromise<ReturnType<typeof OptOut.getInitialProps>>;
 
 function OptOut({ keycode, access }: OptOutProps) {
   const intl = useIntl();
+
+  const {
+    query: { ref },
+  } = useRouter();
 
   const granter = access!.granter!;
 
@@ -58,7 +63,7 @@ function OptOut({ keycode, access }: OptOutProps) {
           {"Parallel | "}
           {intl.formatMessage({
             id: "public.opt-out.title",
-            defaultMessage: "Opt out from reminders",
+            defaultMessage: "Opt out from emails",
           })}
         </title>
       </Head>
@@ -104,7 +109,7 @@ function OptOut({ keycode, access }: OptOutProps) {
               <Text>
                 <FormattedMessage
                   id="public.opt-out.done-body"
-                  defaultMessage="We have informed the sender and you will not receive reminders anymore from this petition."
+                  defaultMessage="We have informed the sender and you will not receive emails anymore from this process."
                 />
               </Text>
             </Stack>
@@ -114,7 +119,7 @@ function OptOut({ keycode, access }: OptOutProps) {
                 <Heading>
                   <FormattedMessage
                     id="public.opt-out.feedback-title"
-                    defaultMessage="Please, let us know why you want to stop receiving reminders? *"
+                    defaultMessage="Please, let us know the reason for not continuing with this process. *"
                   />
                 </Heading>
                 <RadioGroup name="opt-out-reason" onChange={setReason}>
@@ -156,7 +161,10 @@ function OptOut({ keycode, access }: OptOutProps) {
                   variant="solid"
                   type="submit"
                 >
-                  <FormattedMessage id="public.opt-out.opt-out-button" defaultMessage="Opt out" />
+                  <FormattedMessage
+                    id="public.opt-out.opt-out-button"
+                    defaultMessage="Confirm and opt out"
+                  />
                 </Button>
               </Stack>
             </form>
@@ -172,7 +180,7 @@ function OptOut({ keycode, access }: OptOutProps) {
             <Text as="div">
               <FormattedMessage
                 id="public.opt-out.review-before-opt-out"
-                defaultMessage="Before opting out from receiving reminders, check the requested information."
+                defaultMessage="Before opting out from receiving this emails, check the requested information."
               />
             </Text>
             <NakedLink href={`/petition/${keycode}`}>

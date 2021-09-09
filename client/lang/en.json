@@ -6036,8 +6036,8 @@
   },
   {
     "term": "public.opt-out.answer-no-reminders",
-    "definition": "I will upload the information but I do not want to receive reminders anymore",
-    "context": "I will upload the information but I do not want to receive reminders anymore"
+    "definition": "I will upload the information but i do not want to receive this emails anymore",
+    "context": "I will upload the information but i do not want to receive this emails anymore"
   },
   {
     "term": "public.opt-out.answer-not-interested",
@@ -6055,19 +6055,14 @@
     "context": "Other"
   },
   {
-    "term": "public.opt-out.answer-spam",
-    "definition": "I consider this is SPAM",
-    "context": "I consider this is SPAM"
-  },
-  {
     "term": "public.opt-out.answer-wrong-person",
     "definition": "I am not the person to complete this information",
     "context": "I am not the person to complete this information"
   },
   {
     "term": "public.opt-out.done-body",
-    "definition": "We have informed the sender and you will not receive reminders anymore from this petition.",
-    "context": "We have informed the sender and you will not receive reminders anymore from this petition."
+    "definition": "We have informed the sender and you will not receive emails anymore from this process.",
+    "context": "We have informed the sender and you will not receive emails anymore from this process."
   },
   {
     "term": "public.opt-out.done-title",
@@ -6076,13 +6071,13 @@
   },
   {
     "term": "public.opt-out.feedback-title",
-    "definition": "Please, let us know why you want to stop receiving reminders? *",
-    "context": "Please, let us know why you want to stop receiving reminders? *"
+    "definition": "Please, let us know the reason for not continuing with this process. *",
+    "context": "Please, let us know the reason for not continuing with this process. *"
   },
   {
     "term": "public.opt-out.opt-out-button",
-    "definition": "Opt out",
-    "context": "Opt out"
+    "definition": "Confirm and opt out",
+    "context": "Confirm and opt out"
   },
   {
     "term": "public.opt-out.other-error-message",
@@ -6096,8 +6091,8 @@
   },
   {
     "term": "public.opt-out.review-before-opt-out",
-    "definition": "Before opting out from receiving reminders, check the requested information.",
-    "context": "Before opting out from receiving reminders, check the requested information."
+    "definition": "Before opting out from receiving this emails, check the requested information.",
+    "context": "Before opting out from receiving this emails, check the requested information."
   },
   {
     "term": "public.opt-out.review-button",
@@ -6106,8 +6101,8 @@
   },
   {
     "term": "public.opt-out.title",
-    "definition": "Opt out from reminders",
-    "context": "Opt out from reminders"
+    "definition": "Opt out from emails",
+    "context": "Opt out from emails"
   },
   {
     "term": "public.parallel-use-cases.aml-description",

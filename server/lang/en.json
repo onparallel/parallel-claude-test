@@ -190,9 +190,14 @@
     "context": "Privacy"
   },
   {
+    "term": "layout.stop-receiving-emails",
+    "definition": "Stop receiving this emails",
+    "context": "Stop receiving this emails"
+  },
+  {
     "term": "layout.stop-reminders",
-    "definition": "Stop receiving reminders",
-    "context": "Stop receiving reminders"
+    "definition": "Stop receibing reminders",
+    "context": "Stop receibing reminders"
   },
   {
     "term": "layout.terms-and-conditions-link",
