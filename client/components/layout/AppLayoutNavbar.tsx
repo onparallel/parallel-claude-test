@@ -13,7 +13,7 @@ import {
   AddIcon,
   HelpOutlineIcon,
   PaperPlaneIcon,
-  PaperPlanesIcon,
+  ReportsIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
@@ -54,15 +54,6 @@ export const AppLayoutNavbar = Object.assign(
           }),
         },
         {
-          section: "campaigns",
-          icon: <PaperPlanesIcon />,
-          isAvailable: false,
-          text: intl.formatMessage({
-            id: "navbar.campaigns-link",
-            defaultMessage: "Campaigns",
-          }),
-        },
-        {
           section: "contacts",
           href: "/app/contacts",
           icon: <UsersIcon />,
@@ -71,6 +62,15 @@ export const AppLayoutNavbar = Object.assign(
           text: intl.formatMessage({
             id: "navbar.contacts-link",
             defaultMessage: "Contacts",
+          }),
+        },
+        {
+          section: "reports",
+          icon: <ReportsIcon />,
+          isAvailable: false,
+          text: intl.formatMessage({
+            id: "navbar.reports-link",
+            defaultMessage: "Reports",
           }),
         },
       ],

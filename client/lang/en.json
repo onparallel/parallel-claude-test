@@ -3755,11 +3755,6 @@
     "context": "Terms and conditions"
   },
   {
-    "term": "navbar.campaigns-link",
-    "definition": "Campaigns",
-    "context": "Campaigns"
-  },
-  {
     "term": "navbar.coming-soon",
     "definition": "Coming soon",
     "context": "Coming soon"
@@ -3783,6 +3778,11 @@
     "term": "navbar.petitions-link",
     "definition": "Petitions",
     "context": "Petitions"
+  },
+  {
+    "term": "navbar.reports-link",
+    "definition": "Reports",
+    "context": "Reports"
   },
   {
     "term": "navbar.start-tour",

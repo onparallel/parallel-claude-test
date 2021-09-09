@@ -26,12 +26,16 @@ export function AppLayoutNavbarLink({
       position="relative"
       display="block"
       userSelect="none"
+      color={isActive ? "purple.600" : "gray.600"}
       _focus={{
         boxShadow: "none",
         textDecoration: "underline",
       }}
       _hover={{
-        color: "purple.700",
+        color: isActive ? "purple.700" : "gray.700",
+      }}
+      _active={{
+        color: isActive ? "purple.800" : "gray.800",
       }}
       sx={{
         "&[aria-current]": {
@@ -72,7 +76,7 @@ export function AppLayoutNavbarLink({
       })}
       placement={isMobile ? "top" : "right"}
     >
-      <Box opacity={0.5} cursor="default" borderColor="transparent">
+      <Box opacity={0.3} cursor="default" borderColor="transparent">
         <AppLayoutNavbarLinkContent icon={icon} isDisabled>
           {children}
         </AppLayoutNavbarLinkContent>
