@@ -2,6 +2,7 @@ import {
   Button,
   ButtonGroup,
   IconButton,
+  layoutPropNames,
   Menu,
   MenuButton,
   MenuItem,
@@ -13,6 +14,7 @@ import { ChevronDownIcon, PaperPlaneIcon, TimeIcon } from "@parallel/chakra/icon
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { omit, pick } from "remeda";
 import { Divider } from "../common/Divider";
 
 export interface SendButtonProps {
@@ -25,13 +27,15 @@ export const SendButton = chakraForwardRef<"div", SendButtonProps>(function Send
   ref
 ) {
   const intl = useIntl();
+  const layoutProps = pick(props, layoutPropNames as any);
+  const otherProps = omit(props, layoutPropNames as any);
   return (
-    <ButtonGroup ref={ref} isAttached {...props}>
+    <ButtonGroup ref={ref} isAttached {...layoutProps}>
       <Button
-        id="send-button"
         colorScheme="purple"
         leftIcon={<PaperPlaneIcon fontSize="18px" />}
         onClick={onSendClick}
+        {...(otherProps as any)}
       >
         <FormattedMessage id="generic.send" defaultMessage="Send" />
       </Button>

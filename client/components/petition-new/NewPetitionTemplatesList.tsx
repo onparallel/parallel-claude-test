@@ -49,6 +49,7 @@ export const NewPetitionTemplatesList = ({
         >
           {items.map((template) => (
             <TemplateCard
+              data-template-id={template.id}
               key={template.id}
               template={template}
               onPress={() => onClickTemplate(template.id)}

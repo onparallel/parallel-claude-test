@@ -518,6 +518,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       headerActions={
         petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
           <ResponsiveButtonIcon
+            data-action="compose-next"
             id="petition-next"
             colorScheme="purple"
             icon={<ArrowForwardIcon fontSize="18px" />}

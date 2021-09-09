@@ -239,6 +239,7 @@ export function AddPetitionAccessDialog({
       }
       confirm={
         <SendButton
+          data-action="send-petition"
           onSendClick={() => handleSendClick(false)}
           onScheduleClick={() => handleSendClick(true)}
         />

@@ -179,6 +179,7 @@ export function TemplateDetailsDialog({
           <Stack marginY={4} spacing={4} flexDirection={{ base: "column", md: "row-reverse" }}>
             <ButtonGroup isAttached>
               <Button
+                data-action="use-template"
                 justifyContent="left"
                 colorScheme="purple"
                 leftIcon={<PaperPlaneIcon />}

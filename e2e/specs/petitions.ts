@@ -68,7 +68,7 @@ createTestSession("petitions", (context) => {
     );
 
     await waitForGraphQL(page, (o) => o.operationName === "PetitionCompose_updatePetition");
-    await page.click("#send-button");
+    await page.click("[data-action='send-petition']");
     await page.waitForNavigation();
     expect(page.url()).toMatch(/\/app\/petitions$/);
 

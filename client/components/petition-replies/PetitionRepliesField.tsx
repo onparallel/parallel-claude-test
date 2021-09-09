@@ -193,6 +193,7 @@ export const PetitionRepliesField = Object.assign(
             <Flex width="66px">
               <Spacer />
               <CommentsButton
+                data-action="see-field-comments"
                 isActive={isShowingComments}
                 commentCount={field.comments.length}
                 hasUnreadComments={field.comments.some((c) => c.isUnread)}
