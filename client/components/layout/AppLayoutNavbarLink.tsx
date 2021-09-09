@@ -26,20 +26,19 @@ export function AppLayoutNavbarLink({
       position="relative"
       display="block"
       userSelect="none"
-      color={isActive ? "purple.600" : "gray.600"}
+      aria-current={isActive ? "page" : undefined}
       _focus={{
         boxShadow: "none",
         textDecoration: "underline",
       }}
-      _hover={{
-        color: isActive ? "purple.700" : "gray.700",
-      }}
-      _active={{
-        color: isActive ? "purple.800" : "gray.800",
-      }}
       sx={{
-        "&[aria-current]": {
-          textDecoration: "none",
+        color: "gray.600",
+        _hover: { color: "gray.700" },
+        _active: { color: "gray.800" },
+        _activeLink: {
+          color: "purple.600",
+          _hover: { color: "purple.700" },
+          _active: { color: "purple.800" },
           _after: {
             base: {
               display: "block",
@@ -52,19 +51,14 @@ export function AppLayoutNavbarLink({
               backgroundColor: "purple.600",
             },
             sm: {
-              display: "block",
-              position: "absolute",
-              content: "''",
               width: "4px",
               height: "100%",
               left: 0,
               top: 0,
-              backgroundColor: "purple.600",
             },
           },
         },
       }}
-      {...(isActive ? { "aria-current": "page" } : {})}
     >
       <AppLayoutNavbarLinkContent icon={icon}>{children}</AppLayoutNavbarLinkContent>
     </Link>
