@@ -3930,11 +3930,6 @@
     "context": "out of"
   },
   {
-    "term": "organization-usage.visually-hidden.usage-description",
-    "definition": "{usage} de {limit} {title} usado",
-    "context": "{usage} out of {limit} {title} used"
-  },
-  {
     "term": "organization-users.activate",
     "definition": "Activar {count, plural, =1{usuario} other {usuarios}}",
     "context": "Activate {count, plural, =1{user} other {users}}"
@@ -4100,11 +4095,6 @@
     "context": "Organization name"
   },
   {
-    "term": "organizations.header.petitions-limit",
-    "definition": "Límite de peticiones",
-    "context": "Petitions limit"
-  },
-  {
     "term": "organizations.header.petitions-used",
     "definition": "Peticiones utilizadas",
     "context": "Petitions used"
@@ -4118,11 +4108,6 @@
     "term": "organizations.header.user-count",
     "definition": "Usuarios",
     "context": "Users"
-  },
-  {
-    "term": "organizations.header.users-limit",
-    "definition": "Límite de usuarios",
-    "context": "Users limit"
   },
   {
     "term": "petition-access.header",

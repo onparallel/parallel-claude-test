@@ -19,8 +19,10 @@ interface TableTypes
   petition_event: PetitionEvent;
   petition_user_notification: PetitionUserNotification;
   system_event: SystemEvent;
-  organization: Omit<Organization, "usage_details"> & { usage_details: OrganizationUsageDetails };
+  organization: Replace<Organization, { usage_details: OrganizationUsageDetails }>;
 }
+
+type Replace<T, U> = Omit<T, keyof U> & U;
 
 interface TableCreateTypes
   extends Omit<

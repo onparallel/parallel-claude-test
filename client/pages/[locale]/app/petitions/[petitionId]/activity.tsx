@@ -180,7 +180,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         await withError(showPetitionLimitReachedErrorDialog());
       }
     }
-  }, [petitionId, petition.accesses]);
+  }, [petitionId, petition.accesses, showPetitionLimitReachedErrorDialog]);
 
   const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
   const [cancelScheduledMessage] = usePetitionActivity_cancelScheduledMessageMutation();

@@ -15,7 +15,7 @@ import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useOrganizationUsageQuery } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 
 function OrganizationUsage() {
   const intl = useIntl();
@@ -84,24 +84,13 @@ function OrganizationUsage() {
 function UsageCard({ title, limit, usage }: { title: string; limit: number; usage: number }) {
   return (
     <Flex direction="column" shadow="md" rounded="md" overflow="hidden" background="white">
-      <VisuallyHidden>
-        <FormattedMessage
-          id="organization-usage.visually-hidden.usage-description"
-          defaultMessage="{usage} out of {limit} {title} used"
-          values={{
-            usage,
-            limit,
-            title,
-          }}
-        />
-      </VisuallyHidden>
       <Stack as="dl" padding={4} margin={0}>
         <Text as="dt" fontSize="sm" fontWeight="medium" color="gay.500">
           {title}
         </Text>
         <HStack as="dd" align="center" fontWeight="bold">
           <Text as="span" fontSize="2xl">
-            {usage}
+            <FormattedNumber value={usage} />
           </Text>
           <HStack align="center" color="gray.500" fontWeight="semibold">
             <Text as="span" aria-hidden="true">
@@ -113,7 +102,9 @@ function UsageCard({ title, limit, usage }: { title: string; limit: number; usag
                 defaultMessage="out of"
               />
             </VisuallyHidden>
-            <Text as="span">{limit}</Text>
+            <Text as="span">
+              <FormattedNumber value={limit} />
+            </Text>
           </HStack>
         </HStack>
       </Stack>

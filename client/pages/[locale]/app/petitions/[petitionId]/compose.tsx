@@ -486,7 +486,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await withError(showPetitionLimitReachedErrorDialog());
       }
     }
-  }, [petition]);
+  }, [petition, showPetitionLimitReachedErrorDialog]);
 
   const handleIndexFieldClick = useCallback(async (fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
