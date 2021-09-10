@@ -16,9 +16,9 @@
         "bodyPlainText": "Buenos días Juan, \nTal y como comentamos, te mando la información que necesitamos de cara a tu próxima incorporación con nosotros para prepararte el contrato y darte de alta en la Seguridad Social. \nSi tienes cualquier duda me dices, \nGracias y un abrazo! \nLuisa",
         "deadline": "2022-12-11T17:29:24.601Z",
         "keycode": "asdfghjkl",
-        "parallelUrl": "https://www.onparallel.com",
-        "assetsUrl": "https://static.onparallel.com",
-        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {

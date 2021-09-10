@@ -73,13 +73,7 @@ const email: Email<ContactAuthenticationRequest> = {
     logoAlt,
   }: ContactAuthenticationRequest) {
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-        showGdprDisclaimer
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <GreetingFormal fullName={fullName} />

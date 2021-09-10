@@ -47,13 +47,7 @@ const email: Email<AccountVerificationProps> = {
     logoAlt,
   }: AccountVerificationProps) {
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-        showGdprDisclaimer
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <Greeting name={userName} />

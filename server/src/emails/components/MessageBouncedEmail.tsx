@@ -108,7 +108,6 @@ const email: Email<MessageBouncedEmailProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        showGdprDisclaimer
         contentHeading={
           <MjmlWrapper backgroundColor="#3182CE" borderRadius="5px">
             <MjmlText align="center" color="white" fontWeight={600} textTransform="uppercase">

@@ -84,14 +84,14 @@
             ]
           }
         ],
-        "parallelUrl": "https://www.onparallel.com",
-        "assetsUrl": "https://static.onparallel.com",
-        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {
-        "userName": { "control": { "type": "text" } },
-        "petitionName": { "control": { "type": "text" } },
+        "userName": { "control": { "type": "text" }, "type": { "required": false } },
+        "petitionName": { "control": { "type": "text" }, "type": { "required": false } },
         "petitionId": { "control": { "type": "text" } },
         "fields": { "control": { "type": "object" } },
         "parallelUrl": { "control": { "type": "text" } },

@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
+import { MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage } from "react-intl";
 import { Email } from "../buildEmail";
@@ -6,6 +6,7 @@ import { Disclaimer } from "../common/Disclaimer";
 import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer, greetingFormal } from "../common/texts";
+import { UserMessageBox } from "../common/UserMessageBox";
 
 export type PetitionClosedNotificationProps = {
   contactFullName: string;
@@ -61,36 +62,21 @@ const email: Email<PetitionClosedNotificationProps> = {
     logoAlt,
   }: PetitionClosedNotificationProps) {
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-        showGdprDisclaimer
-      >
-        <MjmlSection paddingBottom="10px">
-          <MjmlColumn>
-            <GreetingFormal fullName={contactFullName} />
-            <MjmlText>
-              <FormattedMessage
-                id="petition-closed-notification.text"
-                defaultMessage="{senderName} ({senderEmail}) has received the information."
-                values={{
-                  senderName: <b>{senderName}</b>,
-                  senderEmail: <b>{senderEmail}</b>,
-                }}
-              />
-            </MjmlText>
-          </MjmlColumn>
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
+        <MjmlSection padding="0 0 16px 0">
+          <GreetingFormal fullName={contactFullName} />
+          <MjmlText>
+            <FormattedMessage
+              id="petition-closed-notification.text"
+              defaultMessage="{senderName} ({senderEmail}) has received the information."
+              values={{
+                senderName: <b>{senderName}</b>,
+                senderEmail: <b>{senderEmail}</b>,
+              }}
+            />
+          </MjmlText>
         </MjmlSection>
-        <MjmlSection padding="0 20px">
-          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
-            <MjmlText>
-              <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
-            </MjmlText>
-            <MjmlSpacer height="10px" />
-          </MjmlColumn>
-        </MjmlSection>
+        <UserMessageBox bodyHtml={bodyHtml} />
         <MjmlSection>
           <Disclaimer email={senderEmail} />
         </MjmlSection>

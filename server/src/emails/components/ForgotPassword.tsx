@@ -47,13 +47,7 @@ const email: Email<ForgotPasswordProps> = {
   },
   html({ name, assetsUrl, parallelUrl, logoUrl, logoAlt, verificationCode }: ForgotPasswordProps) {
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-        showGdprDisclaimer
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <Greeting name={name} />

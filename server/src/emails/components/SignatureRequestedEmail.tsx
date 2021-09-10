@@ -71,7 +71,6 @@ const email: Email<SignatureRequestedProps> = {
     const intl = useIntl();
     return (
       <Layout
-        showGdprDisclaimer
         useAlternativeSlogan
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}

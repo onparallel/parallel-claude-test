@@ -19,9 +19,9 @@
         "bodyHtml": "<p style=\"margin:0\"><span>hola </span><span></span><span>, enviame los </span><span>documentos </span><span style=\"font-weight:bold\">siguientes </span><span style=\"font-weight:bold;text-decoration:underline\">super guays</span></p><p style=\"margin:0\"><span>hmmm</span></p><ul style=\"margin:0;margin-left:24px;padding-left:0\"><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-weight:bold;text-decoration:underline\">foto</span></p></li><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-style:italic\">pasaporte</span></p><ul style=\"margin:0;margin-left:24px;padding-left:0\"><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-weight:bold;text-decoration:underline\">foto</span></p></li><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-style:italic\">pasaporte</span></p></li></ul></li></ul>",
         "bodyPlainText": "hola Derek, enviame los documentos siguientes super guays\\nhmmm\\n  - foto\\n  - pasaporte\\n    - foto\\n    - pasaporte",
         "keycode": "asdfghjkl",
-        "parallelUrl": "https://www.onparallel.com",
-        "assetsUrl": "https://static.onparallel.com",
-        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {

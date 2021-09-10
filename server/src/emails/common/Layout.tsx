@@ -27,7 +27,6 @@ export type LayoutProps = {
   logoUrl: string;
   logoAlt: string;
   assetsUrl: string;
-  showGdprDisclaimer?: boolean;
   contentHeading?: Element | null;
   optOutUrl?: string;
   useAlternativeSlogan?: boolean;
@@ -39,7 +38,6 @@ export const Layout: FC<LayoutProps> = function Layout({
   logoAlt,
   assetsUrl,
   children,
-  showGdprDisclaimer,
   contentHeading,
   optOutUrl,
   useAlternativeSlogan,
@@ -177,11 +175,9 @@ export const Layout: FC<LayoutProps> = function Layout({
             ) : null}
           </MjmlColumn>
         </MjmlSection>
-        {showGdprDisclaimer ? (
-          <MjmlSection>
-            <GdprDisclaimer />
-          </MjmlSection>
-        ) : null}
+        <MjmlSection>
+          <GdprDisclaimer />
+        </MjmlSection>
       </MjmlBody>
     </Mjml>
   );

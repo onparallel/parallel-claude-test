@@ -55,7 +55,6 @@ const email: Email<SignatureCompletedProps> = {
     const intl = useIntl();
     return (
       <Layout
-        showGdprDisclaimer
         useAlternativeSlogan
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}

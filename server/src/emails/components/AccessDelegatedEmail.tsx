@@ -109,13 +109,7 @@ const email: Email<AccessDelegatedEmailProps> = {
   }: AccessDelegatedEmailProps) {
     const { locale } = useIntl();
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-        showGdprDisclaimer
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0 0 16px 0">
           <MjmlText>
             <FormattedMessage
