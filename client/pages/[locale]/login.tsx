@@ -18,6 +18,7 @@ import {
 } from "@parallel/components/auth/PasswordChangeForm";
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
 import { NormalLink } from "@parallel/components/common/Link";
+import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
@@ -339,9 +340,11 @@ Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
         }
         fragment Login_User on User {
           id
-          fullName
           email
+          fullName
+          ...UserAvatar_User
         }
+        ${UserAvatar.fragments.User}
       `,
       { ignoreCache: true }
     );

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar } from "@chakra-ui/react";
+import { Circle } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment } from "@parallel/graphql/__types";
@@ -21,11 +21,9 @@ export const PetitionCompletedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Avatar
-              boxSize="36px"
-              background="green.600"
-              icon={<CheckIcon color="white" fontSize="1rem" />}
-            />
+            <Circle boxSize="36px" background="green.600">
+              <CheckIcon color="white" fontSize="1rem" />
+            </Circle>
           }
           path={`/replies`}
         >

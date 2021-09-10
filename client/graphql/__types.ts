@@ -1282,7 +1282,9 @@ export type OrganizationStatus =
   /** Used for demoing the product */
   | "DEMO"
   /** Used for development or testing purposes */
-  | "DEV";
+  | "DEV"
+  /** Root client */
+  | "ROOT";
 
 export interface OrganizationUsageLimit {
   __typename?: "OrganizationUsageLimit";
@@ -2687,6 +2689,8 @@ export interface User extends Timestamps {
   hasFeatureFlag: Scalars["Boolean"];
   /** The ID of the user. */
   id: Scalars["GID"];
+  /** The initials of the user. */
+  initials?: Maybe<Scalars["String"]>;
   isSsoUser: Scalars["Boolean"];
   isSuperAdmin: Scalars["Boolean"];
   lastActiveAt?: Maybe<Scalars["DateTime"]>;
@@ -2755,6 +2759,7 @@ export interface UserGroup extends Timestamps {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  initials: Scalars["String"];
   members: Array<UserGroupMember>;
   name: Scalars["String"];
   /** Time when the resource was last updated. */
@@ -3066,30 +3071,37 @@ export type UserAvatar_UserFragment = {
   __typename?: "User";
   fullName?: Maybe<string>;
   avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
 };
 
 export type UserAvatarList_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
 };
 
 export type UserAvatarList_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
   name: string;
+  initials: string;
 };
 
 export type UserListPopover_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
 };
 
 export type UserListPopover_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
   name: string;
+  initials: string;
 };
 
 export type UserSelect_UserFragment = {
@@ -3185,6 +3197,8 @@ export type AppLayout_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -3199,9 +3213,11 @@ export type AppLayoutNavbar_UserFragment = {
   __typename?: "User";
   id: string;
   email: string;
-  fullName?: Maybe<string>;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  fullName?: Maybe<string>;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -3317,6 +3333,8 @@ export type PetitionLayout_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   hasPetitionPdfExport: boolean;
   organization: {
     __typename?: "Organization";
@@ -3348,6 +3366,8 @@ export type SettingsLayout_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -3360,9 +3380,11 @@ export type SettingsLayout_UserFragment = {
 
 export type UserMenu_UserFragment = {
   __typename?: "User";
-  fullName?: Maybe<string>;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  fullName?: Maybe<string>;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
 };
 
 export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables = Exact<{
@@ -6014,14 +6036,28 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
           name: string;
           members: Array<{
             __typename?: "UserGroupMember";
-            user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+            user: {
+              __typename?: "User";
+              id: string;
+              email: string;
+              fullName?: Maybe<string>;
+              avatarUrl?: Maybe<string>;
+              initials?: Maybe<string>;
+            };
           }>;
         };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+        user: {
+          __typename?: "User";
+          id: string;
+          email: string;
+          fullName?: Maybe<string>;
+          avatarUrl?: Maybe<string>;
+          initials?: Maybe<string>;
+        };
       }
   >;
 };
@@ -6040,14 +6076,28 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
           name: string;
           members: Array<{
             __typename?: "UserGroupMember";
-            user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+            user: {
+              __typename?: "User";
+              id: string;
+              email: string;
+              fullName?: Maybe<string>;
+              avatarUrl?: Maybe<string>;
+              initials?: Maybe<string>;
+            };
           }>;
         };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+        user: {
+          __typename?: "User";
+          id: string;
+          email: string;
+          fullName?: Maybe<string>;
+          avatarUrl?: Maybe<string>;
+          initials?: Maybe<string>;
+        };
       }
   >;
 };
@@ -6059,7 +6109,14 @@ export type PetitionSharingModal_PetitionFragment =
 export type PetitionSharingModal_PetitionUserPermissionFragment = {
   __typename?: "PetitionUserPermission";
   permissionType: PetitionPermissionType;
-  user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+  user: {
+    __typename?: "User";
+    id: string;
+    email: string;
+    fullName?: Maybe<string>;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+  };
 };
 
 export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
@@ -6071,7 +6128,14 @@ export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
     name: string;
     members: Array<{
       __typename?: "UserGroupMember";
-      user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+      user: {
+        __typename?: "User";
+        id: string;
+        email: string;
+        fullName?: Maybe<string>;
+        avatarUrl?: Maybe<string>;
+        initials?: Maybe<string>;
+      };
     }>;
   };
 };
@@ -6081,6 +6145,8 @@ export type PetitionSharingModal_UserFragment = {
   id: string;
   email: string;
   fullName?: Maybe<string>;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
 };
 
 export type PetitionSharingModal_UserGroupFragment = {
@@ -6089,7 +6155,14 @@ export type PetitionSharingModal_UserGroupFragment = {
   name: string;
   members: Array<{
     __typename?: "UserGroupMember";
-    user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+    user: {
+      __typename?: "User";
+      id: string;
+      email: string;
+      fullName?: Maybe<string>;
+      avatarUrl?: Maybe<string>;
+      initials?: Maybe<string>;
+    };
   }>;
 };
 
@@ -6118,14 +6191,28 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
             name: string;
             members: Array<{
               __typename?: "UserGroupMember";
-              user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+              user: {
+                __typename?: "User";
+                id: string;
+                email: string;
+                fullName?: Maybe<string>;
+                avatarUrl?: Maybe<string>;
+                initials?: Maybe<string>;
+              };
             }>;
           };
         }
       | {
           __typename?: "PetitionUserPermission";
           permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+          user: {
+            __typename?: "User";
+            id: string;
+            email: string;
+            fullName?: Maybe<string>;
+            avatarUrl?: Maybe<string>;
+            initials?: Maybe<string>;
+          };
         }
     >;
   }>;
@@ -6152,14 +6239,28 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
             name: string;
             members: Array<{
               __typename?: "UserGroupMember";
-              user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+              user: {
+                __typename?: "User";
+                id: string;
+                email: string;
+                fullName?: Maybe<string>;
+                avatarUrl?: Maybe<string>;
+                initials?: Maybe<string>;
+              };
             }>;
           };
         }
       | {
           __typename?: "PetitionUserPermission";
           permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+          user: {
+            __typename?: "User";
+            id: string;
+            email: string;
+            fullName?: Maybe<string>;
+            avatarUrl?: Maybe<string>;
+            initials?: Maybe<string>;
+          };
         }
     >;
   }>;
@@ -6185,14 +6286,28 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
             name: string;
             members: Array<{
               __typename?: "UserGroupMember";
-              user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+              user: {
+                __typename?: "User";
+                id: string;
+                email: string;
+                fullName?: Maybe<string>;
+                avatarUrl?: Maybe<string>;
+                initials?: Maybe<string>;
+              };
             }>;
           };
         }
       | {
           __typename?: "PetitionUserPermission";
           permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+          user: {
+            __typename?: "User";
+            id: string;
+            email: string;
+            fullName?: Maybe<string>;
+            avatarUrl?: Maybe<string>;
+            initials?: Maybe<string>;
+          };
         }
     >;
   }>;
@@ -6224,6 +6339,8 @@ export type PetitionSharingModal_PetitionsQuery = {
                       id: string;
                       email: string;
                       fullName?: Maybe<string>;
+                      avatarUrl?: Maybe<string>;
+                      initials?: Maybe<string>;
                     };
                   }>;
                 };
@@ -6231,7 +6348,14 @@ export type PetitionSharingModal_PetitionsQuery = {
             | {
                 __typename?: "PetitionUserPermission";
                 permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+                user: {
+                  __typename?: "User";
+                  id: string;
+                  email: string;
+                  fullName?: Maybe<string>;
+                  avatarUrl?: Maybe<string>;
+                  initials?: Maybe<string>;
+                };
               }
           >;
         }
@@ -6254,6 +6378,8 @@ export type PetitionSharingModal_PetitionsQuery = {
                       id: string;
                       email: string;
                       fullName?: Maybe<string>;
+                      avatarUrl?: Maybe<string>;
+                      initials?: Maybe<string>;
                     };
                   }>;
                 };
@@ -6261,7 +6387,14 @@ export type PetitionSharingModal_PetitionsQuery = {
             | {
                 __typename?: "PetitionUserPermission";
                 permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string; email: string; fullName?: Maybe<string> };
+                user: {
+                  __typename?: "User";
+                  id: string;
+                  email: string;
+                  fullName?: Maybe<string>;
+                  avatarUrl?: Maybe<string>;
+                  initials?: Maybe<string>;
+                };
               }
           >;
         }
@@ -6650,7 +6783,13 @@ export type NewPetitionTemplatesList_PetitionTemplateFragment = {
   name?: Maybe<string>;
   descriptionExcerpt?: Maybe<string>;
   locale: PetitionLocale;
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+  };
   publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
 };
 
@@ -6659,7 +6798,13 @@ export type TemplateCard_PetitionTemplateFragment = {
   name?: Maybe<string>;
   descriptionExcerpt?: Maybe<string>;
   locale: PetitionLocale;
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+  };
   publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
 };
 
@@ -7659,6 +7804,8 @@ export type Admin_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -7680,6 +7827,8 @@ export type AdminQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -7714,6 +7863,8 @@ export type AdminOrganizations_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -7764,6 +7915,8 @@ export type AdminOrganizationsUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -7783,6 +7936,8 @@ export type AdminSupportMethods_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -7804,6 +7959,8 @@ export type AdminSupportMethodsUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -7837,12 +7994,18 @@ export type Contact_ContactFragment = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
+              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
             }
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: Maybe<string>;
+                avatarUrl?: Maybe<string>;
+                initials?: Maybe<string>;
+              };
             }
         >;
         progress: {
@@ -7884,12 +8047,18 @@ export type Contact_PetitionAccessFragment = {
       | {
           __typename?: "PetitionUserGroupPermission";
           permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string; name: string };
+          group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
         }
       | {
           __typename?: "PetitionUserPermission";
           permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+          user: {
+            __typename?: "User";
+            id: string;
+            fullName?: Maybe<string>;
+            avatarUrl?: Maybe<string>;
+            initials?: Maybe<string>;
+          };
         }
     >;
     progress: {
@@ -7917,12 +8086,18 @@ export type Contact_PetitionFragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: Maybe<string>;
+          avatarUrl?: Maybe<string>;
+          initials?: Maybe<string>;
+        };
       }
   >;
   progress: {
@@ -7947,6 +8122,8 @@ export type Contact_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   hasPetitionSignature: boolean;
   organization: {
     __typename?: "Organization";
@@ -7985,6 +8162,8 @@ export type ContactUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasPetitionSignature: boolean;
     organization: {
       __typename?: "Organization";
@@ -8025,12 +8204,18 @@ export type ContactQuery = {
             | {
                 __typename?: "PetitionUserGroupPermission";
                 permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string };
+                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
               }
             | {
                 __typename?: "PetitionUserPermission";
                 permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+                user: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: Maybe<string>;
+                  avatarUrl?: Maybe<string>;
+                  initials?: Maybe<string>;
+                };
               }
           >;
           progress: {
@@ -8073,6 +8258,8 @@ export type Contacts_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8123,6 +8310,8 @@ export type ContactsUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8160,6 +8349,8 @@ export type OrganizationBrandingQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8201,6 +8392,8 @@ export type OrganizationGroup_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8327,6 +8520,8 @@ export type OrganizationGroupUserQuery = {
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8348,7 +8543,13 @@ export type OrganizationGroups_UserGroupPaginationFragment = {
     createdAt: string;
     members: Array<{
       __typename?: "UserGroupMember";
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: Maybe<string>;
+        avatarUrl?: Maybe<string>;
+        initials?: Maybe<string>;
+      };
     }>;
   }>;
 };
@@ -8360,7 +8561,13 @@ export type OrganizationGroups_UserGroupFragment = {
   createdAt: string;
   members: Array<{
     __typename?: "UserGroupMember";
-    user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+    user: {
+      __typename?: "User";
+      id: string;
+      fullName?: Maybe<string>;
+      avatarUrl?: Maybe<string>;
+      initials?: Maybe<string>;
+    };
   }>;
 };
 
@@ -8372,6 +8579,8 @@ export type OrganizationGroups_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8395,7 +8604,13 @@ export type OrganizationGroups_createUserGroupMutation = {
     createdAt: string;
     members: Array<{
       __typename?: "UserGroupMember";
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: Maybe<string>;
+        avatarUrl?: Maybe<string>;
+        initials?: Maybe<string>;
+      };
     }>;
   };
 };
@@ -8419,7 +8634,13 @@ export type OrganizationGroups_cloneUserGroupMutation = {
     createdAt: string;
     members: Array<{
       __typename?: "UserGroupMember";
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: Maybe<string>;
+        avatarUrl?: Maybe<string>;
+        initials?: Maybe<string>;
+      };
     }>;
   }>;
 };
@@ -8442,7 +8663,13 @@ export type OrganizationGroupsQuery = {
       createdAt: string;
       members: Array<{
         __typename?: "UserGroupMember";
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: Maybe<string>;
+          avatarUrl?: Maybe<string>;
+          initials?: Maybe<string>;
+        };
       }>;
     }>;
   };
@@ -8459,6 +8686,8 @@ export type OrganizationGroupsUserQuery = {
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8481,6 +8710,8 @@ export type OrganizationSettingsQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8498,10 +8729,13 @@ export type OrganizationUsageQuery = {
   me: {
     __typename?: "User";
     id: string;
-    onboardingStatus: { [key: string]: any };
     fullName?: Maybe<string>;
+    email: string;
+    createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8600,6 +8834,8 @@ export type OrganizationUsersQuery = {
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -9246,6 +9482,8 @@ export type PetitionActivity_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   hasPetitionPdfExport: boolean;
   organization: {
     __typename?: "Organization";
@@ -10630,6 +10868,8 @@ export type PetitionActivityUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasPetitionPdfExport: boolean;
     organization: {
       __typename?: "Organization";
@@ -10827,6 +11067,8 @@ export type PetitionCompose_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   hasPetitionSignature: boolean;
   hasSkipForwardSecurity: boolean;
   hasHideRecipientViewContents: boolean;
@@ -11403,6 +11645,8 @@ export type PetitionComposeUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasPetitionSignature: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
@@ -11757,6 +12001,8 @@ export type PetitionReplies_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   hasPetitionSignature: boolean;
   hasPetitionPdfExport: boolean;
   hasInternalComments: boolean;
@@ -12014,6 +12260,8 @@ export type PetitionRepliesUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasPetitionSignature: boolean;
     hasPetitionPdfExport: boolean;
     hasInternalComments: boolean;
@@ -12183,12 +12431,18 @@ export type Petitions_PetitionBasePaginationFragment = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
+              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
             }
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: Maybe<string>;
+                avatarUrl?: Maybe<string>;
+                initials?: Maybe<string>;
+              };
             }
         >;
         progress: {
@@ -12217,12 +12471,18 @@ export type Petitions_PetitionBasePaginationFragment = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
+              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
             }
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: Maybe<string>;
+                avatarUrl?: Maybe<string>;
+                initials?: Maybe<string>;
+              };
             }
         >;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -12254,12 +12514,18 @@ export type Petitions_PetitionBase_Petition_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: Maybe<string>;
+          avatarUrl?: Maybe<string>;
+          initials?: Maybe<string>;
+        };
       }
   >;
   progress: {
@@ -12289,12 +12555,18 @@ export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: Maybe<string>;
+          avatarUrl?: Maybe<string>;
+          initials?: Maybe<string>;
+        };
       }
   >;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -12312,6 +12584,8 @@ export type Petitions_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   hasPetitionSignature: boolean;
   organization: {
     __typename?: "Organization";
@@ -12334,6 +12608,8 @@ export type PetitionsUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasPetitionSignature: boolean;
     organization: {
       __typename?: "Organization";
@@ -12384,12 +12660,18 @@ export type PetitionsQuery = {
             | {
                 __typename?: "PetitionUserGroupPermission";
                 permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string };
+                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
               }
             | {
                 __typename?: "PetitionUserPermission";
                 permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+                user: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: Maybe<string>;
+                  avatarUrl?: Maybe<string>;
+                  initials?: Maybe<string>;
+                };
               }
           >;
           progress: {
@@ -12418,12 +12700,18 @@ export type PetitionsQuery = {
             | {
                 __typename?: "PetitionUserGroupPermission";
                 permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string };
+                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
               }
             | {
                 __typename?: "PetitionUserPermission";
                 permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+                user: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: Maybe<string>;
+                  avatarUrl?: Maybe<string>;
+                  initials?: Maybe<string>;
+                };
               }
           >;
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -12438,7 +12726,13 @@ export type NewPetition_PetitionTemplateFragment = {
   name?: Maybe<string>;
   descriptionExcerpt?: Maybe<string>;
   locale: PetitionLocale;
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+  };
   publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
 };
 
@@ -12450,6 +12744,8 @@ export type NewPetition_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -12477,7 +12773,13 @@ export type NewPetitionPublicTemplatesQuery = {
       name?: Maybe<string>;
       descriptionExcerpt?: Maybe<string>;
       locale: PetitionLocale;
-      owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+      owner: {
+        __typename?: "User";
+        id: string;
+        fullName?: Maybe<string>;
+        avatarUrl?: Maybe<string>;
+        initials?: Maybe<string>;
+      };
       publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
     }>;
   };
@@ -12502,7 +12804,13 @@ export type NewPetitionTemplatesQuery = {
           name?: Maybe<string>;
           descriptionExcerpt?: Maybe<string>;
           locale: PetitionLocale;
-          owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+          owner: {
+            __typename?: "User";
+            id: string;
+            fullName?: Maybe<string>;
+            avatarUrl?: Maybe<string>;
+            initials?: Maybe<string>;
+          };
           publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
         }
     >;
@@ -12521,6 +12829,8 @@ export type NewPetitionUserQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -12543,6 +12853,8 @@ export type Account_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   hasApiTokens: boolean;
   organization: {
     __typename?: "Organization";
@@ -12566,6 +12878,7 @@ export type Account_updateAccountMutation = {
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     fullName?: Maybe<string>;
+    initials?: Maybe<string>;
   };
 };
 
@@ -12583,6 +12896,8 @@ export type AccountQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasApiTokens: boolean;
     organization: {
       __typename?: "Organization";
@@ -12603,6 +12918,8 @@ export type Settings_UserFragment = {
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
   hasApiTokens: boolean;
   organization: {
     __typename?: "Organization";
@@ -12625,6 +12942,8 @@ export type SettingsQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasApiTokens: boolean;
     organization: {
       __typename?: "Organization";
@@ -12656,6 +12975,8 @@ export type SecurityQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasApiTokens: boolean;
     organization: {
       __typename?: "Organization";
@@ -12698,6 +13019,8 @@ export type TokensQuery = {
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
     hasApiTokens: boolean;
     authenticationTokens: {
       __typename?: "UserAuthenticationTokenPagination";
@@ -12731,14 +13054,23 @@ export type Login_resendVerificationCodeMutation = { resendVerificationCode: Res
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
-  me: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+  me: {
+    __typename?: "User";
+    id: string;
+    email: string;
+    fullName?: Maybe<string>;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+  };
 };
 
 export type Login_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
   email: string;
+  fullName?: Maybe<string>;
+  avatarUrl?: Maybe<string>;
+  initials?: Maybe<string>;
 };
 
 export type RecipientView_PublicPetitionAccessFragment = {
@@ -13625,12 +13957,18 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: Maybe<string>;
+          avatarUrl?: Maybe<string>;
+          initials?: Maybe<string>;
+        };
       }
   >;
   progress: {
@@ -13659,12 +13997,18 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: Maybe<string>;
+          avatarUrl?: Maybe<string>;
+          initials?: Maybe<string>;
+        };
       }
   >;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -13729,16 +14073,11 @@ export const TagEditDialog_TagFragmentDoc = gql`
   }
   ${Tag_TagFragmentDoc}
 `;
-export const UserAvatar_UserFragmentDoc = gql`
-  fragment UserAvatar_User on User {
-    fullName
-    avatarUrl
-  }
-`;
 export const UserListPopover_UserGroupFragmentDoc = gql`
   fragment UserListPopover_UserGroup on UserGroup {
     id
     name
+    initials
   }
 `;
 export const UserSelect_UserFragmentDoc = gql`
@@ -13977,13 +14316,22 @@ export const OrganizationUsersListTableHeader_UserFragmentDoc = gql`
     role
   }
 `;
+export const UserAvatar_UserFragmentDoc = gql`
+  fragment UserAvatar_User on User {
+    fullName
+    avatarUrl
+    initials
+  }
+`;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
     id
     email
     fullName
+    ...UserAvatar_User
     ...UserSelect_User
   }
+  ${UserAvatar_UserFragmentDoc}
   ${UserSelect_UserFragmentDoc}
 `;
 export const PetitionSharingModal_PetitionUserPermissionFragmentDoc = gql`
@@ -14257,10 +14605,11 @@ export const RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPeti
 `;
 export const UserMenu_UserFragmentDoc = gql`
   fragment UserMenu_User on User {
-    fullName
     isSuperAdmin
     role
+    ...UserAvatar_User
   }
+  ${UserAvatar_UserFragmentDoc}
 `;
 export const AppLayoutNavbar_UserFragmentDoc = gql`
   fragment AppLayoutNavbar_User on User {
@@ -14339,20 +14688,25 @@ export const UserListPopover_UserFragmentDoc = gql`
   fragment UserListPopover_User on User {
     id
     fullName
+    ...UserAvatar_User
   }
+  ${UserAvatar_UserFragmentDoc}
 `;
 export const UserAvatarList_UserFragmentDoc = gql`
   fragment UserAvatarList_User on User {
     id
     fullName
+    ...UserAvatar_User
     ...UserListPopover_User
   }
+  ${UserAvatar_UserFragmentDoc}
   ${UserListPopover_UserFragmentDoc}
 `;
 export const UserAvatarList_UserGroupFragmentDoc = gql`
   fragment UserAvatarList_UserGroup on UserGroup {
     id
     name
+    initials
   }
 `;
 export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
@@ -15872,12 +16226,14 @@ export const TemplateCard_PetitionTemplateFragmentDoc = gql`
     owner {
       id
       fullName
+      ...UserAvatar_User
     }
     publicLink {
       id
       isActive
     }
   }
+  ${UserAvatar_UserFragmentDoc}
 `;
 export const NewPetitionTemplatesList_PetitionTemplateFragmentDoc = gql`
   fragment NewPetitionTemplatesList_PetitionTemplate on PetitionTemplate {
@@ -15933,9 +16289,11 @@ export const Tokens_UserAuthenticationTokenFragmentDoc = gql`
 export const Login_UserFragmentDoc = gql`
   fragment Login_User on User {
     id
-    fullName
     email
+    fullName
+    ...UserAvatar_User
   }
+  ${UserAvatar_UserFragmentDoc}
 `;
 export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCard_PublicPetitionFieldReply on PublicPetitionFieldReply {
@@ -20334,6 +20692,7 @@ export const Account_updateAccountDocument = gql`
       firstName
       lastName
       fullName
+      initials
     }
   }
 `;

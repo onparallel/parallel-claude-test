@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
   Button,
   Menu,
   MenuButton,
@@ -16,12 +15,12 @@ import {
 import {
   BellIcon,
   BusinessIcon,
+  CommentIcon,
   HelpOutlineIcon,
   KeyIcon,
   LogOutIcon,
   MapIcon,
   UserIcon,
-  CommentIcon,
 } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
@@ -29,6 +28,7 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink, NormalLink } from "../common/Link";
+import { UserAvatar } from "../common/UserAvatar";
 
 export interface UserMenuProps {
   placement?: UsePopperProps["placement"];
@@ -72,7 +72,7 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
         paddingLeft={0}
         paddingRight={0}
       >
-        <Avatar name={user.fullName!} size="md" />
+        <UserAvatar user={user} size="md" />
       </MenuButton>
       <Portal>
         <MenuList>
@@ -154,9 +154,10 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
 UserMenu.fragments = {
   User: gql`
     fragment UserMenu_User on User {
-      fullName
       isSuperAdmin
       role
+      ...UserAvatar_User
     }
+    ${UserAvatar.fragments.User}
   `,
 };

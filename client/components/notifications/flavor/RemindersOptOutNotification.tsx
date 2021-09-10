@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar, Text } from "@chakra-ui/react";
+import { Circle, Text } from "@chakra-ui/react";
 import { BellOffIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { RemindersOptOutNotification_RemindersOptOutNotificationFragment } from "@parallel/graphql/__types";
@@ -31,11 +31,9 @@ export const RemindersOptOutNotification = Object.assign(
         isFirst={isFirst}
         notification={notification}
         icon={
-          <Avatar
-            boxSize="36px"
-            background="red.600"
-            icon={<BellOffIcon color="white" fontSize="1rem" />}
-          />
+          <Circle boxSize="36px" background="red.600">
+            <BellOffIcon color="white" fontSize="1rem" />
+          </Circle>
         }
         path={`/activity`}
       >

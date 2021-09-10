@@ -10696,6 +10696,11 @@ grapheme-splitter@^1.0.4:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
+graphemer@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/graphemer/-/graphemer-1.2.0.tgz#6984f711609f1a16b2ba09c061f2be2a330eb488"
+  integrity sha512-Z9hIgb2gYceKHPAZGS0KCWGAmyixB71KFSmObYOGWukWQ5DHg7AU44oR4lfAKwdoKKRK3NdshCTG9/F42RKsAg==
+
 graphql-config@^3.0.2:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/graphql-config/-/graphql-config-3.4.1.tgz#59f937a1b4d3a3c2dcdb27ddf5b4d4d4b2c6e9e1"

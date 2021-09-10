@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar } from "@chakra-ui/react";
+import { Circle } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragment } from "@parallel/graphql/__types";
@@ -21,11 +21,9 @@ export const AccessActivatedFromLinkNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Avatar
-              boxSize="36px"
-              background="purple.500"
-              icon={<LinkIcon color="white" fontSize="1rem" />}
-            />
+            <Circle boxSize="36px" background="purple.500">
+              <LinkIcon color="white" fontSize="1rem" />
+            </Circle>
           }
           path={`/activity`}
         >

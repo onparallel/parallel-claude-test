@@ -2,6 +2,7 @@ import { arg, enumType, list, nonNull, objectType, unionType } from "@nexus/sche
 import { omit } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { getInitials } from "../../util/initials";
 import { datetimeArg } from "../helpers/date";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { rootIsContextUser } from "./authorizers";
@@ -70,6 +71,10 @@ export const User = objectType({
     t.nullable.string("fullName", {
       description: "The full name of the user.",
       resolve: (o) => fullName(o.first_name, o.last_name),
+    });
+    t.nullable.string("initials", {
+      description: "The initials of the user.",
+      resolve: (o) => getInitials(fullName(o.first_name, o.last_name)),
     });
     t.field("organization", {
       type: "Organization",

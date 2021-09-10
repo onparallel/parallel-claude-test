@@ -564,6 +564,7 @@ export const schemaTypes: IntrospectionType[] = [
         isDeprecated: false,
         deprecationReason: null,
       },
+      { name: "ROOT", description: "Root client", isDeprecated: false, deprecationReason: null },
     ],
     possibleTypes: null,
   },

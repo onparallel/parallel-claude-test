@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
+  Circle,
   Button,
   Center,
   Flex,
@@ -95,11 +95,9 @@ function OptOut({ keycode, access }: OptOutProps) {
               spacing={6}
               maxWidth={"container.xs"}
             >
-              <Avatar
-                boxSize="88px"
-                background="green.500"
-                icon={<CheckIcon color="white" fontSize="2.5rem" />}
-              />
+              <Circle boxSize="88px" background="green.500">
+                <CheckIcon color="white" fontSize="2.5rem" />
+              </Circle>
               <Heading>
                 <FormattedMessage id="public.opt-out.done-title" defaultMessage="Done!" />
               </Heading>

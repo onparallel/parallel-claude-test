@@ -3733,6 +3733,11 @@ type User implements Timestamps {
   The ID of the user.
   """
   id: GID!
+
+  """
+  The initials of the user.
+  """
+  initials: String
   isSsoUser: Boolean!
   isSuperAdmin: Boolean!
   lastActiveAt: DateTime
@@ -3813,6 +3818,7 @@ type UserGroup implements Timestamps {
   """
   createdAt: DateTime!
   id: GID!
+  initials: String!
   members: [UserGroupMember!]!
   name: String!
 

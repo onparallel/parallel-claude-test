@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar, Text } from "@chakra-ui/react";
+import { Circle, Text } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
@@ -40,7 +40,9 @@ export const CommentCreatedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Avatar boxSize="36px" background="gray.200" icon={<CommentIcon fontSize="16px" />} />
+            <Circle boxSize="36px" background="gray.200">
+              <CommentIcon fontSize="16px" />
+            </Circle>
           }
           path={`/replies?comments=${notification.field.id}`}
         >

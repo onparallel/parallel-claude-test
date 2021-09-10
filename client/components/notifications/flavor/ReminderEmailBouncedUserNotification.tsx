@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar } from "@chakra-ui/react";
+import { Circle } from "@chakra-ui/react";
 import { EmailXIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment } from "@parallel/graphql/__types";
@@ -21,11 +21,9 @@ export const ReminderEmailBouncedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Avatar
-              boxSize="36px"
-              background="red.500"
-              icon={<EmailXIcon color="white" fontSize="1rem" />}
-            />
+            <Circle boxSize="36px" background="red.500">
+              <EmailXIcon color="white" fontSize="1rem" />
+            </Circle>
           }
           path={`/activity`}
         >

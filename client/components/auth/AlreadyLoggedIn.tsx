@@ -1,7 +1,8 @@
-import { Avatar, Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Login_UserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { UserAvatar } from "../common/UserAvatar";
 
 interface AlreadyLoggedInProps {
   me: Login_UserFragment;
@@ -12,7 +13,7 @@ export function AlreadyLoggedIn({ me, onRelogin, onContinueAs }: AlreadyLoggedIn
   return (
     <>
       <Box marginTop={4} textAlign="center">
-        <Avatar name={me.fullName ?? undefined} size="lg" />
+        <UserAvatar user={me} size="lg" />
         <Text marginTop={4}>
           <FormattedMessage
             id="public.login.already-logged-in.explanation"

@@ -19,6 +19,7 @@ import {
 } from "@parallel/graphql/__types";
 import gql from "graphql-tag";
 import { ReactNode } from "react";
+import { UserAvatar } from "./UserAvatar";
 
 export function UserListPopover({
   usersOrGroups,
@@ -43,7 +44,7 @@ export function UserListPopover({
                 <Flex key={u.id} as={ListItem} alignItems="center" paddingX={4}>
                   {u.__typename === "User" ? (
                     <>
-                      <Avatar size="xs" name={u.fullName ?? undefined} />
+                      <UserAvatar size="xs" user={u} />
                       <Text flex="1" marginLeft={2} isTruncated>
                         {u.fullName}
                       </Text>
@@ -76,7 +77,9 @@ UserListPopover.fragments = {
       fragment UserListPopover_User on User {
         id
         fullName
+        ...UserAvatar_User
       }
+      ${UserAvatar.fragments.User}
     `;
   },
   get UserGroup() {
@@ -84,6 +87,7 @@ UserListPopover.fragments = {
       fragment UserListPopover_UserGroup on UserGroup {
         id
         name
+        initials
       }
     `;
   },

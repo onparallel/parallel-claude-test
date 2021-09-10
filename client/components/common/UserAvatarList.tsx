@@ -6,6 +6,7 @@ import {
   UserAvatarList_UserFragment,
   UserAvatarList_UserGroupFragment,
 } from "@parallel/graphql/__types";
+import { UserAvatar } from "./UserAvatar";
 import { UserListPopover } from "./UserListPopover";
 
 interface UserAvatarListProps {
@@ -47,8 +48,8 @@ export const UserAvatarList = Object.assign(
           </UserListPopover>
         )}
         {slice.map((u) => {
-          const name =
-            u.__typename === "User" ? u.fullName : u.__typename === "UserGroup" ? u.name : "";
+          const tooltipDisabled =
+            u.__typename === "User" ? !u.fullName : u.__typename === "UserGroup" ? !u.name : true;
 
           const label =
             u.__typename === "User" ? (
@@ -56,12 +57,12 @@ export const UserAvatarList = Object.assign(
             ) : (
               <Stack direction="row" spacing={2} alignItems="center">
                 <UsersIcon />
-                <Text>{name}</Text>
+                <Text>{u.__typename === "UserGroup" ? u.name : null}</Text>
               </Stack>
             );
 
           return (
-            <Tooltip key={u.id} label={label} isDisabled={!name}>
+            <Tooltip key={u.id} label={label} isDisabled={tooltipDisabled}>
               <Box
                 marginY={-1}
                 marginRight={-2}
@@ -72,15 +73,27 @@ export const UserAvatarList = Object.assign(
                   },
                 }}
               >
-                <Avatar
-                  size="xs"
-                  name={name ?? undefined}
-                  transitionProperty="transform"
-                  transitionDuration="150ms"
-                  boxSize={7}
-                  borderWidth="2px"
-                  borderColor="white"
-                />
+                {u.__typename === "User" ? (
+                  <UserAvatar
+                    size="xs"
+                    user={u}
+                    transitionProperty="transform"
+                    transitionDuration="150ms"
+                    boxSize={7}
+                    borderWidth="2px"
+                    borderColor="white"
+                  />
+                ) : u.__typename === "UserGroup" ? (
+                  <Avatar
+                    size="xs"
+                    name={u.name}
+                    transitionProperty="transform"
+                    transitionDuration="150ms"
+                    boxSize={7}
+                    borderWidth="2px"
+                    borderColor="white"
+                  />
+                ) : null}
               </Box>
             </Tooltip>
           );
@@ -95,8 +108,10 @@ export const UserAvatarList = Object.assign(
           fragment UserAvatarList_User on User {
             id
             fullName
+            ...UserAvatar_User
             ...UserListPopover_User
           }
+          ${UserAvatar.fragments.User}
           ${UserListPopover.fragments.User}
         `;
       },
@@ -105,6 +120,7 @@ export const UserAvatarList = Object.assign(
           fragment UserAvatarList_UserGroup on UserGroup {
             id
             name
+            initials
           }
         `;
       },

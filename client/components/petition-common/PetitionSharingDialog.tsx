@@ -44,6 +44,7 @@ import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { HelpPopover } from "../common/HelpPopover";
 import { PaddedCollapse } from "../common/PaddedCollapse";
+import { UserAvatar } from "../common/UserAvatar";
 import { UserListPopover } from "../common/UserListPopover";
 import {
   UserSelect,
@@ -319,7 +320,7 @@ export function PetitionSharingDialog({
             <Stack display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"} paddingTop={2}>
               {userPermissions?.map(({ user, permissionType }) => (
                 <Flex key={user.id} alignItems="center">
-                  <Avatar role="presentation" name={user.fullName!} size="sm" />
+                  <UserAvatar role="presentation" user={user} size="sm" />
                   <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
                     <Text isTruncated>
                       {user.fullName}{" "}
@@ -581,9 +582,11 @@ PetitionSharingDialog.fragments = {
         id
         email
         fullName
+        ...UserAvatar_User
         ...UserSelect_User
       }
       ${UserSelect.fragments.User}
+      ${UserAvatar.fragments.User}
     `;
   },
   get UserGroup() {

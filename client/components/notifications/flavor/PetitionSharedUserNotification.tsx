@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar } from "@chakra-ui/react";
+import { Circle } from "@chakra-ui/react";
 import { UserArrowIcon, UserGroupArrowIcon } from "@parallel/chakra/icons";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
@@ -23,17 +23,13 @@ export const PetitionSharedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Avatar
-              boxSize="36px"
-              background="purple.500"
-              icon={
-                sharedWith.__typename === "UserGroup" ? (
-                  <UserGroupArrowIcon color="white" fontSize="1rem" />
-                ) : (
-                  <UserArrowIcon color="white" fontSize="1rem" />
-                )
-              }
-            />
+            <Circle boxSize="36px" background="purple.500">
+              {sharedWith.__typename === "UserGroup" ? (
+                <UserGroupArrowIcon color="white" fontSize="1rem" />
+              ) : (
+                <UserArrowIcon color="white" fontSize="1rem" />
+              )}
+            </Circle>
           }
           path={``}
         >

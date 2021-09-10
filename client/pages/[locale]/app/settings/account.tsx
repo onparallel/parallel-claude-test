@@ -149,6 +149,7 @@ function useUpdateAccount() {
         firstName
         lastName
         fullName
+        initials
       }
     }
   `);

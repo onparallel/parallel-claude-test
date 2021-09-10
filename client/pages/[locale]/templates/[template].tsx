@@ -135,7 +135,7 @@ function LandingTemplateDetails({
                 </Text>
                 <Spacer />
                 <HStack spacing={2}>
-                  <UserAvatar boxSize="40px" user={owner} />
+                  <UserAvatar showImage boxSize="40px" user={owner} />
                   <Text>
                     <FormattedMessage
                       id="public.template-card.created-by"

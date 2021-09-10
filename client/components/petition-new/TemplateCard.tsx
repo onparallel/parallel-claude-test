@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar, Flex, Heading, Stack, Text, Tooltip } from "@chakra-ui/react";
+import { Flex, Heading, Stack, Text, Tooltip } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
@@ -8,6 +8,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { TemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
 import { FormattedMessage, useIntl } from "react-intl";
+import { UserAvatar } from "../common/UserAvatar";
 
 export interface TemplateCardProps {
   template: TemplateCard_PetitionTemplateFragment;
@@ -78,7 +79,7 @@ export const TemplateCard = Object.assign(
             </Tooltip>
           ) : null}
           <Spacer />
-          <Avatar name={template.owner.fullName!} size="xs" role="presentation" />
+          <UserAvatar user={template.owner} size="xs" role="presentation" />
           <Text fontSize="xs" marginLeft={2}>
             <FormattedMessage
               id="generic.by"
@@ -100,12 +101,14 @@ export const TemplateCard = Object.assign(
           owner {
             id
             fullName
+            ...UserAvatar_User
           }
           publicLink {
             id
             isActive
           }
         }
+        ${UserAvatar.fragments.User}
       `,
     },
   }

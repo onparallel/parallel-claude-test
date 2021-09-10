@@ -1533,6 +1533,7 @@ export interface NexusGenFieldTypes {
     fullName: string | null; // String
     hasFeatureFlag: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    initials: string | null; // String
     isSsoUser: boolean; // Boolean!
     isSuperAdmin: boolean; // Boolean!
     lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -1561,6 +1562,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    initials: string; // String!
     members: NexusGenRootTypes["UserGroupMember"][]; // [UserGroupMember!]!
     name: string; // String!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2636,6 +2638,7 @@ export interface NexusGenFieldTypeNames {
     fullName: "String";
     hasFeatureFlag: "Boolean";
     id: "GID";
+    initials: "String";
     isSsoUser: "Boolean";
     isSuperAdmin: "Boolean";
     lastActiveAt: "DateTime";
@@ -2664,6 +2667,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    initials: "String";
     members: "UserGroupMember";
     name: "String";
     updatedAt: "DateTime";

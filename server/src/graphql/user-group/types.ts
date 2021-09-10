@@ -1,10 +1,14 @@
 import { objectType } from "@nexus/schema";
+import { getInitials } from "../../util/initials";
 
 export const UserGroup = objectType({
   name: "UserGroup",
   definition(t) {
     t.globalId("id", { prefixName: "UserGroup" });
     t.string("name");
+    t.string("initials", {
+      resolve: (o) => getInitials(o.name, { removeAffixes: false }),
+    });
     t.list.field("members", {
       type: "UserGroupMember",
       resolve: async (root, _, ctx) => {
