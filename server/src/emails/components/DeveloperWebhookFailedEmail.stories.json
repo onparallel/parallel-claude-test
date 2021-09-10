@@ -9,7 +9,7 @@
         }
       },
       "args": {
-        "senderName": "Santi",
+        "userName": "Santi",
         "errorMessage": "request to https://example.site/abcd failed, reason: getaddrinfo ENOTFOUND example.site",
         "subscriptionId": "ABCDEFG",
         "postBody": {
@@ -19,13 +19,13 @@
           "data": { "petitionAccessId": "12313123" },
           "createdAt": "2021-01-19T16:59:13.952Z"
         },
-        "parallelUrl": "https://www.onparallel.com",
-        "assetsUrl": "https://static.onparallel.com",
-        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {
-        "senderName": { "control": { "type": "text" } },
+        "userName": { "control": { "type": "text" } },
         "errorMessage": { "control": { "type": "text" } },
         "subscriptionId": { "control": { "type": "text" } },
         "postBody": { "control": { "type": "object" } },

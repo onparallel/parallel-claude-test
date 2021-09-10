@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Maybe } from "../../util/types";
@@ -79,7 +79,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         logoAlt={logoAlt}
         showGdprDisclaimer
       >
-        <MjmlSection paddingBottom="0px">
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <GreetingFormal fullName={fullName} />
             <MjmlText>
@@ -106,9 +106,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
 
         <MjmlSection paddingTop="0px">
           <MjmlColumn>
-            <MjmlSpacer height="10px" />
             <CompleteInfoButton href={`${parallelUrl}/${locale}/petition/${keycode}`} />
-            <MjmlSpacer height="10px" />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

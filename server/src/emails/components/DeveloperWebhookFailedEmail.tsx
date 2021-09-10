@@ -68,8 +68,14 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
     logoAlt,
   }: DeveloperWebhookFailedEmailProps) {
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection paddingBottom="10px">
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        showGdprDisclaimer
+      >
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>
@@ -83,7 +89,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
         </MjmlSection>
 
         <MjmlSection padding="0 20px">
-          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
+          <MjmlColumn backgroundColor="#F4F7F9" borderRadius="5px" padding="10px 0">
             <MjmlText fontWeight={600}>{errorMessage}</MjmlText>
             <MjmlText>
               <pre>{JSON.stringify(postBody, null, 2)}</pre>
