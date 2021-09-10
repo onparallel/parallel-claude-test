@@ -350,13 +350,6 @@ export type SystemEventPayload<TType extends SystemEventType> = {
     user_id: number;
     from: "sign-up" | "invitation";
   };
-  PETITION_MESSAGE_BOUNCED: {
-    petition_message_id: number;
-  };
-  PETITION_REMINDER_BOUNCED: {
-    petition_reminder_id: number;
-    petition_id: number;
-  };
   EMAIL_VERIFIED: {
     user_id: number;
   };
@@ -408,10 +401,8 @@ export type EmailOpenedSystemEvent<IsCreate extends boolean = false> = GenericSy
 >;
 
 export type SystemEvent<IsCreate extends boolean = false> =
-  | UserLoggedInEvent<IsCreate>
   | UserCreatedEvent<IsCreate>
-  | PetitionMessageBouncedEvent<IsCreate>
-  | PetitionReminderBouncedEvent<IsCreate>
+  | UserLoggedInEvent<IsCreate>
   | EmailVerifiedSystemEvent<IsCreate>
   | InviteSentSystemEvent<IsCreate>
   | EmailOpenedSystemEvent<IsCreate>;
