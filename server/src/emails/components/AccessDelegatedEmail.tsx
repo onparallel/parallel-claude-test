@@ -5,17 +5,17 @@ import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
-import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { disclaimer, greetingFormal } from "../common/texts";
+import { disclaimer } from "../common/texts";
+import { UserMessageBox } from "../common/UserMessageBox";
 import { FORMATS } from "../utils/dates";
 
 export type AccessDelegatedEmailProps = {
-  fullName: string | null;
   senderName: string;
   senderEmail: string;
   petitionOwnerFullName: string;
   petitionOwnerEmail: string;
+  emailSubject: string | null;
   bodyHtml: string;
   bodyPlainText: string;
   deadline: Date | null;
@@ -32,20 +32,21 @@ const email: Email<AccessDelegatedEmailProps> = {
       { senderName }
     );
   },
-  subject({ senderName }, intl) {
+  subject({ senderName, emailSubject }, intl) {
     return intl.formatMessage(
       {
         id: "access-delegated-email.subject",
-        defaultMessage: "You have a message from {senderName}",
+        defaultMessage:
+          "{senderName} has invited you to collaborate on {subject, select, null{a petition} other{{subject}}}",
       },
       {
         senderName,
+        subject: emailSubject,
       }
     );
   },
   text(
     {
-      fullName,
       senderName,
       senderEmail,
       petitionOwnerFullName,
@@ -58,7 +59,6 @@ const email: Email<AccessDelegatedEmailProps> = {
     intl
   ) {
     return outdent`
-      ${greetingFormal({ fullName }, intl)}
       ${intl.formatMessage(
         {
           id: "access-delegated.text",
@@ -95,7 +95,6 @@ const email: Email<AccessDelegatedEmailProps> = {
     `;
   },
   html({
-    fullName,
     senderName,
     senderEmail,
     petitionOwnerFullName,
@@ -117,30 +116,23 @@ const email: Email<AccessDelegatedEmailProps> = {
         logoAlt={logoAlt}
         showGdprDisclaimer
       >
-        <MjmlSection paddingBottom="10px">
-          <MjmlColumn>
-            <GreetingFormal fullName={fullName} />
-            <MjmlText>
-              <FormattedMessage
-                id="access-delegated.text"
-                defaultMessage="{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
-                values={{
-                  senderName: <b>{senderName}</b>,
-                  senderEmail: <b>{senderEmail}</b>,
-                  petitionOwnerFullName: <b>{petitionOwnerFullName}</b>,
-                  petitionOwnerEmail: <b>{petitionOwnerEmail}</b>,
-                }}
-              />
-            </MjmlText>
-          </MjmlColumn>
+        <MjmlSection padding="0 0 16px 0">
+          <MjmlText>
+            <FormattedMessage
+              id="access-delegated.text"
+              defaultMessage="{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
+              values={{
+                senderName: <b>{senderName}</b>,
+                senderEmail: <b>{senderEmail}</b>,
+                petitionOwnerFullName: <b>{petitionOwnerFullName}</b>,
+                petitionOwnerEmail: <b>{petitionOwnerEmail}</b>,
+              }}
+            />
+          </MjmlText>
         </MjmlSection>
-        <MjmlSection padding="0 20px">
-          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
-            <MjmlText>
-              <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
-            </MjmlText>
-          </MjmlColumn>
-        </MjmlSection>
+
+        <UserMessageBox bodyHtml={bodyHtml} />
+
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
             {deadline ? (

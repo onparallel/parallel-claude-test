@@ -1,8 +1,8 @@
 [
   {
     "term": "access-delegated-email.subject",
-    "definition": "Tiene un mensaje de {senderName}",
-    "context": "You have a message from {senderName}"
+    "definition": "{senderName} te ha invitado a colaborar en {subject, select, null{su petición} other{{subject}}}",
+    "context": "{senderName} has invited you to collaborate on {subject, select, null{a petition} other{{subject}}}"
   },
   {
     "term": "access-delegated.text",

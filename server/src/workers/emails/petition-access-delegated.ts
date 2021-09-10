@@ -30,10 +30,11 @@ export async function petitionAccessDelegated(
     throw new Error(`Petition access with id ${payload.original_access_id} not found`);
   }
 
-  const [contact, delegator, petitionOwner] = await Promise.all([
+  const [contact, delegator, petitionOwner, messages] = await Promise.all([
     context.contacts.loadContact(newAccess.contact_id),
     context.contacts.loadContact(originalAccess.contact_id),
     context.users.loadUser(originalAccess.granter_id),
+    context.petitions.loadMessagesByPetitionAccessId(originalAccess.id),
   ]);
 
   if (!contact) {
@@ -55,7 +56,6 @@ export async function petitionAccessDelegated(
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
     {
-      fullName: fullName(contact.first_name, contact.last_name),
       senderName: fullName(delegator.first_name, delegator.last_name)!,
       senderEmail: delegator.email,
       petitionOwnerFullName: fullName(petitionOwner.first_name, petitionOwner.last_name)!,
@@ -63,6 +63,7 @@ export async function petitionAccessDelegated(
       deadline: petition.deadline,
       bodyHtml: toHtml(payload.message_body),
       bodyPlainText: toPlainText(payload.message_body),
+      emailSubject: messages[0].email_subject,
       keycode: newAccess.keycode,
       ...layoutProps,
     },

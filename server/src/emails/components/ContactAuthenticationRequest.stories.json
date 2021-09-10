@@ -13,9 +13,9 @@
         "code": "123456",
         "browserName": "Safari",
         "osName": "iOS",
-        "parallelUrl": "https://www.onparallel.com",
-        "assetsUrl": "https://static.onparallel.com",
-        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {
