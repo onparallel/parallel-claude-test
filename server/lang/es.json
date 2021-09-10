@@ -107,7 +107,7 @@
   {
     "term": "generic.complete-information-button",
     "definition": "Complete aquí la información",
-    "context": "Complete the information here"
+    "context": "Complete the information"
   },
   {
     "term": "generic.complete-information-click-link",
@@ -175,6 +175,11 @@
     "context": "You can login through our website."
   },
   {
+    "term": "layout.email-sent-by",
+    "definition": "Enviado por Parallel Solutions, S.L.",
+    "context": "Sent by Parallel Solutions, S.L."
+  },
+  {
     "term": "layout.privacy-link",
     "definition": "Privacidad",
     "context": "Privacy"
@@ -191,7 +196,7 @@
   },
   {
     "term": "new-petition.text",
-    "definition": "{senderName} ({senderEmail}) le hace llegar la siguiente petición:",
+    "definition": "{senderName} ({senderEmail}) le ha compartido un acceso a Parallel:",
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"
   },
   {
@@ -333,6 +338,11 @@
     "term": "reminder.click-finalize",
     "definition": "Si ya subiste toda la información, dale click a <b>Finalizar</b> en la página.",
     "context": "If you already submitted all the information, click <b>Finalize</b> on the page."
+  },
+  {
+    "term": "reminder.pending-fields-count",
+    "definition": "Tienes {pending}/{total} campos pendientes.",
+    "context": "You have {pending}/{total} fields pending."
   },
   {
     "term": "reminder.text",

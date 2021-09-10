@@ -1,4 +1,4 @@
-import { zip } from "remeda";
+import { countBy, zip } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionReminder from "../../emails/components/PetitionReminder";
@@ -58,10 +58,12 @@ export async function petitionReminder(
       replies: repliesByFieldId[f.id],
     }));
 
-    const missing = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies)).filter(
-      ([field, isVisible]) => isVisible && field.type !== "HEADING" && field.replies.length === 0
-    );
+    const repliableFields = zip(
+      fieldsWithReplies,
+      evaluateFieldVisibility(fieldsWithReplies)
+    ).filter(([field, isVisible]) => isVisible && field.type !== "HEADING");
 
+    const missingFieldCount = countBy(repliableFields, ([field]) => field.replies.length === 0);
     const { emailFrom, ...layoutProps } = await getLayoutProps(granter.org_id, context);
 
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
@@ -73,7 +75,8 @@ export async function petitionReminder(
         contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,
-        missingFieldCount: missing.length,
+        missingFieldCount,
+        totalFieldCount: repliableFields.length,
         bodyHtml: bodyJson ? toHtml(bodyJson, renderContext) : null,
         bodyPlainText: bodyJson ? toPlainText(bodyJson, renderContext) : null,
         deadline: petition.deadline,

@@ -106,8 +106,8 @@
   },
   {
     "term": "generic.complete-information-button",
-    "definition": "Complete the information here",
-    "context": "Complete the information here"
+    "definition": "Complete the information",
+    "context": "Complete the information"
   },
   {
     "term": "generic.complete-information-click-link",
@@ -173,6 +173,11 @@
     "term": "invitation.website",
     "definition": "You can login through our website.",
     "context": "You can login through our website."
+  },
+  {
+    "term": "layout.email-sent-by",
+    "definition": "Sent by Parallel Solutions, S.L.",
+    "context": "Sent by Parallel Solutions, S.L."
   },
   {
     "term": "layout.privacy-link",
@@ -333,6 +338,11 @@
     "term": "reminder.click-finalize",
     "definition": "If you already submitted all the information, click <b>Finalize</b> on the page.",
     "context": "If you already submitted all the information, click <b>Finalize</b> on the page."
+  },
+  {
+    "term": "reminder.pending-fields-count",
+    "definition": "You have {pending}/{total} fields pending.",
+    "context": "You have {pending}/{total} fields pending."
   },
   {
     "term": "reminder.text",

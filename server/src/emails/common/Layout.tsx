@@ -69,7 +69,7 @@ export const Layout: FC<LayoutProps> = function Layout({
         `
         }</MjmlStyle>
       </MjmlHead>
-      <MjmlBody backgroundColor="#f6f6f6">
+      <MjmlBody>
         {/* Header */}
         <MjmlSection>
           <MjmlColumn>
@@ -78,15 +78,9 @@ export const Layout: FC<LayoutProps> = function Layout({
         </MjmlSection>
 
         {/* Content */}
-        <MjmlWrapper padding="1px" backgroundColor="#A0AEC0" borderRadius="4px">
+        <MjmlWrapper padding="1px">
           {contentHeading}
-          <MjmlWrapper
-            padding="0"
-            backgroundColor="#ffffff"
-            borderRadius={contentHeading ? "0 0 3px 3px" : "3px"}
-          >
-            {children}
-          </MjmlWrapper>
+          {children}
         </MjmlWrapper>
 
         {/* Footer */}
@@ -123,10 +117,15 @@ export const Layout: FC<LayoutProps> = function Layout({
                 {" "}
               </MjmlSocialElement>
             </MjmlSocial>
-            <MjmlText align="center" fontSize="12px">
-              {`Parallel Solutions, S.L. - C/Almogàvers 165, 59.203, 08018 Barcelona, Spain`}
+            <MjmlText align="center" color="#1A202C" lineHeight="20px">
+              <FormattedMessage
+                id="layout.email-sent-by"
+                defaultMessage="Sent by Parallel Solutions, S.L."
+              />
+              <br />
+              C/Almogàvers 165, 59.203, 08018 | Barcelona, Spain
             </MjmlText>
-            <MjmlText align="center" fontSize="12px">
+            <MjmlText align="center">
               <a
                 className="link"
                 href={`https://www.onparallel.com/${locale}/legal/terms?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}

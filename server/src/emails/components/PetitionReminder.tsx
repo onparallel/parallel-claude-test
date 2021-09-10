@@ -9,6 +9,7 @@ import { Disclaimer } from "../common/Disclaimer";
 import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer, greetingFormal } from "../common/texts";
+import { UserMessageBox } from "../common/UserMessageBox";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionReminderProps = {
@@ -17,6 +18,7 @@ export type PetitionReminderProps = {
   senderName: string;
   senderEmail: string;
   missingFieldCount: number;
+  totalFieldCount: number;
   bodyHtml: string | null;
   bodyPlainText: string | null;
   deadline: Date | null;
@@ -58,6 +60,7 @@ const email: Email<PetitionReminderProps> = {
       senderEmail,
       bodyPlainText,
       missingFieldCount,
+      totalFieldCount,
       deadline,
       keycode,
       parallelUrl,
@@ -76,6 +79,14 @@ const email: Email<PetitionReminderProps> = {
       )}
       
       ${bodyPlainText}
+
+      ${intl.formatMessage(
+        {
+          id: "reminder.pending-fields-count",
+          defaultMessage: "You have {pending}/{total} fields pending.",
+        },
+        { pending: missingFieldCount, total: totalFieldCount }
+      )}
       ${
         deadline
           ? outdent`
@@ -121,6 +132,7 @@ const email: Email<PetitionReminderProps> = {
     deadline,
     keycode,
     missingFieldCount,
+    totalFieldCount,
     parallelUrl,
     assetsUrl,
     logoUrl,
@@ -136,32 +148,34 @@ const email: Email<PetitionReminderProps> = {
         showGdprDisclaimer
         optOutUrl={`${parallelUrl}/${locale}/petition/${keycode}/opt-out`}
       >
-        <MjmlSection paddingBottom="10px">
-          <MjmlColumn>
-            <GreetingFormal fullName={contactFullName} />
-            <MjmlText>
-              <FormattedMessage
-                id="reminder.text"
-                defaultMessage="We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
-                values={{
-                  senderName: <b>{senderName}</b>,
-                  senderEmail: <b>{senderEmail}</b>,
-                }}
-              />
-            </MjmlText>
-          </MjmlColumn>
+        <MjmlSection padding="0 0 16px 0">
+          <GreetingFormal fullName={contactFullName} />
+          <MjmlSpacer />
+          <MjmlText lineHeight="24px">
+            <FormattedMessage
+              id="reminder.text"
+              defaultMessage="We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
+              values={{
+                senderName: <b>{senderName}</b>,
+                senderEmail: <b>{senderEmail}</b>,
+              }}
+            />
+          </MjmlText>
         </MjmlSection>
-        {bodyHtml ? (
-          <MjmlSection padding="0 20px">
-            <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
-              <MjmlText>
-                <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
-              </MjmlText>
-            </MjmlColumn>
-          </MjmlSection>
-        ) : null}
-        <MjmlSection paddingTop="10px">
+
+        <UserMessageBox bodyHtml={bodyHtml} />
+
+        <MjmlSection paddingTop="0">
           <MjmlColumn>
+            <MjmlText>
+              <li>
+                <FormattedMessage
+                  id="reminder.pending-fields-count"
+                  defaultMessage="You have {pending}/{total} fields pending."
+                  values={{ pending: missingFieldCount, total: totalFieldCount }}
+                />
+              </li>
+            </MjmlText>
             {deadline ? (
               <MjmlText>
                 <FormattedMessage

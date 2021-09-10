@@ -5,13 +5,12 @@ import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
-import { GreetingFormal } from "../common/Greeting";
+import { UserMessageBox } from "../common/UserMessageBox";
 import { Layout, LayoutProps } from "../common/Layout";
-import { disclaimer, greetingFormal } from "../common/texts";
+import { disclaimer } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionMessageProps = {
-  contactFullName: string;
   senderName: string;
   senderEmail: string;
   subject: string | null;
@@ -34,12 +33,8 @@ const email: Email<PetitionMessageProps> = {
   subject({ subject }) {
     return subject || "";
   },
-  text(
-    { contactFullName, senderName, senderEmail, bodyPlainText, deadline, keycode, parallelUrl },
-    intl
-  ) {
+  text({ senderName, senderEmail, bodyPlainText, deadline, keycode, parallelUrl }, intl) {
     return outdent`
-      ${greetingFormal({ fullName: contactFullName }, intl)}
       ${intl.formatMessage(
         {
           id: "new-petition.text",
@@ -69,13 +64,13 @@ const email: Email<PetitionMessageProps> = {
         id: "generic.complete-information-click-link",
         defaultMessage: "Please click the link below to complete the information.",
       })}
+
       ${parallelUrl}/${intl.locale}/petition/${keycode}
       
       ${disclaimer({ email: senderEmail }, intl)}
     `;
   },
   html({
-    contactFullName,
     senderName,
     senderEmail,
     bodyHtml,
@@ -96,28 +91,19 @@ const email: Email<PetitionMessageProps> = {
         logoAlt={logoAlt}
         showGdprDisclaimer
       >
-        <MjmlSection paddingBottom="10px">
-          <MjmlColumn>
-            <GreetingFormal fullName={contactFullName} />
-            <MjmlText>
-              <FormattedMessage
-                id="new-petition.text"
-                defaultMessage="{senderName} ({senderEmail}) has sent you the following petition:"
-                values={{
-                  senderName: <b>{senderName}</b>,
-                  senderEmail: <b>{senderEmail}</b>,
-                }}
-              />
-            </MjmlText>
-          </MjmlColumn>
+        <MjmlSection padding="0 0 16px 0">
+          <MjmlText align="center">
+            <FormattedMessage
+              id="new-petition.text"
+              defaultMessage="{senderName} ({senderEmail}) has sent you the following petition:"
+              values={{
+                senderName: <b>{senderName}</b>,
+                senderEmail: <b>{senderEmail}</b>,
+              }}
+            />
+          </MjmlText>
         </MjmlSection>
-        <MjmlSection padding="0 20px">
-          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
-            <MjmlText>
-              <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
-            </MjmlText>
-          </MjmlColumn>
-        </MjmlSection>
+        <UserMessageBox bodyHtml={bodyHtml} />
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
             {deadline ? (
