@@ -103,7 +103,7 @@ export function RecipientViewProgressFooter({
       <Popover
         returnFocusOnClose={false}
         isOpen={replied + optional === total && !isCompleted && !poppoverClosed}
-        placement="top"
+        placement="top-end"
         closeOnBlur={false}
         onClose={() => setPoppoverClosed(true)}
         autoFocus={false}
