@@ -9,19 +9,19 @@
         }
       },
       "args": {
-        "signatureProvider": "Signaturit",
         "signerName": "{{signer_name}}",
         "documentName": "{{filename}}",
+        "emailBody": "<div>Hola, firmame esto porfa</div>",
         "signButton": "{{sign_button}}",
-        "parallelUrl": "https://www.onparallel.com",
-        "assetsUrl": "https://static.onparallel.com",
-        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {
-        "signatureProvider": { "control": { "type": "text" } },
         "signerName": { "control": { "type": "text" } },
         "documentName": { "control": { "type": "text" } },
+        "emailBody": { "control": { "type": "text" }, "type": { "required": false } },
         "signButton": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },

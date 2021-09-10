@@ -239,7 +239,6 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
-          documentName: "{{filename}}",
           ...opts.templateData,
         },
         { locale: opts.locale }

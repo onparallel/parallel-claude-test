@@ -6,11 +6,12 @@ import { ClosingFormal } from "../common/Closing Formal";
 import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, gdprDisclaimer, greetingFormal } from "../common/texts";
+import { UserMessageBox } from "../common/UserMessageBox";
 
 type SignatureRequestedProps = {
   emailBody: string | null;
-  signerName: string | null;
-  documentName: string | null;
+  signerName: string;
+  documentName: string;
   signButton: string;
 } & LayoutProps;
 
@@ -34,15 +35,11 @@ const email: Email<SignatureRequestedProps> = {
   ) {
     return outdent`
       ${greetingFormal({ fullName }, intl)}
-      ${intl.formatMessage({
-        id: "signature-requested.text",
-        defaultMessage: "You have received a signature request to sign a document.",
-      })}
-
       ${intl.formatMessage(
         {
-          id: "signature-requested.document-name",
-          defaultMessage: "Document: {documentName}",
+          id: "signature-requested.text",
+          defaultMessage:
+            "You have received a signature request to sign a document named {documentName}.",
         },
         { documentName }
       )}
@@ -75,6 +72,7 @@ const email: Email<SignatureRequestedProps> = {
     return (
       <Layout
         showGdprDisclaimer
+        useAlternativeSlogan
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
@@ -84,28 +82,18 @@ const email: Email<SignatureRequestedProps> = {
           defaultMessage: "Signature requested",
         })}
       >
-        <MjmlSection>
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <GreetingFormal fullName={fullName} />
             <MjmlText>
               <FormattedMessage
                 id="signature-requested.text"
-                defaultMessage="You have received a signature request to sign a document."
+                defaultMessage="You have received a signature request to sign a document named {documentName}."
+                values={{ documentName }}
               />
             </MjmlText>
 
-            <MjmlSection padding="0 20px">
-              <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
-                <MjmlText>
-                  <FormattedMessage
-                    id="signature-requested.document-name"
-                    defaultMessage="Document: {documentName}"
-                    values={{ documentName }}
-                  />
-                </MjmlText>
-                {emailBody ? <MjmlText>{emailBody}</MjmlText> : null}
-              </MjmlColumn>
-            </MjmlSection>
+            <UserMessageBox bodyHtml={emailBody} />
 
             <MjmlText>
               <FormattedMessage

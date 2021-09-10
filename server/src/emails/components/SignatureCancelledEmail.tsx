@@ -8,7 +8,6 @@ import { Layout, LayoutProps } from "../common/Layout";
 import { closing, gdprDisclaimer, greetingFormal } from "../common/texts";
 
 type SignatureCancelledProps = {
-  documentName: string | null;
   signerName: string | null;
   signatureProvider: string;
 } & LayoutProps;
@@ -27,7 +26,7 @@ const email: Email<SignatureCancelledProps> = {
       defaultMessage: "Cancelled signature request",
     });
   },
-  text({ signerName, signatureProvider, documentName }: SignatureCancelledProps, intl: IntlShape) {
+  text({ signerName, signatureProvider }: SignatureCancelledProps, intl: IntlShape) {
     return outdent`
       ${greetingFormal({ fullName: signerName }, intl)}
       ${intl.formatMessage(
@@ -57,6 +56,7 @@ const email: Email<SignatureCancelledProps> = {
     return (
       <Layout
         showGdprDisclaimer
+        useAlternativeSlogan
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
@@ -66,7 +66,7 @@ const email: Email<SignatureCancelledProps> = {
           defaultMessage: "Cancelled signature request",
         })}
       >
-        <MjmlSection>
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <GreetingFormal fullName={signerName} />
             <MjmlText>

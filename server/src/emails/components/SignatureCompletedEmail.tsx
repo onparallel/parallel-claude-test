@@ -56,6 +56,7 @@ const email: Email<SignatureCompletedProps> = {
     return (
       <Layout
         showGdprDisclaimer
+        useAlternativeSlogan
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
@@ -65,7 +66,7 @@ const email: Email<SignatureCompletedProps> = {
           defaultMessage: "Signature request completed",
         })}
       >
-        <MjmlSection>
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <GreetingFormal fullName={signerName} />
             <MjmlText>

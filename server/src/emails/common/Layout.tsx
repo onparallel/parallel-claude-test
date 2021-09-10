@@ -3,6 +3,7 @@ import {
   MjmlAll,
   MjmlAttributes,
   MjmlBody,
+  MjmlButton,
   MjmlClass,
   MjmlColumn,
   MjmlDivider,
@@ -29,6 +30,7 @@ export type LayoutProps = {
   showGdprDisclaimer?: boolean;
   contentHeading?: Element | null;
   optOutUrl?: string;
+  useAlternativeSlogan?: boolean;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -40,6 +42,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   showGdprDisclaimer,
   contentHeading,
   optOutUrl,
+  useAlternativeSlogan,
 }) {
   const { locale } = useIntl();
   return (
@@ -85,20 +88,39 @@ export const Layout: FC<LayoutProps> = function Layout({
 
         {/* Footer */}
         <MjmlSection>
-          <MjmlDivider borderWidth="1px" borderColor="#A0AEC0" width="80%" />
+          <MjmlDivider borderWidth="1px" borderColor="#CBD5E0" width="80%" />
         </MjmlSection>
         <MjmlSection padding="0">
           <MjmlColumn width="100%">
-            <MjmlText color="#2D3748" align="center">
-              <FormattedMessage id="footer.slogan" defaultMessage="Work better with" />
-            </MjmlText>
-            <MjmlImage
-              padding="0"
-              width="120px"
-              alt="Parallel"
-              src={`${assetsUrl}/static/emails/logo.png`}
-              href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
-            />
+            {useAlternativeSlogan ? (
+              <MjmlButton
+                href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+                padding="6px 16px"
+                backgroundColor="white"
+                color="black"
+                border="1px solid #A0AEC0"
+                borderRadius="5px"
+              >
+                <FormattedMessage
+                  id="footer.slogan.alternative"
+                  defaultMessage="Create your own <b>parallel</b>"
+                />
+              </MjmlButton>
+            ) : (
+              <>
+                <MjmlText color="#2D3748" align="center">
+                  <FormattedMessage id="footer.slogan" defaultMessage="Work better with" />
+                </MjmlText>
+                <MjmlImage
+                  padding="0"
+                  width="120px"
+                  alt="Parallel"
+                  src={`${assetsUrl}/static/emails/logo.png`}
+                  href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+                />
+              </>
+            )}
+
             <MjmlSocial align="center" icon-padding="1px">
               <MjmlSocialElement
                 alt="LinkedIn"

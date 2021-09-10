@@ -75,6 +75,11 @@
     "context": "Work better with"
   },
   {
+    "term": "footer.slogan.alternative",
+    "definition": "Create your own <b>parallel</b>",
+    "context": "Create your own <b>parallel</b>"
+  },
+  {
     "term": "forgot-password.subject",
     "definition": "Your verification code",
     "context": "Your verification code"
@@ -375,11 +380,6 @@
     "context": "Please find attached a copy of the document you just signed through {signatureProvider}."
   },
   {
-    "term": "signature-requested.document-name",
-    "definition": "Document: {documentName}",
-    "context": "Document: {documentName}"
-  },
-  {
     "term": "signature-requested.external-link",
     "definition": "To review and sign it, click on the following link:",
     "context": "To review and sign it, click on the following link:"
@@ -391,8 +391,8 @@
   },
   {
     "term": "signature-requested.text",
-    "definition": "You have received a signature request to sign a document.",
-    "context": "You have received a signature request to sign a document."
+    "definition": "You have received a signature request to sign a document named {documentName}.",
+    "context": "You have received a signature request to sign a document named {documentName}."
   },
   {
     "term": "verification-code-request.code-label",
