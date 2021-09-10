@@ -130,11 +130,6 @@
     "context": "Untitled petition"
   },
   {
-    "term": "generic.untitled-template",
-    "definition": "Untitled template",
-    "context": "Untitled template"
-  },
-  {
     "term": "greeting",
     "definition": "{name, select, null {Hi,} other {Hi {name},}}",
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
@@ -251,8 +246,8 @@
   },
   {
     "term": "petition-completed.access-button",
-    "definition": "Access the information here",
-    "context": "Access the information here"
+    "definition": "Access the information",
+    "context": "Access the information"
   },
   {
     "term": "petition-completed.access-click-link",
@@ -300,6 +295,21 @@
     "context": "Remember that {senderName} sent you a petition"
   },
   {
+    "term": "petition-shared-email.access-button",
+    "definition": "Access the {isTemplate, select, true{template} other{petition}}",
+    "context": "Access the {isTemplate, select, true{template} other{petition}}"
+  },
+  {
+    "term": "petition-shared-email.subject",
+    "definition": "{userName} has shared {petitionName} with you",
+    "context": "{userName} has shared {petitionName} with you"
+  },
+  {
+    "term": "petition-shared-email.text",
+    "definition": "{owner} has shared the following {isTemplate, select, true{template} other{petition}} with you.",
+    "context": "{owner} has shared the following {isTemplate, select, true{template} other{petition}} with you."
+  },
+  {
     "term": "petition-sharing-notification.access-button",
     "definition": "Access the petition here",
     "context": "Access the petition here"
@@ -308,16 +318,6 @@
     "term": "petition-sharing-notification.access-click-link",
     "definition": "Follow the link below link to access it.",
     "context": "Follow the link below link to access it."
-  },
-  {
-    "term": "petition-sharing-notification.subject",
-    "definition": "\"{petitionName}\" - Petition shared with you",
-    "context": "\"{petitionName}\" - Petition shared with you"
-  },
-  {
-    "term": "petition-sharing-notification.text",
-    "definition": "{ownerName} ({ownerEmail}) has shared the following petition with you.",
-    "context": "{ownerName} ({ownerEmail}) has shared the following petition with you."
   },
   {
     "term": "public-petition-link.text-1",
@@ -388,21 +388,6 @@
     "term": "signature-requested.text",
     "definition": "You have received a signature request to sign a document.",
     "context": "You have received a signature request to sign a document."
-  },
-  {
-    "term": "template-sharing-notification.access-button",
-    "definition": "Access the template here",
-    "context": "Access the template here"
-  },
-  {
-    "term": "template-sharing-notification.subject",
-    "definition": "\"{petitionName}\" - Template shared with you",
-    "context": "\"{petitionName}\" - Template shared with you"
-  },
-  {
-    "term": "template-sharing-notification.text",
-    "definition": "{ownerName} ({ownerEmail}) has shared the following template with you.",
-    "context": "{ownerName} ({ownerEmail}) has shared the following template with you."
   },
   {
     "term": "verification-code-request.code-label",

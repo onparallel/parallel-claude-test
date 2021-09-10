@@ -1,10 +1,9 @@
-import { isDefined, pick, zip } from "remeda";
+import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import { Contact, EmailLog, PetitionAccess } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCompleted from "../../emails/components/PetitionCompleted";
 import { buildFrom } from "../../emails/utils/buildFrom";
-import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
@@ -41,10 +40,9 @@ export async function petitionCompleted(
     );
   }
   const petitionId = payload.petition_id;
-  const [petition, permissions, fields] = await Promise.all([
+  const [petition, permissions] = await Promise.all([
     context.petitions.loadPetition(petitionId),
     context.petitions.loadEffectivePermissions(petitionId),
-    context.petitions.loadFieldsForPetition(petitionId),
   ]);
 
   if (!petition) {
@@ -57,20 +55,6 @@ export async function petitionCompleted(
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
-  const fieldIds = fields.map((f) => f.id);
-  const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
-  const repliesByFieldId = Object.fromEntries(
-    fieldIds.map((id, index) => [id, fieldReplies[index]])
-  );
-  const fieldsWithReplies = fields.map((f) => ({
-    ...f,
-    replies: repliesByFieldId[f.id],
-  }));
-
-  const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
-    .filter(([, isVisible]) => isVisible)
-    .map(([field]) => field);
-
   const emails: EmailLog[] = [];
 
   const subscribedUserIds = permissions.filter((p) => p.is_subscribed).map((p) => p.user_id!);
@@ -80,11 +64,11 @@ export async function petitionCompleted(
       PetitionCompleted,
       {
         isSigned: Boolean(payload.signer_contact_id ?? false),
-        name: user.first_name,
+        userName: user.first_name,
         petitionId: toGlobalId("Petition", petitionId),
         petitionName: petition.name,
-        contactNameOrEmail: fullName(contact.first_name, contact.last_name) || contact.email,
-        fields: visibleFields.map(pick(["id", "title", "position", "type"])),
+        contactName: fullName(contact.first_name, contact.last_name),
+        contactEmail: contact.email,
         ...layoutProps,
       },
       { locale: petition.locale }

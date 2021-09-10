@@ -5,7 +5,7 @@ import { petitionCompleted } from "./emails/petition-completed";
 import { petitionMessage } from "./emails/petition-message";
 import { petitionReminder } from "./emails/petition-reminder";
 import { petitionClosedNotification } from "./emails/petition-closed-notification";
-import { petitionSharingNotification } from "./emails/petition-sharing-notification";
+import { petitionShared } from "./emails/petition-shared";
 import { petitionMessageBounced } from "./emails/petition-message-bounced";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { contactAuthenticationRequest } from "./emails/contact-authentication-request";
@@ -19,7 +19,7 @@ const builders = {
   "comments-contact-notification": commentsContactNotification,
   "petition-message": petitionMessage,
   "petition-reminder": petitionReminder,
-  "petition-sharing-notification": petitionSharingNotification,
+  "petition-shared": petitionShared,
   "petition-closed-notification": petitionClosedNotification,
   "petition-message-bounced": petitionMessageBounced,
   "contact-authentication-request": contactAuthenticationRequest,

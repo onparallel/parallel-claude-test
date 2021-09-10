@@ -130,11 +130,6 @@
     "context": "Untitled petition"
   },
   {
-    "term": "generic.untitled-template",
-    "definition": "Plantilla sin nombre",
-    "context": "Untitled template"
-  },
-  {
     "term": "greeting",
     "definition": "{name, select, null {Hola,} other {Hola {name},}}",
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
@@ -231,7 +226,7 @@
   },
   {
     "term": "petition-comments-user-notification.access-button",
-    "definition": "Responde aquí los comentarios",
+    "definition": "Responde a los comentarios",
     "context": "Reply the comments"
   },
   {
@@ -251,8 +246,8 @@
   },
   {
     "term": "petition-completed.access-button",
-    "definition": "Accede a la información aquí",
-    "context": "Access the information here"
+    "definition": "Accede a la información",
+    "context": "Access the information"
   },
   {
     "term": "petition-completed.access-click-link",
@@ -300,6 +295,21 @@
     "context": "Remember that {senderName} sent you a petition"
   },
   {
+    "term": "petition-shared-email.access-button",
+    "definition": "Acceder a la {isTemplate, select, true{plantilla} other{petición}}",
+    "context": "Access the {isTemplate, select, true{template} other{petition}}"
+  },
+  {
+    "term": "petition-shared-email.subject",
+    "definition": "{userName} te ha compartido {petitionName}",
+    "context": "{userName} has shared {petitionName} with you"
+  },
+  {
+    "term": "petition-shared-email.text",
+    "definition": "{owner} ha compartido la siguiente {isTemplate, select, true{plantilla} other{petición}} contigo:",
+    "context": "{owner} has shared the following {isTemplate, select, true{template} other{petition}} with you."
+  },
+  {
     "term": "petition-sharing-notification.access-button",
     "definition": "Accede a la petición aquí",
     "context": "Access the petition here"
@@ -308,16 +318,6 @@
     "term": "petition-sharing-notification.access-click-link",
     "definition": "Sigue el enlace siguiente para acceder a ella.",
     "context": "Follow the link below link to access it."
-  },
-  {
-    "term": "petition-sharing-notification.subject",
-    "definition": "\"{petitionName}\" - Petición compartida contigo",
-    "context": "\"{petitionName}\" - Petition shared with you"
-  },
-  {
-    "term": "petition-sharing-notification.text",
-    "definition": "{ownerName} ({ownerEmail}) ha compartido la siguiente petición contigo.",
-    "context": "{ownerName} ({ownerEmail}) has shared the following petition with you."
   },
   {
     "term": "public-petition-link.text-1",
@@ -388,21 +388,6 @@
     "term": "signature-requested.text",
     "definition": "Ha recibido una petición para firmar un documento.",
     "context": "You have received a signature request to sign a document."
-  },
-  {
-    "term": "template-sharing-notification.access-button",
-    "definition": "Accede a la plantilla aquí",
-    "context": "Access the template here"
-  },
-  {
-    "term": "template-sharing-notification.subject",
-    "definition": "\"{petitionName}\" - Plantilla compartida contigo",
-    "context": "\"{petitionName}\" - Template shared with you"
-  },
-  {
-    "term": "template-sharing-notification.text",
-    "definition": "{ownerName} ({ownerEmail}) ha compartido la siguiente plantilla contigo.",
-    "context": "{ownerName} ({ownerEmail}) has shared the following template with you."
   },
   {
     "term": "verification-code-request.code-label",

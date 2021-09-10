@@ -6,16 +6,15 @@ import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { PetitionFieldList, PetitionFieldListProps } from "../common/PetitionFieldList";
-import { closing, greeting, petitionFieldList } from "../common/texts";
+import { closing, greeting } from "../common/texts";
 
 export type PetitionCompletedProps = {
   isSigned: boolean;
-  name: string | null;
+  userName: string | null;
   petitionId: string;
   petitionName: string | null;
-  contactNameOrEmail: string;
-  fields: PetitionFieldListProps["fields"];
+  contactName: string;
+  contactEmail: string;
 } & LayoutProps;
 
 const email: Email<PetitionCompletedProps> = {
@@ -37,24 +36,24 @@ const email: Email<PetitionCompletedProps> = {
   text(
     {
       isSigned,
-      name,
+      userName,
       petitionId,
       petitionName,
-      contactNameOrEmail: recipientNameOrEmail,
-      fields,
+      contactName,
+      contactEmail,
       parallelUrl,
     }: PetitionCompletedProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greeting({ name }, intl)}
+      ${greeting({ name: userName }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-completed.text",
           defaultMessage:
             "{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him.",
         },
-        { recipient: recipientNameOrEmail, signed: isSigned }
+        { recipient: `${contactName} (${contactEmail})`, signed: isSigned }
       )}
 
       ${
@@ -64,7 +63,6 @@ const email: Email<PetitionCompletedProps> = {
           defaultMessage: "Untitled petition",
         })
       }:
-      ${petitionFieldList({ fields }, intl)}
 
       ${intl.formatMessage({
         id: "petition-completed.access-click-link",
@@ -76,11 +74,11 @@ const email: Email<PetitionCompletedProps> = {
     `;
   },
   html({
-    name,
+    userName,
     petitionId,
     petitionName,
-    contactNameOrEmail: recipientNameOrEmail,
-    fields,
+    contactName,
+    contactEmail,
     parallelUrl,
     assetsUrl,
     logoUrl,
@@ -89,38 +87,44 @@ const email: Email<PetitionCompletedProps> = {
   }: PetitionCompletedProps) {
     const { locale } = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        showGdprDisclaimer
+      >
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
-            <Greeting name={name} />
+            <Greeting name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-completed.text"
                 defaultMessage="{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him."
                 values={{
-                  recipient: <b>{recipientNameOrEmail}</b>,
+                  recipient: (
+                    <b>
+                      {contactName} ({contactEmail})
+                    </b>
+                  ),
                   signed: isSigned,
                 }}
               />
             </MjmlText>
-            {fields.length > 10 && (
-              <AccessInfoButton
-                href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
-              />
-            )}
-            <MjmlText fontSize="16px">
+
+            <MjmlText fontSize="16px" fontWeight={400}>
               {petitionName ? (
-                <span style={{ textDecoration: "underline" }}>{petitionName}</span>
+                <li>{petitionName}</li>
               ) : (
-                <span style={{ color: "#A0AEC0", fontStyle: "italic" }}>
+                <li style={{ color: "#A0AEC0", fontStyle: "italic" }}>
                   <FormattedMessage
                     id="generic.untitled-petition"
                     defaultMessage="Untitled petition"
                   />
-                </span>
+                </li>
               )}
             </MjmlText>
-            <PetitionFieldList fields={fields} />
+
             <AccessInfoButton
               href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
             />
@@ -136,10 +140,10 @@ export default email;
 
 function AccessInfoButton({ href }: { href: string }) {
   return (
-    <Button href={href}>
+    <Button href={href} fontWeight={500}>
       <FormattedMessage
         id="petition-completed.access-button"
-        defaultMessage="Access the information here"
+        defaultMessage="Access the information"
       />
     </Button>
   );

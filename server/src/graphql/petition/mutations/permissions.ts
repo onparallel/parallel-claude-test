@@ -147,7 +147,7 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
       );
 
       if (newUserPermissions.length > 0) {
-        ctx.emails.sendPetitionSharingNotificationEmail(
+        ctx.emails.sendPetitionSharedEmail(
           ctx.user!.id,
           newUserPermissions.map((p) => p.id),
           args.message ?? null

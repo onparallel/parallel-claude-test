@@ -7,18 +7,19 @@ import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, greeting } from "../common/texts";
-import { BreakLines } from "../common/BreakLines";
+import { UserMessageBox } from "../common/UserMessageBox";
 
-export type TemplateSharingNotificationProps = {
+export type PetitionSharedEmailProps = {
   name: string | null;
   petitionId: string;
   petitionName: string | null;
   ownerEmail: string;
   ownerName: string;
   message: string | null;
+  isTemplate: boolean;
 } & LayoutProps;
 
-const email: Email<TemplateSharingNotificationProps> = {
+const email: Email<PetitionSharedEmailProps> = {
   from({ ownerName }, intl) {
     return intl.formatMessage(
       {
@@ -28,13 +29,13 @@ const email: Email<TemplateSharingNotificationProps> = {
       { senderName: ownerName }
     );
   },
-  subject({ petitionName }: TemplateSharingNotificationProps, intl: IntlShape) {
+  subject({ petitionName, ownerName }: PetitionSharedEmailProps, intl: IntlShape) {
     return intl.formatMessage(
       {
-        id: "template-sharing-notification.subject",
-        defaultMessage: '"{petitionName}" - Template shared with you',
+        id: "petition-shared-email.subject",
+        defaultMessage: "{userName} has shared {petitionName} with you",
       },
-      { petitionName }
+      { petitionName, userName: ownerName }
     );
   },
   text(
@@ -46,24 +47,27 @@ const email: Email<TemplateSharingNotificationProps> = {
       ownerEmail,
       message,
       parallelUrl,
-    }: TemplateSharingNotificationProps,
+      isTemplate,
+    }: PetitionSharedEmailProps,
     intl: IntlShape
   ) {
     return outdent`
       ${greeting({ name }, intl)}
+
       ${intl.formatMessage(
         {
-          id: "template-sharing-notification.text",
-          defaultMessage: "{ownerName} ({ownerEmail}) has shared the following template with you.",
+          id: "petition-shared-email.text",
+          defaultMessage:
+            "{owner} has shared the following {isTemplate, select, true{template} other{petition}} with you.",
         },
-        { ownerName, ownerEmail }
+        { owner: `${ownerName} (${ownerEmail})`, ownerEmail, isTemplate }
       )}
 
       ${
         petitionName ||
         intl.formatMessage({
-          id: "generic.untitled-template",
-          defaultMessage: "Untitled template",
+          id: "generic.untitled-petition",
+          defaultMessage: "Untitled petition",
         })
       }
 
@@ -92,52 +96,68 @@ const email: Email<TemplateSharingNotificationProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-  }: TemplateSharingNotificationProps) {
+    isTemplate,
+  }: PetitionSharedEmailProps) {
     const { locale } = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection paddingBottom={0}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        showGdprDisclaimer
+      >
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <Greeting name={name} />
             <MjmlText>
               <FormattedMessage
-                id="template-sharing-notification.text"
-                defaultMessage="{ownerName} ({ownerEmail}) has shared the following template with you."
+                id="petition-shared-email.text"
+                defaultMessage="{owner} has shared the following {isTemplate, select, true{template} other{petition}} with you."
                 values={{
-                  ownerName: <b>{ownerName}</b>,
-                  ownerEmail,
+                  owner: (
+                    <b>
+                      {ownerName} ({ownerEmail})
+                    </b>
+                  ),
+
+                  isTemplate,
                 }}
               />
             </MjmlText>
-            <MjmlText fontSize="16px" align="center">
+            <MjmlText fontSize="16px">
               {petitionName ? (
-                <span style={{ textDecoration: "underline" }}>{petitionName}</span>
+                <li>{petitionName}</li>
               ) : (
-                <span style={{ color: "#A0AEC0", fontStyle: "italic" }}>
+                <li style={{ color: "#A0AEC0", fontStyle: "italic" }}>
                   <FormattedMessage
-                    id="generic.untitled-template"
-                    defaultMessage="Untitled template"
+                    id="generic.untitled-petition"
+                    defaultMessage="Untitled petition"
                   />
-                </span>
+                </li>
               )}
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
-        {message ? (
-          <MjmlSection padding="10px 20px 0">
-            <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="8px 16px">
-              <MjmlText padding="0" lineHeight="24px">
-                <BreakLines>{message}</BreakLines>
-              </MjmlText>
-            </MjmlColumn>
-          </MjmlSection>
-        ) : null}
+
+        <UserMessageBox
+          bodyHtml={
+            message
+              ? message
+                  .split("\n")
+                  .map((line) => (line ? `<div>${line}</div>` : "<br/>"))
+                  .join("")
+              : null
+          }
+        />
+
         <MjmlSection padding="10px 0 20px">
           <MjmlColumn>
             <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}`}>
               <FormattedMessage
-                id="template-sharing-notification.access-button"
-                defaultMessage="Access the template here"
+                id="petition-shared-email.access-button"
+                defaultMessage="Access the {isTemplate, select, true{template} other{petition}}"
+                values={{ isTemplate }}
               />
             </Button>
             <Closing />

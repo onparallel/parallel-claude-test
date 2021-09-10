@@ -27,7 +27,7 @@ export interface IEmailsService {
     userId: number,
     commentIds: number[]
   ): Promise<void>;
-  sendPetitionSharingNotificationEmail(
+  sendPetitionSharedEmail(
     userId: number,
     petitionPermissionIds: MaybeArray<number>,
     message: Maybe<string>
@@ -139,12 +139,12 @@ export class EmailsService implements IEmailsService {
     });
   }
 
-  async sendPetitionSharingNotificationEmail(
+  async sendPetitionSharedEmail(
     userId: number,
     petitionPermissionIds: MaybeArray<number>,
     message: Maybe<string>
   ) {
-    return await this.enqueueEmail("petition-sharing-notification", {
+    return await this.enqueueEmail("petition-shared", {
       id: this.buildQueueId("PetitionAccess", petitionPermissionIds),
       user_id: userId,
       petition_permission_ids: unMaybeArray(petitionPermissionIds),

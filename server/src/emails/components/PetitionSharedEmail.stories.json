@@ -1,11 +1,11 @@
 {
-  "title": "Petition Sharing Notification",
+  "title": "Petition Shared Email",
   "stories": [
     {
-      "name": "Petition Sharing Notification",
+      "name": "Petition Shared Email",
       "parameters": {
         "server": {
-          "id": "PetitionSharingNotification"
+          "id": "PetitionSharedEmail"
         }
       },
       "args": {
@@ -15,18 +15,20 @@
         "petitionName": "Declaración de la renta",
         "petitionId": "1234567890",
         "message": "hola tio aqui la tienes\\npara que veas",
-        "parallelUrl": "https://www.onparallel.com",
-        "assetsUrl": "https://static.onparallel.com",
-        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
+        "isTemplate": false,
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {
+        "isTemplate": { "control": { "type": "boolean" } },
         "name": { "control": { "type": "text" } },
         "ownerName": { "control": { "type": "text" } },
         "ownerEmail": { "control": { "type": "text" } },
         "petitionName": { "control": { "type": "text" } },
         "petitionId": { "control": { "type": "text" } },
-        "message": { "control": { "type": "text" } },
+        "message": { "control": { "type": "text" }, "type": { "required": false } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },
         "logoUrl": { "control": { "type": "text" } },

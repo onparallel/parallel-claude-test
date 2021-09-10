@@ -2,15 +2,14 @@ import { indexBy, isDefined, uniq } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionSharingNotification from "../../emails/components/PetitionSharingNotification";
-import TemplateSharingNotification from "../../emails/components/TemplateSharingNotification";
+import PetitionSharedEmail from "../../emails/components/PetitionSharedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
-export async function petitionSharingNotification(
+export async function petitionShared(
   payload: {
     user_id: number;
     petition_permission_ids: number[];
@@ -39,7 +38,7 @@ export async function petitionSharingNotification(
       const permissionUser = permissionUsersById[permission.user_id!];
       const petition = petitionsById[permission.petition_id];
       const { html, text, subject, from } = await buildEmail(
-        petition.is_template ? TemplateSharingNotification : PetitionSharingNotification,
+        PetitionSharedEmail,
         {
           petitionId: toGlobalId("Petition", petition.id),
           petitionName: petition.name,
@@ -47,6 +46,7 @@ export async function petitionSharingNotification(
           ownerName: fullName(user.first_name, user.last_name)!,
           ownerEmail: user.email,
           message: payload.message,
+          isTemplate: petition.is_template,
           ...layoutProps,
         },
         { locale: petition.locale }

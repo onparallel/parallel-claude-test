@@ -444,9 +444,9 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("sends notification email to users after adding permissions", async () => {
-      const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharingNotificationEmail"
+        "sendPetitionSharedEmail"
       );
 
       await testClient.mutate({
@@ -478,13 +478,13 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
 
-      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenCalledTimes(1);
+      expect(sendPetitionSharedEmailSpy).toHaveBeenCalledTimes(1);
     });
 
     it("doesn't send notification email to users if notify arg is false or undefined", async () => {
-      const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharingNotificationEmail"
+        "sendPetitionSharedEmail"
       );
 
       await testClient.mutate({
@@ -515,7 +515,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
 
-      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenCalledTimes(0);
+      expect(sendPetitionSharedEmailSpy).toHaveBeenCalledTimes(0);
     });
 
     it("sends error if user is not owner of the petition", async () => {
@@ -651,9 +651,9 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("should send notification email only to users that didn't have previous permissions", async () => {
-      const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharingNotificationEmail"
+        "sendPetitionSharedEmail"
       );
       const [newUser] = await mocks.createRandomUsers(organization.id, 1);
 
@@ -722,15 +722,15 @@ describe("GraphQL/Petition Permissions", () => {
         from_user_group_id: null,
       });
 
-      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenLastCalledWith<
+      expect(sendPetitionSharedEmailSpy).toHaveBeenLastCalledWith<
         [number, MaybeArray<number>, Maybe<string>]
       >(loggedUser.id, [permission.id], null);
     });
 
     it("notifies only once per user and petition", async () => {
-      const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharingNotificationEmail"
+        "sendPetitionSharedEmail"
       );
 
       const [newUser] = await mocks.createRandomUsers(organization.id, 1);
@@ -772,15 +772,15 @@ describe("GraphQL/Petition Permissions", () => {
         from_user_group_id: null,
       });
 
-      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenLastCalledWith<
+      expect(sendPetitionSharedEmailSpy).toHaveBeenLastCalledWith<
         [number, MaybeArray<number>, Maybe<string>]
       >(loggedUser.id, [permission.id], null);
     });
 
     it("should not send notification to user with previous permissions", async () => {
-      const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharingNotificationEmail"
+        "sendPetitionSharedEmail"
       );
       const [newGroup] = await mocks.createUserGroups(1, organization.id);
       const [newUser] = await mocks.createRandomUsers(organization.id, 1);
@@ -807,13 +807,13 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenCalledTimes(0);
+      expect(sendPetitionSharedEmailSpy).toHaveBeenCalledTimes(0);
     });
 
     it("notifies group members when sharing a petition with a group", async () => {
-      const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
-        "sendPetitionSharingNotificationEmail"
+        "sendPetitionSharedEmail"
       );
 
       const [newGroup] = await mocks.createUserGroups(1, organization.id);
@@ -852,7 +852,7 @@ describe("GraphQL/Petition Permissions", () => {
         deleted_at: null,
       });
 
-      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenLastCalledWith<
+      expect(sendPetitionSharedEmailSpy).toHaveBeenLastCalledWith<
         [number, MaybeArray<number>, Maybe<string>]
       >(loggedUser.id, [permission.id], null);
     });
