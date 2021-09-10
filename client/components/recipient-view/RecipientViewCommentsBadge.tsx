@@ -9,6 +9,7 @@ export interface RecipientViewCommentsBadgeProps extends BoxProps {
 export function RecipientViewCommentsBadge({
   hasUnreadComments,
   isReversedPurple,
+  boxSize,
   ...props
 }: RecipientViewCommentsBadgeProps) {
   const intl = useIntl();
@@ -19,7 +20,10 @@ export function RecipientViewCommentsBadge({
   return hasUnreadComments ? (
     <Box display="inline-block" aria-label={label} role="img" {...props}>
       <Tooltip label={label}>
-        <Circle boxSize={2} backgroundColor={isReversedPurple ? "white" : "purple.500"} />
+        <Circle
+          boxSize={boxSize ?? 2}
+          backgroundColor={isReversedPurple ? "white" : "purple.500"}
+        />
       </Tooltip>
     </Box>
   ) : null;

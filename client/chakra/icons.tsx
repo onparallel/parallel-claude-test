@@ -786,6 +786,22 @@ export const ChevronRightIcon = createIcon({
   path: <path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>,
 });
 
+export const ChevronFilledIcon = createIcon({
+  displayName: "ChevronFilledIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth={2}
+      fill="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke="currentColor"
+    >
+      <path d="m6.5 21 11-9-11-9 z" />
+    </g>
+  ),
+});
+
 export const ArrowUpDownIcon = createIcon({
   displayName: "ArrowUpDownIcon",
   viewBox: "0 0 24 24",

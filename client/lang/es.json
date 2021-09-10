@@ -2115,6 +2115,11 @@
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
   },
   {
+    "term": "component.recipient-view-content-card.comment-count",
+    "definition": "{commentCount, plural, =1 {# comentario} other {# comentarios}}",
+    "context": "{commentCount, plural, =1 {# comment} other {# comments}}"
+  },
+  {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
     "definition": "Añadir otra respuesta",
     "context": "Add another reply"

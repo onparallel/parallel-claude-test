@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
-import { CommentIcon } from "@parallel/chakra/icons";
+import { Box, Button, Flex, List, ListItem, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import { ChevronFilledIcon, CommentIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
@@ -10,11 +10,9 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
-import { createElement } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
-import { Card, CardProps } from "../common/Card";
-import { Divider } from "../common/Divider";
+import { Card, CardHeader, CardProps } from "../common/Card";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
@@ -36,83 +34,62 @@ export function RecipientViewContentsCard({
   const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
 
   const handleFocusField = (field: RecipientViewContentsCard_PublicPetitionFieldFragment) => {
-    const ID = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
-    const element = document?.getElementById(ID) as HTMLInputElement;
-    if (element) {
-      element.focus();
-      element.setSelectionRange(element.value.length, element.value.length);
+    if (field.type === "SHORT_TEXT" || field.type === "TEXT") {
+      const id = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
+      const element = document.getElementById(id) as HTMLInputElement;
+      element?.focus();
+      element?.setSelectionRange(element.value.length, element.value.length);
     }
   };
 
   return (
     <Card display="flex" flexDirection="column" {...props}>
-      <Box paddingX={4} paddingY={3}>
-        <Heading display="flex" as="h3" fontSize="lg" alignItems="center">
-          <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
-        </Heading>
-      </Box>
-      <Divider />
-      <Stack as={List} spacing={1} paddingY={3}>
-        {pages.map(({ title, hasUnreadComments }, index) => (
+      <CardHeader as="h3" size="sm">
+        <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
+      </CardHeader>
+      <Stack as={List} spacing={1} paddingY={2} paddingX={1.5}>
+        {pages.map(({ title, commentCount, hasUnreadComments }, index) => (
           <ListItem key={index}>
-            <Text as="h2" display="flex" position="relative" fontWeight="bold" isTruncated>
+            <Text as="h2">
               <NakedLink href={`/petition/${query.keycode}/${index + 1}`}>
-                <Box
-                  _hover={{ backgroundColor: "gray.75" }}
-                  paddingX={5}
-                  paddingY={1}
-                  paddingLeft={5}
+                <Button
+                  variant="ghost"
                   as="a"
-                  display="block"
-                  w="100%"
+                  size="sm"
+                  fontSize="md"
+                  display="flex"
+                  width="100%"
+                  paddingStart={7}
+                  _focus={{ outline: "none" }}
+                  aria-current={index + 1 !== currentPage ? "page" : undefined}
                 >
-                  <HStack spacing={1}>
-                    <Box
-                      width="0"
-                      height="0"
-                      borderLeft="5px solid transparent"
-                      borderRight="5px solid transparent"
-                      borderTop="8px solid"
-                      borderTopColor="gray.500"
-                      transform={index + 1 !== currentPage ? "rotate(-90deg)" : undefined}
-                      transition="transform 0.2s ease"
-                      marginLeft={-0.5}
-                    ></Box>
-                    <Box
-                      flex="1"
-                      cursor="pointer"
-                      paddingRight={3}
-                      isTruncated
-                      {...(title
-                        ? {}
-                        : {
-                            color: "gray.500",
-                            fontWeight: "normal",
-                            fontStyle: "italic",
-                          })}
-                    >
-                      {title || (
-                        <FormattedMessage
-                          id="generic.empty-heading"
-                          defaultMessage="Untitled heading"
-                        />
-                      )}
-                    </Box>
+                  <ChevronFilledIcon
+                    position="absolute"
+                    left={2}
+                    top={2.5}
+                    fontSize="sm"
+                    transform={index + 1 !== currentPage ? "rotate(-90deg)" : undefined}
+                  />
+                  <Box
+                    flex="1"
+                    isTruncated
+                    {...(title ? {} : { textStyle: "hint", fontWeight: "normal" })}
+                  >
+                    {title || (
+                      <FormattedMessage
+                        id="generic.empty-heading"
+                        defaultMessage="Untitled heading"
+                      />
+                    )}
+                  </Box>
 
-                    {hasUnreadComments && index + 1 !== currentPage ? (
-                      <Stack
-                        as="span"
-                        direction="row"
-                        display="inline-flex"
-                        alignItems="center"
-                        position="relative"
-                      >
-                        <RecipientViewCommentsBadge hasUnreadComments={hasUnreadComments} />
-                        <CommentIcon fontSize="sm" opacity="0.8" />
-                      </Stack>
-                    ) : null}
-                  </HStack>
-                </Box>
+                  {hasUnreadComments && index + 1 !== currentPage ? (
+                    <RecipientViewContentsIndicators
+                      hasUnreadComments={hasUnreadComments}
+                      commentCount={commentCount}
+                    />
+                  ) : null}
+                </Button>
               </NakedLink>
             </Text>
             {index + 1 === currentPage ? (
@@ -123,54 +100,57 @@ export function RecipientViewContentsCard({
                       as={field.type === "HEADING" ? "h3" : "div"}
                       display="flex"
                       position="relative"
-                      fontWeight={field.type === "HEADING" ? "bold" : "normal"}
                     >
                       <NakedLink href={`/petition/${query.keycode}/${index + 1}#field-${field.id}`}>
-                        <Box
-                          _hover={{ backgroundColor: "gray.75" }}
-                          paddingX={8}
-                          paddingY={1}
+                        <Button
+                          variant="ghost"
                           as="a"
-                          display="block"
-                          w="100%"
+                          size="sm"
+                          fontSize="md"
+                          display="flex"
+                          width="100%"
+                          paddingStart={7}
+                          fontWeight={field.type === "HEADING" ? "bold" : "normal"}
+                          _focus={{ outline: "none" }}
                           onClick={() => handleFocusField(field)}
                         >
-                          <HStack spacing={1}>
-                            <Box
-                              flex="1"
-                              isTruncated
-                              {...(field.title
-                                ? {
-                                    color: field.replies.some((r) => r.status === "REJECTED")
-                                      ? "red.600"
-                                      : completedFieldReplies(field).length !== 0
-                                      ? "gray.400"
-                                      : "inherit",
-                                  }
-                                : {
-                                    color: field.validated ? "gray.500" : "red.600",
-                                    fontWeight: "normal",
-                                    fontStyle: "italic",
-                                  })}
-                            >
-                              {field.title ||
-                                (field.type === "HEADING" ? (
-                                  <FormattedMessage
-                                    id="generic.empty-heading"
-                                    defaultMessage="Untitled heading"
-                                  />
-                                ) : (
-                                  <FormattedMessage
-                                    id="generic.untitled-field"
-                                    defaultMessage="Untitled field"
-                                  />
-                                ))}
-                            </Box>
-                            {field.commentCount
-                              ? createElement(RecipientViewContentsIndicators, { field })
-                              : null}
-                          </HStack>
-                        </Box>
+                          <Box
+                            flex="1"
+                            isTruncated
+                            {...(field.title
+                              ? {
+                                  color: field.replies.some((r) => r.status === "REJECTED")
+                                    ? "red.600"
+                                    : completedFieldReplies(field).length !== 0
+                                    ? "gray.400"
+                                    : "inherit",
+                                }
+                              : {
+                                  color: field.validated ? "gray.500" : "red.600",
+                                  fontWeight: "normal",
+                                  fontStyle: "italic",
+                                })}
+                          >
+                            {field.title ||
+                              (field.type === "HEADING" ? (
+                                <FormattedMessage
+                                  id="generic.empty-heading"
+                                  defaultMessage="Untitled heading"
+                                />
+                              ) : (
+                                <FormattedMessage
+                                  id="generic.untitled-field"
+                                  defaultMessage="Untitled field"
+                                />
+                              ))}
+                          </Box>
+                          {field.commentCount ? (
+                            <RecipientViewContentsIndicators
+                              hasUnreadComments={!!field.unreadCommentCount}
+                              commentCount={field.commentCount}
+                            />
+                          ) : null}
+                        </Button>
                       </NakedLink>
                     </Text>
                   </ListItem>
@@ -185,44 +165,36 @@ export function RecipientViewContentsCard({
 }
 
 function RecipientViewContentsIndicators({
-  field,
+  hasUnreadComments,
+  commentCount,
 }: {
-  field: RecipientViewContentsCard_PublicPetitionFieldFragment;
+  hasUnreadComments?: boolean;
+  commentCount: number;
 }) {
   const intl = useIntl();
   return (
-    <>
-      {field.commentCount ? (
-        <Stack as="span" direction="row-reverse" display="inline-flex" alignItems="center">
-          <Stack
-            as="span"
-            direction="row-reverse"
-            spacing={1.5}
-            display="inline-flex"
-            alignItems="center"
-            color={!!field.unreadCommentCount ? "inherit" : "gray.500"}
-          >
-            <CommentIcon fontSize="sm" opacity="0.8" />
-            <Text
-              as="span"
-              fontSize="xs"
-              role="img"
-              aria-label={intl.formatMessage(
-                {
-                  id: "generic.comments-button-label",
-                  defaultMessage:
-                    "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-                },
-                { commentCount: field.commentCount }
-              )}
-            >
-              {intl.formatNumber(field.commentCount)}
-            </Text>
-          </Stack>
-          <RecipientViewCommentsBadge hasUnreadComments={!!field.unreadCommentCount} />
-        </Stack>
-      ) : null}
-    </>
+    <Flex
+      alignItems="center"
+      color={hasUnreadComments ? "inherit" : "gray.500"}
+      fontWeight="normal"
+    >
+      <RecipientViewCommentsBadge
+        marginRight={2}
+        boxSize={1.5}
+        hasUnreadComments={hasUnreadComments}
+      />
+      <VisuallyHidden>
+        <FormattedMessage
+          id="component.recipient-view-content-card.comment-count"
+          defaultMessage="{commentCount, plural, =1 {# comment} other {# comments}}"
+          values={{ commentCount: commentCount }}
+        />
+      </VisuallyHidden>
+      <Text as="span" fontSize="sm" aria-hidden>
+        {intl.formatNumber(commentCount)}
+      </Text>
+      <CommentIcon marginLeft={1} role="presentation" fontSize="sm" />
+    </Flex>
   );
 }
 
@@ -232,17 +204,19 @@ function useGetPagesAndFields(
 ) {
   const pages: {
     title: Maybe<string>;
+    commentCount: number;
     hasUnreadComments?: boolean;
   }[] = [];
   const fieldVisibility = useFieldVisibility(fields);
   const _fields: RecipientViewContentsCard_PublicPetitionFieldFragment[] = [];
   for (const [field, isVisible] of zip(fields, fieldVisibility)) {
     if (field.type === "HEADING" && (pages.length === 0 || field.options.hasPageBreak)) {
-      pages.push({ title: field.title ?? null });
+      pages.push({ title: field.title ?? null, commentCount: 0 });
       page -= 1;
     }
     const currentPage = pages[pages.length - 1];
     currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
+    currentPage.commentCount += field.commentCount;
     if (page === 0 && isVisible) {
       _fields.push(field);
     } else {

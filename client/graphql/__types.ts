@@ -7054,6 +7054,7 @@ export type RecipientViewContentsCard_PublicPetitionFragment = {
     title?: Maybe<string>;
     options: { [key: string]: any };
     optional: boolean;
+    validated: boolean;
     isReadOnly: boolean;
     commentCount: number;
     unreadCommentCount: number;
@@ -7061,6 +7062,7 @@ export type RecipientViewContentsCard_PublicPetitionFragment = {
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
       id: string;
+      status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
     }>;
   }>;
@@ -7073,6 +7075,7 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
   title?: Maybe<string>;
   options: { [key: string]: any };
   optional: boolean;
+  validated: boolean;
   isReadOnly: boolean;
   commentCount: number;
   unreadCommentCount: number;
@@ -7080,6 +7083,7 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
+    status: PetitionFieldReplyStatus;
     content: { [key: string]: any };
   }>;
 };
@@ -12360,18 +12364,18 @@ export type RecipientView_PublicPetitionAccessFragment = {
       title?: Maybe<string>;
       options: { [key: string]: any };
       optional: boolean;
+      validated: boolean;
       isReadOnly: boolean;
       commentCount: number;
       unreadCommentCount: number;
-      validated: boolean;
       visibility?: Maybe<{ [key: string]: any }>;
       description?: Maybe<string>;
       multiple: boolean;
       replies: Array<{
         __typename?: "PublicPetitionFieldReply";
         id: string;
-        content: { [key: string]: any };
         status: PetitionFieldReplyStatus;
+        content: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
       }>;
@@ -12447,18 +12451,18 @@ export type RecipientView_PublicPetitionFragment = {
     title?: Maybe<string>;
     options: { [key: string]: any };
     optional: boolean;
+    validated: boolean;
     isReadOnly: boolean;
     commentCount: number;
     unreadCommentCount: number;
-    validated: boolean;
     visibility?: Maybe<{ [key: string]: any }>;
     description?: Maybe<string>;
     multiple: boolean;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
       id: string;
-      content: { [key: string]: any };
       status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
     }>;
@@ -12504,18 +12508,18 @@ export type RecipientView_PublicPetitionFieldFragment = {
   title?: Maybe<string>;
   options: { [key: string]: any };
   optional: boolean;
+  validated: boolean;
   isReadOnly: boolean;
   commentCount: number;
   unreadCommentCount: number;
-  validated: boolean;
   description?: Maybe<string>;
   multiple: boolean;
   visibility?: Maybe<{ [key: string]: any }>;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
-    content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
   }>;
@@ -12577,18 +12581,18 @@ export type PublicPetitionQuery = {
         title?: Maybe<string>;
         options: { [key: string]: any };
         optional: boolean;
+        validated: boolean;
         isReadOnly: boolean;
         commentCount: number;
         unreadCommentCount: number;
-        validated: boolean;
         visibility?: Maybe<{ [key: string]: any }>;
         description?: Maybe<string>;
         multiple: boolean;
         replies: Array<{
           __typename?: "PublicPetitionFieldReply";
           id: string;
-          content: { [key: string]: any };
           status: PetitionFieldReplyStatus;
+          content: { [key: string]: any };
           createdAt: string;
           updatedAt: string;
         }>;
@@ -15603,9 +15607,11 @@ export const RecipientViewContentsCard_PublicPetitionFieldFragmentDoc = gql`
     title
     options
     optional
+    validated
     isReadOnly
     replies {
       id
+      status
     }
     commentCount
     unreadCommentCount
