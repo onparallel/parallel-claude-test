@@ -382,7 +382,7 @@ export interface Organization {
   custom_host: Maybe<string>; // varchar
   custom_email_from: Maybe<string>; // varchar
   logo_public_file_id: Maybe<number>; // int4
-  identifier: string; // varchar
+  identifier: Maybe<string>; // varchar
 }
 
 export type CreateOrganization = PartialProps<
@@ -396,6 +396,7 @@ export type CreateOrganization = PartialProps<
   | "custom_host"
   | "custom_email_from"
   | "logo_public_file_id"
+  | "identifier"
 >;
 
 export interface OrgIntegration {
