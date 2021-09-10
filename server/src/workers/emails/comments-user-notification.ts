@@ -42,9 +42,8 @@ export async function commentsUserNotification(
     PetitionCommentsUserNotification,
     {
       userName: user.first_name,
-
       petitionId: toGlobalId("Petition", petition.id),
-      petitionName: petition.name,
+      petitionName: petition.email_subject || petition.name,
       fields,
       ...layoutProps,
     },

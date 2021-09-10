@@ -211,8 +211,8 @@
   },
   {
     "term": "petition-comments-contact-notification.access-button",
-    "definition": "Responda aquí a los comentarios",
-    "context": "Reply to the comments here"
+    "definition": "Responda aquí los comentarios",
+    "context": "Reply the comments"
   },
   {
     "term": "petition-comments-contact-notification.access-click-link",
@@ -221,18 +221,18 @@
   },
   {
     "term": "petition-comments-contact-notification.intro-text",
-    "definition": "Tiene {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en su petición:",
-    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on your petition:"
+    "definition": "Tiene {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en {subject, select, null{su petición} other{{subject}}}:",
+    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your petition} other{{subject}}}:"
   },
   {
     "term": "petition-comments-contact-notification.subject",
-    "definition": "Tiene comentarios nuevos en su petición",
-    "context": "You have new comments on your petition"
+    "definition": "Nuevos comentarios en {subject, select, null{su petición} other{{subject}}}",
+    "context": "New comments on {subject, select, null{your petition} other{{subject}}}"
   },
   {
     "term": "petition-comments-user-notification.access-button",
-    "definition": "Responder a los comentarios",
-    "context": "Reply to the comments here"
+    "definition": "Responde aquí los comentarios",
+    "context": "Reply the comments"
   },
   {
     "term": "petition-comments-user-notification.access-click-link",
@@ -242,12 +242,12 @@
   {
     "term": "petition-comments-user-notification.intro-text",
     "definition": "Tienes {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en { petitionName, select, null {tu petición} other {{petitionName}}}:",
-    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on { petitionName, select, null {your petition} other {{petitionName}}}:"
+    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your petition} other{{petitionName}}}:"
   },
   {
     "term": "petition-comments-user-notification.subject",
     "definition": "Tienes comentarios nuevos en { petitionName, select, null {tu petición} other {{petitionName}}}",
-    "context": "You have new comments on { petitionName, select, null {your petition} other {{petitionName}}}"
+    "context": "New comments on {petitionName, select, null{your petition} other{{petitionName}}}"
   },
   {
     "term": "petition-completed.access-button",
@@ -433,20 +433,5 @@
     "term": "verification-code-request.subject",
     "definition": "{code} es tu código de verificación en Parallel",
     "context": "{code} is your verification code on Parallel"
-  },
-  {
-    "term": "welcome.click-to-verify",
-    "definition": "Por favor, haz click en el siguiente enlace para verificar tu dirección de correo.",
-    "context": "Please click the link below to verify your email address."
-  },
-  {
-    "term": "welcome.greeting",
-    "definition": "¡Bienvenido a Parallel!",
-    "context": "Welcome to Parallel!"
-  },
-  {
-    "term": "welcome.verify-button",
-    "definition": "Verificar mi correo electrónico",
-    "context": "Verify my email"
   }
 ]

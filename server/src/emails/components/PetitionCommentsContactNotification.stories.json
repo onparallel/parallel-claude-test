@@ -9,6 +9,7 @@
         }
       },
       "args": {
+        "emailSubject": "Proceso de KYC",
         "contactFullName": "Santi Albo",
         "keycode": "1234567890",
         "fields": [
@@ -57,6 +58,7 @@
         "logoAlt": "Parallel"
       },
       "argsTypes": {
+        "emailSubject": { "control": { "type": "text" }, "type": { "required": false } },
         "contactFullName": { "control": { "type": "text" } },
         "keycode": { "control": { "type": "text" } },
         "fields": { "control": { "type": "object" } },

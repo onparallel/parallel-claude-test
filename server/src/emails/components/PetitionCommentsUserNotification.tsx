@@ -3,14 +3,13 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greeting } from "../common/texts";
 import {
-  PetitionFieldAndCommentsProps,
   PetitionFieldAndComments,
+  PetitionFieldAndCommentsProps,
 } from "../common/PetitionFieldAndCommentsList";
+import { closing, greeting } from "../common/texts";
 
 export type PetitionCommentsUserNotificationProps = {
   userName: string | null;
@@ -31,7 +30,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
       {
         id: "petition-comments-user-notification.subject",
         defaultMessage:
-          "You have new comments on { petitionName, select, null {your petition} other {{petitionName}}}",
+          "New comments on {petitionName, select, null{your petition} other{{petitionName}}}",
       },
       { petitionName }
     );
@@ -54,7 +53,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
         {
           id: "petition-comments-user-notification.intro-text",
           defaultMessage:
-            "You have {count, plural, =1{# new comment} other{# new comments}} on { petitionName, select, null {your petition} other {{petitionName}}}:",
+            "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your petition} other{{petitionName}}}:",
         },
         { count: commentCount, petitionName }
       )}
@@ -81,17 +80,23 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const { locale } = useIntl();
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection paddingBottom="10px">
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        showGdprDisclaimer
+      >
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-comments-user-notification.intro-text"
-                defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on { petitionName, select, null {your petition} other {{petitionName}}}:"
+                defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your petition} other{{petitionName}}}:"
                 values={{
                   count: commentCount,
-                  petitionName: <b>{petitionName}</b>,
+                  petitionName: petitionName ? <b>{petitionName}</b> : null,
                 }}
               />
             </MjmlText>
@@ -104,10 +109,9 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
             <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}>
               <FormattedMessage
                 id="petition-comments-user-notification.access-button"
-                defaultMessage="Reply to the comments here"
+                defaultMessage="Reply the comments"
               />
             </Button>
-            <Closing />
           </MjmlColumn>
         </MjmlSection>
       </Layout>
