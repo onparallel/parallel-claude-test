@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText, MjmlWrapper } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
@@ -7,6 +7,7 @@ import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, greeting } from "../common/texts";
+import { UserMessageBox } from "../common/UserMessageBox";
 
 export type MessageBouncedEmailProps = {
   senderName: string | null;
@@ -44,23 +45,22 @@ const email: Email<MessageBouncedEmailProps> = {
     intl: IntlShape
   ) {
     return outdent`
-      ${intl
+      **${intl
         .formatMessage({
           id: "generic.action-required",
           defaultMessage: "Action required",
         })
-        .toUpperCase()}
+        .toUpperCase()}**
 
       ${greeting({ name: senderName }, intl)}
+
       ${intl.formatMessage(
         {
           id: "petition-message-bounced.intro-text",
-          defaultMessage:
-            "We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):",
+          defaultMessage: "We couldn't deliver the petition {petitionName} you sent to {contact}:",
         },
         {
-          contactFullName,
-          contactEmail,
+          contact: `${contactFullName} (${contactEmail})`,
           petitionName:
             petitionName ??
             intl.formatMessage({
@@ -108,58 +108,53 @@ const email: Email<MessageBouncedEmailProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        showGdprDisclaimer
         contentHeading={
-          <MjmlWrapper backgroundColor="#6059f7" borderRadius="3px 3px 0 0">
+          <MjmlWrapper backgroundColor="#3182CE" borderRadius="5px">
             <MjmlText align="center" color="white" fontWeight={600} textTransform="uppercase">
               <FormattedMessage id="generic.action-required" defaultMessage="Action required" />
             </MjmlText>
           </MjmlWrapper>
         }
       >
-        <MjmlSection paddingBottom="10px">
-          <MjmlColumn>
-            <Greeting name={senderName} />
-            <MjmlText>
-              <FormattedMessage
-                id="petition-message-bounced.intro-text"
-                defaultMessage="We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):"
-                values={{
-                  contactFullName,
-                  contactEmail,
-                  petitionName: petitionName ? (
-                    <b>{petitionName}</b>
-                  ) : (
-                    <i>
-                      {intl.formatMessage({
-                        id: "generic.untitled-petition",
-                        defaultMessage: "Untitled petition",
-                      })}
-                    </i>
-                  ),
-                }}
-              />
-            </MjmlText>
-          </MjmlColumn>
+        <MjmlSection padding="16px 0 16px 0">
+          <Greeting name={senderName} />
+          <MjmlSpacer />
+          <MjmlText>
+            <FormattedMessage
+              id="petition-message-bounced.intro-text"
+              defaultMessage="We couldn't deliver the petition {petitionName} you sent to {contact}:"
+              values={{
+                contact: (
+                  <b>
+                    {contactFullName} ({contactEmail})
+                  </b>
+                ),
+                petitionName: petitionName ? (
+                  <b>{petitionName}</b>
+                ) : (
+                  <i>
+                    {intl.formatMessage({
+                      id: "generic.untitled-petition",
+                      defaultMessage: "Untitled petition",
+                    })}
+                  </i>
+                ),
+              }}
+            />
+          </MjmlText>
         </MjmlSection>
 
-        <MjmlSection padding="0 20px">
-          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
-            <MjmlText>
-              <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
-            </MjmlText>
-          </MjmlColumn>
-        </MjmlSection>
+        <UserMessageBox bodyHtml={bodyHtml} />
 
         <MjmlSection>
-          <MjmlColumn>
-            <MjmlText>
-              <FormattedMessage
-                id="petition-message-bounced.intro-text-2"
-                defaultMessage="Please, verify that the email {contactEmail} is correct and try again."
-                values={{ contactEmail: <b>{contactEmail}</b> }}
-              />
-            </MjmlText>
-          </MjmlColumn>
+          <MjmlText>
+            <FormattedMessage
+              id="petition-message-bounced.intro-text-2"
+              defaultMessage="Please, verify that the email {contactEmail} is correct and try again."
+              values={{ contactEmail: <b>{contactEmail}</b> }}
+            />
+          </MjmlText>
         </MjmlSection>
 
         <MjmlSection paddingTop="0px">
@@ -167,7 +162,7 @@ const email: Email<MessageBouncedEmailProps> = {
             <Button href={`${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity`}>
               <FormattedMessage
                 id="petition-sharing-notification.access-button"
-                defaultMessage="Access the petition here"
+                defaultMessage="Access the petition"
               />
             </Button>
             <Closing />

@@ -6,6 +6,7 @@ import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
+import { greeting } from "../common/texts";
 
 export type InvitationProps = {
   email: string;
@@ -36,10 +37,7 @@ const email: Email<InvitationProps> = {
     intl: IntlShape
   ) {
     return outdent`
-    ${intl.formatMessage(
-      { id: "greeting", defaultMessage: "{name, select, null {Hi,} other {Hi {name},}}" },
-      { name: userName }
-    )}
+    ${greeting({ name: userName }, intl)}
     
     ${intl.formatMessage(
       {
@@ -86,8 +84,14 @@ const email: Email<InvitationProps> = {
   }: InvitationProps) {
     const { locale } = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        showGdprDisclaimer
+      >
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>
@@ -119,7 +123,7 @@ const email: Email<InvitationProps> = {
                 defaultMessage="You can login through our website."
               />
             </MjmlText>
-            <Button href={`${parallelUrl}/${locale}/login`}>
+            <Button href={`${parallelUrl}/${locale}/login`} fontWeight={500}>
               <FormattedMessage id="invitation.login-button" defaultMessage="Log in" />
             </Button>
             <Closing />
@@ -131,15 +135,3 @@ const email: Email<InvitationProps> = {
 };
 
 export default email;
-
-export const props: InvitationProps = {
-  email: "mariano@onparallel.com",
-  password: "Qwerty1!",
-  organizationName: "Parallel",
-  organizationUser: "Derek Lou",
-  userName: "Mariano",
-  assetsUrl: "http://localhost",
-  parallelUrl: "http://localhost",
-  logoUrl: "http://localhost/static/emails/logo.png",
-  logoAlt: "Parallel",
-};

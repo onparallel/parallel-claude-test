@@ -3,10 +3,9 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greeting } from "../common/texts";
+import { greeting } from "../common/texts";
 
 export type AccountVerificationProps = {
   userName: string | null;
@@ -37,8 +36,6 @@ const email: Email<AccountVerificationProps> = {
       })}
 
       ${activationUrl}
-
-      ${closing({}, intl)}
     `;
   },
   html({
@@ -50,8 +47,14 @@ const email: Email<AccountVerificationProps> = {
     logoAlt,
   }: AccountVerificationProps) {
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection paddingBottom="10px">
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        showGdprDisclaimer
+      >
+        <MjmlSection padding="0 0 16px 0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>
@@ -70,7 +73,6 @@ const email: Email<AccountVerificationProps> = {
                 defaultMessage="Activate my account"
               />
             </Button>
-            <Closing />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

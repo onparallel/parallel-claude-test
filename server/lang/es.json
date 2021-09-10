@@ -16,7 +16,7 @@
   },
   {
     "term": "account-verification.intro-text.html",
-    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente haz click en el siguiente botón para activar tu cuenta.",
+    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente dale al botón para activar tu cuenta.",
     "context": "You are almost ready, to start using Parallel just click on the activate account button below."
   },
   {
@@ -83,6 +83,11 @@
     "term": "forgot-password.verification-code-1",
     "definition": "Este es el código de verificación que has solicitado para cambiar tu contraseña:",
     "context": "This is the verification code you requested to change your password:"
+  },
+  {
+    "term": "forgot-password.verification-code-expiry",
+    "definition": "Este código de verificación caducará en 30 minutos, intente utilizarlo lo antes posible.",
+    "context": "This verification code will expire in 30 minutes, so make sure you use as soon as possible."
   },
   {
     "term": "from.parallel-team",
@@ -271,8 +276,8 @@
   },
   {
     "term": "petition-message-bounced.intro-text",
-    "definition": "No hemos podido entregar la petición {petitionName} que enviaste a {contactFullName} ({contactEmail}):",
-    "context": "We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):"
+    "definition": "No hemos podido entregar la petición {petitionName} que enviaste a {contact}:",
+    "context": "We couldn't deliver the petition {petitionName} you sent to {contact}:"
   },
   {
     "term": "petition-message-bounced.intro-text-2",
@@ -311,8 +316,8 @@
   },
   {
     "term": "petition-sharing-notification.access-button",
-    "definition": "Accede a la petición aquí",
-    "context": "Access the petition here"
+    "definition": "Accede a la petición",
+    "context": "Access the petition"
   },
   {
     "term": "petition-sharing-notification.access-click-link",

@@ -85,6 +85,11 @@
     "context": "This is the verification code you requested to change your password:"
   },
   {
+    "term": "forgot-password.verification-code-expiry",
+    "definition": "This verification code will expire in 30 minutes, so make sure you use as soon as possible.",
+    "context": "This verification code will expire in 30 minutes, so make sure you use as soon as possible."
+  },
+  {
     "term": "from.parallel-team",
     "definition": "Parallel team",
     "context": "Parallel team"
@@ -271,8 +276,8 @@
   },
   {
     "term": "petition-message-bounced.intro-text",
-    "definition": "We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):",
-    "context": "We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):"
+    "definition": "We couldn't deliver the petition {petitionName} you sent to {contact}:",
+    "context": "We couldn't deliver the petition {petitionName} you sent to {contact}:"
   },
   {
     "term": "petition-message-bounced.intro-text-2",
@@ -311,8 +316,8 @@
   },
   {
     "term": "petition-sharing-notification.access-button",
-    "definition": "Access the petition here",
-    "context": "Access the petition here"
+    "definition": "Access the petition",
+    "context": "Access the petition"
   },
   {
     "term": "petition-sharing-notification.access-click-link",
