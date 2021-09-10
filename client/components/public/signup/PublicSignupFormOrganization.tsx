@@ -33,17 +33,17 @@ export function PublicSignupFormOrganization({
   onNext,
 }: PublicSignupFormOrganizationProps) {
   const [organizationName, setOrganizationName] = useState("");
-  const [isEmptyOrganizationName, setIsEmptyOrganizationName] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
 
   const [organizationLogo, setOrganizationLogo] = useState<Maybe<File> | undefined>(undefined);
 
   useEffect(() => {
-    if (isEmptyOrganizationName) setIsEmptyOrganizationName(false);
+    if (isInvalid) setIsInvalid(false);
   }, [organizationName]);
 
   const handleNext = () => {
     if (!organizationName) {
-      setIsEmptyOrganizationName(true);
+      setIsInvalid(true);
     } else {
       onNext({ organizationName, organizationLogo });
     }
@@ -76,7 +76,7 @@ export function PublicSignupFormOrganization({
             defaultMessage="Fill out your organization’s profile that your customers will see in your communications."
           />
         </Text>
-        <FormControl id="company-name" isInvalid={isEmptyOrganizationName}>
+        <FormControl id="company-name" isInvalid={isInvalid}>
           <FormLabel>
             <FormattedMessage
               id="component.public-signup-form-organization.company-name-label"
