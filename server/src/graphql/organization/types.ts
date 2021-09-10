@@ -12,6 +12,7 @@ export const OrganizationStatus = enumType({
     { name: "DEMO", description: "Used for demoing the product" },
     { name: "ACTIVE", description: "Used for regular clients" },
     { name: "CHURNED", description: "Used on churned clients" },
+    { name: "ROOT", description: "Root client" },
   ],
   description: "The status of the organization.",
 });

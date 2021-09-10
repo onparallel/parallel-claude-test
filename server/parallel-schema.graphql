@@ -1435,6 +1435,11 @@ enum OrganizationStatus {
   Used for development or testing purposes
   """
   DEV
+
+  """
+  Root client
+  """
+  ROOT
 }
 
 type OrganizationUsageLimit {
