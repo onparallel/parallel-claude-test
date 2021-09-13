@@ -1223,7 +1223,8 @@ export class PetitionRepository extends BaseRepository {
       await this.updateRemindersForPetition(petitionId, null);
     }
 
-    return fields;
+    // return in the same order as input
+    return sortBy(fields, (f) => fieldIds.indexOf(f.id));
   }
 
   async updateRemindersForPetition(
