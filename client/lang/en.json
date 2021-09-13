@@ -816,8 +816,8 @@
   },
   {
     "term": "component.notification-reminders-opt-out.body",
-    "definition": "{name} has opted out from receiving reminders:",
-    "context": "{name} has opted out from receiving reminders:"
+    "definition": "{name} has opted out from receiving reminders: {reason}",
+    "context": "{name} has opted out from receiving reminders: {reason}"
   },
   {
     "term": "component.notification-signature-cancelled.body",
@@ -1948,11 +1948,6 @@
     "term": "component.public-signup-form-organization.remove-image",
     "definition": "Remove image",
     "context": "Remove image"
-  },
-  {
-    "term": "component.public-signup-form-organization.taken-company-name-error",
-    "definition": "You can't use this as your company name",
-    "context": "You can't use this as your company name"
   },
   {
     "term": "component.public-signup-form-organization.upload-organizationLogo-button",

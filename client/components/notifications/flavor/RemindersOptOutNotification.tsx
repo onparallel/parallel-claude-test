@@ -39,18 +39,24 @@ export const RemindersOptOutNotification = Object.assign(
         }
         path={`/activity`}
       >
-        <Text>
-          <FormattedMessage
-            id="component.notification-reminders-opt-out.body"
-            defaultMessage="{name} has opted out from receiving reminders: "
-            values={{
-              name: <ContactLink draggable="false" tabIndex={-1} contact={access.contact} />,
-            }}
-          />
-        </Text>
-        <Text as="cite" fontSize="sm">
-          {reason === "OTHER" ? `"${answers[reason]}: ${other}"` : answers[reason]}
-        </Text>
+        <FormattedMessage
+          id="component.notification-reminders-opt-out.body"
+          defaultMessage="{name} has opted out from receiving reminders: {reason}"
+          values={{
+            name: <ContactLink draggable="false" tabIndex={-1} contact={access.contact} />,
+            reason: (
+              <Text as="cite">
+                {reason === "OTHER" ? (
+                  <>
+                    {answers[reason]}: ({other})
+                  </>
+                ) : (
+                  answers[reason]
+                )}
+              </Text>
+            ),
+          }}
+        />
       </PetitionUserNotification>
     );
   }),
