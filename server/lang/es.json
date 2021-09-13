@@ -1,7 +1,7 @@
 [
   {
     "term": "access-delegated-email.subject",
-    "definition": "{senderName} te ha invitado a colaborar en {subject, select, null{su petición} other{{subject}}}",
+    "definition": "{senderName} le ha invitado a colaborar en {subject, select, null{su petición} other{{subject}}}",
     "context": "{senderName} has invited you to collaborate on {subject, select, null{a petition} other{{subject}}}"
   },
   {
@@ -16,7 +16,7 @@
   },
   {
     "term": "account-verification.intro-text.html",
-    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente dale al botón para activar tu cuenta.",
+    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente haz click en el botón para activar tu cuenta.",
     "context": "You are almost ready, to start using Parallel just click on the activate account button below."
   },
   {
@@ -92,7 +92,7 @@
   {
     "term": "forgot-password.verification-code-expiry",
     "definition": "Este código de verificación caducará en 30 minutos, intente utilizarlo lo antes posible.",
-    "context": "This verification code will expire in 30 minutes, so make sure you use as soon as possible."
+    "context": "This verification code will expire in 30 minutes, please make sure you use it as soon as possible."
   },
   {
     "term": "from.parallel-team",
@@ -216,8 +216,8 @@
   },
   {
     "term": "petition-comments-contact-notification.access-button",
-    "definition": "Responda aquí los comentarios",
-    "context": "Reply the comments"
+    "definition": "Responda a los comentarios",
+    "context": "Reply to the comments"
   },
   {
     "term": "petition-comments-contact-notification.access-click-link",
@@ -237,7 +237,7 @@
   {
     "term": "petition-comments-user-notification.access-button",
     "definition": "Responde a los comentarios",
-    "context": "Reply the comments"
+    "context": "Reply to the comments"
   },
   {
     "term": "petition-comments-user-notification.access-click-link",
@@ -392,7 +392,7 @@
   {
     "term": "signature-requested.text",
     "definition": "Ha recibido una petición para firmar un documento con el nombre de {documentName}.",
-    "context": "You have received a signature request to sign a document named {documentName}."
+    "context": "You have received a signature request to sign a document titled {documentName}."
   },
   {
     "term": "verification-code-request.code-label",
@@ -412,7 +412,7 @@
   {
     "term": "verification-code-request.expiry",
     "definition": "Este código de verificación caducará en 30 minutos, intente utilizarlo lo antes posible.",
-    "context": "This verification code will expire in 30 minutes, so make sure you use as soon as possible."
+    "context": "This verification code will expire in 30 minutes, please make sure you use it as soon as possible."
   },
   {
     "term": "verification-code-request.instructions",

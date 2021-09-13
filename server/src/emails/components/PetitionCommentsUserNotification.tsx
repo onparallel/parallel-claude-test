@@ -103,7 +103,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
             <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}>
               <FormattedMessage
                 id="petition-comments-user-notification.access-button"
-                defaultMessage="Reply the comments"
+                defaultMessage="Reply to the comments"
               />
             </Button>
           </MjmlColumn>

@@ -106,7 +106,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
             >
               <FormattedMessage
                 id="petition-comments-contact-notification.access-button"
-                defaultMessage="Reply the comments"
+                defaultMessage="Reply to the comments"
               />
             </Button>
           </MjmlColumn>

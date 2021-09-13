@@ -39,7 +39,7 @@ const email: Email<SignatureRequestedProps> = {
         {
           id: "signature-requested.text",
           defaultMessage:
-            "You have received a signature request to sign a document named {documentName}.",
+            "You have received a signature request to sign a document titled {documentName}.",
         },
         { documentName }
       )}
@@ -87,7 +87,7 @@ const email: Email<SignatureRequestedProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-requested.text"
-                defaultMessage="You have received a signature request to sign a document named {documentName}."
+                defaultMessage="You have received a signature request to sign a document titled {documentName}."
                 values={{ documentName }}
               />
             </MjmlText>
