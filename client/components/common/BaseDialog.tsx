@@ -15,7 +15,7 @@ export function BaseDialog<TResult = void>({
   ...props
 }: BaseDialogProps<TResult>) {
   return (
-    <Modal isOpen={true} onClose={() => onReject({ reason: "CLOSE" })} {...props}>
+    <Modal isOpen={true} onClose={() => onReject("CLOSE")} {...props}>
       <ModalOverlay>{children}</ModalOverlay>
     </Modal>
   );

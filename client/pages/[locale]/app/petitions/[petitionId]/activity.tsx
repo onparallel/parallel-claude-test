@@ -34,6 +34,7 @@ import {
   usePetitionsActivity_sendPetitionMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
@@ -112,12 +113,14 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           await sendReminders({
             variables: { petitionId, accessIds, body: message },
           });
-        } catch (error: any) {
-          const extra = error?.graphQLErrors?.[0]?.extensions?.extra;
-          switch (extra?.errorCode) {
-            case "NO_REMINDERS_LEFT": {
-              showNoRemindersLeftToast(extra.petitionAccessId);
-              return;
+        } catch (error) {
+          if (isApolloError(error)) {
+            const extra = error.graphQLErrors[0]?.extensions?.extra;
+            switch (extra?.errorCode) {
+              case "NO_REMINDERS_LEFT": {
+                showNoRemindersLeftToast(extra.petitionAccessId);
+                return;
+              }
             }
           }
         }
@@ -176,7 +179,10 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       });
       await refetch();
     } catch (e) {
-      if (e.graphQLErrors?.[0]?.extensions.code === "PETITION_SEND_CREDITS_ERROR") {
+      if (
+        isApolloError(e) &&
+        e.graphQLErrors[0]?.extensions?.code === "PETITION_SEND_CREDITS_ERROR"
+      ) {
         await withError(showPetitionLimitReachedErrorDialog());
       }
     }
@@ -282,9 +288,9 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           isClosable: true,
           status: "success",
         });
-      } catch (e: any) {
-        const extra = e?.graphQLErrors?.[0]?.extensions?.extra;
-        if (e && !["CLOSE", "CANCEL"].includes(e.reason)) {
+      } catch (e) {
+        if (isApolloError(e)) {
+          const extra = e.graphQLErrors[0]?.extensions?.extra;
           switch (extra?.errorCode) {
             case "NO_REMINDERS_LEFT":
               showNoRemindersLeftToast();

@@ -90,7 +90,7 @@ export function CopySignatureConfigDialog({
         </Button>
       }
       cancel={
-        <Button onClick={props.onReject}>
+        <Button onClick={() => props.onReject()}>
           <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
       }

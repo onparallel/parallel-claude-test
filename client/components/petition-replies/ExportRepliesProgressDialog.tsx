@@ -158,7 +158,7 @@ export function ExportRepliesProgressDialog({
           }
         }
         if (abort.signal.aborted) {
-          props.onReject({ reason: "CANCEL" });
+          props.onReject("CANCEL");
           return;
         }
         const res = await fileUploadReplyDownloadLink({
@@ -207,7 +207,7 @@ export function ExportRepliesProgressDialog({
           }
         }
         if (abort.signal.aborted) {
-          props.onReject({ reason: "CANCEL" });
+          props.onReject("CANCEL");
           return;
         }
         const res = await signedPetitionDownloadLink({
@@ -343,9 +343,9 @@ export function ExportRepliesProgressDialog({
 
   async function processError(e: any) {
     if (e.name === "AbortError") {
-      props.onReject({ reason: "CANCEL" });
+      props.onReject("CANCEL");
     } else if (e?.ErrorMessage?.startsWith("NDError")) {
-      props.onReject({ reason: "ERROR" });
+      props.onReject("ERROR");
       try {
         await showErrorDialog({
           message: intl.formatMessage({

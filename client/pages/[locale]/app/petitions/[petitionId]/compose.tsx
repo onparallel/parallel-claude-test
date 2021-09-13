@@ -58,6 +58,7 @@ import {
   usePetitionCompose_updatePetitionMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
@@ -482,7 +483,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       }
       router.push(`/${router.query.locale}/app/petitions`);
     } catch (e) {
-      if (e.graphQLErrors?.[0]?.extensions.code === "PETITION_SEND_CREDITS_ERROR") {
+      if (
+        isApolloError(e) &&
+        e.graphQLErrors[0]?.extensions?.code === "PETITION_SEND_CREDITS_ERROR"
+      ) {
         await withError(showPetitionLimitReachedErrorDialog());
       }
     }

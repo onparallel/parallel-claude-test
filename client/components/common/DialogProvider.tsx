@@ -3,16 +3,16 @@ import {
   cloneElement,
   ComponentType,
   createContext,
+  ReactElement,
   ReactNode,
   useCallback,
   useContext,
   useState,
-  ReactElement,
 } from "react";
 
 type DialogCallbacks<TResult = void> = {
   onResolve: (value?: TResult) => void;
-  onReject: (reason?: any) => void;
+  onReject: (reason?: string) => void;
 };
 
 export type DialogProps<TProps = {}, TResult = void> = TProps & DialogCallbacks<TResult>;
@@ -47,9 +47,9 @@ function DialogOpenerProvider({ children }: { children?: ReactNode }) {
           setStack((stack) => stack.slice(0, -1));
           resolve(result as any);
         },
-        onReject: (reason?: any) => {
+        onReject: (reason?: string) => {
           setStack((stack) => stack.slice(0, -1));
-          reject(reason);
+          reject(new DialogError(reason ?? "CANCEL"));
         },
       });
       setStack((stack) => [...stack, dialog]);
@@ -76,4 +76,14 @@ export function withDialogs<P>(Component: ComponentType<P>): ComponentType<P> {
   return Object.assign(WithDialogs, rest, {
     displayName: `WithDialogs(${displayName ?? Component.name})`,
   });
+}
+
+export class DialogError extends Error {
+  constructor(public reason: string) {
+    super(reason);
+  }
+}
+
+export function isDialogError(value: unknown): value is DialogError {
+  return value instanceof DialogError;
 }

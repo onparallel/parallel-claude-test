@@ -21,6 +21,7 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { clearCache } from "@parallel/utils/apollo/clearCache";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToContact } from "@parallel/utils/goToContact";
@@ -101,8 +102,8 @@ function Contacts() {
     try {
       await createContact({});
       refetch();
-    } catch (error: any) {
-      if (error?.graphQLErrors?.[0]?.extensions.code === "EXISTING_CONTACT") {
+    } catch (error) {
+      if (isApolloError(error) && error.graphQLErrors[0]?.extensions?.code === "EXISTING_CONTACT") {
         errorToast();
       }
     }

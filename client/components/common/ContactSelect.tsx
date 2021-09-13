@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useMemoReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
@@ -86,8 +87,8 @@ export const ContactSelect = Object.assign(
         ]);
         setIsCreating(false);
         return true;
-      } catch (error: any) {
-        if (error?.graphQLErrors?.[0]?.extensions.code === "EXISTING_CONTACT") {
+      } catch (e) {
+        if (isApolloError(e) && e.graphQLErrors[0]?.extensions?.code === "EXISTING_CONTACT") {
           errorToast();
         }
       }

@@ -6,6 +6,7 @@ import {
   OperationVariables,
 } from "@apollo/client";
 import { createApolloClient } from "@parallel/utils/apollo/client";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { NextComponentType, NextPageContext } from "next";
 import Router from "next/router";
 
@@ -115,26 +116,27 @@ export function withApolloData<P = {}>(
                 [SERVER_STATE]: apollo.cache.extract(),
               };
             }
-          } catch (error: any) {
+          } catch (error) {
             if (error instanceof RedirectError) {
               return redirect(context, error.location);
-            }
-            const code = error?.graphQLErrors?.[0]?.extensions?.code;
-            if (code === "UNAUTHENTICATED") {
-              return redirect(context, `/${query.locale}/login`);
-            } else if (code === "FORBIDDEN") {
-              return redirect(context, `/${query.locale}/app`);
-            } else if (
-              code === "CONTACT_NOT_VERIFIED" &&
-              context.pathname.startsWith("/[locale]/petition/[keycode]")
-            ) {
-              return redirect(context, `/${query.locale}/petition/${query.keycode}`);
-            } else {
-              if (process.env.NODE_ENV === "development" && error?.graphQLErrors?.[0]?.extensions) {
-                console.error(error?.graphQLErrors?.[0]?.extensions);
+            } else if (isApolloError(error)) {
+              const code = error.graphQLErrors[0]?.extensions?.code;
+              if (code === "UNAUTHENTICATED") {
+                return redirect(context, `/${query.locale}/login`);
+              } else if (code === "FORBIDDEN") {
+                return redirect(context, `/${query.locale}/app`);
+              } else if (
+                code === "CONTACT_NOT_VERIFIED" &&
+                context.pathname.startsWith("/[locale]/petition/[keycode]")
+              ) {
+                return redirect(context, `/${query.locale}/petition/${query.keycode}`);
+              } else {
+                if (process.env.NODE_ENV === "development" && error.graphQLErrors[0]?.extensions) {
+                  console.error(error.graphQLErrors[0].extensions);
+                }
               }
-              throw error;
             }
+            throw error;
           }
         }
       : undefined,

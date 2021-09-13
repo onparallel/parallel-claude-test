@@ -12,6 +12,7 @@ import {
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { clearCache } from "../apollo/clearCache";
+import { isApolloError } from "../apollo/isApolloError";
 
 export function useDeletePetitions() {
   const intl = useIntl();
@@ -71,137 +72,140 @@ export function useDeletePetitions() {
         await deletePetitions({
           variables: { ids: petitionIds! },
         });
-      } catch (error: any) {
-        const conflictingPetitionIds: string[] =
-          error?.graphQLErrors?.[0]?.extensions?.petitionIds ?? [];
+      } catch (error) {
+        if (isApolloError(error)) {
+          const conflictingPetitionIds: string[] =
+            error.graphQLErrors[0]?.extensions?.petitionIds ?? [];
 
-        const errorCode: string | undefined = error?.graphQLErrors?.[0]?.extensions?.code;
+          const errorCode: string | undefined = error.graphQLErrors[0]?.extensions?.code;
 
-        const cachedPetitions = conflictingPetitionIds.map(
-          (id) =>
-            cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>({
-              fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
-              id: id,
-            })!
-        );
-
-        const petitionName =
-          cachedPetitions[0].name ||
-          intl.formatMessage({
-            id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition",
-          });
-
-        const type = cachedPetitions[0].__typename === "PetitionTemplate" ? "TEMPLATE" : "PETITION";
-
-        if (errorCode === "DELETE_SHARED_PETITION_ERROR") {
-          const singlePetitionMessage = (
-            <FormattedMessage
-              id="component.delete-petitions.shared-error-singular"
-              defaultMessage="The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
-              values={{ name: <b>{petitionName}</b>, type }}
-            />
+          const cachedPetitions = conflictingPetitionIds.map(
+            (id) =>
+              cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>({
+                fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
+                id: id,
+              })!
           );
 
-          const multiplePetitionMessage = (
-            <>
+          const petitionName =
+            cachedPetitions[0].name ||
+            intl.formatMessage({
+              id: "generic.untitled-petition",
+              defaultMessage: "Untitled petition",
+            });
+
+          const type =
+            cachedPetitions[0].__typename === "PetitionTemplate" ? "TEMPLATE" : "PETITION";
+
+          if (errorCode === "DELETE_SHARED_PETITION_ERROR") {
+            const singlePetitionMessage = (
               <FormattedMessage
-                id="component.delete-petitions.shared-error-plural-1"
-                defaultMessage="The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:"
-                values={{ type }}
+                id="component.delete-petitions.shared-error-singular"
+                defaultMessage="The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
+                values={{ name: <b>{petitionName}</b>, type }}
               />
-              <UnorderedList paddingLeft={2} py={2}>
-                {cachedPetitions.map((petition) => (
-                  <ListItem key={petition.id}>{petition.name}</ListItem>
-                ))}
-              </UnorderedList>
+            );
+
+            const multiplePetitionMessage = (
+              <>
+                <FormattedMessage
+                  id="component.delete-petitions.shared-error-plural-1"
+                  defaultMessage="The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:"
+                  values={{ type }}
+                />
+                <UnorderedList paddingLeft={2} py={2}>
+                  {cachedPetitions.map((petition) => (
+                    <ListItem key={petition.id}>{petition.name}</ListItem>
+                  ))}
+                </UnorderedList>
+                <FormattedMessage
+                  id="component.delete-petitions.shared-error-plural-2"
+                  defaultMessage="Please transfer ownership or remove shared access first."
+                />
+              </>
+            );
+
+            const errorMessage =
+              conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
+
+            await showErrorDialog({
+              header: errorHeader,
+              message: errorMessage,
+            });
+          } else if (errorCode === "DELETE_GROUP_PETITION_ERROR") {
+            const singlePetitionMessage = (
               <FormattedMessage
-                id="component.delete-petitions.shared-error-plural-2"
-                defaultMessage="Please transfer ownership or remove shared access first."
+                id="component.delete-petitions.group-error-singular"
+                defaultMessage="The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a group."
+                values={{ name: <b>{petitionName}</b>, type }}
               />
-            </>
-          );
+            );
 
-          const errorMessage =
-            conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
+            const multiplePetitionMessage = (
+              <>
+                <FormattedMessage
+                  id="component.delete-petitions.group-error-plural"
+                  defaultMessage="The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a group:"
+                  values={{ type }}
+                />
+                <UnorderedList paddingLeft={2} pt={2}>
+                  {cachedPetitions.map((petition) => (
+                    <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
+                      {petition?.name ??
+                        intl.formatMessage({
+                          id: "generic.untitled-petition",
+                          defaultMessage: "Untitled petition",
+                        })}
+                    </ListItem>
+                  ))}
+                </UnorderedList>
+              </>
+            );
 
-          await showErrorDialog({
-            header: errorHeader,
-            message: errorMessage,
-          });
-        } else if (errorCode === "DELETE_GROUP_PETITION_ERROR") {
-          const singlePetitionMessage = (
-            <FormattedMessage
-              id="component.delete-petitions.group-error-singular"
-              defaultMessage="The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a group."
-              values={{ name: <b>{petitionName}</b>, type }}
-            />
-          );
+            const errorMessage =
+              conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
 
-          const multiplePetitionMessage = (
-            <>
+            await showErrorDialog({
+              header: errorHeader,
+              message: errorMessage,
+            });
+          } else if (errorCode === "DELETE_PUBLIC_TEMPLATE_ERROR") {
+            const singlePetitionMessage = (
               <FormattedMessage
-                id="component.delete-petitions.group-error-plural"
-                defaultMessage="The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a group:"
-                values={{ type }}
+                id="component.delete-petitions.public-templates-error-singular"
+                defaultMessage="The {name} template cannot be deleted because it is public."
+                values={{ name: <b>{petitionName}</b> }}
               />
-              <UnorderedList paddingLeft={2} pt={2}>
-                {cachedPetitions.map((petition) => (
-                  <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
-                    {petition?.name ??
-                      intl.formatMessage({
-                        id: "generic.untitled-petition",
-                        defaultMessage: "Untitled petition",
-                      })}
-                  </ListItem>
-                ))}
-              </UnorderedList>
-            </>
-          );
+            );
 
-          const errorMessage =
-            conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
+            const multiplePetitionMessage = (
+              <>
+                <FormattedMessage
+                  id="component.delete-petitions.public-templates-error-plural"
+                  defaultMessage="The following templates cannot be deleted because they are public:"
+                />
+                <UnorderedList paddingLeft={2} pt={2}>
+                  {cachedPetitions.map((petition) => (
+                    <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
+                      {petition?.name ??
+                        intl.formatMessage({
+                          id: "generic.untitled-template",
+                          defaultMessage: "Untitled template",
+                        })}
+                    </ListItem>
+                  ))}
+                </UnorderedList>
+              </>
+            );
 
-          await showErrorDialog({
-            header: errorHeader,
-            message: errorMessage,
-          });
-        } else if (errorCode === "DELETE_PUBLIC_TEMPLATE_ERROR") {
-          const singlePetitionMessage = (
-            <FormattedMessage
-              id="component.delete-petitions.public-templates-error-singular"
-              defaultMessage="The {name} template cannot be deleted because it is public."
-              values={{ name: <b>{petitionName}</b> }}
-            />
-          );
+            const errorMessage =
+              conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
 
-          const multiplePetitionMessage = (
-            <>
-              <FormattedMessage
-                id="component.delete-petitions.public-templates-error-plural"
-                defaultMessage="The following templates cannot be deleted because they are public:"
-              />
-              <UnorderedList paddingLeft={2} pt={2}>
-                {cachedPetitions.map((petition) => (
-                  <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
-                    {petition?.name ??
-                      intl.formatMessage({
-                        id: "generic.untitled-template",
-                        defaultMessage: "Untitled template",
-                      })}
-                  </ListItem>
-                ))}
-              </UnorderedList>
-            </>
-          );
-
-          const errorMessage =
-            conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
-
-          await showErrorDialog({
-            header: errorHeader,
-            message: errorMessage,
-          });
+            await showErrorDialog({
+              header: errorHeader,
+              message: errorMessage,
+            });
+          }
         }
         throw error;
       }

@@ -10,7 +10,12 @@ import {
 } from "@parallel/chakra/icons";
 import { Card, GenericCardHeader } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
+import {
+  DialogProps,
+  isDialogError,
+  useDialog,
+  withDialogs,
+} from "@parallel/components/common/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
@@ -62,6 +67,7 @@ import {
   usePetitionSettings_cancelPetitionSignatureRequestMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
@@ -385,13 +391,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           });
           toast(petitionClosedNotificationToast);
         }
-      } catch (error: any) {
+      } catch (error) {
         // rethrow error to avoid continuing flow on function handleClosePetition
-        if (["CANCEL", "CLOSE"].includes(error.reason)) {
+        if (isDialogError(error)) {
           throw error;
         }
         if (
-          error?.graphQLErrors?.[0]?.extensions.code === "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
+          isApolloError(error) &&
+          error.graphQLErrors[0]?.extensions?.code === "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
         ) {
           await petitionAlreadyNotifiedDialog({});
           await sendPetitionClosedNotification({

@@ -16,7 +16,7 @@ import {
   useTagEditDialog_tagsQuery,
   useTagEditDialog_updateTagMutation,
 } from "@parallel/graphql/__types";
-import { withError } from "@parallel/utils/promises/withError";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ReactNode, useEffect, useState } from "react";
@@ -53,13 +53,14 @@ export function TagEditDialog({ ...props }: DialogProps) {
   const handleTagChange = useDebouncedCallback(
     async function (tag: TagSelection) {
       if (tag.name.trim().length > 0) {
-        const [error] = await withError(
-          updateTag({
+        try {
+          await updateTag({
             variables: { id: tag.id, data: pick(tag, ["name", "color"]) },
-          })
-        );
-        if (error) {
-          setError((error as any).graphQLErrors?.[0]?.extensions?.code);
+          });
+        } catch (e) {
+          if (isApolloError(e)) {
+            setError(e.graphQLErrors[0]?.extensions?.code);
+          }
         }
       }
     },

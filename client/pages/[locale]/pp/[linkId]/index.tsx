@@ -17,6 +17,7 @@ import {
   usePublicPetitionLink_publicSendReminderMutation,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isInsecureBrowser } from "@parallel/utils/isInsecureBrowser";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
@@ -94,9 +95,10 @@ function PublicPetitionLink({
       } else if (data?.publicCreateAndSendPetitionFromPublicLink === "FAILURE") {
         showErrorToast();
       }
-    } catch (error: any) {
+    } catch (error) {
       if (
-        error?.graphQLErrors?.[0]?.extensions.code === "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
+        isApolloError(error) &&
+        error.graphQLErrors[0]?.extensions?.code === "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
       ) {
         setStep("EMAIL_EXISTS");
       } else {
@@ -123,8 +125,11 @@ function PublicPetitionLink({
       } else if (data?.publicSendReminder === "FAILURE") {
         showErrorToast();
       }
-    } catch (error: any) {
-      if (error?.graphQLErrors?.[0]?.extensions.code === "REMINDER_ALREADY_SENT_ERROR") {
+    } catch (error) {
+      if (
+        isApolloError(error) &&
+        error.graphQLErrors[0]?.extensions?.code === "REMINDER_ALREADY_SENT_ERROR"
+      ) {
         toast({
           title: intl.formatMessage({
             id: "public.public-petition.error-reminder-title",
