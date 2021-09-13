@@ -405,6 +405,9 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       }
     }, [isMenuOpen, target?.anchor.offset]);
 
+    // for some reason frozen objects from the apollo cache cause issues when typing
+    const initialValue = useConstant(() => JSON.parse(JSON.stringify(value)));
+
     return (
       <Box
         role="application"
@@ -424,7 +427,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           plugins={plugins}
           options={options}
           components={components}
-          value={value}
+          initialValue={initialValue}
           onChange={handleChange}
           editableProps={editableProps}
           renderEditable={renderEditable}
