@@ -34,11 +34,10 @@ export interface UserMenuProps {
   placement?: UsePopperProps["placement"];
   user: UserMenu_UserFragment;
   onLocaleChange?: (locale: string) => void;
+  onHelpCenterClick: () => void;
 }
 
-declare const zE: any;
-
-export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
+export function UserMenu({ placement, user, onLocaleChange, onHelpCenterClick }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -46,16 +45,6 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
     window.location.href = `/api/auth/logout`;
   }
   const locales = useSupportedLocales();
-
-  const { query } = router;
-
-  function handleHelpCenterClick() {
-    (window as any).zE?.(function () {
-      zE("webWidget", "setLocale", query.locale);
-      zE.activate({ hideOnClose: true });
-    });
-  }
-
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { onOpen: onOpenNotifications } = useNotificationsState();
 
@@ -121,7 +110,7 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
           {isMobile ? (
             <MenuItem
               icon={<HelpOutlineIcon display="block" boxSize={4} />}
-              onClick={handleHelpCenterClick}
+              onClick={onHelpCenterClick}
             >
               <FormattedMessage id="navbar.help-center" defaultMessage="Help center" />
             </MenuItem>

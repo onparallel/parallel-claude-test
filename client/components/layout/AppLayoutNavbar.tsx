@@ -17,7 +17,6 @@ import {
   UsersIcon,
 } from "@parallel/chakra/icons";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
-import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -31,12 +30,17 @@ import { UserMenu } from "./UserMenu";
 
 export interface AppLayoutNavbarProps extends BoxProps {
   user: AppLayoutNavbar_UserFragment;
+  onHelpCenterClick: () => void;
+  onLocaleChange: (locale: string) => void;
 }
 
-declare const zE: any;
-
 export const AppLayoutNavbar = Object.assign(
-  memo(function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
+  memo(function AppLayoutNavbar({
+    user,
+    onHelpCenterClick,
+    onLocaleChange,
+    ...props
+  }: AppLayoutNavbarProps) {
     const intl = useIntl();
     const router = useRouter();
     const { pathname, query } = router;
@@ -95,24 +99,8 @@ export const AppLayoutNavbar = Object.assign(
       ],
       [intl.locale, pathname, query]
     );
-    function handleLocaleChange(locale: string) {
-      window.analytics?.identify(user.id, { email: user.email, locale });
-      router.push(
-        resolveUrl(pathname, {
-          ...query,
-          locale,
-        })
-      );
-    }
-
-    function handleHelpCenterClick() {
-      (window as any).zE?.(function () {
-        zE("webWidget", "setLocale", query.locale);
-        zE.activate({ hideOnClose: true });
-      });
-    }
-
     const isMobile = useBreakpointValue({ base: true, sm: false });
+
     return (
       <Flex
         alignItems="stretch"
@@ -191,17 +179,18 @@ export const AppLayoutNavbar = Object.assign(
               })}
               placement="right"
               size="md"
-              variant={"ghost"}
+              variant="ghost"
               backgroundColor="white"
               isRound
-              onClick={handleHelpCenterClick}
+              onClick={onHelpCenterClick}
               icon={<HelpOutlineIcon fontSize="22px" />}
             />
           </Stack>
           <UserMenu
             placement={isMobile ? "top-end" : "right-end"}
             user={user}
-            onLocaleChange={handleLocaleChange}
+            onHelpCenterClick={onHelpCenterClick}
+            onLocaleChange={onLocaleChange}
           />
         </Stack>
       </Flex>

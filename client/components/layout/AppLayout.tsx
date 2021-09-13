@@ -1,24 +1,23 @@
 import { gql } from "@apollo/client";
 import { BoxProps, Center, Flex, Spinner } from "@chakra-ui/react";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
+import { resolveUrl } from "@parallel/utils/next";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
 import Router from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import userflow from "userflow.js";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
 import { Zendesk } from "../scripts/Zendesk";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
-import userflow from "userflow.js";
 
 export interface AppLayoutProps extends BoxProps {
   title: string;
   user: AppLayout_UserFragment;
 }
-
-declare const zE: any;
 
 export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
   const rehydrated = useRehydrated();
@@ -50,7 +49,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
 
   // Hide zendesk launcher on route changes
   useEffect(() => {
-    const hide = () => (window as any).zE?.(() => zE.hide());
+    const hide = () => window.zE?.hide?.();
     Router.events.on("routeChangeStart", hide);
     window.addEventListener("load", hide);
     return () => {
@@ -79,22 +78,30 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
     }
   }, [user.id]);
 
-  // Hide Hubspot
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.innerText = /* css */ `
-      body #hubspot-messages-iframe-container {
-        display: none !important;
-      }
-      body iframe#launcher {
-        display: none;
-      }
-    `;
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
+  function handleHelpCenterClick() {
+    window.zE?.activate?.({ hideOnClose: true });
+  }
+
+  function handleLocaleChange(locale: string) {
+    window.analytics?.identify(user.id, { email: user.email, locale });
+    window.zE?.("webWidget", "setLocale", locale);
+    Router.push(
+      resolveUrl(Router.pathname, {
+        ...Router.query,
+        locale,
+      })
+    );
+  }
+
+  function handleZendeskLoad() {
+    window.zE?.("webWidget", "hide");
+    window.zE?.("webWidget", "prefill", {
+      name: { value: user.fullName, readOnly: true },
+      email: { value: user.email, readOnly: true },
+    });
+    window.zE?.("webWidget", "setLocale", Router.query.locale);
+  }
+
   return (
     <>
       <Head>
@@ -106,7 +113,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       </Head>
       {process.env.NODE_ENV !== "development" ? (
         <>
-          <Zendesk />
+          <Zendesk onLoad={handleZendeskLoad} />
           <Segment />
         </>
       ) : null}
@@ -130,7 +137,13 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
             borderColor="gray.200"
             overflow={{ base: "auto hidden", sm: "hidden auto" }}
           >
-            <AppLayoutNavbar user={user} flex="1" zIndex="2" />
+            <AppLayoutNavbar
+              user={user}
+              onHelpCenterClick={handleHelpCenterClick}
+              onLocaleChange={handleLocaleChange}
+              flex="1"
+              zIndex="2"
+            />
           </Flex>
           <Flex
             flex="1"

@@ -23,6 +23,7 @@ import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { serialize as serializeCookie } from "cookie";
+import { Router } from "next/router";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -172,6 +173,12 @@ export function ThirdParty() {
     enableThirdParty(cookiePreferences).then();
   }, []);
 
+  function handleHubspotLoad() {
+    Router.events.on("routeChangeComplete", () => {
+      window.HubSpotConversations?.widget.refresh();
+    });
+  }
+
   function handleSavePreferences() {
     setCookiePreferences({
       ...tempCookiePreferences,
@@ -202,7 +209,7 @@ export function ThirdParty() {
           {rehydrated ? (
             <>
               {/* Load only after giving consent */}
-              {cookiePreferences?.FUNCTIONAL ? <Hubspot /> : null}
+              {cookiePreferences?.FUNCTIONAL ? <Hubspot onLoad={handleHubspotLoad} /> : null}
             </>
           ) : null}
         </>

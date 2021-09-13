@@ -1,15 +1,14 @@
-import Head from "next/head";
-import { memo } from "react";
+import Script, { ScriptProps } from "next/script";
 
-export const Zendesk = memo(() => {
+export const Zendesk = (props: Pick<ScriptProps, "onLoad">) => {
   return (
-    <Head>
-      <script
+    <>
+      <Script
         id="ze-snippet"
-        async
-        defer
+        strategy="afterInteractive"
         src="//static.zdassets.com/ekr/snippet.js?key=f96da31d-cc9a-4568-a1f9-4d2ae55939f5"
+        {...props}
       />
-    </Head>
+    </>
   );
-});
+};

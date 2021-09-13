@@ -1,10 +1,14 @@
-import Head from "next/head";
-import { memo } from "react";
+import Script, { ScriptProps } from "next/script";
 
-export const Hubspot = memo(() => {
+export const Hubspot = (props: Pick<ScriptProps, "onLoad">) => {
   return (
-    <Head>
-      <script id="hs-script-loader" async defer src="//js.hs-scripts.com/6692004.js" />
-    </Head>
+    <>
+      <Script
+        id="hs-script-loader"
+        strategy="lazyOnload"
+        src="//js.hs-scripts.com/6692004.js"
+        {...props}
+      />
+    </>
   );
-});
+};
