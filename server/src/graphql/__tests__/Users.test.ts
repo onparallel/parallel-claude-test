@@ -723,8 +723,53 @@ describe("GraphQL/Users", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("EMAIL_ALREADY_REGISTERED_ERROR");
       expect(data).toBeNull();
+    });
+
+    it("should not create a user if the email domain has SSO enabled", async () => {
+      const [integration] = await mocks.knex.from("org_integration").insert(
+        {
+          org_id: sessionUser.org_id,
+          type: "SSO",
+          provider: "AZURE",
+          settings: { EMAIL_DOMAINS: ["onparallel.com"] },
+          is_enabled: true,
+        },
+        "*"
+      );
+      const [, sessionUserDomain] = sessionUser.email.split("@");
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $email: String!
+            $firstName: String!
+            $lastName: String!
+            $role: OrganizationRole!
+          ) {
+            createOrganizationUser(
+              email: $email
+              firstName: $firstName
+              lastName: $lastName
+              role: $role
+            ) {
+              fullName
+              role
+            }
+          }
+        `,
+        variables: {
+          email: "newuser@".concat(sessionUserDomain),
+          firstName: "Michael",
+          lastName: "Scott",
+          role: "ADMIN",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("SSO_PROVIDER_ENABLED");
+      expect(data).toBeNull();
+
+      await mocks.knex.from("org_integration").where("id", integration.id).delete();
     });
 
     it("should create a user in the organization", async () => {

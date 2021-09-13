@@ -28,6 +28,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
+import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
@@ -155,7 +156,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   },
   validateArgs: validateAnd(
     validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email, "email"),
+    emailIsAvailable((args) => args.email),
     (_, { role }, ctx, info) => {
       if (role === "OWNER") {
         throw new ArgValidationError(info, "role", "Can't create a new user with OWNER role.");
@@ -340,7 +341,8 @@ export const userSignUp = mutationField("userSignUp", {
   validateArgs: validateAnd(
     validPassword((args) => args.password),
     validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email, "email"),
+    emailIsAvailable((args) => args.email),
+    emailDomainIsNotSSO((args) => args.email),
     validateIf(
       (args) => isDefined(args.organizationLogo),
       validateFile(

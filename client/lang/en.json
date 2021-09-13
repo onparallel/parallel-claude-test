@@ -3345,6 +3345,11 @@
     "context": "name@example.com"
   },
   {
+    "term": "generic.forms.email-sso-enabled-error",
+    "definition": "This domain has SSO enabled. Please, contact your administrator to register.",
+    "context": "This domain has SSO enabled. Please, contact your administrator to register."
+  },
+  {
     "term": "generic.forms.first-name-label",
     "definition": "First name",
     "context": "First name"

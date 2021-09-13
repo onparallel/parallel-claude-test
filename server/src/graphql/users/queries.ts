@@ -3,6 +3,9 @@ import { ForbiddenError } from "apollo-server-express";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { validateAnd } from "../helpers/validateArgs";
+import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
+import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { validEmail } from "../helpers/validators/validEmail";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
@@ -22,10 +25,12 @@ export const userQueries = queryField((t) => {
     args: {
       email: nonNull(stringArg()),
     },
-    validateArgs: validEmail((args) => args.email, "email"),
-    resolve: async (_, { email }, ctx) => {
-      return !(await ctx.users.loadUserByEmail(email.trim().toLowerCase()));
-    },
+    validateArgs: validateAnd(
+      validEmail((args) => args.email, "email"),
+      emailIsAvailable((args) => args.email),
+      emailDomainIsNotSSO((args) => args.email)
+    ),
+    resolve: () => true,
   });
 });
 

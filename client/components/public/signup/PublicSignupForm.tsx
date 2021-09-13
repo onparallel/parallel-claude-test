@@ -17,6 +17,7 @@ import {
   PublicSignupForm_emailIsAvailableQuery,
   PublicSignupForm_emailIsAvailableQueryVariables,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
@@ -73,6 +74,8 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
       // "DEBOUNCED" error means the search was cancelled because user kept typing
       if (e === "DEBOUNCED") {
         return "DEBOUNCED";
+      } else if (isApolloError(e)) {
+        return e.graphQLErrors[0]?.extensions?.code as string;
       } else {
         throw e;
       }
@@ -120,21 +123,24 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             />
           </InputGroup>
           {errors.email?.message !== "DEBOUNCED" ? (
-            errors.email?.type === "emailIsAvailable" ? (
-              <Text color="red.500" fontSize="sm" marginTop={2}>
+            <FormErrorMessage>
+              {errors.email?.message === "EMAIL_ALREADY_REGISTERED_ERROR" ? (
                 <FormattedMessage
                   id="generic.forms.email-already-registered-error"
                   defaultMessage="This email is already registered"
                 />
-              </Text>
-            ) : (
-              <FormErrorMessage>
+              ) : errors.email?.message === "SSO_DOMAIN_ENABLED_ERROR" ? (
+                <FormattedMessage
+                  id="generic.forms.email-sso-enabled-error"
+                  defaultMessage="This domain has SSO enabled. Please, contact your administrator to register."
+                />
+              ) : (
                 <FormattedMessage
                   id="generic.forms.invalid-email-error"
                   defaultMessage="Please, enter a valid email"
                 />
-              </FormErrorMessage>
-            )
+              )}
+            </FormErrorMessage>
           ) : null}
         </FormControl>
         <FormControl id="password" isInvalid={!!errors.password}>

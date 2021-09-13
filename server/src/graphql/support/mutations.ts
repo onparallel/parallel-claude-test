@@ -115,7 +115,7 @@ export const createUser = mutationField("createUser", {
   },
   validateArgs: validateAnd(
     validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email, "email")
+    emailIsAvailable((args) => args.email)
   ),
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx) => {
