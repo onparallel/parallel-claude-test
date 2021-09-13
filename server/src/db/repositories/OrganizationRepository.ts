@@ -221,9 +221,10 @@ export class OrganizationRepository extends BaseRepository {
   }
 
   async updateUsageLimitAsExpired(orgUsageLimitId: number) {
-    return await this.from("organization_usage_limit")
-      .where("id", orgUsageLimitId)
-      .update("period_end_date", this.now());
+    return await this.raw<OrganizationUsageLimit>(
+      /* sql */ `UPDATE organization_usage_limit SET "period_end_date" = "period_start_date" + "period" WHERE "id" = ? RETURNING *`,
+      [orgUsageLimitId]
+    );
   }
 
   async updateOrganizationCurrentUsageLimitCredits(
