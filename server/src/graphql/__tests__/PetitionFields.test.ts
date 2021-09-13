@@ -1329,6 +1329,9 @@ describe("GraphQL/Petition Fields", () => {
                   status
                 }
               }
+              fields {
+                id
+              }
             }
           }
         `,
@@ -1342,6 +1345,7 @@ describe("GraphQL/Petition Fields", () => {
         petition: {
           status: "CLOSED",
         },
+        fields: fields.map((f) => ({ id: toGlobalId("PetitionField", f.id) })),
       });
 
       // then update field to required, petition status should change
@@ -1933,6 +1937,7 @@ describe("GraphQL/Petition Fields", () => {
           mutation ($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
             validatePetitionFields(petitionId: $petitionId, fieldIds: $fieldIds, value: $value) {
               fields {
+                id
                 validated
               }
             }
@@ -1947,7 +1952,7 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.validatePetitionFields).toEqual({
-        fields: [{ validated: true }],
+        fields: [{ id: toGlobalId("PetitionField", fields[0].id), validated: true }],
       });
     });
 
@@ -2093,6 +2098,7 @@ describe("GraphQL/Petition Fields", () => {
                 }
               }
               fields {
+                id
                 validated
               }
             }
@@ -2108,7 +2114,7 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toBeUndefined();
       expect(data!.validatePetitionFields).toEqual({
         petition: { status: "CLOSED" },
-        fields: fields.map((f) => ({ validated: true })),
+        fields: fields.map((f) => ({ id: toGlobalId("PetitionField", f.id), validated: true })),
       });
     });
 
@@ -2138,6 +2144,7 @@ describe("GraphQL/Petition Fields", () => {
                 }
               }
               fields {
+                id
                 validated
                 replies {
                   status
@@ -2161,9 +2168,10 @@ describe("GraphQL/Petition Fields", () => {
           events: { items: [{ __typename: "PetitionClosedEvent" }] },
         },
         fields: [
-          { validated: true, replies: [] },
-          { validated: true, replies: [] },
+          { id: toGlobalId("PetitionField", fields[0].id), validated: true, replies: [] },
+          { id: toGlobalId("PetitionField", fields[1].id), validated: true, replies: [] },
           {
+            id: toGlobalId("PetitionField", fields[2].id),
             validated: true,
             replies: [{ status: "APPROVED" }],
           },
@@ -2205,6 +2213,9 @@ describe("GraphQL/Petition Fields", () => {
                   status
                 }
               }
+              fields {
+                id
+              }
             }
           }
         `,
@@ -2218,6 +2229,7 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toBeUndefined();
       expect(data!.validatePetitionFields).toEqual({
         petition: { status: "PENDING" },
+        fields: [{ id: toGlobalId("PetitionField", fields[1].id) }],
       });
     });
 
