@@ -76,7 +76,7 @@ const email: Email<PetitionClosedNotificationProps> = {
             />
           </MjmlText>
         </MjmlSection>
-        <UserMessageBox bodyHtml={bodyHtml} />
+        <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />
         <MjmlSection>
           <Disclaimer email={senderEmail} />
         </MjmlSection>

@@ -14,7 +14,7 @@
         "ownerEmail": "santi@onparallel.com",
         "petitionName": "Declaración de la renta",
         "petitionId": "1234567890",
-        "message": "hola tio aqui la tienes\\npara que veas",
+        "message": "hola tio aqui la tienes\npara que veas",
         "isTemplate": false,
         "parallelUrl": "https://staging.onparallel.com",
         "assetsUrl": "https://static-staging.onparallel.com",

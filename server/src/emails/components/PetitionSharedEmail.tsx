@@ -2,6 +2,7 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
+import { BreakLines } from "../common/BreakLines";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
@@ -134,16 +135,11 @@ const email: Email<PetitionSharedEmailProps> = {
           </MjmlColumn>
         </MjmlSection>
 
-        <UserMessageBox
-          bodyHtml={
-            message
-              ? message
-                  .split("\n")
-                  .map((line) => (line ? `<div>${line}</div>` : "<br/>"))
-                  .join("")
-              : null
-          }
-        />
+        {message ? (
+          <UserMessageBox>
+            <BreakLines>{message}</BreakLines>
+          </UserMessageBox>
+        ) : null}
 
         <MjmlSection padding="10px 0 20px">
           <MjmlColumn>

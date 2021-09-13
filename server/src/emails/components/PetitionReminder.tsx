@@ -162,7 +162,7 @@ const email: Email<PetitionReminderProps> = {
           </MjmlText>
         </MjmlSection>
 
-        <UserMessageBox bodyHtml={bodyHtml} />
+        <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />
 
         <MjmlSection paddingTop="0">
           <MjmlColumn>

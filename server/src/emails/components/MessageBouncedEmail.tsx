@@ -144,7 +144,7 @@ const email: Email<MessageBouncedEmailProps> = {
           </MjmlText>
         </MjmlSection>
 
-        <UserMessageBox bodyHtml={bodyHtml} />
+        <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />
 
         <MjmlSection>
           <MjmlText>

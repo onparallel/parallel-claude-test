@@ -97,7 +97,7 @@ const email: Email<PetitionMessageProps> = {
             />
           </MjmlText>
         </MjmlSection>
-        <UserMessageBox bodyHtml={bodyHtml} />
+        <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
             {deadline ? (

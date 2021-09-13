@@ -92,7 +92,7 @@ const email: Email<SignatureRequestedProps> = {
               />
             </MjmlText>
 
-            <UserMessageBox bodyHtml={emailBody} />
+            <UserMessageBox dangerouslySetInnerHTML={emailBody} />
 
             <MjmlText>
               <FormattedMessage

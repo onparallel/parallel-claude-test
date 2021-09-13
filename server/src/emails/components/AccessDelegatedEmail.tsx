@@ -125,7 +125,7 @@ const email: Email<AccessDelegatedEmailProps> = {
           </MjmlText>
         </MjmlSection>
 
-        <UserMessageBox bodyHtml={bodyHtml} />
+        <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />
 
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
