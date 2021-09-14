@@ -1,10 +1,27 @@
-import { Heading } from "@chakra-ui/layout";
+import { Center, Heading } from "@chakra-ui/layout";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { useIntl } from "react-intl";
+import { PublicPricingCards } from "@parallel/components/public/pricing/PublicPricingCards";
+import { PublicPricingTable } from "@parallel/components/public/pricing/PublicPricingTable";
+import {
+  PublicSwitchPricing,
+  PublicSwitchValues,
+} from "@parallel/components/public/pricing/PublicSwitchPricing";
+import { usePricingList } from "@parallel/components/public/pricing/usePricingList";
+import { useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 
 function Pricing() {
   const intl = useIntl();
+
+  const [billing, setBilling] = useState<PublicSwitchValues>("monthly");
+
+  const handleSwithBillingTime = (e: PublicSwitchValues) => {
+    setBilling(e);
+  };
+
+  const pricingList = usePricingList();
+
   return (
     <PublicLayout
       title={intl.formatMessage({
@@ -12,18 +29,29 @@ function Pricing() {
         defaultMessage: "Pricing",
       })}
       description={intl.formatMessage({
-        id: "public.login.meta-description",
+        id: "public.pricing.meta-description",
         defaultMessage: "Find the right plan according to your needs",
       })}
     >
       <PublicContainer
         wrapper={{
           paddingY: 20,
-          textAlign: "center",
           backgroundColor: "white",
+          display: "flex",
         }}
       >
-        <Heading>Find the right plan according to your needs</Heading>
+        <Heading textAlign="center">
+          <FormattedMessage
+            id="public.pricing.heading"
+            defaultMessage="Find the right plan according to your needs"
+          />
+        </Heading>
+
+        <Center p={10}>
+          <PublicSwitchPricing onChange={handleSwithBillingTime} />
+        </Center>
+        <PublicPricingCards pt={4} pb={20} list={pricingList} billing={billing} />
+        <PublicPricingTable display={{ base: "none", md: "block" }} list={pricingList} />
       </PublicContainer>
     </PublicLayout>
   );

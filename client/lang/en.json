@@ -1760,6 +1760,16 @@
     "context": "Press # to add replaceable placeholders"
   },
   {
+    "term": "component.pricing-table.compare-plans",
+    "definition": "Compare plans",
+    "context": "Compare plans"
+  },
+  {
+    "term": "component.pricing-table.on-demand",
+    "definition": "On demand",
+    "context": "On demand"
+  },
+  {
     "term": "component.public-signup-form-experience.complete-button",
     "definition": "Complete registration",
     "context": "Complete registration"
@@ -2118,6 +2128,21 @@
     "term": "component.public-signup-right-heading.heading",
     "definition": "Work better with",
     "context": "Work better with"
+  },
+  {
+    "term": "component.public-switch-pricing.monthly",
+    "definition": "Monthly",
+    "context": "Monthly"
+  },
+  {
+    "term": "component.public-switch-pricing.save-up-to",
+    "definition": "Save up to {percent}%",
+    "context": "Save up to {percent}%"
+  },
+  {
+    "term": "component.public-switch-pricing.yearly",
+    "definition": "Yearly",
+    "context": "Yearly"
   },
   {
     "term": "component.react-select.loading",
@@ -4148,6 +4173,261 @@
     "term": "organizations.header.user-count",
     "definition": "Users",
     "context": "Users"
+  },
+  {
+    "term": "page.pricing.activity-log",
+    "definition": "Activity log",
+    "context": "Activity log"
+  },
+  {
+    "term": "page.pricing.all-basic-plan",
+    "definition": "All included in Basic, and also:",
+    "context": "All included in Basic, and also:"
+  },
+  {
+    "term": "page.pricing.all-free-plan",
+    "definition": "All included in Free, and also:",
+    "context": "All included in Free, and also:"
+  },
+  {
+    "term": "page.pricing.all-professional-plan",
+    "definition": "All included in Professional, and also:",
+    "context": "All included in Professional, and also:"
+  },
+  {
+    "term": "page.pricing.api-access",
+    "definition": "API access",
+    "context": "API access"
+  },
+  {
+    "term": "page.pricing.automatic-reminders",
+    "definition": "Automatic reminders",
+    "context": "Automatic reminders"
+  },
+  {
+    "term": "page.pricing.basic",
+    "definition": "Basic",
+    "context": "Basic"
+  },
+  {
+    "term": "page.pricing.bulk-petitions",
+    "definition": "Bulk petitions",
+    "context": "Bulk petitions"
+  },
+  {
+    "term": "page.pricing.connect-workflow",
+    "definition": "Connect to your workflow",
+    "context": "Connect to your workflow"
+  },
+  {
+    "term": "page.pricing.contact-sales",
+    "definition": "Contact with sales",
+    "context": "Contact with sales"
+  },
+  {
+    "term": "page.pricing.contact-team-request-budget",
+    "definition": "<b>Contact with our team</b> to request your budget",
+    "context": "<b>Contact with our team</b> to request your budget"
+  },
+  {
+    "term": "page.pricing.core-features",
+    "definition": "Core features",
+    "context": "Core features"
+  },
+  {
+    "term": "page.pricing.custom",
+    "definition": "Custom",
+    "context": "Custom"
+  },
+  {
+    "term": "page.pricing.custom-domain",
+    "definition": "Custom domain",
+    "context": "Custom domain"
+  },
+  {
+    "term": "page.pricing.custom-logo",
+    "definition": "Custom logo",
+    "context": "Custom logo"
+  },
+  {
+    "term": "page.pricing.custom-solutions",
+    "definition": "Custom solutions",
+    "context": "Custom solutions"
+  },
+  {
+    "term": "page.pricing.custom-subdomain",
+    "definition": "Custom subdomain",
+    "context": "Custom subdomain"
+  },
+  {
+    "term": "page.pricing.customization",
+    "definition": "Customization",
+    "context": "Customization"
+  },
+  {
+    "term": "page.pricing.Encrypted storage",
+    "definition": "Encrypted storage",
+    "context": "Encrypted storage"
+  },
+  {
+    "term": "page.pricing.enterprise",
+    "definition": "Enterprise",
+    "context": "Enterprise"
+  },
+  {
+    "term": "page.pricing.esignature",
+    "definition": "eSignature (Signaturit)",
+    "context": "eSignature (Signaturit)"
+  },
+  {
+    "term": "page.pricing.euros-always",
+    "definition": "<big>{amount}€/</big>always",
+    "context": "<big>{amount}€/</big>always"
+  },
+  {
+    "term": "page.pricing.euros-month",
+    "definition": "<big>{amount}€/</big>month",
+    "context": "<big>{amount}€/</big>month"
+  },
+  {
+    "term": "page.pricing.firsts-steps",
+    "definition": "Your first steps with Parallel",
+    "context": "Your first steps with Parallel"
+  },
+  {
+    "term": "page.pricing.forward-security",
+    "definition": "Forward security",
+    "context": "Forward security"
+  },
+  {
+    "term": "page.pricing.free",
+    "definition": "Free",
+    "context": "Free"
+  },
+  {
+    "term": "page.pricing.increase-control",
+    "definition": "Increase control in your processes",
+    "context": "Increase control in your processes"
+  },
+  {
+    "term": "page.pricing.integrations",
+    "definition": "Integrations",
+    "context": "Integrations"
+  },
+  {
+    "term": "page.pricing.live-chat",
+    "definition": "Live chat",
+    "context": "Live chat"
+  },
+  {
+    "term": "page.pricing.modal-body",
+    "definition": "Complete the following information and we will contact you as soon as possible.",
+    "context": "Complete the following information and we will contact you as soon as possible."
+  },
+  {
+    "term": "page.pricing.modal-title",
+    "definition": "Contact with sales",
+    "context": "Contact with sales"
+  },
+  {
+    "term": "page.pricing.only-one-user",
+    "definition": "{count, plural, one {Only <b>#</b> user} other {Up to <b>#</b> users}}",
+    "context": "{count, plural, one {Only <b>#</b> user} other {Up to <b>#</b> users}}"
+  },
+  {
+    "term": "page.pricing.pdf-export",
+    "definition": "PDF export",
+    "context": "PDF export"
+  },
+  {
+    "term": "page.pricing.personalized-plan",
+    "definition": "Create your personalized plan",
+    "context": "Create your personalized plan"
+  },
+  {
+    "term": "page.pricing.petitions-per-month",
+    "definition": "<b>{petitions}</b> petitions/month",
+    "context": "<b>{petitions}</b> petitions/month"
+  },
+  {
+    "term": "page.pricing.plan-suit-you",
+    "definition": "A plan to suit you",
+    "context": "A plan to suit you"
+  },
+  {
+    "term": "page.pricing.priority-support",
+    "definition": "Priority support",
+    "context": "Priority support"
+  },
+  {
+    "term": "page.pricing.professional",
+    "definition": "Professional",
+    "context": "Professional"
+  },
+  {
+    "term": "page.pricing.remove-branding",
+    "definition": "Remove parallel branding",
+    "context": "Remove parallel branding"
+  },
+  {
+    "term": "page.pricing.reporting",
+    "definition": "Reporting",
+    "context": "Reporting"
+  },
+  {
+    "term": "page.pricing.scim",
+    "definition": "SCIM",
+    "context": "SCIM"
+  },
+  {
+    "term": "page.pricing.security",
+    "definition": "Security",
+    "context": "Security"
+  },
+  {
+    "term": "page.pricing.ssl-connection",
+    "definition": "SSL connection",
+    "context": "SSL connection"
+  },
+  {
+    "term": "page.pricing.sso-login",
+    "definition": "SSO login",
+    "context": "SSO login"
+  },
+  {
+    "term": "page.pricing.standard-support",
+    "definition": "Standard support",
+    "context": "Standard support"
+  },
+  {
+    "term": "page.pricing.support",
+    "definition": "Support",
+    "context": "Support"
+  },
+  {
+    "term": "page.pricing.try-it-now",
+    "definition": "Try it now",
+    "context": "Try it now"
+  },
+  {
+    "term": "page.pricing.unlimited-contacts",
+    "definition": "Unlimited contacts",
+    "context": "Unlimited contacts"
+  },
+  {
+    "term": "page.pricing.unlimited-templates",
+    "definition": "Unlimited templates",
+    "context": "Unlimited templates"
+  },
+  {
+    "term": "page.pricing.user-groups",
+    "definition": "User groups",
+    "context": "User groups"
+  },
+  {
+    "term": "page.pricing.zapier-integration",
+    "definition": "Zapier integration",
+    "context": "Zapier integration"
   },
   {
     "term": "petition-access.header",
@@ -6258,6 +6538,26 @@
     "term": "public.powered-by-aws",
     "definition": "Powered by AWS Cloud Computing",
     "context": "Powered by AWS Cloud Computing"
+  },
+  {
+    "term": "public.pricing-link",
+    "definition": "Pricing",
+    "context": "Pricing"
+  },
+  {
+    "term": "public.pricing.heading",
+    "definition": "Find the right plan according to your needs",
+    "context": "Find the right plan according to your needs"
+  },
+  {
+    "term": "public.pricing.meta-description",
+    "definition": "Find the right plan according to your needs",
+    "context": "Find the right plan according to your needs"
+  },
+  {
+    "term": "public.pricing.title",
+    "definition": "Pricing",
+    "context": "Pricing"
   },
   {
     "term": "public.privacy.title",

@@ -1760,6 +1760,16 @@
     "context": "Press # to add replaceable placeholders"
   },
   {
+    "term": "component.pricing-table.compare-plans",
+    "definition": "Comparativa de planes",
+    "context": "Compare plans"
+  },
+  {
+    "term": "component.pricing-table.on-demand",
+    "definition": "Bajo demanda",
+    "context": "On demand"
+  },
+  {
     "term": "component.public-signup-form-experience.complete-button",
     "definition": "Finalizar registro",
     "context": "Complete registration"
@@ -2118,6 +2128,21 @@
     "term": "component.public-signup-right-heading.heading",
     "definition": "Trabaja mejor con",
     "context": "Work better with"
+  },
+  {
+    "term": "component.public-switch-pricing.monthly",
+    "definition": "Mensual",
+    "context": "Monthly"
+  },
+  {
+    "term": "component.public-switch-pricing.save-up-to",
+    "definition": "Ahorra hasta un {percent}%",
+    "context": "Save up to {percent}%"
+  },
+  {
+    "term": "component.public-switch-pricing.yearly",
+    "definition": "Anual",
+    "context": "Yearly"
   },
   {
     "term": "component.react-select.loading",
@@ -4148,6 +4173,261 @@
     "term": "organizations.header.user-count",
     "definition": "Usuarios",
     "context": "Users"
+  },
+  {
+    "term": "page.pricing.activity-log",
+    "definition": "Registro de actividades",
+    "context": "Activity log"
+  },
+  {
+    "term": "page.pricing.all-basic-plan",
+    "definition": "Todo lo del Plan Básico, y además:",
+    "context": "All included in Basic, and also:"
+  },
+  {
+    "term": "page.pricing.all-free-plan",
+    "definition": "Todo lo del Plan Gratuito, y además:",
+    "context": "All included in Free, and also:"
+  },
+  {
+    "term": "page.pricing.all-professional-plan",
+    "definition": "Todo lo del Plan Profesional, y además:",
+    "context": "All included in Professional, and also:"
+  },
+  {
+    "term": "page.pricing.api-access",
+    "definition": "Acceso a la API",
+    "context": "API access"
+  },
+  {
+    "term": "page.pricing.automatic-reminders",
+    "definition": "Recordatorios automáticos",
+    "context": "Automatic reminders"
+  },
+  {
+    "term": "page.pricing.basic",
+    "definition": "Basic",
+    "context": "Basic"
+  },
+  {
+    "term": "page.pricing.bulk-petitions",
+    "definition": "Envíos masivos",
+    "context": "Bulk petitions"
+  },
+  {
+    "term": "page.pricing.connect-workflow",
+    "definition": "Conéctalo con tu flujo de trabajo",
+    "context": "Connect to your workflow"
+  },
+  {
+    "term": "page.pricing.contact-sales",
+    "definition": "Contactar con ventas",
+    "context": "Contact with sales"
+  },
+  {
+    "term": "page.pricing.contact-team-request-budget",
+    "definition": "<b>Contacta con nuestro equipo</b> para solicitar tu presupuesto",
+    "context": "<b>Contact with our team</b> to request your budget"
+  },
+  {
+    "term": "page.pricing.core-features",
+    "definition": "Funcionalidades",
+    "context": "Core features"
+  },
+  {
+    "term": "page.pricing.custom",
+    "definition": "Personalizado",
+    "context": "Custom"
+  },
+  {
+    "term": "page.pricing.custom-domain",
+    "definition": "Dominio personalizado",
+    "context": "Custom domain"
+  },
+  {
+    "term": "page.pricing.custom-logo",
+    "definition": "Personalización con tu logo",
+    "context": "Custom logo"
+  },
+  {
+    "term": "page.pricing.custom-solutions",
+    "definition": "Soluciones personalizadas",
+    "context": "Custom solutions"
+  },
+  {
+    "term": "page.pricing.custom-subdomain",
+    "definition": "Subdominio personalizado",
+    "context": "Custom subdomain"
+  },
+  {
+    "term": "page.pricing.customization",
+    "definition": "Personalización",
+    "context": "Customization"
+  },
+  {
+    "term": "page.pricing.Encrypted storage",
+    "definition": "Encriptación de archivos",
+    "context": "Encrypted storage"
+  },
+  {
+    "term": "page.pricing.enterprise",
+    "definition": "Enterprise",
+    "context": "Enterprise"
+  },
+  {
+    "term": "page.pricing.esignature",
+    "definition": "Firma electrónica (Signaturit)",
+    "context": "eSignature (Signaturit)"
+  },
+  {
+    "term": "page.pricing.euros-always",
+    "definition": "<big>{amount}€/</big>siempre",
+    "context": "<big>{amount}€/</big>always"
+  },
+  {
+    "term": "page.pricing.euros-month",
+    "definition": "<big>{amount}€/</big>mes",
+    "context": "<big>{amount}€/</big>month"
+  },
+  {
+    "term": "page.pricing.firsts-steps",
+    "definition": "Da tus primeros pasos con Parallel",
+    "context": "Your first steps with Parallel"
+  },
+  {
+    "term": "page.pricing.forward-security",
+    "definition": "Protección de reenvío",
+    "context": "Forward security"
+  },
+  {
+    "term": "page.pricing.free",
+    "definition": "Gratuito",
+    "context": "Free"
+  },
+  {
+    "term": "page.pricing.increase-control",
+    "definition": "Aumenta el control en tus procesos",
+    "context": "Increase control in your processes"
+  },
+  {
+    "term": "page.pricing.integrations",
+    "definition": "integraciones",
+    "context": "Integrations"
+  },
+  {
+    "term": "page.pricing.live-chat",
+    "definition": "Chat de ayuda en tiempo real",
+    "context": "Live chat"
+  },
+  {
+    "term": "page.pricing.modal-body",
+    "definition": "Completa los siguientes datos y nos pondremos en contacto contigo lo antes posible.",
+    "context": "Complete the following information and we will contact you as soon as possible."
+  },
+  {
+    "term": "page.pricing.modal-title",
+    "definition": "Contactar con ventas",
+    "context": "Contact with sales"
+  },
+  {
+    "term": "page.pricing.only-one-user",
+    "definition": "{count, plural, one {Solo <b>#</b> usuario} other {Hasta <b>#</b> usuarios}}",
+    "context": "{count, plural, one {Only <b>#</b> user} other {Up to <b>#</b> users}}"
+  },
+  {
+    "term": "page.pricing.pdf-export",
+    "definition": "Exportación a PDF",
+    "context": "PDF export"
+  },
+  {
+    "term": "page.pricing.personalized-plan",
+    "definition": "Crea tu plan personalizado",
+    "context": "Create your personalized plan"
+  },
+  {
+    "term": "page.pricing.petitions-per-month",
+    "definition": "<b>{petitions}</b> peticiones/mes",
+    "context": "<b>{petitions}</b> petitions/month"
+  },
+  {
+    "term": "page.pricing.plan-suit-you",
+    "definition": "Un plan a tu medida",
+    "context": "A plan to suit you"
+  },
+  {
+    "term": "page.pricing.priority-support",
+    "definition": "Priorización de soporte",
+    "context": "Priority support"
+  },
+  {
+    "term": "page.pricing.professional",
+    "definition": "Professional",
+    "context": "Professional"
+  },
+  {
+    "term": "page.pricing.remove-branding",
+    "definition": "Eliminación del branding de Parallel",
+    "context": "Remove parallel branding"
+  },
+  {
+    "term": "page.pricing.reporting",
+    "definition": "Reporting",
+    "context": "Reporting"
+  },
+  {
+    "term": "page.pricing.scim",
+    "definition": "SCIM",
+    "context": "SCIM"
+  },
+  {
+    "term": "page.pricing.security",
+    "definition": "Seguridad",
+    "context": "Security"
+  },
+  {
+    "term": "page.pricing.ssl-connection",
+    "definition": "Conexión con SSL",
+    "context": "SSL connection"
+  },
+  {
+    "term": "page.pricing.sso-login",
+    "definition": "Inicio de sesión con SSO",
+    "context": "SSO login"
+  },
+  {
+    "term": "page.pricing.standard-support",
+    "definition": "Soporte estándar",
+    "context": "Standard support"
+  },
+  {
+    "term": "page.pricing.support",
+    "definition": "soporte",
+    "context": "Support"
+  },
+  {
+    "term": "page.pricing.try-it-now",
+    "definition": "Pruébalo ya",
+    "context": "Try it now"
+  },
+  {
+    "term": "page.pricing.unlimited-contacts",
+    "definition": "Contactos ilimitados",
+    "context": "Unlimited contacts"
+  },
+  {
+    "term": "page.pricing.unlimited-templates",
+    "definition": "Plantillas ilimitadas",
+    "context": "Unlimited templates"
+  },
+  {
+    "term": "page.pricing.user-groups",
+    "definition": "Equipos de trabajo",
+    "context": "User groups"
+  },
+  {
+    "term": "page.pricing.zapier-integration",
+    "definition": "Integración con Zapier",
+    "context": "Zapier integration"
   },
   {
     "term": "petition-access.header",
@@ -6258,6 +6538,26 @@
     "term": "public.powered-by-aws",
     "definition": "Utilizamos AWS Cloud Computing",
     "context": "Powered by AWS Cloud Computing"
+  },
+  {
+    "term": "public.pricing-link",
+    "definition": "Precios",
+    "context": "Pricing"
+  },
+  {
+    "term": "public.pricing.heading",
+    "definition": "Encuentra el plan que más se adapte a ti",
+    "context": "Find the right plan according to your needs"
+  },
+  {
+    "term": "public.pricing.meta-description",
+    "definition": "Encuentra el plan que más se adapte a ti",
+    "context": "Find the right plan according to your needs"
+  },
+  {
+    "term": "public.pricing.title",
+    "definition": "Precios",
+    "context": "Pricing"
   },
   {
     "term": "public.privacy.title",

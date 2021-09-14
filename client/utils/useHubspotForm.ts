@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback } from "react";
 
 declare const hbspt: any;
 
@@ -10,7 +10,7 @@ export type HubspotFormProps = {
 };
 
 export function useHubspotForm(data: HubspotFormProps | null) {
-  useEffect(() => {
+  return useCallback(() => {
     if (!data) {
       return;
     }
