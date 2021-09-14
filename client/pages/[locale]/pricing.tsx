@@ -7,7 +7,6 @@ import {
   PublicSwitchPricing,
   PublicSwitchValues,
 } from "@parallel/components/public/pricing/PublicSwitchPricing";
-import { usePricingList } from "@parallel/components/public/pricing/usePricingList";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -19,8 +18,6 @@ function Pricing() {
   const handleSwithBillingTime = (e: PublicSwitchValues) => {
     setBilling(e);
   };
-
-  const pricingList = usePricingList();
 
   return (
     <PublicLayout
@@ -50,8 +47,8 @@ function Pricing() {
         <Center p={10}>
           <PublicSwitchPricing onChange={handleSwithBillingTime} />
         </Center>
-        <PublicPricingCards pt={4} pb={20} list={pricingList} billing={billing} />
-        <PublicPricingTable display={{ base: "none", md: "block" }} list={pricingList} />
+        <PublicPricingCards pt={4} pb={20} billing={billing} />
+        <PublicPricingTable display={{ base: "none", md: "block" }} />
       </PublicContainer>
     </PublicLayout>
   );

@@ -2,13 +2,11 @@ import { Box, Center, Heading, HStack, Stack, Text } from "@chakra-ui/layout";
 import { CircleCheckFilledIcon, CircleCrossFilledIcon } from "@parallel/chakra/icons";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import { FormattedMessage } from "react-intl";
-import { PricingListCategory } from "./usePricingList";
+import { usePricingList } from "../../../utils/usePricingList";
 
-interface PublicPricingTable extends CardProps {
-  list: PricingListCategory[];
-}
+export function PublicPricingTable(props: CardProps) {
+  const list = usePricingList();
 
-export function PublicPricingTable({ list, ...props }: PublicPricingTable) {
   return (
     <Card {...props} px={8} py={6}>
       <Stack spacing={6}>

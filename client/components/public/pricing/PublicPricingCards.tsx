@@ -22,25 +22,25 @@ import {
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
-import { NakedLink } from "@parallel/components/common/Link";
 import { useHubspotForm } from "@parallel/utils/useHubspotForm";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { PricingListFeatures, usePricingList } from "../../../utils/usePricingList";
 import { PublicSwitchValues } from "./PublicSwitchPricing";
-import { PricingListCategory, PricingListFeatures } from "./usePricingList";
 
 interface PublicPricingCardsProps extends GridProps {
-  list: PricingListCategory[];
   billing: PublicSwitchValues;
 }
 
-export function PublicPricingCards({ list, billing, ...props }: PublicPricingCardsProps) {
+export function PublicPricingCards({ billing, ...props }: PublicPricingCardsProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [formId, setFormId] = useState({
     es: "",
     en: "",
   });
+
+  const list = usePricingList();
 
   const { query, push } = useRouter();
 
@@ -291,7 +291,7 @@ export function PublicPricingCards({ list, billing, ...props }: PublicPricingCar
         <Card flex="1" p={6} display="flex" flexDirection="column" alignItems="center">
           <Stack textAlign="center" spacing={4} maxWidth="sm" w="full">
             <Stack>
-              <Heading as="h2" fontSize="2xl" color="gray.700">
+              <Heading as="h2" fontSize="2xl" color="blue.700">
                 <FormattedMessage id="page.pricing.professional" defaultMessage="Professional" />
               </Heading>
               <Text fontSize="sm">
