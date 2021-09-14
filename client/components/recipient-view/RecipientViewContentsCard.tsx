@@ -64,11 +64,12 @@ export function RecipientViewContentsCard({
                   aria-current={index + 1 !== currentPage ? "page" : undefined}
                 >
                   <ChevronFilledIcon
+                    color="gray.500"
                     position="absolute"
                     left={2}
                     top={2.5}
                     fontSize="sm"
-                    transform={index + 1 !== currentPage ? "rotate(-90deg)" : undefined}
+                    transform={index + 1 === currentPage ? "rotate(90deg)" : undefined}
                   />
                   <Box
                     flex="1"
