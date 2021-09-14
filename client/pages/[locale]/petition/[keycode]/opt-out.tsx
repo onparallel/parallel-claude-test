@@ -109,7 +109,7 @@ function OptOut({ keycode, access }: OptOutProps) {
               <Text>
                 <FormattedMessage
                   id="public.opt-out.done-body"
-                  defaultMessage="We have informed the sender and you will not receive emails anymore from this process."
+                  defaultMessage="We have informed the sender and you will not receive any more emails related to this process."
                 />
               </Text>
             </Stack>
@@ -119,8 +119,9 @@ function OptOut({ keycode, access }: OptOutProps) {
                 <Heading>
                   <FormattedMessage
                     id="public.opt-out.feedback-title"
-                    defaultMessage="Please, let us know the reason for not continuing with this process. *"
+                    defaultMessage="Please let us know why you would like to stop receiving emails related to this process."
                   />
+                  {" *"}
                 </Heading>
                 <RadioGroup name="opt-out-reason" onChange={setReason}>
                   <Stack>
@@ -180,7 +181,7 @@ function OptOut({ keycode, access }: OptOutProps) {
             <Text as="div">
               <FormattedMessage
                 id="public.opt-out.review-before-opt-out"
-                defaultMessage="Before opting out from receiving this emails, check the requested information."
+                defaultMessage="Before opting out from receiving emails, check the requested information."
               />
             </Text>
             <NakedLink href={`/petition/${keycode}`}>

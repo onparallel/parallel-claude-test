@@ -125,7 +125,7 @@ const email: Email<PetitionReminderProps> = {
 
       ${intl.formatMessage({
         id: "layout.stop-reminders",
-        defaultMessage: "Stop receibing reminders",
+        defaultMessage: "Stop receiving reminders",
       })}:
       ${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=reminder
     `;
@@ -156,7 +156,7 @@ const email: Email<PetitionReminderProps> = {
         optOutUrl={`${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=reminder`}
         optOutText={intl.formatMessage({
           id: "layout.stop-reminders",
-          defaultMessage: "Stop receibing reminders",
+          defaultMessage: "Stop receiving reminders",
         })}
       >
         <MjmlSection padding="0">

@@ -28,7 +28,11 @@ export function useReminderOptOutReasons(): Record<ReminderOptOutReason, string>
       NO_REMINDERS: intl.formatMessage({
         id: "public.opt-out.answer-no-reminders",
         defaultMessage:
-          "I will upload the information but i do not want to receive this emails anymore",
+          "I will upload the information but I do not want to receive any more emails",
+      }),
+      SPAM: intl.formatMessage({
+        id: "public.opt-out.answer-spam",
+        defaultMessage: "I consider this is spam",
       }),
       OTHER: intl.formatMessage({
         id: "public.opt-out.answer-other",

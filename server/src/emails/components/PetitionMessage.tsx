@@ -72,7 +72,7 @@ const email: Email<PetitionMessageProps> = {
 
       ${intl.formatMessage({
         id: "layout.stop-receiving-emails",
-        defaultMessage: "Stop receiving this emails",
+        defaultMessage: "Stop receiving emails",
       })}:
       ${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=petition-access
     `;
@@ -100,7 +100,7 @@ const email: Email<PetitionMessageProps> = {
         optOutUrl={`${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=petition-access`}
         optOutText={intl.formatMessage({
           id: "layout.stop-receiving-emails",
-          defaultMessage: "Stop receiving this emails",
+          defaultMessage: "Stop receiving emails",
         })}
       >
         <MjmlSection padding="0">

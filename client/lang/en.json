@@ -6036,8 +6036,8 @@
   },
   {
     "term": "public.opt-out.answer-no-reminders",
-    "definition": "I will upload the information but i do not want to receive this emails anymore",
-    "context": "I will upload the information but i do not want to receive this emails anymore"
+    "definition": "I will upload the information but I do not want to receive any more emails",
+    "context": "I will upload the information but I do not want to receive any more emails"
   },
   {
     "term": "public.opt-out.answer-not-interested",
@@ -6055,14 +6055,19 @@
     "context": "Other"
   },
   {
+    "term": "public.opt-out.answer-spam",
+    "definition": "I consider this is spam",
+    "context": "I consider this is spam"
+  },
+  {
     "term": "public.opt-out.answer-wrong-person",
     "definition": "I am not the person to complete this information",
     "context": "I am not the person to complete this information"
   },
   {
     "term": "public.opt-out.done-body",
-    "definition": "We have informed the sender and you will not receive emails anymore from this process.",
-    "context": "We have informed the sender and you will not receive emails anymore from this process."
+    "definition": "We have informed the sender and you will not receive any more emails related to this process.",
+    "context": "We have informed the sender and you will not receive any more emails related to this process."
   },
   {
     "term": "public.opt-out.done-title",
@@ -6071,8 +6076,8 @@
   },
   {
     "term": "public.opt-out.feedback-title",
-    "definition": "Please, let us know the reason for not continuing with this process. *",
-    "context": "Please, let us know the reason for not continuing with this process. *"
+    "definition": "Please let us know why you would like to stop receiving emails related to this process.",
+    "context": "Please let us know why you would like to stop receiving emails related to this process."
   },
   {
     "term": "public.opt-out.opt-out-button",
@@ -6091,8 +6096,8 @@
   },
   {
     "term": "public.opt-out.review-before-opt-out",
-    "definition": "Before opting out from receiving this emails, check the requested information.",
-    "context": "Before opting out from receiving this emails, check the requested information."
+    "definition": "Before opting out from receiving emails, check the requested information.",
+    "context": "Before opting out from receiving emails, check the requested information."
   },
   {
     "term": "public.opt-out.review-button",

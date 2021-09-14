@@ -192,12 +192,12 @@
   {
     "term": "layout.stop-receiving-emails",
     "definition": "Dejar de recibir estos correos",
-    "context": "Stop receiving this emails"
+    "context": "Stop receiving emails"
   },
   {
     "term": "layout.stop-reminders",
     "definition": "Dejar de recibir recordatorios",
-    "context": "Stop receibing reminders"
+    "context": "Stop receiving reminders"
   },
   {
     "term": "layout.terms-and-conditions-link",

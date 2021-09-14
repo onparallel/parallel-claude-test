@@ -6036,8 +6036,8 @@
   },
   {
     "term": "public.opt-out.answer-no-reminders",
-    "definition": "Subiré la información pero no quiero seguir recibiendo estos correos",
-    "context": "I will upload the information but i do not want to receive this emails anymore"
+    "definition": "Subiré la información pero no quiero seguir recibiendo más correos",
+    "context": "I will upload the information but I do not want to receive any more emails"
   },
   {
     "term": "public.opt-out.answer-not-interested",
@@ -6055,14 +6055,19 @@
     "context": "Other"
   },
   {
+    "term": "public.opt-out.answer-spam",
+    "definition": "Considero que es correo basura (spam)",
+    "context": "I consider this is spam"
+  },
+  {
     "term": "public.opt-out.answer-wrong-person",
     "definition": "No soy la persona adecuada para completar esta información",
     "context": "I am not the person to complete this information"
   },
   {
     "term": "public.opt-out.done-body",
-    "definition": "Hemos informado a tu remitente y no recibirá más recordatorios de esta petición.",
-    "context": "We have informed the sender and you will not receive emails anymore from this process."
+    "definition": "Hemos informado al remitente y no recibirá más correos relacionados con este proceso.",
+    "context": "We have informed the sender and you will not receive any more emails related to this process."
   },
   {
     "term": "public.opt-out.done-title",
@@ -6071,8 +6076,8 @@
   },
   {
     "term": "public.opt-out.feedback-title",
-    "definition": "Por favor, ¿podrías indicarnos el motivo para no querer seguir con este proceso? *",
-    "context": "Please, let us know the reason for not continuing with this process. *"
+    "definition": "Por favor, ¿podrías indicarnos el motivo para no querer seguir recibiendo correos acerca de este proceso?",
+    "context": "Please let us know why you would like to stop receiving emails related to this process."
   },
   {
     "term": "public.opt-out.opt-out-button",
@@ -6091,8 +6096,8 @@
   },
   {
     "term": "public.opt-out.review-before-opt-out",
-    "definition": "Antes de cancelar los correos, comprueba la información solicitada.",
-    "context": "Before opting out from receiving this emails, check the requested information."
+    "definition": "Antes de cancelar el envío de correos, compruebe la información solicitada.",
+    "context": "Before opting out from receiving emails, check the requested information."
   },
   {
     "term": "public.opt-out.review-button",
