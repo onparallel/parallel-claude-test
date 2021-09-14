@@ -2136,7 +2136,7 @@
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-message-2",
-    "definition": "{count, plural, =1{Impórtalo} other{Impórtalos}} antes en la <a>página de contactos</a>, o {count, plural, =1{anádelo} other{añádelos uno a uno}} aquí introduciendo {count, plural, =1{su correo electrónico} other{sus correos electrónicos}}.",
+    "definition": "{count, plural, =1{Impórtalo} other{Impórtalos}} antes en la <a>página de contactos</a>, o {count, plural, =1{añádelo} other{añádelos uno a uno}} aquí introduciendo {count, plural, =1{su correo electrónico} other{sus correos electrónicos}}.",
     "context": "Import {count, plural, =1{it} other{them}} first in the <a>contacts page</a>, or add {count, plural, =1{it} other{them}} individually here with {count, plural, =1{its} other{their}} contact email."
   },
   {
