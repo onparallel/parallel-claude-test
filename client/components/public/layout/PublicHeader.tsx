@@ -87,7 +87,7 @@ export function PublicHeader(props: BoxProps) {
         >
           <PublicHeaderMenu
             direction={{ base: "column", [bp]: "row" }}
-            spacing={{ base: 2, [bp]: 4 }}
+            spacing={{ base: 2, [bp]: 2.5, xl: 4 }}
             alignItems={{ base: "stretch", [bp]: "center" }}
           />
         </Box>

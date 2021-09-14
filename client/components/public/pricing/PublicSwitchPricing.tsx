@@ -45,7 +45,8 @@ export function PublicSwitchPricing({ onChange }: PublicSwitchPricingProps) {
     <Stack width="min-content" alignItems="center">
       <AnimateSharedLayout>
         <MotionHStack
-          {...group}
+          ref={group.ref}
+          role={group.role}
           layout
           backgroundColor="gray.200"
           width="min-content"
