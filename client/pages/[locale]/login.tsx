@@ -63,7 +63,11 @@ function Login() {
         password,
       });
       await client.clearStore();
-      window.location.href = `/${router.query.locale}/app`;
+      const redirect =
+        typeof router.query.redirect === "string" && router.query.redirect.startsWith("/")
+          ? router.query.redirect
+          : undefined;
+      window.location.href = redirect ?? `/${router.query.locale}/app`;
     } catch (error: any) {
       if (error.error === "NewPasswordRequired") {
         setPasswordChange({ type: "CHANGE", email, password });

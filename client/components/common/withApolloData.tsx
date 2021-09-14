@@ -27,9 +27,13 @@ export type WithServerState<P> = P & {
   [SERVER_STATE]: any;
 };
 
-export function redirect(context: NextPageContext, location: string) {
+export function redirect(context: NextPageContext, location: string, reload = false) {
   if (typeof window !== "undefined") {
-    Router.push(location);
+    if (reload) {
+      window.location.href = location;
+    } else {
+      Router.push(location);
+    }
   } else {
     context.res!.writeHead(302, { Location: location }).end();
   }
@@ -122,7 +126,19 @@ export function withApolloData<P = {}>(
             } else if (isApolloError(error)) {
               const code = error.graphQLErrors[0]?.extensions?.code;
               if (code === "UNAUTHENTICATED") {
-                return redirect(context, `/${query.locale}/login`);
+                const url = (req?.url ?? context.asPath) as string;
+                const [path, params] = url.split("?");
+                // remove any redirect params to avoid infinite redirect
+                const _params = (params ?? "")
+                  .split("&")
+                  .filter((p) => !p.startsWith("redirect="))
+                  .join("&");
+                const from = params ? `${path}?${_params}` : path;
+                return redirect(
+                  context,
+                  `/${query.locale}/login?redirect=${encodeURIComponent(from)}`,
+                  true
+                );
               } else if (code === "FORBIDDEN") {
                 return redirect(context, `/${query.locale}/app`);
               } else if (
