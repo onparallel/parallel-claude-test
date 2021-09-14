@@ -10,12 +10,3 @@ export function useRehydrated() {
   }, []);
   return rehydrated;
 }
-
-export function useRehydratedEffect(effect: EffectCallback, deps?: DependencyList) {
-  const rehydrated = useRehydrated();
-  useEffect(() => {
-    if (rehydrated) {
-      return effect();
-    }
-  }, [rehydrated, ...deps!]);
-}

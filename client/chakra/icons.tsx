@@ -107,25 +107,6 @@ export const LockOpenIcon = createIcon({
   ),
 });
 
-export const GlobeIcon = createIcon({
-  displayName: "GlobeIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      strokeWidth={2}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle r="10" cy="12" cx="12" />
-      <line y2="9" x2="21" y1="9" x1="3" />
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-      <line x1="3" y1="15" x2="21" y2="15" />
-    </g>
-  ),
-});
-
 export const ConditionIcon = createIcon({
   displayName: "ConditionIcon",
   viewBox: "0 0 24 24",
@@ -254,33 +235,6 @@ export const PaperPlaneIcon = createIcon({
     >
       <path d="M11.5 17L18 6.5L8.5 15" />
       <path d="M22 2L17.5 21L11.5 17L8.5 21.5V15L2.5 11L22 2Z" />
-    </g>
-  ),
-});
-
-export const PaperPlanesIcon = createIcon({
-  displayName: "PaperPlanesIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      strokeWidth={2}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <g transform="translate(0,-6)">
-        <path d="m 2,18 6,4 2,-8 z" />
-        <path d="M 5.5,20.333333 4.5,22 V 19.666667 L 6,19 Z" />
-      </g>
-      <g transform="translate(12,-12)">
-        <path d="m 2,18 6,4 2,-8 z" />
-        <path d="M 5.5,20.333333 4.5,22 V 19.666667 L 6,19 Z" />
-      </g>
-      <g transform="translate(9)">
-        <path d="m 2,18 6,4 2,-8 z" />
-        <path d="M 5.5,20.333333 4.5,22 V 19.666667 L 6,19 Z" />
-      </g>
     </g>
   ),
 });
@@ -527,26 +481,6 @@ export const UserCheckIcon = createIcon({
   ),
 });
 
-export const FileTextIcon = createIcon({
-  displayName: "FileTextIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      strokeWidth={2}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-      <polyline points="14 2 14 8 20 8"></polyline>
-      <line x1="16" y1="13" x2="8" y2="13"></line>
-      <line x1="16" y1="17" x2="8" y2="17"></line>
-      <polyline points="10 9 9 9 8 9"></polyline>
-    </g>
-  ),
-});
-
 export const FileNewIcon = createIcon({
   displayName: "FileNewIcon",
   viewBox: "0 0 24 24",
@@ -560,28 +494,6 @@ export const FileNewIcon = createIcon({
     >
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
       <polyline points="14 2 14 8 20 8"></polyline>
-    </g>
-  ),
-});
-
-export const FileShineIcon = createIcon({
-  displayName: "FileShineIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      strokeWidth={2}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-      <polyline points="14 2 14 8 20 8"></polyline>
-      <path d="M 12,12.523314 V 10.993793" />
-      <path d="M 14.355469,14.234662 15.81013,13.762014" />
-      <path d="m 13.45576,17.003681 0.89903,1.237409" />
-      <path d="M 10.54424,17.003681 9.6452102,18.24109" />
-      <path d="M 9.6445314,14.234662 8.1898703,13.762014" />
     </g>
   ),
 });
@@ -689,23 +601,6 @@ export const FilterIcon = createIcon({
   ),
 });
 
-export const PencilIcon = createIcon({
-  displayName: "PencilIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      fill="none"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 20h9"></path>
-      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-    </g>
-  ),
-});
-
 export const ForbiddenIcon = createIcon({
   displayName: "ForbiddenIcon",
   viewBox: "0 0 24 24",
@@ -719,38 +614,6 @@ export const ForbiddenIcon = createIcon({
     >
       <circle cx="12" cy="12" r="10"></circle>
       <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-    </g>
-  ),
-});
-
-export const ChevronDownBigIcon = createIcon({
-  displayName: "ChevronDownBigIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      strokeWidth={2}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="2 8 12 18 22 8"></polyline>
-    </g>
-  ),
-});
-
-export const ChevronUpBigIcon = createIcon({
-  displayName: "ChevronUpBigIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      strokeWidth={2}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="2 18 12 8 22 18"></polyline>
     </g>
   ),
 });
@@ -933,24 +796,6 @@ export const ShinyIcon = createIcon({
       <line x1="18" y1="12" x2="22" y2="12"></line>
       <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
       <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-    </g>
-  ),
-});
-
-export const SaveIcon = createIcon({
-  displayName: "SaveIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      strokeWidth={2}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-      <polyline points="17 21 17 13 7 13 7 21"></polyline>
-      <polyline points="7 3 7 8 15 8"></polyline>
     </g>
   ),
 });
@@ -1260,18 +1105,6 @@ export const AddIcon = createIcon({
   ),
 });
 
-export const InfoOutlineIcon = createIcon({
-  displayName: "InfoOutlineIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2">
-      <circle cx="12" cy="12" r="11" stroke="currentColor"></circle>
-      <line x1="12" x2="12" y1="11" y2="17"></line>
-      <circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"></circle>
-    </g>
-  ),
-});
-
 export const HelpOutlineIcon = createIcon({
   displayName: "HelpOutlineIcon",
   viewBox: "0 0 24 24",
@@ -1324,18 +1157,6 @@ export const CloseIcon = createIcon({
     <path
       fill="currentColor"
       d="M.439,21.44a1.5,1.5,0,0,0,2.122,2.121L11.823,14.3a.25.25,0,0,1,.354,0l9.262,9.263a1.5,1.5,0,1,0,2.122-2.121L14.3,12.177a.25.25,0,0,1,0-.354l9.263-9.262A1.5,1.5,0,0,0,21.439.44L12.177,9.7a.25.25,0,0,1-.354,0L2.561.44A1.5,1.5,0,0,0,.439,2.561L9.7,11.823a.25.25,0,0,1,0,.354Z"
-    ></path>
-  ),
-});
-
-export const SmallCloseIcon = createIcon({
-  displayName: "SmallCloseIcon",
-  viewBox: "0 0 16 16",
-  path: (
-    <path
-      d="M9.41 8l2.29-2.29c.19-.18.3-.43.3-.71a1.003 1.003 0 0 0-1.71-.71L8 6.59l-2.29-2.3a1.003 1.003 0 0 0-1.42 1.42L6.59 8 4.3 10.29c-.19.18-.3.43-.3.71a1.003 1.003 0 0 0 1.71.71L8 9.41l2.29 2.29c.18.19.43.3.71.3a1.003 1.003 0 0 0 .71-1.71L9.41 8z"
-      fillRule="evenodd"
-      fill="currentColor"
     ></path>
   ),
 });
@@ -1556,24 +1377,6 @@ export const FieldSelectIcon = createIcon({
       <path d="m 5,16 3,-8 3,8" />
       <path d="m 6,14 h 4" />
       <path d="m 13,11 3,3 3,-3" />
-    </g>
-  ),
-});
-
-export const DownForwardArrowIcon = createIcon({
-  displayName: "DownForwardArrowIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M 15,19 22,12 15,5" />
-      <path d="M 2,12 H 22" />
-      <path d="M 2,12 V 5" />
     </g>
   ),
 });
