@@ -42,7 +42,7 @@ export function PublicPricingCards({ list, billing, ...props }: PublicPricingCar
     en: "",
   });
 
-  const { query } = useRouter();
+  const { query, push } = useRouter();
 
   const initHubspotForm = useHubspotForm(
     query.locale
@@ -125,6 +125,7 @@ export function PublicPricingCards({ list, billing, ...props }: PublicPricingCar
 
   function trackCTAClick() {
     window.analytics?.track("Register CTA Clicked", { from: "public-pricing" });
+    push(`/${query.locale}/signup`);
   }
 
   return (
@@ -163,13 +164,11 @@ export function PublicPricingCards({ list, billing, ...props }: PublicPricingCar
                 }}
               />
             </Text>
-            <NakedLink href="/signup">
-              <Button onClick={trackCTAClick}>
-                <Text as="span" fontWeight="bold">
-                  <FormattedMessage id="page.pricing.try-it-now" defaultMessage="Try it now" />
-                </Text>
-              </Button>
-            </NakedLink>
+            <Button onClick={trackCTAClick}>
+              <Text as="span" fontWeight="bold">
+                <FormattedMessage id="page.pricing.try-it-now" defaultMessage="Try it now" />
+              </Text>
+            </Button>
             <Stack wordBreak="keep-all" whiteSpace="nowrap">
               <Text>
                 <FormattedMessage
@@ -435,7 +434,7 @@ export function PublicPricingCards({ list, billing, ...props }: PublicPricingCar
           </ModalHeader>
           <ModalCloseButton mt={1} />
           <ModalBody>
-            <Stack spacing={4}>
+            <Stack spacing={5} py={4}>
               <Text>
                 <FormattedMessage
                   id="page.pricing.modal-body"

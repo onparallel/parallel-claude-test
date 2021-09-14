@@ -14,10 +14,6 @@ type PublicSwitchPricingProps = {
 export function PublicSwitchPricing({ onChange }: PublicSwitchPricingProps) {
   const intl = useIntl();
 
-  useEffect(() => {
-    console.log("PublicSwitchPricing render");
-  }, []);
-
   const options = [
     {
       label: intl.formatMessage({
