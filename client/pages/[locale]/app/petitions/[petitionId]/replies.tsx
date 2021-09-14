@@ -508,7 +508,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         />
 
         <Button
-          aria-action="close-petition"
+          data-action="close-petition"
           hidden={petition.status === "CLOSED"}
           colorScheme="green"
           leftIcon={<CheckIcon />}
