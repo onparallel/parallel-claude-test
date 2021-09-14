@@ -11,6 +11,7 @@
       "args": {
         "emailSubject": "First email subject",
         "fullName": "Derek Lou",
+        "senderName": "Mariano Rodriguez",
         "petitionTitle": "Some petition title",
         "keycode": "asdfghjkl",
         "parallelUrl": "https://staging.onparallel.com",
@@ -20,6 +21,7 @@
       },
       "argsTypes": {
         "emailSubject": { "control": { "type": "text" } },
+        "senderName": { "control": { "type": "text" } },
         "fullName": { "control": { "type": "text" } },
         "petitionTitle": { "control": { "type": "text" } },
         "keycode": { "control": { "type": "text" } },

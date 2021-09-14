@@ -111,12 +111,6 @@ const email: Email<InvitationProps> = {
                 defaultMessage="This password will expire in 30 days, try to use it as soon as possible."
               />
             </MjmlText>
-            <MjmlText>
-              <FormattedMessage
-                id="invitation.website"
-                defaultMessage="You can login through our website."
-              />
-            </MjmlText>
             <Button href={`${parallelUrl}/${locale}/login`} fontWeight={500}>
               <FormattedMessage id="invitation.login-button" defaultMessage="Log in" />
             </Button>

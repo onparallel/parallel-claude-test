@@ -141,6 +141,7 @@ const email: Email<PetitionReminderProps> = {
     const { locale } = useIntl();
     return (
       <Layout
+        useAlternativeSlogan
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}

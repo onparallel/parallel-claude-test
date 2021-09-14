@@ -62,7 +62,13 @@ const email: Email<PetitionClosedNotificationProps> = {
     logoAlt,
   }: PetitionClosedNotificationProps) {
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
+      <Layout
+        useAlternativeSlogan
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+      >
         <MjmlSection padding="0 0 16px 0">
           <GreetingFormal fullName={contactFullName} />
           <MjmlText>

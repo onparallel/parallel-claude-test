@@ -93,7 +93,7 @@ export const Layout: FC<LayoutProps> = function Layout({
             {useAlternativeSlogan ? (
               <MjmlButton
                 href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
-                padding="6px 16px"
+                innerPadding="6px 25px"
                 backgroundColor="white"
                 color="black"
                 border="1px solid #A0AEC0"
@@ -114,28 +114,23 @@ export const Layout: FC<LayoutProps> = function Layout({
                   width="120px"
                   alt="Parallel"
                   src={`${assetsUrl}/static/emails/logo.png`}
-                  href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+                  href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=users`}
                 />
               </>
             )}
-
             <MjmlSocial align="center" icon-padding="1px">
               <MjmlSocialElement
                 alt="LinkedIn"
                 name="linkedin-noshare"
                 href="https://www.linkedin.com/company/onparallel"
                 backgroundColor="#6059f7"
-              >
-                {" "}
-              </MjmlSocialElement>
+              />
               <MjmlSocialElement
                 alt="Twitter"
                 name="twitter-noshare"
                 href="https://twitter.com/Parallel_SO"
                 backgroundColor="#6059f7"
-              >
-                {" "}
-              </MjmlSocialElement>
+              />
             </MjmlSocial>
             <MjmlText align="center" color="#1A202C" lineHeight="20px">
               <FormattedMessage
