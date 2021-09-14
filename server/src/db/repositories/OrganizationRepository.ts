@@ -129,6 +129,17 @@ export class OrganizationRepository extends BaseRepository {
       },
       t
     );
+
+    // set default usage limits for new organizations
+    await this.createOrganizationUsageLimit(
+      org.id,
+      {
+        limit_name: "PETITION_SEND",
+        limit: this.defaultOrganizationUsageDetails["PETITION_SEND"].limit,
+        period: this.defaultOrganizationUsageDetails["PETITION_SEND"].period,
+      },
+      t
+    );
     return org;
   }
 
@@ -214,10 +225,11 @@ export class OrganizationRepository extends BaseRepository {
 
   async createOrganizationUsageLimit(
     orgId: number,
-    data: MaybeArray<Omit<CreateOrganizationUsageLimit, "org_id">>
+    data: MaybeArray<Omit<CreateOrganizationUsageLimit, "org_id">>,
+    t?: Knex.Transaction
   ) {
     const dataArr = unMaybeArray(data).map((d) => ({ org_id: orgId, ...d }));
-    return await this.insert("organization_usage_limit", dataArr);
+    return await this.insert("organization_usage_limit", dataArr, t);
   }
 
   async updateUsageLimitAsExpired(orgUsageLimitId: number) {
