@@ -16,10 +16,15 @@ export interface Email<T> {
 
 export async function buildEmail<T>(email: Email<T>, props: T, { locale }: EmailOptions) {
   const messages = await loadMessages(locale);
+  const intlProps = {
+    messages,
+    locale,
+    defaultRichTextElements: {
+      b: (chunks: any) => <strong>{chunks}</strong>,
+    },
+  };
   const { html } = render(
-    <IntlProvider locale={locale} messages={messages}>
-      {createElement(email.html, props)}
-    </IntlProvider>,
+    <IntlProvider {...intlProps}>{createElement(email.html, props)}</IntlProvider>,
     {
       keepComments: false,
       minify: true,
