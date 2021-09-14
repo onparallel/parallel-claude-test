@@ -87,6 +87,7 @@ export const UserAvatarList = Object.assign(
                   <Avatar
                     size="xs"
                     name={u.name}
+                    getInitials={() => u.initials}
                     transitionProperty="transform"
                     transitionDuration="150ms"
                     boxSize={7}

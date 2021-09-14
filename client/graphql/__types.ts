@@ -6034,6 +6034,7 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
           __typename?: "UserGroup";
           id: string;
           name: string;
+          initials: string;
           members: Array<{
             __typename?: "UserGroupMember";
             user: {
@@ -6074,6 +6075,7 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
           __typename?: "UserGroup";
           id: string;
           name: string;
+          initials: string;
           members: Array<{
             __typename?: "UserGroupMember";
             user: {
@@ -6126,6 +6128,7 @@ export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
     __typename?: "UserGroup";
     id: string;
     name: string;
+    initials: string;
     members: Array<{
       __typename?: "UserGroupMember";
       user: {
@@ -6153,6 +6156,7 @@ export type PetitionSharingModal_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
   name: string;
+  initials: string;
   members: Array<{
     __typename?: "UserGroupMember";
     user: {
@@ -6189,6 +6193,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
             __typename?: "UserGroup";
             id: string;
             name: string;
+            initials: string;
             members: Array<{
               __typename?: "UserGroupMember";
               user: {
@@ -6237,6 +6242,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
             __typename?: "UserGroup";
             id: string;
             name: string;
+            initials: string;
             members: Array<{
               __typename?: "UserGroupMember";
               user: {
@@ -6284,6 +6290,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
             __typename?: "UserGroup";
             id: string;
             name: string;
+            initials: string;
             members: Array<{
               __typename?: "UserGroupMember";
               user: {
@@ -6332,6 +6339,7 @@ export type PetitionSharingModal_PetitionsQuery = {
                   __typename?: "UserGroup";
                   id: string;
                   name: string;
+                  initials: string;
                   members: Array<{
                     __typename?: "UserGroupMember";
                     user: {
@@ -6371,6 +6379,7 @@ export type PetitionSharingModal_PetitionsQuery = {
                   __typename?: "UserGroup";
                   id: string;
                   name: string;
+                  initials: string;
                   members: Array<{
                     __typename?: "UserGroupMember";
                     user: {
@@ -14343,20 +14352,27 @@ export const PetitionSharingModal_PetitionUserPermissionFragmentDoc = gql`
   }
   ${PetitionSharingModal_UserFragmentDoc}
 `;
-export const PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc = gql`
-  fragment PetitionSharingModal_PetitionUserGroupPermission on PetitionUserGroupPermission {
-    permissionType
-    group {
-      id
-      name
-      members {
-        user {
-          ...PetitionSharingModal_User
-        }
+export const PetitionSharingModal_UserGroupFragmentDoc = gql`
+  fragment PetitionSharingModal_UserGroup on UserGroup {
+    id
+    name
+    initials
+    members {
+      user {
+        ...PetitionSharingModal_User
       }
     }
   }
   ${PetitionSharingModal_UserFragmentDoc}
+`;
+export const PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc = gql`
+  fragment PetitionSharingModal_PetitionUserGroupPermission on PetitionUserGroupPermission {
+    permissionType
+    group {
+      ...PetitionSharingModal_UserGroup
+    }
+  }
+  ${PetitionSharingModal_UserGroupFragmentDoc}
 `;
 export const PetitionSharingModal_PetitionFragmentDoc = gql`
   fragment PetitionSharingModal_Petition on PetitionBase {
@@ -14373,18 +14389,6 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
   }
   ${PetitionSharingModal_PetitionUserPermissionFragmentDoc}
   ${PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc}
-`;
-export const PetitionSharingModal_UserGroupFragmentDoc = gql`
-  fragment PetitionSharingModal_UserGroup on UserGroup {
-    id
-    name
-    members {
-      user {
-        ...PetitionSharingModal_User
-      }
-    }
-  }
-  ${PetitionSharingModal_UserFragmentDoc}
 `;
 export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
   fragment TemplateDetailsDialog_PetitionTemplate on PetitionTemplate {

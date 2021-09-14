@@ -382,7 +382,12 @@ export function PetitionSharingDialog({
               {groupPermissions.map(({ group, permissionType }) => {
                 return (
                   <Flex key={group.id} alignItems="center">
-                    <Avatar role="presentation" name={group.name!} size="sm" />
+                    <Avatar
+                      role="presentation"
+                      getInitials={() => group.initials}
+                      name={group.name!}
+                      size="sm"
+                    />
                     <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
                       <Stack direction={"row"} spacing={2} align="center">
                         <UsersIcon />
@@ -564,16 +569,10 @@ PetitionSharingDialog.fragments = {
       fragment PetitionSharingModal_PetitionUserGroupPermission on PetitionUserGroupPermission {
         permissionType
         group {
-          id
-          name
-          members {
-            user {
-              ...PetitionSharingModal_User
-            }
-          }
+          ...PetitionSharingModal_UserGroup
         }
       }
-      ${this.User}
+      ${this.UserGroup}
     `;
   },
   get User() {
@@ -594,6 +593,7 @@ PetitionSharingDialog.fragments = {
       fragment PetitionSharingModal_UserGroup on UserGroup {
         id
         name
+        initials
         members {
           user {
             ...PetitionSharingModal_User
