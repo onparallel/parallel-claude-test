@@ -31,13 +31,7 @@ export async function buildEmail<T>(email: Email<T>, props: T, { locale }: Email
       validationLevel: "skip",
     }
   );
-  const intl = createIntl({
-    locale,
-    messages,
-    defaultRichTextElements: {
-      b: (chunks: any) => <strong>{chunks}</strong>,
-    },
-  });
+  const intl = createIntl(intlProps);
   const text = email.text(props, intl);
   const subject = email.subject(props, intl);
   const from = email.from(props, intl);
