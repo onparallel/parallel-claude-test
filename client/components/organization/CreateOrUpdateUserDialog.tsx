@@ -10,16 +10,16 @@ import {
   InputRightElement,
   Select,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
-  OrganizationRole,
   CreateUserDialog_emailIsAvailableQuery,
   CreateUserDialog_emailIsAvailableQueryVariables,
+  OrganizationRole,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -81,6 +81,8 @@ function CreateOrUpdateUserDialog({
       // "DEBOUNCED" error means the search was cancelled because user kept typing
       if (e === "DEBOUNCED") {
         return "DEBOUNCED";
+      } else if (isApolloError(e)) {
+        return e.graphQLErrors[0]?.extensions?.code as string;
       } else {
         throw e;
       }
@@ -141,21 +143,19 @@ function CreateOrUpdateUserDialog({
               ) : null}
             </InputGroup>
             {errors.email?.message !== "DEBOUNCED" ? (
-              errors.email?.type === "emailIsAvailable" ? (
-                <Text color="red.500" fontSize="sm" marginTop={2}>
+              <FormErrorMessage>
+                {errors.email?.message === "EMAIL_ALREADY_REGISTERED_ERROR" ? (
                   <FormattedMessage
                     id="generic.forms.email-already-registered-error"
                     defaultMessage="This email is already registered"
                   />
-                </Text>
-              ) : (
-                <FormErrorMessage>
+                ) : (
                   <FormattedMessage
                     id="generic.forms.invalid-email-error"
                     defaultMessage="Please, enter a valid email"
                   />
-                </FormErrorMessage>
-              )
+                )}
+              </FormErrorMessage>
             ) : null}
           </FormControl>
           <FormControl
