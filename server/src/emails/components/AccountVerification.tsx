@@ -48,7 +48,7 @@ const email: Email<AccountVerificationProps> = {
   }: AccountVerificationProps) {
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>
@@ -59,7 +59,7 @@ const email: Email<AccountVerificationProps> = {
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
-        <MjmlSection paddingTop="0px">
+        <MjmlSection>
           <MjmlColumn>
             <Button href={`${activationUrl}`}>
               <FormattedMessage

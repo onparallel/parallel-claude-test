@@ -69,7 +69,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
   }: DeveloperWebhookFailedEmailProps) {
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>

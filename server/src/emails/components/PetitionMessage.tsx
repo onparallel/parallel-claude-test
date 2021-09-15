@@ -91,19 +91,23 @@ const email: Email<PetitionMessageProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
       >
-        <MjmlSection padding="0 0 16px 0">
-          <MjmlText align="center">
-            <FormattedMessage
-              id="new-petition.text"
-              defaultMessage="{senderName} ({senderEmail}) has sent you the following petition:"
-              values={{
-                senderName: <b>{senderName}</b>,
-                senderEmail: <b>{senderEmail}</b>,
-              }}
-            />
-          </MjmlText>
+        <MjmlSection padding="0">
+          <MjmlColumn>
+            <MjmlText align="center">
+              <FormattedMessage
+                id="new-petition.text"
+                defaultMessage="{senderName} ({senderEmail}) has sent you the following petition:"
+                values={{
+                  senderName: <b>{senderName}</b>,
+                  senderEmail: <b>{senderEmail}</b>,
+                }}
+              />
+            </MjmlText>
+          </MjmlColumn>
         </MjmlSection>
+
         <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />
+
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
             {deadline ? (

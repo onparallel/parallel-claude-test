@@ -79,7 +79,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
       >
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingFormal fullName={fullName} />
             <MjmlText>
@@ -104,7 +104,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
           </MjmlColumn>
         </MjmlSection>
 
-        <MjmlSection paddingTop="0px">
+        <MjmlSection>
           <MjmlColumn>
             <CompleteInfoButton href={`${parallelUrl}/${locale}/petition/${keycode}`} />
           </MjmlColumn>

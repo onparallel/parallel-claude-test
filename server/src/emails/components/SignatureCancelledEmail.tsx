@@ -65,7 +65,7 @@ const email: Email<SignatureCancelledProps> = {
           defaultMessage: "Cancelled signature request",
         })}
       >
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingFormal fullName={signerName} />
             <MjmlText>

@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlText, MjmlWrapper } from "mjml-react";
+import { MjmlColumn, MjmlText, MjmlSection, MjmlWrapper } from "mjml-react";
 import { ReactNode } from "react";
 
 interface UserMessageBoxProps {
@@ -7,16 +7,18 @@ interface UserMessageBoxProps {
 }
 export function UserMessageBox({ children, dangerouslySetInnerHTML }: UserMessageBoxProps) {
   return children || dangerouslySetInnerHTML ? (
-    <MjmlWrapper backgroundColor="#F4F7F9" borderRadius="5px" padding="12px 16px">
-      <MjmlColumn>
-        <MjmlText lineHeight="21px" padding="0">
-          {children ? (
-            children
-          ) : (
-            <div dangerouslySetInnerHTML={{ __html: dangerouslySetInnerHTML! }} />
-          )}
-        </MjmlText>
-      </MjmlColumn>
+    <MjmlWrapper padding="10px 25px">
+      <MjmlSection backgroundColor="#F4F7F9" borderRadius="5px" padding="12px 16px">
+        <MjmlColumn>
+          <MjmlText lineHeight="21px" padding="0">
+            {children ? (
+              children
+            ) : (
+              <div dangerouslySetInnerHTML={{ __html: dangerouslySetInnerHTML! }} />
+            )}
+          </MjmlText>
+        </MjmlColumn>
+      </MjmlSection>
     </MjmlWrapper>
   ) : null;
 }

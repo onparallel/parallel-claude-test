@@ -81,7 +81,7 @@ const email: Email<SignatureRequestedProps> = {
           defaultMessage: "Signature requested",
         })}
       >
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingFormal fullName={fullName} />
             <MjmlText>

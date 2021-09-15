@@ -1,4 +1,4 @@
-import { MjmlSection, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage } from "react-intl";
 import { Email } from "../buildEmail";
@@ -69,22 +69,28 @@ const email: Email<PetitionClosedNotificationProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
       >
-        <MjmlSection padding="0 0 16px 0">
-          <GreetingFormal fullName={contactFullName} />
-          <MjmlText>
-            <FormattedMessage
-              id="petition-closed-notification.text"
-              defaultMessage="{senderName} ({senderEmail}) has received the information."
-              values={{
-                senderName: <b>{senderName}</b>,
-                senderEmail: <b>{senderEmail}</b>,
-              }}
-            />
-          </MjmlText>
+        <MjmlSection padding="0">
+          <MjmlColumn>
+            <GreetingFormal fullName={contactFullName} />
+            <MjmlText>
+              <FormattedMessage
+                id="petition-closed-notification.text"
+                defaultMessage="{senderName} ({senderEmail}) has received the information."
+                values={{
+                  senderName: <b>{senderName}</b>,
+                  senderEmail: <b>{senderEmail}</b>,
+                }}
+              />
+            </MjmlText>
+          </MjmlColumn>
         </MjmlSection>
+
         <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />
+
         <MjmlSection>
-          <Disclaimer email={senderEmail} />
+          <MjmlColumn>
+            <Disclaimer email={senderEmail} />
+          </MjmlColumn>
         </MjmlSection>
       </Layout>
     );

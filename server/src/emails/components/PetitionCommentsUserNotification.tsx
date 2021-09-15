@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
@@ -81,7 +81,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>
@@ -96,10 +96,11 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
+
         <PetitionFieldAndComments fields={fields} />
-        <MjmlSection paddingTop="0px">
+
+        <MjmlSection>
           <MjmlColumn>
-            <MjmlSpacer height="10px" />
             <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}>
               <FormattedMessage
                 id="petition-comments-user-notification.access-button"

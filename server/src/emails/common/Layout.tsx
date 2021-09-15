@@ -171,7 +171,9 @@ export const Layout: FC<LayoutProps> = function Layout({
           </MjmlColumn>
         </MjmlSection>
         <MjmlSection>
-          <GdprDisclaimer />
+          <MjmlColumn>
+            <GdprDisclaimer />
+          </MjmlColumn>
         </MjmlSection>
       </MjmlBody>
     </Mjml>

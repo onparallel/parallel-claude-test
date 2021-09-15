@@ -85,7 +85,7 @@ const email: Email<InvitationProps> = {
     const { locale } = useIntl();
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>
@@ -111,6 +111,10 @@ const email: Email<InvitationProps> = {
                 defaultMessage="This password will expire in 30 days, try to use it as soon as possible."
               />
             </MjmlText>
+          </MjmlColumn>
+        </MjmlSection>
+        <MjmlSection>
+          <MjmlColumn>
             <Button href={`${parallelUrl}/${locale}/login`} fontWeight={500}>
               <FormattedMessage id="invitation.login-button" defaultMessage="Log in" />
             </Button>

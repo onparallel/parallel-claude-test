@@ -148,19 +148,20 @@ const email: Email<PetitionReminderProps> = {
         logoAlt={logoAlt}
         optOutUrl={`${parallelUrl}/${locale}/petition/${keycode}/opt-out`}
       >
-        <MjmlSection padding="0 0 16px 0">
-          <GreetingFormal fullName={contactFullName} />
-          <MjmlSpacer />
-          <MjmlText lineHeight="24px">
-            <FormattedMessage
-              id="reminder.text"
-              defaultMessage="We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
-              values={{
-                senderName: <b>{senderName}</b>,
-                senderEmail: <b>{senderEmail}</b>,
-              }}
-            />
-          </MjmlText>
+        <MjmlSection padding="0">
+          <MjmlColumn>
+            <GreetingFormal fullName={contactFullName} />
+            <MjmlText lineHeight="24px">
+              <FormattedMessage
+                id="reminder.text"
+                defaultMessage="We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
+                values={{
+                  senderName: <b>{senderName}</b>,
+                  senderEmail: <b>{senderEmail}</b>,
+                }}
+              />
+            </MjmlText>
+          </MjmlColumn>
         </MjmlSection>
 
         <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />

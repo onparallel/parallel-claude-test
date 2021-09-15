@@ -48,7 +48,7 @@ const email: Email<ForgotPasswordProps> = {
   html({ name, assetsUrl, parallelUrl, logoUrl, logoAlt, verificationCode }: ForgotPasswordProps) {
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <Greeting name={name} />
 
@@ -58,15 +58,18 @@ const email: Email<ForgotPasswordProps> = {
                 defaultMessage="This is the verification code you requested to change your password:"
               />
             </MjmlText>
+          </MjmlColumn>
+        </MjmlSection>
 
-            <MjmlSection padding="2px">
-              <MjmlColumn width="110px" borderRadius="3px" padding="10px" backgroundColor="#F4F7F9">
-                <MjmlText fontFamily="monospace" fontSize="24px" align="center" padding="0">
-                  {verificationCode}
-                </MjmlText>
-              </MjmlColumn>
-            </MjmlSection>
-
+        <MjmlSection paddingTop="10px">
+          <MjmlColumn width="110px" borderRadius="3px" padding="10px" backgroundColor="#F4F7F9">
+            <MjmlText fontFamily="monospace" fontSize="24px" align="center" padding="0">
+              {verificationCode}
+            </MjmlText>
+          </MjmlColumn>
+        </MjmlSection>
+        <MjmlSection padding="0">
+          <MjmlColumn>
             <MjmlText>
               <FormattedMessage
                 id="forgot-password.verification-code-expiry"

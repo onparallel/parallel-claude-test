@@ -80,7 +80,7 @@ const email: Email<ContactAuthenticationRequest> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
       >
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingFormal fullName={fullName} />
             <MjmlText>
@@ -91,14 +91,14 @@ const email: Email<ContactAuthenticationRequest> = {
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
-        <MjmlSection padding="0">
+        <MjmlSection paddingTop="10px">
           <MjmlColumn width="110px" borderRadius="3px" padding="10px" backgroundColor="#F4F7F9">
             <MjmlText fontFamily="monospace" fontSize="24px" align="center" padding="0">
               {code}
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
-        <MjmlSection padding="10px 0 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <MjmlText align="center" fontSize="12px" padding="0">
               <FormattedMessage

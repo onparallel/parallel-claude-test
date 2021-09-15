@@ -102,7 +102,7 @@ const email: Email<PetitionSharedEmailProps> = {
     const { locale } = useIntl();
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <Greeting name={name} />
             <MjmlText>
@@ -141,7 +141,7 @@ const email: Email<PetitionSharedEmailProps> = {
           </UserMessageBox>
         ) : null}
 
-        <MjmlSection padding="10px 0 20px">
+        <MjmlSection>
           <MjmlColumn>
             <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}`}>
               <FormattedMessage

@@ -88,7 +88,7 @@ const email: Email<PetitionCompletedProps> = {
     const { locale } = useIntl();
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <Greeting name={userName} />
             <MjmlText>
@@ -118,7 +118,11 @@ const email: Email<PetitionCompletedProps> = {
                 </li>
               )}
             </MjmlText>
+          </MjmlColumn>
+        </MjmlSection>
 
+        <MjmlSection>
+          <MjmlColumn>
             <AccessInfoButton
               href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
             />

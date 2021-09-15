@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
@@ -86,7 +86,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
       >
-        <MjmlSection padding="0 0 16px 0">
+        <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingFormal fullName={contactFullName} />
             <MjmlText>
@@ -101,10 +101,11 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
+
         <PetitionFieldAndComments fields={fields} />
-        <MjmlSection paddingTop="0px">
+
+        <MjmlSection>
           <MjmlColumn>
-            <MjmlSpacer height="10px" />
             <Button
               href={`${parallelUrl}/${locale}/petition/${keycode}`}
               fontWeight={500}

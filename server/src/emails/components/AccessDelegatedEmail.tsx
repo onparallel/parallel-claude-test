@@ -116,24 +116,26 @@ const email: Email<AccessDelegatedEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
       >
-        <MjmlSection padding="0 0 16px 0">
-          <MjmlText>
-            <FormattedMessage
-              id="access-delegated.text"
-              defaultMessage="{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
-              values={{
-                senderName: <b>{senderName}</b>,
-                senderEmail: <b>{senderEmail}</b>,
-                petitionOwnerFullName: <b>{petitionOwnerFullName}</b>,
-                petitionOwnerEmail: <b>{petitionOwnerEmail}</b>,
-              }}
-            />
-          </MjmlText>
+        <MjmlSection padding="0">
+          <MjmlColumn>
+            <MjmlText>
+              <FormattedMessage
+                id="access-delegated.text"
+                defaultMessage="{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
+                values={{
+                  senderName: <b>{senderName}</b>,
+                  senderEmail: <b>{senderEmail}</b>,
+                  petitionOwnerFullName: <b>{petitionOwnerFullName}</b>,
+                  petitionOwnerEmail: <b>{petitionOwnerEmail}</b>,
+                }}
+              />
+            </MjmlText>
+          </MjmlColumn>
         </MjmlSection>
 
         <UserMessageBox dangerouslySetInnerHTML={bodyHtml} />
 
-        <MjmlSection paddingTop="10px">
+        <MjmlSection>
           <MjmlColumn>
             {deadline ? (
               <MjmlText>
