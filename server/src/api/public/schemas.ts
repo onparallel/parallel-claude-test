@@ -1181,10 +1181,6 @@ export const PetitionEvent = schema({
           type: "string",
           description: "If reason is OTHER, this will be the explanation added by the contact",
         },
-        referer: {
-          description: "Identifies the previous page",
-          type: ["string", "null"],
-        },
       },
     },
     ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
