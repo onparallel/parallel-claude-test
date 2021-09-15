@@ -19,8 +19,20 @@ export async function getRequiredPetitionSendCredits(
     await ctx.contacts.loadContact(uniq(currentAccesses.map((a) => a.contact_id)))
   ).filter(isDefined);
 
-  // count credits if the context user is the only one with previous access to this petition (or nobody has access yet)
-  if (currentContacts.every((c) => c.email === user.email)) {
+  if (currentContacts.length > 0 && contactIdGroups.length !== 1) {
+    // we don't support this case for now, throw error to avoid possible future bugs
+    throw new Error("UNSUPPORTED_USE_CASE");
+  }
+
+  /* 
+    count required credits only if the petition:
+      - has not been sent to anyone yet; or
+      - has been sent only to the logged user email 
+  */
+  if (
+    currentContacts.length === 0 ||
+    (currentContacts.length === 1 && currentContacts[0].email === user.email)
+  ) {
     for (const group of contactIdGroups) {
       const contactGroup = newContacts.filter(
         (c) => isDefined(c) && group.includes(c.id)
