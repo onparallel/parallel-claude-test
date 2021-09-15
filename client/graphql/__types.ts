@@ -3387,6 +3387,7 @@ export type UserMenu_UserFragment = {
   __typename?: "User";
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  email: string;
   fullName?: Maybe<string>;
   avatarUrl?: Maybe<string>;
   initials?: Maybe<string>;
@@ -12833,9 +12834,9 @@ export type Account_UserFragment = {
   firstName?: Maybe<string>;
   lastName?: Maybe<string>;
   isSsoUser: boolean;
+  email: string;
   id: string;
   fullName?: Maybe<string>;
-  email: string;
   createdAt: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
@@ -12877,8 +12878,8 @@ export type AccountQuery = {
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     isSsoUser: boolean;
-    fullName?: Maybe<string>;
     email: string;
+    fullName?: Maybe<string>;
     createdAt: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
@@ -14589,6 +14590,7 @@ export const UserMenu_UserFragmentDoc = gql`
   fragment UserMenu_User on User {
     isSuperAdmin
     role
+    email
     ...UserAvatar_User
   }
   ${UserAvatar_UserFragmentDoc}
@@ -16246,6 +16248,7 @@ export const Account_UserFragmentDoc = gql`
     firstName
     lastName
     isSsoUser
+    email
     ...SettingsLayout_User
     ...useSettingsSections_User
   }

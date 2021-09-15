@@ -5,12 +5,15 @@ import {
   MenuButton,
   MenuDivider,
   MenuItem,
-  MenuItemOption,
   MenuList,
-  MenuOptionGroup,
   Portal,
   useBreakpointValue,
   UsePopperProps,
+  HStack,
+  Text,
+  MenuOptionGroup,
+  MenuItemOption,
+  Stack,
 } from "@chakra-ui/react";
 import {
   BellIcon,
@@ -33,11 +36,11 @@ import { UserAvatar } from "../common/UserAvatar";
 export interface UserMenuProps {
   placement?: UsePopperProps["placement"];
   user: UserMenu_UserFragment;
-  onLocaleChange?: (locale: string) => void;
   onHelpCenterClick: () => void;
+  onLocaleChange?: (locale: string) => void;
 }
 
-export function UserMenu({ placement, user, onLocaleChange, onHelpCenterClick }: UserMenuProps) {
+export function UserMenu({ placement, user, onHelpCenterClick, onLocaleChange }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -45,6 +48,7 @@ export function UserMenu({ placement, user, onLocaleChange, onHelpCenterClick }:
     window.location.href = `/api/auth/logout`;
   }
   const locales = useSupportedLocales();
+
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { onOpen: onOpenNotifications } = useNotificationsState();
 
@@ -65,6 +69,20 @@ export function UserMenu({ placement, user, onLocaleChange, onHelpCenterClick }:
       </MenuButton>
       <Portal>
         <MenuList>
+          <HStack paddingX={3.5} paddingY={1}>
+            <UserAvatar user={user} size="sm" />
+            <Stack spacing={0}>
+              <Text as="div" fontWeight="semibold">
+                {user.fullName}
+              </Text>
+              <Text as="div" color="gray.600" fontSize="sm">
+                {user.email}
+              </Text>
+            </Stack>
+          </HStack>
+
+          <MenuDivider />
+
           {isMobile ? (
             <MenuItem onClick={onOpenNotifications} icon={<BellIcon display="block" boxSize={4} />}>
               <FormattedMessage
@@ -106,7 +124,6 @@ export function UserMenu({ placement, user, onLocaleChange, onHelpCenterClick }:
             ))}
           </MenuOptionGroup>
           <MenuDivider />
-
           {isMobile ? (
             <MenuItem
               icon={<HelpOutlineIcon display="block" boxSize={4} />}
@@ -145,6 +162,7 @@ UserMenu.fragments = {
     fragment UserMenu_User on User {
       isSuperAdmin
       role
+      email
       ...UserAvatar_User
     }
     ${UserAvatar.fragments.User}
