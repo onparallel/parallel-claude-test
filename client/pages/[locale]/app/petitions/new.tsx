@@ -50,7 +50,7 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { boolean, parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 
@@ -165,6 +165,12 @@ function NewPetition() {
     },
     [goToPetition, createPetition]
   );
+
+  useEffect(() => {
+    if (!hasTemplates) {
+      handleTabChange(1);
+    }
+  }, []);
 
   const selectTabStyles = {
     color: "blue.600",
