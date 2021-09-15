@@ -185,7 +185,10 @@ function _PetitionSettings({
 
         const _ownerId = petition.owner.id ?? "";
 
-        const publicLinkSettings = await publicLinkSettingDialog({ ownerId: _ownerId });
+        const publicLinkSettings = await publicLinkSettingDialog({
+          ownerId: _ownerId,
+          locale: petition.locale,
+        });
 
         const { title, description, ownerId, otherPermissions } = publicLinkSettings;
         const { data } = await createPublicPetitionLink({
@@ -207,6 +210,7 @@ function _PetitionSettings({
     try {
       const publicLinkSettings = await publicLinkSettingDialog({
         publicLink: publicLink as PublicLinkSettingsDialog_PublicPetitionLinkFragment,
+        locale: petition.locale,
       });
 
       const { title, description, ownerId, otherPermissions } = publicLinkSettings;

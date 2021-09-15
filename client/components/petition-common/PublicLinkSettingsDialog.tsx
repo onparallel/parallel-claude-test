@@ -8,6 +8,8 @@ import {
   Stack,
   Text,
   Textarea,
+  InputGroup,
+  InputLeftAddon,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
@@ -25,15 +27,21 @@ interface PublicLinkSettingsData {
   title: string;
   description: string;
   ownerId: string;
+  link: string;
   otherPermissions: UserOrUserGroupPublicLinkPermission[];
 }
 
 export function PublicLinkSettingsDialog({
   publicLink,
   ownerId,
+  locale,
   ...props
 }: DialogProps<
-  { ownerId?: string; publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment },
+  {
+    publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment;
+    ownerId?: string;
+    locale: string;
+  },
   PublicLinkSettingsData
 >) {
   const owner = publicLink?.linkPermissions.find((p) => p.permissionType === "OWNER");
@@ -247,6 +255,24 @@ export function PublicLinkSettingsDialog({
                 />
               )}
             />
+          </FormControl>
+          <FormControl>
+            <FormLabel>
+              <FormattedMessage
+                id="component.settings-public-link-dialog.link-label"
+                defaultMessage="Link:"
+              />
+            </FormLabel>
+            <InputGroup>
+              <InputLeftAddon>{`${process.env.NEXT_PUBLIC_PARALLEL_URL}/${locale}/pp/`}</InputLeftAddon>
+              <Input type="text" placeholder="" />
+            </InputGroup>
+            <FormErrorMessage>
+              <FormattedMessage
+                id="component.settings-public-link-dialog.link-error"
+                defaultMessage="Link is taken"
+              />
+            </FormErrorMessage>
           </FormControl>
         </Stack>
       }
