@@ -1349,6 +1349,8 @@ export interface Petition extends PetitionBase {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
+  /** The template GID used for this petition */
+  fromTemplateId?: Maybe<Scalars["ID"]>;
   /** Whether comments are enabled or not. */
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
@@ -13608,6 +13610,7 @@ export type PetitionPdf_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   name?: Maybe<string>;
+  fromTemplateId?: Maybe<string>;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -13661,6 +13664,7 @@ export type PdfViewPetitionQuery = {
     __typename?: "Petition";
     id: string;
     name?: Maybe<string>;
+    fromTemplateId?: Maybe<string>;
     fields: Array<{
       __typename?: "PetitionField";
       id: string;
@@ -16712,6 +16716,7 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
       name
       logoUrl
     }
+    fromTemplateId
     currentSignatureRequest(token: $token) {
       signatureConfig {
         contacts {

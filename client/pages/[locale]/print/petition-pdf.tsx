@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Flex, Heading, Image, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Image, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PdfFieldWithReplies } from "@parallel/components/print/PdfFieldWithReplies";
@@ -38,6 +38,7 @@ function PetitionPdf({ token }: { token: string }) {
   const {
     organization: { name: orgName, logoUrl: orgLogo },
     currentSignatureRequest,
+    fromTemplateId,
   } = petition;
 
   const contacts = currentSignatureRequest?.signatureConfig.contacts;
@@ -72,11 +73,13 @@ function PetitionPdf({ token }: { token: string }) {
             pageNum === pages.length - 1 &&
             (contacts ?? []).length > 0 && (
               <Box sx={{ pageBreakInside: "avoid" }}>
-                <SignatureDisclaimer
-                  textAlign="center"
-                  margin="15mm 4mm 5mm 4mm"
-                  fontStyle="italic"
-                />
+                <Text textAlign="center" margin="15mm 4mm 5mm 4mm" fontStyle="italic">
+                  <FormattedMessage
+                    id="petition.print-pdf.signatures-disclaimer"
+                    defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
+                  />
+                </Text>
+                {fromTemplateId ? <HardcodedSignatures fromTemplateId={fromTemplateId} /> : null}
                 <Flex
                   sx={{
                     display: "grid",
@@ -106,17 +109,6 @@ function PetitionPdf({ token }: { token: string }) {
   );
 }
 
-function SignatureDisclaimer(props: BoxProps) {
-  return (
-    <Text {...props}>
-      <FormattedMessage
-        id="petition.print-pdf.signatures-disclaimer"
-        defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
-      />
-    </Text>
-  );
-}
-
 PetitionPdf.fragments = {
   get Petition() {
     return gql`
@@ -130,6 +122,7 @@ PetitionPdf.fragments = {
           name
           logoUrl
         }
+        fromTemplateId
         currentSignatureRequest(token: $token) {
           signatureConfig {
             contacts {
@@ -163,6 +156,43 @@ PetitionPdf.fragments = {
     `;
   },
 };
+
+type HardcodedSigner = {
+  name: string;
+  imgSrc: string;
+};
+function HardcodedSignatures({ fromTemplateId }: { fromTemplateId: string }) {
+  /* hardcoded signature image for eXp. see https://app.shortcut.com/parallelso/story/1677 */
+  const renataSujto: HardcodedSigner = {
+    name: "Renata Sujto",
+    imgSrc: "static/images/signatures/renata-sujto-exp.jpeg",
+  };
+  const signaturesByTemplateId: Record<string, HardcodedSigner[]> = {
+    EAwW2jXkP4C9LZvEb2: [renataSujto],
+    EAwW2jXkP4C9LZvEb3: [renataSujto],
+  };
+  return process.env.NODE_ENV === "production" &&
+    (signaturesByTemplateId[fromTemplateId] ?? []).length > 0 ? (
+    <Flex
+      marginBottom="10px"
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gridAutoRows: "minmax(150px, auto)",
+        alignItems: "center",
+        justifyItems: "center",
+        width: "100%",
+      }}
+    >
+      {signaturesByTemplateId[fromTemplateId].map((signer, index) => (
+        <Box key={index}>
+          <Image height="35mm" src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/${signer.imgSrc}`} />
+          <Text textAlign="center">{signer.name}</Text>
+        </Box>
+      ))}
+    </Flex>
+  ) : null;
+}
 
 PetitionPdf.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const token = decodeURIComponent(query.token as string);

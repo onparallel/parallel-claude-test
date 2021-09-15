@@ -249,6 +249,12 @@ export const Petition = objectType({
         return await ctx.subscriptions.loadSubscriptionsByPetitionId(root.id);
       },
     });
+    t.nullable.field("fromTemplateId", {
+      type: "ID",
+      description: "The template GID used for this petition",
+      resolve: (root) =>
+        root.from_template_id ? toGlobalId("Petition", root.from_template_id) : null,
+    });
   },
 });
 

@@ -1547,6 +1547,11 @@ type Petition implements PetitionBase {
   fields: [PetitionField!]!
 
   """
+  The template GID used for this petition
+  """
+  fromTemplateId: ID
+
+  """
   Whether comments are enabled or not.
   """
   hasCommentsEnabled: Boolean!
