@@ -543,7 +543,9 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             border="none"
             padding={0}
             height={6}
-            _placeholder={showError && !title ? { color: "red.500" } : undefined}
+            _placeholder={
+              showError && !title && field.type !== "HEADING" ? { color: "red.500" } : undefined
+            }
             _focus={{ boxShadow: "none" }}
             onChange={(event) => setTitle(event.target.value ?? null)}
             onBlur={() => {
