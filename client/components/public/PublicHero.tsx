@@ -73,10 +73,11 @@ export function PublicHero({
             {subtitle}
           </Heading>
           <HStack
+            flexWrap="wrap-reverse"
             paddingTop={8}
             marginBottom={{ base: 2, [breakpoint]: 0 }}
             marginRight={{ base: 0, [breakpoint]: 2 }}
-            spacing={4}
+            gridGap={3}
           >
             <NakedLink href={url}>
               <Button as="a" size="lg" variant="outline">
