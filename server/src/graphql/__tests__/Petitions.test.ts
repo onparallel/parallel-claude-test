@@ -2135,7 +2135,7 @@ describe("GraphQL/Petitions", () => {
     let usageLimit: OrganizationUsageLimit;
     let contacts: Contact[];
     beforeAll(async () => {
-      contacts = await mocks.createRandomContacts(organization.id, 2, (i) => ({
+      contacts = await mocks.createRandomContacts(organization.id, 3, (i) => ({
         email: i === 0 ? sessionUser.email : internet.email(),
       }));
       usageLimit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 0);
@@ -2308,6 +2308,144 @@ describe("GraphQL/Petitions", () => {
         .select("id", "used", "limit");
 
       expect(organizationCurrentUsageLimit).toEqual([{ id: usageLimit.id, used: 10, limit: 10 }]);
+    });
+
+    it("sending a petition to myself and then to another contact should consume 1 credit in total", async () => {
+      await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
+        used: 0,
+        limit: 1,
+      });
+
+      const { errors: errors1, data: data1 } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contacts[0].id)],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors1).toBeUndefined();
+      expect(data1?.sendPetition).toEqual({ result: "SUCCESS" });
+
+      const firstSendUsageLimits = await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .select("id", "used", "limit");
+
+      expect(firstSendUsageLimits).toEqual([{ id: usageLimit.id, used: 0, limit: 1 }]);
+
+      const { errors: errors2, data: data2 } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contacts[1].id)],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors2).toBeUndefined();
+      expect(data2?.sendPetition).toEqual({ result: "SUCCESS" });
+
+      const secondSendUsageLimits = await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .select("id", "used", "limit");
+
+      expect(secondSendUsageLimits).toEqual([{ id: usageLimit.id, used: 1, limit: 1 }]);
+    });
+
+    it("adding an access to an already sent petition (not to me) should not consume any credits", async () => {
+      await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
+        used: 0,
+        limit: 1,
+      });
+
+      const { errors: errors1, data: data1 } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contacts[1].id)],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors1).toBeUndefined();
+      expect(data1?.sendPetition).toEqual({ result: "SUCCESS" });
+
+      const firstSendUsageLimits = await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .select("id", "used", "limit");
+
+      expect(firstSendUsageLimits).toEqual([{ id: usageLimit.id, used: 1, limit: 1 }]);
+
+      const { errors: errors2, data: data2 } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contacts[2].id)],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors2).toBeUndefined();
+      expect(data2?.sendPetition).toEqual({ result: "SUCCESS" });
+
+      const secondSendUsageLimits = await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .select("id", "used", "limit");
+
+      expect(secondSendUsageLimits).toEqual([{ id: usageLimit.id, used: 1, limit: 1 }]);
     });
 
     it("doing a batch send with only me in a group should reduce the amount of credits needed", async () => {

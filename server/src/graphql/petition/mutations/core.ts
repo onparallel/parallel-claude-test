@@ -992,7 +992,10 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     userHasAccessToPetitions("petitionId"),
     petitionHasRepliableFields("petitionId"),
     userHasAccessToContactGroups("contactIdGroups"),
-    orgHasAvailablePetitionSendCredits((args) => args.contactIdGroups)
+    orgHasAvailablePetitionSendCredits(
+      (args) => args.petitionId,
+      (args) => args.contactIdGroups
+    )
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1111,7 +1114,12 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       ]);
     }
 
-    const usedCredits = await getRequiredPetitionSendCredits(args.contactIdGroups, ctx.user!, ctx);
+    const usedCredits = await getRequiredPetitionSendCredits(
+      args.petitionId,
+      args.contactIdGroups,
+      ctx.user!,
+      ctx
+    );
     if (usedCredits > 0) {
       await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
         ctx.user!.org_id,
@@ -1131,7 +1139,10 @@ export const sendPetition = mutationField("sendPetition", {
     userHasAccessToPetitions("petitionId"),
     userHasAccessToContacts("contactIds"),
     petitionHasRepliableFields("petitionId"),
-    orgHasAvailablePetitionSendCredits((args) => [args.contactIds])
+    orgHasAvailablePetitionSendCredits(
+      (args) => args.petitionId,
+      (args) => [args.contactIds]
+    )
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1182,7 +1193,12 @@ export const sendPetition = mutationField("sendPetition", {
         ]);
       }
     }
-    const usedCredits = await getRequiredPetitionSendCredits([args.contactIds], ctx.user!, ctx);
+    const usedCredits = await getRequiredPetitionSendCredits(
+      args.petitionId,
+      [args.contactIds],
+      ctx.user!,
+      ctx
+    );
     if (usedCredits > 0) {
       await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
         ctx.user!.org_id,
