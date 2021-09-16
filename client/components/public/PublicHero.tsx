@@ -1,14 +1,4 @@
-import {
-  AspectRatio,
-  Box,
-  BoxProps,
-  Button,
-  Center,
-  Flex,
-  Heading,
-  HStack,
-  Stack,
-} from "@chakra-ui/react";
+import { AspectRatio, Box, BoxProps, Button, Center, Flex, Heading, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
 
