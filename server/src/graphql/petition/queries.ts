@@ -144,7 +144,7 @@ export const publicTemplateCategoriesQuery = queryField((t) => {
   });
 });
 
-export const publicTemplatesQuery = queryField((t) => {
+export const templatesQuery = queryField((t) => {
   t.paginationField("templates", {
     type: "PetitionTemplate",
     description: "The available templates",

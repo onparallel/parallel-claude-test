@@ -95,7 +95,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                   return incoming;
                 } else {
                   return {
-                    items: uniqBy([...incoming.items, ...existing.items], (obj) =>
+                    items: uniqBy([...existing.items, ...incoming.items], (obj) =>
                       readField("id", obj)
                     ),
                     totalCount: incoming.totalCount,
