@@ -1787,30 +1787,26 @@ export class PetitionRepository extends BaseRepository {
     >(
       async (ids) => {
         const rows = await this.from("petition_field_comment")
-          .where((qb) => {
-            for (const { petitionId, petitionFieldId, loadInternalComments } of ids) {
-              qb = qb.orWhere((qb) => {
-                qb.where({
-                  petition_id: petitionId,
-                  petition_field_id: petitionFieldId,
-                });
-              });
-              if (!loadInternalComments) {
-                qb.andWhere("is_internal", false);
-              }
-            }
-          })
+          .joinRaw(
+            /* sql */ `
+              join (values ${ids.map(() => `(?, ?)`).join(", ")}) as v(p_id, pf_id)
+              on v.p_id::int = petition_id and v.pf_id::int = petition_field_id
+            `,
+            [...ids.flatMap((id) => [id.petitionId, id.petitionFieldId])]
+          )
           .whereNull("deleted_at")
+          .select<PetitionFieldComment[]>("petition_field_comment.*");
 
-          .select("*");
-
-        const byId = groupBy(rows, keyBuilder(["petition_id", "petition_field_id"]));
-        return ids
-          .map(keyBuilder(["petitionId", "petitionFieldId"]))
-          .map((key) => this.sortComments(byId[key] ?? []));
+        const byId = groupBy(rows, (r) => r.petition_field_id);
+        return ids.map((id) => {
+          const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
+          return id.loadInternalComments
+            ? comments
+            : comments.filter((c) => c.is_internal === false);
+        });
       },
       {
-        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId"]),
+        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]),
       }
     )
   );
