@@ -1507,6 +1507,7 @@ export class PetitionRepository extends BaseRepository {
               })),
               t
             ).returning("*"),
+        // copy permissions
         insertUserPermissions
           ? this.insert(
               "petition_permission",
@@ -1523,7 +1524,20 @@ export class PetitionRepository extends BaseRepository {
               t
             )
           : [],
+        // clone tags if source petition is from same org
+        sourcePetition?.org_id === user.org_id
+          ? this.raw(
+              /* sql */ `
+              insert into petition_tag (petition_id, tag_id)
+              select ?, tag_id from petition_tag where petition_id = ?
+            `,
+              [cloned.id, petitionId],
+              t
+            )
+          : [],
       ]);
+
+      // map[old field id] = cloned field id
       const newIds = Object.fromEntries(
         zip(
           fields.map((f) => f.id),
@@ -1532,9 +1546,11 @@ export class PetitionRepository extends BaseRepository {
       );
 
       const toUpdate = clonedFields.filter((f) => f.visibility);
-      if (toUpdate.length > 0) {
-        await this.raw<PetitionField>(
-          /* sql */ `
+      await Promise.all([
+        // update visibility conditions on cloned fields
+        toUpdate.length > 0
+          ? this.raw<PetitionField>(
+              /* sql */ `
             update petition_field as pf set
               visibility = t.visibility
             from (
@@ -1543,61 +1559,50 @@ export class PetitionRepository extends BaseRepository {
             where t.id = pf.id
             returning *;
           `,
-          toUpdate.flatMap((field) => {
-            const visibility = field.visibility as PetitionFieldVisibility;
-            return [
-              field.id,
-              JSON.stringify({
-                ...visibility,
-                conditions: visibility.conditions.map((condition) => ({
-                  ...condition,
-                  fieldId: newIds[condition.fieldId],
-                })),
+              toUpdate.flatMap((field) => {
+                const visibility = field.visibility as PetitionFieldVisibility;
+                return [
+                  field.id,
+                  JSON.stringify({
+                    ...visibility,
+                    conditions: visibility.conditions.map((condition) => ({
+                      ...condition,
+                      fieldId: newIds[condition.fieldId],
+                    })),
+                  }),
+                ];
               }),
-            ];
-          }),
-          t
-        );
-      }
-
-      if (sourcePetition?.org_id === user.org_id) {
-        // copy original tag ids to cloned petition
-        if (!sourcePetition!.is_template) {
-          await this.raw(
-            /* sql */ `
-        insert into petition_tag (petition_id, tag_id)
-        select ?, tag_id from petition_tag where petition_id = ?
-      `,
-            [cloned.id, petitionId],
-            t
-          );
-        }
-
+              t
+            )
+          : [],
         // copy field attachments to new fields, using the original file_upload_id
-        if (fields.length > 0) {
-          await this.raw(
-            /* sql */ `
+        fields.length > 0
+          ? this.raw(
+              /* sql */ `
             with
-              pfa as (select petition_field_id, file_upload_id from petition_field_attachment where deleted_at is null and petition_field_id in (${fields
-                .map(() => "?")
-                .join(",")})),
+              pfa as (
+                select petition_field_id, file_upload_id
+                from petition_field_attachment
+                where deleted_at is null
+                  and petition_field_id in (${fields.map(() => "?").join(",")})),
               new_id_map as (
-                select petition_field_id, new_petition_field_id from (
+                select petition_field_id, new_petition_field_id
+                from (
                   values ${fields.map(() => "(?::int, ?::int)").join(",")}
                 ) as t(petition_field_id, new_petition_field_id)
               )
             insert into petition_field_attachment (petition_field_id, file_upload_id, created_by)
             select new_id_map.new_petition_field_id, pfa.file_upload_id, ? from pfa join new_id_map on pfa.petition_field_id = new_id_map.petition_field_id
           `,
-            [
-              ...fields.map((f) => f.id),
-              ...fields.flatMap((f) => [f.id, newIds[f.id]]),
-              `User:${user.id}`,
-            ],
-            t
-          );
-        }
-      }
+              [
+                ...fields.map((f) => f.id),
+                ...fields.flatMap((f) => [f.id, newIds[f.id]]),
+                `User:${user.id}`,
+              ],
+              t
+            )
+          : [],
+      ]);
 
       return cloned;
     }, t);
