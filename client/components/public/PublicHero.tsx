@@ -72,12 +72,12 @@ export function PublicHero({
           <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="150%">
             {subtitle}
           </Heading>
-          <HStack
-            flexWrap="wrap-reverse"
+          <Stack
+            direction={{ base: "column-reverse", sm: "row" }}
+            spacing={3}
             paddingTop={8}
             marginBottom={{ base: 2, [breakpoint]: 0 }}
             marginRight={{ base: 0, [breakpoint]: 2 }}
-            gridGap={3}
           >
             <NakedLink href={url}>
               <Button as="a" size="lg" variant="outline">
@@ -89,7 +89,7 @@ export function PublicHero({
                 <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
               </Button>
             </NakedLink>
-          </HStack>
+          </Stack>
         </Flex>
       </Center>
       <AspectRatio
