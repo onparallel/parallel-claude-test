@@ -377,7 +377,6 @@ export type CreateFileUpload = PartialProps<
 export interface Organization {
   id: number; // int4
   name: string; // varchar
-  identifier: Maybe<string>; // varchar
   status: OrganizationStatus; // organization_status
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
@@ -393,7 +392,6 @@ export interface Organization {
 
 export type CreateOrganization = PartialProps<
   Omit<Organization, "id">,
-  | "identifier"
   | "created_at"
   | "created_by"
   | "updated_at"
