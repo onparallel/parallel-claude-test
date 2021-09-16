@@ -391,14 +391,13 @@ function PetitionRepliesFieldAttachments({
           paddingBottom={1}
           display="flex"
           flexWrap="wrap"
-          margin={-1}
+          gridGap={2}
         >
           {attachments.map((attachment) => (
             <PetitionRepliesFieldAttachment
               key={attachment.id}
               attachment={attachment}
               onClick={() => onAttachmentClick(attachment.id)}
-              margin={1}
             />
           ))}
         </AccordionPanel>

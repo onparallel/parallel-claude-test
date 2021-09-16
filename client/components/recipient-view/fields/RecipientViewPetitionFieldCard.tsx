@@ -110,12 +110,11 @@ export function RecipientViewPetitionFieldCard({
         </Text>
       ) : null}
       {field.attachments.length ? (
-        <Flex flexWrap="wrap" margin={-1} marginBottom={1}>
+        <Flex flexWrap="wrap" gridGap={2} marginBottom={1}>
           {field.attachments.map((attachment) => (
             <RecipientViewFieldAttachment
               key={attachment.id}
               attachment={attachment}
-              margin={1}
               onClick={() => onDownloadAttachment(attachment.id)}
             />
           ))}

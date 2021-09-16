@@ -689,7 +689,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       )}
       {field.attachments.length ? (
         <Box>
-          <Flex flexWrap="wrap" margin={-1}>
+          <Flex flexWrap="wrap" gridGap={2}>
             {field.attachments.map((attachment) => (
               <PetitionComposeFieldAttachment
                 key={attachment.id}
@@ -698,7 +698,6 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                 progress={attachmentUploadProgress[attachment.id]}
                 onDownload={() => onDownloadAttachment(attachment.id)}
                 onRemove={() => onRemoveAttachment(attachment.id)}
-                margin={1}
               />
             ))}
           </Flex>

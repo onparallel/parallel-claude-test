@@ -25,12 +25,11 @@ export function RecipientViewPetitionFieldHeading({
       ) : null}
       {field.attachments.length ? (
         <Box>
-          <Flex flexWrap="wrap" margin={-1}>
+          <Flex flexWrap="wrap" gridGap={2}>
             {field.attachments.map((attachment) => (
               <RecipientViewFieldAttachment
                 key={attachment.id}
                 attachment={attachment}
-                margin={1}
                 onClick={() => onDownloadAttachment(attachment.id)}
               />
             ))}
