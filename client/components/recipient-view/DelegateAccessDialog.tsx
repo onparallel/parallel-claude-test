@@ -113,7 +113,7 @@ function DelegateAccessDialog({
       }
       body={
         <Stack>
-          <Box fontSize="sm" fontStyle="italic">
+          <Box fontSize="sm">
             <Text>
               <FormattedMessage
                 id="recipient-view.invite-collaborator-dialog.subtitle-1"
