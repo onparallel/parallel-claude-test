@@ -188,6 +188,7 @@ function _PetitionSettings({
         const publicLinkSettings = await publicLinkSettingDialog({
           ownerId: _ownerId,
           locale: petition.locale,
+          petitionName: petition.name ?? "",
         });
 
         const { title, description, ownerId, otherPermissions } = publicLinkSettings;
@@ -211,6 +212,7 @@ function _PetitionSettings({
       const publicLinkSettings = await publicLinkSettingDialog({
         publicLink: publicLink as PublicLinkSettingsDialog_PublicPetitionLinkFragment,
         locale: petition.locale,
+        petitionName: petition.name ?? "",
       });
 
       const { title, description, ownerId, otherPermissions } = publicLinkSettings;
@@ -442,6 +444,7 @@ const fragments = {
       skipForwardSecurity
       isRecipientViewContentsHidden
       isReadOnly
+      name
       owner {
         id
       }

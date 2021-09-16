@@ -1,16 +1,20 @@
 import { gql } from "@apollo/client";
 import {
+  Alert,
+  AlertIcon,
   Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
+  InputGroup,
+  InputLeftAddon,
   Stack,
   Text,
   Textarea,
-  InputGroup,
-  InputLeftAddon,
+  InputRightElement,
 } from "@chakra-ui/react";
+import { CheckIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
@@ -28,6 +32,7 @@ interface PublicLinkSettingsData {
   description: string;
   ownerId: string;
   link: string;
+  petitionName: string;
   otherPermissions: UserOrUserGroupPublicLinkPermission[];
 }
 
@@ -35,12 +40,14 @@ export function PublicLinkSettingsDialog({
   publicLink,
   ownerId,
   locale,
+  petitionName,
   ...props
 }: DialogProps<
   {
     publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment;
     ownerId?: string;
     locale: string;
+    petitionName: string;
   },
   PublicLinkSettingsData
 >) {
@@ -51,12 +58,13 @@ export function PublicLinkSettingsDialog({
     register,
     watch,
     control,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, dirtyFields },
   } = useForm<PublicLinkSettingsData>({
     mode: "onChange",
     defaultValues: {
       title: publicLink?.title ?? "",
       description: publicLink?.description ?? "",
+      link: publicLink?.slug ?? (petitionName || "random"),
       ownerId:
         owner?.__typename === "PublicPetitionLinkUserPermission" ? owner.user.id : ownerId ?? "",
       otherPermissions:
@@ -131,6 +139,23 @@ export function PublicLinkSettingsDialog({
       }
       body={
         <Stack>
+          {publicLink && dirtyFields.link === true ? (
+            <Alert status="warning" rounded="md">
+              <AlertIcon color="yellow.500" />
+              <Stack>
+                <Text>
+                  <FormattedMessage
+                    id="component.settings-public-link-dialog.link-edited-alert"
+                    defaultMessage="The link has been edited, if you save, you will no longer be able to access the request through the old link:"
+                  />
+                </Text>
+                <Text as="b">
+                  {`${process.env.NEXT_PUBLIC_PARALLEL_URL}/${locale}/pp/${publicLink?.slug}`}
+                </Text>
+              </Stack>
+            </Alert>
+          ) : null}
+
           <Text>
             <FormattedMessage
               id="component.settings-public-link-dialog.description"
@@ -265,12 +290,15 @@ export function PublicLinkSettingsDialog({
             </FormLabel>
             <InputGroup>
               <InputLeftAddon>{`${process.env.NEXT_PUBLIC_PARALLEL_URL}/${locale}/pp/`}</InputLeftAddon>
-              <Input type="text" placeholder="" />
+              <Input type="text" {...register("link", { required: true })} />
+              <InputRightElement>
+                <CheckIcon color="green.500" />
+              </InputRightElement>
             </InputGroup>
             <FormErrorMessage>
               <FormattedMessage
                 id="component.settings-public-link-dialog.link-error"
-                defaultMessage="Link is taken"
+                defaultMessage="The link is in use or contains banned words"
               />
             </FormErrorMessage>
           </FormControl>

@@ -16592,6 +16592,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     skipForwardSecurity
     isRecipientViewContentsHidden
     isReadOnly
+    name
     owner {
       id
     }

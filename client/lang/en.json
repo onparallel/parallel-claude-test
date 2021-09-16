@@ -2480,6 +2480,21 @@
     "context": "Generate link"
   },
   {
+    "term": "component.settings-public-link-dialog.link-edited-alert",
+    "definition": "The link has been edited, if you save, you will no longer be able to access the request through the old link:",
+    "context": "The link has been edited, if you save, you will no longer be able to access the request through the old link:"
+  },
+  {
+    "term": "component.settings-public-link-dialog.link-error",
+    "definition": "The link is in use or contains banned words",
+    "context": "The link is in use or contains banned words"
+  },
+  {
+    "term": "component.settings-public-link-dialog.link-label",
+    "definition": "Link:",
+    "context": "Link:"
+  },
+  {
     "term": "component.settings-public-link-dialog.owner-label",
     "definition": "Owner:",
     "context": "Owner:"
