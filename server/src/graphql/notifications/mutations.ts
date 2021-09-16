@@ -1,5 +1,7 @@
 import { booleanArg, list, mutationField, nonNull } from "@nexus/schema";
 import { outdent } from "outdent";
+import { sortBy } from "remeda";
+import { PetitionUserNotification } from "../../db/notifications";
 import { xorDefined } from "../../util/remedaExtensions";
 import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -61,31 +63,33 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
       { petitionUserNotificationIds, petitionIds, petitionFieldCommentIds, filter, isRead },
       ctx
     ) => {
+      let notifications: PetitionUserNotification<false>[] = [];
       if (petitionUserNotificationIds) {
-        return await ctx.petitions.updatePetitionUserNotificationsReadStatus(
+        notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatus(
           petitionUserNotificationIds,
           isRead,
           ctx.user!.id
         );
       } else if (petitionIds) {
-        return await ctx.petitions.updatePetitionUserNotificationsReadStatusByPetitionId(
+        notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByPetitionId(
           petitionIds,
           isRead,
           ctx.user!.id
         );
       } else if (petitionFieldCommentIds) {
-        return await ctx.petitions.updatePetitionUserNotificationsReadStatusByCommentIds(
+        notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByCommentIds(
           petitionFieldCommentIds,
           isRead,
           ctx.user!.id
         );
       } else {
-        return await ctx.petitions.updatePetitionUserNotificationsReadStatusByUserId(
+        notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByUserId(
           filter!,
           isRead,
           ctx.user!.id
         );
       }
+      return sortBy(notifications, [(n) => n.created_at, "desc"]);
     },
   }
 );
