@@ -1580,20 +1580,26 @@ export class PetitionRepository extends BaseRepository {
         }
 
         // copy field attachments to new fields, using the original file_upload_id
-        // TODO maybe this can be done in just one query
-        const attachments = await this.from("petition_field_attachment", t)
-          .whereNull("deleted_at")
-          .whereIn("petition_field_id", uniq(fields.map((f) => f.id)))
-          .select("*");
-
-        if (attachments.length > 0) {
-          await this.insert(
-            "petition_field_attachment",
-            attachments.map((a) => ({
-              file_upload_id: a.file_upload_id,
-              petition_field_id: newIds[a.petition_field_id],
-              created_by: `User:${user.id}`,
-            })),
+        if (fields.length > 0) {
+          await this.raw(
+            /* sql */ `
+            with
+              pfa as (select petition_field_id, file_upload_id from petition_field_attachment where deleted_at is null and petition_field_id in (${fields
+                .map(() => "?")
+                .join(",")})),
+              new_id_map as (
+                select petition_field_id, new_petition_field_id from (
+                  values ${fields.map(() => "(?::int, ?::int)").join(",")}
+                ) as t(petition_field_id, new_petition_field_id)
+              )
+            insert into petition_field_attachment (petition_field_id, file_upload_id, created_by)
+            select new_id_map.new_petition_field_id, pfa.file_upload_id, ? from pfa join new_id_map on pfa.petition_field_id = new_id_map.petition_field_id
+          `,
+            [
+              ...fields.map((f) => f.id),
+              ...fields.flatMap((f) => [f.id, newIds[f.id]]),
+              `User:${user.id}`,
+            ],
             t
           );
         }
