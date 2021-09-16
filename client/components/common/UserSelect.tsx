@@ -1,5 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Box, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   useGetUsersOrGroupsQuery,
@@ -8,7 +8,9 @@ import {
   UserSelect_UserGroupFragment,
   useSearchUsers_searchUsersQuery,
   useSearchUsers_searchUsersQueryVariables,
+  useUserSelect_canCreateUsersQuery,
 } from "@parallel/graphql/__types";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
@@ -25,7 +27,8 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { components } from "react-select";
 import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
 import { indexBy, zip } from "remeda";
-import { NormalLink } from "./Link";
+import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
+import { Link, NakedLink } from "./Link";
 import { UserListPopover } from "./UserListPopover";
 
 export type UserSelectSelection<IncludeGroups extends boolean = false> =
@@ -61,6 +64,16 @@ const fragments = {
       ${this.User}
     `;
   },
+};
+
+const queries = {
+  canCreateUsers: gql`
+    query UserSelect_canCreateUsers {
+      me {
+        canCreateUsers
+      }
+    }
+  `,
 };
 
 interface UserSelectProps<IsMulti extends boolean = false, IncludeGroups extends boolean = false>
@@ -122,7 +135,14 @@ export const UserSelect = Object.assign(
       [onSearch, _value]
     );
 
-    const reactSelectProps = useUserSelectReactSelectProps<IsMulti, IncludeGroups>(props);
+    const {
+      data: { me },
+    } = useAssertQueryOrPreviousData(useUserSelect_canCreateUsersQuery());
+
+    const reactSelectProps = useUserSelectReactSelectProps<IsMulti, IncludeGroups>({
+      ...props,
+      canCreateUsers: me.canCreateUsers,
+    });
 
     return (
       <AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>
@@ -138,7 +158,7 @@ export const UserSelect = Object.assign(
     props: UserSelectProps<IsMulti, IncludeGroups> &
       RefAttributes<UserSelectInstance<IsMulti, IncludeGroups>>
   ) => ReactElement | null,
-  { fragments }
+  { fragments, queries }
 );
 
 type AsyncUserSelectProps<
@@ -151,8 +171,10 @@ function useUserSelectReactSelectProps<IsMulti extends boolean, IncludeGroups ex
   ...props
 }: UseReactSelectProps & {
   includeGroups?: IncludeGroups;
+  canCreateUsers?: boolean;
 }): AsyncUserSelectProps<IsMulti, IncludeGroups> {
   const reactSelectProps = useReactSelectProps<UserSelectSelection<IncludeGroups>, IsMulti>(props);
+
   return useMemo<AsyncUserSelectProps<IsMulti, IncludeGroups>>(
     () => ({
       ...reactSelectProps,
@@ -161,31 +183,38 @@ function useUserSelectReactSelectProps<IsMulti extends boolean, IncludeGroups ex
         NoOptionsMessage: memo(({ selectProps }) => {
           const search = selectProps.inputValue;
           return (
-            <Stack alignItems="center" textAlign="center" padding={4}>
+            <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
               {search ? (
                 <>
-                  <Image
-                    width="120px"
-                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_void.svg`}
-                    role="presentation"
-                  />
+                  <EmptySearchTemplatesIcon width="166px" height="77px" />
                   <Text as="strong">
                     <FormattedMessage
                       id="component.user-select.no-options"
                       defaultMessage="Can't find someone?"
                     />
                   </Text>
-                  <Text>
-                    <FormattedMessage
-                      id="component.user-select.no-options-contact-us"
-                      defaultMessage="Contact us via email on <a>support@onparallel.com</a> or the support chat and we will create them an account"
-                      values={{
-                        a: (chunks: any) => (
-                          <NormalLink href={`mailto:${chunks[0]}`}>{chunks}</NormalLink>
-                        ),
-                      }}
-                    />
-                  </Text>
+                  {props.canCreateUsers ? (
+                    <NakedLink href="/app/organization/users?dialog=true">
+                      <Button colorScheme="purple">
+                        <FormattedMessage
+                          id="component.user-select.invite-button"
+                          defaultMessage="Invite people"
+                        />
+                      </Button>
+                    </NakedLink>
+                  ) : (
+                    <Text>
+                      <FormattedMessage
+                        id="component.user-select.no-options-contact-admin"
+                        defaultMessage="Contact with <a>the owner or an admin</a> of your organization to create them an account."
+                        values={{
+                          a: (chunks: any) => (
+                            <Link href={`/app/organization/users`}>{chunks}</Link>
+                          ),
+                        }}
+                      />
+                    </Text>
+                  )}
                 </>
               ) : (
                 <Text as="div" color="gray.400">

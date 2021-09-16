@@ -1528,6 +1528,7 @@ export interface NexusGenFieldTypes {
     // field return type
     authenticationTokens: NexusGenRootTypes["UserAuthenticationTokenPagination"]; // UserAuthenticationTokenPagination!
     avatarUrl: string | null; // String
+    canCreateUsers: boolean; // Boolean!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     email: string; // String!
     firstName: string | null; // String
@@ -2634,6 +2635,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     authenticationTokens: "UserAuthenticationTokenPagination";
     avatarUrl: "String";
+    canCreateUsers: "Boolean";
     createdAt: "DateTime";
     email: "String";
     firstName: "String";

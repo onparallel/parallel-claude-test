@@ -54,6 +54,13 @@ export const User = objectType({
         return org?.status === "ROOT" && ["OWNER", "ADMIN"].includes(o.organization_role);
       },
     });
+    t.boolean("canCreateUsers", {
+      resolve: async (o, _, ctx) => {
+        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(o.org_id);
+        const hasSsoProvider = integrations.some((i) => i.type === "SSO");
+        return ["OWNER", "ADMIN"].includes(o.organization_role) && !hasSsoProvider;
+      },
+    });
     t.boolean("isSsoUser", {
       resolve: (o) => o.is_sso_user,
     });

@@ -2577,6 +2577,7 @@ export type User = Timestamps & {
   authenticationTokens: UserAuthenticationTokenPagination;
   /** URL to the user avatar */
   avatarUrl: Maybe<Scalars["String"]>;
+  canCreateUsers: Scalars["Boolean"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The email of the user. */

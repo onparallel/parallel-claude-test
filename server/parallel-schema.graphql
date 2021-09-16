@@ -3717,6 +3717,7 @@ type User implements Timestamps {
   URL to the user avatar
   """
   avatarUrl: String
+  canCreateUsers: Boolean!
 
   """
   Time when the resource was created.

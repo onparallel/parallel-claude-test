@@ -207,6 +207,7 @@ export const AppLayout = Object.assign(
           lastName
           email
           createdAt
+          canCreateUsers
           ...AppLayoutNavbar_User
         }
         ${AppLayoutNavbar.fragments.User}

@@ -2695,14 +2695,19 @@
     "context": "{count, plural, =1 {1 member} other {# members}}"
   },
   {
+    "term": "component.user-select.invite-button",
+    "definition": "Invite people",
+    "context": "Invite people"
+  },
+  {
     "term": "component.user-select.no-options",
     "definition": "Can't find someone?",
     "context": "Can't find someone?"
   },
   {
-    "term": "component.user-select.no-options-contact-us",
-    "definition": "Contact us via email on <a>support@onparallel.com</a> or the support chat and we will create them an account",
-    "context": "Contact us via email on <a>support@onparallel.com</a> or the support chat and we will create them an account"
+    "term": "component.user-select.no-options-contact-admin",
+    "definition": "Contact with <a>the owner or an admin</a> of your organization to create them an account.",
+    "context": "Contact with <a>the owner or an admin</a> of your organization to create them an account."
   },
   {
     "term": "component.user-select.search-hint",

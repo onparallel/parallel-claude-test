@@ -2683,6 +2683,7 @@ export interface User extends Timestamps {
   authenticationTokens: UserAuthenticationTokenPagination;
   /** URL to the user avatar */
   avatarUrl?: Maybe<Scalars["String"]>;
+  canCreateUsers: Scalars["Boolean"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
@@ -3126,6 +3127,12 @@ export type UserSelect_UserGroupFragment = {
   }>;
 };
 
+export type UserSelect_canCreateUsersQueryVariables = Exact<{ [key: string]: never }>;
+
+export type UserSelect_canCreateUsersQuery = {
+  me: { __typename?: "User"; canCreateUsers: boolean };
+};
+
 export type useSearchUsers_searchUsersQueryVariables = Exact<{
   search: Scalars["String"];
   excludeUsers?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
@@ -3202,6 +3209,7 @@ export type AppLayout_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -3340,6 +3348,7 @@ export type PetitionLayout_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -3375,6 +3384,7 @@ export type SettingsLayout_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -7785,6 +7795,7 @@ export type Admin_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -7810,6 +7821,7 @@ export type AdminQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -7848,6 +7860,7 @@ export type AdminOrganizations_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -7902,6 +7915,7 @@ export type AdminOrganizationsUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -7925,6 +7939,7 @@ export type AdminSupportMethods_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -7950,6 +7965,7 @@ export type AdminSupportMethodsUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8115,6 +8131,7 @@ export type Contact_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8157,6 +8174,7 @@ export type ContactUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8255,6 +8273,7 @@ export type Contacts_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8309,6 +8328,7 @@ export type ContactsUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8350,6 +8370,7 @@ export type OrganizationBrandingQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8395,6 +8416,7 @@ export type OrganizationGroup_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8526,6 +8548,7 @@ export type OrganizationGroupUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
@@ -8586,6 +8609,7 @@ export type OrganizationGroups_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8696,6 +8720,7 @@ export type OrganizationGroupsUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
@@ -8721,6 +8746,7 @@ export type OrganizationSettingsQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8747,6 +8773,7 @@ export type OrganizationUsageQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8850,6 +8877,7 @@ export type OrganizationUsersQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
@@ -9499,6 +9527,7 @@ export type PetitionActivity_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -10887,6 +10916,7 @@ export type PetitionActivityUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -11088,6 +11118,7 @@ export type PetitionCompose_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -11668,6 +11699,7 @@ export type PetitionComposeUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -12026,6 +12058,7 @@ export type PetitionReplies_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -12287,6 +12320,7 @@ export type PetitionRepliesUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -12613,6 +12647,7 @@ export type Petitions_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -12639,6 +12674,7 @@ export type PetitionsUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -12777,6 +12813,7 @@ export type NewPetition_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -12835,6 +12872,7 @@ export type NewPetitionUserQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -12900,6 +12938,7 @@ export type Account_UserFragment = {
   id: string;
   fullName?: Maybe<string>;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -12943,6 +12982,7 @@ export type AccountQuery = {
     email: string;
     fullName?: Maybe<string>;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -12967,6 +13007,7 @@ export type Settings_UserFragment = {
   lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -12993,6 +13034,7 @@ export type SettingsQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -13028,6 +13070,7 @@ export type SecurityQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -13074,6 +13117,7 @@ export type TokensQuery = {
     lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -14690,6 +14734,7 @@ export const AppLayout_UserFragmentDoc = gql`
     lastName
     email
     createdAt
+    canCreateUsers
     ...AppLayoutNavbar_User
   }
   ${AppLayoutNavbar_UserFragmentDoc}
@@ -16902,6 +16947,43 @@ export function useTagEditDialog_updateTagMutation(
 }
 export type TagEditDialog_updateTagMutationHookResult = ReturnType<
   typeof useTagEditDialog_updateTagMutation
+>;
+export const UserSelect_canCreateUsersDocument = gql`
+  query UserSelect_canCreateUsers {
+    me {
+      canCreateUsers
+    }
+  }
+`;
+export function useUserSelect_canCreateUsersQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    UserSelect_canCreateUsersQuery,
+    UserSelect_canCreateUsersQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserSelect_canCreateUsersQuery, UserSelect_canCreateUsersQueryVariables>(
+    UserSelect_canCreateUsersDocument,
+    options
+  );
+}
+export function useUserSelect_canCreateUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserSelect_canCreateUsersQuery,
+    UserSelect_canCreateUsersQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UserSelect_canCreateUsersQuery,
+    UserSelect_canCreateUsersQueryVariables
+  >(UserSelect_canCreateUsersDocument, options);
+}
+export type UserSelect_canCreateUsersQueryHookResult = ReturnType<
+  typeof useUserSelect_canCreateUsersQuery
+>;
+export type UserSelect_canCreateUsersLazyQueryHookResult = ReturnType<
+  typeof useUserSelect_canCreateUsersLazyQuery
 >;
 export const useSearchUsers_searchUsersDocument = gql`
   query useSearchUsers_searchUsers(

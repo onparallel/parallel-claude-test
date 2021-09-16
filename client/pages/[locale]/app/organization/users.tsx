@@ -29,18 +29,20 @@ import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
+  boolean,
   integer,
   parseQuery,
   sorting,
   string,
   useQueryState,
+  useQueryStateSlice,
   values,
 } from "@parallel/utils/queryState";
 import { isAdmin } from "@parallel/utils/roles";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
@@ -53,6 +55,7 @@ const QUERY_STATE = {
     field: "createdAt",
     direction: "ASC",
   }),
+  dialog: boolean(),
 };
 
 function OrganizationUsers() {
@@ -73,6 +76,8 @@ function OrganizationUsers() {
       },
     })
   );
+
+  const [showDialog, setShowDialog] = useQueryStateSlice(state, setQueryState, "dialog");
 
   const hasSsoProvider = me.organization.hasSsoProvider;
   const userList = me.organization.users;
@@ -142,6 +147,13 @@ function OrganizationUsers() {
       });
     } catch {}
   };
+
+  useEffect(() => {
+    if (showDialog) {
+      handleCreateUser();
+      setShowDialog(null);
+    }
+  }, [showDialog]);
 
   const [updateOrganizationUser] = useOrganizationUsers_updateOrganizationUserMutation();
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
