@@ -14,12 +14,7 @@ import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
-import {
-  CreatePetitionEvent,
-  GenericPetitionEvent,
-  PetitionEvent,
-  PetitionEventPayload,
-} from "../events";
+import { CreatePetitionEvent, GenericPetitionEvent, PetitionEvent } from "../events";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
@@ -53,7 +48,6 @@ import {
   PublicPetitionLinkUser,
   User,
 } from "../__types";
-
 type PetitionType = "PETITION" | "TEMPLATE";
 type PetitionLocale = "en" | "es";
 
@@ -1715,7 +1709,6 @@ export class PetitionRepository extends BaseRepository {
       ? {
           type: T;
           last_used_at: Date;
-          data: PetitionEventPayload<T>;
         }
       : never)[]
   > {
@@ -1723,7 +1716,7 @@ export class PetitionRepository extends BaseRepository {
       .where("petition_id", petitionId)
       .whereIn("type", eventTypes)
       .groupBy("type")
-      .select("type", this.knex.raw("MAX(created_at) as last_used_at"), "data");
+      .select("type", this.knex.raw("MAX(created_at) as last_used_at"));
     return events as any[];
   }
 
