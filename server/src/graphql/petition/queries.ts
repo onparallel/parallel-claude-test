@@ -157,20 +157,16 @@ export const templatesQuery = queryField((t) => {
     },
     searchable: true,
     resolve: async (_, { limit, offset, locale, search, isPublic, isOwner, category }, ctx) => {
-      const userId = ctx.user!.id;
       if (isPublic) {
-        return await ctx.petitions.loadPublicTemplates(
-          {
-            search,
-            locale,
-            limit,
-            offset,
-            sortBy: "last_used_at",
-            categories: category ? [category] : null,
-          },
-          userId
-        );
+        return await ctx.petitions.loadPublicTemplates({
+          search,
+          locale,
+          limit,
+          offset,
+          categories: category ? [category] : null,
+        });
       } else {
+        const userId = ctx.user!.id;
         return await ctx.petitions.loadPetitionsForUser(userId, {
           search,
           limit,

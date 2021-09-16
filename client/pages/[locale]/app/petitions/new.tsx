@@ -63,7 +63,7 @@ const QUERY_STATE = {
   template: string(),
 };
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 18;
 
 function NewPetition() {
   const intl = useIntl();

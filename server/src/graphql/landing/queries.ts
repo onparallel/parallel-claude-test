@@ -140,7 +140,6 @@ export const landingQueries = queryField((t) => {
               offset,
               locale,
               categories: [category],
-              sortBy: "used_count",
             });
           },
         });

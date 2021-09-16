@@ -3030,10 +3030,8 @@ export class PetitionRepository extends BaseRepository {
     opts: {
       search?: string | null;
       locale?: PetitionLocale | null;
-      sortBy?: "last_used_at" | "used_count";
       categories?: string[] | null;
-    } & PageOpts,
-    userId?: number
+    } & PageOpts
   ) {
     return await this.loadPageAndCount(
       this.from("petition")
@@ -3043,7 +3041,7 @@ export class PetitionRepository extends BaseRepository {
           is_template: true,
         })
         .mmodify((q) => {
-          const { search, locale, sortBy, categories } = opts;
+          const { search, locale, categories } = opts;
           if (locale) {
             q.where("locale", locale);
           }
@@ -3065,29 +3063,29 @@ export class PetitionRepository extends BaseRepository {
               ...categories,
             ]);
           }
-          if (userId !== undefined) {
-            q.leftJoin(
-              this.knex.raw(
-                /* sql */ `(
-              SELECT
-                p.from_template_id AS template_id,
-                count(*) AS used_count,
-                max(p.created_at) AS last_used_at 
-              FROM petition AS p
-                WHERE created_by = ?
-                GROUP BY p.from_template_id
-            ) as lj`,
-                [`User:${userId}`]
-              ),
-              "lj.template_id",
-              "petition.id"
-            );
-            if (sortBy === "used_count") {
-              q.orderByRaw(/* sql */ `lj.used_count DESC NULLS LAST`);
-            } else if (sortBy === undefined || sortBy === "last_used_at") {
-              q.orderByRaw(/* sql */ `lj.last_used_at DESC NULLS LAST`);
-            }
-          }
+          q.leftJoin(
+            this.from("petition")
+              .whereIn(
+                "from_template_id",
+                this.from("petition")
+                  .where({
+                    template_public: true,
+                    deleted_at: null,
+                    is_template: true,
+                  })
+                  .select("id")
+              )
+              .whereNull("deleted_at")
+              .groupBy("from_template_id")
+              .select<{ template_id: number; used_count: number }[]>(
+                this.knex.raw(`"from_template_id" as template_id`),
+                this.knex.raw(`count(*) as used_count`)
+              )
+              .as("t"),
+            "t.template_id",
+            "petition.id"
+          );
+          q.orderByRaw(/* sql */ `t.used_count DESC NULLS LAST`).orderBy("created_at", "desc");
         })
         .select<Petition[]>("petition.*"),
       opts
