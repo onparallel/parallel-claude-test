@@ -2160,12 +2160,13 @@ export type Query = {
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   publicPetitionLinkBySlug: Maybe<PublicPetitionLink>;
-  /** The publicly available templates */
-  publicTemplates: PetitionTemplatePagination;
+  publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
+  /** The available templates */
+  templates: PetitionTemplatePagination;
   userGroup: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
@@ -2264,13 +2265,6 @@ export type QuerypublicPetitionLinkBySlugArgs = {
   slug: Scalars["String"];
 };
 
-export type QuerypublicTemplatesArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  locale?: Maybe<PetitionLocale>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-};
-
 export type QuerysearchUsersArgs = {
   excludeUserGroups?: Maybe<Array<Scalars["GID"]>>;
   excludeUsers?: Maybe<Array<Scalars["GID"]>>;
@@ -2281,6 +2275,16 @@ export type QuerysearchUsersArgs = {
 
 export type QuerytagsArgs = {
   limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+};
+
+export type QuerytemplatesArgs = {
+  category?: Maybe<Scalars["String"]>;
+  isOwner?: Maybe<Scalars["Boolean"]>;
+  isPublic: Scalars["Boolean"];
+  limit?: Maybe<Scalars["Int"]>;
+  locale?: Maybe<PetitionLocale>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
 };

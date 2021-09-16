@@ -6458,46 +6458,6 @@ export type SignatureConfigDialog_OrgIntegrationFragment = {
   value: string;
 };
 
-export type useTemplateDetailsModalPetitionQueryVariables = Exact<{
-  templateId: Scalars["GID"];
-}>;
-
-export type useTemplateDetailsModalPetitionQuery = {
-  petition?: Maybe<
-    | { __typename?: "Petition" }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        descriptionHtml?: Maybe<string>;
-        name?: Maybe<string>;
-        updatedAt: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          title?: Maybe<string>;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-        }>;
-        owner: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          organization: { __typename?: "Organization"; id: string; name: string };
-        };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        }>;
-        publicLink?: Maybe<{
-          __typename?: "PublicPetitionLink";
-          id: string;
-          isActive: boolean;
-          slug: string;
-        }>;
-      }
-  >;
-};
-
 export type TemplateDetailsModal_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
@@ -17559,44 +17519,6 @@ export type PetitionSharingModal_PetitionsQueryHookResult = ReturnType<
 >;
 export type PetitionSharingModal_PetitionsLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionsLazyQuery
->;
-export const useTemplateDetailsModalPetitionDocument = gql`
-  query useTemplateDetailsModalPetition($templateId: GID!) {
-    petition(id: $templateId) {
-      ...TemplateDetailsModal_PetitionTemplate
-    }
-  }
-  ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
-`;
-export function useuseTemplateDetailsModalPetitionQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    useTemplateDetailsModalPetitionQuery,
-    useTemplateDetailsModalPetitionQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    useTemplateDetailsModalPetitionQuery,
-    useTemplateDetailsModalPetitionQueryVariables
-  >(useTemplateDetailsModalPetitionDocument, options);
-}
-export function useuseTemplateDetailsModalPetitionLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    useTemplateDetailsModalPetitionQuery,
-    useTemplateDetailsModalPetitionQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    useTemplateDetailsModalPetitionQuery,
-    useTemplateDetailsModalPetitionQueryVariables
-  >(useTemplateDetailsModalPetitionDocument, options);
-}
-export type useTemplateDetailsModalPetitionQueryHookResult = ReturnType<
-  typeof useuseTemplateDetailsModalPetitionQuery
->;
-export type useTemplateDetailsModalPetitionLazyQueryHookResult = ReturnType<
-  typeof useuseTemplateDetailsModalPetitionLazyQuery
 >;
 export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
   mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
