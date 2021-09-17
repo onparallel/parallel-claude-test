@@ -34,7 +34,6 @@ export interface PetitionFieldTypeSelectProps extends Omit<SelectProps, "onChang
 
 export const PetitionFieldTypeSelect = chakraForwardRef<"div", PetitionFieldTypeSelectProps>(
   function PetitionFieldTypeSelect({ type, onChange, ...props }, ref) {
-    console.log(props);
     return (
       <Menu placement="bottom" gutter={2}>
         <MenuButton as={SelectLikeButton} ref={ref as any} {...(props as any)}>
