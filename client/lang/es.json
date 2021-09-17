@@ -305,6 +305,11 @@
     "context": "Import contacts"
   },
   {
+    "term": "component.contact-select.bounced-email-tooltip",
+    "definition": "Correo devuelto previamente como error",
+    "context": "Previously bounced email"
+  },
+  {
     "term": "component.contact-select.create-new-contact",
     "definition": "Crear nuevo contacto para: <b>{email}</b>",
     "context": "Create new contact for: <b>{email}</b>"
@@ -2093,6 +2098,11 @@
     "term": "component.recipient-select-groups.delete-group.label",
     "definition": "Eliminar grupo de destinatarios",
     "context": "Delete recipient group"
+  },
+  {
+    "term": "component.recipient-select-groups.emails-bounced-warning",
+    "definition": "{count, plural, =1{El siguiente correo ha sido devuelto como error de envío previamente. Asegúrate de introducir una dirección de correo válida.} other {Los siguientes correos han sido devueltos como errores de envíos previamente. Asegúrate de introducir una dirección de correo válida.}}",
+    "context": "{count, plural, =1{The following email has been bounced previously. Make sure you enter a working email address.} other {The following emails have been bounced previously. Make sure you enter working emails address.}}"
   },
   {
     "term": "component.recipient-select-groups.recipients-label",

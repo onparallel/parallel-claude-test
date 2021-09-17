@@ -1,5 +1,6 @@
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
   Box,
   Button,
@@ -14,6 +15,8 @@ import {
   RadioGroup,
   Stack,
   Text,
+  UnorderedList,
+  ListItem,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { withError } from "@parallel/utils/promises/withError";
@@ -56,6 +59,7 @@ export function RecipientSelectGroups({
   const recipientGroupFormControlRef = useMultipleRefs<HTMLDivElement>();
 
   const [isAlertVisible, setAlertVisible] = useState(true);
+  const [isBouncedAlertVisible, setBouncedAlertVisible] = useState(true);
 
   function handleRecipientsChange(groupNumber: number) {
     return (recipients: ContactSelectSelection[]) => {
@@ -184,6 +188,11 @@ export function RecipientSelectGroups({
     return contact;
   }
 
+  const bouncedEmailRecipients = recipientGroups.reduce(
+    (acc, recipients) => [...acc, ...recipients],
+    []
+  );
+
   return (
     <>
       <Stack
@@ -281,6 +290,7 @@ export function RecipientSelectGroups({
           </FormControl>
         ))}
       </Stack>
+
       {canAddRecipientGroups ? (
         <Flex justifyContent="flex-start" alignItems="center" marginTop={4}>
           <Button
@@ -301,11 +311,36 @@ export function RecipientSelectGroups({
           </Button>
         </Flex>
       ) : null}
+      {isBouncedAlertVisible && bouncedEmailRecipients.length ? (
+        <Alert status="warning" backgroundColor="orange.100" borderRadius="base" marginTop={4}>
+          <Flex alignItems="center" justifyContent="flex-start">
+            <AlertIcon color="yellow.500" />
+            <AlertDescription>
+              <Text>
+                <FormattedMessage
+                  id="component.recipient-select-groups.emails-bounced-warning"
+                  defaultMessage="{count, plural, =1{The following email has been bounced previously. Make sure you enter a working email address.} other {The following emails have been bounced previously. Make sure you enter working emails address.}} "
+                  values={{
+                    count: 2,
+                  }}
+                />
+              </Text>
+              <UnorderedList paddingLeft={2}>
+                {bouncedEmailRecipients.map((recipient, index) => (
+                  <ListItem key={index}>{`${recipient.fullName} <${recipient.email}>`}</ListItem>
+                ))}
+              </UnorderedList>
+            </AlertDescription>
+          </Flex>
+          <CloseButton fontSize="xs" onClick={() => setBouncedAlertVisible(false)} />
+        </Alert>
+      ) : null}
+
       {isAlertVisible &&
       recipientGroups.length === 1 &&
       validRecipients(0).length >= 2 &&
       invalidRecipients(0).length === 0 ? (
-        <Alert status="info" marginTop={4}>
+        <Alert status="info" marginTop={4} borderRadius="base">
           <AlertIcon />
           <Text display="block">
             <FormattedMessage

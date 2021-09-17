@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
-import { UserPlusIcon } from "@parallel/chakra/icons";
+import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import {
@@ -166,6 +166,7 @@ export const ContactSelect = Object.assign(
           id
           fullName
           email
+          # hasBouncedEmail
         }
       `,
     },
@@ -285,6 +286,16 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
           email
         )}
       </Text>
+      {/* {hasBouncedEmail ? (
+          <Tooltip
+            label={intl.formatMessage({
+              id: "component.contact-select.bounced-email-tooltip",
+              defaultMessage: "Previously bounced email",
+            })}
+          >
+            <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
+          </Tooltip>
+        ) : null} */}
     </components.MultiValueLabel>
   );
 };
@@ -311,6 +322,9 @@ const Option: typeof components.Option = function Option({ children, ...props })
         ) : (
           <Text as="span">{contact.email}</Text>
         )}
+        {/* {contact.hasBouncedEmail ? (
+            <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
+          ) : null} */}
       </components.Option>
     );
   }
