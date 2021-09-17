@@ -1,5 +1,6 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
+import { createTrue } from "typescript";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -23,7 +24,7 @@ describe("GraphQL/PublicPetitionLink", () => {
   let user: User;
   let organization: Organization;
   let contact: Contact;
-  let template: Petition;
+  let templates: Petition[];
   let publicPetitionLink: PublicPetitionLink;
 
   beforeAll(async () => {
@@ -38,17 +39,22 @@ describe("GraphQL/PublicPetitionLink", () => {
       cognito_id: USER_COGNITO_ID,
     }));
 
-    [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+    templates = await mocks.createRandomPetitions(organization.id, user.id, 2, () => ({
       is_template: true,
       status: null,
     }));
 
-    await mocks.createRandomPetitionFields(template.id, 1, () => ({ type: "TEXT" }));
+    await mocks.createRandomPetitionFields(templates[0].id, 1, () => ({ type: "TEXT" }));
+    await mocks.createRandomPetitionFields(templates[1].id, 1, () => ({ type: "TEXT" }));
 
-    publicPetitionLink = await mocks.createRandomPublicPetitionLink(template.id, user.id, () => ({
-      slug: "public-link-slug",
-      is_active: true,
-    }));
+    publicPetitionLink = await mocks.createRandomPublicPetitionLink(
+      templates[0].id,
+      user.id,
+      () => ({
+        slug: "public-link-slug",
+        is_active: true,
+      })
+    );
   });
 
   afterAll(async () => {
@@ -135,6 +141,145 @@ describe("GraphQL/PublicPetitionLink", () => {
         .from("public_petition_link")
         .where("id", publicPetitionLink.id)
         .update("is_active", true);
+    });
+  });
+
+  describe("getSlugForPublicPetitionLink", () => {
+    it("should return a random valid slug", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($petitionName: String) {
+            getSlugForPublicPetitionLink(petitionName: $petitionName)
+          }
+        `,
+        variables: {
+          petitionName: "public-link-slug", // use a slug that is already taken
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      const slug = data?.getSlugForPublicPetitionLink as string;
+      expect(slug.length).toBeGreaterThanOrEqual(8);
+      expect(slug.length).toBeLessThanOrEqual(30);
+      expect(slug.startsWith("public-link-slug")).toEqual(true);
+      expect(slug.match(/^[a-z0-9-]*$/)).toBeDefined();
+    });
+
+    it("should return the proposed slug", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($petitionName: String) {
+            getSlugForPublicPetitionLink(petitionName: $petitionName)
+          }
+        `,
+        variables: {
+          petitionName: "this-slug-should-be-valid",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.getSlugForPublicPetitionLink).toEqual("this-slug-should-be-valid");
+    });
+
+    it("should convert the proposed slug to a valid set of chars", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($petitionName: String) {
+            getSlugForPublicPetitionLink(petitionName: $petitionName)
+          }
+        `,
+        variables: {
+          petitionName: "Know Your Customer (KYC)👨🏻‍💻",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.getSlugForPublicPetitionLink).toEqual("know-your-customer-kyc");
+    });
+  });
+
+  describe("isValidPublicPetitionLinkSlug", () => {
+    it("should be a valid slug", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($slug: String!) {
+            isValidPublicPetitionLinkSlug(slug: $slug)
+          }
+        `,
+        variables: {
+          slug: "x".repeat(10),
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.isValidPublicPetitionLinkSlug).toEqual(true);
+    });
+
+    it("should throw error if passing a slug of less than 8 chars", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($slug: String!) {
+            isValidPublicPetitionLinkSlug(slug: $slug)
+          }
+        `,
+        variables: {
+          slug: "aaa",
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { code: "MIN_SLUG_LENGTH_VALIDATION_ERROR" },
+      });
+      expect(data).toBeNull();
+    });
+
+    it("should throw error if passing a slug of more than 30 chars", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($slug: String!) {
+            isValidPublicPetitionLinkSlug(slug: $slug)
+          }
+        `,
+        variables: {
+          slug: "x".repeat(31),
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { code: "MAX_SLUG_LENGTH_VALIDATION_ERROR" },
+      });
+      expect(data).toBeNull();
+    });
+
+    it("should throw error if passing invalid characters", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($slug: String!) {
+            isValidPublicPetitionLinkSlug(slug: $slug)
+          }
+        `,
+        variables: {
+          slug: "TEST@onparallel.com",
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { code: "INVALID_SLUG_CHARS_VALIDATION_ERROR" },
+      });
+      expect(data).toBeNull();
+    });
+
+    it("should throw error if the slug is already taken", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($slug: String!) {
+            isValidPublicPetitionLinkSlug(slug: $slug)
+          }
+        `,
+        variables: {
+          slug: "public-link-slug",
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { code: "SLUG_ALREADY_TAKEN_VALIDATION_ERROR" },
+      });
+      expect(data).toBeNull();
     });
   });
 
@@ -797,7 +942,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          templateId: toGlobalId("Petition", template.id),
+          templateId: toGlobalId("Petition", templates[0].id),
           title: "link title",
           description: "link description",
           ownerId: toGlobalId("User", user.id),
@@ -819,6 +964,7 @@ describe("GraphQL/PublicPetitionLink", () => {
             $description: String!
             $ownerId: GID!
             $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+            $slug: String
           ) {
             createPublicPetitionLink(
               templateId: $templateId
@@ -826,10 +972,12 @@ describe("GraphQL/PublicPetitionLink", () => {
               description: $description
               ownerId: $ownerId
               otherPermissions: $otherPermissions
+              slug: $slug
             ) {
               id
               publicLink {
                 isActive
+                slug
                 linkPermissions {
                   isSubscribed
                   permissionType
@@ -849,10 +997,11 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          templateId: toGlobalId("Petition", template.id),
+          templateId: toGlobalId("Petition", templates[0].id),
           title: "link title",
           description: "link description",
           ownerId: toGlobalId("User", user.id),
+          slug: "this-is-my-valid-slug",
           otherPermissions: [
             { id: toGlobalId("User", otherUsers[0].id), permissionType: "READ" },
             { id: toGlobalId("UserGroup", userGroup.id), permissionType: "WRITE" },
@@ -861,9 +1010,10 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(errors).toBeUndefined();
       expect(data?.createPublicPetitionLink).toEqual({
-        id: toGlobalId("Petition", template.id),
+        id: toGlobalId("Petition", templates[0].id),
         publicLink: {
           isActive: true,
+          slug: "this-is-my-valid-slug",
           linkPermissions: [
             {
               isSubscribed: true,
@@ -900,7 +1050,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          templateId: toGlobalId("Petition", template.id),
+          templateId: toGlobalId("Petition", templates[0].id),
           title: "link title",
           description: "link description",
           ownerId: toGlobalId("User", user.id),
@@ -908,6 +1058,43 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if passing an invalid slug", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $ownerId: GID!
+            $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+            $slug: String
+          ) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+              ownerId: $ownerId
+              otherPermissions: $otherPermissions
+              slug: $slug
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", templates[1].id),
+          title: "link title",
+          description: "link description",
+          ownerId: toGlobalId("User", user.id),
+          slug: "you cant use this slug!!!",
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { code: "INVALID_SLUG_CHARS_VALIDATION_ERROR" },
+      });
       expect(data).toBeNull();
     });
   });
@@ -1071,6 +1258,49 @@ describe("GraphQL/PublicPetitionLink", () => {
         id: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
         isActive: false,
       });
+    });
+
+    it("should update the slug of an active link", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($publicPetitionLinkId: GID!, $slug: String) {
+            updatePublicPetitionLink(publicPetitionLinkId: $publicPetitionLinkId, slug: $slug) {
+              id
+              slug
+            }
+          }
+        `,
+        variables: {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: "valid-slug",
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.updatePublicPetitionLink).toEqual({
+        id: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+        slug: "valid-slug",
+      });
+    });
+
+    it("sends error if trying to set an invalid slug", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($publicPetitionLinkId: GID!, $slug: String) {
+            updatePublicPetitionLink(publicPetitionLinkId: $publicPetitionLinkId, slug: $slug) {
+              id
+              slug
+            }
+          }
+        `,
+        variables: {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: "aaa",
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        extra: { code: "MIN_SLUG_LENGTH_VALIDATION_ERROR" },
+      });
+      expect(data).toBeNull();
     });
   });
 });

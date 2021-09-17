@@ -94,3 +94,49 @@ export function validateAuthTokenPayload<TypeName extends string, FieldName exte
     });
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
+
+export function validatePublicPetitionLinkSlug<TypeName extends string, FieldName extends string>(
+  slugArg: (args: ArgsValue<TypeName, FieldName>) => string,
+  argName: string,
+  publicPetitionLinkIdArg?: (args: ArgsValue<TypeName, FieldName>) => number
+) {
+  const MIN_SLUG_LENGTH = 8;
+  const MAX_SLUG_LENGTH = 30;
+
+  return (async (_, args, ctx, info) => {
+    const slug = slugArg(args);
+    const publicPetitionLinkId = publicPetitionLinkIdArg?.(args);
+
+    if (slug.length < MIN_SLUG_LENGTH) {
+      throw new ArgValidationError(
+        info,
+        argName,
+        `Value can't have less than ${MIN_SLUG_LENGTH} characters.`,
+        { code: "MIN_SLUG_LENGTH_VALIDATION_ERROR" }
+      );
+    }
+    if (slug.length > MAX_SLUG_LENGTH) {
+      throw new ArgValidationError(
+        info,
+        argName,
+        `Value can't have more than ${MAX_SLUG_LENGTH} characters.`,
+        { code: "MAX_SLUG_LENGTH_VALIDATION_ERROR" }
+      );
+    }
+    if (!slug.match(/^[a-z0-9-]*$/)) {
+      throw new ArgValidationError(info, argName, `Slug must match /^[a-z0-9-]*$/`, {
+        code: "INVALID_SLUG_CHARS_VALIDATION_ERROR",
+      });
+    }
+
+    const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
+    if (publicLink && publicLink.id !== publicPetitionLinkId) {
+      throw new ArgValidationError(
+        info,
+        argName,
+        "Slug is already being used on another public link",
+        { code: "SLUG_ALREADY_TAKEN_VALIDATION_ERROR" }
+      );
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}

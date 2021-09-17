@@ -1396,9 +1396,11 @@ export interface NexusGenFieldTypes {
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     emailIsAvailable: boolean; // Boolean!
+    getSlugForPublicPetitionLink: string; // String!
     getUsersOrGroups: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    isValidPublicPetitionLinkSlug: boolean; // Boolean!
     landingTemplateBySlug: NexusGenRootTypes["LandingTemplate"] | null; // LandingTemplate
     landingTemplates: NexusGenRootTypes["LandingTemplatePagination"]; // LandingTemplatePagination!
     landingTemplatesSamples: NexusGenRootTypes["LandingTemplateSample"][]; // [LandingTemplateSample!]!
@@ -2536,9 +2538,11 @@ export interface NexusGenFieldTypeNames {
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
     emailIsAvailable: "Boolean";
+    getSlugForPublicPetitionLink: "String";
     getUsersOrGroups: "UserOrUserGroup";
     globalIdDecode: "SupportMethodResponse";
     globalIdEncode: "SupportMethodResponse";
+    isValidPublicPetitionLinkSlug: "Boolean";
     landingTemplateBySlug: "LandingTemplate";
     landingTemplates: "LandingTemplatePagination";
     landingTemplatesSamples: "LandingTemplateSample";
@@ -3017,6 +3021,7 @@ export interface NexusGenArgTypes {
       description: string; // String!
       otherPermissions?: NexusGenInputs["UserOrUserGroupPublicLinkPermission"][] | null; // [UserOrUserGroupPublicLinkPermission!]
       ownerId: NexusGenScalars["GID"]; // GID!
+      slug?: string | null; // String
       templateId: NexusGenScalars["GID"]; // GID!
       title: string; // String!
     };
@@ -3457,6 +3462,7 @@ export interface NexusGenArgTypes {
       otherPermissions?: NexusGenInputs["UserOrUserGroupPublicLinkPermission"][] | null; // [UserOrUserGroupPublicLinkPermission!]
       ownerId?: NexusGenScalars["GID"] | null; // GID
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
+      slug?: string | null; // String
       title?: string | null; // String
     };
     updateSignatureRequestMetadata: {
@@ -3581,6 +3587,10 @@ export interface NexusGenArgTypes {
       // args
       email: string; // String!
     };
+    getSlugForPublicPetitionLink: {
+      // args
+      petitionName?: string | null; // String
+    };
     getUsersOrGroups: {
       // args
       ids: string[]; // [ID!]!
@@ -3593,6 +3603,10 @@ export interface NexusGenArgTypes {
       // args
       id: number; // Int!
       type: NexusGenEnums["EntityType"]; // EntityType!
+    };
+    isValidPublicPetitionLinkSlug: {
+      // args
+      slug: string; // String!
     };
     landingTemplateBySlug: {
       // args

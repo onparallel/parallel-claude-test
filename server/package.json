@@ -60,6 +60,7 @@
     "express": "^4.17.1",
     "fast-safe-stringify": "^2.1.1",
     "file-type": "^16.5.3",
+    "fold-to-ascii": "^5.0.0",
     "fuse.js": "^6.4.6",
     "graphemer": "^1.2.0",
     "graphql": "^15.6.0",

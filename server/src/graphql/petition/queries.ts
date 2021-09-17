@@ -1,3 +1,4 @@
+import { decode } from "jsonwebtoken";
 import {
   arg,
   booleanArg,
@@ -9,15 +10,15 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { decode } from "jsonwebtoken";
-import { toGlobalId, fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { isDefined } from "remeda";
+import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { random } from "../../util/token";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { petitionsArePublicTemplates, userHasAccessToPetitions } from "./authorizers";
-import { validateAuthTokenPayload } from "./validations";
-import { isDefined } from "remeda";
+import { validateAuthTokenPayload, validatePublicPetitionLinkSlug } from "./validations";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -210,4 +211,46 @@ export const petitionAuthToken = queryField("petitionAuthToken", {
     const payload: any = decode(token);
     return await ctx.petitions.loadPetition(payload.petitionId);
   },
+});
+
+export const getSlugForPublicPetitionLink = queryField("getSlugForPublicPetitionLink", {
+  type: "String",
+  args: {
+    petitionName: nullable(stringArg()),
+  },
+  authorize: authenticate(),
+  resolve: async (_, { petitionName }, ctx) => {
+    const randomSlug = () => "".padEnd(8, random(8).toLowerCase()); // random string of 8 chars long
+
+    let slug = petitionName
+      ? ASCIIFolder.foldReplacing(petitionName.trim().toLowerCase()) // replace all non ASCII chars with their ASCII equivalent
+          .replace(/\s/g, "-") // replace spaces with dashes
+          .replace(/[^a-z0-9-]/g, "") // remove all invalid chars
+          .padEnd(8, random(8).toLowerCase()) // fill with random chars to ensure min length
+          .slice(0, 30) // max 30 chars
+      : randomSlug();
+
+    let publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
+    // loop until we get a slug that is not taken
+    while (publicLink) {
+      slug += randomSlug();
+      if (slug.length > 30) {
+        // if slug reaches max length, set to random to ensure it is still valid
+        slug = randomSlug();
+      }
+      publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
+    }
+
+    return slug;
+  },
+});
+
+export const isValidPublicPetitionLinkSlug = queryField("isValidPublicPetitionLinkSlug", {
+  type: "Boolean",
+  args: {
+    slug: nonNull(stringArg()),
+  },
+  authorize: authenticate(),
+  validateArgs: validatePublicPetitionLinkSlug((args) => args.slug, "slug"),
+  resolve: () => true,
 });

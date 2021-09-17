@@ -586,6 +586,7 @@ type Mutation {
     description: String!
     otherPermissions: [UserOrUserGroupPublicLinkPermission!]
     ownerId: GID!
+    slug: String
     templateId: GID!
     title: String!
   ): PetitionTemplate!
@@ -1202,6 +1203,7 @@ type Mutation {
     otherPermissions: [UserOrUserGroupPublicLinkPermission!]
     ownerId: GID
     publicPetitionLinkId: GID!
+    slug: String
     title: String
   ): PublicPetitionLink!
   updateSignatureRequestMetadata(
@@ -3165,6 +3167,7 @@ type Query {
   Checks if the provided email is available to be registered as a user on Parallel
   """
   emailIsAvailable(email: String!): Boolean!
+  getSlugForPublicPetitionLink(petitionName: String): String!
 
   """
   Get users or groups from IDs
@@ -3191,6 +3194,7 @@ type Query {
     id: Int!
     type: EntityType!
   ): SupportMethodResponse!
+  isValidPublicPetitionLinkSlug(slug: String!): Boolean!
   landingTemplateBySlug(slug: String!): LandingTemplate
   landingTemplates(
     categories: [String!]

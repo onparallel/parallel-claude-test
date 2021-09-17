@@ -84,6 +84,7 @@ import {
   validateAccessesRemindersLeft,
   validateAccessesStatus,
   validatePetitionStatus,
+  validatePublicPetitionLinkSlug,
 } from "../validations";
 import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
 import {
@@ -1530,7 +1531,12 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     description: nonNull(stringArg()),
     ownerId: nonNull(globalIdArg("User")),
     otherPermissions: nullable(list(nonNull("UserOrUserGroupPublicLinkPermission"))),
+    slug: nullable(stringArg()),
   },
+  validateArgs: validateIf(
+    (args) => isDefined(args.slug),
+    validatePublicPetitionLinkSlug((args) => args.slug!, "slug")
+  ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
       const publicPetitionLink = await ctx.petitions.createPublicPetitionLink(
@@ -1538,7 +1544,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
           template_id: args.templateId,
           title: args.title,
           description: args.description,
-          slug: random(10),
+          slug: args.slug ?? random(10),
           is_active: true,
         },
         `User:${ctx.user!.id}`,
@@ -1591,7 +1597,16 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     description: stringArg(),
     ownerId: globalIdArg("User"),
     otherPermissions: list(nonNull("UserOrUserGroupPublicLinkPermission")),
+    slug: stringArg(),
   },
+  validateArgs: validateIf(
+    (args) => isDefined(args.slug),
+    validatePublicPetitionLinkSlug(
+      (args) => args.slug!,
+      "slug",
+      (args) => args.publicPetitionLinkId
+    )
+  ),
   resolve: async (_, args, ctx) => {
     const publicPetitionLinkData: Partial<CreatePublicPetitionLink> = {};
     if (isDefined(args.title)) {
@@ -1602,6 +1617,10 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     }
     if (isDefined(args.isActive)) {
       publicPetitionLinkData.is_active = args.isActive;
+    }
+
+    if (isDefined(args.slug)) {
+      publicPetitionLinkData.slug = args.slug;
     }
 
     return await ctx.petitions.withTransaction(async (t) => {
