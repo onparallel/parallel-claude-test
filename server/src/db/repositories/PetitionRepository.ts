@@ -3325,9 +3325,7 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadPublicPetitionLink = this.buildLoadBy("public_petition_link", "id");
 
-  readonly loadPublicPetitionLinkBySlug = this.buildLoadBy("public_petition_link", "slug", (q) =>
-    q.where("is_active", true)
-  );
+  readonly loadPublicPetitionLinkBySlug = this.buildLoadBy("public_petition_link", "slug");
 
   readonly loadPublicPetitionLinksByTemplateId = this.buildLoadMultipleBy(
     "public_petition_link",
