@@ -331,6 +331,8 @@ describe("GraphQL/Petitions", () => {
     });
 
     it("fetches my templates ordered by last used", async () => {
+      await mocks.knex.from("petition").update("from_template_id", null);
+
       const { data: templates } = await testClient.query({
         query: gql`
           query {
@@ -454,7 +456,8 @@ describe("GraphQL/Petitions", () => {
       expect(data!.templates.totalCount).toBe(3);
     });
 
-    it("orders public templates by last used", async () => {
+    it("orders public templates by use count", async () => {
+      await mocks.knex.from("petition").update("from_template_id", null);
       const { data } = await testClient.query({
         query: gql`
           query {
