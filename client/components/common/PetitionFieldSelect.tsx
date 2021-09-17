@@ -6,11 +6,11 @@ import { PetitionFieldSelect_PetitionFieldFragment } from "@parallel/graphql/__t
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { FieldOptions, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { CustomSelectProps, SelectProps } from "@parallel/utils/react-select/types";
+import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { components } from "react-select";
+import Select, { components, StylesConfig } from "react-select";
 import { zip } from "remeda";
 
 export interface PetitionFieldSelectProps<
@@ -35,58 +35,31 @@ export function PetitionFieldSelect<
 }: PetitionFieldSelectProps<T, ExpandFields>) {
   const intl = useIntl();
   const rsProps = useReactSelectProps<PetitionFieldSelectOption<T>, any, never>(props);
-  const fieldSelectProps = useMemo<SelectProps<PetitionFieldSelectOption<T>, any, never>>(
+
+  const components = useMemo(
     () => ({
-      ...rsProps,
-      components: {
-        ...rsProps.components,
-        Option: ({ children, ...props }) => {
-          return (
-            <components.Option {...props}>
-              <PetitionFieldSelectItem
-                option={props.data as PetitionFieldSelectOption<T>}
-                highlight={props.selectProps.inputValue ?? ""}
-              />
-            </components.Option>
-          );
-        },
-        SingleValue: ({ children, ...props }) => {
-          return (
-            <components.SingleValue {...props}>
-              <PetitionFieldSelectItem
-                option={props.data}
-                highlight={props.selectProps.inputValue ?? ""}
-              />
-            </components.SingleValue>
-          );
-        },
-      },
-      styles: {
-        ...rsProps.styles,
-        singleValue: (styles) => {
-          return {
-            maxWidth: "calc(100% - 6px)",
-            display: "flex",
-            flex: "0 1 auto",
-            alignItems: "center",
-          };
-        },
-      },
-      getOptionValue(option) {
-        return option.type === "FIELD" ? option.field.id : `${option.field.id}-${option.column}`;
-      },
-      getOptionLabel(option) {
-        if (option.type === "FIELD") {
-          return option.field.title ?? "";
-        } else {
-          const options = option.field.options as FieldOptions["DYNAMIC_SELECT"];
-          const label = options.labels[option.column];
-          return `${option.field.title ?? ""} ${label}`;
-        }
+      ...rsProps.components,
+      SingleValue,
+      Option,
+    }),
+    [rsProps.components]
+  );
+
+  const styles = useMemo<StylesConfig<PetitionFieldSelectOption<T>, false, never>>(
+    () => ({
+      ...rsProps.styles,
+      singleValue: (styles) => {
+        return {
+          maxWidth: "calc(100% - 6px)",
+          display: "flex",
+          flex: "0 1 auto",
+          alignItems: "center",
+        };
       },
     }),
-    [rsProps, expandFields, fields, indices]
+    [rsProps.styles]
   );
+
   const { options, _value } = useMemo(() => {
     const options: PetitionFieldSelectOption<T>[] = zip(fields, indices).flatMap(
       ([field, fieldIndex]) => {
@@ -131,7 +104,8 @@ export function PetitionFieldSelect<
   );
   return (
     <Select
-      {...fieldSelectProps}
+      {...props}
+      {...rsProps}
       options={options}
       value={_value}
       onChange={handleChange as any}
@@ -139,6 +113,10 @@ export function PetitionFieldSelect<
         id: "component.petition-field-select.placeholder",
         defaultMessage: "Select a field",
       })}
+      components={components}
+      styles={styles}
+      getOptionValue={getOptionValue}
+      getOptionLabel={getOptionLabel}
     />
   );
 }
@@ -222,3 +200,39 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
     );
   }
 });
+
+const getOptionValue = (option: PetitionFieldSelectOption<any>) => {
+  return option.type === "FIELD" ? option.field.id : `${option.field.id}-${option.column}`;
+};
+
+const getOptionLabel = (option: PetitionFieldSelectOption<any>) => {
+  if (option.type === "FIELD") {
+    return option.field.title ?? "";
+  } else {
+    const options = option.field.options as FieldOptions["DYNAMIC_SELECT"];
+    const label = options.labels[option.column];
+    return `${option.field.title ?? ""} ${label}`;
+  }
+};
+
+const SingleValue: typeof components.SingleValue = function SingleValue(props) {
+  return (
+    <components.SingleValue {...props}>
+      <PetitionFieldSelectItem
+        option={props.data as unknown as PetitionFieldSelectOption<any>}
+        highlight={props.selectProps.inputValue ?? ""}
+      />
+    </components.SingleValue>
+  );
+};
+
+const Option: typeof components.Option = function Option(props) {
+  return (
+    <components.Option {...props}>
+      <PetitionFieldSelectItem
+        option={props.data as PetitionFieldSelectOption<any>}
+        highlight={props.selectProps.inputValue ?? ""}
+      />
+    </components.Option>
+  );
+};

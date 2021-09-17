@@ -3,7 +3,7 @@ import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useRecipientViewReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -101,15 +101,10 @@ export function RecipientViewPetitionFieldSelect({
     setTimeout(() => newReplyRef.current!.focus());
   }
 
-  const reactSelectProps = useFieldSelectReactSelectProps(
-    useMemo(
-      () => ({
-        id: `reply-${field.id}-new`,
-        isDisabled,
-      }),
-      [isDisabled]
-    )
-  );
+  const rsProps = useRecipientViewReactSelectProps({
+    id: `reply-${field.id}-new`,
+    isDisabled,
+  });
 
   const values = useMemo(() => options.values.map(toSelectOption), [options.values]);
 
@@ -149,7 +144,7 @@ export function RecipientViewPetitionFieldSelect({
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Box flex="1" position="relative" marginTop={2}>
           <Select
-            {...reactSelectProps}
+            {...rsProps}
             ref={newReplyRef as any}
             value={value}
             options={values as any}
@@ -191,16 +186,11 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
   const [isSaving, setIsSaving] = useState(false);
 
   const options = field.options as FieldOptions["SELECT"];
-  const reactSelectProps = useFieldSelectReactSelectProps(
-    useMemo(
-      () => ({
-        id: `reply-${field.id}-${reply.id}`,
-        isDisabled: isDisabled || reply.status === "APPROVED",
-        isInvalid: reply.status === "REJECTED",
-      }),
-      [isDisabled, reply.status]
-    )
-  );
+  const rsProps = useRecipientViewReactSelectProps({
+    id: `reply-${field.id}-${reply.id}`,
+    isDisabled: isDisabled || reply.status === "APPROVED",
+    isInvalid: reply.status === "REJECTED",
+  });
 
   const values = useMemo(() => options.values.map(toSelectOption), [options.values]);
 
@@ -218,7 +208,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
       <Box flex="1" position="relative">
         <Box position="relative">
           <Select<{ label: string; value: string }, false, never>
-            {...reactSelectProps}
+            {...rsProps}
             ref={ref}
             value={value}
             options={values as any}

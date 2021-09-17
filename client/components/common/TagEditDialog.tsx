@@ -19,9 +19,9 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import Select, { components, Props as SelectProps } from "react-select";
+import Select, { components, Props as SelectProps, StylesConfig } from "react-select";
 import { maxBy, pick } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
@@ -190,47 +190,57 @@ export function useTagEditDialog() {
 }
 
 function TagSelect({ value, onChange, ...props }: SelectProps<TagSelection, false, never>) {
-  const rsProps = useReactSelectProps<TagSelection, false, never>({
-    components: {
-      SingleValue: ({ data: tag, innerProps }) => {
-        return <Tag tag={tag as TagSelection} minWidth="0" {...innerProps} />;
-      },
-      Option: (props) => {
-        return (
-          <components.Option {...props}>
-            <Tag
-              flex="0 1 auto"
-              minWidth="0"
-              tag={props.data as TagSelection}
-              // boxShadow={props.isFocused ? "outline" : "none"}
-            />
-          </components.Option>
-        );
-      },
-    },
-    styles: {
+  const rsProps = useReactSelectProps<TagSelection, false, never>({});
+
+  const components = useMemo(
+    () => ({
+      ...rsProps.components,
+      SingleValue,
+      Option,
+    }),
+    [rsProps.components]
+  );
+
+  const styles = useMemo<StylesConfig<TagSelection, false, never>>(
+    () => ({
+      ...rsProps.styles,
       valueContainer: (styles) => ({
         ...styles,
         flexWrap: "nowrap",
         paddingLeft: "1rem",
         paddingRight: "1rem",
       }),
-      option: (styles, { isFocused, theme }) => ({
+      option: (styles) => ({
         ...styles,
         display: "flex",
         padding: "0.25rem 1rem",
       }),
-    },
-  });
+    }),
+    [rsProps.styles]
+  );
 
   return (
     <Select
+      {...props}
       {...rsProps}
       getOptionValue={(o) => o.id}
       getOptionLabel={(o) => o.name}
+      components={components}
+      styles={styles}
       value={value}
       onChange={onChange}
-      {...props}
     />
   );
 }
+
+const SingleValue: typeof components.SingleValue = function SingleValue({ data, innerProps }) {
+  return <Tag tag={data as unknown as TagSelection} minWidth="0" {...innerProps} />;
+};
+
+const Option: typeof components.Option = function Option(props) {
+  return (
+    <components.Option {...props}>
+      <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
+    </components.Option>
+  );
+};

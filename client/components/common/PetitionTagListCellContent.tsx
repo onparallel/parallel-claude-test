@@ -15,12 +15,12 @@ import {
 } from "@parallel/graphql/__types";
 import { clearCache } from "@parallel/utils/apollo/clearCache";
 import { withError } from "@parallel/utils/promises/withError";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { ExtendComponentProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import useMergedRef from "@react-hook/merged-ref";
-import { forwardRef, MouseEvent, useEffect, useRef, useState } from "react";
+import { forwardRef, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ActionMeta, components } from "react-select";
+import { ActionMeta, CommonProps, components, StylesConfig } from "react-select";
 import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
@@ -333,111 +333,22 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
     });
   }, [innerRef.current, props.defaultOptions]);
   const _ref = useMergedRef(ref, innerRef);
-  const rsProps = useReactSelectProps<TagSelection, true, never>({
-    components: {
-      IndicatorsContainer: () => <></>,
-      MultiValue: ({ data: tag, innerProps, removeProps }) => {
-        return (
-          <Tag
-            tag={tag as TagSelection}
-            margin="2px"
-            isRemovable
-            onRemove={removeProps.onClick}
-            minWidth="0"
-            {...innerProps}
-          />
-        );
-      },
-      Option: (props) => {
-        return props.data.__isNew__ ? (
-          <components.Option {...props}>
-            <Flex alignItems="baseline">
-              <FormattedMessage
-                id="components.petition-tag-list-cell-content.tags-create"
-                defaultMessage="Create {tag}"
-                values={{
-                  tag: (
-                    <Tag
-                      marginLeft="0.5rem"
-                      flex="0 1 auto"
-                      minWidth="0"
-                      tag={{
-                        name: props.data.value.trim().replace(/\s+/g, " "),
-                        color: newTagColor,
-                      }}
-                    />
-                  ),
-                }}
-              />
-            </Flex>
-          </components.Option>
-        ) : (
-          <components.Option {...props}>
-            <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
-          </components.Option>
-        );
-      },
-      NoOptionsMessage: (props) => {
-        return (
-          <Stack
-            direction="column"
-            spacing={1}
-            textStyle="hint"
-            fontSize="sm"
-            paddingX={2}
-            paddingY={4}
-            textAlign="center"
-          >
-            {props.options.length === 0 && !props.selectProps.inputValue ? (
-              <>
-                <Text>
-                  <FormattedMessage
-                    id="components.petition-tag-list-cell-content.no-options-1"
-                    defaultMessage="Your organization doesn't have any tags yet."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="components.petition-tag-list-cell-content.no-options-2"
-                    defaultMessage="Write something to create the first one."
-                  />
-                </Text>
-              </>
-            ) : (
-              <Text as="div">
-                <FormattedMessage
-                  id="components.petition-tag-list-cell-content.no-options-3"
-                  defaultMessage="Type to create a new tag"
-                />
-              </Text>
-            )}
-          </Stack>
-        );
-      },
-      MenuList: ({ children, ...props }) => (
-        <components.MenuList {...props}>
-          {children}
-          {props.selectProps.defaultOptions?.length > 0 ? (
-            <Box position="sticky" bottom="0" padding={2} backgroundColor="white">
-              <Button
-                width="100%"
-                size="sm"
-                variant="outline"
-                fontWeight="normal"
-                leftIcon={<EditIcon position="relative" top="-1px" />}
-                onClick={() => onEditTags()}
-              >
-                <FormattedMessage
-                  id="components.petition-tag-list-cell-content.edit-tags"
-                  defaultMessage="Edit tags"
-                />
-              </Button>
-            </Box>
-          ) : null}
-        </components.MenuList>
-      ),
-    },
-    styles: {
+  const rsProps = useReactSelectProps<TagSelection, true, never>();
+  const components = useMemo(
+    () => ({
+      ...rsProps.components,
+      IndicatorsContainer,
+      MultiValue,
+      Option,
+      NoOptionsMessage,
+      MenuList,
+    }),
+    [rsProps.components]
+  );
+
+  const styles = useMemo<StylesConfig<TagSelection, true, never>>(
+    () => ({
+      ...rsProps.styles,
       container: (styles) => ({ ...styles, width: "100%" }),
       valueContainer: (styles) => ({
         ...omit(styles as any, ["padding"]),
@@ -464,8 +375,10 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
         ...styles,
         paddingBottom: 0,
       }),
-    },
-  });
+    }),
+    [rsProps.styles]
+  );
+
   const handleChange = function (_: any, action: ActionMeta<TagSelection>) {
     switch (action.action) {
       case "select-option":
@@ -482,25 +395,159 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
   return (
     <AsyncCreatableSelect
       ref={_ref}
+      {...props}
       {...rsProps}
       isMulti
       isClearable={false}
       defaultMenuIsOpen
       closeMenuOnSelect={false}
+      value={value}
+      onChange={handleChange}
+      components={components}
+      styles={styles}
       getOptionValue={(o) => o.id}
       getOptionLabel={(o) => o.name}
       isValidNewOption={(value, _, options) => {
         const name = value.trim().replace(/\s+/g, " ");
         return name.length > 0 && !options.some((o) => o.name === name);
       }}
-      value={value}
-      onChange={handleChange}
       onMenuOpen={() => setNewTagColor(randomColor())}
       onCreateOption={(name) => {
         onCreateTag({ name, color: newTagColor });
         setNewTagColor(randomColor());
       }}
-      {...props}
+      newTagColor={newTagColor}
+      onEditTags={onEditTags}
     />
   );
 });
+
+export type PetitionTagListCellContentPropExtensions = {
+  newTagColor: string;
+  onEditTags: () => void;
+};
+
+export type PetitionTagListCellContentProps<T = CommonProps<any, any, any>> = ExtendComponentProps<
+  T,
+  PetitionTagListCellContentPropExtensions
+>;
+
+const IndicatorsContainer: typeof components.IndicatorsContainer = function IndicatorsContainer() {
+  return <></>;
+};
+
+const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsMessage(props) {
+  return (
+    <Stack
+      direction="column"
+      spacing={1}
+      textStyle="hint"
+      fontSize="sm"
+      paddingX={2}
+      paddingY={4}
+      textAlign="center"
+    >
+      {props.options.length === 0 && !props.selectProps.inputValue ? (
+        <>
+          <Text>
+            <FormattedMessage
+              id="components.petition-tag-list-cell-content.no-options-1"
+              defaultMessage="Your organization doesn't have any tags yet."
+            />
+          </Text>
+          <Text>
+            <FormattedMessage
+              id="components.petition-tag-list-cell-content.no-options-2"
+              defaultMessage="Write something to create the first one."
+            />
+          </Text>
+        </>
+      ) : (
+        <Text as="div">
+          <FormattedMessage
+            id="components.petition-tag-list-cell-content.no-options-3"
+            defaultMessage="Type to create a new tag"
+          />
+        </Text>
+      )}
+    </Stack>
+  );
+};
+
+const MultiValue: typeof components.MultiValue = function MultiValue({
+  data,
+  removeProps,
+  innerProps,
+}) {
+  return (
+    <Tag
+      tag={data as unknown as TagSelection}
+      margin="2px"
+      isRemovable
+      onRemove={removeProps.onClick}
+      minWidth="0"
+      {...innerProps}
+    />
+  );
+};
+
+const Option: typeof components.Option = function Option(props) {
+  const {
+    selectProps: { newTagColor },
+  } = props as unknown as PetitionTagListCellContentProps;
+  return props.data.__isNew__ ? (
+    <components.Option {...props}>
+      <Flex alignItems="baseline">
+        <FormattedMessage
+          id="components.petition-tag-list-cell-content.tags-create"
+          defaultMessage="Create {tag}"
+          values={{
+            tag: (
+              <Tag
+                marginLeft="0.5rem"
+                flex="0 1 auto"
+                minWidth="0"
+                tag={{
+                  name: props.data.value.trim().replace(/\s+/g, " "),
+                  color: newTagColor,
+                }}
+              />
+            ),
+          }}
+        />
+      </Flex>
+    </components.Option>
+  ) : (
+    <components.Option {...props}>
+      <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
+    </components.Option>
+  );
+};
+
+const MenuList: typeof components.MenuList = function MenuList(props) {
+  const {
+    selectProps: { onEditTags },
+  } = props as unknown as PetitionTagListCellContentProps;
+  return (
+    <components.MenuList {...props}>
+      {props.children}
+      {props.selectProps.defaultOptions?.length > 0 ? (
+        <Box position="sticky" bottom="0" padding={2} backgroundColor="white">
+          <Button
+            width="100%"
+            size="sm"
+            variant="outline"
+            fontWeight="normal"
+            leftIcon={<EditIcon position="relative" top="-1px" />}
+            onClick={() => onEditTags()}
+          >
+            <FormattedMessage
+              id="components.petition-tag-list-cell-content.edit-tags"
+              defaultMessage="Edit tags"
+            />
+          </Button>
+        </Box>
+      ) : null}
+    </components.MenuList>
+  );
+};

@@ -10,7 +10,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
-import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -26,20 +26,12 @@ export function CheckboxSettings({
   const intl = useIntl();
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 180, [field.id]);
-  const reactSelectProps = useFieldSelectReactSelectProps({});
-
-  const [selected, setSelected] = useState({
-    label: intl.formatMessage({
-      id: "component.petition-field-checkbox-settings.unlimited",
-      defaultMessage: "Unlimited",
-    }),
-    value: "UNLIMITED",
-  });
+  const rsProps = useReactSelectProps<OptionType, false, never>({ isDisabled: isReadOnly });
 
   const values = field.options?.values ?? [];
-  const [type, setType] = useState(field.options?.limit?.type ?? "UNLIMITED");
-  const [min, setMin] = useState<number | "">(1);
-  const [max, setMax] = useState<number | "">(1);
+  const [limitType, setLimitType] = useState(field.options?.limit?.type ?? "UNLIMITED");
+  const [min, setMin] = useState<number>(1);
+  const [max, setMax] = useState<number>(1);
 
   const refMin = useRef<HTMLInputElement>(null);
   const refMax = useRef<HTMLInputElement>(null);
@@ -77,61 +69,16 @@ export function CheckboxSettings({
     ];
   }, [intl.locale]);
 
-  useEffect(() => {
-    let _selected = null;
-    switch (type) {
-      case "UNLIMITED":
-        _selected = {
-          label: intl.formatMessage({
-            id: "component.petition-field-checkbox-settings.unlimited",
-            defaultMessage: "Unlimited",
-          }),
-          value: "UNLIMITED",
-        };
-        break;
+  const selected = options.find((o) => o.value === limitType);
 
-      case "EXACT":
-        _selected = {
-          label: intl.formatMessage({
-            id: "component.petition-field-checkbox-settings.exact-number",
-            defaultMessage: "Exact number",
-          }),
-          value: "EXACT",
-        };
-        break;
-
-      case "RANGE":
-        _selected = {
-          label: intl.formatMessage({
-            id: "component.petition-field-checkbox-settings.range",
-            defaultMessage: "Range",
-          }),
-          value: "RANGE",
-        };
-        break;
-
-      default:
-        _selected = {
-          label: intl.formatMessage({
-            id: "component.petition-field-checkbox-settings.unlimited",
-            defaultMessage: "Unlimited",
-          }),
-          value: "UNLIMITED",
-        };
-        break;
-    }
-
-    setSelected(_selected);
-  }, [intl.locale, type]);
-
-  const handleMinOnChange = (value: string) => {
-    if (value === "") {
-      setMin("");
+  const handleMinOnChange = (_: never, value: number) => {
+    if (Number.isNaN(value)) {
+      setMin(0);
       return;
     }
 
     const [_min, _max] = getMinMaxCheckboxLimit({
-      min: Number(value) || 0,
+      min: value,
       max: max || 1,
       valuesLength: values.length || 1,
       optional: field.optional,
@@ -152,15 +99,15 @@ export function CheckboxSettings({
     }
   };
 
-  const handleMaxOnChange = (value: string) => {
-    if (value === "") {
-      setMax("");
+  const handleMaxOnChange = (_: never, value: number) => {
+    if (Number.isNaN(value)) {
+      setMax(0);
       return;
     }
 
     const [_min, _max] = getMinMaxCheckboxLimit({
       min: min || 0,
-      max: Number(value) || 1,
+      max: value || 1,
       valuesLength: values.length || 1,
       optional: field.optional,
     });
@@ -179,20 +126,18 @@ export function CheckboxSettings({
     });
   };
 
-  const handleChangeSelect = (_selected: OptionType | null) => {
-    if (_selected && _selected.value !== selected?.value) {
-      setType(_selected.value);
+  const handleChangeSelect = (option: OptionType | null) => {
+    if (option && option.value !== selected?.value) {
+      setLimitType(option.value);
       debouncedOnUpdate(field.id, {
         options: {
           ...field.options,
           limit: {
             ...field.options.limit,
-            type: _selected.value,
+            type: option.value,
           },
         },
       });
-
-      setSelected(_selected);
     }
   };
 
@@ -221,9 +166,9 @@ export function CheckboxSettings({
           display="block"
           id="field-checkbox"
           color="green"
-          isChecked={type !== "RADIO"}
+          isChecked={limitType !== "RADIO"}
           onChange={(event) => {
-            setType(event.target.checked ? "UNLIMITED" : "RADIO");
+            setLimitType(event.target.checked ? "UNLIMITED" : "RADIO");
             debouncedOnUpdate(field.id, {
               options: {
                 ...field.options,
@@ -238,7 +183,7 @@ export function CheckboxSettings({
           isDisabled={isReadOnly}
         />
       </SettingsRow>
-      {type !== "RADIO" ? (
+      {limitType !== "RADIO" ? (
         <Stack direction="row">
           <Box flex={1}>
             <Select
@@ -246,12 +191,11 @@ export function CheckboxSettings({
               value={selected}
               isSearchable={false}
               onChange={handleChangeSelect}
-              {...reactSelectProps}
-              isDisabled={isReadOnly}
+              {...rsProps}
             />
           </Box>
 
-          {type === "RANGE" && (
+          {limitType === "RANGE" && (
             <NumberInput
               value={min}
               min={field.optional ? 0 : 1}
@@ -268,10 +212,10 @@ export function CheckboxSettings({
               </NumberInputStepper>
             </NumberInput>
           )}
-          {(type === "EXACT" || type === "RANGE") && (
+          {(limitType === "EXACT" || limitType === "RANGE") && (
             <NumberInput
               value={max}
-              min={type === "EXACT" ? 1 : Number(min)}
+              min={limitType === "EXACT" ? 1 : Number(min)}
               max={field.options.values.length ?? 1}
               width={"72px"}
               onChange={handleMaxOnChange}

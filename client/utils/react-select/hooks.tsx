@@ -1,17 +1,20 @@
 import { Box, CloseButton, Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
-import { DependencyList, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
-  components as Components,
+  CommonProps,
+  components,
   GroupTypeBase,
+  IndicatorProps,
   OptionTypeBase,
   SelectComponentsConfig,
   StylesConfig,
+  Theme,
 } from "react-select";
 import { omit } from "remeda";
-import { SelectProps } from "./types";
+import { OptionType, SelectProps } from "./types";
 
 export const SIZES = {
   lg: {
@@ -19,39 +22,30 @@ export const SIZES = {
       controlHeight: 48,
       menuGutter: 8,
       baseUnit: 4,
+      padding: 16,
     },
-    paddingX: 4,
     fontSize: "md" as const,
     borderRadius: "md" as const,
-    multiValue: {
-      borderRadius: "sm" as const,
-    },
   },
   md: {
     spacing: {
       controlHeight: 40,
       menuGutter: 8,
       baseUnit: 4,
+      padding: 16,
     },
-    paddingX: 4,
     fontSize: "md" as const,
     borderRadius: "md" as const,
-    multiValue: {
-      borderRadius: "sm" as const,
-    },
   },
   sm: {
     spacing: {
       controlHeight: 32,
       menuGutter: 8,
       baseUnit: 4,
+      padding: 8,
     },
-    paddingX: 2,
     fontSize: "sm" as const,
     borderRadius: "md" as const,
-    multiValue: {
-      borderRadius: "sm" as const,
-    },
   },
 };
 
@@ -66,17 +60,6 @@ export type UseReactSelectProps = {
   usePortal?: boolean;
 };
 
-export function useMemoReactSelectProps<
-  OptionType extends OptionTypeBase = { label: string; value: string },
-  IsMulti extends boolean = any,
-  GroupType extends GroupTypeBase<OptionType> = never
->(
-  factory: () => UseReactSelectProps,
-  deps: DependencyList | undefined
-): SelectProps<OptionType, IsMulti, GroupType> {
-  return useReactSelectProps(useMemo(factory, deps));
-}
-
 /**
  * Generates the props necessary for styling react-select as a chakra component
  */
@@ -84,43 +67,27 @@ export function useReactSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },
   IsMulti extends boolean = any,
   GroupType extends GroupTypeBase<OptionType> = never
->({
-  size = "md",
-  placeholder,
-  styles,
-  components,
-  usePortal = true,
-  ...props
-}: UseReactSelectProps = {}): SelectProps<OptionType, IsMulti, GroupType> {
-  const intl = useIntl();
-  const { colors, radii, sizes, fontSizes } = useTheme();
+>({ size = "md", placeholder, usePortal = true, ...props }: UseReactSelectProps = {}): SelectProps<
+  OptionType,
+  IsMulti,
+  GroupType
+> {
+  const { colors, radii, fontSizes } = useTheme();
 
   const { id: inputId, "aria-invalid": isInvalid, disabled: isDisabled } = useFormControl(props);
 
-  const labels = useMemo(
-    () => ({
-      clear: intl.formatMessage({
-        id: "generic.clear",
-        defaultMessage: "Clear",
-      }),
-    }),
-    [intl.locale]
-  );
-
-  const rehydrated = useRehydrated();
-  return useMemo<SelectProps<OptionType, IsMulti, GroupType>>(
-    () => ({
-      placeholder,
-      inputId,
-      isDisabled,
-      menuPortalTarget: usePortal && rehydrated ? document.body : undefined,
-      menuPlacement: "auto",
-      theme: (theme) => ({
+  const theme = useCallback(
+    (theme: Theme) => {
+      return {
         spacing: SIZES[size].spacing,
         colors: {
           ...theme.colors,
           primary: colors.blue[500],
           primary25: colors.gray[75],
+          error: colors.red[500],
+          error10: colors.red[100],
+          error20: colors.red[200],
+          error30: colors.red[300],
           neutral0: colors.white,
           neutral5: colors.gray[50],
           neutral10: colors.gray[100],
@@ -133,157 +100,169 @@ export function useReactSelectProps<
           neutral80: colors.gray[800],
           neutral90: colors.gray[900],
         },
-        borderRadius: radii[SIZES[size].borderRadius] as any,
+        borderRadius: radii[SIZES[size].borderRadius] as number,
+        fontSize: fontSizes[SIZES[size].fontSize] as string,
+      } as Theme;
+    },
+    [size, colors]
+  );
+
+  const styles = useMemo<StylesConfig<OptionType, IsMulti, GroupType>>(
+    () => ({
+      menuPortal: (styles) => ({
+        ...styles,
+        zIndex: 40,
       }),
-      components: {
-        IndicatorSeparator: () => null,
-        ClearIndicator: ({ innerProps }) => (
-          <CloseButton
-            tabIndex={-1}
-            title={labels.clear}
-            aria-label={labels.clear}
-            size="sm"
-            {...innerProps}
-          />
-        ),
-        DropdownIndicator: () => (
-          <Flex
-            alignItems="center"
-            paddingRight={SIZES[size].paddingX}
-            paddingLeft={SIZES[size].paddingX / 2}
-            color="gray.600"
-          >
-            <ChevronDownIcon display="block" position="relative" top="1px" />
-          </Flex>
-        ),
-        NoOptionsMessage: () => (
-          <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
-            <FormattedMessage id="component.react-select.no-options" defaultMessage="No options" />
-          </Text>
-        ),
-        MultiValueRemove: ({ innerProps, ...props }) => {
-          const intl = useIntl();
-          return (
-            <Components.MultiValueRemove
-              innerProps={{
-                ...innerProps,
-                role: "button",
-                "aria-label": intl.formatMessage({
-                  id: "generic.remove",
-                  defaultMessage: "Remove",
-                }),
-              }}
-              {...props}
-            >
-              <CloseIcon boxSize="10px" marginX={1} />
-            </Components.MultiValueRemove>
-          );
-        },
-        LoadingMessage: () => (
-          <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
-            <FormattedMessage id="component.react-select.loading" defaultMessage="Loading..." />
-          </Text>
-        ),
-        Option: ({ children, ...props }) => (
-          <Components.Option {...props}>
-            <Box flex="1" isTruncated>
-              {children}
-            </Box>
-          </Components.Option>
-        ),
-        ...components,
+      container: (styles, { isDisabled }) => ({
+        ...styles,
+        cursor: isDisabled ? "not-allowed" : "default",
+        pointerEvents: undefined,
+      }),
+      input: (styles) => ({
+        ...styles,
+        margin: "0 2px",
+      }),
+      control: (styles, { isDisabled, isFocused, theme, selectProps }) => {
+        const isInvalid = selectProps.isInvalid as boolean;
+        const {
+          colors: { error, primary: borderColor, neutral30: borderColorHover },
+          fontSize,
+        } = theme as Theme & ThemeExtension;
+        return {
+          ...styles,
+          alignItems: "stretch",
+          opacity: isDisabled ? 0.4 : 1,
+          borderColor: isInvalid ? error : isFocused ? borderColor : "inherit",
+          boxShadow: isInvalid
+            ? `0 0 0 1px ${error}`
+            : isFocused
+            ? `0 0 0 1px ${borderColor}`
+            : undefined,
+          "&:hover": {
+            borderColor: isInvalid ? error : isFocused ? borderColor : borderColorHover,
+          },
+          pointerEvents: isDisabled ? "none" : undefined,
+          fontSize: fontSize,
+        };
       },
-      styles: {
-        menuPortal: (styles) => ({
+      placeholder: (styles, { theme }) => {
+        const {
+          colors: { neutral40: placeholderColor },
+        } = theme;
+        return {
           ...styles,
-          zIndex: 40,
-        }),
-        container: (styles, { isDisabled }) => ({
-          ...styles,
-          cursor: isDisabled ? "not-allowed" : "default",
-          pointerEvents: undefined,
-        }),
-        input: (styles) => ({
-          ...styles,
-          margin: "0 2px",
-        }),
-        control: (styles, { isDisabled, isFocused, theme }: any) => {
-          return {
-            ...styles,
-            alignItems: "stretch",
-            opacity: isDisabled ? 0.4 : 1,
-            borderColor: isInvalid ? colors.red[500] : isFocused ? colors.blue[500] : "inherit",
-            boxShadow: isInvalid
-              ? `0 0 0 1px ${colors.red[500]}`
-              : isFocused
-              ? `0 0 0 1px ${colors.blue[500]}`
-              : undefined,
-            "&:hover": {
-              borderColor: isInvalid
-                ? colors.red[500]
-                : isFocused
-                ? theme.colors.primary
-                : colors.gray[300],
-            },
-            pointerEvents: isDisabled ? "none" : undefined,
-            fontSize: fontSizes[SIZES[size].fontSize],
-          };
-        },
-        placeholder: (styles) => ({
-          ...styles,
-          color: colors.gray[400],
+          color: placeholderColor,
           whiteSpace: "nowrap",
-        }),
-        valueContainer: (styles) => ({
+        };
+      },
+      valueContainer: (styles, { theme }) => {
+        const {
+          spacing: { padding },
+        } = theme as Theme & ThemeExtension;
+        return {
           ...omit(styles, ["padding"]),
-          paddingLeft: (sizes as any)[SIZES[size].paddingX],
+          paddingLeft: padding,
           paddingRight: 0,
-        }),
-        option: (styles) => ({
+        };
+      },
+      option: (styles, { theme }) => {
+        const {
+          fontSize,
+          spacing: { padding },
+        } = theme as Theme & ThemeExtension;
+        return {
           ...styles,
           cursor: "pointer",
-          padding: `0 ${SIZES[size].paddingX / 4}rem`,
+          padding: `0 ${padding}px`,
           minHeight: "32px",
           display: "flex",
           alignItems: "center",
-          fontSize: fontSizes[SIZES[size].fontSize],
+          fontSize: fontSize,
           whiteSpace: "nowrap",
-        }),
-        menu: (styles) => ({
+        };
+      },
+      menu: (styles) => {
+        return {
           ...styles,
           overflow: "hidden", // when using OptimizedMenuList this is needed
-        }),
-        menuList: (styles) => ({
+        };
+      },
+      menuList: (styles) => {
+        return {
           ...styles,
           padding: "0.5rem 0",
-        }),
-        singleValue: (styles) => omit(styles, ["color"]),
-        multiValue: (styles, { data }) => ({
+        };
+      },
+      singleValue: (styles) => {
+        return { ...omit(styles, ["color"]) };
+      },
+      multiValue: (styles, { data, theme }) => {
+        const {
+          colors: { neutral20: backgroundColor, error20: backgroundColorError },
+        } = theme;
+        return {
           ...styles,
-          backgroundColor: data.isInvalid ? colors.red[200] : colors.gray[200],
-          borderRadius: radii[SIZES[size].multiValue.borderRadius],
-        }),
-        multiValueRemove: (styles, { data }) => {
-          const radius = radii[SIZES[size].multiValue.borderRadius];
-          return {
-            ...styles,
-            borderRadius: `0 ${radius} ${radius} 0`,
-            ":hover": {
-              backgroundColor: data.isInvalid ? colors.red[300] : colors.gray[300],
-              color: colors.gray[900],
-            },
-          };
-        },
-        multiValueLabel: (styles) => ({
+          backgroundColor: data.isInvalid ? backgroundColorError : backgroundColor,
+          borderRadius: radii["sm"],
+        };
+      },
+      multiValueRemove: (styles, { data, theme }) => {
+        const {
+          colors: {
+            neutral30: backgroundColorHover,
+            error30: backgroundColorHoverError,
+            neutral90: fontColor,
+          },
+        } = theme;
+        return {
+          ...styles,
+          borderRadius: `0 ${radii["sm"]} ${radii["sm"]} 0`,
+          ":hover": {
+            backgroundColor: data.isInvalid ? backgroundColorHoverError : backgroundColorHover,
+            color: fontColor,
+          },
+        };
+      },
+      multiValueLabel: (styles) => {
+        return {
           ...styles,
           display: "inline-flex",
           alignItems: "center",
-        }),
-        ...styles,
+        };
       },
+      ...props.styles,
     }),
-    [rehydrated, size, placeholder, inputId, isInvalid, isDisabled, components, styles]
+    [props.styles]
   );
+
+  const components = useMemo<SelectComponentsConfig<OptionType, IsMulti, GroupType>>(
+    () => ({
+      IndicatorSeparator,
+      ClearIndicator,
+      DropdownIndicator,
+      NoOptionsMessage,
+      MultiValueRemove,
+      LoadingMessage,
+      Option,
+      ...props.components,
+    }),
+    [props.components]
+  );
+
+  const rehydrated = useRehydrated();
+  return {
+    placeholder,
+    inputId,
+    isDisabled,
+    menuPortalTarget: usePortal && rehydrated ? document.body : undefined,
+    menuPlacement: "auto",
+    theme,
+    components,
+    styles,
+    // Extension props
+    size,
+    isInvalid,
+  };
 }
 
 export function useInlineReactSelectProps<
@@ -292,56 +271,156 @@ export function useInlineReactSelectProps<
   GroupType extends GroupTypeBase<OptionType> = never
 >(props: UseReactSelectProps): SelectProps<OptionType, IsMulti, GroupType> {
   const rsProps = useReactSelectProps<OptionType, IsMulti, GroupType>(props);
-
-  return useMemo<SelectProps<OptionType, IsMulti, GroupType>>(
+  const styles = useMemo<StylesConfig<OptionType, IsMulti, GroupType>>(
     () => ({
-      ...rsProps,
-      styles: {
-        ...rsProps.styles,
-        control: (styles, data) =>
-          omit(rsProps.styles?.control?.(styles, data) ?? styles, ["flexWrap"]),
-        valueContainer: (styles, data) =>
-          omit(rsProps.styles?.valueContainer?.(styles, data) ?? styles, ["flexWrap"]),
-        singleValue: (styles, data) =>
-          omit(rsProps.styles?.singleValue?.(styles, data) ?? styles, [
-            "position",
-            "maxWidth",
-            "transform",
-            "top",
-          ]),
-        menu: (styles, data) => ({
-          ...(rsProps.styles?.menu?.(styles, data) ?? styles),
-          minWidth: "100%",
-          width: "unset",
-          left: "50%",
-          transform: "translateX(-50%)",
-        }),
-      },
+      ...rsProps.styles,
+      control: (styles, data) =>
+        omit(rsProps.styles?.control?.(styles, data) ?? styles, ["flexWrap"]),
+      valueContainer: (styles, data) =>
+        omit(rsProps.styles?.valueContainer?.(styles, data) ?? styles, ["flexWrap"]),
+      singleValue: (styles, data) =>
+        omit(rsProps.styles?.singleValue?.(styles, data) ?? styles, [
+          "position",
+          "maxWidth",
+          "transform",
+          "top",
+        ]),
+      menu: (styles, data) => ({
+        ...(rsProps.styles?.menu?.(styles, data) ?? styles),
+        minWidth: "100%",
+        width: "unset",
+        left: "50%",
+        transform: "translateX(-50%)",
+      }),
     }),
-    [rsProps]
-  ) as any;
+    [rsProps.styles]
+  );
+
+  return {
+    ...rsProps,
+    styles,
+  };
 }
 
-export function useFieldSelectReactSelectProps(props: UseReactSelectProps) {
-  const _reactSelectProps = useReactSelectProps(props);
-  return useMemo<SelectProps>(
-    () =>
-      ({
-        ..._reactSelectProps,
-        styles: {
-          ..._reactSelectProps.styles,
-          menu: (styles, props) => ({
-            ...styles,
-            ..._reactSelectProps.styles!.menu?.(styles, props),
-            zIndex: 100,
-          }),
-          valueContainer: (styles, props) => ({
-            ...styles,
-            ..._reactSelectProps.styles!.valueContainer?.(styles, props),
-            paddingRight: 32,
-          }),
-        },
-      } as typeof _reactSelectProps),
-    [_reactSelectProps]
+export function useRecipientViewReactSelectProps(props: UseReactSelectProps) {
+  const rsProps = useReactSelectProps<OptionType, false, never>(props);
+  const styles = useMemo<StylesConfig<OptionType, false, never>>(
+    () => ({
+      ...rsProps.styles,
+      menu: (styles, props) => ({
+        ...(rsProps.styles!.menu?.(styles, props) ?? styles),
+        zIndex: 100,
+      }),
+      valueContainer: (styles, props) => ({
+        ...(rsProps.styles!.valueContainer?.(styles, props) ?? styles),
+        paddingRight: 32,
+      }),
+    }),
+    [rsProps.styles]
   );
+
+  return {
+    ...rsProps,
+    styles,
+  };
 }
+
+export type ExtendComponentProps<T = CommonProps<any, any, any>, TSelectProps = {}> = T & {
+  theme: Theme & ThemeExtension;
+  selectProps: TSelectProps & SelectComponentPropExtensions;
+};
+
+export type SelectComponentPropExtensions = {
+  isInvalid: boolean;
+  size: "sm" | "md" | "lg";
+};
+
+export type ThemeExtension = {
+  spacing: {
+    padding: number;
+  };
+  fontSize: string;
+};
+
+const IndicatorSeparator: typeof components.IndicatorSeparator = function IndicatorSeparator() {
+  return <></>;
+};
+
+const ClearIndicator: typeof components.ClearIndicator = function ClearIndicator({ innerProps }) {
+  const intl = useIntl();
+  return (
+    <CloseButton
+      tabIndex={-1}
+      aria-label={intl.formatMessage({
+        id: "generic.clear",
+        defaultMessage: "Clear",
+      })}
+      size="sm"
+      {...innerProps}
+    />
+  );
+};
+
+const DropdownIndicator: typeof components.DropdownIndicator = function DropdownIndicator(props) {
+  const { theme } = props as ExtendComponentProps<IndicatorProps<any, any, any>>;
+  return (
+    <Flex
+      alignItems="center"
+      paddingRight={theme.spacing.padding / 4}
+      paddingLeft={theme.spacing.padding / 4 / 2}
+      color="gray.600"
+    >
+      <ChevronDownIcon display="block" position="relative" top="1px" />
+    </Flex>
+  );
+};
+
+const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsMessage() {
+  return (
+    <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
+      <FormattedMessage id="component.react-select.no-options" defaultMessage="No options" />
+    </Text>
+  );
+};
+
+const MultiValueRemove: typeof components.MultiValueRemove = function MultiValueRemove({
+  innerProps,
+  ...props
+}) {
+  const intl = useIntl();
+  return (
+    <components.MultiValueRemove
+      innerProps={
+        {
+          ...innerProps,
+          role: "button" as any,
+          "aria-label": intl.formatMessage({
+            id: "generic.remove",
+            defaultMessage: "Remove",
+          }),
+        } as any
+      }
+      {...props}
+    >
+      <CloseIcon boxSize="10px" marginX={1} />
+    </components.MultiValueRemove>
+  );
+};
+
+const LoadingMessage: typeof components.LoadingMessage = function LoadingMessage() {
+  return (
+    <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
+      <FormattedMessage id="component.react-select.loading" defaultMessage="Loading..." />
+    </Text>
+  );
+};
+
+const Option: typeof components.Option = function Option({ children, ...props }) {
+  return (
+    <components.Option {...props}>
+      <Box flex="1" isTruncated>
+        {children}
+      </Box>
+    </components.Option>
+  );
+};

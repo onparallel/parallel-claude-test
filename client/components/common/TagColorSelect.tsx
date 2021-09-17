@@ -3,7 +3,7 @@ import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import Select, { components, Props as SelectProps } from "react-select";
+import Select, { components, Props as SelectProps, StylesConfig } from "react-select";
 
 export const DEFAULT_COLORS = [
   "#E2E8F0",
@@ -87,45 +87,48 @@ export type TagColorSelectProps = Omit<
 export function TagColorSelect({ value, onChange, ...props }: TagColorSelectProps) {
   const options = useTagColors();
   const _value = options.find((o) => o.value === value) ?? null;
-  const rsProps = useReactSelectProps<TagColor, false, never>({
-    components: {
-      SingleValue: (props) => {
-        return <TagColorOption color={props.data} />;
-      },
-      Option: (props) => {
-        return (
-          <components.Option {...props}>
-            <TagColorOption color={props.data} />
-          </components.Option>
-        );
-      },
-    },
-    styles: {
+  const rsProps = useReactSelectProps<TagColor, false, never>();
+
+  const components = useMemo(
+    () => ({
+      ...rsProps.components,
+      SingleValue,
+      Option,
+    }),
+    [rsProps.components]
+  );
+
+  const styles = useMemo<StylesConfig<TagColor, false, never>>(
+    () => ({
+      ...rsProps.styles,
       valueContainer: (styles) => ({
         ...styles,
         flexWrap: "nowrap",
       }),
-      option: (styles, { isFocused, theme }) => ({
+      option: (styles) => ({
         ...styles,
         display: "flex",
         padding: "0.25rem 1rem",
-        // backgroundColor: isFocused ? theme.colors.neutral5 : undefined,
       }),
-    },
-  });
+    }),
+    [rsProps.styles]
+  );
+
   function handleChange(color: TagColor | null) {
     onChange(color?.value ?? null);
   }
 
   return (
     <Select
+      {...props}
       {...rsProps}
       options={options}
+      components={components}
+      styles={styles}
       getOptionValue={(o) => o.value}
       getOptionLabel={(o) => o.name}
       value={_value}
       onChange={handleChange}
-      {...props}
     />
   );
 }
@@ -140,3 +143,15 @@ function TagColorOption({ color }: { color: TagColor }) {
     </Stack>
   );
 }
+
+const SingleValue: typeof components.SingleValue = function SingleValue(props) {
+  return <TagColorOption color={props.data as unknown as TagColor} />;
+};
+
+const Option: typeof components.Option = function Option(props) {
+  return (
+    <components.Option {...props}>
+      <TagColorOption color={props.data as TagColor} />
+    </components.Option>
+  );
+};

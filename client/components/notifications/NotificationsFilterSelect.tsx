@@ -1,6 +1,7 @@
 import { PetitionUserNotificationFilter } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
-import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { OptionType } from "@parallel/utils/react-select/types";
 import { Focusable } from "@parallel/utils/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { forwardRef, useMemo, useRef } from "react";
@@ -11,7 +12,7 @@ export const NotificationsFilterSelect = forwardRef<
   Focusable,
   ValueProps<PetitionUserNotificationFilter>
 >(function NotificationsFilterSelect({ value, onChange }, ref) {
-  const reactSelectProps = useFieldSelectReactSelectProps({});
+  const rsProps = useReactSelectProps<OptionType, false, never>({});
   const intl = useIntl();
 
   const options = useMemo(
@@ -64,7 +65,7 @@ export const NotificationsFilterSelect = forwardRef<
 
   const _value = options.find((o) => o.value === value) ?? null;
 
-  const _ref = useRef<Select<any, false, never>>(null);
+  const _ref = useRef<Select<OptionType, false, never>>(null);
   assignRef(ref, {
     focus: () => setTimeout(() => _ref.current?.focus()),
   });
@@ -78,7 +79,7 @@ export const NotificationsFilterSelect = forwardRef<
       onChange={(selected) =>
         onChange((selected?.value as PetitionUserNotificationFilter) ?? "ALL")
       }
-      {...reactSelectProps}
+      {...rsProps}
     />
   );
 });

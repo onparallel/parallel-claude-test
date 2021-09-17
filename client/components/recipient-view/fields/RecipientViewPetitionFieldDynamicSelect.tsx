@@ -7,7 +7,7 @@ import {
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { DynamicSelectOption, FieldOptions } from "@parallel/utils/petitionFields";
-import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useRecipientViewReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -253,16 +253,11 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
   const [optimistic, setOptimistic] = useState<string | null>(null);
 
-  const reactSelectProps = useFieldSelectReactSelectProps(
-    useMemo(
-      () => ({
-        id: `reply-${field.id}-${reply?.id ? `${reply.id}-${level}` : "new"}`,
-        isDisabled: isDisabled || reply?.status === "APPROVED",
-        isInvalid: reply?.status === "REJECTED",
-      }),
-      [reply?.id, reply?.status, isDisabled]
-    )
-  );
+  const rsProps = useRecipientViewReactSelectProps({
+    id: `reply-${field.id}-${reply?.id ? `${reply.id}-${level}` : "new"}`,
+    isDisabled: isDisabled || reply?.status === "APPROVED",
+    isInvalid: reply?.status === "REJECTED",
+  });
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -302,12 +297,12 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     (reply && reply.content.columns[level][0] !== field.options.labels[level]) ?? false;
 
   return (
-    <FormControl id={reactSelectProps.inputId} isDisabled={labelsAreOutdated}>
+    <FormControl id={rsProps.inputId} isDisabled={labelsAreOutdated}>
       <FormLabel>{label}</FormLabel>
       <Flex alignItems="center">
         <Box flex="1" position="relative">
           <Select
-            {...reactSelectProps}
+            {...rsProps}
             ref={ref}
             value={optimistic ? toSelectOption(optimistic) : value}
             options={options}

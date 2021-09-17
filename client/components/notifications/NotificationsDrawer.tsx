@@ -41,7 +41,7 @@ export function NotificationsDrawer() {
     notifyOnNetworkStatusChange: true,
   });
   const isInitialLoading = loading && networkStatus !== NetworkStatus.fetchMore;
-  const selectRef = useRef<Focusable>(null);
+  const filterRef = useRef<Focusable>(null);
 
   const notifications = data?.me.notifications?.items ?? [];
   const hasMore = data?.me.notifications?.hasMore ?? true;
@@ -117,7 +117,7 @@ export function NotificationsDrawer() {
       isOpen={isOpen}
       size="sm"
       isFullHeight
-      initialFocusRef={selectRef}
+      initialFocusRef={filterRef}
     >
       <DrawerOverlay />
       <DrawerContent>
@@ -138,7 +138,7 @@ export function NotificationsDrawer() {
               />
             </Text>
           </Stack>
-          <NotificationsFilterSelect ref={selectRef} value={filter} onChange={handleFilterChange} />
+          <NotificationsFilterSelect ref={filterRef} value={filter} onChange={handleFilterChange} />
         </DrawerHeader>
         <DrawerBody
           paddingInlineStart={0}

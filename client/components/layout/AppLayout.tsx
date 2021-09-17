@@ -207,7 +207,7 @@ export const AppLayout = Object.assign(
           lastName
           email
           createdAt
-          canCreateUsers
+          canCreateUsers # UserSelect reads this from cache
           ...AppLayoutNavbar_User
         }
         ${AppLayoutNavbar.fragments.User}
