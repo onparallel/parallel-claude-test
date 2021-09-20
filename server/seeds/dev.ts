@@ -5,13 +5,27 @@ import {
   CreateOrganization,
   CreateUser,
   Organization,
+  OrganizationUsageLimit,
   User,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
 
 export async function seed(knex: Knex): Promise<any> {
   await deleteAllData(knex);
-  const orgs: CreateOrganization[] = [{ name: "Parallel", status: "DEV" }];
+  const orgs: CreateOrganization[] = [
+    {
+      name: "Parallel",
+      status: "DEV",
+      usage_details: {
+        USER_LIMIT: 100,
+        PETITION_SEND: {
+          limit: 5000,
+          period: "1 month",
+        },
+      },
+    },
+  ];
+
   const orgIds = await knex<Organization>("organization").insert(orgs, "id");
   const users: CreateUser[] = [
     {
@@ -62,6 +76,14 @@ export async function seed(knex: Knex): Promise<any> {
       created_by: `User:${userIds[0]}`,
       updated_by: `User:${userIds[0]}`,
     });
+
+  await knex<OrganizationUsageLimit>("organization_usage_limit").insert({
+    org_id: orgIds[0],
+    limit_name: "PETITION_SEND",
+    limit: 5000,
+    period: "1 month",
+    used: 0,
+  });
 
   const contacts: CreateContact[] = [
     {
