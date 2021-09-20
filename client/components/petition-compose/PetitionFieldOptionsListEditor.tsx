@@ -4,12 +4,19 @@ import {
   PetitionFieldOptionsListEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { assignRef } from "@parallel/utils/assignRef";
 import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { isEmptyParagraph } from "@parallel/utils/slate/isEmptyRTEValue";
 import { ParagraphElement } from "@parallel/utils/slate/types";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { isSelectionExpanded } from "@udecode/plate-common";
-import { forwardRef, KeyboardEvent, useCallback, useMemo, useState } from "react";
+import {
+  forwardRef,
+  KeyboardEvent,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
 import { FormattedMessage } from "react-intl";
 import { pipe } from "remeda";
 import { shallowEqualArrays } from "shallow-equal";
@@ -72,7 +79,6 @@ function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
 
 export type PetitionFieldOptionsListEditorRef = {
   focus: (position?: "START" | "END") => void;
-  editor: Editor;
 };
 
 function valuesToSlateNodes(values: string[]): ParagraphElement[] {
@@ -89,27 +95,25 @@ export const PetitionFieldOptionsListEditor = Object.assign(
       ref
     ) {
       const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
+      const editorRef = useUpdatingRef(editor);
       const [value, onChange] = useState<ParagraphElement[]>(
         valuesToSlateNodes(field.options.values ?? [])
       );
-      assignRef(
+      useImperativeHandle(
         ref,
-        useMemo(
-          () =>
-            ({
-              focus: (position) => {
-                ReactEditor.focus(editor);
-                if (position) {
-                  Transforms.select(
-                    editor,
-                    position === "START" ? Editor.start(editor, []) : Editor.end(editor, [])
-                  );
-                }
-              },
-              editor,
-            } as PetitionFieldOptionsListEditorRef),
-          [editor]
-        )
+        () =>
+          ({
+            focus: (position) => {
+              const editor = editorRef.current;
+              ReactEditor.focus(editor);
+              if (position) {
+                Transforms.select(
+                  editor,
+                  position === "START" ? Editor.start(editor, []) : Editor.end(editor, [])
+                );
+              }
+            },
+          } as PetitionFieldOptionsListEditorRef)
       );
 
       const handleKeyDown = useCallback(

@@ -1,10 +1,9 @@
 import { PetitionUserNotificationFilter } from "@parallel/graphql/__types";
-import { assignRef } from "@parallel/utils/assignRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { Focusable } from "@parallel/utils/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { forwardRef, useMemo, useRef } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 
@@ -66,9 +65,11 @@ export const NotificationsFilterSelect = forwardRef<
   const _value = options.find((o) => o.value === value) ?? null;
 
   const _ref = useRef<Select<OptionType, false, never>>(null);
-  assignRef(ref, {
-    focus: () => setTimeout(() => _ref.current?.focus()),
-  });
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      setTimeout(() => _ref.current?.focus());
+    },
+  }));
 
   return (
     <Select
