@@ -3655,4 +3655,17 @@ export class PetitionRepository extends BaseRepository {
       petitions_pending: petitions.filter((s) => s.status === "PENDING").length,
     };
   }
+
+  async markPetitionAccessEmailBounceStatus(petitionAccessId: number, hasBounced: boolean) {
+    await this.from("contact")
+      .update("last_email_bounced", hasBounced)
+      .where(
+        "id",
+        this.from("contact")
+          .join("petition_access", "contact.id", "petition_access.contact_id")
+          .whereNull("contact.deleted_at")
+          .where("petition_access.id", petitionAccessId)
+          .select("contact.id")
+      );
+  }
 }

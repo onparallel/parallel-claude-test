@@ -134,6 +134,7 @@ type Contact implements Timestamps {
   The full name of the contact.
   """
   fullName: String
+  hasBouncedEmail: Boolean!
 
   """
   The ID of the contact.

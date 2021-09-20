@@ -34,5 +34,8 @@ export const Contact = objectType({
         });
       },
     });
+    t.boolean("hasBouncedEmail", {
+      resolve: (root) => root.last_email_bounced,
+    });
   },
 });

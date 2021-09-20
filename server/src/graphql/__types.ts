@@ -658,6 +658,7 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     firstName: string | null; // String
     fullName: string | null; // String
+    hasBouncedEmail: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     lastName: string | null; // String
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1766,6 +1767,7 @@ export interface NexusGenFieldTypeNames {
     email: "String";
     firstName: "String";
     fullName: "String";
+    hasBouncedEmail: "Boolean";
     id: "GID";
     lastName: "String";
     updatedAt: "DateTime";

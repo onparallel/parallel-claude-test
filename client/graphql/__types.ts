@@ -127,6 +127,7 @@ export interface Contact extends Timestamps {
   firstName?: Maybe<Scalars["String"]>;
   /** The full name of the contact. */
   fullName?: Maybe<Scalars["String"]>;
+  hasBouncedEmail: Scalars["Boolean"];
   /** The ID of the contact. */
   id: Scalars["GID"];
   /** The last name of the contact. */
@@ -2885,6 +2886,7 @@ export type ContactSelect_ContactFragment = {
   id: string;
   fullName?: Maybe<string>;
   email: string;
+  hasBouncedEmail: boolean;
 };
 
 export type PetitionFieldSelect_PetitionFieldFragment = {
@@ -4277,7 +4279,13 @@ export type AddPetitionAccessDialog_contactsByEmailQueryVariables = Exact<{
 
 export type AddPetitionAccessDialog_contactsByEmailQuery = {
   contactsByEmail: Array<
-    Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+    Maybe<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+      hasBouncedEmail: boolean;
+    }>
   >;
 };
 
@@ -5918,7 +5926,13 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     title: string;
     review: boolean;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
   }>;
 };
@@ -6466,7 +6480,13 @@ export type SignatureConfigDialog_PetitionFragment = {
     title: string;
     review: boolean;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
   }>;
 };
@@ -7094,7 +7114,13 @@ export type PetitionSignaturesCard_PetitionFragment = {
     title: string;
     review: boolean;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
   }>;
   signatureRequests?: Maybe<
@@ -7143,7 +7169,13 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           title: string;
           review: boolean;
           contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
           >;
         }>;
         signatureRequests?: Maybe<
@@ -10983,7 +11015,13 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     title: string;
     review: boolean;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
   }>;
   remindersConfig?: Maybe<{
@@ -11182,7 +11220,13 @@ export type PetitionCompose_updatePetitionMutation = {
           title: string;
           review: boolean;
           contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
           >;
         }>;
         remindersConfig?: Maybe<{
@@ -11777,7 +11821,13 @@ export type PetitionComposeQuery = {
           title: string;
           review: boolean;
           contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
           >;
         }>;
         remindersConfig?: Maybe<{
@@ -11975,7 +12025,13 @@ export type PetitionReplies_PetitionFragment = {
     provider: string;
     title: string;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
   }>;
   signatureRequests?: Maybe<
@@ -12438,7 +12494,13 @@ export type PetitionRepliesQuery = {
           provider: string;
           title: string;
           contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
           >;
         }>;
         signatureRequests?: Maybe<
@@ -12936,9 +12998,9 @@ export type Account_UserFragment = {
   firstName?: Maybe<string>;
   lastName?: Maybe<string>;
   isSsoUser: boolean;
-  email: string;
   id: string;
   fullName?: Maybe<string>;
+  email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
@@ -12981,8 +13043,8 @@ export type AccountQuery = {
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     isSsoUser: boolean;
-    email: string;
     fullName?: Maybe<string>;
+    email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
@@ -14137,7 +14199,13 @@ export type PetitionComposeSearchContactsQueryVariables = Exact<{
 export type PetitionComposeSearchContactsQuery = {
   contacts: {
     __typename?: "ContactPagination";
-    items: Array<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+    items: Array<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+      hasBouncedEmail: boolean;
+    }>;
   };
 };
 
@@ -15821,6 +15889,7 @@ export const ContactSelect_ContactFragmentDoc = gql`
     id
     fullName
     email
+    hasBouncedEmail
   }
 `;
 export const SignatureConfigDialog_PetitionFragmentDoc = gql`
@@ -16369,7 +16438,6 @@ export const Account_UserFragmentDoc = gql`
     firstName
     lastName
     isSsoUser
-    email
     ...SettingsLayout_User
     ...useSettingsSections_User
   }

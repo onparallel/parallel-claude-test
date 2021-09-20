@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, Tooltip } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -13,7 +13,7 @@ import { useExistingContactToast } from "@parallel/utils/useExistingContactToast
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import { ClipboardEvent, forwardRef, KeyboardEvent, useMemo, useRef, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { CommonProps, components, InputActionMeta, InputProps } from "react-select";
 import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
@@ -79,7 +79,7 @@ export const ContactSelect = Object.assign(
         const contact = await onCreateContact({ defaultEmail: email });
         onChange([
           ...(value ?? []).filter((v) => v.id !== email),
-          pick(contact, ["id", "email", "fullName"]),
+          pick(contact, ["id", "email", "fullName", "hasBouncedEmail"]),
         ]);
         setIsCreating(false);
         return true;
@@ -166,7 +166,7 @@ export const ContactSelect = Object.assign(
           id
           fullName
           email
-          # hasBouncedEmail
+          hasBouncedEmail
         }
       `,
     },
@@ -274,7 +274,9 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
   children,
   ...props
 }) {
-  const { fullName, email, isDeleted } = props.data as unknown as ContactSelectSelection;
+  const { fullName, email, isDeleted, hasBouncedEmail } =
+    props.data as unknown as ContactSelectSelection;
+  const intl = useIntl();
   return (
     <components.MultiValueLabel {...props}>
       <Text as="span" marginLeft={1}>
@@ -286,16 +288,16 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
           email
         )}
       </Text>
-      {/* {hasBouncedEmail ? (
-          <Tooltip
-            label={intl.formatMessage({
-              id: "component.contact-select.bounced-email-tooltip",
-              defaultMessage: "Previously bounced email",
-            })}
-          >
-            <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
-          </Tooltip>
-        ) : null} */}
+      {hasBouncedEmail ? (
+        <Tooltip
+          label={intl.formatMessage({
+            id: "component.contact-select.bounced-email-tooltip",
+            defaultMessage: "Previously bounced email",
+          })}
+        >
+          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
+        </Tooltip>
+      ) : null}
     </components.MultiValueLabel>
   );
 };
@@ -322,9 +324,9 @@ const Option: typeof components.Option = function Option({ children, ...props })
         ) : (
           <Text as="span">{contact.email}</Text>
         )}
-        {/* {contact.hasBouncedEmail ? (
-            <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
-          ) : null} */}
+        {contact.hasBouncedEmail ? (
+          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
+        ) : null}
       </components.Option>
     );
   }

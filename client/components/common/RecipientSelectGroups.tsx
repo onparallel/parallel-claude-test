@@ -188,9 +188,8 @@ export function RecipientSelectGroups({
     return contact;
   }
 
-  const bouncedEmailRecipients = recipientGroups.reduce(
-    (acc, recipients) => [...acc, ...recipients],
-    []
+  const bouncedEmailRecipients = recipientGroups.flatMap((group) =>
+    group.filter((contact) => contact.hasBouncedEmail)
   );
 
   return (
@@ -319,9 +318,9 @@ export function RecipientSelectGroups({
               <Text>
                 <FormattedMessage
                   id="component.recipient-select-groups.emails-bounced-warning"
-                  defaultMessage="{count, plural, =1{The following email has been bounced previously. Make sure you enter a working email address.} other {The following emails have been bounced previously. Make sure you enter working emails address.}} "
+                  defaultMessage="{count, plural, =1{The following email has been bounced previously. Make sure you enter a working email address.} other {The following emails have been bounced previously. Make sure you enter working email addresses.}} "
                   values={{
-                    count: 2,
+                    count: bouncedEmailRecipients.length,
                   }}
                 />
               </Text>
