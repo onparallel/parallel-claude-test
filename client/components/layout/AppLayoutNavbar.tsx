@@ -31,16 +31,10 @@ import { UserMenu } from "./UserMenu";
 export interface AppLayoutNavbarProps extends BoxProps {
   user: AppLayoutNavbar_UserFragment;
   onHelpCenterClick: () => void;
-  onLocaleChange: (locale: string) => void;
 }
 
 export const AppLayoutNavbar = Object.assign(
-  memo(function AppLayoutNavbar({
-    user,
-    onHelpCenterClick,
-    onLocaleChange,
-    ...props
-  }: AppLayoutNavbarProps) {
+  memo(function AppLayoutNavbar({ user, onHelpCenterClick, ...props }: AppLayoutNavbarProps) {
     const intl = useIntl();
     const router = useRouter();
     const { pathname, query } = router;
@@ -192,7 +186,6 @@ export const AppLayoutNavbar = Object.assign(
             placement={isMobile ? "top-end" : "right-end"}
             user={user}
             onHelpCenterClick={onHelpCenterClick}
-            onLocaleChange={onLocaleChange}
           />
         </Stack>
       </Flex>

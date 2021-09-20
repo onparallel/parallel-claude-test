@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Center, Flex, Spinner } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
-import { resolveUrl } from "@parallel/utils/next";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -94,17 +93,6 @@ export const AppLayout = Object.assign(
       window.zE?.activate?.({ hideOnClose: true });
     }
 
-    function handleLocaleChange(locale: string) {
-      window.analytics?.identify(user.id, {
-        email: user.email,
-        locale,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      });
-      window.zE?.("webWidget", "setLocale", locale);
-      router.push(resolveUrl(router.pathname, router.query), undefined, { locale });
-    }
-
     function handleZendeskLoad() {
       window.zE?.("webWidget", "hide");
       window.zE?.("webWidget", "prefill", {
@@ -152,7 +140,6 @@ export const AppLayout = Object.assign(
               <AppLayoutNavbar
                 user={user}
                 onHelpCenterClick={handleHelpCenterClick}
-                onLocaleChange={handleLocaleChange}
                 flex="1"
                 zIndex="2"
               />

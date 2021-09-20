@@ -2695,11 +2695,6 @@
     "context": "Notifications"
   },
   {
-    "term": "component.user-menu.ui-language",
-    "definition": "Language",
-    "context": "Language"
-  },
-  {
     "term": "component.user-select.group-members",
     "definition": "{count, plural, =1 {1 member} other {# members}}",
     "context": "{count, plural, =1 {1 member} other {# members}}"
@@ -7210,9 +7205,14 @@
     "context": "Change password"
   },
   {
+    "term": "settings.account.language",
+    "definition": "Language",
+    "context": "Language"
+  },
+  {
     "term": "settings.account.name-header",
-    "definition": "Name",
-    "context": "Name"
+    "definition": "Name and surname",
+    "context": "Name and surname"
   },
   {
     "term": "settings.account.sso-user-explanation",

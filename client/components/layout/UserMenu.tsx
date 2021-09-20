@@ -11,8 +11,6 @@ import {
   UsePopperProps,
   HStack,
   Text,
-  MenuOptionGroup,
-  MenuItemOption,
   Stack,
 } from "@chakra-ui/react";
 import {
@@ -27,7 +25,6 @@ import {
 } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink, NormalLink } from "../common/Link";
@@ -37,10 +34,9 @@ export interface UserMenuProps {
   placement?: UsePopperProps["placement"];
   user: UserMenu_UserFragment;
   onHelpCenterClick: () => void;
-  onLocaleChange?: (locale: string) => void;
 }
 
-export function UserMenu({ placement, user, onHelpCenterClick, onLocaleChange }: UserMenuProps) {
+export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -49,7 +45,6 @@ export function UserMenu({ placement, user, onHelpCenterClick, onLocaleChange }:
       locale: router.locale!,
     })}`;
   }
-  const locales = useSupportedLocales();
 
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { onOpen: onOpenNotifications } = useNotificationsState();
@@ -110,22 +105,8 @@ export function UserMenu({ placement, user, onHelpCenterClick, onLocaleChange }:
               </MenuItem>
             </NakedLink>
           ) : null}
-          <MenuOptionGroup
-            value={router.locale}
-            title={intl.formatMessage({
-              id: "component.user-menu.ui-language",
-              defaultMessage: "Language",
-            })}
-            onChange={onLocaleChange as any}
-            type="radio"
-          >
-            {locales.map(({ key, localizedLabel }) => (
-              <MenuItemOption key={key} value={key}>
-                {localizedLabel}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
           <MenuDivider />
+
           {isMobile ? (
             <MenuItem
               icon={<HelpOutlineIcon display="block" boxSize={4} />}
