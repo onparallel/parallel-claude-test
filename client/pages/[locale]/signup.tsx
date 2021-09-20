@@ -66,7 +66,9 @@ function Signup() {
     // track current step of registration process into analytics
     window.analytics?.track("Register Steps", {
       step: currentStep,
-      email: formData.current?.email,
+      email: formData.current.email,
+      firstName: formData.current.firstName,
+      lastName: formData.current.lastName,
     });
   }, [currentStep]);
 

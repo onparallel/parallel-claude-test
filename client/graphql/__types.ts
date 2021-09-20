@@ -3198,6 +3198,8 @@ export type AppLayout_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -3334,6 +3336,8 @@ export type PetitionLayout_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -3367,6 +3371,8 @@ export type SettingsLayout_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -7775,6 +7781,8 @@ export type Admin_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -7798,6 +7806,8 @@ export type AdminQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -7834,6 +7844,8 @@ export type AdminOrganizations_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -7886,6 +7898,8 @@ export type AdminOrganizationsUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -7907,6 +7921,8 @@ export type AdminSupportMethods_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -7930,6 +7946,8 @@ export type AdminSupportMethodsUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -8093,6 +8111,8 @@ export type Contact_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -8133,6 +8153,8 @@ export type ContactUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -8229,6 +8251,8 @@ export type Contacts_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -8281,6 +8305,8 @@ export type ContactsUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -8320,6 +8346,8 @@ export type OrganizationBrandingQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -8363,6 +8391,8 @@ export type OrganizationGroup_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -8492,6 +8522,8 @@ export type OrganizationGroupUserQuery = {
     id: string;
     role: OrganizationRole;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -8550,6 +8582,8 @@ export type OrganizationGroups_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -8658,6 +8692,8 @@ export type OrganizationGroupsUserQuery = {
     id: string;
     role: OrganizationRole;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -8681,6 +8717,8 @@ export type OrganizationSettingsQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -8705,6 +8743,8 @@ export type OrganizationUsageQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -8806,6 +8846,8 @@ export type OrganizationUsersQuery = {
     id: string;
     role: OrganizationRole;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -9453,6 +9495,8 @@ export type PetitionActivity_UserFragment = {
   id: string;
   unreadNotificationIds: Array<string>;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -10839,6 +10883,8 @@ export type PetitionActivityUserQuery = {
     id: string;
     unreadNotificationIds: Array<string>;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -11038,6 +11084,8 @@ export type PetitionCompose_UserFragment = {
   id: string;
   unreadNotificationIds: Array<string>;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -11616,6 +11664,8 @@ export type PetitionComposeUserQuery = {
     id: string;
     unreadNotificationIds: Array<string>;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -11972,6 +12022,8 @@ export type PetitionReplies_UserFragment = {
   id: string;
   unreadNotificationIds: Array<string>;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -12231,6 +12283,8 @@ export type PetitionRepliesUserQuery = {
     id: string;
     unreadNotificationIds: Array<string>;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -12555,6 +12609,8 @@ export type Petitions_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -12579,6 +12635,8 @@ export type PetitionsUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -12715,6 +12773,8 @@ export type NewPetition_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -12771,6 +12831,8 @@ export type NewPetitionUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -12901,6 +12963,8 @@ export type Settings_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
   isSuperAdmin: boolean;
@@ -12925,6 +12989,8 @@ export type SettingsQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -12958,6 +13024,8 @@ export type SecurityQuery = {
     isSsoUser: boolean;
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -13002,6 +13070,8 @@ export type TokensQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
     isSuperAdmin: boolean;
@@ -14616,6 +14686,8 @@ export const AppLayout_UserFragmentDoc = gql`
   fragment AppLayout_User on User {
     id
     fullName
+    firstName
+    lastName
     email
     createdAt
     ...AppLayoutNavbar_User

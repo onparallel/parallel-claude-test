@@ -68,7 +68,12 @@ export const AppLayout = Object.assign(
       if (window.analytics && !(window.analytics as any).initialized) {
         window.analytics?.load(process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY);
       }
-      window.analytics?.identify(user.id, { email: user.email, locale: Router.query.locale });
+      window.analytics?.identify(user.id, {
+        email: user.email,
+        locale: Router.query.locale,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
     }, [user.id]);
 
     // Initialize userflow
@@ -88,7 +93,12 @@ export const AppLayout = Object.assign(
     }
 
     function handleLocaleChange(locale: string) {
-      window.analytics?.identify(user.id, { email: user.email, locale });
+      window.analytics?.identify(user.id, {
+        email: user.email,
+        locale,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
       window.zE?.("webWidget", "setLocale", locale);
       Router.push(
         resolveUrl(Router.pathname, {
@@ -193,6 +203,8 @@ export const AppLayout = Object.assign(
         fragment AppLayout_User on User {
           id
           fullName
+          firstName
+          lastName
           email
           createdAt
           ...AppLayoutNavbar_User
