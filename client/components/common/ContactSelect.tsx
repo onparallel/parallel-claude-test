@@ -48,7 +48,7 @@ export const ContactSelect = Object.assign(
 
     const [options, setOptions] = useState<ContactSelectSelection[]>();
 
-    const reactSelectProps = useContactSelectReactSelectProps({
+    const rsProps = useContactSelectReactSelectProps({
       ...props,
       isDisabled: props.isDisabled || isCreating,
     });
@@ -155,7 +155,7 @@ export const ContactSelect = Object.assign(
         loadOptions={loadOptions}
         defaultOptions={options}
         {...{ onPasteEmails }}
-        {...reactSelectProps}
+        {...rsProps}
       />
     );
   }),
@@ -189,6 +189,7 @@ function useContactSelectReactSelectProps(
   );
 
   return {
+    ...rsProps,
     getOptionLabel,
     getOptionValue,
     isValidNewOption,
