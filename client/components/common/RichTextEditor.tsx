@@ -32,6 +32,7 @@ import {
 } from "@parallel/chakra/icons";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { formatList } from "@parallel/utils/slate/formatList";
 import {
   Placeholder,
   PlaceholderMenu,
@@ -57,7 +58,6 @@ import { createExitBreakPlugin } from "@udecode/plate-break";
 import {
   getAbove,
   getNode,
-  getParent,
   getPreventDefaultHandler,
   insertNodes,
   isCollapsed,
@@ -70,7 +70,6 @@ import {
 import {
   createHistoryPlugin,
   createReactPlugin,
-  isElement,
   Plate,
   PlatePluginOptions,
   useStoreEditorState,
@@ -204,17 +203,6 @@ export type RichTextEditorValue = CustomElement[];
 export interface RichTextEditorInstance {
   focus(): void;
 }
-
-const formatList = (editor: CustomEditor, elementType: string) => {
-  if (editor.selection) {
-    const parentEntry = getParent(editor, editor.selection);
-    if (!parentEntry) return;
-    const [node] = parentEntry;
-    if (isElement(node)) {
-      toggleList(editor, { type: elementType });
-    }
-  }
-};
 
 export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
   function RichTextEditor(
