@@ -956,7 +956,7 @@ export interface NexusGenFieldTypes {
     events: NexusGenRootTypes["PetitionEventPagination"]; // PetitionEventPagination!
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
-    fromTemplateId: string | null; // ID
+    fromTemplateId: NexusGenScalars["GID"] | null; // GID
     hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isReadOnly: boolean; // Boolean!
@@ -2064,7 +2064,7 @@ export interface NexusGenFieldTypeNames {
     events: "PetitionEventPagination";
     fieldCount: "Int";
     fields: "PetitionField";
-    fromTemplateId: "ID";
+    fromTemplateId: "GID";
     hasCommentsEnabled: "Boolean";
     id: "GID";
     isReadOnly: "Boolean";

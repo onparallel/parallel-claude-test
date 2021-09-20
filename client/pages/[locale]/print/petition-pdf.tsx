@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, Image, Text } from "@chakra-ui/react";
+import { Box, Grid, GridProps, Heading, Image, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PdfFieldWithReplies } from "@parallel/components/print/PdfFieldWithReplies";
@@ -80,16 +80,7 @@ function PetitionPdf({ token }: { token: string }) {
                   />
                 </Text>
                 {fromTemplateId ? <HardcodedSignatures fromTemplateId={fromTemplateId} /> : null}
-                <Flex
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gridAutoRows: "minmax(150px, auto)",
-                    alignItems: "center",
-                    justifyItems: "center",
-                    width: "100%",
-                  }}
-                >
+                <SignaturesGrid>
                   {contacts?.map(
                     (signer, index) =>
                       signer && (
@@ -100,7 +91,7 @@ function PetitionPdf({ token }: { token: string }) {
                         />
                       )
                   )}
-                </Flex>
+                </SignaturesGrid>
               </Box>
             )}
         </PdfPage>
@@ -167,31 +158,48 @@ function HardcodedSignatures({ fromTemplateId }: { fromTemplateId: string }) {
     name: "Renata Sujto",
     imgSrc: "static/images/signatures/renata-sujto-exp.jpeg",
   };
-  const signaturesByTemplateId: Record<string, HardcodedSigner[]> = {
-    EAwW2jXkP4C9LZvEb2: [renataSujto],
-    EAwW2jXkP4C9LZvEb3: [renataSujto],
-  };
-  return process.env.NODE_ENV === "production" &&
-    (signaturesByTemplateId[fromTemplateId] ?? []).length > 0 ? (
-    <Flex
-      marginBottom="10px"
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gridAutoRows: "minmax(150px, auto)",
-        alignItems: "center",
-        justifyItems: "center",
-        width: "100%",
-      }}
-    >
-      {signaturesByTemplateId[fromTemplateId].map((signer, index) => (
+  const signaturesByTemplateId: Record<string, HardcodedSigner[] | undefined> = useMemo(() => {
+    switch (process.env.NEXT_PUBLIC_ENVIRONMENT) {
+      case "production":
+        return {
+          EAwW2jXkP4C9LZvEb2: [renataSujto],
+          EAwW2jXkP4C9LZvEb3: [renataSujto],
+        };
+      case "staging":
+        return {
+          "4exV9AsWJrjj7qFL3": [renataSujto],
+        };
+      default:
+        return {};
+    }
+  }, []);
+
+  return (signaturesByTemplateId[fromTemplateId] ?? []).length > 0 ? (
+    <SignaturesGrid marginBottom="10px">
+      {(signaturesByTemplateId[fromTemplateId] ?? []).map((signer, index) => (
         <Box key={index}>
           <Image height="35mm" src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/${signer.imgSrc}`} />
           <Text textAlign="center">{signer.name}</Text>
         </Box>
       ))}
-    </Flex>
+    </SignaturesGrid>
   ) : null;
+}
+
+function SignaturesGrid({ children, ...props }: GridProps) {
+  return (
+    <Grid
+      templateColumns="repeat(3, 1fr)"
+      autoRows="minmax(150px, auto)"
+      alignItems="center"
+      justifyItems="center"
+      width="100%"
+      marginBottom="10px"
+      {...props}
+    >
+      {children}
+    </Grid>
+  );
 }
 
 PetitionPdf.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {

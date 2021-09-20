@@ -1549,7 +1549,7 @@ type Petition implements PetitionBase {
   """
   The template GID used for this petition
   """
-  fromTemplateId: ID
+  fromTemplateId: GID
 
   """
   Whether comments are enabled or not.
