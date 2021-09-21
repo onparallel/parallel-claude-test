@@ -35,7 +35,23 @@ export function PetitionRemindersConfig({
   if (value?.weekdaysOnly && isWeekend(day)) {
     day = addWeeks(startOfWeek(day, { weekStartsOn: 1 }), 1);
   }
-  const firstReminder = parse(value?.time ?? "09:00", "HH:mm", day);
+
+  const possibleSendTimes = [
+    "08:00",
+    "08:30",
+    "09:00",
+    "09:30",
+    "10:00",
+    "10:30",
+    "11:00",
+    "11:30",
+    "12:00",
+  ];
+  const randomIndex = Math.floor(Math.random() * possibleSendTimes.length);
+  const sendTime = value?.time ?? possibleSendTimes[randomIndex];
+
+  const firstReminder = parse(sendTime, "HH:mm", day);
+
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const timeInput = useTimeInput(value?.time ?? "", {
     onChange: (time) => value && time && onChange({ ...value, timezone, time }),
@@ -50,7 +66,7 @@ export function PetitionRemindersConfig({
       onChange(
         previousValueRef.current ?? {
           offset: 2,
-          time: "09:00",
+          time: sendTime,
           timezone,
           weekdaysOnly: true,
         }
