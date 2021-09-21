@@ -2101,8 +2101,8 @@
   },
   {
     "term": "component.recipient-select-groups.emails-bounced-warning",
-    "definition": "{count, plural, =1{The following email has been bounced previously. Make sure you enter a working email address.} other {The following emails have been bounced previously. Make sure you enter working email addresses.}}",
-    "context": "{count, plural, =1{The following email has been bounced previously. Make sure you enter a working email address.} other {The following emails have been bounced previously. Make sure you enter working email addresses.}}"
+    "definition": "The following {count, plural, =1{email has} other{emails have}} bounced previously. Please, make sure the email addresses are valid.",
+    "context": "The following {count, plural, =1{email has} other{emails have}} bounced previously. Please, make sure the email addresses are valid."
   },
   {
     "term": "component.recipient-select-groups.recipients-label",

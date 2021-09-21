@@ -318,7 +318,7 @@ export function RecipientSelectGroups({
               <Text>
                 <FormattedMessage
                   id="component.recipient-select-groups.emails-bounced-warning"
-                  defaultMessage="{count, plural, =1{The following email has been bounced previously. Make sure you enter a working email address.} other {The following emails have been bounced previously. Make sure you enter working email addresses.}} "
+                  defaultMessage="The following {count, plural, =1{email has} other{emails have}} bounced previously. Please, make sure the email addresses are valid."
                   values={{
                     count: bouncedEmailRecipients.length,
                   }}
