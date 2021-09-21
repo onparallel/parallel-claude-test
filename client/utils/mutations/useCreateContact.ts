@@ -19,6 +19,7 @@ export function useCreateContact() {
           firstName
           lastName
           fullName
+          hasBouncedEmail
         }
       }
     `

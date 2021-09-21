@@ -1351,7 +1351,7 @@ export interface Petition extends PetitionBase {
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The template GID used for this petition */
-  fromTemplateId?: Maybe<Scalars["ID"]>;
+  fromTemplateId?: Maybe<Scalars["GID"]>;
   /** Whether comments are enabled or not. */
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
@@ -1412,7 +1412,7 @@ export interface PetitionAccess extends Timestamps {
   contact?: Maybe<Contact>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  /** The user who granted the access. */
+  /** The user who granted the original access. */
   granter?: Maybe<User>;
   /** The ID of the petition access. */
   id: Scalars["GID"];
@@ -13992,6 +13992,7 @@ export type useCreateContact_createContactMutation = {
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     fullName?: Maybe<string>;
+    hasBouncedEmail: boolean;
   };
 };
 
@@ -21727,6 +21728,7 @@ export const useCreateContact_createContactDocument = gql`
       firstName
       lastName
       fullName
+      hasBouncedEmail
     }
   }
 `;
