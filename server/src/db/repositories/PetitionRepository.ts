@@ -536,6 +536,7 @@ export class PetitionRepository extends BaseRepository {
       keycode: random(16),
       reminders_left: 10,
       status: "ACTIVE",
+      delegator_contact_id: recipient.id,
       created_by: `Contact:${recipient.id}`,
       updated_by: `Contact:${recipient.id}`,
     }).returning("*");
@@ -549,7 +550,8 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadMessagesByPetitionAccessId = this.buildLoadMultipleBy(
     "petition_message",
-    "petition_access_id"
+    "petition_access_id",
+    (q) => q.orderBy("created_at", "asc")
   );
 
   async createMessages(

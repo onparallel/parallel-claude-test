@@ -5,6 +5,7 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
+import { loadOriginalMessageByPetitionAccess } from "../helpers/loadOriginalMessageByPetitionAccess";
 
 export async function petitionAccessDelegated(
   payload: {
@@ -30,11 +31,11 @@ export async function petitionAccessDelegated(
     throw new Error(`Petition access with id ${payload.original_access_id} not found`);
   }
 
-  const [contact, delegator, petitionOwner, messages] = await Promise.all([
+  const [contact, delegator, petitionOwner, originalMessage] = await Promise.all([
     context.contacts.loadContact(newAccess.contact_id),
     context.contacts.loadContact(originalAccess.contact_id),
     context.users.loadUser(originalAccess.granter_id),
-    context.petitions.loadMessagesByPetitionAccessId(originalAccess.id),
+    loadOriginalMessageByPetitionAccess(payload.original_access_id, payload.petition_id, context),
   ]);
 
   if (!contact) {
@@ -63,7 +64,7 @@ export async function petitionAccessDelegated(
       deadline: petition.deadline,
       bodyHtml: toHtml(payload.message_body),
       bodyPlainText: toPlainText(payload.message_body),
-      emailSubject: messages[0].email_subject,
+      emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
       ...layoutProps,
     },

@@ -7,6 +7,7 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { buildFieldWithComments } from "../helpers/getFieldWithComments";
 import { getLayoutProps } from "../helpers/getLayoutProps";
+import { loadOriginalMessageByPetitionAccess } from "../helpers/loadOriginalMessageByPetitionAccess";
 
 export async function commentsContactNotification(
   payload: {
@@ -16,12 +17,12 @@ export async function commentsContactNotification(
   },
   context: WorkerContext
 ) {
-  const [petition, contact, access, _comments, messages] = await Promise.all([
+  const [petition, contact, access, _comments, originalMessage] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
     context.contacts.loadContactByAccessId(payload.petition_access_id),
     context.petitions.loadAccess(payload.petition_access_id),
     context.petitions.loadPetitionFieldComment(payload.petition_field_comment_ids),
-    context.petitions.loadMessagesByPetitionAccessId(payload.petition_access_id),
+    loadOriginalMessageByPetitionAccess(payload.petition_access_id, payload.petition_id, context),
   ]);
   if (!petition) {
     throw new Error(`Petition not found for petition_id ${payload.petition_id}`);
@@ -45,7 +46,7 @@ export async function commentsContactNotification(
   const { html, text, subject, from } = await buildEmail(
     PetitionCommentsContactNotification,
     {
-      emailSubject: messages[0].email_subject,
+      emailSubject: originalMessage?.email_subject ?? null,
       contactFullName: fullName(contact.first_name, contact.last_name),
       keycode: access.keycode,
       fields,

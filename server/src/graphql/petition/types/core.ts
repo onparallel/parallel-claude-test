@@ -533,7 +533,7 @@ export const PetitionAccess = objectType({
     });
     t.nullable.field("granter", {
       type: "User",
-      description: "The user who granted the access.",
+      description: "The user who granted the original access.",
       resolve: async (root, _, ctx) => {
         return (await ctx.users.loadUser(root.granter_id))!;
       },

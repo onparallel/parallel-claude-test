@@ -7,6 +7,7 @@ import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
+import { loadOriginalMessageByPetitionAccess } from "../helpers/loadOriginalMessageByPetitionAccess";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
@@ -27,12 +28,12 @@ export async function petitionReminder(
         `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`
       );
     }
-    const [petition, granter, contact, fields, messages] = await Promise.all([
+    const [petition, granter, contact, fields, originalMessage] = await Promise.all([
       context.petitions.loadPetition(access.petition_id),
       context.users.loadUser(access.granter_id),
       context.contacts.loadContact(access.contact_id),
       context.petitions.loadFieldsForPetition(access.petition_id),
-      context.petitions.loadMessagesByPetitionAccessId(reminder.petition_access_id),
+      loadOriginalMessageByPetitionAccess(access.id, access.petition_id, context),
     ]);
     if (!petition) {
       throw new Error(`Petition not found for petition_access.petition_id ${access.petition_id}`);
@@ -71,7 +72,7 @@ export async function petitionReminder(
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
-        emailSubject: messages[0]?.email_subject,
+        emailSubject: originalMessage?.email_subject ?? null,
         contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,

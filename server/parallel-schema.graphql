@@ -1656,7 +1656,7 @@ type PetitionAccess implements Timestamps {
   createdAt: DateTime!
 
   """
-  The user who granted the access.
+  The user who granted the original access.
   """
   granter: User
 
