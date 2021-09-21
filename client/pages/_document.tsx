@@ -79,8 +79,8 @@ class MyDocument extends Document<MyDocumentProps> {
           ) : null}
           {(
             [
-              ["ibm-plex-sans-v8-latin", ["300", "regular", "500", "600"]],
-              ["source-sans-pro-v14-latin", ["regular", "600"]],
+              ["ibm-plex-sans-v8-latin", ["regular", "600"]],
+              ["source-sans-pro-v14-latin", ["600"]],
             ] as [string, string[]][]
           ).flatMap(([name, types]) =>
             types.map((type) => (
