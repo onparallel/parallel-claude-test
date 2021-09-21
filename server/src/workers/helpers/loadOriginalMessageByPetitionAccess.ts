@@ -12,8 +12,10 @@ export async function loadOriginalMessageByPetitionAccess(
   const allAccesses = await ctx.petitions.loadAccessesForPetition(petitionId);
   let access = await ctx.petitions.loadAccess(petitionAccessId);
 
-  while (access?.delegator_contact_id) {
+  let triesLeft = 10;
+  while (access?.delegator_contact_id && triesLeft > 0) {
     access = allAccesses.find((a) => a.contact_id === access!.delegator_contact_id) ?? null;
+    triesLeft--;
   }
   if (access) {
     const [firstMessage] = await ctx.petitions.loadMessagesByPetitionAccessId(access.id);
