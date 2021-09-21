@@ -1,21 +1,60 @@
-import { redirect } from "@parallel/components/common/withApolloData";
-import languages from "@parallel/lang/languages.json";
-import { negotiate } from "@parallel/utils/negotiate";
-import { NextPageContext } from "next";
+import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicDataProtection } from "@parallel/components/public/PublicDataProtection";
+import { PublicDemoCta } from "@parallel/components/public/PublicDemoCta";
+import { PublicFigures } from "@parallel/components/public/PublicFigures";
+import { PublicHero } from "@parallel/components/public/PublicHero";
+import { PublicHeroPopularUseCases } from "@parallel/components/public/PublicHeroPopularUseCases";
+import { PublicHowItWorksHero } from "@parallel/components/public/PublicHowItWorksHero";
+import { PublicTrust } from "@parallel/components/public/PublicTrust";
+import { useRouter } from "next/router";
+import { FormattedMessage, useIntl } from "react-intl";
 
-function Redirect() {
-  return <></>;
-}
+export default function Home() {
+  const intl = useIntl();
+  const { locale } = useRouter();
 
-Redirect.getInitialProps = async (context: NextPageContext) => {
-  // this only runs in development
-  const url = context.query.url;
-  const locale = negotiate(
-    typeof window !== "undefined" ? navigator.languages : context.req!.headers["accept-language"]!,
-    languages.map((l) => l.locale),
-    languages.find((l) => l.default)!.locale
+  const hero = {
+    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${locale}`,
+    alt: intl.formatMessage({
+      id: "public.showcase-hero-alt",
+      defaultMessage: "A screenshot of the app showcasing the information received using Parallel",
+    }),
+    ratio: 1426 / 1140,
+    title: intl.formatMessage({
+      id: "public.home.hero-title",
+      defaultMessage: "Automate your workflows with clients",
+    }),
+    subtitle: intl.formatMessage({
+      id: "public.home.hero-subtitle",
+      defaultMessage:
+        "With Parallel you can easily automate forms with documents and make it an agile and safe process.",
+    }),
+    buttonText: intl.formatMessage({
+      id: "public.book-demo-button",
+      defaultMessage: "Book a demo",
+    }),
+    url: "/book-demo",
+  };
+
+  return (
+    <PublicLayout
+      title={intl.formatMessage({
+        id: "public.home.title",
+        defaultMessage: "Automate your workflows with clients",
+      })}
+    >
+      <PublicHero {...hero} />
+      <PublicHeroPopularUseCases />
+      <PublicFigures />
+      <PublicHowItWorksHero />
+      <PublicDataProtection />
+      <PublicTrust />
+      <PublicDemoCta>
+        <FormattedMessage
+          id="public.home.work-in-parallel"
+          defaultMessage="Shall we work in parallel?"
+        />
+      </PublicDemoCta>
+    </PublicLayout>
   );
-  return redirect(context, `/${locale}${url ?? ""}`);
-};
-
-export default Redirect;
+}

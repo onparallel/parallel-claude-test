@@ -109,7 +109,7 @@ export function UserMenu({ placement, user, onHelpCenterClick, onLocaleChange }:
             </NakedLink>
           ) : null}
           <MenuOptionGroup
-            value={router.query.locale}
+            value={router.locale}
             title={intl.formatMessage({
               id: "component.user-menu.ui-language",
               defaultMessage: "Language",

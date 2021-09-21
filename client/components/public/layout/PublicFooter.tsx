@@ -27,16 +27,14 @@ export function PublicFooter(props: BoxProps) {
   const router = useRouter();
   const intl = useIntl();
   const supportUrl =
-    (
-      {
-        en: "https://support.onparallel.com/hc/en-us",
-        es: "https://support.onparallel.com/hc/es",
-      } as any
-    )[router.query.locale as string] ?? "https://support.onparallel.com/hc";
+    {
+      en: "https://support.onparallel.com/hc/en-us",
+      es: "https://support.onparallel.com/hc/es",
+    }[router.locale!] ?? "https://support.onparallel.com/hc";
 
   function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
     const locale = event.target.value;
-    router.push(resolveUrl(router.pathname, { ...router.query, locale }));
+    router.push(resolveUrl(router.pathname, { ...router.query }), undefined, { locale });
   }
 
   const locales = useSupportedLocales();
@@ -75,7 +73,7 @@ export function PublicFooter(props: BoxProps) {
               </Link>
             </ListItem>
             <ListItem>
-              <Link href="/developers/api" omitLocale>
+              <Link href="/developers/api" next={{ locale: false }}>
                 <FormattedMessage id="public.api-docs-link" defaultMessage="API Documentation" />
               </Link>
             </ListItem>
@@ -175,7 +173,7 @@ export function PublicFooter(props: BoxProps) {
               minWidth="160px"
               marginTop={4}
               onChange={handleLangChange}
-              value={router.query.locale}
+              value={router.locale}
               aria-label={intl.formatMessage({
                 id: "public.footer.language-select-label",
                 defaultMessage: "Change language",
@@ -205,7 +203,7 @@ export function PublicFooter(props: BoxProps) {
               alt="Enisa"
               width="80px"
               loading="lazy"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/enisa_${router.query.locale}.png`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/enisa_${router.locale}.png`}
             />
           </NormalLink>
         </Stack>

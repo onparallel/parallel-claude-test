@@ -41,17 +41,13 @@ export function I18nProvider({ children, ...props }: I18nProps & { children: Rea
 }
 
 function useTranslations() {
-  const {
-    query: { locale },
-  } = useRouter();
+  const { locale } = useRouter();
   const [{ current, cache }, setState] = useState<IntlCache>(() => {
     const locale = (window as any).__LOCALE__ as string;
     const messages = (window as any).__LOCALE_DATA__ as IntlConfig["messages"];
     return {
       current: locale,
-      cache: {
-        [locale]: messages,
-      },
+      cache: { [locale]: messages },
     };
   });
   const setLocale = useCallback(async function (locale: string) {

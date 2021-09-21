@@ -9,6 +9,10 @@ const config = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  i18n: {
+    locales: ["en", "es"],
+    defaultLocale: "en",
+  },
   crossOrigin: "anonymous",
   assetPrefix: process.env.NEXT_PUBLIC_ASSETS_URL,
   poweredByHeader: false,
@@ -80,13 +84,8 @@ const config = {
   },
 };
 
-const plugins = [
-  require("@next/bundle-analyzer")({
-    enabled: Boolean(process.env.ANALYZE),
-  }),
+module.exports = [
+  require("@next/bundle-analyzer")({ enabled: Boolean(process.env.ANALYZE) }),
   require("next-plugin-graphql"),
-  // source maps in last place, so it wraps every other plugin
-  require("@zeit/next-source-maps")(),
-];
-
-module.exports = plugins.reduce((acc, curr) => curr(acc), config);
+  require("@zeit/next-source-maps")(), // source maps in last place, so it wraps every other plugin
+].reduce((acc, curr) => curr(acc), config);

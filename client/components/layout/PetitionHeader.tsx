@@ -78,7 +78,7 @@ export function PetitionHeader({
   const handleDeleteClick = async function () {
     try {
       await deletePetitions([petition.id]);
-      router.push(`/${router.query.locale}/app/petitions/`);
+      router.push("/app/petitions/");
     } catch {}
   };
 

@@ -6505,14 +6505,14 @@
     "context": "Start streamlining your petitions for information"
   },
   {
-    "term": "public.resend-activation-email.success-description",
+    "term": "public.resend-verification-email.success-description",
     "definition": "Please, check your email.",
     "context": "Please, check your email."
   },
   {
-    "term": "public.resend-activation-email.success-title",
-    "definition": "Activation link sent",
-    "context": "Activation link sent"
+    "term": "public.resend-verification-email.success-title",
+    "definition": "Verification link sent",
+    "context": "Verification link sent"
   },
   {
     "term": "public.resources.faq",

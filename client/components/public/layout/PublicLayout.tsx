@@ -27,9 +27,9 @@ export function PublicLayout({
   hideHeader,
   og,
 }: PublicLayoutProps) {
-  const { query, pathname, asPath } = useRouter();
+  const { locale, query, pathname, asPath } = useRouter();
   const intl = useIntl();
-
+  const url = process.env.NEXT_PUBLIC_PARALLEL_URL;
   return (
     <>
       <Head>
@@ -46,17 +46,18 @@ export function PublicLayout({
             })
           }
         />
-        {languages.map(({ locale }) => (
+        <link rel="canonical" href={`${url}/${locale}${resolveUrl(pathname, query)}`} />
+      </Head>
+      {languages.map((lang) => (
+        <Head key={lang.locale}>
           <link
-            key={locale}
             rel="alternate"
-            hrefLang={locale}
-            href={`${process.env.NEXT_PUBLIC_PARALLEL_URL}${resolveUrl(pathname, {
-              ...query,
-              locale,
-            })}`}
+            hrefLang={lang.locale}
+            href={`${url}/${lang.locale}${resolveUrl(pathname, query)}`}
           />
-        ))}
+        </Head>
+      ))}
+      <Head>
         <meta property="og:title" content={og?.title ?? title} />
         <meta property="og:type" content={og?.type ?? "website"} />
         <meta property="og:url" content={og?.url ?? asPath} />
@@ -64,15 +65,15 @@ export function PublicLayout({
           property="og:image"
           content={
             og?.image ??
-            `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${query.locale}.png?v=${process.env.BUILD_ID}`
+            `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${locale}.png?v=${process.env.BUILD_ID}`
           }
         />
         <meta property="og:description" content={og?.description ?? description} />
-        {languages.map(({ locale }) => (
+        {languages.map((lang) => (
           <meta
-            key={locale}
-            property={locale === query.locale ? "og:locale" : "og:locale:alternate"}
-            content={locale}
+            key={lang.locale}
+            property={lang.locale === locale ? "og:locale" : "og:locale:alternate"}
+            content={lang.locale}
           />
         ))}
       </Head>

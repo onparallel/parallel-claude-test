@@ -35,7 +35,6 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
-import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { DateTime } from "../common/DateTime";
@@ -47,7 +46,6 @@ export interface TemplateDetailsModalProps extends Omit<ModalProps, "children"> 
 
 export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModalProps) {
   const intl = useIntl();
-  const { query } = useRouter();
 
   const canEdit = Boolean(
     template.myEffectivePermission &&
@@ -56,10 +54,12 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
 
   const indices = useFieldIndices(template.fields);
 
-  const publicLinkURL = `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${query.locale}/pp/${template.publicLink?.slug}`;
+  const publicLinkURL = template.publicLink?.isActive
+    ? `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${template.locale}/pp/${template.publicLink.slug}`
+    : undefined;
 
   const { onCopy: onCopyPublicLink } = useClipboardWithToast({
-    value: publicLinkURL,
+    value: publicLinkURL!,
     text: intl.formatMessage({
       id: "component.petition-settings.link-copied-toast",
       defaultMessage: "Link copied to clipboard",
@@ -285,6 +285,7 @@ TemplateDetailsModal.fragments = {
       id
       descriptionHtml
       name
+      locale
       fields {
         id
         title

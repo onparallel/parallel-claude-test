@@ -7,9 +7,11 @@ import {
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { clearCache } from "../apollo/clearCache";
+import { useUpdatingRef } from "../useUpdatingRef";
 
 export function useCreatePetition() {
-  const { query } = useRouter();
+  const router = useRouter();
+  const localeRef = useUpdatingRef(router.locale as PetitionLocale);
 
   const [createPetition] = useMutation<
     useCreatePetition_createPetitionMutation,
@@ -41,18 +43,16 @@ export function useCreatePetition() {
     }
   );
 
-  return useCallback(
-    async function ({
-      name = null,
-      locale = query.locale as PetitionLocale,
-      petitionId = null,
-      type = null,
-    }: Partial<useCreatePetition_createPetitionMutationVariables> = {}) {
-      const { data } = await createPetition({
-        variables: { name, locale, petitionId, type },
-      });
-      return data!.createPetition.id;
-    },
-    [query.locale]
-  );
+  return useCallback(async function ({
+    name = null,
+    locale = router.locale as PetitionLocale,
+    petitionId = null,
+    type = null,
+  }: Partial<useCreatePetition_createPetitionMutationVariables> = {}) {
+    const { data } = await createPetition({
+      variables: { name, locale: localeRef.current, petitionId, type },
+    });
+    return data!.createPetition.id;
+  },
+  []);
 }

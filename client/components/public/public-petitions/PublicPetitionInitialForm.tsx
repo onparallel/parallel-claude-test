@@ -54,12 +54,10 @@ export function PublicPetitionInitialForm({
   const router = useRouter();
 
   const supportUrl =
-    (
-      {
-        en: "https://support.onparallel.com/hc/en-us",
-        es: "https://support.onparallel.com/hc/es",
-      } as any
-    )[router.query.locale as string] ?? "https://support.onparallel.com/hc";
+    {
+      en: "https://support.onparallel.com/hc/en-us",
+      es: "https://support.onparallel.com/hc/es",
+    }[router.locale!] ?? "https://support.onparallel.com/hc";
 
   const [isDialogOpen, setDialogIsOpen] = useState(false);
   const onCloseDialog = () => setDialogIsOpen(false);

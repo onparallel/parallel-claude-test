@@ -131,19 +131,21 @@ export const AppLayoutNavbar = Object.assign(
           </NakedLink>
         </Center>
         <Flex justifyContent="center" alignItems="center">
-          <IconButtonWithTooltip
-            id="create-petition"
-            colorScheme="purple"
-            icon={<AddIcon />}
-            size="lg"
-            isRound
-            onClick={() => router.push(`/${router.query.locale}/app/petitions/new`)}
-            label={intl.formatMessage({
-              id: "new-petition.title",
-              defaultMessage: "New petition",
-            })}
-            placement={isMobile ? "top" : "right"}
-          />
+          <NakedLink href="/app/petitions/new">
+            <IconButtonWithTooltip
+              id="create-petition"
+              as="a"
+              colorScheme="purple"
+              icon={<AddIcon />}
+              size="lg"
+              isRound
+              label={intl.formatMessage({
+                id: "new-petition.title",
+                defaultMessage: "New petition",
+              })}
+              placement={isMobile ? "top" : "right"}
+            />
+          </NakedLink>
         </Flex>
         <Flex
           as={List}

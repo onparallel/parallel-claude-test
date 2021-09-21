@@ -39,11 +39,10 @@ export function SettingsLayout({
     useCallback(
       (matches) => {
         if (isBase && matches) {
-          const defaultPath = sections[0].path;
-          router.replace(`/${router.query.locale}${defaultPath}`);
+          router.replace(sections[0].path);
         }
       },
-      [sections, router.query.locale]
+      [sections]
     )
   );
 

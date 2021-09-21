@@ -28,14 +28,16 @@ export type WithServerState<P> = P & {
 };
 
 export function redirect(context: NextPageContext, location: string, reload = false) {
+  const locationWithLocale =
+    context.locale !== context.defaultLocale ? `/${context.locale}${location}` : location;
   if (typeof window !== "undefined") {
     if (reload) {
-      window.location.href = location;
+      window.location.href = locationWithLocale;
     } else {
       Router.push(location);
     }
   } else {
-    context.res!.writeHead(302, { Location: location }).end();
+    context.res!.writeHead(302, { Location: locationWithLocale }).end();
   }
   return { __redirect: location };
 }
@@ -134,18 +136,14 @@ export function withApolloData<P = {}>(
                   .filter((p) => !p.startsWith("redirect="))
                   .join("&");
                 const from = params ? `${path}?${_params}` : path;
-                return redirect(
-                  context,
-                  `/${query.locale}/login?redirect=${encodeURIComponent(from)}`,
-                  true
-                );
+                return redirect(context, `/login?redirect=${encodeURIComponent(from)}`, true);
               } else if (code === "FORBIDDEN") {
-                return redirect(context, `/${query.locale}/app`);
+                return redirect(context, `/app`);
               } else if (
                 code === "CONTACT_NOT_VERIFIED" &&
-                context.pathname.startsWith("/[locale]/petition/[keycode]")
+                context.pathname.startsWith("/petition/[keycode]")
               ) {
-                return redirect(context, `/${query.locale}/petition/${query.keycode}`);
+                return redirect(context, `/petition/${query.keycode}`);
               } else {
                 if (process.env.NODE_ENV === "development" && error.graphQLErrors[0]?.extensions) {
                   console.error(error.graphQLErrors[0].extensions);

@@ -6505,14 +6505,14 @@
     "context": "Start streamlining your petitions for information"
   },
   {
-    "term": "public.resend-activation-email.success-description",
+    "term": "public.resend-verification-email.success-description",
     "definition": "Por favor, revisa su correo.",
     "context": "Please, check your email."
   },
   {
-    "term": "public.resend-activation-email.success-title",
-    "definition": "Enlace de activación enviado",
-    "context": "Activation link sent"
+    "term": "public.resend-verification-email.success-title",
+    "definition": "Enlace de verificación enviado",
+    "context": "Verification link sent"
   },
   {
     "term": "public.resources.faq",

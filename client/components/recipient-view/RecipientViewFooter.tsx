@@ -13,7 +13,7 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
       en: "https://support.onparallel.com/hc/en-us",
       es: "https://support.onparallel.com/hc/es",
     } as any
-  )[router.query.locale as any];
+  )[router.locale!];
   return (
     <Flex flexDirection="column" marginTop={12} as="footer" alignItems="center" {...props}>
       <Text as="div" fontSize="sm">

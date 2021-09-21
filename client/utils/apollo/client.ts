@@ -73,7 +73,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         operation.operationName !== "CurrentUser" &&
         graphQLErrors?.[0]?.extensions?.code === "UNAUTHENTICATED"
       ) {
-        Router.push(`/${Router.query.locale ?? "en"}/login`);
+        Router.push("/login");
       }
     }
   });

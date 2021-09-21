@@ -5,7 +5,7 @@ import { AppLayout_UserFragment } from "@parallel/graphql/__types";
 import { resolveUrl } from "@parallel/utils/next";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -27,15 +27,17 @@ export const AppLayout = Object.assign(
   ) {
     const rehydrated = useRehydrated();
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+
     const timeoutRef = useRef<number>();
     // Show spinner if a page takes more than 1s to load
     useEffect(() => {
-      Router.events.on("routeChangeStart", handleRouteChangeStart);
-      Router.events.on("routeChangeComplete", handleRouteChangeComplete);
+      router.events.on("routeChangeStart", handleRouteChangeStart);
+      router.events.on("routeChangeComplete", handleRouteChangeComplete);
       return () => {
         window.clearTimeout(timeoutRef.current);
-        Router.events.off("routeChangeStart", handleRouteChangeStart);
-        Router.events.off("routeChangeComplete", handleRouteChangeComplete);
+        router.events.off("routeChangeStart", handleRouteChangeStart);
+        router.events.off("routeChangeComplete", handleRouteChangeComplete);
       };
       function handleRouteChangeStart() {
         timeoutRef.current = window.setTimeout(() => {
@@ -55,10 +57,10 @@ export const AppLayout = Object.assign(
     // Hide zendesk launcher on route changes
     useEffect(() => {
       const hide = () => window.zE?.hide?.();
-      Router.events.on("routeChangeStart", hide);
+      router.events.on("routeChangeStart", hide);
       window.addEventListener("load", hide);
       return () => {
-        Router.events.off("routeChangeStart", hide);
+        router.events.off("routeChangeStart", hide);
         window.removeEventListener("load", hide);
       };
     }, []);
@@ -70,7 +72,7 @@ export const AppLayout = Object.assign(
       }
       window.analytics?.identify(user.id, {
         email: user.email,
-        locale: Router.query.locale,
+        locale: router.locale,
         firstName: user.firstName,
         lastName: user.lastName,
       });
@@ -100,12 +102,7 @@ export const AppLayout = Object.assign(
         lastName: user.lastName,
       });
       window.zE?.("webWidget", "setLocale", locale);
-      Router.push(
-        resolveUrl(Router.pathname, {
-          ...Router.query,
-          locale,
-        })
-      );
+      router.push(resolveUrl(router.pathname, router.query), undefined, { locale });
     }
 
     function handleZendeskLoad() {
@@ -114,7 +111,7 @@ export const AppLayout = Object.assign(
         name: { value: user.fullName, readOnly: true },
         email: { value: user.email, readOnly: true },
       });
-      window.zE?.("webWidget", "setLocale", Router.query.locale);
+      window.zE?.("webWidget", "setLocale", router.locale);
     }
 
     return (

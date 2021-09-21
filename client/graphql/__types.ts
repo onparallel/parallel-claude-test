@@ -6502,6 +6502,7 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
   id: string;
   descriptionHtml?: Maybe<string>;
   name?: Maybe<string>;
+  locale: PetitionLocale;
   updatedAt: string;
   fields: Array<{
     __typename?: "PetitionField";
@@ -12965,6 +12966,7 @@ export type NewPetitionUserTemplateQuery = {
         id: string;
         descriptionHtml?: Maybe<string>;
         name?: Maybe<string>;
+        locale: PetitionLocale;
         updatedAt: string;
         fields: Array<{
           __typename?: "PetitionField";
@@ -14561,6 +14563,7 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
     id
     descriptionHtml
     name
+    locale
     fields {
       id
       title
