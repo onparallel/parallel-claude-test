@@ -331,7 +331,11 @@ export function RecipientSelectGroups({
               </UnorderedList>
             </AlertDescription>
           </Flex>
-          <CloseButton fontSize="xs" onClick={() => setBouncedAlertVisible(false)} />
+          <CloseButton
+            aria-label={intl.formatMessage({ id: "generic.close", defaultMessage: "Close" })}
+            fontSize="xs"
+            onClick={() => setBouncedAlertVisible(false)}
+          />
         </Alert>
       ) : null}
 
