@@ -35,6 +35,7 @@ export function PublicTemplateCard({ template }: PublicTemplateCardProps) {
       <Stack spacing={0}>
         <Center height="130px" padding={5} backgroundColor={backgroundColor ?? "gray.200"}>
           <Image
+            loading="lazy"
             width="100%"
             height="100%"
             objectFit="contain"
