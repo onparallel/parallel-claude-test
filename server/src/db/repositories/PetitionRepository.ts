@@ -3658,9 +3658,17 @@ export class PetitionRepository extends BaseRepository {
     };
   }
 
-  async markPetitionAccessEmailBounceStatus(petitionAccessId: number, hasBounced: boolean) {
+  async markPetitionAccessEmailBounceStatus(
+    petitionAccessId: number,
+    hasBounced: boolean,
+    updatedBy: string
+  ) {
     await this.from("contact")
-      .update("last_email_bounced", hasBounced)
+      .update({
+        last_email_bounced: hasBounced,
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      })
       .where(
         "id",
         this.from("contact")

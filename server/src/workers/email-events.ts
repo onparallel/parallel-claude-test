@@ -40,7 +40,11 @@ createQueueWorker(
       // bounce can come from a PetitionMessage or a PetitionReminder
       if (message) {
         await Promise.all([
-          context.petitions.markPetitionAccessEmailBounceStatus(message.petition_access_id, true),
+          context.petitions.markPetitionAccessEmailBounceStatus(
+            message.petition_access_id,
+            true,
+            "Worker:email-events"
+          ),
           context.emails.sendPetitionMessageBouncedEmail(message.id),
           context.petitions.updateRemindersForPetition(message.petition_id, null),
           context.system.createEvent({
@@ -52,7 +56,11 @@ createQueueWorker(
         const access = (await context.petitions.loadAccess(reminder.petition_access_id))!;
 
         await Promise.all([
-          context.petitions.markPetitionAccessEmailBounceStatus(reminder.petition_access_id, true),
+          context.petitions.markPetitionAccessEmailBounceStatus(
+            reminder.petition_access_id,
+            true,
+            "Worker:email-events"
+          ),
           context.petitions.updateRemindersForPetition(access.petition_id, null),
           context.system.createEvent({
             type: "PETITION_REMINDER_BOUNCED",
@@ -100,7 +108,8 @@ createQueueWorker(
       if (message || reminder) {
         await context.petitions.markPetitionAccessEmailBounceStatus(
           message?.petition_access_id ?? reminder!.petition_access_id,
-          false
+          false,
+          "Worker:email-events"
         );
       }
     }
