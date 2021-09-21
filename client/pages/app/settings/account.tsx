@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Radio, RadioGroup } from "@chakra-ui/radio";
 import {
   Alert,
@@ -17,16 +17,15 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   AccountQuery,
-  Account_updateAccountMutation,
-  Account_updateAccountMutationVariables,
   useAccountQuery,
+  useAccount_setUserPreferredLocaleMutation,
+  useAccount_updateAccountMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
-import { resolveUrl } from "@parallel/utils/next";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -37,6 +36,7 @@ interface NameChangeFormData {
 
 function Account() {
   const intl = useIntl();
+  const router = useRouter();
 
   const {
     data: { me },
@@ -53,22 +53,20 @@ function Account() {
       lastName: me.lastName ?? undefined,
     },
   });
-  const [updateAccount] = useUpdateAccount();
+  const [updateAccount] = useAccount_updateAccountMutation();
+  const [setUserLocale] = useAccount_setUserPreferredLocaleMutation();
   const locales = useSupportedLocales();
 
   function onSaveName({ firstName, lastName }: NameChangeFormData) {
+    window.analytics?.identify(me.id, { firstName, lastName });
     updateAccount({ variables: { id: me.id, data: { firstName, lastName } } });
   }
 
   function handleLocaleChange(locale: string) {
-    window.analytics?.identify(me.id, { email: me.email, locale });
+    setUserLocale({ variables: { locale } });
+    window.analytics?.identify(me.id, { locale });
     window.zE?.("webWidget", "setLocale", locale);
-    Router.push(
-      resolveUrl(Router.pathname, {
-        ...Router.query,
-        locale,
-      })
-    );
+    router.push(router.asPath, undefined, { locale });
   }
 
   return (
@@ -91,10 +89,7 @@ function Account() {
         <Card height="fit-content" width="full" maxWidth="container.2xs">
           <Stack padding={4}>
             <Heading as="h4" size="md" marginBottom={2}>
-              <FormattedMessage
-                id="settings.account.name-header"
-                defaultMessage="Name and surname"
-              />
+              <FormattedMessage id="settings.account.name-header" defaultMessage="Name" />
             </Heading>
             {me.isSsoUser ? (
               <Alert>
@@ -157,7 +152,7 @@ function Account() {
             <Heading as="h4" size="md" marginBottom={2}>
               <FormattedMessage id="settings.account.language" defaultMessage="Language" />
             </Heading>
-            <RadioGroup onChange={handleLocaleChange} value={intl.locale}>
+            <RadioGroup onChange={handleLocaleChange} value={me.preferredLocale ?? intl.locale}>
               <Stack>
                 {locales.map(({ key, localizedLabel }) => (
                   <Radio key={key} value={key}>
@@ -180,6 +175,7 @@ Account.fragments = {
       lastName
       isSsoUser
       email
+      preferredLocale
       ...SettingsLayout_User
       ...useSettingsSections_User
     }
@@ -188,8 +184,8 @@ Account.fragments = {
   `,
 };
 
-function useUpdateAccount() {
-  return useMutation<Account_updateAccountMutation, Account_updateAccountMutationVariables>(gql`
+Account.mutations = [
+  gql`
     mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
       updateUser(id: $id, data: $data) {
         id
@@ -199,8 +195,17 @@ function useUpdateAccount() {
         initials
       }
     }
-  `);
-}
+  `,
+  gql`
+    mutation Account_setUserPreferredLocale($locale: String!) {
+      setUserPreferredLocale(locale: $locale) {
+        id
+        ...Account_User
+      }
+    }
+    ${Account.fragments.User}
+  `,
+];
 
 Account.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery<AccountQuery>(gql`

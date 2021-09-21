@@ -187,7 +187,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
           email,
           first_name: args.firstName,
           last_name: args.lastName,
-          details: { source: "org-invitation" },
+          details: { source: "org-invitation", preferredLocale: args.locale ?? "en" },
         },
         `User:${ctx.user!.id}`
       ),
@@ -402,6 +402,7 @@ export const userSignUp = mutationField("userSignUp", {
             industry: args.industry,
             role: args.role,
             position: args.position,
+            preferredLocale: args.locale ?? "en",
           },
         },
         undefined,
@@ -448,5 +449,34 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
     } catch {
       return RESULT.FAILURE;
     }
+  },
+});
+
+export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
+  description:
+    "Sets the locale passed as arg as the preferred language of the user to see the page",
+  type: "User",
+  args: {
+    locale: nonNull(stringArg()),
+  },
+  authorize: authenticate(),
+  validateArgs: (_, { locale }, ctx, info) => {
+    // only supported locales
+    if (!["en", "es"].includes(locale)) {
+      throw new ArgValidationError(info, "locale", `Unknown locale ${locale}.`);
+    }
+  },
+  resolve: async (_, { locale }, ctx) => {
+    const [user] = await ctx.users.updateUserById(
+      ctx.user!.id,
+      {
+        details: {
+          ...(ctx.user!.details ?? {}),
+          preferredLocale: locale,
+        },
+      },
+      `User:${ctx.user!.id}`
+    );
+    return user;
   },
 });

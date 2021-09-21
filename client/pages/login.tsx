@@ -55,23 +55,25 @@ function Login() {
 
   const toast = useToast();
 
-  function redirectToApp() {
+  function redirectToApp(locale?: string) {
     router.push(
       typeof router.query.redirect === "string" && router.query.redirect.startsWith("/")
         ? router.query.redirect
-        : "/app"
+        : "/app",
+      undefined,
+      { locale }
     );
   }
 
   async function handleLoginSubmit({ email, password }: LoginData) {
     setIsSubmitting(true);
     try {
-      await postJSON<{ token: string }>("/api/auth/login", {
+      const data = await postJSON<{ preferredLocale?: string }>("/api/auth/login", {
         email,
         password,
       });
       await client.clearStore();
-      redirectToApp();
+      redirectToApp(data?.preferredLocale);
     } catch (error: any) {
       if (error.error === "NewPasswordRequired") {
         setPasswordChange({ type: "CHANGE", email, password });

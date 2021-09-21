@@ -489,6 +489,8 @@ export interface Mutation {
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
+  /** Sets the locale passed as arg as the preferred language of the user to see the page */
+  setUserPreferredLocale: User;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
@@ -1000,6 +1002,10 @@ export interface MutationsendRemindersArgs {
   accessIds: Array<Scalars["GID"]>;
   body?: Maybe<Scalars["JSON"]>;
   petitionId: Scalars["GID"];
+}
+
+export interface MutationsetUserPreferredLocaleArgs {
+  locale: Scalars["String"];
 }
 
 export interface MutationsignedPetitionDownloadLinkArgs {
@@ -2710,6 +2716,7 @@ export interface User extends Timestamps {
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
+  preferredLocale?: Maybe<Scalars["String"]>;
   role: OrganizationRole;
   status: UserStatus;
   unreadNotificationIds: Array<Scalars["ID"]>;
@@ -13000,9 +13007,10 @@ export type Account_UserFragment = {
   firstName?: Maybe<string>;
   lastName?: Maybe<string>;
   isSsoUser: boolean;
+  email: string;
+  preferredLocale?: Maybe<string>;
   id: string;
   fullName?: Maybe<string>;
-  email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
@@ -13036,6 +13044,38 @@ export type Account_updateAccountMutation = {
   };
 };
 
+export type Account_setUserPreferredLocaleMutationVariables = Exact<{
+  locale: Scalars["String"];
+}>;
+
+export type Account_setUserPreferredLocaleMutation = {
+  setUserPreferredLocale: {
+    __typename?: "User";
+    id: string;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    isSsoUser: boolean;
+    email: string;
+    preferredLocale?: Maybe<string>;
+    fullName?: Maybe<string>;
+    createdAt: string;
+    canCreateUsers: boolean;
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+    hasApiTokens: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+};
+
 export type AccountQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AccountQuery = {
@@ -13045,8 +13085,9 @@ export type AccountQuery = {
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     isSsoUser: boolean;
-    fullName?: Maybe<string>;
     email: string;
+    preferredLocale?: Maybe<string>;
+    fullName?: Maybe<string>;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
@@ -16442,6 +16483,8 @@ export const Account_UserFragmentDoc = gql`
     firstName
     lastName
     isSsoUser
+    email
+    preferredLocale
     ...SettingsLayout_User
     ...useSettingsSections_User
   }
@@ -20886,6 +20929,30 @@ export function useAccount_updateAccountMutation(
 }
 export type Account_updateAccountMutationHookResult = ReturnType<
   typeof useAccount_updateAccountMutation
+>;
+export const Account_setUserPreferredLocaleDocument = gql`
+  mutation Account_setUserPreferredLocale($locale: String!) {
+    setUserPreferredLocale(locale: $locale) {
+      id
+      ...Account_User
+    }
+  }
+  ${Account_UserFragmentDoc}
+`;
+export function useAccount_setUserPreferredLocaleMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    Account_setUserPreferredLocaleMutation,
+    Account_setUserPreferredLocaleMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    Account_setUserPreferredLocaleMutation,
+    Account_setUserPreferredLocaleMutationVariables
+  >(Account_setUserPreferredLocaleDocument, options);
+}
+export type Account_setUserPreferredLocaleMutationHookResult = ReturnType<
+  typeof useAccount_setUserPreferredLocaleMutation
 >;
 export const AccountDocument = gql`
   query Account {

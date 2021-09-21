@@ -864,6 +864,7 @@ export interface NexusGenFieldTypes {
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
+    setUserPreferredLocale: NexusGenRootTypes["User"]; // User!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -1545,6 +1546,7 @@ export interface NexusGenFieldTypes {
     notifications: NexusGenRootTypes["UserNotifications_Pagination"]; // UserNotifications_Pagination!
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
+    preferredLocale: string | null; // String
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
     unreadNotificationIds: string[]; // [ID!]!
@@ -1973,6 +1975,7 @@ export interface NexusGenFieldTypeNames {
     sendPetition: "SendPetitionResult";
     sendPetitionClosedNotification: "Petition";
     sendReminders: "Result";
+    setUserPreferredLocale: "User";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
     startSignatureRequest: "PetitionSignatureRequest";
     switchAutomaticReminders: "PetitionAccess";
@@ -2654,6 +2657,7 @@ export interface NexusGenFieldTypeNames {
     notifications: "UserNotifications_Pagination";
     onboardingStatus: "JSONObject";
     organization: "Organization";
+    preferredLocale: "String";
     role: "OrganizationRole";
     status: "UserStatus";
     unreadNotificationIds: "ID";
@@ -3253,6 +3257,10 @@ export interface NexusGenArgTypes {
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
       body?: NexusGenScalars["JSON"] | null; // JSON
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    setUserPreferredLocale: {
+      // args
+      locale: string; // String!
     };
     signedPetitionDownloadLink: {
       // args

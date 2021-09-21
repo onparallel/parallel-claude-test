@@ -7212,7 +7212,7 @@
   {
     "term": "settings.account.name-header",
     "definition": "Nombre y apellidos",
-    "context": "Name and surname"
+    "context": "Name"
   },
   {
     "term": "settings.account.sso-user-explanation",

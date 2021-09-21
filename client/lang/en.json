@@ -7211,8 +7211,8 @@
   },
   {
     "term": "settings.account.name-header",
-    "definition": "Name and surname",
-    "context": "Name and surname"
+    "definition": "Name",
+    "context": "Name"
   },
   {
     "term": "settings.account.sso-user-explanation",

@@ -204,7 +204,7 @@ export class Auth implements IAuth {
         const user = await this.getUserFromAuthenticationResult(auth.AuthenticationResult);
         await this.trackSessionLogin(user);
         this.setSession(res, token);
-        res.status(201).send({});
+        res.status(201).send({ preferredLocale: user.details?.preferredLocale });
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
         res.status(401).send({ error: "NewPasswordRequired" });
       } else {

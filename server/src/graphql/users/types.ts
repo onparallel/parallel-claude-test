@@ -177,6 +177,9 @@ export const User = objectType({
         return await ctx.users.loadAvatarUrl(o.id);
       },
     });
+    t.nullable.string("preferredLocale", {
+      resolve: (root) => root.details?.preferredLocale ?? null,
+    });
   },
 });
 

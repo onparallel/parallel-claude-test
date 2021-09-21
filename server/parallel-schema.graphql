@@ -1003,6 +1003,11 @@ type Mutation {
   sendReminders(accessIds: [GID!]!, body: JSON, petitionId: GID!): Result!
 
   """
+  Sets the locale passed as arg as the preferred language of the user to see the page
+  """
+  setUserPreferredLocale(locale: String!): User!
+
+  """
   Generates a download link for the signed PDF petition.
   """
   signedPetitionDownloadLink(
@@ -3785,6 +3790,7 @@ type User implements Timestamps {
   """
   onboardingStatus: JSONObject!
   organization: Organization!
+  preferredLocale: String
   role: OrganizationRole!
   status: UserStatus!
   unreadNotificationIds: [ID!]!
