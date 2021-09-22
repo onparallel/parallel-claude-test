@@ -12,8 +12,8 @@ import {
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
-import { plainTextToRTEValue } from "@parallel/utils/slate/plainTextToRTEValue";
+import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
+import { plainTextToRTEValue } from "@parallel/utils/slate/RichTextEditor/plainTextToRTEValue";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import outdent from "outdent";
 import { useRef } from "react";
@@ -21,7 +21,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
-import { RichTextEditor } from "../common/RichTextEditor";
+import { RichTextEditor } from "../common/slate/RichTextEditor";
 
 type DelegateAccessDialogData = {
   email: string;

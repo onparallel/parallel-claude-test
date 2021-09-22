@@ -5,8 +5,8 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
-import { isEmptyParagraph } from "@parallel/utils/slate/isEmptyRTEValue";
-import { ParagraphElement } from "@parallel/utils/slate/types";
+import { isEmptyParagraph } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
+import { SlateElement, SlateText } from "@parallel/utils/slate/types";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { isSelectionExpanded } from "@udecode/plate-common";
 import {
@@ -32,6 +32,10 @@ import {
 } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 
+type PetitionFieldOptionsListEditorValue = PetitionFieldOptionsListEditorBlock[];
+
+interface PetitionFieldOptionsListEditorBlock extends SlateElement<"paragraph", SlateText> {}
+
 export interface PetitionFieldOptionsListEditorProps extends EditableProps {
   field: PetitionFieldOptionsListEditor_PetitionFieldFragment;
   showError: boolean;
@@ -41,47 +45,11 @@ export interface PetitionFieldOptionsListEditorProps extends EditableProps {
   isReadOnly?: boolean;
 }
 
-function renderElement({ attributes, children, element }: RenderElementProps) {
-  const isEmpty = isEmptyParagraph(element);
-  return (
-    <Text
-      as="div"
-      _before={{ content: "'-'", marginRight: 1 }}
-      color={isEmpty ? "gray.400" : undefined}
-      {...attributes}
-    >
-      {children}
-    </Text>
-  );
-}
-
-function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
-  const isEmpty = !leaf.text;
-  return (
-    <Text as="span" {...attributes}>
-      {isEmpty ? (
-        <Text
-          as="span"
-          display="inline-block"
-          whiteSpace="nowrap"
-          userSelect="none"
-          pointerEvents="none"
-          contentEditable={false}
-          width={0}
-        >
-          <FormattedMessage id="generic.choice" defaultMessage="Choice" />
-        </Text>
-      ) : null}
-      {children}
-    </Text>
-  );
-}
-
 export type PetitionFieldOptionsListEditorRef = {
   focus: (position?: "START" | "END") => void;
 };
 
-function valuesToSlateNodes(values: string[]): ParagraphElement[] {
+function valuesToSlateNodes(values: string[]): PetitionFieldOptionsListEditorValue {
   return (values.length ? values : [""]).map((option) => ({
     type: "paragraph",
     children: [{ text: option }],
@@ -96,9 +64,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
     ) {
       const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
       const editorRef = useUpdatingRef(editor);
-      const [value, onChange] = useState<ParagraphElement[]>(
-        valuesToSlateNodes(field.options.values ?? [])
-      );
+      const [value, onChange] = useState(valuesToSlateNodes(field.options.values ?? []));
       useImperativeHandle(
         ref,
         () =>
@@ -217,3 +183,39 @@ export const PetitionFieldOptionsListEditor = Object.assign(
     },
   }
 );
+
+function renderElement({ attributes, children, element }: RenderElementProps) {
+  const isEmpty = isEmptyParagraph(element as PetitionFieldOptionsListEditorBlock);
+  return (
+    <Text
+      as="div"
+      _before={{ content: "'-'", marginRight: 1 }}
+      color={isEmpty ? "gray.400" : undefined}
+      {...attributes}
+    >
+      {children}
+    </Text>
+  );
+}
+
+function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
+  const isEmpty = !leaf.text;
+  return (
+    <Text as="span" {...attributes}>
+      {isEmpty ? (
+        <Text
+          as="span"
+          display="inline-block"
+          whiteSpace="nowrap"
+          userSelect="none"
+          pointerEvents="none"
+          contentEditable={false}
+          width={0}
+        >
+          <FormattedMessage id="generic.choice" defaultMessage="Choice" />
+        </Text>
+      ) : null}
+      {children}
+    </Text>
+  );
+}

@@ -11,8 +11,9 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
-import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
-import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
+import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
+import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
+import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
@@ -22,7 +23,6 @@ import { noop, omit } from "remeda";
 import { ContactSelect, ContactSelectProps, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
 import { RecipientSelectGroups } from "../common/RecipientSelectGroups";
-import { RichTextEditorValue } from "../common/RichTextEditor";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
 import {

@@ -9,17 +9,17 @@ import {
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
-  Placeholder,
+  PlaceholderOption,
+  PlaceholderElement,
   PlaceholderMenu,
   usePlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
-import { slateNodesToTextWithPlaceholders } from "@parallel/utils/slate/placeholders/slateNodesToTextWithPlaceholders";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
 import { createSingleLinePlugin, useSingleLine } from "@parallel/utils/slate/SingleLinePlugin";
-import { CustomEditor, CustomElement } from "@parallel/utils/slate/types";
-import { createReactPlugin, createHistoryPlugin, withPlate, Plate } from "@udecode/plate-core";
-import { ELEMENT_PARAGRAPH, createParagraphPlugin } from "@udecode/plate-paragraph";
+import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/types";
+import { createHistoryPlugin, createReactPlugin, Plate, withPlate } from "@udecode/plate-core";
+import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import {
   CSSProperties,
   KeyboardEvent,
@@ -33,8 +33,14 @@ import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
 
+type PlaceholderInputValue = [PlaceholderInputBlock];
+
+interface PlaceholderInputBlock extends SlateElement<"paragraph", PlaceholderInputBlockContent> {}
+
+type PlaceholderInputBlockContent = SlateText | PlaceholderElement;
+
 export type PlaceholderInputProps = {
-  placeholders: Placeholder[];
+  placeholders: PlaceholderOption[];
   value: string;
   isDisabled?: boolean;
   onChange: (value: string) => void;
@@ -101,7 +107,7 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
     const { onKeyDown: onKeyDownFixDeleteAll } = useFixDeleteAll();
 
     const handleChange = useCallback(
-      (value: CustomElement[]) => {
+      (value: PlaceholderInputValue) => {
         onChangePlaceholder(editor);
         onChangeSelection(editor.selection);
         onChange(slateNodesToTextWithPlaceholders(value));
@@ -128,7 +134,10 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
       _focusWithin: (inputStyleConfig as any)._focus,
     } as any;
 
-    const slateValue = useMemo(() => textWithPlaceholderToSlateNodes(value, placeholders), [value]);
+    const slateValue = useMemo(
+      () => textWithPlaceholderToSlateNodes(value, placeholders) as PlaceholderInputValue,
+      [value]
+    );
     const selected = isOpen ? values[selectedIndex] : undefined;
 
     function onPlaceholderButtonClick(event: MouseEvent) {
@@ -240,3 +249,15 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
     );
   }
 );
+
+function slateNodesToTextWithPlaceholders(value: PlaceholderInputValue) {
+  return value[0].children
+    .map((child) => {
+      if ("type" in child) {
+        return child.type === "placeholder" ? `#${child.placeholder}#` : "";
+      } else {
+        return child.text;
+      }
+    })
+    .join("");
+}

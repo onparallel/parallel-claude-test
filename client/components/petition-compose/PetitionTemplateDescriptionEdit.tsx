@@ -1,12 +1,13 @@
 import { Box, BoxProps } from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { UpdatePetitionInput } from "@parallel/graphql/__types";
-import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
-import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
+import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
+import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
+import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { RichTextEditor, RichTextEditorValue } from "../common/RichTextEditor";
+import { RichTextEditor } from "../common/slate/RichTextEditor";
 
 export interface PetitionTemplateDescriptionEditProps extends BoxProps {
   onUpdatePetition: (data: UpdatePetitionInput) => void;

@@ -12,7 +12,7 @@ import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
-import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
+import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { Maybe } from "@parallel/utils/types";
@@ -21,11 +21,8 @@ import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
 import { PaddedCollapse } from "../common/PaddedCollapse";
-import {
-  RichTextEditor,
-  RichTextEditorInstance,
-  RichTextEditorValue,
-} from "../common/RichTextEditor";
+import { RichTextEditor, RichTextEditorInstance } from "../common/slate/RichTextEditor";
+import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 
 const messages: Record<PetitionLocale, string> = {
   en: outdent`

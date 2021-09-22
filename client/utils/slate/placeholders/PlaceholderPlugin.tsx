@@ -11,17 +11,19 @@ import { KeyboardEvent, ReactNode, useCallback, useEffect, useReducer, useRef } 
 import { Editor, Range, Transforms } from "slate";
 import { useFocused, useSelected } from "slate-react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { PlaceholderElement } from "../types";
-import { insertPlaceholder } from "./insertPlaceholder";
+import { SlateElement, SlateText } from "../types";
 
-export type Placeholder = {
+export type PlaceholderOption = {
   value: string;
   label: string;
 };
 
-export const ELEMENT_PLACEHOLDER = "placeholder";
+export const ELEMENT_PLACEHOLDER = "placeholder" as const;
+export interface PlaceholderElement extends SlateElement<typeof ELEMENT_PLACEHOLDER, SlateText> {
+  placeholder: string;
+}
 
-export function usePlaceholderPlugin(placeholders: Placeholder[]) {
+export function usePlaceholderPlugin(options: PlaceholderOption[]) {
   type PlaceholderState = {
     target: Range | null;
     index: number;
@@ -37,17 +39,15 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
     }
   );
 
-  const placeholdersRef = useUpdatingRef(placeholders);
+  const placeholderOptionsRef = useUpdatingRef(options);
   const targetRef = useUpdatingRef(target);
   const indexRef = useUpdatingRef(index);
   const valuesRef = useUpdatingRef(
-    search
-      ? placeholders.filter((c) => c.label.toLowerCase().includes(search.toLowerCase()))
-      : placeholders
+    search ? options.filter((c) => c.label.toLowerCase().includes(search.toLowerCase())) : options
   );
 
   const onAddPlaceholder = useCallback(
-    (editor: Editor, placeholder: Placeholder) => {
+    (editor: Editor, placeholder: PlaceholderOption) => {
       if (target !== null) {
         Transforms.select(editor, target);
         insertPlaceholder(editor, placeholder);
@@ -135,21 +135,14 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
     onAddPlaceholder,
     onHighlightOption,
     plugin: useConstant<PlatePlugin>(() => ({
-      // withOverrides: ((editor: CustomEditor) => {
-      //   editor.insertData = (data) => {
-      //     const text = data.getData("text/plain");
-      //     editor.insertFragment(
-      //       textWithPlaceholderToSlateNodes(text, placeholders)
-      //     );
-      //   };
-      //   return editor;
-      // }) as any,
       inlineTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
       voidTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
       renderElement: () => (props: TRenderElementProps) => {
         const { children, attributes } = props;
         const element = props.element as PlaceholderElement;
-        const placeholder = placeholdersRef.current.find((p) => p.value === element.placeholder);
+        const placeholder = placeholderOptionsRef.current.find(
+          (p) => p.value === element.placeholder
+        );
         return placeholder ? (
           <PlaceholderToken
             value={element.placeholder}
@@ -178,9 +171,9 @@ interface PlaceholderMenuProps {
   menuId: string;
   itemIdPrefix: string;
   search?: string | null;
-  values: Placeholder[];
+  values: PlaceholderOption[];
   selectedIndex: number;
-  onAddPlaceholder: (placeholder: Placeholder) => void;
+  onAddPlaceholder: (placeholder: PlaceholderOption) => void;
   onHighlightOption: (index: number) => void;
 }
 
@@ -286,3 +279,13 @@ const PlaceholderToken = function ({
     </Box>
   );
 };
+
+function insertPlaceholder(editor: Editor, placeholder: PlaceholderOption) {
+  Transforms.insertNodes(editor, {
+    type: "placeholder",
+    placeholder: placeholder.value,
+    children: [{ text: "" }],
+  });
+
+  Transforms.move(editor);
+}

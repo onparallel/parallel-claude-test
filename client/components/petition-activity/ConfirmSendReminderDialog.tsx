@@ -13,18 +13,15 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { PetitionAccessTable_PetitionAccessFragment } from "@parallel/graphql/__types";
-import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
-import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
+import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
+import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
+import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactLink } from "../common/ContactLink";
 import { PaddedCollapse } from "../common/PaddedCollapse";
-import {
-  RichTextEditor,
-  RichTextEditorInstance,
-  RichTextEditorValue,
-} from "../common/RichTextEditor";
+import { RichTextEditor, RichTextEditorInstance } from "../common/slate/RichTextEditor";
 
 export function ConfirmSendReminderDialog({
   accesses,
@@ -34,7 +31,7 @@ export function ConfirmSendReminderDialog({
   { message: null | RichTextEditorValue }
 >) {
   const intl = useIntl();
-  const [message, setMessage] = useState<RichTextEditorValue>(emptyRTEValue());
+  const [message, setMessage] = useState(emptyRTEValue());
   const [isInvalid, setIsInvalid] = useState(false);
   const [hasMessage, setHasMessage] = useState(false);
   const messageRef = useRef<RichTextEditorInstance>(null);

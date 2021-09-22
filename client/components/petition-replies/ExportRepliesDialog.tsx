@@ -27,7 +27,7 @@ import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PaddedCollapse } from "../common/PaddedCollapse";
-import { PlaceholderInput, PlaceholderInputRef } from "../common/PlaceholderInput";
+import { PlaceholderInput, PlaceholderInputRef } from "../common/slate/PlaceholderInput";
 
 export type ExportRepliesDialogProps = {
   user: ExportRepliesDialog_UserFragment;

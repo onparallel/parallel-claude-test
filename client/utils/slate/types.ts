@@ -1,41 +1,21 @@
 import { SPEditor } from "@udecode/plate-core";
-import { BaseEditor, BaseElement, BaseText } from "slate";
+import { BaseEditor } from "slate";
 import { HistoryEditor } from "slate-history";
 import { ReactEditor } from "slate-react";
 
-type SimpleElement<T extends string> = BaseElement & { type: T };
+export type SlateElement<TType extends string, TChild> = {
+  type: TType;
+  children: TChild[];
+};
 
-export interface ParagraphElement extends BaseElement {
-  type?: "paragraph";
-}
-export interface BulletedListElement extends SimpleElement<"bulleted-list"> {}
-export interface ListItemElement extends SimpleElement<"list-item"> {}
-export interface PlaceholderElement extends SimpleElement<"placeholder"> {
-  placeholder: string;
-}
-export interface LinkElement extends SimpleElement<"link"> {
-  url: string;
-}
-
-export type CustomElement =
-  | ParagraphElement
-  | BulletedListElement
-  | ListItemElement
-  | PlaceholderElement
-  | LinkElement;
-
-export interface CustomText extends BaseText {
-  bold?: boolean;
-  underline?: boolean;
-  italic?: boolean;
-}
+export type SlateText = {
+  text: string;
+};
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor & SPEditor;
 
 declare module "slate" {
   interface CustomTypes {
     Editor: CustomEditor;
-    Element: CustomElement;
-    Text: CustomText;
   }
 }

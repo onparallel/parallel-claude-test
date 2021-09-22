@@ -1,16 +1,27 @@
 import escapeStringRegexp from "escape-string-regexp";
-import { CustomElement, CustomText } from "../types";
-import { Placeholder } from "./PlaceholderPlugin";
+import { PlaceholderOption } from "./PlaceholderPlugin";
+
+import { SlateElement, SlateText } from "../types";
+
+interface EditorBlock extends SlateElement<"paragraph", EditorBlockContent> {}
+
+interface EditorPlaceholder extends SlateElement<"placeholder", EditorText> {
+  placeholder: string;
+}
+
+interface EditorText extends SlateText {}
+
+type EditorBlockContent = EditorText | EditorPlaceholder;
 
 export function textWithPlaceholderToSlateNodes(
   value: string,
-  placeholders: Placeholder[]
-): CustomElement[] {
+  placeholders: PlaceholderOption[]
+): EditorBlock[] {
   return value.split("\n").map((line) => {
     const parts = line.split(
       new RegExp(`(#(?:${placeholders.map((p) => escapeStringRegexp(p.value)).join("|")})#)`, "g")
     );
-    const children: (CustomElement | CustomText)[] = [];
+    const children: EditorBlockContent[] = [];
     for (const part of parts) {
       if (part.startsWith("#") && part.endsWith("#")) {
         const value = part.slice(1, -1);

@@ -1,9 +1,10 @@
 import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
-import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
+import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
+import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Ref } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { RichTextEditor, RichTextEditorValue } from "../common/RichTextEditor";
+import { RichTextEditor } from "../common/slate/RichTextEditor";
 
 export function MessageEmailEditor({
   showErrors,

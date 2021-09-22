@@ -18,7 +18,6 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
@@ -80,6 +79,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
+import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
