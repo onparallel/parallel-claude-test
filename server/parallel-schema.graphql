@@ -3525,6 +3525,11 @@ type SignatureConfig {
   contacts: [Contact]!
 
   """
+  If true, allows the recipients of the petition to select additional signers
+  """
+  letRecipientsChooseSigners: Boolean!
+
+  """
   The selected provider for the signature.
   """
   provider: String!
@@ -3553,6 +3558,11 @@ input SignatureConfigInput {
   The contacts that need to sign the generated document.
   """
   contactIds: [ID!]!
+
+  """
+  If true, allows the recipients of the petition to select additional signers
+  """
+  letRecipientsChooseSigners: Boolean!
 
   """
   The selected provider for the signature.

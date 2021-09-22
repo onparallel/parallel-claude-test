@@ -123,6 +123,7 @@ export interface NexusGenInputs {
   SignatureConfigInput: {
     // input type
     contactIds: string[]; // [ID!]!
+    letRecipientsChooseSigners: boolean; // Boolean!
     provider: string; // String!
     review: boolean; // Boolean!
     timezone: string; // String!
@@ -488,6 +489,7 @@ export interface NexusGenObjects {
     timezone: string;
     title: string;
     review?: boolean;
+    letRecipientsChooseSigners?: boolean;
   };
   SignatureStartedEvent: events.SignatureStartedEvent;
   Subscription: db.PetitionEventSubscription;
@@ -1487,6 +1489,7 @@ export interface NexusGenFieldTypes {
   SignatureConfig: {
     // field return type
     contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
+    letRecipientsChooseSigners: boolean; // Boolean!
     provider: string; // String!
     review: boolean; // Boolean!
     timezone: string; // String!
@@ -2598,6 +2601,7 @@ export interface NexusGenFieldTypeNames {
   SignatureConfig: {
     // field return type name
     contacts: "Contact";
+    letRecipientsChooseSigners: "Boolean";
     provider: "String";
     review: "Boolean";
     timezone: "String";

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
+import { Button, Checkbox, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
@@ -45,6 +45,7 @@ export function SignatureConfigDialog({
     provider: string;
     review: boolean;
     title: string;
+    letRecipientsChooseSigners: boolean;
   }>({
     mode: "onChange",
     defaultValues: {
@@ -61,10 +62,12 @@ export function SignatureConfigDialog({
       provider: providers[0].value,
       review: petition.signatureConfig?.review ?? true,
       title: petition.signatureConfig?.title ?? petition.name ?? "",
+      letRecipientsChooseSigners: petition.signatureConfig?.letRecipientsChooseSigners ?? false,
     },
   });
 
   const review = watch("review");
+  const selectedContacts = watch("contacts");
 
   const titleRef = useRef<HTMLInputElement>(null);
   const titleRegisterProps = useRegisterWithRef(titleRef, register, "title", {
@@ -114,15 +117,18 @@ export function SignatureConfigDialog({
       size="xl"
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ contacts, provider, review, title }) => {
-          props.onResolve({
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            contactIds: contacts.map((c) => c!.id),
-            provider,
-            review: petitionIsCompleted ? false : review,
-            title,
-          });
-        }),
+        onSubmit: handleSubmit(
+          ({ contacts, provider, review, title, letRecipientsChooseSigners }) => {
+            props.onResolve({
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              contactIds: contacts.map((c) => c!.id),
+              provider,
+              review: petitionIsCompleted ? false : review,
+              title,
+              letRecipientsChooseSigners: contacts.length === 0 ? true : letRecipientsChooseSigners,
+            });
+          }
+        ),
       }}
       header={
         <FormattedMessage
@@ -165,7 +171,7 @@ export function SignatureConfigDialog({
                 id="component.signature-config-dialog.title-label"
                 defaultMessage="Title of the document"
               />
-              <HelpPopover marginLeft={2}>
+              <HelpPopover marginLeft={2} color="gray.300">
                 <FormattedMessage
                   id="component.signature-config-dialog.title-help"
                   defaultMessage="We will use this as the title of the signing document"
@@ -253,6 +259,20 @@ export function SignatureConfigDialog({
               )}
             />
           </FormControl>
+          <FormControl hidden={selectedContacts.length === 0} alignItems="center" display="flex">
+            <Checkbox {...register("letRecipientsChooseSigners")} colorScheme="purple">
+              <FormattedMessage
+                id="component.signature-config-dialog.allow-recipient-to-choose.label"
+                defaultMessage="Allow the recipient to choose signers"
+              />
+            </Checkbox>
+            <HelpPopover marginLeft={2} color="gray.300">
+              <FormattedMessage
+                id="component.signature-config-dialog.allow-recipient-to-choose.help"
+                defaultMessage="If this option is disabled, only the assigned people will be able to sign."
+              />
+            </HelpPopover>
+          </FormControl>
         </Stack>
       }
       confirm={
@@ -286,6 +306,7 @@ SignatureConfigDialog.fragments = {
         }
         title
         review
+        letRecipientsChooseSigners
       }
     }
     ${ContactSelect.fragments.Contact}

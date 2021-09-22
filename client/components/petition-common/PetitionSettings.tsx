@@ -110,7 +110,9 @@ function _PetitionSettings({
         (signatureConfig.provider !== petition.signatureConfig?.provider ||
           signatureConfig.contactIds.toString() !==
             petition.signatureConfig?.contacts.map((c) => c?.id).toString() ||
-          signatureConfig.title !== petition.signatureConfig?.title)
+          signatureConfig.title !== petition.signatureConfig?.title ||
+          signatureConfig.letRecipientsChooseSigners !==
+            petition.signatureConfig?.letRecipientsChooseSigners)
       ) {
         await showConfirmSignatureConfigChanged({});
         await cancelSignatureRequest({

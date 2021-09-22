@@ -14,7 +14,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
     if (signatureConfig) {
-      const { provider, contactIds, timezone, title } = signatureConfig;
+      const { provider, contactIds, timezone, title, letRecipientsChooseSigners } = signatureConfig;
       const [hasFeatureFlag, contacts, integrations] = await Promise.all([
         ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, "PETITION_SIGNATURE"),
         ctx.contacts.loadContact(fromGlobalIds(contactIds, "Contact").ids),
@@ -47,6 +47,14 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
 
       if (!isDefined(title)) {
         throw new ArgValidationError(info, `${argName}.title`, "Value must be defined");
+      }
+
+      if (!letRecipientsChooseSigners && contactIds.length === 0) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.letRecipientsChooseSigners`,
+          "Invalid value with empty list of contacts"
+        );
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

@@ -12,7 +12,7 @@ import {
   stringArg,
 } from "nexus";
 import pMap from "p-map";
-import { isDefined, omit, pick, zip } from "remeda";
+import { isDefined, omit, zip } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
 import {
@@ -410,6 +410,9 @@ export const SignatureConfigInput = inputObjectType({
       description:
         "If true, lets the user review the replies before starting the signature process",
     });
+    t.nonNull.boolean("letRecipientsChooseSigners", {
+      description: "If true, allows the recipients of the petition to select additional signers",
+    });
   },
 });
 
@@ -520,7 +523,7 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig && {
-        ...pick(signatureConfig, ["provider", "timezone", "title", "review"]),
+        ...signatureConfig,
         contactIds: fromGlobalIds(signatureConfig.contactIds, "Contact").ids,
       };
     }

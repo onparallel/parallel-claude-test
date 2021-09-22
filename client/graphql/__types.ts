@@ -2562,6 +2562,8 @@ export interface SignatureConfig {
   __typename?: "SignatureConfig";
   /** The contacts that need to sign the generated document. */
   contacts: Array<Maybe<Contact>>;
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -2576,6 +2578,8 @@ export interface SignatureConfig {
 export interface SignatureConfigInput {
   /** The contacts that need to sign the generated document. */
   contactIds: Array<Scalars["ID"]>;
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -5932,6 +5936,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     provider: string;
     title: string;
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     contacts: Array<
       Maybe<{
         __typename?: "Contact";
@@ -6486,6 +6491,7 @@ export type SignatureConfigDialog_PetitionFragment = {
     provider: string;
     title: string;
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     contacts: Array<
       Maybe<{
         __typename?: "Contact";
@@ -7121,6 +7127,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     provider: string;
     title: string;
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     contacts: Array<
       Maybe<{
         __typename?: "Contact";
@@ -7176,6 +7183,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           provider: string;
           title: string;
           review: boolean;
+          letRecipientsChooseSigners: boolean;
           contacts: Array<
             Maybe<{
               __typename?: "Contact";
@@ -11022,6 +11030,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     provider: string;
     title: string;
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     contacts: Array<
       Maybe<{
         __typename?: "Contact";
@@ -11227,6 +11236,7 @@ export type PetitionCompose_updatePetitionMutation = {
           provider: string;
           title: string;
           review: boolean;
+          letRecipientsChooseSigners: boolean;
           contacts: Array<
             Maybe<{
               __typename?: "Contact";
@@ -11828,6 +11838,7 @@ export type PetitionComposeQuery = {
           provider: string;
           title: string;
           review: boolean;
+          letRecipientsChooseSigners: boolean;
           contacts: Array<
             Maybe<{
               __typename?: "Contact";
@@ -12032,6 +12043,7 @@ export type PetitionReplies_PetitionFragment = {
     review: boolean;
     provider: string;
     title: string;
+    letRecipientsChooseSigners: boolean;
     contacts: Array<
       Maybe<{
         __typename?: "Contact";
@@ -12501,6 +12513,7 @@ export type PetitionRepliesQuery = {
           review: boolean;
           provider: string;
           title: string;
+          letRecipientsChooseSigners: boolean;
           contacts: Array<
             Maybe<{
               __typename?: "Contact";
@@ -15950,6 +15963,7 @@ export const SignatureConfigDialog_PetitionFragmentDoc = gql`
       }
       title
       review
+      letRecipientsChooseSigners
     }
   }
   ${ContactSelect_ContactFragmentDoc}
