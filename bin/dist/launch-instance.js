@@ -18,7 +18,7 @@ const INSTANCE_TYPES = {
     staging: "t2.small",
 };
 const KEY_NAME = "ops";
-const IMAGE_ID = "ami-03d91be57468cdda3";
+const IMAGE_ID = "ami-00bdae3a831b8427d";
 const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
 const IAM_ROLE = "parallel-server";
 const VPC_ID = "vpc-5356ab39";
