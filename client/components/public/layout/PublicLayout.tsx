@@ -17,6 +17,7 @@ export interface PublicLayoutProps {
   hideHeader?: boolean;
   hideFooter?: boolean;
   og?: Partial<Record<string, Maybe<string> | undefined>>;
+  canonicalLocale?: string;
 }
 
 export function PublicLayout({
@@ -26,6 +27,7 @@ export function PublicLayout({
   hideFooter,
   hideHeader,
   og,
+  canonicalLocale,
 }: PublicLayoutProps) {
   const { locale, query, pathname, asPath } = useRouter();
   const intl = useIntl();
@@ -46,7 +48,10 @@ export function PublicLayout({
             })
           }
         />
-        <link rel="canonical" href={`${url}/${locale}${resolveUrl(pathname, query)}`} />
+        <link
+          rel="canonical"
+          href={`${url}/${canonicalLocale ?? locale}${resolveUrl(pathname, query)}`}
+        />
       </Head>
       {languages.map((lang) => (
         <Head key={lang.locale}>

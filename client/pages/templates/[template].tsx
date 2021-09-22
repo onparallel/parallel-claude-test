@@ -80,6 +80,7 @@ function LandingTemplateDetails({
       title={name as string}
       description={shortDescription as string}
       og={{ image: template.imageUrl }}
+      canonicalLocale={template.locale}
     >
       <PublicContainer
         maxWidth="container.xl"
