@@ -4,7 +4,8 @@ The server image is built by copying all files inside `ops/prod/image` in a vani
 
 ```
 cd ops/prod/image
-scp * ec2-user@[IP]:~
+scp * ec2-user@[INSTANCE_IP]:~
+ssh ec2-user@[INSTANCE_IP]
 sudo bash build.sh
 ```
 
@@ -12,15 +13,7 @@ This script will install all the dependencies needed, including:
 
 - node.js
 - yarn
-- nginx with nginx_accept_language_module
-
-To create a new image, launch a new vanilla Amazon Linux and copy the files inside `ops/prod/image`.
-
-```
-scp ops/prod/image/* ec2-user@[INSTANCE_IP]:~
-ssh ec2-user@[INSTANCE_IP]
-sudo bash build.sh
-```
+- nginx
 
 ## Release
 

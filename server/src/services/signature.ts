@@ -21,6 +21,7 @@ import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmai
 import { OrgIntegration } from "../db/__types";
 import { downloadImageBase64 } from "../util/images";
 import { toGlobalId } from "../util/globalId";
+import { URLSearchParams } from "url";
 
 type SignerBox = {
   email?: string;
@@ -152,8 +153,6 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
 
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
 
-    const orgGID = toGlobalId("Organization", this.orgId);
-
     return await this.sdk.createSignature(
       files,
       recipients,
@@ -163,7 +162,9 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         signing_mode: opts.signingMode ?? "parallel",
         branding_id: brandingId,
         events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
-        callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks-for-signing?o=${orgGID}`,
+        callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
+          o: toGlobalId("Organization", this.orgId),
+        })}`,
         recipients: recipients.map((r) => ({
           email: r.email,
           name: r.name,

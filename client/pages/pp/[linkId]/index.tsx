@@ -291,7 +291,7 @@ export async function getServerSideProps({ req, query: { linkId } }: GetServerSi
   if (isInsecureBrowser(req.headers["user-agent"])) {
     return {
       redirect: {
-        destination: `/update-browser`,
+        destination: `/update`,
         permanent: false,
       },
     };

@@ -270,7 +270,6 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl }: RecipientViewVerify
 }
 
 export async function getServerSideProps({
-  locale,
   query: { keycode },
   req,
   res,
@@ -278,7 +277,7 @@ export async function getServerSideProps({
   if (isInsecureBrowser(req.headers["user-agent"])) {
     return {
       redirect: {
-        destination: `/update-browser`,
+        destination: `/update`,
         permanent: false,
       },
     };

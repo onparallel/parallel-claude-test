@@ -9,9 +9,10 @@ import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
 import fetch from "node-fetch";
+import { isDefined, pick } from "remeda";
 import { getClientIp } from "request-ip";
 import { Memoize } from "typescript-memoize";
-import { URL } from "url";
+import { URL, URLSearchParams } from "url";
 import { CONFIG, Config } from "../config";
 import {
   IntegrationRepository,
@@ -63,29 +64,28 @@ export class Auth implements IAuth {
   ) {}
 
   async guessLogin(req: Request, res: Response, next: NextFunction) {
-    const { email } = req.body;
+    const { email, locale, redirect } = req.body;
     const [, domain] = email.split("@");
     try {
       const sso = await this.integrations.loadSSOIntegrationByDomain(domain);
       if (sso) {
         const org = (await this.orgs.loadOrg(sso.org_id))!;
-        const url = new URL(`https://${this.config.cognito.domain}/oauth2/authorize`);
         const provider = (sso.settings as IntegrationSettings<"SSO">).COGNITO_PROVIDER;
-        for (const [name, value] of Object.entries({
+        const url = `https://${this.config.cognito.domain}/oauth2/authorize?${new URLSearchParams({
           identity_provider: provider,
           redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
           response_type: "code",
           client_id: this.config.cognito.clientId,
           scope: "aws.cognito.signin.user.admin email openid profile",
-          state: org.custom_host
-            ? Buffer.from(JSON.stringify({ org_id: org.id })).toString("base64")
-            : undefined,
-        })) {
-          if (value !== undefined) {
-            url.searchParams.append(name, value);
-          }
-        }
-        res.json({ type: "SSO", url: url.href });
+          state: Buffer.from(
+            new URLSearchParams({
+              orgId: org.id.toString(),
+              ...(locale ? { locale: locale.toString() } : {}),
+              ...(redirect ? { redirect: redirect.toString() } : {}),
+            }).toString()
+          ).toString("base64"),
+        })}`;
+        res.json({ type: "SSO", url });
       } else {
         res.json({ type: "PASSWORD" });
       }
@@ -96,35 +96,34 @@ export class Auth implements IAuth {
 
   async callback(req: Request, res: Response, next: NextFunction) {
     try {
-      const url = new URL(`https://${this.config.cognito.domain}/oauth2/token`);
-      if (req.query.state) {
-        const state = JSON.parse(
-          Buffer.from(req.query.state as string, "base64").toString("ascii")
-        );
-        if (typeof state?.org_id !== "number") {
-          throw new Error("Invalid state");
-        }
-        const org = await this.orgs.loadOrg(state.org_id);
-        if (!org || !org.custom_host) {
-          throw new Error("Invalid state");
-        }
-        res.redirect(
-          302,
-          `https://${org.custom_host}/api/auth/callback?code=${encodeURIComponent(
-            req.query.code as string
-          )}`
-        );
-        return;
+      const state = new URLSearchParams(
+        Buffer.from(req.query.state as string, "base64").toString("ascii")
+      );
+      const orgId = state.has("orgId") ? parseInt(state.get("orgId")!) : null;
+      if (!isDefined(orgId) || Number.isNaN(orgId)) {
+        throw new Error("Invalid state");
       }
-      for (const [name, value] of Object.entries({
+      const org = await this.orgs.loadOrg(orgId);
+      if (!isDefined(org)) {
+        throw new Error("Invalid state");
+      }
+      if (isDefined(org.custom_host) && org.custom_host !== req.hostname) {
+        const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+        return res.redirect(
+          302,
+          `${protocol}://${org.custom_host}/api/auth/callback?${new URLSearchParams({
+            code: req.query.code as string,
+            state: req.query.state as string,
+          })}`
+        );
+      }
+      const url = `https://${this.config.cognito.domain}/oauth2/token?${new URLSearchParams({
         grant_type: "authorization_code",
         client_id: this.config.cognito.clientId,
         redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
         code: req.query.code as string,
-      })) {
-        url.searchParams.append(name, value);
-      }
-      const response = await fetch(url.href, {
+      })}`;
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
@@ -136,20 +135,15 @@ export class Auth implements IAuth {
       const email = (payload["email"] as string).toLowerCase();
       const externalId = payload["identities"][0].userId as string;
       let user = await this.users.loadUserByEmail(email);
-      const [, domain] = email.split("@");
-      const orgId = user
-        ? user.org_id
-        : (await this.integrations.loadSSOIntegrationByDomain(domain))?.org_id;
-      if (!orgId) {
-        throw new Error(`can't find SSO integration for domain ${domain}`);
+      if (isDefined(user) && user.org_id !== orgId) {
+        throw new Error("Invalid user");
       }
-
-      const org = await this.orgs.loadOrg(orgId);
-      if (!org) {
-        throw new Error(`can't find organization with id ${orgId}`);
-      }
-
-      if (!user) {
+      if (!isDefined(user)) {
+        const [, domain] = email.split("@");
+        const integration = await this.integrations.loadSSOIntegrationByDomain(domain);
+        if (!isDefined(integration) || integration.org_id !== orgId) {
+          throw new Error("Invalid user");
+        }
         user = await this.users.createUser(
           {
             first_name: firstName,
@@ -190,7 +184,12 @@ export class Auth implements IAuth {
         RefreshToken: tokens["refresh_token"],
       });
       this.setSession(res, token);
-      res.redirect(302, `/?url=${encodeURIComponent("/app")}`);
+      const prefix = state.has("locale") ? `/${state.get("locale")}` : "";
+      const path =
+        state.has("redirect") && state.get("redirect")!.startsWith("/")
+          ? state.get("redirect")!
+          : "/app";
+      res.redirect(302, prefix + path);
     } catch (error: any) {
       next(error);
     }
@@ -310,21 +309,46 @@ export class Auth implements IAuth {
   }
 
   async logoutCallback(req: Request, res: Response, next: NextFunction) {
-    res.redirect(302, `/?url=${encodeURIComponent("/login")}`);
+    const state = new URLSearchParams(
+      Buffer.from(req.cookies["parallel_logout"] ?? "", "base64").toString("ascii")
+    );
+    const path = state.has("locale") ? `/${state.get("locale")!}/login` : "/login";
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    const host = state.has("hostname")
+      ? `${protocol}://${state.get("hostname")}`
+      : this.config.misc.parallelUrl;
+    res.redirect(302, host + path);
   }
 
   async logout(req: Request, res: Response, next: NextFunction) {
-    const url = new URL(`https://${this.config.cognito.domain}/logout`);
-    for (const [name, value] of Object.entries({
-      logout_uri: `${this.config.misc.parallelUrl}/api/auth/logout/callback`,
-      client_id: this.config.cognito.clientId,
-    })) {
-      url.searchParams.append(name, value);
-    }
     const cookie = req.cookies["parallel_session"];
     await this.deleteSession(cookie);
     res.clearCookie("parallel_session");
-    res.redirect(302, url.href);
+    // if custom hostname pass hostname to canonical hostname for later redirect in logout/callback
+    if (req.hostname !== new URL(this.config.misc.parallelUrl).hostname) {
+      return res.redirect(
+        302,
+        `${this.config.misc.parallelUrl}/api/auth/logout?${new URLSearchParams({
+          ...(req.query.locale ? { locale: req.query.locale as string } : {}),
+          hostname: req.hostname,
+        })}`
+      );
+    }
+    const state = Buffer.from(
+      new URLSearchParams(pick(req.query, ["locale", "hostname"]) as any).toString()
+    ).toString("base64");
+    res.cookie("parallel_logout", state, {
+      maxAge: 30000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+    res.redirect(
+      302,
+      `https://${this.config.cognito.domain}/logout?${new URLSearchParams({
+        logout_uri: `${this.config.misc.parallelUrl}/api/auth/logout/callback`,
+        client_id: this.config.cognito.clientId,
+      })}`
+    );
   }
 
   private async getUserFromAuthenticationResult(result: AuthenticationResultType) {

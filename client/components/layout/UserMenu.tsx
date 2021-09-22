@@ -45,7 +45,9 @@ export function UserMenu({ placement, user, onHelpCenterClick, onLocaleChange }:
   const router = useRouter();
 
   async function handleLogoutClick() {
-    window.location.href = `/api/auth/logout`;
+    window.location.href = `/api/auth/logout?${new URLSearchParams({
+      locale: router.locale!,
+    })}`;
   }
   const locales = useSupportedLocales();
 

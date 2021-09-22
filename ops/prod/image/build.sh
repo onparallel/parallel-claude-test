@@ -26,7 +26,6 @@ curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
 yum -y install yarn
 
 echo "Installing nginx"
-git clone https://github.com/giom/nginx_accept_language_module
 curl -O https://nginx.org/download/${nginx_version}.tar.gz
 tar -xvf ${nginx_version}.tar.gz 
 pushd ${nginx_version}
@@ -73,8 +72,7 @@ pushd ${nginx_version}
     --with-stream_ssl_module \
     --with-debug \
     --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic' \
-    --with-ld-opt=' -Wl,-E' \
-    --add-module=../nginx_accept_language_module
+    --with-ld-opt=' -Wl,-E'
 make
 make install
 popd > /dev/null

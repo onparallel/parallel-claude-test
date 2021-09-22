@@ -16,6 +16,7 @@ import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { postJSON } from "@parallel/utils/rest";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
+import router, { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -35,6 +36,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
     formState: { errors },
     watch,
   } = useForm<LoginData>();
+  const { locale } = useRouter();
   const [ssoUrl, setSsoUrl] = useState<string | undefined>(undefined);
   const [forcePassword, setForcePassword] = useState(false);
   const email = watch("email");
@@ -47,7 +49,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
     async function guessLogin() {
       const result = await postJSON<{ type: "SSO" | "PASSWORD"; url?: string }>(
         "/api/auth/guess-login",
-        { email }
+        { email, locale, redirect: router.query.redirect }
       );
       if (result?.url && document.activeElement === passwordRef.current) {
         buttonRef.current!.focus();
