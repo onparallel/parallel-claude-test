@@ -1053,6 +1053,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           ctx.petitions.clonePublicPetitionLinkUsersIntoPetitionPermission(
             args.publicPetitionLinkId,
             newPetition.id,
+            `PublicPetitionLink:${args.publicPetitionLinkId}`,
             t
           ),
         ]);

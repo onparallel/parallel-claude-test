@@ -2596,6 +2596,7 @@ export class PetitionRepository extends BaseRepository {
   async clonePetitionPermissions(
     fromPetitionId: number,
     toPetitionIds: number[],
+    createdBy: string,
     t?: Knex.Transaction
   ) {
     await this.raw(
@@ -2605,10 +2606,10 @@ export class PetitionRepository extends BaseRepository {
           p as (select * from (values ${toPetitionIds
             .map(() => "(?::int)")
             .join(",")}) as t (petition_id))
-        insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id)
-        select p.petition_id, u.user_id, u.type, u.is_subscribed, u.user_group_id, u.from_user_group_id from u cross join p
+        insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id, created_by)
+        select p.petition_id, u.user_id, u.type, u.is_subscribed, u.user_group_id, u.from_user_group_id, ? from u cross join p
         `,
-      [fromPetitionId, ...toPetitionIds],
+      [fromPetitionId, ...toPetitionIds, createdBy],
       t
     );
   }
@@ -3600,17 +3601,18 @@ export class PetitionRepository extends BaseRepository {
   async clonePublicPetitionLinkUsersIntoPetitionPermission(
     publicPetitionLinkId: number,
     petitionId: number,
+    createdBy: string,
     t?: Knex.Transaction
   ) {
     await this.raw(
       /* sql */ `
-      insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id)
+      insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id, created_by)
         (
-          select ?, pplu.user_id, pplu.type, pplu.is_subscribed, pplu.user_group_id, pplu.from_user_group_id 
+          select ?, pplu.user_id, pplu.type, pplu.is_subscribed, pplu.user_group_id, pplu.from_user_group_id, ?
           from public_petition_link_user pplu where pplu.public_petition_link_id = ? and deleted_at is null
         )
     `,
-      [petitionId, publicPetitionLinkId],
+      [petitionId, createdBy, publicPetitionLinkId],
       t
     );
   }
