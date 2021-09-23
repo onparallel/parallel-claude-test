@@ -8,7 +8,7 @@ import {
   usePopper,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { PlaceholderMenu } from "@parallel/utils/slate/placeholders/PlaceholderMenu";
+import { PlaceholderMenu } from "@parallel/components/common/slate/PlaceholderMenu";
 import {
   PlaceholderElement,
   PlaceholderOption,

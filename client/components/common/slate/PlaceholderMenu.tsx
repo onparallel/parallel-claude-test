@@ -5,7 +5,7 @@ import { HighlightText } from "@parallel/components/common/HighlightText";
 import { CustomDomComponent, motion, Variants } from "framer-motion";
 import { useEffect, useRef } from "react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { PlaceholderOption } from "./PlaceholderPlugin";
+import { PlaceholderOption } from "../../../utils/slate/placeholders/PlaceholderPlugin";
 
 interface PlaceholderMenuProps {
   isOpen: boolean;

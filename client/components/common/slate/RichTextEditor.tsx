@@ -1,6 +1,6 @@
 import { Box, Portal, Text, useFormControl, useId, useMultiStyleConfig } from "@chakra-ui/react";
 import { formatList } from "@parallel/utils/slate/formatList";
-import { PlaceholderMenu } from "@parallel/utils/slate/placeholders/PlaceholderMenu";
+import { PlaceholderMenu } from "@parallel/components/common/slate/PlaceholderMenu";
 import {
   PlaceholderOption,
   usePlaceholderPlugin,
