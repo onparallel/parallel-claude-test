@@ -272,7 +272,12 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                             values={{
                               a: (chunks: any) => (
                                 <ContactListPopover
-                                  contacts={petition.signature!.signers.map((c) => c!).slice(1)}
+                                  contacts={petition
+                                    .signature!.signers.filter(isDefined)
+                                    .slice(1)
+                                    .concat(
+                                      petition.signature!.additionalSigners.filter(isDefined)
+                                    )}
                                 >
                                   <Text
                                     display="initial"
@@ -286,7 +291,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                               ),
                               name: petition.signature.signers[0]!.fullName,
                               email: petition.signature.signers[0]!.email,
-                              count: petition.signature.signers.length - 1,
+                              count:
+                                petition.signature.signers.length +
+                                petition.signature.additionalSigners.length -
+                                1,
                             }}
                           />
                         ) : (
@@ -483,6 +491,9 @@ RecipientView.fragments = {
           signers {
             ...RecipientView_PublicContact
           }
+          additionalSigners {
+            ...RecipientView_PublicContact
+          }
         }
         recipients {
           ...RecipientViewHeader_PublicContact
@@ -548,9 +559,10 @@ RecipientView.mutations = [
         message: $message
       ) {
         id
-        status
+        ...RecipientView_PublicPetition
       }
     }
+    ${RecipientView.fragments.PublicPetition}
   `,
 ];
 

@@ -457,6 +457,7 @@ export interface NexusGenObjects {
     contactIds: number[];
     review?: boolean;
     letRecipientsChooseSigners?: boolean;
+    additionalSignerContactIds?: number[];
   };
   PublicUser: db.User;
   Query: {};
@@ -1348,6 +1349,7 @@ export interface NexusGenFieldTypes {
   };
   PublicSignatureConfig: {
     // field return type
+    additionalSigners: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
     letRecipientsChooseSigners: boolean; // Boolean!
     review: boolean; // Boolean!
     signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
@@ -2461,6 +2463,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicSignatureConfig: {
     // field return type name
+    additionalSigners: "PublicContact";
     letRecipientsChooseSigners: "Boolean";
     review: "Boolean";
     signers: "PublicContact";

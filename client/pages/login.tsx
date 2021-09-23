@@ -28,7 +28,6 @@ import {
   useLogin_resendVerificationCodeMutation,
 } from "@parallel/graphql/__types";
 import { postJSON } from "@parallel/utils/rest";
-import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";

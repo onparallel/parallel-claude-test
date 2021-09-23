@@ -2195,6 +2195,8 @@ export interface PublicPetitionSignerDataInput {
 /** The public signature settings of a petition */
 export interface PublicSignatureConfig {
   __typename?: "PublicSignatureConfig";
+  /** The contacts assigned by the petition recipient to sign */
+  additionalSigners: Array<Maybe<PublicContact>>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -13356,6 +13358,16 @@ export type RecipientView_PublicPetitionAccessFragment = {
           email: string;
         }>
       >;
+      additionalSigners: Array<
+        Maybe<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: Maybe<string>;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          email: string;
+        }>
+      >;
     }>;
     recipients: Array<{
       __typename?: "PublicContact";
@@ -13446,6 +13458,16 @@ export type RecipientView_PublicPetitionFragment = {
         email: string;
       }>
     >;
+    additionalSigners: Array<
+      Maybe<{
+        __typename?: "PublicContact";
+        id: string;
+        fullName?: Maybe<string>;
+        firstName?: Maybe<string>;
+        lastName?: Maybe<string>;
+        email: string;
+      }>
+    >;
   }>;
   recipients: Array<{
     __typename?: "PublicContact";
@@ -13516,7 +13538,81 @@ export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
 }>;
 
 export type RecipientView_publicCompletePetitionMutation = {
-  publicCompletePetition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+  publicCompletePetition: {
+    __typename?: "PublicPetition";
+    id: string;
+    status: PetitionStatus;
+    deadline?: Maybe<string>;
+    hasCommentsEnabled: boolean;
+    isRecipientViewContentsHidden: boolean;
+    signatureStatus?: Maybe<PublicSignatureStatus>;
+    fields: Array<{
+      __typename?: "PublicPetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: Maybe<string>;
+      options: { [key: string]: any };
+      optional: boolean;
+      validated: boolean;
+      isReadOnly: boolean;
+      commentCount: number;
+      unreadCommentCount: number;
+      visibility?: Maybe<{ [key: string]: any }>;
+      description?: Maybe<string>;
+      multiple: boolean;
+      replies: Array<{
+        __typename?: "PublicPetitionFieldReply";
+        id: string;
+        status: PetitionFieldReplyStatus;
+        content: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+      attachments: Array<{
+        __typename?: "PetitionFieldAttachment";
+        id: string;
+        file: {
+          __typename?: "FileUpload";
+          filename: string;
+          contentType: string;
+          size: number;
+          isComplete: boolean;
+        };
+      }>;
+    }>;
+    signature?: Maybe<{
+      __typename?: "PublicSignatureConfig";
+      review: boolean;
+      letRecipientsChooseSigners: boolean;
+      signers: Array<
+        Maybe<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: Maybe<string>;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          email: string;
+        }>
+      >;
+      additionalSigners: Array<
+        Maybe<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: Maybe<string>;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          email: string;
+        }>
+      >;
+    }>;
+    recipients: Array<{
+      __typename?: "PublicContact";
+      id: string;
+      fullName?: Maybe<string>;
+      firstName?: Maybe<string>;
+      email: string;
+    }>;
+  };
 };
 
 export type PublicPetitionQueryVariables = Exact<{
@@ -13573,6 +13669,16 @@ export type PublicPetitionQuery = {
         review: boolean;
         letRecipientsChooseSigners: boolean;
         signers: Array<
+          Maybe<{
+            __typename?: "PublicContact";
+            id: string;
+            fullName?: Maybe<string>;
+            firstName?: Maybe<string>;
+            lastName?: Maybe<string>;
+            email: string;
+          }>
+        >;
+        additionalSigners: Array<
           Maybe<{
             __typename?: "PublicContact";
             id: string;
@@ -16721,6 +16827,9 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
       review
       letRecipientsChooseSigners
       signers {
+        ...RecipientView_PublicContact
+      }
+      additionalSigners {
         ...RecipientView_PublicContact
       }
     }
@@ -21204,9 +21313,10 @@ export const RecipientView_publicCompletePetitionDocument = gql`
       message: $message
     ) {
       id
-      status
+      ...RecipientView_PublicPetition
     }
   }
+  ${RecipientView_PublicPetitionFragmentDoc}
 `;
 export function useRecipientView_publicCompletePetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<

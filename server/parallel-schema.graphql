@@ -3033,6 +3033,11 @@ The public signature settings of a petition
 """
 type PublicSignatureConfig {
   """
+  The contacts assigned by the petition recipient to sign
+  """
+  additionalSigners: [PublicContact]!
+
+  """
   If true, allows the recipients of the petition to select additional signers
   """
   letRecipientsChooseSigners: Boolean!

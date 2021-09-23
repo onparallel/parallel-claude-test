@@ -87,6 +87,7 @@ export type PetitionSignatureConfig = {
   review?: boolean;
   letRecipientsChooseSigners?: boolean;
   message?: string;
+  additionalSignerContactIds?: number[];
 };
 
 @injectable()

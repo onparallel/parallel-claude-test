@@ -49,6 +49,15 @@ export const PublicSignatureConfig = objectType({
         return await ctx.contacts.loadContact(root.contactIds);
       },
     });
+    t.list.nullable.field("additionalSigners", {
+      type: "PublicContact",
+      description: "The contacts assigned by the petition recipient to sign",
+      resolve: async (root, _, ctx) => {
+        return root.additionalSignerContactIds
+          ? await ctx.contacts.loadContact(root.additionalSignerContactIds)
+          : [];
+      },
+    });
     t.boolean("review", {
       description:
         "If true, lets the user review the replies before starting the signature process",
@@ -63,7 +72,7 @@ export const PublicSignatureConfig = objectType({
     contactIds: number[];
     review?: boolean;
     letRecipientsChooseSigners?: boolean;
-
+    additionalSignerContactIds?: number[];
   }`,
 });
 

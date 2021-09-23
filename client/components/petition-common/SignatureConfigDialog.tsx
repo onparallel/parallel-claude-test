@@ -259,7 +259,11 @@ export function SignatureConfigDialog({
               )}
             />
           </FormControl>
-          <FormControl hidden={selectedContacts.length === 0} alignItems="center" display="flex">
+          <FormControl
+            hidden={selectedContacts.length === 0 || petitionIsCompleted}
+            alignItems="center"
+            display="flex"
+          >
             <Checkbox {...register("letRecipientsChooseSigners")} colorScheme="purple">
               <FormattedMessage
                 id="component.signature-config-dialog.allow-recipient-to-choose.label"

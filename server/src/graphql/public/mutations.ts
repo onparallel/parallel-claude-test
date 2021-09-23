@@ -10,7 +10,7 @@ import {
 } from "nexus";
 import { differenceInDays, differenceInSeconds } from "date-fns";
 import pMap from "p-map";
-import { prop } from "remeda";
+import { isDefined, prop } from "remeda";
 import { getClientIp } from "request-ip";
 import { ApiContext } from "../../context";
 import { Petition } from "../../db/__types";
@@ -594,15 +594,16 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   },
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (_, args, ctx) => {
-    const petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!.id);
+    let petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!.id);
 
     if (petition.signature_config?.review === false) {
-      await startSignatureRequest(
+      const updatedPetition = await startSignatureRequest(
         petition,
         args.additionalSigners ?? null,
         args.message ?? null,
         ctx
       );
+      petition = updatedPetition ?? petition;
     } else {
       await ctx.emails.sendPetitionCompletedEmail(petition.id, {
         accessId: ctx.access!.id,
@@ -839,6 +840,7 @@ async function startSignatureRequest(
   message: string | null,
   ctx: ApiContext
 ) {
+  let updatedPetition = null;
   const specifiedByUser = petition.signature_config.contactIds.length > 0;
   const specifiedByRecipient = (additionalSigners ?? []).length > 0;
 
@@ -863,6 +865,20 @@ async function startSignatureRequest(
       )
   );
 
+  if (recipientSigners.length > 0 && isDefined(petition.signature_config)) {
+    [updatedPetition] = await ctx.petitions.updatePetition(
+      petition.id,
+      {
+        signature_config: {
+          ...petition.signature_config,
+          // save the ids of the signer contacts specified by the recipient, so we can show this info later on recipient view
+          additionalSignerContactIds: recipientSigners.map((s) => s.id),
+        },
+      },
+      `Contact:${ctx.contact!.id}`
+    );
+  }
+
   const signatureRequest = await ctx.petitions.createPetitionSignature(petition.id, {
     ...petition.signature_config,
     contactIds: userSignersIds.concat(...recipientSigners.map((s) => s.id)),
@@ -876,6 +892,8 @@ async function startSignatureRequest(
       payload: { petitionSignatureRequestId: signatureRequest.id },
     },
   });
+
+  return updatedPetition;
 }
 
 export const publicPetitionFieldAttachmentDownloadLink = mutationField(

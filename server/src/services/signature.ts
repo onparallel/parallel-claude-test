@@ -157,7 +157,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
       files,
       recipients,
       removeNotDefined<SignatureParams>({
-        body: opts.initialMessage,
+        body: opts.initialMessage ?? "{{filename}}", // include the filename as default to make sure the message card on the email does not look empty
         delivery_type: "email",
         signing_mode: opts.signingMode ?? "parallel",
         branding_id: brandingId,

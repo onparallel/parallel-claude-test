@@ -2465,6 +2465,16 @@
     "context": "Select a user or group"
   },
   {
+    "term": "component.signature-config-dialog.allow-recipient-to-choose.help",
+    "definition": "If this option is disabled, only the assigned people will be able to sign.",
+    "context": "If this option is disabled, only the assigned people will be able to sign."
+  },
+  {
+    "term": "component.signature-config-dialog.allow-recipient-to-choose.label",
+    "definition": "Allow the recipient to choose signers",
+    "context": "Allow the recipient to choose signers"
+  },
+  {
     "term": "component.signature-config-dialog.confirm-start",
     "definition": "Start signature",
     "context": "Start signature"
@@ -2728,6 +2738,16 @@
     "term": "component.user-select.user-group-icon-alt",
     "definition": "User group",
     "context": "User group"
+  },
+  {
+    "term": "components.add-new-signer-dialog.email-already-used.error",
+    "definition": "This email is already on the list of signers",
+    "context": "This email is already on the list of signers"
+  },
+  {
+    "term": "components.add-new-signer-dialog.header",
+    "definition": "Enter the signer's information",
+    "context": "Enter the signer's information"
   },
   {
     "term": "components.multiple-emails-pasted-dialog.header",
@@ -3080,9 +3100,9 @@
     "context": "Actions"
   },
   {
-    "term": "generic.add-message",
-    "definition": "Add message",
-    "context": "Add message"
+    "term": "generic.add",
+    "definition": "Add",
+    "context": "Add"
   },
   {
     "term": "generic.added-at",
@@ -3443,11 +3463,6 @@
     "term": "generic.forms.passwords-must-match",
     "definition": "Passwords must match",
     "context": "Passwords must match"
-  },
-  {
-    "term": "generic.forms.radiogroup-error",
-    "definition": "Please, choose an option",
-    "context": "Please, choose an option"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -4568,21 +4583,6 @@
     "term": "petition.field-type.text",
     "definition": "Long replies",
     "context": "Long replies"
-  },
-  {
-    "term": "petition.finalize-start-signature.body-1",
-    "definition": "This petition requires an eSignature in order to be completed.",
-    "context": "This petition requires an eSignature in order to be completed."
-  },
-  {
-    "term": "petition.finalize-start-signature.body-2",
-    "definition": "After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:",
-    "context": "After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:"
-  },
-  {
-    "term": "petition.finalize-start-signature.header",
-    "definition": "Sign petition",
-    "context": "Sign petition"
   },
   {
     "term": "petition.header.activity-tab",
@@ -6940,29 +6940,49 @@
     "context": "Already trust us"
   },
   {
+    "term": "recipient-view.complete-signer-info-dialog.add-more-signers.button",
+    "definition": "Add more signers",
+    "context": "Add more signers"
+  },
+  {
     "term": "recipient-view.complete-signer-info-dialog.header",
     "definition": "Sign petition",
     "context": "Sign petition"
   },
   {
-    "term": "recipient-view.complete-signer-info-dialog.subtitle",
-    "definition": "An eSignature is required to complete this petition.",
-    "context": "An eSignature is required to complete this petition."
+    "term": "recipient-view.complete-signer-info-dialog.include-message",
+    "definition": "Include message",
+    "context": "Include message"
   },
   {
-    "term": "recipient-view.complete-signer-info-dialog.who-will-sign",
+    "term": "recipient-view.complete-signer-info-dialog.no-selected-signers.question",
     "definition": "Who has to sign the document?",
     "context": "Who has to sign the document?"
   },
   {
-    "term": "recipient-view.complete-signer-info-dialog.who-will-sign.myself",
+    "term": "recipient-view.complete-signer-info-dialog.recipient-will-sign",
     "definition": "I will sign ({email})",
     "context": "I will sign ({email})"
   },
   {
-    "term": "recipient-view.complete-signer-info-dialog.who-will-sign.other",
-    "definition": "Another person will sign",
-    "context": "Another person will sign"
+    "term": "recipient-view.complete-signer-info-dialog.remove-signer-button.tooltip",
+    "definition": "Remove signer",
+    "context": "Remove signer"
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.subtitle",
+    "definition": "This petition requires an eSignature in order to be completed.",
+    "context": "This petition requires an eSignature in order to be completed."
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.subtitle.recipient-can-add",
+    "definition": "You can add more signers if you consider it necessary.",
+    "context": "You can add more signers if you consider it necessary."
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.subtitle.with-signers",
+    "definition": "After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people.",
+    "context": "After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people."
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
