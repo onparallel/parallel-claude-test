@@ -7,10 +7,8 @@ import {
   Button,
   CloseButton,
   Flex,
-  ListItem,
   Stack,
   Text,
-  UnorderedList,
   useToast,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
@@ -22,7 +20,10 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { useCompleteSignerInfoDialog } from "@parallel/components/recipient-view/CompleteSignerInfoDialog";
+import {
+  CompleteSignerInfoDialogResult,
+  useCompleteSignerInfoDialog,
+} from "@parallel/components/recipient-view/CompleteSignerInfoDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
@@ -33,8 +34,6 @@ import { RecipientViewProgressFooter } from "@parallel/components/recipient-view
 import {
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
-  PublicPetitionSignerData,
-  RecipientView_PublicContactFragment,
   RecipientView_PublicPetitionFieldFragment,
   RecipientView_PublicUserFragment,
   usePublicPetitionQuery,
@@ -46,13 +45,14 @@ import { compose } from "@parallel/utils/compose";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
-import { Maybe, UnwrapPromise } from "@parallel/utils/types";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
+import { isDefined } from "remeda";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
@@ -74,8 +74,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const [showAlert, setShowAlert] = useState(true);
 
   const [finalized, setFinalized] = useState(false);
-  const confirmStartSignatureProcessDialog = useDialog(ConfirmStartSignatureProcess);
-  const [completePetition] = useRecipientView_publicCompletePetitionMutation();
+  const [publicCompletePetition] = useRecipientView_publicCompletePetitionMutation();
   const showCompleteSignerInfoDialog = useCompleteSignerInfoDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
   const handleFinalize = useCallback(
@@ -91,26 +90,27 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             f.isReadOnly
         );
         if (canFinalize) {
-          let signer: Maybe<PublicPetitionSignerData> = null;
+          let completeSignerInfoData: CompleteSignerInfoDialogResult | null = null;
           if (petition.signature?.review === false) {
-            if (signers.length === 0) {
-              signer = await showCompleteSignerInfoDialog({
-                keycode,
-                organization: granter.organization.name,
-                contact,
-              });
-            } else {
-              await confirmStartSignatureProcessDialog({
-                signers,
-                contactId: contact.id,
-              });
-            }
+            completeSignerInfoData = await showCompleteSignerInfoDialog({
+              recipientCanAddSigners: petition.signature.letRecipientsChooseSigners,
+              signers: signers.filter(isDefined),
+              keycode,
+              organization: granter.organization.name,
+              contact,
+            });
           }
-          await completePetition({ variables: { keycode, signer } });
+          await publicCompletePetition({
+            variables: {
+              keycode,
+              additionalSigners: completeSignerInfoData?.additionalSigners,
+              message: completeSignerInfoData?.message,
+            },
+          });
           if (petition.signature?.review) {
             await showReviewBeforeSigningDialog({ granter });
           }
-          if (!toast.isActive("petition-completed-toast"))
+          if (!toast.isActive("petition-completed-toast")) {
             toast({
               id: "petition-completed-toast",
               title: intl.formatMessage({
@@ -127,6 +127,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               status: "success",
               isClosable: true,
             });
+          }
         } else {
           // go to first repliable field without replies
           let page = 1;
@@ -389,63 +390,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   );
 }
 
-interface ConfirmStartSignatureProcessProps {
-  signers: Maybe<RecipientView_PublicContactFragment>[];
-  contactId: string;
-}
-
-function ConfirmStartSignatureProcess({
-  signers,
-  contactId,
-  ...props
-}: DialogProps<ConfirmStartSignatureProcessProps>) {
-  return (
-    <ConfirmDialog
-      closeOnEsc={false}
-      closeOnOverlayClick={false}
-      size="lg"
-      header={
-        <FormattedMessage
-          id="petition.finalize-start-signature.header"
-          defaultMessage="Sign petition"
-        />
-      }
-      body={
-        <>
-          <FormattedMessage
-            id="petition.finalize-start-signature.body-1"
-            defaultMessage="This petition requires an eSignature in order to be completed."
-          />
-          <Spacer marginTop={2} />
-          <FormattedMessage
-            id="petition.finalize-start-signature.body-2"
-            defaultMessage="After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:"
-          />
-          <Spacer marginTop={4} />
-          <UnorderedList>
-            {signers.map((s, i) => {
-              return (
-                <ListItem key={i}>
-                  {s?.fullName} {`<${s?.email}> `}
-                </ListItem>
-              );
-            })}
-          </UnorderedList>
-        </>
-      }
-      confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="petition.continue-with-signature"
-            defaultMessage="Continue with eSignature"
-          />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
 function ReviewBeforeSignDialog({
   granter,
   ...props
@@ -534,6 +478,8 @@ RecipientView.fragments = {
           ...RecipientView_PublicPetitionField
         }
         signature {
+          review
+          letRecipientsChooseSigners
           signers {
             ...RecipientView_PublicContact
           }
@@ -558,6 +504,8 @@ RecipientView.fragments = {
       fragment RecipientView_PublicContact on PublicContact {
         id
         fullName
+        firstName
+        lastName
         email
       }
     `;
@@ -591,9 +539,14 @@ RecipientView.mutations = [
   gql`
     mutation RecipientView_publicCompletePetition(
       $keycode: ID!
-      $signer: PublicPetitionSignerData
+      $additionalSigners: [PublicPetitionSignerDataInput!]
+      $message: String
     ) {
-      publicCompletePetition(keycode: $keycode, signer: $signer) {
+      publicCompletePetition(
+        keycode: $keycode
+        additionalSigners: $additionalSigners
+        message: $message
+      ) {
         id
         status
       }

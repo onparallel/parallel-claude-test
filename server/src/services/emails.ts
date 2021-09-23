@@ -92,19 +92,22 @@ export class EmailsService implements IEmailsService {
   async sendPetitionCompletedEmail(
     petitionId: number,
     {
-      accessIds,
+      accessId,
       contactId,
     }: {
-      accessIds?: MaybeArray<number>;
+      accessId?: number;
       contactId?: number;
     }
   ) {
-    const payload = accessIds
-      ? unMaybeArray(accessIds).map((accessId) => ({
+    if (!accessId && !contactId) {
+      return;
+    }
+    const payload = accessId
+      ? {
           id: this.buildQueueId("PetitionAccess", accessId),
           petition_id: petitionId,
           petition_access_id: accessId,
-        }))
+        }
       : {
           id: this.buildQueueId("PetitionSigned", petitionId),
           petition_id: petitionId,

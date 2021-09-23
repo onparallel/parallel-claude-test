@@ -1,5 +1,5 @@
-import { core, enumType, interfaceType, objectType, unionType } from "nexus";
 import { extension } from "mime-types";
+import { core, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { isDefined } from "remeda";
 import { Contact } from "../../db/__types";
 import { fullName } from "../../util/fullName";
@@ -54,11 +54,26 @@ export const PublicSignatureConfig = objectType({
         "If true, lets the user review the replies before starting the signature process",
       resolve: (o) => o.review ?? false,
     });
+    t.boolean("letRecipientsChooseSigners", {
+      description: "If true, allows the recipients of the petition to select additional signers",
+      resolve: (o) => o.letRecipientsChooseSigners ?? false,
+    });
   },
   sourceType: /* ts */ `{
     contactIds: number[];
     review?: boolean;
+    letRecipientsChooseSigners?: boolean;
+
   }`,
+});
+
+export const PublicPetitionSignerDataInput = inputObjectType({
+  name: "PublicPetitionSignerDataInput",
+  definition(t) {
+    t.nonNull.string("email");
+    t.nonNull.string("firstName");
+    t.nonNull.string("lastName");
+  },
 });
 
 export const PublicPetition = objectType({

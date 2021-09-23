@@ -106,12 +106,11 @@ export interface NexusGenInputs {
     operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
     value: string; // ID!
   };
-  PublicPetitionSignerData: {
+  PublicPetitionSignerDataInput: {
     // input type
     email: string; // String!
     firstName: string; // String!
     lastName: string; // String!
-    message?: string | null; // String
   };
   RemindersConfigInput: {
     // input type
@@ -457,6 +456,7 @@ export interface NexusGenObjects {
   PublicSignatureConfig: {
     contactIds: number[];
     review?: boolean;
+    letRecipientsChooseSigners?: boolean;
   };
   PublicUser: db.User;
   Query: {};
@@ -1348,6 +1348,7 @@ export interface NexusGenFieldTypes {
   };
   PublicSignatureConfig: {
     // field return type
+    letRecipientsChooseSigners: boolean; // Boolean!
     review: boolean; // Boolean!
     signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
   };
@@ -2460,6 +2461,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicSignatureConfig: {
     // field return type name
+    letRecipientsChooseSigners: "Boolean";
     review: "Boolean";
     signers: "PublicContact";
   };
@@ -3071,8 +3073,9 @@ export interface NexusGenArgTypes {
     };
     publicCompletePetition: {
       // args
+      additionalSigners?: NexusGenInputs["PublicPetitionSignerDataInput"][] | null; // [PublicPetitionSignerDataInput!]
       keycode: string; // ID!
-      signer?: NexusGenInputs["PublicPetitionSignerData"] | null; // PublicPetitionSignerData
+      message?: string | null; // String
     };
     publicCreateAndSendPetitionFromPublicLink: {
       // args

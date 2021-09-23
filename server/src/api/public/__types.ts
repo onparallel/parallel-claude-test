@@ -112,6 +112,7 @@ export type Contact = Timestamps & {
   firstName: Maybe<Scalars["String"]>;
   /** The full name of the contact. */
   fullName: Maybe<Scalars["String"]>;
+  hasBouncedEmail: Scalars["Boolean"];
   /** The ID of the contact. */
   id: Scalars["GID"];
   /** The last name of the contact. */
@@ -776,7 +777,8 @@ export type MutationpublicCheckVerificationCodeArgs = {
 
 export type MutationpublicCompletePetitionArgs = {
   keycode: Scalars["ID"];
-  signer?: Maybe<PublicPetitionSignerData>;
+  message?: Maybe<Scalars["String"]>;
+  signers?: Maybe<Array<PublicPetitionSignerDataInput>>;
 };
 
 export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
@@ -1307,6 +1309,8 @@ export type Petition = PetitionBase & {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
+  /** The template GID used for this petition */
+  fromTemplateId: Maybe<Scalars["GID"]>;
   /** Whether comments are enabled or not. */
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
@@ -1366,7 +1370,7 @@ export type PetitionAccess = Timestamps & {
   contact: Maybe<Contact>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  /** The user who granted the access. */
+  /** The user who granted the original access. */
   granter: Maybe<User>;
   /** The ID of the petition access. */
   id: Scalars["GID"];
@@ -2094,15 +2098,16 @@ export type PublicPetitionMessage = {
   subject: Maybe<Scalars["String"]>;
 };
 
-export type PublicPetitionSignerData = {
+export type PublicPetitionSignerDataInput = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
-  message?: Maybe<Scalars["String"]>;
 };
 
 /** The public signature settings of a petition */
 export type PublicSignatureConfig = {
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The contacts that need to sign the generated document. */
@@ -2454,6 +2459,8 @@ export type SignatureCompletedUserNotification = PetitionUserNotification & {
 export type SignatureConfig = {
   /** The contacts that need to sign the generated document. */
   contacts: Array<Maybe<Contact>>;
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -2468,6 +2475,8 @@ export type SignatureConfig = {
 export type SignatureConfigInput = {
   /** The contacts that need to sign the generated document. */
   contactIds: Array<Scalars["ID"]>;
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */

@@ -184,7 +184,7 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
       petition_access_id: event.data.petition_access_id,
       org_id: user.org_id,
       petition_id: event.petition_id,
-      requires_signature: !!petition.signature_config,
+      requires_signature: isDefined(petition.signature_config),
       same_domain: user.email.split("@")[1] === contact.email.split("@")[1],
     },
   });

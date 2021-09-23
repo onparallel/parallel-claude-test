@@ -1,7 +1,6 @@
 import {
   booleanArg,
   idArg,
-  inputObjectType,
   list,
   mutationField,
   nonNull,
@@ -10,6 +9,7 @@ import {
   stringArg,
 } from "nexus";
 import { differenceInDays, differenceInSeconds } from "date-fns";
+import pMap from "p-map";
 import { prop } from "remeda";
 import { getClientIp } from "request-ip";
 import { ApiContext } from "../../context";
@@ -589,33 +589,23 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   type: "PublicPetition",
   args: {
     keycode: nonNull(idArg()),
-    signer: inputObjectType({
-      name: "PublicPetitionSignerData",
-      definition(t) {
-        t.nonNull.string("email");
-        t.nonNull.string("firstName");
-        t.nonNull.string("lastName");
-        t.nullable.string("message");
-      },
-    }).asArg(),
+    additionalSigners: list(nonNull("PublicPetitionSignerDataInput")),
+    message: nullable("String"),
   },
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (_, args, ctx) => {
     const petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!.id);
 
-    const signatureConfig = petition.signature_config as {
-      provider: string;
-      review: boolean;
-      contactIds: number[];
-      timezone: string;
-      title: string;
-    } | null;
-
-    if (signatureConfig?.review === false) {
-      await startSignatureRequest(petition, args.signer ?? null, ctx);
+    if (petition.signature_config?.review === false) {
+      await startSignatureRequest(
+        petition,
+        args.additionalSigners ?? null,
+        args.message ?? null,
+        ctx
+      );
     } else {
       await ctx.emails.sendPetitionCompletedEmail(petition.id, {
-        accessIds: ctx.access!.id,
+        accessId: ctx.access!.id,
       });
     }
     return petition;
@@ -839,40 +829,46 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
 
 async function startSignatureRequest(
   petition: Petition,
-  contactSigner: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    message?: string | null;
-  } | null,
+  additionalSigners:
+    | {
+        email: string;
+        firstName: string;
+        lastName: string;
+      }[]
+    | null,
+  message: string | null,
   ctx: ApiContext
 ) {
   const specifiedByUser = petition.signature_config.contactIds.length > 0;
-  if (!specifiedByUser && !contactSigner) {
+  const specifiedByRecipient = (additionalSigners ?? []).length > 0;
+
+  if (!specifiedByUser && !specifiedByRecipient) {
     throw new Error(
       `Can't complete petition with id ${petition.id}. Signer info is not specified.`
     );
   }
 
+  const userSignersIds: number[] = petition.signature_config?.contactIds ?? [];
+  const recipientSigners = await pMap(
+    additionalSigners ?? [],
+    async (signer) =>
+      await ctx.contacts.loadOrCreate(
+        {
+          email: signer.email,
+          firstName: signer.firstName,
+          lastName: signer.lastName,
+          orgId: ctx.contact!.org_id,
+        },
+        `Contact:${ctx.contact!.id}`
+      )
+  );
+
   const signatureRequest = await ctx.petitions.createPetitionSignature(petition.id, {
     ...petition.signature_config,
-    contactIds: specifiedByUser
-      ? petition.signature_config.contactIds
-      : [
-          (
-            await ctx.contacts.loadOrCreate(
-              {
-                email: contactSigner!.email,
-                firstName: contactSigner!.firstName,
-                lastName: contactSigner!.lastName,
-                orgId: ctx.contact!.org_id,
-              },
-              `Contact:${ctx.contact!.id}`
-            )
-          ).id,
-        ],
-    message: contactSigner?.message,
+    contactIds: userSignersIds.concat(...recipientSigners.map((s) => s.id)),
+    message,
   });
+
   await ctx.aws.enqueueMessages("signature-worker", {
     groupId: `signature-${toGlobalId("Petition", petition.id)}`,
     body: {

@@ -15,14 +15,13 @@ import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { CreatePetitionEvent, GenericPetitionEvent, PetitionEvent } from "../events";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import { CommentCreatedUserNotification, CreatePetitionUserNotification } from "../notifications";
 import {
   Contact,
-  CreatePetition,
   CreatePetitionAccess,
   CreatePetitionContactNotification,
   CreatePetitionField,
@@ -79,6 +78,16 @@ type EffectivePetitionPermission = Pick<
   PetitionPermission,
   "petition_id" | "user_id" | "type" | "is_subscribed"
 >;
+
+export type PetitionSignatureConfig = {
+  provider: string;
+  contactIds: number[];
+  timezone: string;
+  title: string;
+  review?: boolean;
+  letRecipientsChooseSigners?: boolean;
+  message?: string;
+};
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
@@ -706,7 +715,7 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  async createPetition(data: Omit<CreatePetition, "org_id" | "status">, user: User) {
+  async createPetition(data: Omit<TableCreateTypes["petition"], "org_id" | "status">, user: User) {
     return await this.withTransaction(async (t) => {
       const [petition] = await this.insert(
         "petition",
@@ -851,7 +860,7 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetition(
     petitionIds: MaybeArray<number>,
-    data: Partial<CreatePetition>,
+    data: Partial<TableTypes["petition"]>,
     updatedBy: string,
     t?: Knex.Transaction
   ) {
@@ -1440,7 +1449,7 @@ export class PetitionRepository extends BaseRepository {
   async clonePetition(
     petitionId: number,
     user: User,
-    data?: Partial<CreatePetition>,
+    data?: Partial<TableTypes["petition"]>,
     insertUserPermissions = true,
     t?: Knex.Transaction
   ) {
@@ -3160,16 +3169,7 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  async createPetitionSignature(
-    petitionId: number,
-    config: {
-      provider: string;
-      contactIds: number[];
-      timezone: string;
-      title: string;
-      message?: string;
-    }
-  ) {
+  async createPetitionSignature(petitionId: number, config: PetitionSignatureConfig) {
     const [row] = await this.insert("petition_signature_request", {
       petition_id: petitionId,
       signature_config: config,

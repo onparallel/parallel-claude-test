@@ -33,9 +33,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       throw new Error(`Signature configuration not found for petition with id ${petitionId}`);
     }
     if (process.env.NODE_ENV !== "production") {
-      const contacts = await ctx.contacts.loadContact(
-        petition.signature_config.contactIds as number[]
-      );
+      const contacts = await ctx.contacts.loadContact(petition.signature_config.contactIds);
       if (!contacts.every((c) => c && c.email.endsWith("@onparallel.com"))) {
         throw new WhitelistedError(
           "DEVELOPMENT: All recipients must have a parallel email.",

@@ -1064,9 +1064,10 @@ export const batchSendPetition = mutationField("batchSendPetition", {
           signature_config:
             args.batchSendSigningMode === "LET_RECIPIENT_CHOOSE"
               ? {
-                  ...petition.signature_config,
-                  review: false,
+                  ...petition.signature_config!,
                   contactIds: [],
+                  review: false,
+                  letRecipientsChooseSigners: true,
                 }
               : null,
         },

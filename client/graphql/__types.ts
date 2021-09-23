@@ -812,8 +812,9 @@ export interface MutationpublicCheckVerificationCodeArgs {
 }
 
 export interface MutationpublicCompletePetitionArgs {
+  additionalSigners?: Maybe<Array<PublicPetitionSignerDataInput>>;
   keycode: Scalars["ID"];
-  signer?: Maybe<PublicPetitionSignerData>;
+  message?: Maybe<Scalars["String"]>;
 }
 
 export interface MutationpublicCreateAndSendPetitionFromPublicLinkArgs {
@@ -2185,16 +2186,17 @@ export interface PublicPetitionMessage {
   subject?: Maybe<Scalars["String"]>;
 }
 
-export interface PublicPetitionSignerData {
+export interface PublicPetitionSignerDataInput {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
-  message?: Maybe<Scalars["String"]>;
 }
 
 /** The public signature settings of a petition */
 export interface PublicSignatureConfig {
   __typename?: "PublicSignatureConfig";
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The contacts that need to sign the generated document. */
@@ -13343,8 +13345,16 @@ export type RecipientView_PublicPetitionAccessFragment = {
     signature?: Maybe<{
       __typename?: "PublicSignatureConfig";
       review: boolean;
+      letRecipientsChooseSigners: boolean;
       signers: Array<
-        Maybe<{ __typename?: "PublicContact"; id: string; fullName?: Maybe<string>; email: string }>
+        Maybe<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: Maybe<string>;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          email: string;
+        }>
       >;
     }>;
     recipients: Array<{
@@ -13425,8 +13435,16 @@ export type RecipientView_PublicPetitionFragment = {
   signature?: Maybe<{
     __typename?: "PublicSignatureConfig";
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     signers: Array<
-      Maybe<{ __typename?: "PublicContact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "PublicContact";
+        id: string;
+        fullName?: Maybe<string>;
+        firstName?: Maybe<string>;
+        lastName?: Maybe<string>;
+        email: string;
+      }>
     >;
   }>;
   recipients: Array<{
@@ -13442,6 +13460,8 @@ export type RecipientView_PublicContactFragment = {
   __typename?: "PublicContact";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
 };
 
@@ -13491,7 +13511,8 @@ export type RecipientView_PublicUserFragment = {
 
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  signer?: Maybe<PublicPetitionSignerData>;
+  additionalSigners?: Maybe<Array<PublicPetitionSignerDataInput> | PublicPetitionSignerDataInput>;
+  message?: Maybe<Scalars["String"]>;
 }>;
 
 export type RecipientView_publicCompletePetitionMutation = {
@@ -13550,11 +13571,14 @@ export type PublicPetitionQuery = {
       signature?: Maybe<{
         __typename?: "PublicSignatureConfig";
         review: boolean;
+        letRecipientsChooseSigners: boolean;
         signers: Array<
           Maybe<{
             __typename?: "PublicContact";
             id: string;
             fullName?: Maybe<string>;
+            firstName?: Maybe<string>;
+            lastName?: Maybe<string>;
             email: string;
           }>
         >;
@@ -16649,6 +16673,8 @@ export const RecipientView_PublicContactFragmentDoc = gql`
   fragment RecipientView_PublicContact on PublicContact {
     id
     fullName
+    firstName
+    lastName
     email
   }
 `;
@@ -16692,6 +16718,8 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
       ...RecipientView_PublicPetitionField
     }
     signature {
+      review
+      letRecipientsChooseSigners
       signers {
         ...RecipientView_PublicContact
       }
@@ -21165,8 +21193,16 @@ export function useCurrentUserLazyQuery(
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
 export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
 export const RecipientView_publicCompletePetitionDocument = gql`
-  mutation RecipientView_publicCompletePetition($keycode: ID!, $signer: PublicPetitionSignerData) {
-    publicCompletePetition(keycode: $keycode, signer: $signer) {
+  mutation RecipientView_publicCompletePetition(
+    $keycode: ID!
+    $additionalSigners: [PublicPetitionSignerDataInput!]
+    $message: String
+  ) {
+    publicCompletePetition(
+      keycode: $keycode
+      additionalSigners: $additionalSigners
+      message: $message
+    ) {
       id
       status
     }

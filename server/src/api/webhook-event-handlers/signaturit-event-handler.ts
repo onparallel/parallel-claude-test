@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import sanitize from "sanitize-filename";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
-import { PetitionSignatureRequest } from "../../db/__types";
-import sanitize from "sanitize-filename";
 import { random } from "../../util/token";
 
 export async function validateSignaturitRequest(
@@ -135,11 +134,11 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
     );
   }
 
-  const config = signature.signature_config;
+  const { title } = signature.signature_config;
 
   const signedDoc = await storeDocument(
     await client.downloadSignedDocument(`${signatureId}/${documentId}`),
-    sanitize(`${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`),
+    sanitize(`${title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`),
     signaturitIntegration.id,
     ctx
   );
@@ -204,11 +203,11 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
     );
   }
 
-  const config = signature.signature_config;
+  const { title } = signature.signature_config;
 
   const auditTrail = await storeDocument(
     await client.downloadAuditTrail(`${signatureId}/${documentId}`),
-    sanitize(`${config.title}_audit_trail.pdf`),
+    sanitize(`${title}_audit_trail.pdf`),
     signaturitIntegration.id,
     ctx
   );
@@ -220,10 +219,7 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
   await appendEventLogs(ctx, data);
 }
 
-async function fetchPetitionSignature(
-  signatureId: string,
-  ctx: ApiContext
-): Promise<PetitionSignatureRequest> {
+async function fetchPetitionSignature(signatureId: string, ctx: ApiContext) {
   const externalId = `SIGNATURIT/${signatureId}`;
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(externalId);
   if (!signature) {

@@ -7,24 +7,34 @@ import { KeysOfType, MaybeArray, UnwrapPromise } from "../../util/types";
 import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
+import { PetitionSignatureConfig } from "../repositories/PetitionRepository";
 import {
+  CreatePetition,
+  CreatePetitionSignatureRequest,
   Organization,
+  Petition,
+  PetitionSignatureRequest,
   TableCreateTypes as _TableCreateTypes,
   TablePrimaryKeys,
   TableTypes as _TableTypes,
 } from "../__types";
 
-interface TableTypes
+export interface TableTypes
   extends Omit<_TableTypes, "PetitionEvent" | "SystemEvent" | "PetitionUserNotification"> {
   petition_event: PetitionEvent;
   petition_user_notification: PetitionUserNotification;
   system_event: SystemEvent;
   organization: Replace<Organization, { usage_details: OrganizationUsageDetails }>;
+  petition: Replace<Petition, { signature_config: PetitionSignatureConfig | null }>;
+  petition_signature_request: Replace<
+    PetitionSignatureRequest,
+    { signature_config: PetitionSignatureConfig }
+  >;
 }
 
 type Replace<T, U> = Omit<T, keyof U> & U;
 
-interface TableCreateTypes
+export interface TableCreateTypes
   extends Omit<
     _TableCreateTypes,
     "CreatePetitionEvent" | "CreateSystemEvent" | "CreatePetitionUserNotification"
@@ -32,6 +42,11 @@ interface TableCreateTypes
   petition_event: CreatePetitionEvent;
   system_event: CreateSystemEvent;
   petition_user_notification: CreatePetitionUserNotification;
+  petition: Replace<CreatePetition, { signature_config?: PetitionSignatureConfig | null }>;
+  petition_signature_request: Replace<
+    CreatePetitionSignatureRequest,
+    { signature_config: PetitionSignatureConfig }
+  >;
 }
 export interface PageOpts {
   offset?: number | null;

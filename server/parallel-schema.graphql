@@ -752,7 +752,11 @@ type Mutation {
   Marks a filled petition as COMPLETED.
   If the petition does not require a review, starts the signing process. Otherwise sends email to user.
   """
-  publicCompletePetition(keycode: ID!, signer: PublicPetitionSignerData): PublicPetition!
+  publicCompletePetition(
+    additionalSigners: [PublicPetitionSignerDataInput!]
+    keycode: ID!
+    message: String
+  ): PublicPetition!
 
   """
   Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args
@@ -3018,17 +3022,21 @@ type PublicPetitionMessage {
   subject: String
 }
 
-input PublicPetitionSignerData {
+input PublicPetitionSignerDataInput {
   email: String!
   firstName: String!
   lastName: String!
-  message: String
 }
 
 """
 The public signature settings of a petition
 """
 type PublicSignatureConfig {
+  """
+  If true, allows the recipients of the petition to select additional signers
+  """
+  letRecipientsChooseSigners: Boolean!
+
   """
   If true, lets the user review the replies before starting the signature process
   """

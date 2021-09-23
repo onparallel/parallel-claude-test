@@ -1,10 +1,10 @@
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
+import { isDefined } from "remeda";
 import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
 import { WorkerContext } from "../context";
-import { Contact, OrgIntegration, Petition } from "../db/__types";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { removeKeys } from "../util/remedaExtensions";
@@ -12,15 +12,6 @@ import { random } from "../util/token";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { getLayoutProps } from "./helpers/getLayoutProps";
-
-type PetitionSignatureConfig = {
-  provider: string;
-  timezone: string;
-  contactIds: number[];
-  title: string;
-  review: boolean;
-  message?: string;
-};
 
 /** starts a signature request on the petition */
 async function startSignatureProcess(
@@ -39,8 +30,7 @@ async function startSignatureProcess(
     throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
 
-  const petitionGID = toGlobalId("Petition", signature.petition_id);
-  const settings = signature.signature_config as PetitionSignatureConfig;
+  const settings = signature.signature_config;
 
   let removeGeneratedPdf = true;
   const tmpPdfPath = resolve(tmpdir(), "print", random(16), sanitize(`${settings.title}.pdf`));
@@ -82,13 +72,18 @@ async function startSignatureProcess(
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 
     // send request to signature client
-    const data = await signatureClient.startSignatureRequest(petitionGID, tmpPdfPath, recipients, {
-      locale: petition.locale as "en" | "es",
-      templateData: await getLayoutProps(petition.org_id, ctx),
-      signingMode: "parallel",
-      signatureBoxPositions,
-      initialMessage: settings.message,
-    });
+    const data = await signatureClient.startSignatureRequest(
+      toGlobalId("Petition", petition.id),
+      tmpPdfPath,
+      recipients,
+      {
+        locale: petition.locale,
+        templateData: await getLayoutProps(petition.org_id, ctx),
+        signingMode: "parallel",
+        signatureBoxPositions,
+        initialMessage: settings.message,
+      }
+    );
 
     const provider = signatureIntegration.provider.toUpperCase();
 
@@ -147,7 +142,7 @@ async function cancelSignatureProcess(
   }
 
   const petition = await fetchPetition(signature.petition_id, ctx);
-  const config = signature.signature_config as PetitionSignatureConfig;
+  const config = signature.signature_config;
   const signatureIntegration = await fetchOrgSignatureIntegration(
     petition.org_id,
     config.provider,
@@ -180,11 +175,7 @@ createQueueWorker("signature-worker", async (data: SignatureWorkerPayload, ctx) 
   await handlers[data.type](data.payload as any, ctx);
 });
 
-async function fetchOrgSignatureIntegration(
-  orgId: number,
-  provider: string,
-  ctx: WorkerContext
-): Promise<OrgIntegration> {
+async function fetchOrgSignatureIntegration(orgId: number, provider: string, ctx: WorkerContext) {
   const orgIntegrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(orgId);
 
   const orgSignatureIntegration = orgIntegrations.find(
@@ -200,7 +191,7 @@ async function fetchOrgSignatureIntegration(
   return orgSignatureIntegration;
 }
 
-async function fetchPetition(id: number, ctx: WorkerContext): Promise<Petition> {
+async function fetchPetition(id: number, ctx: WorkerContext) {
   const petition = await ctx.petitions.loadPetition(id);
   if (!petition) {
     throw new Error(`Couldn't find petition with id ${id}`);
@@ -209,7 +200,7 @@ async function fetchPetition(id: number, ctx: WorkerContext): Promise<Petition> 
 }
 
 async function fetchSignatureRecipients(contactIds: number[], ctx: WorkerContext) {
-  const contacts = (await ctx.contacts.loadContact(contactIds)).filter((c) => !!c) as Contact[];
+  const contacts = (await ctx.contacts.loadContact(contactIds)).filter(isDefined);
 
   if (contacts.length !== contactIds.length) {
     throw new Error(`Couldn't load all required contacts: ${contactIds.toString()}`);
