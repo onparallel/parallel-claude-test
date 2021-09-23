@@ -287,11 +287,15 @@ PublicPetitionLink.mutations = [
   `,
 ];
 
-export async function getServerSideProps({ req, query: { linkId } }: GetServerSidePropsContext) {
+export async function getServerSideProps({
+  req,
+  query: { linkId },
+  locale,
+}: GetServerSidePropsContext) {
   if (isInsecureBrowser(req.headers["user-agent"])) {
     return {
       redirect: {
-        destination: `/update`,
+        destination: `/${locale}/update`,
         permanent: false,
       },
     };
