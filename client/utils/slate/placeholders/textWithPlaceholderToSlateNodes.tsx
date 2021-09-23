@@ -1,17 +1,13 @@
 import escapeStringRegexp from "escape-string-regexp";
-import { PlaceholderOption } from "./PlaceholderPlugin";
+import { PlaceholderElement, PlaceholderOption, PLACEHOLDER_TYPE } from "./PlaceholderPlugin";
 
 import { SlateElement, SlateText } from "../types";
 
 interface EditorBlock extends SlateElement<"paragraph", EditorBlockContent> {}
 
-interface EditorPlaceholder extends SlateElement<"placeholder", EditorText> {
-  placeholder: string;
-}
-
 interface EditorText extends SlateText {}
 
-type EditorBlockContent = EditorText | EditorPlaceholder;
+type EditorBlockContent = EditorText | PlaceholderElement;
 
 export function textWithPlaceholderToSlateNodes(
   value: string,
@@ -27,7 +23,7 @@ export function textWithPlaceholderToSlateNodes(
         const value = part.slice(1, -1);
         if (placeholders.some((p) => p.value === value)) {
           children.push({
-            type: "placeholder",
+            type: PLACEHOLDER_TYPE,
             placeholder: value,
             children: [{ text: "" }],
           });

@@ -13,6 +13,7 @@ import {
   PlaceholderElement,
   PlaceholderMenu,
   usePlaceholderPlugin,
+  PLACEHOLDER_TYPE,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
@@ -254,7 +255,7 @@ function slateNodesToTextWithPlaceholders(value: PlaceholderInputValue) {
   return value[0].children
     .map((child) => {
       if ("type" in child) {
-        return child.type === "placeholder" ? `#${child.placeholder}#` : "";
+        return child.type === PLACEHOLDER_TYPE ? `#${child.placeholder}#` : "";
       } else {
         return child.text;
       }

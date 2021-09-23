@@ -18,8 +18,8 @@ export type PlaceholderOption = {
   label: string;
 };
 
-export const ELEMENT_PLACEHOLDER = "placeholder" as const;
-export interface PlaceholderElement extends SlateElement<typeof ELEMENT_PLACEHOLDER, SlateText> {
+export const PLACEHOLDER_TYPE = "placeholder" as const;
+export interface PlaceholderElement extends SlateElement<typeof PLACEHOLDER_TYPE, SlateText> {
   placeholder: string;
 }
 
@@ -135,8 +135,8 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
     onAddPlaceholder,
     onHighlightOption,
     plugin: useConstant<PlatePlugin>(() => ({
-      inlineTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
-      voidTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
+      inlineTypes: getPlatePluginTypes(PLACEHOLDER_TYPE),
+      voidTypes: getPlatePluginTypes(PLACEHOLDER_TYPE),
       renderElement: () => (props: TRenderElementProps) => {
         const { children, attributes } = props;
         const element = props.element as PlaceholderElement;
@@ -155,9 +155,9 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
       },
       deserialize: () => ({
         element: getNodeDeserializer({
-          type: ELEMENT_PLACEHOLDER,
+          type: PLACEHOLDER_TYPE,
           getNode: (el) => ({
-            type: "placeholder",
+            type: PLACEHOLDER_TYPE,
             value: el.getAttribute("data-placeholder"),
           }),
           rules: [{ className: "slate-placeholder" }],
@@ -282,7 +282,7 @@ const PlaceholderToken = function ({
 
 function insertPlaceholder(editor: Editor, placeholder: PlaceholderOption) {
   Transforms.insertNodes(editor, {
-    type: "placeholder",
+    type: PLACEHOLDER_TYPE,
     placeholder: placeholder.value,
     children: [{ text: "" }],
   });
