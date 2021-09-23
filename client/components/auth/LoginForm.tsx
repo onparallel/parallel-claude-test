@@ -59,7 +59,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
     if (EMAIL_REGEX.test(email)) {
       guessLogin().then();
     }
-  }, [email]);
+  }, [email, locale]);
   return (
     <>
       <Box marginBottom={6} textAlign="center">
