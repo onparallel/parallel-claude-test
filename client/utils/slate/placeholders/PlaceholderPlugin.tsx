@@ -1,16 +1,12 @@
 import { Box } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Card } from "@parallel/components/common/Card";
-import { HighlightText } from "@parallel/components/common/HighlightText";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import useMergedRef from "@react-hook/merged-ref";
 import { getNodeDeserializer, getText } from "@udecode/plate-common";
 import { getPlatePluginTypes, PlatePlugin, TRenderElementProps } from "@udecode/plate-core";
-import { KeyboardEvent, ReactNode, useCallback, useEffect, useReducer, useRef } from "react";
+import { KeyboardEvent, ReactNode, useMemo, useState } from "react";
+import { clamp, isDefined } from "remeda";
 import { Editor, Range, Transforms } from "slate";
 import { useFocused, useSelected } from "slate-react";
-import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { SlateElement, SlateText } from "../types";
 
 export type PlaceholderOption = {
@@ -24,116 +20,102 @@ export interface PlaceholderElement extends SlateElement<typeof PLACEHOLDER_TYPE
 }
 
 export function usePlaceholderPlugin(options: PlaceholderOption[]) {
-  type PlaceholderState = {
+  const [state, setState] = useState<{
     target: Range | null;
     index: number;
     search: string | null;
-  };
-  const [{ target, index, search }, dispatch] = useReducer(
-    (state: PlaceholderState, action: (prevState: PlaceholderState) => PlaceholderState) =>
-      action(state),
-    {
-      target: null,
-      index: 0,
-      search: null,
-    }
-  );
-
+  }>({
+    target: null,
+    index: 0,
+    search: null,
+  });
+  const stateRef = useUpdatingRef(state);
   const placeholderOptionsRef = useUpdatingRef(options);
-  const targetRef = useUpdatingRef(target);
-  const indexRef = useUpdatingRef(index);
-  const valuesRef = useUpdatingRef(
-    search ? options.filter((c) => c.label.toLowerCase().includes(search.toLowerCase())) : options
+  const filteredValuesRef = useUpdatingRef(
+    isDefined(state.search)
+      ? options.filter((c) => c.label.toLowerCase().includes(state.search!.toLowerCase()))
+      : options
   );
-
-  const onAddPlaceholder = useCallback(
-    (editor: Editor, placeholder: PlaceholderOption) => {
-      if (target !== null) {
-        Transforms.select(editor, target);
-        insertPlaceholder(editor, placeholder);
-        dispatch((state) => ({ ...state, target: null }));
-      }
-    },
-    [target]
-  );
-
-  const onKeyDownPlaceholder = useCallback(
-    (e: KeyboardEvent, editor: Editor) => {
-      const values = valuesRef.current;
-      const index = indexRef.current;
-      const target = targetRef.current;
-      if (target && values.length > 0) {
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          dispatch((state) => ({
-            ...state,
-            index: index < values.length - 1 ? index + 1 : 0,
-          }));
-        }
-        if (e.key === "ArrowUp") {
-          e.preventDefault();
-          dispatch((state) => ({
-            ...state,
-            index: index > 0 ? index - 1 : values.length - 1,
-          }));
-        }
-        if (e.key === "Escape") {
-          e.preventDefault();
-          dispatch((state) => ({ ...state, target: null }));
-        }
-
-        if (["Tab", "Enter"].includes(e.key)) {
-          const value = values[index];
-          if (value) {
-            e.preventDefault();
-            return onAddPlaceholder(editor, value);
-          }
-        }
-      }
-    },
-    [onAddPlaceholder]
-  );
-
-  const onChangePlaceholder = useCallback((editor: Editor) => {
-    const { selection } = editor;
-
-    if (selection && Range.isCollapsed(selection)) {
-      const cursor = Range.start(selection);
-      const before = Editor.before(editor, cursor, { unit: "block" });
-      const beforeRange = before && Editor.range(editor, before, cursor);
-      const beforeText = beforeRange && Editor.string(editor, beforeRange);
-      const match = !!beforeText && beforeText.match(/#([a-z-]*)$/);
-      const after = Editor.after(editor, cursor);
-      const afterRange = Editor.range(editor, cursor, after);
-      const afterText = getText(editor, afterRange);
-      if (match && afterText.match(/^([^a-z]|$)/)) {
-        // Get the range for the #xxx
-        const beforeHash = Editor.before(editor, cursor, {
-          unit: "character",
-          distance: match ? match[0].length : 0,
-        });
-        const target = beforeHash && Editor.range(editor, beforeHash, cursor);
-        const [, search] = match;
-        dispatch(() => ({ target: target ?? null, search, index: 0 }));
-        return;
-      }
-    }
-    dispatch((state) => ({ ...state, target: null, search: null }));
-  }, []);
-
-  const onHighlightOption = useCallback((index: number) => {
-    dispatch((state) => ({ ...state, index }));
-  }, []);
 
   return {
-    search,
-    selectedIndex: index,
-    target,
-    values: valuesRef.current,
-    onChangePlaceholder,
-    onKeyDownPlaceholder,
-    onAddPlaceholder,
-    onHighlightOption,
+    ...state,
+    values: filteredValuesRef.current,
+    ...useMemo(() => {
+      const onAddPlaceholder = (editor: Editor, placeholder: PlaceholderOption) => {
+        const { target } = stateRef.current;
+        if (target !== null) {
+          Transforms.select(editor, target);
+          insertPlaceholder(editor, placeholder);
+          setState((state) => ({ ...state, index: 0, target: null }));
+        }
+      };
+      const onKeyDownPlaceholder = (e: KeyboardEvent, editor: Editor) => {
+        const values = filteredValuesRef.current;
+        const { index, target } = stateRef.current!;
+        if (target && values.length > 0) {
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setState((s) => ({
+              ...s,
+              index: clamp(index + 1, { max: values.length - 1, min: 0 }),
+            }));
+          }
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setState((s) => ({
+              ...s,
+              index: clamp(index - 1, { max: values.length - 1, min: 0 }),
+            }));
+          }
+          if (e.key === "Escape") {
+            e.preventDefault();
+            setState((state) => ({ ...state, index: 0, target: null }));
+          }
+          if (["Tab", "Enter"].includes(e.key)) {
+            const value = values[index];
+            if (value) {
+              e.preventDefault();
+              return onAddPlaceholder(editor, value);
+            }
+          }
+        }
+      };
+      const onChangePlaceholder = (editor: Editor) => {
+        const { selection } = editor;
+
+        if (selection && Range.isCollapsed(selection)) {
+          const cursor = Range.start(selection);
+          const before = Editor.before(editor, cursor, { unit: "block" });
+          const beforeRange = before && Editor.range(editor, before, cursor);
+          const beforeText = beforeRange && Editor.string(editor, beforeRange);
+          const match = !!beforeText && beforeText.match(/#([a-z-]*)$/);
+          const after = Editor.after(editor, cursor);
+          const afterRange = Editor.range(editor, cursor, after);
+          const afterText = getText(editor, afterRange);
+          if (match && afterText.match(/^([^a-z]|$)/)) {
+            // Get the range for the #xxx
+            const beforeHash = Editor.before(editor, cursor, {
+              unit: "character",
+              distance: match ? match[0].length : 0,
+            });
+            const target = beforeHash && Editor.range(editor, beforeHash, cursor);
+            const [, search] = match;
+            setState(() => ({ target: target ?? null, search, index: 0 }));
+            return;
+          }
+        }
+        setState((s) => ({ ...s, target: null, search: null }));
+      };
+      const onHighlightOption = (index: number) => {
+        setState((s) => ({ ...s, index }));
+      };
+      return {
+        onAddPlaceholder,
+        onKeyDownPlaceholder,
+        onChangePlaceholder,
+        onHighlightOption,
+      };
+    }, []),
     plugin: useConstant<PlatePlugin>(() => ({
       inlineTypes: getPlatePluginTypes(PLACEHOLDER_TYPE),
       voidTypes: getPlatePluginTypes(PLACEHOLDER_TYPE),
@@ -166,75 +148,6 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
     })),
   };
 }
-
-interface PlaceholderMenuProps {
-  menuId: string;
-  itemIdPrefix: string;
-  search?: string | null;
-  values: PlaceholderOption[];
-  selectedIndex: number;
-  onAddPlaceholder: (placeholder: PlaceholderOption) => void;
-  onHighlightOption: (index: number) => void;
-}
-
-export const PlaceholderMenu = chakraForwardRef<"div", PlaceholderMenuProps>(
-  function PlaceholderMenu(
-    {
-      search,
-      menuId,
-      itemIdPrefix,
-      values,
-      selectedIndex,
-      onAddPlaceholder,
-      onHighlightOption,
-      ...props
-    },
-    ref
-  ) {
-    const menuRef = useRef<HTMLElement>(null);
-    const mergedRef = useMergedRef(ref, menuRef);
-    useEffect(() => {
-      const element = menuRef.current?.children.item(selectedIndex);
-      if (element) {
-        scrollIntoView(element, { block: "nearest", scrollMode: "if-needed" });
-      }
-    }, [selectedIndex]);
-    return (
-      <Card
-        as="div"
-        ref={mergedRef}
-        id={menuId}
-        role="listbox"
-        overflow="auto"
-        maxHeight="180px"
-        paddingY={1}
-        {...props}
-      >
-        {values.map((placeholder, index) => {
-          const isSelected = index === selectedIndex;
-          return (
-            <Box
-              key={placeholder.value}
-              id={`${itemIdPrefix}-${placeholder.value}`}
-              role="option"
-              aria-selected={isSelected ? "true" : undefined}
-              backgroundColor={isSelected ? "gray.100" : "white"}
-              paddingX={4}
-              paddingY={1}
-              cursor="pointer"
-              onMouseDown={() => onAddPlaceholder(placeholder)}
-              onMouseEnter={() => onHighlightOption(index)}
-            >
-              <Box whiteSpace="nowrap">
-                <HighlightText text={placeholder.label} search={search ?? ""} />
-              </Box>
-            </Box>
-          );
-        })}
-      </Card>
-    );
-  }
-);
 
 const PlaceholderToken = function ({
   value,

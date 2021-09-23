@@ -1,16 +1,8 @@
-import {
-  Box,
-  Portal,
-  Text,
-  useFormControl,
-  useId,
-  useMultiStyleConfig,
-  usePopper,
-} from "@chakra-ui/react";
+import { Box, Portal, Text, useFormControl, useId, useMultiStyleConfig } from "@chakra-ui/react";
 import { formatList } from "@parallel/utils/slate/formatList";
+import { PlaceholderMenu } from "@parallel/utils/slate/placeholders/PlaceholderMenu";
 import {
   PlaceholderOption,
-  PlaceholderMenu,
   usePlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
@@ -32,7 +24,7 @@ import {
   MARK_UNDERLINE,
 } from "@udecode/plate-basic-marks";
 import { createExitBreakPlugin } from "@udecode/plate-break";
-import { getNode, withProps } from "@udecode/plate-common";
+import { withProps } from "@udecode/plate-common";
 import {
   createHistoryPlugin,
   createReactPlugin,
@@ -57,7 +49,6 @@ import {
   KeyboardEvent,
   ReactNode,
   useCallback,
-  useEffect,
   useImperativeHandle,
   useMemo,
 } from "react";
@@ -145,7 +136,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       onChangePlaceholder,
       onKeyDownPlaceholder,
       onHighlightOption,
-      selectedIndex,
+      index,
       search,
       target,
       values,
@@ -227,7 +218,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     } as any;
 
     const isMenuOpen = Boolean(target && values.length > 0);
-    const selected = isMenuOpen ? values[selectedIndex] : undefined;
+    const selected = isMenuOpen ? values[index] : undefined;
 
     const handleChange = useCallback(
       (value: RichTextEditorValue) => {
@@ -266,6 +257,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     );
 
     const { popperRef } = useEditorPopper(editorRef.current!, target, {
+      strategy: "fixed",
       placement: "bottom-start",
       enabled: isMenuOpen,
     });
@@ -306,17 +298,16 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
         <Portal>
           <PlaceholderMenu
             ref={popperRef}
+            isOpen={isMenuOpen}
             menuId={placeholderMenuId}
             itemIdPrefix={itemIdPrefix}
             search={search}
             values={values}
-            selectedIndex={selectedIndex}
-            hidden={!isMenuOpen}
+            highlightedIndex={index}
             onAddPlaceholder={(placeholder) => onAddPlaceholder(editorRef.current!, placeholder)}
             onHighlightOption={onHighlightOption}
             width="fit-content"
             position="relative"
-            opacity={isMenuOpen ? 1 : 0}
           />
         </Portal>
       </Box>

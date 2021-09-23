@@ -8,12 +8,12 @@ import {
   usePopper,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { PlaceholderMenu } from "@parallel/utils/slate/placeholders/PlaceholderMenu";
 import {
-  PlaceholderOption,
   PlaceholderElement,
-  PlaceholderMenu,
-  usePlaceholderPlugin,
+  PlaceholderOption,
   PLACEHOLDER_TYPE,
+  usePlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
@@ -72,7 +72,7 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
       onChangePlaceholder,
       onKeyDownPlaceholder,
       onHighlightOption,
-      selectedIndex,
+      index,
       search,
       target,
       values,
@@ -139,7 +139,7 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
       () => textWithPlaceholderToSlateNodes(value, placeholders) as PlaceholderInputValue,
       [value]
     );
-    const selected = isOpen ? values[selectedIndex] : undefined;
+    const selected = isOpen ? values[index] : undefined;
 
     function onPlaceholderButtonClick(event: MouseEvent) {
       event.stopPropagation();
@@ -235,13 +235,13 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
         </Box>
         <Portal>
           <PlaceholderMenu
+            isOpen={isOpen}
             ref={popperRef}
             menuId={placeholderMenuId}
             itemIdPrefix={itemIdPrefix}
             search={search}
             values={values}
-            selectedIndex={selectedIndex}
-            visibility={isOpen ? "visible" : "hidden"}
+            highlightedIndex={index}
             onAddPlaceholder={(placeholder) => onAddPlaceholder(editor, placeholder)}
             onHighlightOption={onHighlightOption}
           />
