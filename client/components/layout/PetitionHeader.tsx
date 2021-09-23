@@ -41,6 +41,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
 import { ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -58,7 +59,6 @@ export interface PetitionHeaderProps extends BoxProps {
   user: PetitionHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: "compose" | "replies" | "activity";
-  state: "SAVED" | "SAVING" | "ERROR";
   actions?: ReactNode;
 }
 
@@ -67,12 +67,12 @@ export function PetitionHeader({
   user,
   onUpdatePetition,
   section: current,
-  state,
   actions,
   ...props
 }: PetitionHeaderProps) {
   const intl = useIntl();
   const router = useRouter();
+  const state = usePetitionState();
 
   const deletePetitions = useDeletePetitions();
   const handleDeleteClick = async function () {

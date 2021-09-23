@@ -24,6 +24,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { LocaleBadge } from "../common/LocaleBadge";
@@ -35,18 +36,17 @@ export interface PetitionTemplateHeaderProps extends BoxProps {
   petition: PetitionTemplateHeader_PetitionTemplateFragment;
   user: PetitionTemplateHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  state: "SAVED" | "SAVING" | "ERROR";
 }
 
 export function PetitionTemplateHeader({
   petition,
   user,
   onUpdatePetition,
-  state,
   ...props
 }: PetitionTemplateHeaderProps) {
   const intl = useIntl();
   const router = useRouter();
+  const state = usePetitionState();
 
   const deletePetitions = useDeletePetitions();
   const handleDeleteClick = async function () {

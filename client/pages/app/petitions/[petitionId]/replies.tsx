@@ -84,7 +84,7 @@ import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
-import { usePetitionState } from "@parallel/utils/usePetitionState";
+import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -163,7 +163,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     }
   }, [activeFieldId]);
 
-  const [state, wrapper] = usePetitionState();
+  const wrapper = usePetitionStateWrapper();
   const [updatePetition] = usePetitionReplies_updatePetitionMutation();
   const [validatePetitionFields] = usePetitionReplies_validatePetitionFieldsMutation();
   const downloadReplyFile = useDownloadReplyFile();
@@ -484,7 +484,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       onUpdatePetition={handleOnUpdatePetition}
       section="replies"
       scrollBody={false}
-      state={state}
       display="flex"
       flexDirection="column"
       minHeight={0}
@@ -1029,4 +1028,4 @@ PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   };
 };
 
-export default compose(withDialogs, withApolloData)(PetitionReplies);
+export default compose(withPetitionState, withDialogs, withApolloData)(PetitionReplies);

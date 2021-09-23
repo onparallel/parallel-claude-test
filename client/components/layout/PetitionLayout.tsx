@@ -17,7 +17,6 @@ export interface PetitionLayoutProps extends BoxProps {
   onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: "compose" | "replies" | "activity";
-  state: "SAVED" | "SAVING" | "ERROR";
   scrollBody: boolean;
   headerActions?: ReactNode;
 }
@@ -26,7 +25,6 @@ export function PetitionLayout({
   user,
   petition,
   scrollBody,
-  state,
   section,
   onUpdatePetition,
   headerActions,
@@ -82,7 +80,6 @@ export function PetitionLayout({
           user={user}
           onUpdatePetition={onUpdatePetition}
           section={section!}
-          state={state}
           actions={headerActions}
         />
       ) : petition.__typename === "PetitionTemplate" ? (
@@ -90,7 +87,6 @@ export function PetitionLayout({
           petition={petition}
           user={user}
           onUpdatePetition={onUpdatePetition}
-          state={state}
         />
       ) : null}
       <Box flex="1" overflow="auto" {...props}>

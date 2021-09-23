@@ -70,7 +70,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
-import { usePetitionState } from "@parallel/utils/usePetitionState";
+import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
@@ -115,7 +115,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const indices = useFieldIndices(petition!.fields);
   const petitionDataRef = useUpdatingRef({ fields: petition!.fields, indices });
 
-  const [petitionState, wrapper] = usePetitionState();
+  const wrapper = usePetitionStateWrapper();
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
 
   const [showErrors, setShowErrors] = useState(false);
@@ -530,7 +530,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       onUpdatePetition={handleUpdatePetition}
       section="compose"
       scrollBody
-      state={petitionState}
       headerActions={
         petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
           <ResponsiveButtonIcon
@@ -930,4 +929,4 @@ PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   };
 };
 
-export default compose(withDialogs, withApolloData)(PetitionCompose);
+export default compose(withPetitionState, withDialogs, withApolloData)(PetitionCompose);

@@ -40,7 +40,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
-import { usePetitionState } from "@parallel/utils/usePetitionState";
+import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useCallback, useEffect } from "react";
 import { useIntl } from "react-intl";
@@ -65,7 +65,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const petition = data!.petition as PetitionActivity_PetitionFragment;
 
-  const [state, wrapper] = usePetitionState();
+  const wrapper = usePetitionStateWrapper();
 
   const [updatePetition] = usePetitionActivity_updatePetitionMutation();
   const handleOnUpdatePetition = useCallback(
@@ -335,7 +335,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       onUpdatePetition={handleOnUpdatePetition}
       section="activity"
       scrollBody
-      state={state}
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
           <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
@@ -499,4 +498,4 @@ PetitionActivity.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
   };
 };
 
-export default compose(withDialogs, withApolloData)(PetitionActivity);
+export default compose(withPetitionState, withDialogs, withApolloData)(PetitionActivity);
