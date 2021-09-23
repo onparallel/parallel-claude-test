@@ -183,6 +183,7 @@ export const AppLayout = Object.assign(
   }),
   {
     fragments: {
+      // UserSelect reads canCreateUsers from cache{
       User: gql`
         fragment AppLayout_User on User {
           id
@@ -191,7 +192,7 @@ export const AppLayout = Object.assign(
           lastName
           email
           createdAt
-          canCreateUsers # UserSelect reads this from cache
+          canCreateUsers
           ...AppLayoutNavbar_User
         }
         ${AppLayoutNavbar.fragments.User}

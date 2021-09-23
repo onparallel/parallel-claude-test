@@ -1,6 +1,5 @@
 import { usePopper, UsePopperProps } from "@chakra-ui/react";
 import { getNode } from "@udecode/plate-common";
-import { useWindowScroll } from "beautiful-react-hooks";
 import { useEffect } from "react";
 import { isDefined } from "remeda";
 import { Range } from "slate";
