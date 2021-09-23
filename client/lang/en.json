@@ -5075,6 +5075,11 @@
     "context": "Product"
   },
   {
+    "term": "public-templates.categories.real-estate",
+    "definition": "Real Estate",
+    "context": "Real Estate"
+  },
+  {
     "term": "public-templates.categories.sales",
     "definition": "Sales",
     "context": "Sales"

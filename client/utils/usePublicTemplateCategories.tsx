@@ -110,6 +110,13 @@ export function usePublicTemplateCategories(): PublicTemplateCategory[] {
       },
       {
         label: intl.formatMessage({
+          id: "public-templates.categories.real-estate",
+          defaultMessage: "Real Estate",
+        }),
+        slug: "real-estate",
+      },
+      {
+        label: intl.formatMessage({
           id: "public-templates.categories.sales",
           defaultMessage: "Sales",
         }),
