@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { Radio, RadioGroup } from "@chakra-ui/radio";
 import {
   Alert,
   AlertIcon,
@@ -9,6 +8,8 @@ import {
   FormLabel,
   Heading,
   Input,
+  Radio,
+  RadioGroup,
   Stack,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";

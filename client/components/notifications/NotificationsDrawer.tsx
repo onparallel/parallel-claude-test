@@ -1,6 +1,6 @@
 import { gql, NetworkStatus, useApolloClient } from "@apollo/client";
-import { Stack, Text } from "@chakra-ui/layout";
 import {
+  Button,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -8,8 +8,10 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-} from "@chakra-ui/modal";
-import { Button, ModalFooterProps } from "@chakra-ui/react";
+  ModalFooterProps,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import {
   PetitionUserNotificationFilter,

@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { PetitionAccess, PetitionField, PetitionFieldReply } from "../../db/__types";
 import { initServer, TestClient } from "./server";

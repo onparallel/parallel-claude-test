@@ -1,12 +1,12 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
+import faker from "faker";
+import { Knex } from "knex";
+import { USER_COGNITO_ID } from "../../../test/mocks";
+import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Contact, Organization, User } from "../../db/__types";
-import { USER_COGNITO_ID } from "../../../test/mocks";
-import faker from "faker";
-import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
-import { Knex } from "knex";
-import { KNEX } from "../../db/knex";
+import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Contacts", () => {
   let testClient: TestClient;

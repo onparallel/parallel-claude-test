@@ -1,5 +1,5 @@
+import { gql } from "@apollo/client";
 import { usePetitionCurrentSignatureStatus_PetitionFragment } from "@parallel/graphql/__types";
-import gql from "graphql-tag";
 
 export function usePetitionCurrentSignatureStatus(
   petition: usePetitionCurrentSignatureStatus_PetitionFragment

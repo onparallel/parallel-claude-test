@@ -1,12 +1,12 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
+import faker from "faker";
 import { Knex } from "knex";
+import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, PetitionEventSubscription, User } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
-import faker from "faker";
 
 describe("GraphQL/Petition Event Subscriptions", () => {
   let testClient: TestClient;

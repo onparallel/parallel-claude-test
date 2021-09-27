@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Avatar,
   Flex,
@@ -17,7 +18,6 @@ import {
   UserListPopover_UserFragment,
   UserListPopover_UserGroupFragment,
 } from "@parallel/graphql/__types";
-import gql from "graphql-tag";
 import { ReactNode } from "react";
 import { UserAvatar } from "./UserAvatar";
 

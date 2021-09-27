@@ -1,5 +1,5 @@
+import { gql } from "@apollo/client";
 import { uploadFile_AWSPresignedPostDataFragment } from "@parallel/graphql/__types";
-import gql from "graphql-tag";
 
 export function uploadFile(
   file: File,

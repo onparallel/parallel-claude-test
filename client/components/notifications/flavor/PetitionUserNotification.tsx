@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Stack, Text } from "@chakra-ui/layout";
-import { Circle, Flex, LinkOverlay } from "@chakra-ui/react";
+import { Circle, Flex, LinkOverlay, Stack, Text } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -10,7 +9,6 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import Link from "next/link";
 import { forwardRef, ReactNode, useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
-
 export interface PetitionUserNotificationProps {
   isFirst?: boolean;
   icon: ReactNode;

@@ -1,8 +1,8 @@
+import { gql } from "@apollo/client";
 import { CircularProgress, Flex, IconButton, Text } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment } from "@parallel/graphql/__types";
-import gql from "graphql-tag";
 import { useIntl } from "react-intl";
 import { FileIcon } from "../common/FileIcon";
 import { FileName } from "../common/FileName";

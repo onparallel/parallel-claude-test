@@ -1,5 +1,5 @@
+import { gql } from "@apollo/client";
 import faker from "faker";
-import gql from "graphql-tag";
 import { Knex } from "knex";
 import { pick } from "remeda";
 import { USER_COGNITO_ID } from "../../../test/mocks";

@@ -1,6 +1,14 @@
 import { gql } from "@apollo/client";
-import { Stack, Text } from "@chakra-ui/layout";
-import { AbsoluteCenterProps, Center, Circle, Flex, LinkBox, Spinner } from "@chakra-ui/react";
+import {
+  AbsoluteCenterProps,
+  Center,
+  Circle,
+  Flex,
+  LinkBox,
+  Spinner,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";

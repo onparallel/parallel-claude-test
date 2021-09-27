@@ -1,5 +1,4 @@
-import { Image } from "@chakra-ui/image";
-import { Link, Stack, Text } from "@chakra-ui/layout";
+import { Image, Link, Stack, Text } from "@chakra-ui/react";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { FormattedMessage } from "react-intl";
 

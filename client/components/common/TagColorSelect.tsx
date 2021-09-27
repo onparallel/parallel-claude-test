@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from "@chakra-ui/layout";
+import { Box, Stack, Text } from "@chakra-ui/react";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useMemo } from "react";

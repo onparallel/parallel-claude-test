@@ -1,6 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { Box, BoxProps } from "@chakra-ui/layout";
-import { Circle } from "@chakra-ui/react";
+import { Box, BoxProps, Circle } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Notifications_UnreadPetitionUserNotificationIdsQuery } from "@parallel/graphql/__types";

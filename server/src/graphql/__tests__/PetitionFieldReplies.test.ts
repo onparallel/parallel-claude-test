@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { Knex } from "knex";
 import { omit } from "remeda";
 import { USER_COGNITO_ID } from "../../../test/mocks";

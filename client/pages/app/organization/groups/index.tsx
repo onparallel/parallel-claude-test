@@ -1,7 +1,5 @@
-import { Button } from "@chakra-ui/button";
-import { Flex, Heading } from "@chakra-ui/layout";
-import { Text } from "@chakra-ui/react";
-import { useToast } from "@chakra-ui/toast";
+import { gql } from "@apollo/client";
+import { Button, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
@@ -40,7 +38,6 @@ import {
 } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import gql from "graphql-tag";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
