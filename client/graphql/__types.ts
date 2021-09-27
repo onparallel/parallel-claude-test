@@ -13267,6 +13267,7 @@ export type CurrentUserQuery = {
     id: string;
     email: string;
     fullName?: Maybe<string>;
+    preferredLocale?: Maybe<string>;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
   };
@@ -13277,6 +13278,7 @@ export type Login_UserFragment = {
   id: string;
   email: string;
   fullName?: Maybe<string>;
+  preferredLocale?: Maybe<string>;
   avatarUrl?: Maybe<string>;
   initials?: Maybe<string>;
 };
@@ -16512,6 +16514,7 @@ export const Login_UserFragmentDoc = gql`
     id
     email
     fullName
+    preferredLocale
     ...UserAvatar_User
   }
   ${UserAvatar_UserFragmentDoc}

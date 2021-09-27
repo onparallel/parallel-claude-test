@@ -276,7 +276,7 @@ function Login() {
           <AlreadyLoggedIn
             me={data!.me}
             onRelogin={() => setShowContinueAs(false)}
-            onContinueAs={redirectToApp}
+            onContinueAs={() => redirectToApp(data!.me.preferredLocale ?? undefined)}
           />
         ) : passwordChange?.type === "CHANGE" ? (
           <PasswordChangeForm
@@ -335,6 +335,7 @@ Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
           id
           email
           fullName
+          preferredLocale
           ...UserAvatar_User
         }
         ${UserAvatar.fragments.User}
