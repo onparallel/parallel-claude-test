@@ -82,7 +82,7 @@ const config = {
         ]
       : [];
   },
-  productionBrowserSourceMaps: process.env.NODE_ENV === "production",
+  productionBrowserSourceMaps: true,
 };
 
 module.exports = [
