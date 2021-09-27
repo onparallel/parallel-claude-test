@@ -94,6 +94,8 @@ export const PetitionEvent = interfaceType({
         return "RemindersOptOutEvent";
       case "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK":
         return "AccessActivatedFromPublicPetitionLinkEvent";
+      case "RECIPIENT_SIGNED":
+        return "RecipientSignedEvent";
     }
   },
   sourceType: "events.PetitionEvent",
@@ -565,3 +567,10 @@ export const AccessActivatedFromPublicPetitionLinkEvent = createPetitionEvent(
     });
   }
 );
+
+export const RecipientSignedEvent = createPetitionEvent("RecipientSignedEvent", (t) => {
+  t.nullable.field("contact", {
+    type: "Contact",
+    resolve: async (root, _, ctx) => await ctx.contacts.loadContact(root.data.contact_id),
+  });
+});

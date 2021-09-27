@@ -465,6 +465,7 @@ export interface NexusGenObjects {
   };
   PublicUser: db.User;
   Query: {};
+  RecipientSignedEvent: events.RecipientSignedEvent;
   ReminderEmailBouncedUserNotification: notifications.ReminderEmailBouncedUserNotification;
   ReminderSentEvent: events.ReminderSentEvent;
   RemindersConfig: {
@@ -1402,6 +1403,12 @@ export interface NexusGenFieldTypes {
     templates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
+  };
+  RecipientSignedEvent: {
+    // field return type
+    contact: NexusGenRootTypes["Contact"] | null; // Contact
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
   };
   ReminderEmailBouncedUserNotification: {
     // field return type
@@ -2522,6 +2529,12 @@ export interface NexusGenFieldTypeNames {
     templates: "PetitionTemplatePagination";
     userGroup: "UserGroup";
     userGroups: "UserGroupPagination";
+  };
+  RecipientSignedEvent: {
+    // field return type name
+    contact: "Contact";
+    createdAt: "DateTime";
+    id: "GID";
   };
   ReminderEmailBouncedUserNotification: {
     // field return type name
@@ -3700,6 +3713,7 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionCreatedEvent"
     | "PetitionDeletedEvent"
     | "PetitionReopenedEvent"
+    | "RecipientSignedEvent"
     | "ReminderSentEvent"
     | "RemindersOptOutEvent"
     | "ReplyCreatedEvent"
@@ -3788,6 +3802,7 @@ export interface NexusGenTypeInterfaces {
   PublicPetitionFieldReply: "Timestamps";
   PublicPetitionLinkUserGroupPermission: "PublicPetitionLinkPermission" | "Timestamps";
   PublicPetitionLinkUserPermission: "PublicPetitionLinkPermission" | "Timestamps";
+  RecipientSignedEvent: "PetitionEvent";
   ReminderEmailBouncedUserNotification: "PetitionUserNotification";
   ReminderSentEvent: "PetitionEvent";
   RemindersOptOutEvent: "PetitionEvent";

@@ -7510,6 +7510,11 @@
     "context": "{contact} created the petition from a public link {timeAgo}"
   },
   {
+    "term": "timeline.recipient-signed-description",
+    "definition": "{contact} firmó el documento {timeAgo}",
+    "context": "{contact} signed the document {timeAgo}"
+  },
+  {
     "term": "timeline.reminder-sent-description-automatic",
     "definition": "Se envió un recordatorio automático a {contact} {timeAgo}",
     "context": "An automatic reminder was sent to {contact} {timeAgo}"

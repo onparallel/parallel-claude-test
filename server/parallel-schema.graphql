@@ -3394,6 +3394,12 @@ enum QueryUserGroups_OrderBy {
   name_DESC
 }
 
+type RecipientSignedEvent implements PetitionEvent {
+  contact: Contact
+  createdAt: DateTime!
+  id: GID!
+}
+
 type ReminderEmailBouncedUserNotification implements PetitionUserNotification {
   access: PetitionAccess!
   createdAt: DateTime!

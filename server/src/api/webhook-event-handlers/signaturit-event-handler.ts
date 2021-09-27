@@ -78,6 +78,14 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
       signer_status: { ...signature?.signer_status, [contact.id]: "SIGNED" },
     }),
     appendEventLogs(ctx, data),
+    ctx.petitions.createEvent({
+      type: "RECIPIENT_SIGNED",
+      petition_id: petition.id,
+      data: {
+        contact_id: contact.id,
+        petition_signature_request_id: signature!.id,
+      },
+    }),
   ]);
 }
 

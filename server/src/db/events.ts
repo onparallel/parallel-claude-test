@@ -109,6 +109,10 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_signature_request_id: number;
     file_upload_id: number;
   };
+  RECIPIENT_SIGNED: {
+    petition_signature_request_id: number;
+    contact_id: number;
+  };
   TEMPLATE_USED: {
     new_petition_id: number;
     org_id: number;
@@ -277,6 +281,11 @@ export type RemindersOptOutEvent<IsCreate extends boolean = false> = GenericPeti
 export type AccessActivatedFromPublicPetitionLinkEvent<IsCreate extends boolean = false> =
   GenericPetitionEvent<"ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK", IsCreate>;
 
+export type RecipientSignedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "RECIPIENT_SIGNED",
+  IsCreate
+>;
+
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -310,7 +319,8 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionClonedEvent<IsCreate>
   | PetitionDeletedEvent<IsCreate>
   | RemindersOptOutEvent<IsCreate>
-  | AccessActivatedFromPublicPetitionLinkEvent<IsCreate>;
+  | AccessActivatedFromPublicPetitionLinkEvent<IsCreate>
+  | RecipientSignedEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;
 

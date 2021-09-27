@@ -33,6 +33,7 @@ import { TimelineUserPermissionAddedEvent } from "./timeline/TimelineUserPermiss
 import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermissionRemovedEvent";
 import { TimelineAccessActivatedFromLinkEvent } from "./timeline/TimelineAccessActivatedFromLinkEvent";
+import { TimelineRecipientSignedEvent } from "./timeline/TimelineRecipientSignedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -121,6 +122,8 @@ export function PetitionActivityTimeline({
               <TimelineRemindersOptOutEvent event={event} />
             ) : event.__typename === "AccessActivatedFromPublicPetitionLinkEvent" ? (
               <TimelineAccessActivatedFromLinkEvent event={event} />
+            ) : event.__typename === "RecipientSignedEvent" ? (
+              <TimelineRecipientSignedEvent event={event} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -239,6 +242,9 @@ PetitionActivityTimeline.fragments = {
       ... on AccessActivatedFromPublicPetitionLinkEvent {
         ...TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent
       }
+      ... on RecipientSignedEvent {
+        ...TimelineRecipientSignedEvent_RecipientSignedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -271,5 +277,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionClonedEvent.fragments.PetitionClonedEvent}
     ${TimelineRemindersOptOutEvent.fragments.RemindersOptOutEvent}
     ${TimelineAccessActivatedFromLinkEvent.fragments.AccessActivatedFromPublicPetitionLinkEvent}
+    ${TimelineRecipientSignedEvent.fragments.RecipientSignedEvent}
   `,
 };

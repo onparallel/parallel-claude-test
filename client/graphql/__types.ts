@@ -1847,10 +1847,19 @@ export interface PetitionSignatureRequest extends Timestamps {
   /** The signature configuration for the request. */
   signatureConfig: SignatureConfig;
   signedDocumentFilename?: Maybe<Scalars["String"]>;
+  signerStatus: Array<PetitionSignatureRequestSignerStatus>;
   /** The status of the petition signature. */
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+}
+
+export interface PetitionSignatureRequestSignerStatus {
+  __typename?: "PetitionSignatureRequestSignerStatus";
+  /** The contact that need to sign the generated document. */
+  contact: Contact;
+  /** The signing status of the individual contact. */
+  status: Scalars["String"];
 }
 
 export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
@@ -2431,6 +2440,13 @@ export type QueryPetitions_OrderBy =
 
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
+
+export interface RecipientSignedEvent extends PetitionEvent {
+  __typename?: "RecipientSignedEvent";
+  contact?: Maybe<Contact>;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+}
 
 export interface ReminderEmailBouncedUserNotification extends PetitionUserNotification {
   __typename?: "ReminderEmailBouncedUserNotification";
@@ -4731,6 +4747,17 @@ export type PetitionActivityTimeline_PetitionFragment = {
           }>;
         }
       | {
+          __typename?: "RecipientSignedEvent";
+          id: string;
+          createdAt: string;
+          contact?: Maybe<{
+            __typename?: "Contact";
+            id: string;
+            fullName?: Maybe<string>;
+            email: string;
+          }>;
+        }
+      | {
           __typename?: "ReminderSentEvent";
           id: string;
           createdAt: string;
@@ -5212,6 +5239,13 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragmen
   user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
 };
 
+export type PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment = {
+  __typename?: "RecipientSignedEvent";
+  id: string;
+  createdAt: string;
+  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+};
+
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
   __typename?: "ReminderSentEvent";
   id: string;
@@ -5403,6 +5437,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
@@ -5739,6 +5774,12 @@ export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
   __typename?: "PetitionReopenedEvent";
   createdAt: string;
   user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+};
+
+export type TimelineRecipientSignedEvent_RecipientSignedEventFragment = {
+  __typename?: "RecipientSignedEvent";
+  createdAt: string;
+  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
 };
 
 export type TimelineReminderSentEvent_ReminderSentEventFragment = {
@@ -6839,6 +6880,17 @@ export type TemplateCard_PetitionTemplateFragment = {
   publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
 };
 
+export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+  id: string;
+  status: PetitionSignatureRequestStatus;
+  signerStatus: Array<{
+    __typename?: "PetitionSignatureRequestSignerStatus";
+    status: string;
+    contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+  }>;
+};
+
 export type ExportRepliesDialog_UserFragment = {
   __typename?: "User";
   hasExportCuatrecasas: boolean;
@@ -6962,6 +7014,32 @@ export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation =
     id: string;
     metadata: { [key: string]: any };
   };
+};
+
+export type NewSignatureRequestRow_PetitionFragment = {
+  __typename?: "Petition";
+  status: PetitionStatus;
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    provider: string;
+    review: boolean;
+    timezone: string;
+    title: string;
+    contacts: Array<
+      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+    >;
+  }>;
+};
+
+export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+  id: string;
+  status: PetitionSignatureRequestStatus;
+  signerStatus: Array<{
+    __typename?: "PetitionSignatureRequestSignerStatus";
+    status: string;
+    contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+  }>;
 };
 
 export type PetitionRepliesField_PetitionFieldFragment = {
@@ -7125,13 +7203,25 @@ export type PetitionSignaturesCard_PetitionFragment = {
   id: string;
   status: PetitionStatus;
   name?: Maybe<string>;
+  signatureRequests?: Maybe<
+    Array<{
+      __typename?: "PetitionSignatureRequest";
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      signerStatus: Array<{
+        __typename?: "PetitionSignatureRequestSignerStatus";
+        status: string;
+        contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+      }>;
+    }>
+  >;
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
-    timezone: string;
     provider: string;
     title: string;
     review: boolean;
     letRecipientsChooseSigners: boolean;
+    timezone: string;
     contacts: Array<
       Maybe<{
         __typename?: "Contact";
@@ -7142,31 +7232,6 @@ export type PetitionSignaturesCard_PetitionFragment = {
       }>
     >;
   }>;
-  signatureRequests?: Maybe<
-    Array<{
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        contacts: Array<
-          Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-        >;
-      };
-    }>
-  >;
-};
-
-export type PetitionSignaturesCard_PetitionSignatureRequestFragment = {
-  __typename?: "PetitionSignatureRequest";
-  id: string;
-  status: PetitionSignatureRequestStatus;
-  signatureConfig: {
-    __typename?: "SignatureConfig";
-    contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-    >;
-  };
 };
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables = Exact<{
@@ -7181,13 +7246,30 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         id: string;
         status: PetitionStatus;
         name?: Maybe<string>;
+        signatureRequests?: Maybe<
+          Array<{
+            __typename?: "PetitionSignatureRequest";
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            signerStatus: Array<{
+              __typename?: "PetitionSignatureRequestSignerStatus";
+              status: string;
+              contact: {
+                __typename?: "Contact";
+                id: string;
+                fullName?: Maybe<string>;
+                email: string;
+              };
+            }>;
+          }>
+        >;
         signatureConfig?: Maybe<{
           __typename?: "SignatureConfig";
-          timezone: string;
           provider: string;
           title: string;
           review: boolean;
           letRecipientsChooseSigners: boolean;
+          timezone: string;
           contacts: Array<
             Maybe<{
               __typename?: "Contact";
@@ -7198,24 +7280,6 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             }>
           >;
         }>;
-        signatureRequests?: Maybe<
-          Array<{
-            __typename?: "PetitionSignatureRequest";
-            id: string;
-            status: PetitionSignatureRequestStatus;
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              contacts: Array<
-                Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>
-              >;
-            };
-          }>
-        >;
       }
     | { __typename?: "PetitionTemplate" };
 };
@@ -9361,6 +9425,17 @@ export type PetitionActivity_PetitionFragment = {
           }>;
         }
       | {
+          __typename?: "RecipientSignedEvent";
+          id: string;
+          createdAt: string;
+          contact?: Maybe<{
+            __typename?: "Contact";
+            id: string;
+            fullName?: Maybe<string>;
+            email: string;
+          }>;
+        }
+      | {
           __typename?: "ReminderSentEvent";
           id: string;
           createdAt: string;
@@ -10007,6 +10082,17 @@ export type PetitionActivity_updatePetitionMutation = {
                   id: string;
                   fullName?: Maybe<string>;
                   status: UserStatus;
+                }>;
+              }
+            | {
+                __typename?: "RecipientSignedEvent";
+                id: string;
+                createdAt: string;
+                contact?: Maybe<{
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: Maybe<string>;
+                  email: string;
                 }>;
               }
             | {
@@ -10722,6 +10808,17 @@ export type PetitionActivityQuery = {
                   id: string;
                   fullName?: Maybe<string>;
                   status: UserStatus;
+                }>;
+              }
+            | {
+                __typename?: "RecipientSignedEvent";
+                id: string;
+                createdAt: string;
+                contact?: Maybe<{
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: Maybe<string>;
+                  email: string;
                 }>;
               }
             | {
@@ -12041,13 +12138,25 @@ export type PetitionReplies_PetitionFragment = {
         user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
       }
   >;
+  signatureRequests?: Maybe<
+    Array<{
+      __typename?: "PetitionSignatureRequest";
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      signerStatus: Array<{
+        __typename?: "PetitionSignatureRequestSignerStatus";
+        status: string;
+        contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+      }>;
+    }>
+  >;
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
-    timezone: string;
     review: boolean;
     provider: string;
     title: string;
     letRecipientsChooseSigners: boolean;
+    timezone: string;
     contacts: Array<
       Maybe<{
         __typename?: "Contact";
@@ -12058,19 +12167,6 @@ export type PetitionReplies_PetitionFragment = {
       }>
     >;
   }>;
-  signatureRequests?: Maybe<
-    Array<{
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        contacts: Array<
-          Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-        >;
-      };
-    }>
-  >;
   myEffectivePermission?: Maybe<{
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -12511,13 +12607,30 @@ export type PetitionRepliesQuery = {
               user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
             }
         >;
+        signatureRequests?: Maybe<
+          Array<{
+            __typename?: "PetitionSignatureRequest";
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            signerStatus: Array<{
+              __typename?: "PetitionSignatureRequestSignerStatus";
+              status: string;
+              contact: {
+                __typename?: "Contact";
+                id: string;
+                fullName?: Maybe<string>;
+                email: string;
+              };
+            }>;
+          }>
+        >;
         signatureConfig?: Maybe<{
           __typename?: "SignatureConfig";
-          timezone: string;
           review: boolean;
           provider: string;
           title: string;
           letRecipientsChooseSigners: boolean;
+          timezone: string;
           contacts: Array<
             Maybe<{
               __typename?: "Contact";
@@ -12528,24 +12641,6 @@ export type PetitionRepliesQuery = {
             }>
           >;
         }>;
-        signatureRequests?: Maybe<
-          Array<{
-            __typename?: "PetitionSignatureRequest";
-            id: string;
-            status: PetitionSignatureRequestStatus;
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              contacts: Array<
-                Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>
-              >;
-            };
-          }>
-        >;
         myEffectivePermission?: Maybe<{
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -15827,6 +15922,15 @@ export const TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetit
   }
   ${ContactLink_ContactFragmentDoc}
 `;
+export const TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc = gql`
+  fragment TimelineRecipientSignedEvent_RecipientSignedEvent on RecipientSignedEvent {
+    contact {
+      ...ContactLink_Contact
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -15926,6 +16030,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on AccessActivatedFromPublicPetitionLinkEvent {
       ...TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent
     }
+    ... on RecipientSignedEvent {
+      ...TimelineRecipientSignedEvent_RecipientSignedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -15958,6 +16065,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc}
   ${TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc}
   ${TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc}
+  ${TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -16399,14 +16507,43 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${ExportRepliesDialog_PetitionFieldFragmentDoc}
   ${useFieldVisibility_PetitionFieldFragmentDoc}
 `;
-export const PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc = gql`
-  fragment PetitionSignaturesCard_PetitionSignatureRequest on PetitionSignatureRequest {
-    id
+export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
+  fragment NewSignatureRequestRow_Petition on Petition {
     status
     signatureConfig {
       contacts {
         ...ContactLink_Contact
       }
+      provider
+      review
+      timezone
+      title
+    }
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gql`
+  fragment CurrentSignatureRequestRow_PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    status
+    signerStatus {
+      contact {
+        ...ContactLink_Contact
+      }
+      status
+    }
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql`
+  fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    status
+    signerStatus {
+      contact {
+        ...ContactLink_Contact
+      }
+      status
     }
   }
   ${ContactLink_ContactFragmentDoc}
@@ -16415,20 +16552,17 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   fragment PetitionSignaturesCard_Petition on Petition {
     id
     status
-    signatureConfig {
-      timezone
-      contacts {
-        ...ContactLink_Contact
-      }
-    }
-    signatureRequests {
-      ...PetitionSignaturesCard_PetitionSignatureRequest
-    }
     ...SignatureConfigDialog_Petition
+    ...NewSignatureRequestRow_Petition
+    signatureRequests {
+      ...CurrentSignatureRequestRow_PetitionSignatureRequest
+      ...OlderSignatureRequestRows_PetitionSignatureRequest
+    }
   }
-  ${ContactLink_ContactFragmentDoc}
-  ${PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc}
   ${SignatureConfigDialog_PetitionFragmentDoc}
+  ${NewSignatureRequestRow_PetitionFragmentDoc}
+  ${CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc}
+  ${OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc}
 `;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
