@@ -770,6 +770,7 @@ export interface PetitionSignatureRequest {
   updated_at: Date; // timestamptz
   file_upload_audit_trail_id: Maybe<number>; // int4
   metadata: any; // jsonb
+  signer_status: any; // jsonb
 }
 
 export type CreatePetitionSignatureRequest = PartialProps<
@@ -785,6 +786,7 @@ export type CreatePetitionSignatureRequest = PartialProps<
   | "updated_at"
   | "file_upload_audit_trail_id"
   | "metadata"
+  | "signer_status"
 >;
 
 export interface PetitionTag {

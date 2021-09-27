@@ -44,6 +44,8 @@ export type SignaturItEventBody = {
 
 export function signaturItEventHandler(type: SignatureEvents) {
   switch (type) {
+    case "document_signed":
+      return documentSigned;
     case "document_declined":
       return documentDeclined;
     case "document_completed":
@@ -55,6 +57,30 @@ export function signaturItEventHandler(type: SignatureEvents) {
   }
 }
 
+/** the document was signed by any of the assigned signers */
+async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+  const petition = await ctx.petitions.loadPetition(petitionId);
+  if (!petition) {
+    throw new Error(`petition with id ${petitionId} not found.`);
+  }
+
+  const contact = (await ctx.contacts.loadContactByEmail({
+    orgId: petition.org_id,
+    email: data.document.email,
+  }))!;
+
+  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
+    `SIGNATURIT/${data.document.signature.id}`
+  );
+
+  await Promise.all([
+    ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${data.document.signature.id}`, {
+      signer_status: { ...signature?.signer_status, [contact.id]: "SIGNED" },
+    }),
+    appendEventLogs(ctx, data),
+  ]);
+}
+
 /** signer declined the document. Whole signature process will be cancelled */
 async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const petition = await ctx.petitions.loadPetition(petitionId);
@@ -62,10 +88,14 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
     throw new Error(`Can't find petition with id ${petitionId}`);
   }
 
-  const contact = await ctx.contacts.loadContactByEmail({
+  const contact = (await ctx.contacts.loadContactByEmail({
     orgId: petition.org_id,
     email: data.document.email,
-  });
+  }))!;
+
+  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
+    `SIGNATURIT/${data.document.signature.id}`
+  );
 
   const [signatureRequest] = await Promise.all([
     ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${data.document.signature.id}`, {
@@ -74,6 +104,10 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
       cancel_data: {
         contact_id: contact?.id,
         decline_reason: data.document.decline_reason,
+      },
+      signer_status: {
+        ...signature?.signer_status,
+        [contact.id]: "DECLINED",
       },
     }),
     appendEventLogs(ctx, data),

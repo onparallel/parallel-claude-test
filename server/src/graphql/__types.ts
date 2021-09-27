@@ -409,6 +409,10 @@ export interface NexusGenObjects {
   PetitionReopenedEvent: events.PetitionReopenedEvent;
   PetitionSharedUserNotification: notifications.PetitionSharedUserNotification;
   PetitionSignatureRequest: db.PetitionSignatureRequest;
+  PetitionSignatureRequestSignerStatus: {
+    contactId: number;
+    status?: "SIGNED" | "DECLINED" | undefined;
+  };
   PetitionTemplate: db.Petition;
   PetitionTemplateAndField: {
     // root type
@@ -1169,8 +1173,14 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     signatureConfig: NexusGenRootTypes["SignatureConfig"]; // SignatureConfig!
     signedDocumentFilename: string | null; // String
+    signerStatus: NexusGenRootTypes["PetitionSignatureRequestSignerStatus"][]; // [PetitionSignatureRequestSignerStatus!]!
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  PetitionSignatureRequestSignerStatus: {
+    // field return type
+    contact: NexusGenRootTypes["Contact"]; // Contact!
+    status: string; // String!
   };
   PetitionTemplate: {
     // field return type
@@ -2283,8 +2293,14 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     signatureConfig: "SignatureConfig";
     signedDocumentFilename: "String";
+    signerStatus: "PetitionSignatureRequestSignerStatus";
     status: "PetitionSignatureRequestStatus";
     updatedAt: "DateTime";
+  };
+  PetitionSignatureRequestSignerStatus: {
+    // field return type name
+    contact: "Contact";
+    status: "String";
   };
   PetitionTemplate: {
     // field return type name

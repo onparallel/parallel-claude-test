@@ -3213,7 +3213,8 @@ export class PetitionRepository extends BaseRepository {
     return await this.knex.raw(
       /* sql */ `
         UPDATE petition_signature_request
-        SET event_logs = event_logs || ${logs.map(() => "?::jsonb").join(" || ")}
+        SET event_logs = event_logs || ${logs.map(() => "?::jsonb").join(" || ")},
+        updated_at = NOW()
         WHERE external_id = ?
       `,
       [...logs, prefixedExternalId]

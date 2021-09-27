@@ -10,6 +10,29 @@ export const PetitionSignatureCancelReason = enumType({
   members: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR"],
 });
 
+export const PetitionSignatureRequestSignerStatus = objectType({
+  name: "PetitionSignatureRequestSignerStatus",
+  sourceType: /* ts */ `{
+    contactId: number;
+    status?: "SIGNED" | "DECLINED" | undefined;
+  }`,
+  definition(t) {
+    t.field("contact", {
+      type: "Contact",
+      description: "The contact that need to sign the generated document.",
+      resolve: async (root, _, ctx) => {
+        const contact = await ctx.contacts.loadContact(root.contactId);
+        if (!contact) throw new Error(`Contact:${root.contactId} not found`);
+        return contact;
+      },
+    });
+    t.string("status", {
+      description: "The signing status of the individual contact.",
+      resolve: (o) => o.status ?? "PENDING",
+    });
+  },
+});
+
 export const PetitionSignatureRequest = objectType({
   name: "PetitionSignatureRequest",
   sourceType: "db.PetitionSignatureRequest",
@@ -30,6 +53,14 @@ export const PetitionSignatureRequest = objectType({
     t.field("status", {
       type: "PetitionSignatureRequestStatus",
       description: "The status of the petition signature.",
+    });
+    t.nonNull.list.nonNull.field("signerStatus", {
+      type: "PetitionSignatureRequestSignerStatus",
+      resolve: (o) =>
+        ((o.signature_config.contactIds as number[]) ?? []).map((contactId) => ({
+          contactId,
+          status: o.signer_status[contactId],
+        })),
     });
     t.nullable.string("signedDocumentFilename", {
       resolve: async (o, _, ctx) => {

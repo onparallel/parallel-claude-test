@@ -2422,6 +2422,7 @@ type PetitionSignatureRequest implements Timestamps {
   """
   signatureConfig: SignatureConfig!
   signedDocumentFilename: String
+  signerStatus: [PetitionSignatureRequestSignerStatus!]!
 
   """
   The status of the petition signature.
@@ -2432,6 +2433,18 @@ type PetitionSignatureRequest implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+type PetitionSignatureRequestSignerStatus {
+  """
+  The contact that need to sign the generated document.
+  """
+  contact: Contact!
+
+  """
+  The signing status of the individual contact.
+  """
+  status: String!
 }
 
 enum PetitionSignatureRequestStatus {
