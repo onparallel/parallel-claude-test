@@ -47,7 +47,7 @@ export const AppLayoutNavbar = Object.assign(
           href: "/app/petitions",
           icon: <PaperPlaneIcon />,
           isAvailable: true,
-          isActive: pathname.startsWith("/[locale]/app/petitions"),
+          isActive: pathname.startsWith("/app/petitions"),
           text: intl.formatMessage({
             id: "navbar.petitions-link",
             defaultMessage: "Petitions",
@@ -74,7 +74,7 @@ export const AppLayoutNavbar = Object.assign(
           section: "contacts",
           href: "/app/contacts",
           icon: <UsersIcon />,
-          isActive: pathname.startsWith("/[locale]/app/contacts"),
+          isActive: pathname.startsWith("/app/contacts"),
           isAvailable: true,
           text: intl.formatMessage({
             id: "navbar.contacts-link",

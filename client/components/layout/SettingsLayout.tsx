@@ -139,7 +139,7 @@ interface SettingsLayoutMenuItemProps {
 function SettingsLayoutMenuItem({ path, children }: SettingsLayoutMenuItemProps) {
   const { pathname } = useRouter();
 
-  const active = pathname.startsWith(`/[locale]${path}`);
+  const active = pathname.startsWith(path);
 
   return (
     <NakedLink href={path}>

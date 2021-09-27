@@ -200,10 +200,7 @@ export const PublicHeaderLink = chakraForwardRef<"a", PublicHeaderLink>(function
   ref
 ) {
   const router = useRouter();
-  const current = router.pathname.startsWith("/[locale]")
-    ? router.asPath.replace(/^\/[^\/]+/, "")
-    : router.asPath;
-  const isCurrent = current === href || current.startsWith(`${href}/`);
+  const isCurrent = router.pathname === href || router.pathname.startsWith(`${href}/`);
   return (
     <NakedLink href={href}>
       <Button
@@ -226,15 +223,13 @@ interface PublicHeaderMenuItemLinkProps extends MenuItemProps {
 export const PublicHeaderMenuItemLink = chakraForwardRef<"a", PublicHeaderMenuItemLinkProps>(
   function MenuItemLink({ href, ...props }, ref) {
     const router = useRouter();
-    const current = router.pathname.startsWith("/[locale]")
-      ? router.asPath.replace(/^\/[^\/]+/, "")
-      : router.asPath;
+    const isCurrent = router.pathname === href || router.pathname.startsWith(`${href}/`);
     return (
       <NakedLink href={href}>
         <MenuItem
           as="a"
           ref={ref as any}
-          aria-current={current === href ? "page" : undefined}
+          aria-current={isCurrent ? "page" : undefined}
           _activeLink={{
             fontWeight: "bold",
             color: "purple.600",
@@ -252,10 +247,7 @@ interface PublicHeaderMenuButton extends MenuButtonProps, ButtonProps {
 export const PublicHeaderMenuButton = chakraForwardRef<"button", PublicHeaderMenuButton>(
   function MenuButtonHighlight({ urlPrefix, children, ...props }, ref) {
     const router = useRouter();
-    const current = router.pathname.startsWith("/[locale]")
-      ? router.asPath.replace(/^\/[^\/]+/, "")
-      : router.asPath;
-    const isCurrent = current === urlPrefix || current.startsWith(`${urlPrefix}/`);
+    const isCurrent = router.pathname === urlPrefix || router.pathname.startsWith(`${urlPrefix}/`);
     return (
       <MenuButton
         ref={ref as any}
