@@ -1,4 +1,4 @@
-import { objectType } from "@nexus/schema";
+import { objectType } from "nexus";
 import { fullName } from "../../util/fullName";
 
 export const Contact = objectType({

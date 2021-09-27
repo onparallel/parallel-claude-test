@@ -1,4 +1,4 @@
-import { enumType, objectType } from "@nexus/schema";
+import { enumType, objectType } from "nexus";
 import { toHtml } from "../../../util/slate";
 
 export const PetitionMessageStatus = enumType({

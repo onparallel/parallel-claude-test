@@ -1,4 +1,4 @@
-import { core } from "@nexus/schema";
+import { core } from "nexus";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { isValidTime, isValidTimezone } from "../../../util/validators";

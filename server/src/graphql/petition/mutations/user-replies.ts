@@ -1,4 +1,4 @@
-import { mutationField, nonNull, stringArg } from "@nexus/schema";
+import { mutationField, nonNull, stringArg } from "nexus";
 import { differenceInSeconds } from "date-fns";
 import { random } from "../../../util/token";
 import { Maybe } from "../../../util/types";

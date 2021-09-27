@@ -31,7 +31,7 @@ async function main() {
         `yarn switch-release --commit ${commit} --env ${env}`,
         `yarn prune-instances --env ${env}`,
     ]) {
-        child_process_1.execSync(command, { encoding: "utf-8", stdio: "inherit" });
+        (0, child_process_1.execSync)(command, { encoding: "utf-8", stdio: "inherit" });
     }
 }
-run_1.run(main);
+(0, run_1.run)(main);

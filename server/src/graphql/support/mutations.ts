@@ -1,4 +1,4 @@
-import { arg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "@nexus/schema";
+import { arg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, uniq } from "remeda";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId } from "../../util/globalId";

@@ -1,4 +1,4 @@
-import { arg, list, nonNull, objectType, queryField, stringArg } from "@nexus/schema";
+import { arg, list, nonNull, objectType, queryField, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { PetitionLocale } from "../../api/public/__types";
 import { fullName } from "../../util/fullName";
@@ -9,7 +9,7 @@ import { toHtml } from "../../util/slate";
 export const LandingTemplateField = objectType({
   name: "LandingTemplateField",
   description: "A public template field",
-  rootTyping: "db.PetitionField",
+  sourceType: "db.PetitionField",
   definition(t) {
     t.globalId("id", { prefixName: "PetitionField" });
     t.field("type", { type: "PetitionFieldType" });
@@ -20,7 +20,7 @@ export const LandingTemplateField = objectType({
 export const LandingTemplate = objectType({
   name: "LandingTemplate",
   description: "A public template on landing page",
-  rootTyping: "db.Petition",
+  sourceType: "db.Petition",
   definition(t) {
     t.globalId("id", { prefixName: "Petition" });
     t.nullable.string("name", { resolve: (o) => o.name });
@@ -121,7 +121,7 @@ export const landingQueries = queryField((t) => {
   t.list.field("landingTemplatesSamples", {
     type: objectType({
       name: "LandingTemplateSample",
-      rootTyping: "string",
+      sourceType: "string",
       definition(t) {
         t.nonNull.string("category", {
           resolve: (category) => category,

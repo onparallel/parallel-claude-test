@@ -1,4 +1,4 @@
-import { fieldAuthorizePlugin, makeSchema } from "@nexus/schema";
+import { fieldAuthorizePlugin, makeSchema } from "nexus";
 import { ForbiddenError } from "apollo-server-express";
 import path from "path";
 import { paginationPlugin } from "./graphql/helpers/paginationPlugin";
@@ -32,15 +32,15 @@ export const schema = makeSchema({
     validateArgsPlugin(),
     paginationPlugin(),
   ],
-  typegenAutoConfig: {
+  sourceTypes: {
     headers: [`import { FileUpload } from "graphql-upload";`],
-    sources: [
-      { source: resolve("./db/__types.ts"), alias: "db" },
-      { source: resolve("./db/events.ts"), alias: "events" },
-      { source: resolve("./db/notifications.ts"), alias: "notifications" },
-      { source: resolve("./context.ts"), alias: "ctx" },
+    modules: [
+      { module: resolve("./db/__types.ts"), alias: "db" },
+      { module: resolve("./db/events.ts"), alias: "events" },
+      { module: resolve("./db/notifications.ts"), alias: "notifications" },
+      { module: resolve("./context.ts"), alias: "ctx" },
     ],
-    contextType: "ctx.ApiContext",
   },
+  contextType: { module: resolve("./context.ts"), export: "ApiContext" },
   prettierConfig: path.join(__dirname, "../../.prettierrc"),
 });

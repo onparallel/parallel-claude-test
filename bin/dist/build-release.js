@@ -32,15 +32,15 @@ async function main() {
     const commit = _commit.slice(0, 7);
     const buildId = `${commit}-${env}`;
     const buildDir = `${WORK_DIR}/${buildId}`;
-    console.log(chalk_1.default `Checking out the code for commit {bold ${commit}}`);
-    child_process_1.execSync(`git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`, {
+    console.log((0, chalk_1.default) `Checking out the code for commit {bold ${commit}}`);
+    (0, child_process_1.execSync)(`git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`, {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
-    child_process_1.execSync(`git checkout ${commit}`, { cwd: buildDir, encoding: "utf-8" });
-    child_process_1.execSync(`rm -rf .git`, { cwd: buildDir, encoding: "utf-8" });
+    (0, child_process_1.execSync)(`git checkout ${commit}`, { cwd: buildDir, encoding: "utf-8" });
+    (0, child_process_1.execSync)(`rm -rf .git`, { cwd: buildDir, encoding: "utf-8" });
     console.log("Installing dependencies...");
-    child_process_1.execSync(`PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
+    (0, child_process_1.execSync)(`PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
      --prefer-offline \
      --frozen-lockfile`, {
         cwd: buildDir,
@@ -57,59 +57,59 @@ async function main() {
         }
     }
     console.log("Getting the secrets 🤫");
-    child_process_1.execSync("git clone --depth 1 git@github.com:onparallel/secrets.git secrets", {
+    (0, child_process_1.execSync)("git clone --depth 1 git@github.com:onparallel/secrets.git secrets", {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
     for (const dir of ["server", "client"]) {
-        child_process_1.execSync(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
+        (0, child_process_1.execSync)(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
             cwd: WORK_DIR,
             encoding: "utf-8",
         });
     }
-    child_process_1.execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
+    (0, child_process_1.execSync)("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
     // Generate tokens
-    const CLIENT_SERVER_TOKEN = token_1.token(32);
-    const SECURITY_SERVICE_JWT_SECRET = token_1.token(32);
-    child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, {
+    const CLIENT_SERVER_TOKEN = (0, token_1.token)(32);
+    const SECURITY_SERVICE_JWT_SECRET = (0, token_1.token)(32);
+    (0, child_process_1.execSync)(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
-    child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, {
+    (0, child_process_1.execSync)(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
-    child_process_1.execSync(`echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
+    (0, child_process_1.execSync)(`echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
     console.log("Building the client");
-    child_process_1.execSync(`ENV=${env} yarn build`, {
+    (0, child_process_1.execSync)(`ENV=${env} yarn build`, {
         cwd: `${buildDir}/client`,
         encoding: "utf-8",
     });
-    child_process_1.execSync(`aws s3 sync \
+    (0, child_process_1.execSync)(`aws s3 sync \
       ${buildDir}/client/.next/static \
       s3://parallel-static-${env}/_next/static \
       --cache-control max-age=31536000 \
       --profile parallel-deploy`);
-    child_process_1.execSync(`aws s3 sync \
+    (0, child_process_1.execSync)(`aws s3 sync \
       ${buildDir}/client/public/static \
       s3://parallel-static-${env}/static \
       --cache-control max-age=2592000 \
       --profile parallel-deploy`);
     console.log("Building the server");
-    child_process_1.execSync(`yarn build`, { cwd: `${buildDir}/server`, encoding: "utf-8" });
+    (0, child_process_1.execSync)(`yarn build`, { cwd: `${buildDir}/server`, encoding: "utf-8" });
     console.log("Pruning devDependencies");
-    child_process_1.execSync(`PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
+    (0, child_process_1.execSync)(`PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
     --production \
     --ignore-scripts \
     --prefer-offline \
     --frozen-lockfile`, { cwd: buildDir, encoding: "utf-8" });
-    child_process_1.execSync(`yarn patch-package`, { cwd: buildDir, encoding: "utf-8" });
+    (0, child_process_1.execSync)(`yarn patch-package`, { cwd: buildDir, encoding: "utf-8" });
     console.log("Zip and upload to S3");
-    child_process_1.execSync(`tar -zcf ${buildId}.tar.gz ${buildId}`, {
+    (0, child_process_1.execSync)(`tar -zcf ${buildId}.tar.gz ${buildId}`, {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
-    child_process_1.execSync(`rm -rf ${buildDir}`, { cwd: WORK_DIR, encoding: "utf-8" });
-    child_process_1.execSync(`aws s3 mv ${buildId}.tar.gz s3://parallel-builds/${buildId}.tar.gz --profile parallel-deploy`, { cwd: WORK_DIR, encoding: "utf-8" });
+    (0, child_process_1.execSync)(`rm -rf ${buildDir}`, { cwd: WORK_DIR, encoding: "utf-8" });
+    (0, child_process_1.execSync)(`aws s3 mv ${buildId}.tar.gz s3://parallel-builds/${buildId}.tar.gz --profile parallel-deploy`, { cwd: WORK_DIR, encoding: "utf-8" });
 }
-run_1.run(main);
+(0, run_1.run)(main);

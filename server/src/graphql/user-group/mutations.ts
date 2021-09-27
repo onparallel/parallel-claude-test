@@ -1,4 +1,4 @@
-import { inputObjectType, list, mutationField, nonNull, stringArg } from "@nexus/schema";
+import { inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { CreateUserGroup, UserGroup } from "../../db/__types";
 import { authenticateAnd } from "../helpers/authorize";

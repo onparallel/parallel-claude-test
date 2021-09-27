@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from "graphql";
-import { plugin, core } from "@nexus/schema";
+import { plugin, core } from "nexus";
 
 const fieldDefTypes = core.printedGenTyping({
   optional: true,
@@ -18,7 +18,7 @@ const fieldDefTypes = core.printedGenTyping({
 });
 
 export type FieldValidateArgsResolver<TypeName extends string, FieldName extends string> = (
-  root: core.RootValue<TypeName>,
+  root: core.GetGen2<"rootTypes", TypeName>,
   args: core.ArgsValue<TypeName, FieldName>,
   context: core.GetGen<"context">,
   info: GraphQLResolveInfo

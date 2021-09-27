@@ -1,4 +1,4 @@
-import { core } from "@nexus/schema";
+import { core } from "nexus";
 import { ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 

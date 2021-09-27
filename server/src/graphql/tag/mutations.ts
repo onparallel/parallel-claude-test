@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField, nonNull, stringArg } from "@nexus/schema";
+import { inputObjectType, mutationField, nonNull, stringArg } from "nexus";
 import { CreateTag } from "../../db/__types";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";

@@ -42,7 +42,7 @@ async function main() {
             .promise();
         return [lb.LoadBalancerName, tgHealth.TargetHealthDescriptions[0]];
     }));
-    const instanceToLb = remeda_1.indexBy(lbs, ([_, h]) => { var _a; return (_a = h.Target) === null || _a === void 0 ? void 0 : _a.Id; });
+    const instanceToLb = (0, remeda_1.indexBy)(lbs, ([_, h]) => { var _a; return (_a = h.Target) === null || _a === void 0 ? void 0 : _a.Id; });
     const instances = (r1.Reservations || [])
         .flatMap((r) => { var _a; return (_a = r.Instances) !== null && _a !== void 0 ? _a : []; })
         .filter((i) => { var _a; return (_a = i.Tags) === null || _a === void 0 ? void 0 : _a.some((t) => t.Key === "Release"); });
@@ -100,4 +100,4 @@ async function main() {
     }));
     console.log(table.toString());
 }
-run_1.run(main);
+(0, run_1.run)(main);

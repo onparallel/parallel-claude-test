@@ -1,5 +1,5 @@
-import { core } from "@nexus/schema";
-import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { core } from "nexus";
+import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { getRequiredPetitionSendCredits } from "../../util/organizationUsageLimits";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";

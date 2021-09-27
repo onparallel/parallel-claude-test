@@ -1,4 +1,4 @@
-import { objectType, unionType } from "@nexus/schema";
+import { objectType, unionType } from "nexus";
 
 export const UserOrPetitionAccess = unionType({
   name: "UserOrPetitionAccess",
@@ -11,7 +11,7 @@ export const UserOrPetitionAccess = unionType({
     }
     throw new Error("Missing __type on UserOrPetitionAccess");
   },
-  rootTyping: /* ts */ `
+  sourceType: /* ts */ `
     | ({__type: "User"} & NexusGenRootTypes["User"])
     | ({__type: "PetitionAccess"} & NexusGenRootTypes["PetitionAccess"])
   `,

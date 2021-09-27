@@ -1,4 +1,4 @@
-import { booleanArg, list, mutationField, nonNull } from "@nexus/schema";
+import { booleanArg, list, mutationField, nonNull } from "nexus";
 import { outdent } from "outdent";
 import { sortBy } from "remeda";
 import { PetitionUserNotification } from "../../db/notifications";

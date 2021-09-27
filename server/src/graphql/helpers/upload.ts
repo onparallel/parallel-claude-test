@@ -1,9 +1,9 @@
-import { arg, core, scalarType } from "@nexus/schema";
+import { arg, core, scalarType } from "nexus";
 import { GraphQLUpload as _GraphQLUpload } from "graphql-upload";
 
 export const GraphQLUpload = scalarType({
   ..._GraphQLUpload,
-  rootTyping: "Promise<FileUpload>",
+  sourceType: "Promise<FileUpload>",
 });
 
 export function uploadArg(opts?: Omit<core.NexusArgConfig<"Upload">, "type">) {

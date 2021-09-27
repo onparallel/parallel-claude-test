@@ -1,4 +1,4 @@
-import { core } from "@nexus/schema";
+import { core } from "nexus";
 import { isDefined } from "remeda";
 import { fromGlobalIds } from "../../../util/globalId";
 import { isValidTimezone } from "../../../util/validators";

@@ -1,4 +1,4 @@
-import { core, enumType, interfaceType, objectType, unionType } from "@nexus/schema";
+import { core, enumType, interfaceType, objectType, unionType } from "nexus";
 import { extension } from "mime-types";
 import { isDefined } from "remeda";
 import { Contact } from "../../db/__types";
@@ -7,7 +7,7 @@ import { toGlobalId } from "../../util/globalId";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
-  rootTyping: "db.PetitionAccess",
+  sourceType: "db.PetitionAccess",
   description: "A public view of a petition access",
   definition(t) {
     t.nullable.field("petition", {
@@ -55,7 +55,7 @@ export const PublicSignatureConfig = objectType({
       resolve: (o) => o.review ?? false,
     });
   },
-  rootTyping: /* ts */ `{
+  sourceType: /* ts */ `{
     contactIds: number[];
     review?: boolean;
   }`,
@@ -63,7 +63,7 @@ export const PublicSignatureConfig = objectType({
 
 export const PublicPetition = objectType({
   name: "PublicPetition",
-  rootTyping: "db.Petition",
+  sourceType: "db.Petition",
   description: "A public view of the petition",
   definition(t) {
     t.implements("Timestamps");
@@ -129,7 +129,7 @@ export const PublicPetition = objectType({
 
 export const PublicPetitionMessage = objectType({
   name: "PublicPetitionMessage",
-  rootTyping: "db.PetitionMessage",
+  sourceType: "db.PetitionMessage",
   description: "A public message in a petition",
   definition(t) {
     t.globalId("id", {
@@ -145,7 +145,7 @@ export const PublicPetitionMessage = objectType({
 
 export const PublicPetitionField = objectType({
   name: "PublicPetitionField",
-  rootTyping: "db.PetitionField",
+  sourceType: "db.PetitionField",
   description: "A field within a petition.",
   definition(t) {
     t.globalId("id", {
@@ -241,7 +241,7 @@ export const PublicPetitionField = objectType({
 
 export const PublicUser = objectType({
   name: "PublicUser",
-  rootTyping: "db.User",
+  sourceType: "db.User",
   description: "A public view of a user",
   definition(t) {
     t.globalId("id", {
@@ -275,7 +275,7 @@ export const PublicUser = objectType({
 
 export const PublicOrganization = objectType({
   name: "PublicOrganization",
-  rootTyping: "db.Organization",
+  sourceType: "db.Organization",
   description: "A public view of an organization",
   definition(t) {
     t.globalId("id", {
@@ -296,7 +296,7 @@ export const PublicOrganization = objectType({
 
 export const PublicPetitionFieldReply = objectType({
   name: "PublicPetitionFieldReply",
-  rootTyping: "db.PetitionFieldReply",
+  sourceType: "db.PetitionFieldReply",
   description: "A reply to a petition field",
   definition(t) {
     t.implements("Timestamps");
@@ -340,7 +340,7 @@ export const PublicPetitionFieldReply = objectType({
 
 export const PublicContact = objectType({
   name: "PublicContact",
-  rootTyping: "db.Contact",
+  sourceType: "db.Contact",
   description: "A public view of a contact",
   definition(t) {
     t.globalId("id", {
@@ -376,7 +376,7 @@ export const PublicUserOrContact = unionType({
     }
     throw new Error("Missing __type on PublicUserOrContact");
   },
-  rootTyping: /* ts */ `
+  sourceType: /* ts */ `
     | ({__type: "Contact"} & NexusGenRootTypes["Contact"])
     | ({__type: "User"} & NexusGenRootTypes["User"])
   `,
@@ -384,7 +384,7 @@ export const PublicUserOrContact = unionType({
 
 export const PublicPetitionFieldComment = objectType({
   name: "PublicPetitionFieldComment",
-  rootTyping: "db.PetitionFieldComment",
+  sourceType: "db.PetitionFieldComment",
   description: "A comment on a petition field",
   definition(t) {
     t.globalId("id", {
@@ -429,7 +429,7 @@ export const PublicPetitionFieldComment = objectType({
 
 export const PublicPetitionLinkPermission = interfaceType({
   name: "PublicPetitionLinkPermission",
-  rootTyping: "db.PublicPetitionLinkUser",
+  sourceType: "db.PublicPetitionLinkUser",
   resolveType: (o) => {
     if (isDefined(o.user_id)) {
       return "PublicPetitionLinkUserPermission";
@@ -454,7 +454,7 @@ export const PublicPetitionLinkPermission = interfaceType({
 
 export const PublicPetitionLinkUserPermission = objectType({
   name: "PublicPetitionLinkUserPermission",
-  rootTyping: "db.PublicPetitionLinkUser",
+  sourceType: "db.PublicPetitionLinkUser",
   definition(t) {
     t.implements("PublicPetitionLinkPermission");
     t.field("user", {
@@ -468,7 +468,7 @@ export const PublicPetitionLinkUserPermission = objectType({
 
 export const PublicPetitionLinkUserGroupPermission = objectType({
   name: "PublicPetitionLinkUserGroupPermission",
-  rootTyping: "db.PublicPetitionLinkUser",
+  sourceType: "db.PublicPetitionLinkUser",
   definition(t) {
     t.implements("PublicPetitionLinkPermission");
     t.field("group", {

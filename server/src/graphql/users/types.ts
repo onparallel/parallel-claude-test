@@ -1,4 +1,4 @@
-import { arg, enumType, list, nonNull, objectType, unionType } from "@nexus/schema";
+import { arg, enumType, list, nonNull, objectType, unionType } from "nexus";
 import { omit } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -27,13 +27,13 @@ export const FeatureFlag = enumType({
     "SKIP_FORWARD_SECURITY",
     "EXPORT_CUATRECASAS",
   ],
-  rootTyping: "db.FeatureFlagName",
+  sourceType: "db.FeatureFlagName",
 });
 
 export const UserStatus = enumType({
   name: "UserStatus",
   members: ["ACTIVE", "INACTIVE"],
-  rootTyping: "db.UserStatus",
+  sourceType: "db.UserStatus",
 });
 
 export const User = objectType({
@@ -194,7 +194,7 @@ export const UserOrUserGroup = unionType({
     }
     throw new Error("Missing __type on UserOrUserGroup");
   },
-  rootTyping: /* ts */ `
+  sourceType: /* ts */ `
     | ({__type: "User"} & NexusGenRootTypes["User"])
     | ({__type: "UserGroup"} & NexusGenRootTypes["UserGroup"])
   `,

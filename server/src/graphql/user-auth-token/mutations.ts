@@ -1,4 +1,4 @@
-import { list, mutationField, nonNull, objectType, stringArg } from "@nexus/schema";
+import { list, mutationField, nonNull, objectType, stringArg } from "nexus";
 import { authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";

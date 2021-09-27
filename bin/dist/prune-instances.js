@@ -59,13 +59,13 @@ async function main() {
             const name = (_b = instance.Tags.find((t) => t.Key === "Name")) === null || _b === void 0 ? void 0 : _b.Value;
             const state = instance.State.Name;
             if (state === "running") {
-                console.log(chalk_1.default `Stopping instance {bold ${id}} {yellow {bold ${name}}}`);
+                console.log((0, chalk_1.default) `Stopping instance {bold ${id}} {yellow {bold ${name}}}`);
                 if (!dryRun) {
                     await ec2.stopInstances({ InstanceIds: [id] }).promise();
                 }
             }
             else if (state === "stopped" || state === "stopping") {
-                console.log(chalk_1.default `Terminating instance {bold ${id}} {red {bold ${name}}}`);
+                console.log((0, chalk_1.default) `Terminating instance {bold ${id}} {red {bold ${name}}}`);
                 if (!dryRun) {
                     await ec2.terminateInstances({ InstanceIds: [id] }).promise();
                 }
@@ -75,11 +75,11 @@ async function main() {
     const result5 = await elbv2.describeTargetGroups().promise();
     for (const tg of result5.TargetGroups) {
         if (tg.TargetGroupName.endsWith(`-${env}`) && tg.TargetGroupArn !== tgArn) {
-            console.log(chalk_1.default `Deleting target group {red {bold ${tg.TargetGroupName}}}`);
+            console.log((0, chalk_1.default) `Deleting target group {red {bold ${tg.TargetGroupName}}}`);
             if (!dryRun) {
                 await elbv2.deleteTargetGroup({ TargetGroupArn: tg.TargetGroupArn }).promise();
             }
         }
     }
 }
-run_1.run(main);
+(0, run_1.run)(main);

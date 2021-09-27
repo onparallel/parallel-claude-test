@@ -1,4 +1,4 @@
-import { core, interfaceType, objectType } from "@nexus/schema";
+import { core, interfaceType, objectType } from "nexus";
 import { isDefined } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionAccess, User } from "../../../db/__types";
@@ -96,7 +96,7 @@ export const PetitionEvent = interfaceType({
         return "AccessActivatedFromPublicPetitionLinkEvent";
     }
   },
-  rootTyping: "events.PetitionEvent",
+  sourceType: "events.PetitionEvent",
 });
 
 function createPetitionEvent<TypeName extends string>(
@@ -109,7 +109,7 @@ function createPetitionEvent<TypeName extends string>(
       t.implements("PetitionEvent");
       definition(t);
     },
-    rootTyping: `events.${name}`,
+    sourceType: `events.${name}`,
   });
 }
 

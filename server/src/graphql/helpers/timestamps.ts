@@ -1,4 +1,4 @@
-import { interfaceType } from "@nexus/schema";
+import { interfaceType } from "nexus";
 
 export const Timestamps = interfaceType({
   name: "Timestamps",
@@ -13,7 +13,7 @@ export const Timestamps = interfaceType({
     });
   },
   resolveType: () => null,
-  rootTyping: `{
+  sourceType: `{
     created_at: Date;
     updated_at: Date;
   }`,
@@ -28,7 +28,7 @@ export const CreatedAt = interfaceType({
     });
   },
   resolveType: () => null,
-  rootTyping: `{
+  sourceType: `{
     created_at: Date;
   }`,
 });

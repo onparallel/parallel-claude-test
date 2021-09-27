@@ -10,7 +10,7 @@ import {
   objectType,
   plugin,
   stringArg,
-} from "@nexus/schema";
+} from "nexus";
 import { GraphQLResolveInfo } from "graphql";
 import { omit } from "remeda";
 import { KeysOfType } from "../../util/types";
@@ -65,7 +65,7 @@ export type PaginationFieldConfig<
   /**
    * The description to annotate the GraphQL SDL
    */
-  description?: string | null;
+  description?: string;
   /**
    * Custom logic to validate the arguments.
    */
@@ -84,7 +84,7 @@ export type PaginationFieldConfig<
    * Implement the full resolve, including `items` and `totalCount`.
    */
   resolve: (
-    root: core.RootValue<TypeName>,
+    root: core.GetGen2<"rootTypes", TypeName>,
     args: core.ArgsValue<TypeName, FieldName>,
     ctx: core.GetGen<"context">,
     info: GraphQLResolveInfo
@@ -112,7 +112,7 @@ export function paginationPlugin() {
     name: "PaginationPlugin",
     fieldDefTypes: [
       core.printedGenTypingImport({
-        module: "@nexus/schema",
+        module: "nexus",
         bindings: ["core"],
       }),
       core.printedGenTypingImport({

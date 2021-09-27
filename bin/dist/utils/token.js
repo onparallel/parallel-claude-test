@@ -42,7 +42,7 @@ function encode(buffer) {
 }
 exports.encode = encode;
 function token(length) {
-    const buffer = crypto_1.randomBytes(length);
+    const buffer = (0, crypto_1.randomBytes)(length);
     return encode(buffer);
 }
 exports.token = token;

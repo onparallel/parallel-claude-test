@@ -8,7 +8,7 @@ import {
   nullable,
   objectType,
   stringArg,
-} from "@nexus/schema";
+} from "nexus";
 import { differenceInDays, differenceInSeconds } from "date-fns";
 import { prop } from "remeda";
 import { getClientIp } from "request-ip";

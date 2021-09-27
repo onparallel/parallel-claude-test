@@ -1,4 +1,4 @@
-import { core } from "@nexus/schema";
+import { core } from "nexus";
 import { FileUpload } from "graphql-upload";
 import { validateAnd } from "../validateArgs";
 import { contentType as contentTypeValidator } from "./contentType";

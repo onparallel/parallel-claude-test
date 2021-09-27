@@ -1,4 +1,4 @@
-import { mutationField, nonNull, objectType } from "@nexus/schema";
+import { mutationField, nonNull, objectType } from "nexus";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ArgValidationError, WhitelistedError } from "../../helpers/errors";

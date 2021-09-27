@@ -1,5 +1,5 @@
 import { nameCase } from "@foundernest/namecase";
-import { inputObjectType, list, mutationField, nonNull } from "@nexus/schema";
+import { inputObjectType, list, mutationField, nonNull } from "nexus";
 import pMap from "p-map";
 import { chunk, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";

@@ -85,14 +85,14 @@ async function main() {
         .promise();
     const instanceId = result.Instances[0].InstanceId;
     const ipAddress = result.Instances[0].PrivateIpAddress;
-    console.log(chalk_1.default `Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`);
-    await wait_1.wait(5000);
-    await wait_1.waitFor(async () => {
+    console.log((0, chalk_1.default) `Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`);
+    await (0, wait_1.wait)(5000);
+    await (0, wait_1.waitFor)(async () => {
         var _a, _b, _c;
         const result = await ec2.describeInstances({ InstanceIds: [instanceId] }).promise();
         return ((_c = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0].State) === null || _c === void 0 ? void 0 : _c.Name) === "running";
-    }, chalk_1.default `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
-    console.log(chalk_1.default `Instance {green ✓ running}`);
+    }, (0, chalk_1.default) `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
+    console.log((0, chalk_1.default) `Instance {green ✓ running}`);
     const targetGroupName = `${commit}-${env}`;
     let targetGroupArn;
     try {
@@ -122,9 +122,9 @@ async function main() {
         Targets: [{ Id: instanceId }],
     })
         .promise();
-    await wait_1.waitFor(async () => {
+    await (0, wait_1.waitFor)(async () => {
         try {
-            child_process_1.execSync(`ssh \
+            (0, child_process_1.execSync)(`ssh \
             -o ConnectTimeout=1 \
             -o "UserKnownHostsFile=/dev/null" \
             -o StrictHostKeyChecking=no \
@@ -134,15 +134,15 @@ async function main() {
         catch {
             return false;
         }
-    }, chalk_1.default `SSH not available. Waiting 5 more seconds...`, 5000);
+    }, (0, chalk_1.default) `SSH not available. Waiting 5 more seconds...`, 5000);
     console.log("Uploading install script to the new instance.");
-    child_process_1.execSync(`scp \
+    (0, child_process_1.execSync)(`scp \
     -o "UserKnownHostsFile=/dev/null" \
     -o "StrictHostKeyChecking=no" \
     ${OPS_DIR}/{install.sh,workers.sh} ${ipAddress}:/home/ec2-user/`);
-    child_process_1.execSync(`ssh \
+    (0, child_process_1.execSync)(`ssh \
     -o "UserKnownHostsFile=/dev/null" \
     -o StrictHostKeyChecking=no \
     ${ipAddress} /home/ec2-user/install.sh ${commit} ${env}`);
 }
-run_1.run(main);
+(0, run_1.run)(main);

@@ -20,7 +20,7 @@ async function extract(locales, input, output) {
             logStats(terms, data);
         }
         const updated = updateLocaleData(first, data, terms);
-        await json_1.writeJson(path_1.default.join(output, `${locale}.json`), updated, {
+        await (0, json_1.writeJson)(path_1.default.join(output, `${locale}.json`), updated, {
             pretty: true,
         });
         first = false;
@@ -29,23 +29,23 @@ async function extract(locales, input, output) {
 async function extractTerms(input) {
     try {
         const tmpFileName = "lang_tmp.json";
-        child_process_1.execSync(`formatjs extract \
+        (0, child_process_1.execSync)(`formatjs extract \
        --extract-source-location \
        --throws \
        --out-file ${tmpFileName} \
       ${isWindows ? input : `'${input}'`}`, { encoding: "utf-8" });
-        const terms = await json_1.readJson(tmpFileName);
+        const terms = await (0, json_1.readJson)(tmpFileName);
         await fs_1.promises.unlink(tmpFileName);
         return terms;
     }
     catch (error) {
-        console.log(chalk_1.default `[ {red error} ]`, error.stderr);
+        console.log((0, chalk_1.default) `[ {red error} ]`, error.stderr);
         throw error;
     }
 }
 async function loadLocaleData(dir, locale) {
     try {
-        const terms = await json_1.readJson(path_1.default.join(dir, `${locale}.json`));
+        const terms = await (0, json_1.readJson)(path_1.default.join(dir, `${locale}.json`));
         const data = new Map();
         for (const { term, definition, context } of terms) {
             data.set(term, { term, definition, context });
@@ -112,4 +112,4 @@ async function main() {
     }).argv;
     await extract(locales, input, output);
 }
-run_1.run(main);
+(0, run_1.run)(main);

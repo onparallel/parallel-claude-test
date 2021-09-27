@@ -1,4 +1,4 @@
-import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { countBy, isDefined } from "remeda";
 import { FeatureFlagName, PetitionPermissionType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";

@@ -1,4 +1,4 @@
-import { idArg, list, nonNull, nullable, queryField, stringArg } from "@nexus/schema";
+import { idArg, list, nonNull, nullable, queryField, stringArg } from "nexus";
 import { chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { authenticatePublicAccess, fieldBelongsToAccess } from "./authorizers";

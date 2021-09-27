@@ -1,4 +1,4 @@
-import { core } from "@nexus/schema";
+import { core } from "nexus";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import Ajv from "ajv";
 import { ArgValidationError } from "../errors";

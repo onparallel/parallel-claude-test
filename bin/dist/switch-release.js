@@ -46,12 +46,12 @@ async function main() {
     const result3 = await getTargetGroupInstances(oldTargetGroupArn);
     for (const instance of result3.Reservations.flatMap((r) => r.Instances)) {
         const ipAddress = instance.PrivateIpAddress;
-        console.log(chalk_1.default `Stopping workers on ${(_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value}`);
-        child_process_1.execSync(`ssh \
+        console.log((0, chalk_1.default) `Stopping workers on ${(_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value}`);
+        (0, child_process_1.execSync)(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
       ${ipAddress} /home/ec2-user/workers.sh stop`);
-        console.log(chalk_1.default `Workers stopped on ${(_b = instance.Tags) === null || _b === void 0 ? void 0 : _b.find((t) => t.Key === "Name").Value}`);
+        console.log((0, chalk_1.default) `Workers stopped on ${(_b = instance.Tags) === null || _b === void 0 ? void 0 : _b.find((t) => t.Key === "Name").Value}`);
     }
     console.log("Getting new target group.");
     const targetGroupName = `${commit}-${env}`;
@@ -60,14 +60,14 @@ async function main() {
     const result5 = await getTargetGroupInstances(targetGroupArn);
     for (const instance of result5.Reservations.flatMap((r) => r.Instances)) {
         const ipAddress = instance.PrivateIpAddress;
-        console.log(chalk_1.default `Starting services on ${(_c = instance.Tags) === null || _c === void 0 ? void 0 : _c.find((t) => t.Key === "Name").Value}`);
-        child_process_1.execSync(`ssh \
+        console.log((0, chalk_1.default) `Starting services on ${(_c = instance.Tags) === null || _c === void 0 ? void 0 : _c.find((t) => t.Key === "Name").Value}`);
+        (0, child_process_1.execSync)(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
       ${ipAddress} /home/ec2-user/workers.sh start`);
-        console.log(chalk_1.default `Workers started on ${(_d = instance.Tags) === null || _d === void 0 ? void 0 : _d.find((t) => t.Key === "Name").Value}`);
+        console.log((0, chalk_1.default) `Workers started on ${(_d = instance.Tags) === null || _d === void 0 ? void 0 : _d.find((t) => t.Key === "Name").Value}`);
     }
-    wait_1.waitFor(async () => {
+    (0, wait_1.waitFor)(async () => {
         var _a, _b;
         const result = await elbv2
             .describeTargetHealth({
@@ -92,7 +92,7 @@ async function main() {
         },
     })
         .promise();
-    console.log(chalk_1.default `Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`);
+    console.log((0, chalk_1.default) `Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`);
     const result6 = await elbv2.describeListeners({ LoadBalancerArn: loadBalancerArn }).promise();
     const listenerArn = result6.Listeners.find((l) => l.Protocol === "HTTPS").ListenerArn;
     await elbv2
@@ -107,7 +107,7 @@ async function main() {
     })
         .promise();
 }
-run_1.run(main);
+(0, run_1.run)(main);
 async function getTargetGroupInstances(targetGroupArn) {
     const result1 = await elbv2
         .describeTargetGroups({

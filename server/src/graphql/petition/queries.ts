@@ -8,7 +8,7 @@ import {
   nullable,
   queryField,
   stringArg,
-} from "@nexus/schema";
+} from "nexus";
 import { decode } from "jsonwebtoken";
 import { toGlobalId, fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";

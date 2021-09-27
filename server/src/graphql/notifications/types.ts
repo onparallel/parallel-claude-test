@@ -1,4 +1,4 @@
-import { core, enumType, interfaceType, nonNull, objectType, unionType } from "@nexus/schema";
+import { core, enumType, interfaceType, nonNull, objectType, unionType } from "nexus";
 
 export const UserOrContact = unionType({
   name: "UserOrContact",
@@ -11,7 +11,7 @@ export const UserOrContact = unionType({
     }
     throw new Error("Missing __type on UserOrContact");
   },
-  rootTyping: /* ts */ `
+  sourceType: /* ts */ `
     | ({__type: "User"} & NexusGenRootTypes["User"])
     | ({__type: "Contact"} & NexusGenRootTypes["Contact"])
   `,
@@ -25,7 +25,7 @@ export const PetitionUserNotificationFilter = enumType({
 
 export const PetitionUserNotification = interfaceType({
   name: "PetitionUserNotification",
-  rootTyping: "db.PetitionUserNotification",
+  sourceType: "db.PetitionUserNotification",
   definition(t) {
     t.globalId("id");
     t.field("petition", {
@@ -75,7 +75,7 @@ function createPetitionUserNotification<TypeName extends string>(
       t.implements("PetitionUserNotification");
       definition(t);
     },
-    rootTyping: `notifications.${name}`,
+    sourceType: `notifications.${name}`,
   });
 }
 

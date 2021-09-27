@@ -1,4 +1,4 @@
-import { list, nonNull, nullable, queryField, stringArg } from "@nexus/schema";
+import { list, nonNull, nullable, queryField, stringArg } from "nexus";
 import pMap from "p-map";
 import { SortBy } from "../../db/helpers/utils";
 import { Contact } from "../../db/__types";

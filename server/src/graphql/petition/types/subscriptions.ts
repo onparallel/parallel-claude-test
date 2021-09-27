@@ -1,4 +1,4 @@
-import { objectType } from "@nexus/schema";
+import { objectType } from "nexus";
 
 export const Subscription = objectType({
   name: "Subscription",
@@ -13,5 +13,5 @@ export const Subscription = objectType({
     });
     t.string("endpoint");
   },
-  rootTyping: "db.PetitionEventSubscription",
+  sourceType: "db.PetitionEventSubscription",
 });

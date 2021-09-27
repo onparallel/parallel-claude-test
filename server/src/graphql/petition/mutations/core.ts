@@ -10,7 +10,7 @@ import {
   nullable,
   objectType,
   stringArg,
-} from "@nexus/schema";
+} from "nexus";
 import pMap from "p-map";
 import { isDefined, omit, pick, zip } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";

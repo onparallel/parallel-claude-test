@@ -1,4 +1,4 @@
-import { queryField } from "@nexus/schema";
+import { queryField } from "nexus";
 import { authenticate } from "../helpers/authorize";
 import Fuse from "fuse.js";
 

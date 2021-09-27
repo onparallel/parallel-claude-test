@@ -1,5 +1,3 @@
-import { core, dynamicOutputMethod, plugin } from "@nexus/schema";
-import { NexusOutputFieldDef } from "@nexus/schema/dist/core";
 import { ForbiddenError } from "apollo-server-errors";
 import {
   GraphQLInputType,
@@ -8,6 +6,7 @@ import {
   isNonNullType,
   isScalarType,
 } from "graphql";
+import { core, dynamicOutputMethod, plugin } from "nexus";
 import { isDefined, mapValues, omit } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { If, UnwrapArray } from "../../util/types";
@@ -38,7 +37,7 @@ export type GlobalIdResolverConfig<TypeName extends string, FieldName extends st
 };
 
 type GlobalIdFieldResolver<TypeName extends string, FieldName extends string> = (
-  root: core.RootValue<TypeName>,
+  root: core.GetGen2<"rootTypes", TypeName>,
   args: core.ArgsValue<TypeName, FieldName>,
   context: core.GetGen<"context">,
   info: GraphQLResolveInfo
@@ -128,7 +127,7 @@ export function globalIdPlugin() {
       }),
     ],
     onCreateFieldResolver({ fieldConfig }) {
-      const config = fieldConfig.extensions?.nexus?.config as NexusOutputFieldDef;
+      const config = fieldConfig.extensions?.nexus?.config as core.NexusOutputFieldDef;
       return async function (root, args, ctx, info, next) {
         // decode any GID args
         const _args = mapValues(args ?? {}, (argValue, argName) => {
@@ -155,7 +154,7 @@ export function globalIdPlugin() {
       b.addType(
         core.scalarType({
           name: "GID",
-          rootTyping: "number",
+          sourceType: "number",
         })
       );
       b.addType(

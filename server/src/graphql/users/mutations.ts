@@ -1,12 +1,4 @@
-import {
-  arg,
-  enumType,
-  inputObjectType,
-  list,
-  mutationField,
-  nonNull,
-  stringArg,
-} from "@nexus/schema";
+import { arg, enumType, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { isDefined, zip } from "remeda";
 import { PublicFileUpload } from "../../db/__types";

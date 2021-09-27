@@ -1,4 +1,4 @@
-import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { authenticate, chain, userIsSuperAdmin } from "../helpers/authorize";
 
 export function supportMethodAccess<

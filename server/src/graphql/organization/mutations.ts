@@ -1,4 +1,4 @@
-import { mutationField, nonNull } from "@nexus/schema";
+import { mutationField, nonNull } from "nexus";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";

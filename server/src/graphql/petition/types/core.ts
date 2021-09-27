@@ -1,11 +1,4 @@
-import {
-  enumType,
-  inputObjectType,
-  interfaceType,
-  nullable,
-  objectType,
-  stringArg,
-} from "@nexus/schema";
+import { enumType, inputObjectType, interfaceType, nullable, objectType, stringArg } from "nexus";
 import { extension } from "mime-types";
 import { isDefined, minBy } from "remeda";
 import { toGlobalId } from "../../../util/globalId";
@@ -158,7 +151,7 @@ export const PetitionBase = interfaceType({
     });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
-  rootTyping: "db.Petition",
+  sourceType: "db.Petition",
 });
 
 export const Petition = objectType({
@@ -299,7 +292,7 @@ export const PetitionTemplate = objectType({
       },
     });
   },
-  rootTyping: "db.Petition",
+  sourceType: "db.Petition",
 });
 
 export const PetitionFieldType = enumType({
@@ -323,7 +316,7 @@ export const PetitionBaseAndField = interfaceType({
     t.field("field", { type: "PetitionField" });
   },
   resolveType: (o) => (o.petition.is_template ? "PetitionTemplateAndField" : "PetitionAndField"),
-  rootTyping: `{
+  sourceType: `{
     petition: db.Petition;
     field: db.PetitionField;
   }`,
@@ -429,7 +422,7 @@ export const PetitionField = objectType({
       },
     });
   },
-  rootTyping: "db.PetitionField",
+  sourceType: "db.PetitionField",
 });
 
 export const PetitionAndUpdatedFields = objectType({
@@ -458,7 +451,7 @@ export const RemindersConfig = objectType({
       description: "Whether to send reminders only from monday to friday.",
     });
   },
-  rootTyping: /* ts */ `{
+  sourceType: /* ts */ `{
     offset: number;
     time: string;
     timezone: string;
@@ -492,7 +485,7 @@ export const SignatureConfig = objectType({
       resolve: (o) => o.review ?? false,
     });
   },
-  rootTyping: /* ts */ `{
+  sourceType: /* ts */ `{
     provider: string;
     contactIds: number[];
     timezone: string;

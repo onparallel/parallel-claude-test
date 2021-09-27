@@ -1,4 +1,4 @@
-import { booleanArg, list, mutationField, nonNull, stringArg } from "@nexus/schema";
+import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
 import { prop } from "remeda";
 import { and, authenticate, authenticateAnd, chain, ifArgEquals } from "../../helpers/authorize";
 import { WhitelistedError } from "../../helpers/errors";

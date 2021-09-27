@@ -82,10 +82,10 @@ const config = {
         ]
       : [];
   },
+  productionBrowserSourceMaps: process.env.NODE_ENV === "production",
 };
 
 module.exports = [
   require("@next/bundle-analyzer")({ enabled: Boolean(process.env.ANALYZE) }),
   require("next-plugin-graphql"),
-  require("@zeit/next-source-maps")(), // source maps in last place, so it wraps every other plugin
 ].reduce((acc, curr) => curr(acc), config);

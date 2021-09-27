@@ -1,4 +1,4 @@
-import { booleanArg, idArg, list, nonNull, queryField, stringArg } from "@nexus/schema";
+import { booleanArg, idArg, list, nonNull, queryField, stringArg } from "nexus";
 import { ForbiddenError } from "apollo-server-express";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";

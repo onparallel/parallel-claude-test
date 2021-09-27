@@ -1,4 +1,4 @@
-import { arg, nonNull, nullable, queryField } from "@nexus/schema";
+import { arg, nonNull, nullable, queryField } from "nexus";
 import { authenticateAnd, or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";

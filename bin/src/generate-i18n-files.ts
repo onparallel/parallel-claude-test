@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { promises as fs } from "fs";
-import { MessageFormatElement, parse, TYPE } from "intl-messageformat-parser";
+import { MessageFormatElement, parse, TYPE } from "@formatjs/icu-messageformat-parser";
 import outdent from "outdent";
 import path from "path";
 import { difference, uniq } from "remeda";

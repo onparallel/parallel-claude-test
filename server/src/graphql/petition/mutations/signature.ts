@@ -1,4 +1,4 @@
-import { booleanArg, mutationField, nonNull } from "@nexus/schema";
+import { booleanArg, mutationField, nonNull } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
 import { WhitelistedError } from "../../helpers/errors";

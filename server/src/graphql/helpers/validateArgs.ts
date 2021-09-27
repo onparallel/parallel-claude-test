@@ -1,7 +1,7 @@
 import { FieldValidateArgsResolver } from "./validateArgsPlugin";
 import { ValidatorOrConditionError } from "./errors";
 import { Maybe } from "../../util/types";
-import { ArgsValue } from "@nexus/schema/dist/core";
+import { ArgsValue } from "nexus/dist/core";
 
 export function validateAnd<TypeName extends string, FieldName extends string>(
   ...validators: FieldValidateArgsResolver<TypeName, FieldName>[]

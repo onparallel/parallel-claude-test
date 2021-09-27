@@ -1,5 +1,5 @@
 import { userHasAccessToUserGroups } from "./authorizers";
-import { nonNull, queryField } from "@nexus/schema";
+import { nonNull, queryField } from "nexus";
 import { authenticate, chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";

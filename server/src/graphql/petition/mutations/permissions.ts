@@ -1,4 +1,4 @@
-import { arg, booleanArg, list, mutationField, nonNull, stringArg } from "@nexus/schema";
+import { arg, booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { groupBy, isDefined, uniq, zip } from "remeda";
 import { Petition } from "../../../db/__types";

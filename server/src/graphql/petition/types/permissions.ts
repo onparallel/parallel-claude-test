@@ -1,4 +1,4 @@
-import { enumType, interfaceType, objectType } from "@nexus/schema";
+import { enumType, interfaceType, objectType } from "nexus";
 import { isDefined } from "remeda";
 
 export const PetitionPermissionTypeRW = enumType({
@@ -15,7 +15,7 @@ export const PetitionPermissionType = enumType({
 
 export const PetitionPermission = interfaceType({
   name: "PetitionPermission",
-  rootTyping: "db.PetitionPermission",
+  sourceType: "db.PetitionPermission",
   resolveType: (o) => {
     if (isDefined(o.user_id)) {
       return "PetitionUserPermission";
@@ -49,7 +49,7 @@ export const PetitionPermission = interfaceType({
 
 export const EffectivePetitionUserPermission = objectType({
   name: "EffectivePetitionUserPermission",
-  rootTyping: `Pick<db.PetitionPermission, "petition_id" | "user_id" | "type" | "is_subscribed">`,
+  sourceType: `Pick<db.PetitionPermission, "petition_id" | "user_id" | "type" | "is_subscribed">`,
   description: "The effective permission for a petition and user",
   definition(t) {
     t.field("permissionType", {
@@ -66,7 +66,7 @@ export const EffectivePetitionUserPermission = objectType({
 
 export const PetitionUserGroupPermission = objectType({
   name: "PetitionUserGroupPermission",
-  rootTyping: "db.PetitionPermission",
+  sourceType: "db.PetitionPermission",
   description: "The permission for a petition and user group",
   definition(t) {
     t.implements("PetitionPermission");
@@ -82,7 +82,7 @@ export const PetitionUserGroupPermission = objectType({
 
 export const PetitionUserPermission = objectType({
   name: "PetitionUserPermission",
-  rootTyping: "db.PetitionPermission",
+  sourceType: "db.PetitionPermission",
   description: "The permission for a petition and user",
   definition(t) {
     t.implements("PetitionPermission");

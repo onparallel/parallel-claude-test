@@ -1,4 +1,4 @@
-import { enumType, objectType } from "@nexus/schema";
+import { enumType, objectType } from "nexus";
 
 export const PetitionSignatureRequestStatus = enumType({
   name: "PetitionSignatureRequestStatus",
@@ -12,7 +12,7 @@ export const PetitionSignatureCancelReason = enumType({
 
 export const PetitionSignatureRequest = objectType({
   name: "PetitionSignatureRequest",
-  rootTyping: "db.PetitionSignatureRequest",
+  sourceType: "db.PetitionSignatureRequest",
   definition(t) {
     t.globalId("id");
     t.implements("Timestamps");

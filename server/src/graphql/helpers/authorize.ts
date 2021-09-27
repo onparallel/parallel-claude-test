@@ -1,5 +1,5 @@
-import { core } from "@nexus/schema";
-import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { core } from "nexus";
+import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { AuthenticationError } from "apollo-server-express";
 import pAll from "p-all";
 import { isDefined } from "remeda";

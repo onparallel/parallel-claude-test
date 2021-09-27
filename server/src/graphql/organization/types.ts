@@ -1,4 +1,4 @@
-import { arg, booleanArg, enumType, list, nonNull, objectType } from "@nexus/schema";
+import { arg, booleanArg, enumType, list, nonNull, objectType } from "nexus";
 import { titleize } from "../../util/strings";
 import { userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -129,7 +129,7 @@ export const Organization = objectType({
       authorize: isOwnOrgOrSuperAdmin(),
       type: objectType({
         name: "OrganizationUsageLimit",
-        rootTyping: /* ts*/ `{
+        sourceType: /* ts*/ `{
           petitions: {
             limit: number,
             used: number
