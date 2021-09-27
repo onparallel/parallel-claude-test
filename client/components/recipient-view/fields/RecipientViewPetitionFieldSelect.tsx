@@ -88,8 +88,7 @@ export function RecipientViewPetitionFieldSelect({
         setShowNewReply(false);
         setValue(null);
         setTimeout(() => {
-          const instance = replyRefs[reply.id].current!;
-          instance.focus();
+          replyRefs[reply.id].current?.focus();
         });
       }
     } catch {}
