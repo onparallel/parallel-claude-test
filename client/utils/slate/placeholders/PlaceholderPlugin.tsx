@@ -1,4 +1,5 @@
 import { Box } from "@chakra-ui/react";
+import { normalizeEventKey } from "@parallel/utils/normalizeEventKey";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { getNodeDeserializer, getText } from "@udecode/plate-common";
@@ -53,25 +54,26 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
         const values = filteredValuesRef.current;
         const { index, target } = stateRef.current!;
         if (target && values.length > 0) {
-          if (e.key === "ArrowDown") {
+          const eventKey = normalizeEventKey(e);
+          if (eventKey === "ArrowDown") {
             e.preventDefault();
             setState((s) => ({
               ...s,
               index: clamp(index + 1, { max: values.length - 1, min: 0 }),
             }));
           }
-          if (e.key === "ArrowUp") {
+          if (eventKey === "ArrowUp") {
             e.preventDefault();
             setState((s) => ({
               ...s,
               index: clamp(index - 1, { max: values.length - 1, min: 0 }),
             }));
           }
-          if (e.key === "Escape") {
+          if (eventKey === "Escape") {
             e.preventDefault();
             setState((state) => ({ ...state, index: 0, target: null }));
           }
-          if (["Tab", "Enter"].includes(e.key)) {
+          if (["Tab", "Enter"].includes(eventKey)) {
             const value = values[index];
             if (value) {
               e.preventDefault();
