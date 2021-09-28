@@ -1,3 +1,4 @@
+import { differenceInDays, differenceInSeconds } from "date-fns";
 import {
   booleanArg,
   idArg,
@@ -8,8 +9,6 @@ import {
   objectType,
   stringArg,
 } from "nexus";
-import { differenceInDays, differenceInSeconds } from "date-fns";
-import pMap from "p-map";
 import { isDefined, prop } from "remeda";
 import { getClientIp } from "request-ip";
 import { ApiContext } from "../../context";
@@ -775,7 +774,7 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     const recipient = ctx.contact!;
     const petitionId = access.petition_id;
 
-    const contactToDelegate = await ctx.contacts.loadOrCreate(
+    const [contactToDelegate] = await ctx.contacts.loadOrCreate(
       {
         email: args.email,
         orgId: recipient.org_id,
@@ -851,18 +850,9 @@ async function startSignatureRequest(
   }
 
   const userSignersIds: number[] = petition.signature_config?.contactIds ?? [];
-  const recipientSigners = await pMap(
-    additionalSigners ?? [],
-    async (signer) =>
-      await ctx.contacts.loadOrCreate(
-        {
-          email: signer.email,
-          firstName: signer.firstName,
-          lastName: signer.lastName,
-          orgId: ctx.contact!.org_id,
-        },
-        `Contact:${ctx.contact!.id}`
-      )
+  const recipientSigners = await ctx.contacts.loadOrCreate(
+    (additionalSigners ?? []).map((signer) => ({ ...signer, orgId: ctx.contact!.org_id })),
+    `Contact:${ctx.contact!.id}`
   );
 
   if (recipientSigners.length > 0 && isDefined(petition.signature_config)) {
@@ -1020,7 +1010,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
       ]);
 
       const { messages, result } = await ctx.petitions.withTransaction(async (t) => {
-        const [newPetition, contact] = await Promise.all([
+        const [newPetition, [contact]] = await Promise.all([
           ctx.petitions.clonePetition(
             publicPetitionLink!.template_id,
             linkOwner!,

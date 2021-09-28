@@ -104,16 +104,16 @@ function _PetitionSettings({
         petition,
         providers: user.organization.signatureIntegrations,
       });
-      if (
-        // config changed
-        ongoingSignatureRequest &&
-        (signatureConfig.provider !== petition.signatureConfig?.provider ||
-          signatureConfig.contactIds.toString() !==
-            petition.signatureConfig?.contacts.map((c) => c?.id).toString() ||
-          signatureConfig.title !== petition.signatureConfig?.title ||
-          signatureConfig.letRecipientsChooseSigners !==
-            petition.signatureConfig?.letRecipientsChooseSigners)
-      ) {
+
+      const previous = petition.signatureConfig;
+      const signatureConfigHasChanged = [
+        [signatureConfig.provider, previous?.provider],
+        [signatureConfig.contactIds.join(","), previous?.contacts.map((c) => c?.id).join(",")],
+        [signatureConfig.title, previous?.title],
+        [signatureConfig.letRecipientsChooseSigners, previous?.letRecipientsChooseSigners],
+      ].some(([after, before]) => after !== before);
+
+      if (ongoingSignatureRequest && signatureConfigHasChanged) {
         await showConfirmSignatureConfigChanged({});
         await cancelSignatureRequest({
           variables: {

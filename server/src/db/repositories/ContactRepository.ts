@@ -69,21 +69,11 @@ export class ContactRepository extends BaseRepository {
   );
 
   async loadOrCreate(
-    {
-      email,
-      orgId,
-      firstName,
-      lastName,
-    }: {
-      email: string;
-      orgId: number;
-      firstName: string;
-      lastName: string;
-    },
+    contacts: MaybeArray<{ email: string; orgId: number; firstName: string; lastName: string }>,
     createdBy: string,
     t?: Knex.Transaction
   ) {
-    const [contact] = await this.raw<Contact>(
+    return await this.raw<Contact>(
       /* sql */ `
       ? 
       ON CONFLICT (org_id, email) WHERE deleted_at is NULL
@@ -92,17 +82,18 @@ export class ContactRepository extends BaseRepository {
         email=EXCLUDED.email
       RETURNING *;`,
       [
-        this.from("contact").insert({
-          email: email.toLowerCase().trim(),
-          org_id: orgId,
-          first_name: firstName,
-          last_name: lastName,
-          created_by: createdBy,
-        }),
+        this.from("contact").insert(
+          unMaybeArray(contacts).map((c) => ({
+            email: c.email.toLowerCase().trim(),
+            org_id: c.orgId,
+            first_name: c.firstName,
+            last_name: c.lastName,
+            created_by: createdBy,
+          }))
+        ),
       ],
       t
     );
-    return contact;
   }
 
   async createOrUpdate(
