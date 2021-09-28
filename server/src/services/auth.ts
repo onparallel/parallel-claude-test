@@ -184,7 +184,8 @@ export class Auth implements IAuth {
         RefreshToken: tokens["refresh_token"],
       });
       this.setSession(res, token);
-      const prefix = state.has("locale") ? `/${state.get("locale")}` : "";
+      const prefix =
+        user.details?.preferredLocale ?? state.has("locale") ? `/${state.get("locale")}` : "";
       const path =
         state.has("redirect") && state.get("redirect")!.startsWith("/")
           ? state.get("redirect")!
