@@ -153,22 +153,12 @@ type HardcodedSigner = {
   imgSrc: string;
 };
 function HardcodedSignatures({ fromTemplateId }: { fromTemplateId: string }) {
-  /* hardcoded signature image for eXp. see https://app.shortcut.com/parallelso/story/1677 */
-  const renataSujto: HardcodedSigner = {
-    name: "Renata Sujto",
-    imgSrc: "static/images/signatures/renata-sujto-exp.jpeg",
-  };
   const signaturesByTemplateId: Record<string, HardcodedSigner[] | undefined> = useMemo(() => {
     switch (process.env.NEXT_PUBLIC_ENVIRONMENT) {
       case "production":
-        return {
-          EAwW2jXkP4C9LZvEb2: [renataSujto],
-          EAwW2jXkP4C9LZvEb3: [renataSujto],
-        };
+        return {};
       case "staging":
-        return {
-          "4exV9AsWJrjj7qFL3": [renataSujto],
-        };
+        return {};
       default:
         return {};
     }
