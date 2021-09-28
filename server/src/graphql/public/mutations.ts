@@ -784,22 +784,16 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     const recipient = ctx.contact!;
     const petitionId = access.petition_id;
 
-    let contactToDelegate = await ctx.contacts.loadContactByEmail({
-      email: args.email,
-      orgId: recipient.org_id,
-    });
+    const contactToDelegate = await ctx.contacts.loadOrCreate(
+      {
+        email: args.email,
+        orgId: recipient.org_id,
+        firstName: args.firstName,
+        lastName: args.lastName,
+      },
+      `Contact:${recipient.id}`
+    );
 
-    if (!contactToDelegate) {
-      contactToDelegate = await ctx.contacts.createContact(
-        {
-          email: args.email,
-          first_name: args.firstName,
-          last_name: args.lastName,
-        },
-        recipient,
-        `Contact:${recipient.id}`
-      );
-    }
     try {
       const newAccess = await ctx.petitions.createAccessFromRecipient(
         petitionId,
