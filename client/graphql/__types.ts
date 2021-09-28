@@ -489,6 +489,8 @@ export interface Mutation {
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
+  /** Sends a reminder email to the pending signers */
+  sendSignatureRequestReminders: Result;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
   /** Generates a download link for the signed PDF petition. */
@@ -1003,6 +1005,10 @@ export interface MutationsendRemindersArgs {
   accessIds: Array<Scalars["GID"]>;
   body?: Maybe<Scalars["JSON"]>;
   petitionId: Scalars["GID"];
+}
+
+export interface MutationsendSignatureRequestRemindersArgs {
+  petitionSignatureRequestId: Scalars["GID"];
 }
 
 export interface MutationsetUserPreferredLocaleArgs {
@@ -7319,6 +7325,14 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
     result: Result;
     url?: Maybe<string>;
   };
+};
+
+export type PetitionSignaturesCard_sendSignatureRequestRemindersMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
+
+export type PetitionSignaturesCard_sendSignatureRequestRemindersMutation = {
+  sendSignatureRequestReminders: Result;
 };
 
 export type PublicSignupForm_emailIsAvailableQueryVariables = Exact<{
@@ -18585,6 +18599,26 @@ export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
 }
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
+>;
+export const PetitionSignaturesCard_sendSignatureRequestRemindersDocument = gql`
+  mutation PetitionSignaturesCard_sendSignatureRequestReminders($petitionSignatureRequestId: GID!) {
+    sendSignatureRequestReminders(petitionSignatureRequestId: $petitionSignatureRequestId)
+  }
+`;
+export function usePetitionSignaturesCard_sendSignatureRequestRemindersMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSignaturesCard_sendSignatureRequestRemindersMutation,
+    PetitionSignaturesCard_sendSignatureRequestRemindersMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionSignaturesCard_sendSignatureRequestRemindersMutation,
+    PetitionSignaturesCard_sendSignatureRequestRemindersMutationVariables
+  >(PetitionSignaturesCard_sendSignatureRequestRemindersDocument, options);
+}
+export type PetitionSignaturesCard_sendSignatureRequestRemindersMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_sendSignatureRequestRemindersMutation
 >;
 export const PublicSignupForm_emailIsAvailableDocument = gql`
   query PublicSignupForm_emailIsAvailable($email: String!) {

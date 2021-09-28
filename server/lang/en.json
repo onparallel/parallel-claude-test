@@ -385,6 +385,21 @@
     "context": "Please find attached a copy of the document you just signed through {signatureProvider}."
   },
   {
+    "term": "signature-reminder.external-link",
+    "definition": "To review and sign it, click on the following link:",
+    "context": "To review and sign it, click on the following link:"
+  },
+  {
+    "term": "signature-reminder.subject",
+    "definition": "Signature reminder",
+    "context": "Signature reminder"
+  },
+  {
+    "term": "signature-reminder.text",
+    "definition": "You have a pending signature request to sign a document titled {documentName}.",
+    "context": "You have a pending signature request to sign a document titled {documentName}."
+  },
+  {
     "term": "signature-requested.external-link",
     "definition": "To review and sign it, click on the following link:",
     "context": "To review and sign it, click on the following link:"

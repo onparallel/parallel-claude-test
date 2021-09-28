@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Text } from "@chakra-ui/react";
+import { Box, Center, Text, useToast } from "@chakra-ui/react";
 import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -7,6 +7,7 @@ import {
   PetitionSignaturesCard_UserFragment,
   SignatureConfigInput,
   usePetitionSignaturesCard_cancelSignatureRequestMutation,
+  usePetitionSignaturesCard_sendSignatureRequestRemindersMutation,
   usePetitionSignaturesCard_signedPetitionDownloadLinkMutation,
   usePetitionSignaturesCard_startSignatureRequestMutation,
   usePetitionSignaturesCard_updatePetitionSignatureConfigMutation,
@@ -108,6 +109,13 @@ const mutations = [
       }
     }
   `,
+  gql`
+    mutation PetitionSignaturesCard_sendSignatureRequestReminders(
+      $petitionSignatureRequestId: GID!
+    ) {
+      sendSignatureRequestReminders(petitionSignatureRequestId: $petitionSignatureRequestId)
+    }
+  `,
 ];
 
 export const PetitionSignaturesCard = Object.assign(
@@ -131,14 +139,16 @@ export const PetitionSignaturesCard = Object.assign(
       current = null;
     }
 
+    const intl = useIntl();
+    const toast = useToast();
+
     const [cancelSignatureRequest] = usePetitionSignaturesCard_cancelSignatureRequestMutation();
     const [startSignatureRequest] = usePetitionSignaturesCard_startSignatureRequestMutation();
-
     const [updateSignatureConfig] =
       usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
-
     const [downloadSignedDoc] = usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
-
+    const [sendSignatureRequestReminders] =
+      usePetitionSignaturesCard_sendSignatureRequestRemindersMutation();
     const handleCancelSignatureProcess = useCallback(
       async (petitionSignatureRequestId: string) => {
         await updateSignatureConfig({
@@ -201,7 +211,27 @@ export const PetitionSignaturesCard = Object.assign(
       });
     }
 
-    const intl = useIntl();
+    const handleSendSignatureReminder = useCallback(
+      async (petitionSignatureRequestId: string) => {
+        try {
+          await sendSignatureRequestReminders({ variables: { petitionSignatureRequestId } });
+          toast({
+            title: intl.formatMessage({
+              id: "component.petition-signatures-card.reminder-sent.toast-title",
+              defaultMessage: "Reminder sent",
+            }),
+            description: intl.formatMessage({
+              id: "component.petition-signatures-card.reminder-sent.toast-description",
+              defaultMessage: "We have sent a reminder to the pending signers",
+            }),
+            duration: 5000,
+            isClosable: true,
+            status: "success",
+          });
+        } catch {}
+      },
+      [sendSignatureRequestReminders]
+    );
 
     return (
       <Card ref={ref} {...props}>
@@ -246,6 +276,7 @@ export const PetitionSignaturesCard = Object.assign(
                 signatureRequest={current}
                 onCancel={handleCancelSignatureProcess}
                 onDownload={handleDownloadSignedDoc}
+                onSendReminder={handleSendSignatureReminder}
               />
             ) : null}
             {older.length ? (

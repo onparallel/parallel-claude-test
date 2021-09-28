@@ -153,9 +153,33 @@ async function cancelSignatureProcess(
   await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
 }
 
+/** sends a reminder email to every pending signer of the signature request */
+async function sendSignatureReminder(
+  payload: { petitionSignatureRequestId: number },
+  ctx: WorkerContext
+) {
+  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+  if (!signature.external_id) {
+    throw new Error(
+      `Can't find external_id on petition signature request ${payload.petitionSignatureRequestId}`
+    );
+  }
+  const petition = await fetchPetition(signature.petition_id, ctx);
+  const config = signature.signature_config;
+  const signatureIntegration = await fetchOrgSignatureIntegration(
+    petition.org_id,
+    config.provider,
+    ctx
+  );
+
+  const signatureClient = ctx.signature.getClient(signatureIntegration);
+  await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
+}
+
 const handlers = {
   "start-signature-process": startSignatureProcess,
   "cancel-signature-process": cancelSignatureProcess,
+  "send-signature-reminder": sendSignatureReminder,
 };
 
 type HandlerType = keyof typeof handlers;

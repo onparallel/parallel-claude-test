@@ -5,7 +5,6 @@ import { FormattedList, FormattedMessage } from "react-intl";
 import { ContactLink } from "../common/ContactLink";
 import { Divider } from "../common/Divider";
 import { Spacer } from "../common/Spacer";
-import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
 
 export function OlderSignatureRequestRows({
@@ -35,11 +34,8 @@ export function OlderSignatureRequestRows({
             </Text>
             <Text as="span">
               <FormattedList
-                value={signature.signerStatus.map(({ contact, status }, i) => [
-                  <>
-                    <ContactLink contact={contact} key={i} />
-                    <PetitionSignatureRequestSignerStatusIcon status={status} />
-                  </>,
+                value={signature.signerStatus.map(({ contact }) => [
+                  <ContactLink contact={contact} key={contact.id} />,
                 ])}
               />
             </Text>

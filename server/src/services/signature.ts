@@ -18,6 +18,7 @@ import { buildEmail } from "../emails/buildEmail";
 import SignatureRequestedEmail from "../emails/components/SignatureRequestedEmail";
 import SignatureCompletedEmail from "../emails/components/SignatureCompletedEmail";
 import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmail";
+import SignatureReminderEmail from "../emails/components/SignatureReminderEmail";
 import { OrgIntegration } from "../db/__types";
 import { downloadImageBase64 } from "../util/images";
 import { toGlobalId } from "../util/globalId";
@@ -77,6 +78,7 @@ export interface ISignatureClient {
   cancelSignatureRequest: (externalId: string) => Promise<SignatureResponse>;
   downloadSignedDocument: (externalId: string) => Promise<Buffer>;
   downloadAuditTrail: (externalId: string) => Promise<Buffer>;
+  sendPendingSignatureReminder: (signatureId: string) => Promise<SignatureResponse>;
 }
 
 export const SIGNATURE = Symbol.for("SIGNATURE");
@@ -193,6 +195,10 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     return Buffer.from(await this.sdk.downloadAuditTrail(signatureId, documentId));
   }
 
+  public async sendPendingSignatureReminder(signatureId: string) {
+    return await this.sdk.sendSignatureReminder(signatureId);
+  }
+
   private async createOrgBranding(opts: SignatureOptions): Promise<BrandingResponse> {
     return await this.sdk.createBranding({
       show_welcome_page: false,
@@ -213,6 +219,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
       { html: signatureRequestedEmail },
       { html: signatureCompletedEmail },
       { html: signatureCancelledEmail },
+      { html: signatureReminderEmail },
     ] = await Promise.all([
       buildEmail(
         SignatureRequestedEmail,
@@ -244,12 +251,23 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         },
         { locale: opts.locale }
       ),
+      buildEmail(
+        SignatureReminderEmail,
+        {
+          documentName: "{{filename}}",
+          signerName: "{{signer_name}}",
+          signButton: "{{sign_button}}",
+          ...opts.templateData,
+        },
+        { locale: opts.locale }
+      ),
     ]);
 
     return {
       signatures_request: signatureRequestedEmail,
       signatures_receipt: signatureCompletedEmail,
       document_canceled: signatureCancelledEmail,
+      pending_sign: signatureReminderEmail,
     };
   }
 }

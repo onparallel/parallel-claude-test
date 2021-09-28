@@ -198,3 +198,39 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
     }
   },
 });
+
+export const sendSignatureRequestReminders = mutationField("sendSignatureRequestReminders", {
+  description: "Sends a reminder email to the pending signers",
+  type: "Result",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PETITION_SIGNATURE"),
+    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
+  ),
+  args: {
+    petitionSignatureRequestId: nonNull(globalIdArg("PetitionSignatureRequest")),
+  },
+  resolve: async (_, { petitionSignatureRequestId }, ctx) => {
+    const signature = await ctx.petitions.loadPetitionSignatureById(petitionSignatureRequestId);
+
+    if (!signature) {
+      throw new Error(`Petition signature request with id ${petitionSignatureRequestId} not found`);
+    }
+    const petition = await ctx.petitions.loadPetition(signature.petition_id);
+    if (!petition) {
+      throw new Error(
+        `Can't find petition with id ${signature.petition_id} on signature request with id ${petitionSignatureRequestId}`
+      );
+    }
+    // make sure to only send reminders on pending signatures
+    if (signature.status === "PROCESSING") {
+      await ctx.aws.enqueueMessages("signature-worker", {
+        groupId: `signature-${toGlobalId("Petition", petition.id)}`,
+        body: {
+          type: "send-signature-reminder",
+          payload: { petitionSignatureRequestId },
+        },
+      });
+    }
+    return RESULT.SUCCESS;
+  },
+});

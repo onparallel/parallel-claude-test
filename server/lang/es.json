@@ -385,6 +385,21 @@
     "context": "Please find attached a copy of the document you just signed through {signatureProvider}."
   },
   {
+    "term": "signature-reminder.external-link",
+    "definition": "Para revisar y firmar el documento, haga click en el siguiente enlace:",
+    "context": "To review and sign it, click on the following link:"
+  },
+  {
+    "term": "signature-reminder.subject",
+    "definition": "Recordatorio de firma",
+    "context": "Signature reminder"
+  },
+  {
+    "term": "signature-reminder.text",
+    "definition": "Tiene una solicitud de firma pendiente para firmar un documento con el nombre de {documentName}",
+    "context": "You have a pending signature request to sign a document titled {documentName}."
+  },
+  {
     "term": "signature-requested.external-link",
     "definition": "Para revisar y firmar el documento, haga click en el siguiente enlace:",
     "context": "To review and sign it, click on the following link:"
