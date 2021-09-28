@@ -66,7 +66,7 @@ export const PlaceholderMenu = chakraForwardRef<"div", PlaceholderMenuProps>(
       }
     }, [highlightedIndex]);
     return (
-      <chakra.div ref={ref} pointerEvents={isOpen ? undefined : "none"}>
+      <chakra.div ref={ref} position="fixed" pointerEvents={isOpen ? undefined : "none"}>
         <MotionCard
           ref={menuRef}
           id={menuId}
