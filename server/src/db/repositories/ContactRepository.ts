@@ -73,6 +73,10 @@ export class ContactRepository extends BaseRepository {
     createdBy: string,
     t?: Knex.Transaction
   ) {
+    const contactsArr = unMaybeArray(contacts);
+    if (contactsArr.length === 0) {
+      return [];
+    }
     return await this.raw<Contact>(
       /* sql */ `
       ? 
@@ -83,7 +87,7 @@ export class ContactRepository extends BaseRepository {
       RETURNING *;`,
       [
         this.from("contact").insert(
-          unMaybeArray(contacts).map((c) => ({
+          contactsArr.map((c) => ({
             email: c.email.toLowerCase().trim(),
             org_id: c.orgId,
             first_name: c.firstName,
@@ -100,6 +104,10 @@ export class ContactRepository extends BaseRepository {
     contacts: MaybeArray<Pick<CreateContact, "first_name" | "last_name" | "email" | "org_id">>,
     updatedBy: string
   ) {
+    const contactsArr = unMaybeArray(contacts);
+    if (contactsArr.length === 0) {
+      return [];
+    }
     return await this.raw<Contact>(
       /* sql */ `
       ? 
@@ -110,7 +118,7 @@ export class ContactRepository extends BaseRepository {
       RETURNING *;`,
       [
         this.from("contact").insert(
-          unMaybeArray(contacts).map((contact) => ({
+          contactsArr.map((contact) => ({
             ...contact,
             email: contact.email.toLowerCase().trim(),
             created_by: updatedBy,
