@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
+import { SignaturePlusIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineRecipientSignedEvent_RecipientSignedEventFragment } from "@parallel/graphql/__types";

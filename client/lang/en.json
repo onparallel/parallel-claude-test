@@ -265,6 +265,21 @@
     "context": "The following contacts have opted out from receiving reminders for this petition:"
   },
   {
+    "term": "component.confirm-send-signature-reminder.body",
+    "definition": "{contactsList} {count, plural, =1{has} other{have}} not yet signed the document. Do you want to send a reminder to sign it?",
+    "context": "{contactsList} {count, plural, =1{has} other{have}} not yet signed the document. Do you want to send a reminder to sign it?"
+  },
+  {
+    "term": "component.confirm-send-signature-reminder.confirm",
+    "definition": "Yes, send",
+    "context": "Yes, send"
+  },
+  {
+    "term": "component.confirm-send-signature-reminder.header",
+    "definition": "Send signature reminder",
+    "context": "Send signature reminder"
+  },
+  {
     "term": "component.confirm-signature-config-changed.body",
     "definition": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled.",
     "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
@@ -1678,6 +1693,21 @@
     "term": "component.petition-signatures-card.previous-signatures",
     "definition": "Previous signatures",
     "context": "Previous signatures"
+  },
+  {
+    "term": "component.petition-signatures-card.reminder-sent.toast-description",
+    "definition": "We have sent a reminder to the pending signers",
+    "context": "We have sent a reminder to the pending signers"
+  },
+  {
+    "term": "component.petition-signatures-card.reminder-sent.toast-title",
+    "definition": "Reminder sent",
+    "context": "Reminder sent"
+  },
+  {
+    "term": "component.petition-signatures-card.send-reminder",
+    "definition": "Send reminder",
+    "context": "Send reminder"
   },
   {
     "term": "component.petition-signatures-card.signers",
