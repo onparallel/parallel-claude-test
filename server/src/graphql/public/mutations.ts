@@ -9,10 +9,10 @@ import {
   objectType,
   stringArg,
 } from "nexus";
-import { isDefined, prop } from "remeda";
+import { countBy, isDefined, prop } from "remeda";
 import { getClientIp } from "request-ip";
 import { ApiContext } from "../../context";
-import { Petition } from "../../db/__types";
+import { Petition, PetitionSignatureRequest } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { random } from "../../util/token";
@@ -869,6 +869,30 @@ async function startSignatureRequest(
     );
   }
 
+  const previousSignatureRequests = await ctx.petitions.loadPetitionSignaturesByPetitionId(
+    petition.id
+  );
+
+  // avoid recipients restarting the signature process too many times
+  if (countBy(previousSignatureRequests, (r) => r.cancel_reason === "REQUEST_RESTARTED") >= 20) {
+    throw new Error(`Signature request on Petition:${petition.id} was restarted too many times`);
+  }
+
+  const enqueuedSignatureRequest = previousSignatureRequests.find((r) => r.status === "ENQUEUED");
+  // ENQUEUED signature requests cannot be cancelled because those still don't have an external_id
+  if (enqueuedSignatureRequest) {
+    throw new WhitelistedError(
+      `Can't cancel enqueued PetitionSignatureRequest:${enqueuedSignatureRequest.id}`,
+      "CANCEL_ENQUEUED_SIGNATURE_REQUEST_ERROR"
+    );
+  }
+  const pendingSignatureRequest = previousSignatureRequests.find((r) => r.status === "PROCESSING");
+
+  // cancel pending signature request before starting a new one
+  if (pendingSignatureRequest) {
+    await cancelSignatureRequest(pendingSignatureRequest, ctx);
+  }
+
   const signatureRequest = await ctx.petitions.createPetitionSignature(petition.id, {
     ...petition.signature_config,
     contactIds: userSignersIds.concat(...recipientSigners.map((s) => s.id)),
@@ -884,6 +908,26 @@ async function startSignatureRequest(
   });
 
   return updatedPetition;
+}
+
+async function cancelSignatureRequest(
+  petitionSignatureRequest: PetitionSignatureRequest,
+  ctx: ApiContext
+) {
+  await ctx.petitions.updatePetitionSignature(petitionSignatureRequest.id, {
+    status: "CANCELLED",
+    cancel_reason: "REQUEST_RESTARTED",
+    cancel_data: {
+      contact_id: ctx.contact!.id,
+    },
+  });
+  await ctx.aws.enqueueMessages("signature-worker", {
+    groupId: `signature-${toGlobalId("Petition", petitionSignatureRequest.petition_id)}`,
+    body: {
+      type: "cancel-signature-process",
+      payload: { petitionSignatureRequestId: petitionSignatureRequest.id },
+    },
+  });
 }
 
 export const publicPetitionFieldAttachmentDownloadLink = mutationField(

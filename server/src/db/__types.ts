@@ -83,7 +83,8 @@ export type PetitionReminderType = "AUTOMATIC" | "MANUAL";
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
-  | "REQUEST_ERROR";
+  | "REQUEST_ERROR"
+  | "REQUEST_RESTARTED";
 
 export type PetitionSignatureStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
 
