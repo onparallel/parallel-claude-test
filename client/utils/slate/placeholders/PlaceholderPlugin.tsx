@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/react";
-import { normalizeEventKey } from "@parallel/utils/normalizeEventKey";
+import { normalizeEventKey } from "@parallel/utils/keys";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { getNodeDeserializer, getText } from "@udecode/plate-common";
