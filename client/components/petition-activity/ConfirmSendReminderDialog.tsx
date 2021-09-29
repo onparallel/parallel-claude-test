@@ -19,7 +19,7 @@ import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTE
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 import { RichTextEditor, RichTextEditorInstance } from "../common/slate/RichTextEditor";
 
@@ -66,7 +66,7 @@ export function ConfirmSendReminderDialog({
                       <UnorderedList paddingLeft={2}>
                         {optedOut.map((pa) => (
                           <ListItem key={pa.id} s>
-                            <ContactLink contact={pa.contact} />
+                            <ContactReference contact={pa.contact} />
                           </ListItem>
                         ))}
                       </UnorderedList>

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Text } from "@chakra-ui/react";
 import { BellOffIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineRemindersOptOutEvent_RemindersOptOutEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -30,7 +30,7 @@ export function TimelineRemindersOptOutEvent({ event }: TimelineRemindersOptOutE
           id="timeline.reminders-opt-out-description"
           defaultMessage="{contact} has opted out from receiving reminders for this petition {timeAgo}"
           values={{
-            contact: <ContactLink contact={access.contact} />,
+            contact: <ContactReference contact={access.contact} />,
             timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
           }}
         />
@@ -47,13 +47,13 @@ TimelineRemindersOptOutEvent.fragments = {
     fragment TimelineRemindersOptOutEvent_RemindersOptOutEvent on RemindersOptOutEvent {
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       createdAt
       reason
       other
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

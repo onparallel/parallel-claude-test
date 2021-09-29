@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Flex, IconButton, Text } from "@chakra-ui/react";
 import { BellSettingsIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
@@ -119,7 +119,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                       values={recipients}
                       maxItems={1}
                       renderItem={({ value }, index) => (
-                        <ContactLink
+                        <ContactReference
                           key={index}
                           contact={value}
                           onClick={(e: MouseEvent) => e.stopPropagation()}
@@ -379,7 +379,7 @@ usePetitionsTableColumns.fragments = {
         accesses {
           status
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
           nextReminderAt
           reminders {
@@ -397,7 +397,7 @@ usePetitionsTableColumns.fragments = {
     ${UserAvatarList.fragments.User}
     ${UserAvatarList.fragments.UserGroup}
     ${PetitionTagListCellContent.fragments.PetitionBase}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
     ${PetitionStatusCellContent.fragments.Petition}
     ${PetitionSignatureCellContent.fragments.Petition}
   `,

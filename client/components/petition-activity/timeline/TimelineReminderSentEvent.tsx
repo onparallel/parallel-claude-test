@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineReminderSentEvent_ReminderSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -41,7 +41,7 @@ export function TimelineReminderSentEvent({
               values={{
                 same: userId === reminder.sender?.id,
                 user: <UserReference user={reminder.sender} />,
-                contact: <ContactLink contact={reminder.access.contact} />,
+                contact: <ContactReference contact={reminder.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
@@ -52,7 +52,7 @@ export function TimelineReminderSentEvent({
               id="timeline.reminder-sent-description-automatic"
               defaultMessage="An automatic reminder was sent to {contact} {timeAgo}"
               values={{
-                contact: <ContactLink contact={reminder.access.contact} />,
+                contact: <ContactReference contact={reminder.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
@@ -80,7 +80,7 @@ TimelineReminderSentEvent.fragments = {
         }
         access {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
         ...SentReminderMessageDialog_PetitionReminder
@@ -88,7 +88,7 @@ TimelineReminderSentEvent.fragments = {
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
     ${SentReminderMessageDialog.fragments.PetitionReminder}
   `,
 };

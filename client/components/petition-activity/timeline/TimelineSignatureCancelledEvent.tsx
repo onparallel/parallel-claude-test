@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -53,7 +53,7 @@ export function TimelineSignatureCancelledEvent({
               id="timeline.signature-declined-description"
               defaultMessage="{contact} has declined the eSignature process {timeAgo}"
               values={{
-                contact: <ContactLink contact={event.contact} />,
+                contact: <ContactReference contact={event.contact} />,
                 timeAgo: (
                   <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
@@ -81,13 +81,13 @@ TimelineSignatureCancelledEvent.fragments = {
         ...UserReference_User
       }
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
       cancelType
       cancellerReason
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

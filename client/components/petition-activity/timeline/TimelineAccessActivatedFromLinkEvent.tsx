@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { LinkIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -23,7 +23,7 @@ export function TimelineAccessActivatedFromLinkEvent({
         id="timeline.public-petition-link-created-description"
         defaultMessage="{contact} created the petition from a public link {timeAgo}"
         values={{
-          contact: <ContactLink contact={event.access.contact} />,
+          contact: <ContactReference contact={event.access.contact} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
@@ -38,11 +38,11 @@ TimelineAccessActivatedFromLinkEvent.fragments = {
     fragment TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent on AccessActivatedFromPublicPetitionLinkEvent {
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       createdAt
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

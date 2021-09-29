@@ -1,13 +1,13 @@
 import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
-import { ContactLink_ContactFragment, Maybe } from "@parallel/graphql/__types";
+import { ContactReference_ContactFragment, Maybe } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 
 export type DeclinedSignatureReasonDialogProps = {
   declineReason: string;
-  contact: Maybe<ContactLink_ContactFragment>;
+  contact: Maybe<ContactReference_ContactFragment>;
 };
 
 export function DeclinedSignatureReasonDialog({
@@ -22,7 +22,7 @@ export function DeclinedSignatureReasonDialog({
       {...props}
       header={
         <Heading size="md">
-          <ContactLink contact={contact} />
+          <ContactReference contact={contact} />
         </Heading>
       }
       body={

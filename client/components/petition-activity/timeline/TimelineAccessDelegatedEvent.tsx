@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { UserPlusIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineAccessDelegatedEvent_AccessDelegatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -20,8 +20,8 @@ export function TimelineAccessDelegatedEvent({ event }: TimelineAccessDelegatedE
         id="timeline.access-delegated-description"
         defaultMessage="{contact} has delegated the petition to {newContact} {timeAgo}"
         values={{
-          contact: <ContactLink contact={event.originalAccess.contact} />,
-          newContact: <ContactLink contact={event.newAccess.contact} />,
+          contact: <ContactReference contact={event.originalAccess.contact} />,
+          newContact: <ContactReference contact={event.newAccess.contact} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
@@ -36,16 +36,16 @@ TimelineAccessDelegatedEvent.fragments = {
     fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
       originalAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       newAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       createdAt
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { XCircleIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineReplyDeletedEvent_ReplyDeletedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -30,7 +30,7 @@ export function TimelineReplyDeletedEvent({
           same: deletedBy?.__typename === "User" && deletedBy.id === userId,
           deletedBy:
             deletedBy?.__typename === "PetitionAccess" ? (
-              <ContactLink contact={deletedBy.contact} />
+              <ContactReference contact={deletedBy.contact} />
             ) : deletedBy?.__typename === "User" ? (
               <UserReference user={deletedBy} />
             ) : null,
@@ -54,7 +54,7 @@ TimelineReplyDeletedEvent.fragments = {
         }
         ... on PetitionAccess {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
       }
@@ -62,6 +62,6 @@ TimelineReplyDeletedEvent.fragments = {
     }
     ${PetitionFieldReference.fragments.PetitionField}
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

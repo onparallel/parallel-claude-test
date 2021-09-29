@@ -4,7 +4,7 @@ import { SentReminderMessageDialog_PetitionReminderFragment } from "@parallel/gr
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 
@@ -36,7 +36,7 @@ export function SentReminderMessageDialog({
               id="component.sent-petition-reminder-dialog.message-sent"
               defaultMessage="Reminder sent to {recipient} on {date}"
               values={{
-                recipient: <ContactLink isFull contact={reminder.access.contact} />,
+                recipient: <ContactReference isFull contact={reminder.access.contact} />,
                 date: <DateTime value={reminder.createdAt} format={FORMATS["LLL"]} />,
               }}
             />
@@ -65,12 +65,12 @@ SentReminderMessageDialog.fragments = {
     fragment SentReminderMessageDialog_PetitionReminder on PetitionReminder {
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       createdAt
       emailBody
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

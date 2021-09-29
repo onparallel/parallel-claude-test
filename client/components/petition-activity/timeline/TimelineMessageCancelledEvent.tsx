@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { ForbiddenIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineMessageCancelledEvent_MessageCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -28,7 +28,7 @@ export function TimelineMessageCancelledEvent({
           same: userId === user?.id,
           user: <UserReference user={user} />,
           subject: message.emailSubject,
-          contact: <ContactLink contact={message.access.contact} />,
+          contact: <ContactReference contact={message.access.contact} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
       />
@@ -45,7 +45,7 @@ TimelineMessageCancelledEvent.fragments = {
         emailSubject
         access {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
       }
@@ -54,7 +54,7 @@ TimelineMessageCancelledEvent.fragments = {
       }
       createdAt
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
     ${UserReference.fragments.User}
   `,
 };

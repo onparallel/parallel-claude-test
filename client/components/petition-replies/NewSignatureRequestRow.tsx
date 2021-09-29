@@ -7,7 +7,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { omit } from "remeda";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { useSignerSelectDialog } from "./SignerSelectDialog";
 
 interface NewSignatureRequestRowProps {
@@ -71,7 +71,7 @@ export function NewSignatureRequestRow({
           </Heading>
           {signers.length > 0 ? (
             <FormattedList
-              value={signers.map((contact, i) => [<ContactLink contact={contact} key={i} />])}
+              value={signers.map((contact, i) => [<ContactReference contact={contact} key={i} />])}
             />
           ) : (
             <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
@@ -112,14 +112,15 @@ NewSignatureRequestRow.fragments = {
       status
       signatureConfig {
         contacts {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
+        letRecipientsChooseSigners
         provider
         review
         timezone
         title
       }
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

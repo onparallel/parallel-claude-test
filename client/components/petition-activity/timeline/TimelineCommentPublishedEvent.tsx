@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Text, useTheme } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Divider } from "@parallel/components/common/Divider";
 import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@parallel/graphql/__types";
@@ -45,7 +45,7 @@ export function TimelineCommentPublishedEvent({
                 same: author?.__typename === "User" && author?.id === userId,
                 author:
                   author?.__typename === "PetitionAccess" ? (
-                    <ContactLink contact={author.contact} />
+                    <ContactReference contact={author.contact} />
                   ) : (
                     <UserReference user={author as any} />
                   ),
@@ -93,7 +93,7 @@ TimelineCommentPublishedEvent.fragments = {
           }
           ... on PetitionAccess {
             contact {
-              ...ContactLink_Contact
+              ...ContactReference_Contact
             }
           }
         }
@@ -104,6 +104,6 @@ TimelineCommentPublishedEvent.fragments = {
     }
     ${PetitionFieldReference.fragments.PetitionField}
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

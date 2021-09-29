@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { ThumbUpIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -26,7 +26,7 @@ export function TimelinePetitionClosedNotifiedEvent({
         defaultMessage="{same, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}"
         values={{
           same: userId === event.user?.id,
-          contact: <ContactLink contact={event.access.contact} />,
+          contact: <ContactReference contact={event.access.contact} />,
           user: <UserReference user={event.user} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -45,12 +45,12 @@ TimelinePetitionClosedNotifiedEvent.fragments = {
       }
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

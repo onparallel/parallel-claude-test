@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Circle } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";
@@ -32,7 +32,7 @@ export const AccessActivatedFromLinkNotification = Object.assign(
             defaultMessage="{name} created the petition from a public link."
             values={{
               name: (
-                <ContactLink
+                <ContactReference
                   draggable="false"
                   tabIndex={-1}
                   contact={notification.access.contact}
@@ -51,12 +51,12 @@ export const AccessActivatedFromLinkNotification = Object.assign(
           ...PetitionUserNotification_PetitionUserNotification
           access {
             contact {
-              ...ContactLink_Contact
+              ...ContactReference_Contact
             }
           }
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
-        ${ContactLink.fragments.Contact}
+        ${ContactReference.fragments.Contact}
       `,
     },
   }

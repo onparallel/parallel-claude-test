@@ -30,7 +30,7 @@ import { usePreviousValue } from "beautiful-react-hooks";
 import { ChangeEvent, Fragment, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
@@ -304,7 +304,7 @@ function FieldComment({
               <FormattedMessage id="generic.you" defaultMessage="You" />
             </Text>
           ) : author?.__typename === "PetitionAccess" ? (
-            <ContactLink contact={author.contact} fontWeight="bold" />
+            <ContactReference contact={author.contact} fontWeight="bold" />
           ) : author?.__typename === "User" ? (
             <UserReference user={author} />
           ) : null}
@@ -451,7 +451,7 @@ PetitionRepliesFieldComments.fragments = {
           }
           ... on PetitionAccess {
             contact {
-              ...ContactLink_Contact
+              ...ContactReference_Contact
             }
           }
         }
@@ -462,7 +462,7 @@ PetitionRepliesFieldComments.fragments = {
         isInternal @include(if: $hasInternalComments)
       }
       ${UserReference.fragments.User}
-      ${ContactLink.fragments.Contact}
+      ${ContactReference.fragments.Contact}
     `;
   },
 };

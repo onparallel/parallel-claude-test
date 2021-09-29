@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { UserXIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -49,6 +48,5 @@ TimelineUserPermissionRemovedEvent.fragments = {
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
   `,
 };

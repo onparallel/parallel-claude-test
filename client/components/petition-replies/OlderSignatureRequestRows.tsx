@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { Divider } from "../common/Divider";
 import { Spacer } from "../common/Spacer";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
@@ -35,7 +35,7 @@ export function OlderSignatureRequestRows({
             <Text as="span">
               <FormattedList
                 value={signature.signerStatus.map(({ contact }) => [
-                  <ContactLink contact={contact} key={contact.id} />,
+                  <ContactReference contact={contact} key={contact.id} />,
                 ])}
               />
             </Text>
@@ -59,11 +59,11 @@ OlderSignatureRequestRows.fragments = {
       status
       signerStatus {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
         status
       }
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

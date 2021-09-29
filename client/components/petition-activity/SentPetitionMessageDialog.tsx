@@ -4,7 +4,7 @@ import { SentPetitionMessageDialog_PetitionMessageFragment } from "@parallel/gra
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 
@@ -30,7 +30,7 @@ export function SentPetitionMessageDialog({
                 id="component.sent-petition-message-dialog.message-sent"
                 defaultMessage="Message sent to {recipient} on {date}"
                 values={{
-                  recipient: <ContactLink isFull contact={message.access.contact} />,
+                  recipient: <ContactReference isFull contact={message.access.contact} />,
                   date: <DateTime value={message.sentAt} format={FORMATS["LLL"]} />,
                 }}
               />
@@ -39,7 +39,7 @@ export function SentPetitionMessageDialog({
                 id="component.sent-petition-message-dialog.message-scheduled"
                 defaultMessage="Message scheduled to be sent to {recipient} on {date}"
                 values={{
-                  recipient: <ContactLink isFull contact={message.access.contact} />,
+                  recipient: <ContactReference isFull contact={message.access.contact} />,
                   date: <DateTime value={message.scheduledAt!} format={FORMATS["LLL"]} />,
                 }}
               />
@@ -73,10 +73,10 @@ SentPetitionMessageDialog.fragments = {
       scheduledAt
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { EmailSentIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { MessageEventsIndicator } from "@parallel/components/petition-activity/MessageEventsIndicator";
 import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/graphql/__types";
@@ -43,7 +43,7 @@ export function TimelineMessageSentEvent({
                 same: userId === message.sender?.id,
                 user: <UserReference user={message.sender} />,
                 subject: message.emailSubject,
-                contact: <ContactLink contact={message.access.contact} />,
+                contact: <ContactReference contact={message.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
@@ -57,7 +57,7 @@ export function TimelineMessageSentEvent({
                 same: userId === message.sender!.id,
                 user: message.sender!.fullName,
                 subject: message.emailSubject,
-                contact: <ContactLink contact={message.access.contact} />,
+                contact: <ContactReference contact={message.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
@@ -87,7 +87,7 @@ TimelineMessageSentEvent.fragments = {
         scheduledAt
         access {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
         ...MessageEventsIndicator_PetitionMessage
@@ -96,7 +96,7 @@ TimelineMessageSentEvent.fragments = {
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
     ${MessageEventsIndicator.fragments.PetitionMessage}
     ${SentPetitionMessageDialog.fragments.PetitionMessage}
   `,

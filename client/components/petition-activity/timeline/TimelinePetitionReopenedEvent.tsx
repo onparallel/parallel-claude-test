@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { EditIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionReopenedEvent_PetitionReopenedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -45,6 +44,5 @@ TimelinePetitionReopenedEvent.fragments = {
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
   `,
 };

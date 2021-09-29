@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, Select, Text } from "@chakra-ui/react";
-import { ContactLink } from "@parallel/components/common/ContactLink";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -372,7 +371,6 @@ Petitions.fragments = {
         totalCount
       }
       ${this.PetitionBase}
-      ${ContactLink.fragments.Contact}
     `;
   },
   get PetitionBase() {

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { PlusCircleIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineReplyCreatedEvent_ReplyCreatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -30,7 +30,7 @@ export function TimelineReplyCreatedEvent({
           same: createdBy?.__typename === "User" && createdBy.id === userId,
           createdBy:
             createdBy?.__typename === "PetitionAccess" ? (
-              <ContactLink contact={createdBy.contact} />
+              <ContactReference contact={createdBy.contact} />
             ) : createdBy?.__typename === "User" ? (
               <UserReference user={createdBy} />
             ) : null,
@@ -54,7 +54,7 @@ TimelineReplyCreatedEvent.fragments = {
         }
         ... on PetitionAccess {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
       }
@@ -62,6 +62,6 @@ TimelineReplyCreatedEvent.fragments = {
     }
     ${PetitionFieldReference.fragments.PetitionField}
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

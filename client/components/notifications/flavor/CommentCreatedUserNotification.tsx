@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Circle, Text } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { CommentCreatedUserNotification_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
@@ -19,7 +19,7 @@ export const CommentCreatedUserNotification = Object.assign(
       const { author, isInternal } = notification.comment;
       const name =
         author?.__typename === "PetitionAccess" ? (
-          <ContactLink draggable="false" tabIndex={-1} contact={author.contact} />
+          <ContactReference draggable="false" tabIndex={-1} contact={author.contact} />
         ) : (
           <UserReference user={author as any} />
         );
@@ -81,7 +81,7 @@ export const CommentCreatedUserNotification = Object.assign(
               }
               ... on PetitionAccess {
                 contact {
-                  ...ContactLink_Contact
+                  ...ContactReference_Contact
                 }
               }
             }
@@ -89,7 +89,7 @@ export const CommentCreatedUserNotification = Object.assign(
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
         ${UserReference.fragments.User}
-        ${ContactLink.fragments.Contact}
+        ${ContactReference.fragments.Contact}
       `,
     },
   }

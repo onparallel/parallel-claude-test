@@ -4,7 +4,7 @@ import { BellIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { useConfirmSendSignatureReminderDialog } from "./ConfirmSendSignatureReminderDialog";
@@ -34,9 +34,7 @@ export function CurrentSignatureRequestRow({
   async function handleConfirmSendSignatureReminders() {
     const [, sendReminder] = await withError(
       showConfirmSendSignatureReminderDialog({
-        pendingSignerNames: signers
-          .filter((s) => s.status === "PENDING")
-          .map((s) => s.contact.fullName ?? s.contact.email),
+        pendingSigners: signers.filter((s) => s.status === "PENDING").map((s) => s.contact),
       })
     );
 
@@ -73,7 +71,7 @@ export function CurrentSignatureRequestRow({
           <FormattedList
             value={signers.map(({ contact, status }, i) => [
               <>
-                <ContactLink contact={contact} key={contact.id} />
+                <ContactReference contact={contact} key={contact.id} />
                 {isAwaitingSignature ? (
                   <PetitionSignatureRequestSignerStatusIcon status={status} />
                 ) : null}
@@ -115,11 +113,11 @@ CurrentSignatureRequestRow.fragments = {
       status
       signerStatus {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
         status
       }
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

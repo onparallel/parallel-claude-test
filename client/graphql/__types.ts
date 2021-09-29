@@ -2897,13 +2897,6 @@ export interface VerificationCodeRequest {
   token: Scalars["ID"];
 }
 
-export type ContactLink_ContactFragment = {
-  __typename?: "Contact";
-  id: string;
-  fullName?: Maybe<string>;
-  email: string;
-};
-
 export type ContactListPopover_ContactFragment = {
   __typename?: "Contact";
   id: string;
@@ -2916,6 +2909,13 @@ export type ContactListPopover_PublicContactFragment = {
   id: string;
   email: string;
   fullName?: Maybe<string>;
+};
+
+export type ContactReference_ContactFragment = {
+  __typename?: "Contact";
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
 };
 
 export type ContactSelect_ContactFragment = {
@@ -7027,6 +7027,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
   status: PetitionStatus;
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
+    letRecipientsChooseSigners: boolean;
     provider: string;
     review: boolean;
     timezone: string;
@@ -14594,8 +14595,8 @@ export const UserReference_UserFragmentDoc = gql`
     status
   }
 `;
-export const ContactLink_ContactFragmentDoc = gql`
-  fragment ContactLink_Contact on Contact {
+export const ContactReference_ContactFragmentDoc = gql`
+  fragment ContactReference_Contact on Contact {
     id
     fullName
     email
@@ -14617,7 +14618,7 @@ export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragme
         }
         ... on PetitionAccess {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
       }
@@ -14625,43 +14626,43 @@ export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragme
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragmentDoc = gql`
   fragment MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotification on MessageEmailBouncedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragmentDoc = gql`
   fragment ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotification on ReminderEmailBouncedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragmentDoc = gql`
   fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionSharedUserNotification_PetitionSharedUserNotificationFragmentDoc = gql`
   fragment PetitionSharedUserNotification_PetitionSharedUserNotification on PetitionSharedUserNotification {
@@ -14703,26 +14704,26 @@ export const RemindersOptOutNotification_RemindersOptOutNotificationFragmentDoc 
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     reason
     other
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragmentDoc = gql`
   fragment AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotification on AccessActivatedFromPublicPetitionLinkUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
   fragment NotificationsList_PetitionUserNotification on PetitionUserNotification {
@@ -15420,7 +15421,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
   fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
     id
     contact {
-      ...ContactLink_Contact
+      ...ContactReference_Contact
     }
     status
     nextReminderAt
@@ -15433,7 +15434,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc}
 `;
 export const PetitionAccessTable_PetitionFragmentDoc = gql`
@@ -15458,12 +15459,12 @@ export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = 
   fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
   fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
@@ -15472,13 +15473,13 @@ export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
     }
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = gql`
   fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
@@ -15487,24 +15488,24 @@ export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = 
     }
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc = gql`
   fragment TimelineAccessOpenedEvent_AccessOpenedEvent on AccessOpenedEvent {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const SentPetitionMessageDialog_PetitionMessageFragmentDoc = gql`
   fragment SentPetitionMessageDialog_PetitionMessage on PetitionMessage {
@@ -15514,11 +15515,11 @@ export const SentPetitionMessageDialog_PetitionMessageFragmentDoc = gql`
     scheduledAt
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gql`
   fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
@@ -15531,7 +15532,7 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
       emailSubject
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       ...SentPetitionMessageDialog_PetitionMessage
@@ -15539,7 +15540,7 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
 `;
 export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gql`
@@ -15550,7 +15551,7 @@ export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gq
       emailSubject
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15559,7 +15560,7 @@ export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gq
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${UserReference_UserFragmentDoc}
 `;
 export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
@@ -15579,7 +15580,7 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
       scheduledAt
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       ...MessageEventsIndicator_PetitionMessage
@@ -15588,7 +15589,7 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${MessageEventsIndicator_PetitionMessageFragmentDoc}
   ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
 `;
@@ -15596,13 +15597,13 @@ export const SentReminderMessageDialog_PetitionReminderFragmentDoc = gql`
   fragment SentReminderMessageDialog_PetitionReminder on PetitionReminder {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
     emailBody
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
   fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {
@@ -15613,7 +15614,7 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
       }
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       ...SentReminderMessageDialog_PetitionReminder
@@ -15621,7 +15622,7 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${SentReminderMessageDialog_PetitionReminderFragmentDoc}
 `;
 export const PetitionFieldReference_PetitionFieldFragmentDoc = gql`
@@ -15640,7 +15641,7 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15648,7 +15649,7 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
   fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
@@ -15661,7 +15662,7 @@ export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15669,7 +15670,7 @@ export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
   fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
@@ -15682,7 +15683,7 @@ export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15690,7 +15691,7 @@ export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gql`
   fragment TimelineCommentPublishedEvent_CommentPublishedEvent on CommentPublishedEvent {
@@ -15704,7 +15705,7 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
         }
         ... on PetitionAccess {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
       }
@@ -15715,7 +15716,7 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
   fragment TimelineCommentDeletedEvent_CommentDeletedEvent on CommentDeletedEvent {
@@ -15728,7 +15729,7 @@ export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15736,7 +15737,7 @@ export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc = gql`
   fragment TimelineUserPermissionAddedEvent_UserPermissionAddedEvent on UserPermissionAddedEvent {
@@ -15807,13 +15808,13 @@ export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFrag
     }
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc = gql`
   fragment TimelinePetitionReopenedEvent_PetitionReopenedEvent on PetitionReopenedEvent {
@@ -15840,30 +15841,30 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
       ...UserReference_User
     }
     contact {
-      ...ContactLink_Contact
+      ...ContactReference_Contact
     }
     cancelType
     cancellerReason
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
   fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
     originalAccess {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     newAccess {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc = gql`
   fragment TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent on GroupPermissionAddedEvent {
@@ -15916,34 +15917,34 @@ export const TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc = gql`
   fragment TimelineRemindersOptOutEvent_RemindersOptOutEvent on RemindersOptOutEvent {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
     reason
     other
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc = gql`
   fragment TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent on AccessActivatedFromPublicPetitionLinkEvent {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc = gql`
   fragment TimelineRecipientSignedEvent_RecipientSignedEvent on RecipientSignedEvent {
     contact {
-      ...ContactLink_Contact
+      ...ContactReference_Contact
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
@@ -16448,7 +16449,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -16459,7 +16460,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
     isInternal @include(if: $hasInternalComments)
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
@@ -16526,15 +16527,16 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
     status
     signatureConfig {
       contacts {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
+      letRecipientsChooseSigners
       provider
       review
       timezone
       title
     }
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gql`
   fragment CurrentSignatureRequestRow_PetitionSignatureRequest on PetitionSignatureRequest {
@@ -16542,12 +16544,12 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     status
     signerStatus {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
       status
     }
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql`
   fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
@@ -16555,12 +16557,12 @@ export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql
     status
     signerStatus {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
       status
     }
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   fragment PetitionSignaturesCard_Petition on Petition {
@@ -16677,7 +16679,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
       accesses {
         status
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
         nextReminderAt
         reminders {
@@ -16695,7 +16697,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   ${UserAvatarList_UserFragmentDoc}
   ${UserAvatarList_UserGroupFragmentDoc}
   ${PetitionTagListCellContent_PetitionBaseFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${PetitionStatusCellContent_PetitionFragmentDoc}
   ${PetitionSignatureCellContent_PetitionFragmentDoc}
 `;

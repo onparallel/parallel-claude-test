@@ -17,7 +17,6 @@ import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
-import { ContactLink } from "../common/ContactLink";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Link } from "../common/Link";
 import {
@@ -62,7 +61,6 @@ const fragments = {
     ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
     ${OlderSignatureRequestRows.fragments.PetitionSignatureRequest}
     ${SignatureConfigDialog.fragments.Petition}
-    ${ContactLink.fragments.Contact}
   `,
 };
 const mutations = [

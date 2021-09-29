@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineMessageScheduledEvent_MessageScheduledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -43,7 +43,7 @@ export function TimelineMessageScheduledEvent({
               same: userId === message.sender?.id,
               user: <UserReference user={message.sender} />,
               subject: message.emailSubject,
-              contact: <ContactLink contact={message.access.contact} />,
+              contact: <ContactReference contact={message.access.contact} />,
               scheduledAt: (
                 <DateTime fontWeight="bold" value={message.scheduledAt!} format={FORMATS.LLL} />
               ),
@@ -84,7 +84,7 @@ TimelineMessageScheduledEvent.fragments = {
         emailSubject
         access {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
         ...SentPetitionMessageDialog_PetitionMessage
@@ -92,7 +92,7 @@ TimelineMessageScheduledEvent.fragments = {
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
     ${SentPetitionMessageDialog.fragments.PetitionMessage}
   `,
 };

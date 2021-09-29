@@ -32,7 +32,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Table, TableColumn } from "../common/Table";
@@ -177,7 +177,7 @@ function usePetitionAccessesColumns(): TableColumn<
         }),
         CellContent: ({ row: { contact, remindersOptOut } }) => (
           <HStack>
-            <ContactLink contact={contact} />
+            <ContactReference contact={contact} />
             {remindersOptOut ? (
               <Tooltip
                 label={intl.formatMessage({
@@ -363,7 +363,7 @@ PetitionAccessesTable.fragments = {
     fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
       id
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
       status
       nextReminderAt
@@ -376,6 +376,6 @@ PetitionAccessesTable.fragments = {
       }
       createdAt
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

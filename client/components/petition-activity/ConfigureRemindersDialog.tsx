@@ -18,7 +18,7 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { ContactLink } from "../common/ContactLink";
+import { ContactReference } from "../common/ContactReference";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
 
 export type ConfigureRemindersDialogProps = {
@@ -63,7 +63,7 @@ export function ConfigureRemindersDialog({
                   <UnorderedList paddingLeft={2}>
                     {optedOut.map((pa) => (
                       <ListItem key={pa.id}>
-                        <ContactLink contact={pa.contact} />
+                        <ContactReference contact={pa.contact} />
                       </ListItem>
                     ))}
                   </UnorderedList>

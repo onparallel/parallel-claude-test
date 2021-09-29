@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { UserPlusIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineAccessActivatedEvent_AccessActivatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -24,7 +24,7 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
         values={{
           same: userId === event.user?.id,
           user: <UserReference user={event.user} />,
-          contact: <ContactLink contact={event.access.contact} />,
+          contact: <ContactReference contact={event.access.contact} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
@@ -42,12 +42,12 @@ TimelineAccessActivatedEvent.fragments = {
       }
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

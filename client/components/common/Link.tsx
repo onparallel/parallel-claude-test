@@ -3,7 +3,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { PropsWithChildren, ReactNode } from "react";
 
-export interface LinkProps extends Pick<NextLinkProps, "href">, Omit<ChakraLinkProps, "href"> {
+interface LinkProps extends Pick<NextLinkProps, "href">, Omit<ChakraLinkProps, "href"> {
   next?: Omit<NextLinkProps, "href">;
   children?: ReactNode;
 }

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Circle, Text } from "@chakra-ui/react";
 import { BellOffIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { RemindersOptOutNotification_RemindersOptOutNotificationFragment } from "@parallel/graphql/__types";
 import {
   ReminderOptOutReason,
@@ -41,7 +41,7 @@ export const RemindersOptOutNotification = Object.assign(
           id="component.notification-reminders-opt-out.body"
           defaultMessage="{name} has opted out from receiving reminders: {reason}"
           values={{
-            name: <ContactLink draggable="false" tabIndex={-1} contact={access.contact} />,
+            name: <ContactReference draggable="false" tabIndex={-1} contact={access.contact} />,
             reason: (
               <Text as="cite">
                 {reason === "OTHER" ? (
@@ -65,14 +65,14 @@ export const RemindersOptOutNotification = Object.assign(
           ...PetitionUserNotification_PetitionUserNotification
           access {
             contact {
-              ...ContactLink_Contact
+              ...ContactReference_Contact
             }
           }
           reason
           other
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
-        ${ContactLink.fragments.Contact}
+        ${ContactReference.fragments.Contact}
       `,
     },
   }

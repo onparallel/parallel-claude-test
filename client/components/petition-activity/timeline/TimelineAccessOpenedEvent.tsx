@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { EyeIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineAccessOpenedEvent_AccessOpenedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -20,7 +20,7 @@ export function TimelineAccessOpenedEvent({ event }: TimelineAccessOpenedEventPr
         id="timeline.access-opened-description"
         defaultMessage="{contact} opened the petition {timeAgo}"
         values={{
-          contact: <ContactLink contact={event.access.contact} />,
+          contact: <ContactReference contact={event.access.contact} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
@@ -35,11 +35,11 @@ TimelineAccessOpenedEvent.fragments = {
     fragment TimelineAccessOpenedEvent_AccessOpenedEvent on AccessOpenedEvent {
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       createdAt
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

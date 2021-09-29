@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionCompletedEvent_PetitionCompletedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -20,7 +20,7 @@ export function TimelinePetitionCompletedEvent({ event }: TimelinePetitionComple
         id="timeline.petition-completed-description"
         defaultMessage="{contact} completed the petition {timeAgo}"
         values={{
-          contact: <ContactLink contact={event.access.contact} />,
+          contact: <ContactReference contact={event.access.contact} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
@@ -35,11 +35,11 @@ TimelinePetitionCompletedEvent.fragments = {
     fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       createdAt
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };
