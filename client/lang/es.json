@@ -2495,6 +2495,11 @@
     "context": "Select a user or group"
   },
   {
+    "term": "component.signature-config-dialog.alert",
+    "definition": "Se asignarán estos firmantes a todas las peticiones que se creen desde esta plantilla.",
+    "context": "These signers will be assigned to all the petitions that are created from this template."
+  },
+  {
     "term": "component.signature-config-dialog.allow-recipient-to-choose.help",
     "definition": "Si esta opción está desactivada, solo podrán firmar el documento las personas indicadas.",
     "context": "If this option is disabled, only the assigned people will be able to sign."

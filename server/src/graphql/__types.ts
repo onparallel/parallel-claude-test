@@ -1206,6 +1206,7 @@ export interface NexusGenFieldTypes {
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     publicLink: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
+    signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1673,6 +1674,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
+    signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2333,6 +2335,7 @@ export interface NexusGenFieldTypeNames {
     owner: "User";
     permissions: "PetitionPermission";
     publicLink: "PublicPetitionLink";
+    signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
     tags: "Tag";
     updatedAt: "DateTime";
@@ -2800,6 +2803,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     permissions: "PetitionPermission";
+    signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
     tags: "Tag";
     updatedAt: "DateTime";

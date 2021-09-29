@@ -149,6 +149,13 @@ export const PetitionBase = interfaceType({
     t.nonNull.boolean("isReadOnly", {
       resolve: (o) => o.is_readonly || o.template_public,
     });
+    t.nullable.field("signatureConfig", {
+      type: "SignatureConfig",
+      description: "The signature configuration for the petition.",
+      resolve: async (root, _, ctx) => {
+        return root.signature_config;
+      },
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",
@@ -194,13 +201,6 @@ export const Petition = objectType({
       description: "The reminders configuration for the petition.",
       resolve: async (root, _, ctx) => {
         return root.reminders_config;
-      },
-    });
-    t.nullable.field("signatureConfig", {
-      type: "SignatureConfig",
-      description: "The signature configuration for the petition.",
-      resolve: async (root, _, ctx) => {
-        return root.signature_config;
       },
     });
     t.nullable.field("currentSignatureRequest", {

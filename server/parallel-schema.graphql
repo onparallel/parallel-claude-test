@@ -1831,6 +1831,11 @@ interface PetitionBase {
   permissions: [PetitionPermission!]!
 
   """
+  The signature configuration for the petition.
+  """
+  signatureConfig: SignatureConfig
+
+  """
   Whether to skip the forward security check on the recipient view.
   """
   skipForwardSecurity: Boolean!
@@ -2575,6 +2580,11 @@ type PetitionTemplate implements PetitionBase {
   The public link linked to this template
   """
   publicLink: PublicPetitionLink
+
+  """
+  The signature configuration for the petition.
+  """
+  signatureConfig: SignatureConfig
 
   """
   Whether to skip the forward security check on the recipient view.

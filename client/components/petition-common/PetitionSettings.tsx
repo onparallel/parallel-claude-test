@@ -70,9 +70,7 @@ function _PetitionSettings({
   const locales = useSupportedLocales();
   const intl = useIntl();
   const hasSignature =
-    petition.__typename === "Petition" &&
-    user.hasPetitionSignature &&
-    user.organization.signatureIntegrations.length > 0;
+    user.hasPetitionSignature && user.organization.signatureIntegrations.length > 0;
 
   const ongoingSignatureRequest =
     petition.__typename === "Petition" &&
@@ -93,9 +91,6 @@ function _PetitionSettings({
   const [startSignatureRequest] = usePetitionSettings_startPetitionSignatureRequestMutation();
 
   async function handleConfigureSignatureClick() {
-    if (petition.__typename !== "Petition") {
-      return;
-    }
     try {
       if (ongoingSignatureRequest) {
         await showConfirmConfigureOngoingSignature({});
@@ -123,7 +118,7 @@ function _PetitionSettings({
       }
       await onUpdatePetition({ signatureConfig });
 
-      if (["COMPLETED", "CLOSED"].includes(petition.status)) {
+      if (petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status)) {
         await startSignatureRequest({ variables: { petitionId: petition.id } });
       }
     } catch {}
@@ -289,7 +284,7 @@ function _PetitionSettings({
         onChange={async (value) => await onUpdatePetition({ hasCommentsEnabled: value })}
         isDisabled={isReadOnly}
       />
-      {petition.__typename === "Petition" && (petition.signatureConfig || hasSignature) ? (
+      {petition.signatureConfig || hasSignature ? (
         <Box>
           <SwitchSetting
             icon={<SignatureIcon />}
@@ -446,10 +441,10 @@ const fragments = {
       owner {
         id
       }
+      ...SignatureConfigDialog_PetitionBase @include(if: $hasPetitionSignature)
       ... on Petition {
         status
         deadline
-        ...SignatureConfigDialog_Petition @include(if: $hasPetitionSignature)
         currentSignatureRequest @include(if: $hasPetitionSignature) {
           id
           status
@@ -463,7 +458,7 @@ const fragments = {
       }
     }
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
-    ${SignatureConfigDialog.fragments.Petition}
+    ${SignatureConfigDialog.fragments.PetitionBase}
   `,
 };
 const mutations = [

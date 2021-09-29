@@ -1509,6 +1509,8 @@ export interface PetitionBase {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The signature configuration for the petition. */
+  signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
@@ -1924,6 +1926,8 @@ export interface PetitionTemplate extends PetitionBase {
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
   publicLink?: Maybe<PublicPetitionLink>;
+  /** The signature configuration for the petition. */
+  signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
@@ -6009,6 +6013,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
   isReadOnly: boolean;
+  name?: Maybe<string>;
   publicLink?: Maybe<{
     __typename?: "PublicPetitionLink";
     id: string;
@@ -6030,6 +6035,22 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     >;
   }>;
   owner: { __typename?: "User"; id: string };
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    provider: string;
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    contacts: Array<
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
+    >;
+  }>;
 };
 
 export type PetitionSettings_PetitionBaseFragment =
@@ -6533,10 +6554,10 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   >;
 };
 
-export type SignatureConfigDialog_PetitionFragment = {
+export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  name?: Maybe<string>;
   status: PetitionStatus;
+  name?: Maybe<string>;
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
     provider: string;
@@ -6554,6 +6575,31 @@ export type SignatureConfigDialog_PetitionFragment = {
     >;
   }>;
 };
+
+export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  name?: Maybe<string>;
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    provider: string;
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    contacts: Array<
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
+    >;
+  }>;
+};
+
+export type SignatureConfigDialog_PetitionBaseFragment =
+  | SignatureConfigDialog_PetitionBase_Petition_Fragment
+  | SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment;
 
 export type SignatureConfigDialog_OrgIntegrationFragment = {
   __typename?: "OrgIntegration";
@@ -11247,6 +11293,22 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     >;
   }>;
   owner: { __typename?: "User"; id: string };
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    provider: string;
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    contacts: Array<
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
+    >;
+  }>;
 };
 
 export type PetitionCompose_PetitionBaseFragment =
@@ -11422,6 +11484,22 @@ export type PetitionCompose_updatePetitionMutation = {
           >;
         }>;
         owner: { __typename?: "User"; id: string };
+        signatureConfig?: Maybe<{
+          __typename?: "SignatureConfig";
+          provider: string;
+          title: string;
+          review: boolean;
+          letRecipientsChooseSigners: boolean;
+          contacts: Array<
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
+          >;
+        }>;
       };
 };
 
@@ -12058,6 +12136,22 @@ export type PetitionComposeQuery = {
           >;
         }>;
         owner: { __typename?: "User"; id: string };
+        signatureConfig?: Maybe<{
+          __typename?: "SignatureConfig";
+          provider: string;
+          title: string;
+          review: boolean;
+          letRecipientsChooseSigners: boolean;
+          contacts: Array<
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
+          >;
+        }>;
       }
   >;
 };
@@ -16205,10 +16299,9 @@ export const ContactSelect_ContactFragmentDoc = gql`
     hasBouncedEmail
   }
 `;
-export const SignatureConfigDialog_PetitionFragmentDoc = gql`
-  fragment SignatureConfigDialog_Petition on Petition {
+export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
+  fragment SignatureConfigDialog_PetitionBase on PetitionBase {
     name
-    status
     signatureConfig {
       provider
       contacts {
@@ -16217,6 +16310,9 @@ export const SignatureConfigDialog_PetitionFragmentDoc = gql`
       title
       review
       letRecipientsChooseSigners
+    }
+    ... on Petition {
+      status
     }
   }
   ${ContactSelect_ContactFragmentDoc}
@@ -16254,10 +16350,10 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     owner {
       id
     }
+    ...SignatureConfigDialog_PetitionBase @include(if: $hasPetitionSignature)
     ... on Petition {
       status
       deadline
-      ...SignatureConfigDialog_Petition @include(if: $hasPetitionSignature)
       currentSignatureRequest @include(if: $hasPetitionSignature) {
         id
         status
@@ -16270,7 +16366,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
       }
     }
   }
-  ${SignatureConfigDialog_PetitionFragmentDoc}
+  ${SignatureConfigDialog_PetitionBaseFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 `;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
@@ -16568,14 +16664,14 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   fragment PetitionSignaturesCard_Petition on Petition {
     id
     status
-    ...SignatureConfigDialog_Petition
+    ...SignatureConfigDialog_PetitionBase
     ...NewSignatureRequestRow_Petition
     signatureRequests {
       ...CurrentSignatureRequestRow_PetitionSignatureRequest
       ...OlderSignatureRequestRows_PetitionSignatureRequest
     }
   }
-  ${SignatureConfigDialog_PetitionFragmentDoc}
+  ${SignatureConfigDialog_PetitionBaseFragmentDoc}
   ${NewSignatureRequestRow_PetitionFragmentDoc}
   ${CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc}
   ${OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc}

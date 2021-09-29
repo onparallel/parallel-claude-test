@@ -2495,6 +2495,11 @@
     "context": "Select a user or group"
   },
   {
+    "term": "component.signature-config-dialog.alert",
+    "definition": "These signers will be assigned to all the petitions that are created from this template.",
+    "context": "These signers will be assigned to all the petitions that are created from this template."
+  },
+  {
     "term": "component.signature-config-dialog.allow-recipient-to-choose.help",
     "definition": "If this option is disabled, only the assigned people will be able to sign.",
     "context": "If this option is disabled, only the assigned people will be able to sign."

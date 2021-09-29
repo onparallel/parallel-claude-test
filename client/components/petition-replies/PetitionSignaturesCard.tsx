@@ -49,14 +49,14 @@ const fragments = {
     fragment PetitionSignaturesCard_Petition on Petition {
       id
       status
-      ...SignatureConfigDialog_Petition
+      ...SignatureConfigDialog_PetitionBase
       ...NewSignatureRequestRow_Petition
       signatureRequests {
         ...CurrentSignatureRequestRow_PetitionSignatureRequest
         ...OlderSignatureRequestRows_PetitionSignatureRequest
       }
     }
-    ${SignatureConfigDialog.fragments.Petition}
+    ${SignatureConfigDialog.fragments.PetitionBase}
     ${NewSignatureRequestRow.fragments.Petition}
     ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
     ${OlderSignatureRequestRows.fragments.PetitionSignatureRequest}

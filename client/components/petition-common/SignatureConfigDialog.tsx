@@ -1,17 +1,28 @@
 import { gql } from "@apollo/client";
-import { Button, Checkbox, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  Button,
+  Checkbox,
+  CloseButton,
+  FormControl,
+  FormLabel,
+  Input,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   SignatureConfigDialog_OrgIntegrationFragment,
-  SignatureConfigDialog_PetitionFragment,
+  SignatureConfigDialog_PetitionBaseFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { StylesConfig } from "react-select";
@@ -19,7 +30,7 @@ import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
 
 export type SignatureConfigDialogProps = {
-  petition: SignatureConfigDialog_PetitionFragment;
+  petition: SignatureConfigDialog_PetitionBaseFragment;
   providers: SignatureConfigDialog_OrgIntegrationFragment[];
 };
 
@@ -32,7 +43,8 @@ export function SignatureConfigDialog({
   const handleCreateContact = useCreateContact();
 
   const intl = useIntl();
-  const petitionIsCompleted = ["COMPLETED", "CLOSED"].includes(petition.status);
+  const petitionIsCompleted =
+    petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
 
   const {
     control,
@@ -109,6 +121,10 @@ export function SignatureConfigDialog({
       } as StylesConfig<any, any, any>,
     }),
     [petitionIsCompleted]
+  );
+
+  const [isSignatureAlertVisible, setIsSignatureAlertVisible] = useState(
+    petition.__typename === "PetitionTemplate"
   );
 
   return (
@@ -277,6 +293,16 @@ export function SignatureConfigDialog({
               />
             </HelpPopover>
           </FormControl>
+          {isSignatureAlertVisible ? (
+            <Alert status="info" borderRadius="base">
+              <AlertIcon />
+              <FormattedMessage
+                id="component.signature-config-dialog.alert"
+                defaultMessage="These signers will be assigned to all the petitions that are created from this template."
+              />
+              <CloseButton onClick={() => setIsSignatureAlertVisible(false)} />
+            </Alert>
+          ) : null}
         </Stack>
       }
       confirm={
@@ -299,10 +325,9 @@ export function SignatureConfigDialog({
 }
 
 SignatureConfigDialog.fragments = {
-  Petition: gql`
-    fragment SignatureConfigDialog_Petition on Petition {
+  PetitionBase: gql`
+    fragment SignatureConfigDialog_PetitionBase on PetitionBase {
       name
-      status
       signatureConfig {
         provider
         contacts {
@@ -311,6 +336,9 @@ SignatureConfigDialog.fragments = {
         title
         review
         letRecipientsChooseSigners
+      }
+      ... on Petition {
+        status
       }
     }
     ${ContactSelect.fragments.Contact}
