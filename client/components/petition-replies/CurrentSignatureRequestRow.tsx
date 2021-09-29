@@ -74,7 +74,9 @@ export function CurrentSignatureRequestRow({
             value={signers.map(({ contact, status }, i) => [
               <>
                 <ContactLink contact={contact} key={contact.id} />
-                <PetitionSignatureRequestSignerStatusIcon status={status} />
+                {isAwaitingSignature ? (
+                  <PetitionSignatureRequestSignerStatusIcon status={status} />
+                ) : null}
               </>,
             ])}
           />
