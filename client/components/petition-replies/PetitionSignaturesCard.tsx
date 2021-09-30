@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Text, useToast } from "@chakra-ui/react";
+import { Box, Center, Grid, Text, useToast } from "@chakra-ui/react";
 import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -262,7 +262,13 @@ export const PetitionSignaturesCard = Object.assign(
           </Box>
         </GenericCardHeader>
         {current || older.length > 0 || petition.signatureConfig ? (
-          <>
+          <Grid
+            paddingX={4}
+            paddingY={2}
+            gap={2}
+            templateColumns="auto 1fr auto"
+            alignItems="center"
+          >
             {petition.signatureConfig && !current ? (
               <NewSignatureRequestRow
                 petition={petition}
@@ -280,7 +286,7 @@ export const PetitionSignaturesCard = Object.assign(
             {older.length ? (
               <OlderSignatureRequestRows signatures={older} onDownload={handleDownloadSignedDoc} />
             ) : null}
-          </>
+          </Grid>
         ) : (
           <Center flexDirection="column" minHeight={24} textStyle="hint" textAlign="center">
             <Text>

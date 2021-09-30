@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Divider, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import {
   NewSignatureRequestRow_PetitionFragment,
@@ -38,37 +38,31 @@ export function NewSignatureRequestRow({
 
   return (
     <>
-      <Stack
-        paddingX={4}
-        paddingY={2}
-        direction={{ base: "column", md: "row" }}
-        alignItems="center"
-        spacing={4}
-      >
-        <Box>
-          <Heading size="xs" as="h4">
+      <Box>
+        <Heading size="xs" as="h4">
+          <FormattedMessage
+            id="component.petition-signatures-card.status"
+            defaultMessage="Status"
+          />
+        </Heading>
+        <Stack direction="row" display="inline-flex" alignItems="center" color="gray.600">
+          <TimeIcon />
+          <Text>
             <FormattedMessage
-              id="component.petition-signatures-card.status"
-              defaultMessage="Status"
+              id="component.petition-sigatures-card.not-started"
+              defaultMessage="Not started"
             />
-          </Heading>
-          <Stack direction="row" display="inline-flex" alignItems="center" color="gray.600">
-            <TimeIcon />
-            <Text>
-              <FormattedMessage
-                id="component.petition-sigatures-card.not-started"
-                defaultMessage="Not started"
-              />
-            </Text>
-          </Stack>
-        </Box>
+          </Text>
+        </Stack>
+      </Box>
+      <Box>
+        <Heading size="xs" as="h4">
+          <FormattedMessage
+            id="component.petition-signatures-card.signers"
+            defaultMessage="Signers"
+          />
+        </Heading>
         <Box>
-          <Heading size="xs" as="h4">
-            <FormattedMessage
-              id="component.petition-signatures-card.signers"
-              defaultMessage="Signers"
-            />
-          </Heading>
           {signers.length > 0 ? (
             <FormattedList
               value={signers.map((contact, i) => [<ContactReference contact={contact} key={i} />])}
@@ -77,31 +71,30 @@ export function NewSignatureRequestRow({
             <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
           )}
         </Box>
-        <Stack flex="1" direction="row" justifyContent="flex-end">
-          {petition.status === "PENDING" ? (
-            <Button width="24" colorScheme="red" onClick={() => onUpdateConfig(null)}>
+      </Box>
+      <Box>
+        {petition.status === "PENDING" ? (
+          <Button width="24" colorScheme="red" onClick={() => onUpdateConfig(null)}>
+            <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+          </Button>
+        ) : (
+          <Flex alignItems="center">
+            <Button width="24" onClick={() => onUpdateConfig(null)}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
-          ) : (
-            <Flex alignItems="center">
-              <Button width="24" onClick={() => onUpdateConfig(null)}>
-                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-              </Button>
-              <Button width="24" colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
-                {signers.length === 0 ? (
-                  <FormattedMessage
-                    id="component.petition-signatures-card.start"
-                    defaultMessage="Start..."
-                  />
-                ) : (
-                  <FormattedMessage id="generic.start" defaultMessage="Start" />
-                )}
-              </Button>
-            </Flex>
-          )}
-        </Stack>
-      </Stack>
-      <Divider />
+            <Button width="24" colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
+              {signers.length === 0 ? (
+                <FormattedMessage
+                  id="component.petition-signatures-card.start"
+                  defaultMessage="Start..."
+                />
+              ) : (
+                <FormattedMessage id="generic.start" defaultMessage="Start" />
+              )}
+            </Button>
+          </Flex>
+        )}
+      </Box>
     </>
   );
 }

@@ -18,6 +18,8 @@ export function PetitionSignatureCellContent({
 }: PetitionSignatureCellContentProps) {
   const labels = usePetitionSignatureStatusLabels();
   const status = usePetitionCurrentSignatureStatus(petition);
+  // do not show signature status on drafts
+  if (petition.status === "DRAFT") return null;
   return user.hasPetitionSignature && status ? (
     <Tooltip label={labels[status]}>
       <Flex alignItems="center">

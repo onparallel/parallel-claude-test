@@ -1,11 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Heading, Stack } from "@chakra-ui/react";
+import { Box, Button, Heading } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { ContactReference } from "../common/ContactReference";
-import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { useConfirmSendSignatureReminderDialog } from "./ConfirmSendSignatureReminderDialog";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
@@ -45,63 +44,55 @@ export function CurrentSignatureRequestRow({
 
   return (
     <>
-      <Stack
-        paddingX={4}
-        paddingY={2}
-        direction={{ base: "column", md: "row" }}
-        alignItems="center"
-        spacing={4}
-      >
+      <Box>
+        <Heading size="xs" as="h4">
+          <FormattedMessage
+            id="component.petition-signatures-card.status"
+            defaultMessage="Status"
+          />
+        </Heading>
+        <PetitionSignatureRequestStatusText status={status} />
+      </Box>
+      <Box>
+        <Heading size="xs" as="h4">
+          <FormattedMessage
+            id="component.petition-signatures-card.signers"
+            defaultMessage="Signers"
+          />
+        </Heading>
         <Box>
-          <Heading size="xs" as="h4">
-            <FormattedMessage
-              id="component.petition-signatures-card.status"
-              defaultMessage="Status"
-            />
-          </Heading>
-          <PetitionSignatureRequestStatusText status={status} />
-        </Box>
-        <Box>
-          <Heading size="xs" as="h4">
-            <FormattedMessage
-              id="component.petition-signatures-card.signers"
-              defaultMessage="Signers"
-            />
-          </Heading>
           <FormattedList
-            value={signers.map(({ contact, status }, i) => [
-              <>
-                <ContactReference contact={contact} key={contact.id} />
-                {isAwaitingSignature ? (
-                  <PetitionSignatureRequestSignerStatusIcon status={status} />
-                ) : null}
-              </>,
+            value={signers.map(({ contact, status }) => [
+              <ContactReference contact={contact} key={contact.id} />,
+              isAwaitingSignature ? (
+                <PetitionSignatureRequestSignerStatusIcon status={status} marginBottom={1} />
+              ) : null,
             ])}
           />
         </Box>
-        <Stack flex="1" direction="row" justifyContent="flex-end">
-          {isAwaitingSignature ? (
-            <>
-              <IconButtonWithTooltip
-                icon={<BellIcon />}
-                label={intl.formatMessage({
-                  id: "component.petition-signatures-card.send-reminder",
-                  defaultMessage: "Send reminder",
-                })}
-                onClick={handleConfirmSendSignatureReminders}
-              />
-              <Button width="24" colorScheme="red" onClick={() => onCancel(signatureRequest.id)}>
-                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-              </Button>
-            </>
-          ) : isSigned ? (
-            <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>
-              <FormattedMessage id="generic.download" defaultMessage="Download" />
+      </Box>
+      <Box>
+        {isAwaitingSignature ? (
+          <>
+            <IconButtonWithTooltip
+              marginRight={2}
+              icon={<BellIcon />}
+              label={intl.formatMessage({
+                id: "component.petition-signatures-card.send-reminder",
+                defaultMessage: "Send reminder",
+              })}
+              onClick={handleConfirmSendSignatureReminders}
+            />
+            <Button width="24" colorScheme="red" onClick={() => onCancel(signatureRequest.id)}>
+              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
-          ) : null}
-        </Stack>
-      </Stack>
-      <Divider />
+          </>
+        ) : isSigned ? (
+          <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>
+            <FormattedMessage id="generic.download" defaultMessage="Download" />
+          </Button>
+        ) : null}
+      </Box>
     </>
   );
 }

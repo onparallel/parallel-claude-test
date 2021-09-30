@@ -1,10 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, GridItem, Heading } from "@chakra-ui/react";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { ContactReference } from "../common/ContactReference";
 import { Divider } from "../common/Divider";
-import { Spacer } from "../common/Spacer";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
 
 export function OlderSignatureRequestRows({
@@ -16,38 +15,39 @@ export function OlderSignatureRequestRows({
 }) {
   return (
     <>
-      <Box paddingX={4} paddingY={1.5}>
+      <GridItem colSpan={3}>
+        <Divider />
+      </GridItem>
+      <GridItem colSpan={3}>
         <Heading size="xs">
           <FormattedMessage
             id="component.petition-signatures-card.previous-signatures"
             defaultMessage="Previous signatures"
           />
         </Heading>
-      </Box>
-      <Divider />
-      <Stack as="ul" paddingX={4} paddingY={2}>
-        {signatures.map((signature) => (
-          <Flex as="li" key={signature.id} listStyleType="none" alignItems="center">
-            <PetitionSignatureRequestStatusText status={signature.status} />
-            <Text as="span" marginX={2}>
-              -
-            </Text>
-            <Text as="span">
-              <FormattedList
-                value={signature.signerStatus.map(({ contact }) => [
-                  <ContactReference contact={contact} key={contact.id} />,
-                ])}
-              />
-            </Text>
-            <Spacer />
+      </GridItem>
+      <GridItem colSpan={3}>
+        <Divider />
+      </GridItem>
+      {signatures.map((signature) => (
+        <>
+          <PetitionSignatureRequestStatusText status={signature.status} />
+          <Box>
+            <FormattedList
+              value={signature.signerStatus.map(({ contact }) => [
+                <ContactReference contact={contact} key={contact.id} />,
+              ])}
+            />
+          </Box>
+          <Flex justifyContent="flex-end">
             {signature.status === "COMPLETED" ? (
               <Button width="24" fontSize="sm" height={8} onClick={() => onDownload(signature.id)}>
                 <FormattedMessage id="generic.download" defaultMessage="Download" />
               </Button>
             ) : null}
           </Flex>
-        ))}
-      </Stack>
+        </>
+      ))}
     </>
   );
 }
