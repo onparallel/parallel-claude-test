@@ -455,6 +455,10 @@ export type Mutation = {
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
+  /** Sends a reminder email to the pending signers */
+  sendSignatureRequestReminders: Result;
+  /** Sets the locale passed as arg as the preferred language of the user to see the page */
+  setUserPreferredLocale: User;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
@@ -776,9 +780,9 @@ export type MutationpublicCheckVerificationCodeArgs = {
 };
 
 export type MutationpublicCompletePetitionArgs = {
+  additionalSigners?: Maybe<Array<PublicPetitionSignerDataInput>>;
   keycode: Scalars["ID"];
   message?: Maybe<Scalars["String"]>;
-  signers?: Maybe<Array<PublicPetitionSignerDataInput>>;
 };
 
 export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
@@ -967,6 +971,14 @@ export type MutationsendRemindersArgs = {
   accessIds: Array<Scalars["GID"]>;
   body?: Maybe<Scalars["JSON"]>;
   petitionId: Scalars["GID"];
+};
+
+export type MutationsendSignatureRequestRemindersArgs = {
+  petitionSignatureRequestId: Scalars["GID"];
+};
+
+export type MutationsetUserPreferredLocaleArgs = {
+  locale: Scalars["String"];
 };
 
 export type MutationsignedPetitionDownloadLinkArgs = {
@@ -1776,10 +1788,18 @@ export type PetitionSignatureRequest = Timestamps & {
   /** The signature configuration for the request. */
   signatureConfig: SignatureConfig;
   signedDocumentFilename: Maybe<Scalars["String"]>;
+  signerStatus: Array<PetitionSignatureRequestSignerStatus>;
   /** The status of the petition signature. */
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+};
+
+export type PetitionSignatureRequestSignerStatus = {
+  /** The contact that need to sign the generated document. */
+  contact: Contact;
+  /** The signing status of the individual contact. */
+  status: Scalars["String"];
 };
 
 export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
@@ -2106,6 +2126,8 @@ export type PublicPetitionSignerDataInput = {
 
 /** The public signature settings of a petition */
 export type PublicSignatureConfig = {
+  /** The contacts assigned by the petition recipient to sign */
+  additionalSigners: Array<Maybe<PublicContact>>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -2338,6 +2360,12 @@ export type QueryPetitions_OrderBy =
 
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
+
+export type RecipientSignedEvent = PetitionEvent & {
+  contact: Maybe<Contact>;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+};
 
 export type ReminderEmailBouncedUserNotification = PetitionUserNotification & {
   access: PetitionAccess;
@@ -2610,6 +2638,7 @@ export type User = Timestamps & {
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
+  preferredLocale: Maybe<Scalars["String"]>;
   role: OrganizationRole;
   status: UserStatus;
   unreadNotificationIds: Array<Scalars["ID"]>;

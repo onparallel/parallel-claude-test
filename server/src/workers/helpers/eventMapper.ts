@@ -240,6 +240,11 @@ function mapEventPayload(event: PetitionEvent) {
         petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
       };
     }
+    case "RECIPIENT_SIGNED": {
+      return {
+        contactId: toGlobalId("Contact", event.data.contact_id),
+      };
+    }
     default:
       return {};
   }

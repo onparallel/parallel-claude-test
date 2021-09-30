@@ -1193,6 +1193,17 @@ export const PetitionEvent = schema({
         },
       },
     },
+    RECIPIENT_SIGNED: {
+      description: "A recipient has signed the document.",
+      required: ["petitionAccessId"],
+      properties: {
+        contactId: {
+          type: "string",
+          description: "The ID of the contact that signed the document",
+          example: toGlobalId("Contact", 2),
+        },
+      },
+    },
   } as Record<PetitionEventType, JsonSchema>).map(
     ([event, data]) =>
       ({
