@@ -53,15 +53,17 @@ export function PublicLayout({
           href={`${url}/${canonicalLocale ?? locale}${resolveUrl(pathname, query)}`}
         />
       </Head>
-      {languages.map((lang) => (
-        <Head key={lang.locale}>
-          <link
-            rel="alternate"
-            hrefLang={lang.locale}
-            href={`${url}/${lang.locale}${resolveUrl(pathname, query)}`}
-          />
-        </Head>
-      ))}
+      {(canonicalLocale ? [canonicalLocale] : languages.map((lang) => lang.locale)).map(
+        (locale) => (
+          <Head key={locale}>
+            <link
+              rel="alternate"
+              hrefLang={locale}
+              href={`${url}/${locale}${resolveUrl(pathname, query)}`}
+            />
+          </Head>
+        )
+      )}
       <Head>
         <meta property="og:title" content={og?.title ?? title} />
         <meta property="og:type" content={og?.type ?? "website"} />
