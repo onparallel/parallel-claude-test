@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, GridItem, Heading } from "@chakra-ui/react";
+import { Button, Flex, GridItem, Heading } from "@chakra-ui/react";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { ContactReference } from "../common/ContactReference";
@@ -32,20 +32,20 @@ export function OlderSignatureRequestRows({
       {signatures.map((signature) => (
         <>
           <PetitionSignatureRequestStatusText status={signature.status} />
-          <Box>
+          <GridItem colSpan={signature.status === "COMPLETED" ? 1 : 2}>
             <FormattedList
-              value={signature.signerStatus.map(({ contact }) => [
-                <ContactReference contact={contact} key={contact.id} />,
-              ])}
+              value={signature.signerStatus.map(({ contact }) => (
+                <ContactReference contact={contact} key={contact.id} />
+              ))}
             />
-          </Box>
-          <Flex justifyContent="flex-end">
-            {signature.status === "COMPLETED" ? (
+          </GridItem>
+          {signature.status === "COMPLETED" ? (
+            <Flex justifyContent="flex-end">
               <Button width="24" fontSize="sm" height={8} onClick={() => onDownload(signature.id)}>
                 <FormattedMessage id="generic.download" defaultMessage="Download" />
               </Button>
-            ) : null}
-          </Flex>
+            </Flex>
+          ) : null}
         </>
       ))}
     </>
