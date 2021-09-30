@@ -6830,6 +6830,11 @@
     "context": "Example of question you will find in this template."
   },
   {
+    "term": "public.template-category-empty.coming-soon",
+    "definition": "Más plantillas próximamente",
+    "context": "More templates coming soon"
+  },
+  {
     "term": "public.template-category-preview.templates-for",
     "definition": "Plantillas para {category}",
     "context": "Templates for {category}"

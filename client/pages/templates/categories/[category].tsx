@@ -60,6 +60,12 @@ function LandingTemplatesCategory({
             </Heading>
           </Flex>
 
+          {templates.items.length === 0 ? (
+            <FormattedMessage
+              id="public.template-category-empty.coming-soon"
+              defaultMessage="More templates coming soon"
+            />
+          ) : null}
           <Grid
             templateColumns={{
               lg: "repeat(2, 1fr)",
@@ -171,10 +177,6 @@ export const getServerSideProps: GetServerSideProps<{
         locale: locale as PetitionLocale,
       },
     });
-
-    if (!landingTemplates.items.length) {
-      throw new Error();
-    }
 
     return {
       props: {
