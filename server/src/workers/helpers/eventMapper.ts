@@ -243,6 +243,10 @@ function mapEventPayload(event: PetitionEvent) {
     case "RECIPIENT_SIGNED": {
       return {
         contactId: toGlobalId("Contact", event.data.contact_id),
+        petitionSignatureRequestId: toGlobalId(
+          "PetitionSignatureRequest",
+          event.data.petition_signature_request_id
+        ),
       };
     }
     default:

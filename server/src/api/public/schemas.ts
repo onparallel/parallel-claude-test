@@ -1195,12 +1195,17 @@ export const PetitionEvent = schema({
     },
     RECIPIENT_SIGNED: {
       description: "A recipient has signed the document.",
-      required: ["petitionAccessId"],
+      required: ["contactId", "petitionSignatureRequestId"],
       properties: {
         contactId: {
           type: "string",
           description: "The ID of the contact that signed the document",
           example: toGlobalId("Contact", 2),
+        },
+        petitionSignatureRequestId: {
+          type: "string",
+          description: "The ID of the signature request",
+          example: toGlobalId("PetitionSignatureRequest", 2),
         },
       },
     },
