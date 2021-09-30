@@ -50,7 +50,9 @@ export function PublicLayout({
         />
         <link
           rel="canonical"
-          href={`${url}/${canonicalLocale ?? locale}${resolveUrl(pathname, query)}`}
+          href={`${url}/${canonicalLocale ?? locale}${
+            pathname === "/" ? "" : resolveUrl(pathname, query)
+          }`}
         />
       </Head>
       {(canonicalLocale ? [canonicalLocale] : languages.map((lang) => lang.locale)).map(
