@@ -60,7 +60,6 @@ const fragments = {
     ${NewSignatureRequestRow.fragments.Petition}
     ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
     ${OlderSignatureRequestRows.fragments.PetitionSignatureRequest}
-    ${SignatureConfigDialog.fragments.Petition}
   `,
 };
 const mutations = [
