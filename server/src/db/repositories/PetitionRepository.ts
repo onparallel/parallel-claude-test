@@ -1495,6 +1495,12 @@ export class PetitionRepository extends BaseRepository {
             (data?.is_template === undefined || data?.is_template)
               ? ([] as const)
               : (["template_description"] as const)),
+            // avoid copying signature_config if creating from a public template in another organization
+            ...(sourcePetition?.is_template &&
+            sourcePetition.template_public &&
+            sourcePetition.org_id !== user.org_id
+              ? (["signature_config"] as const)
+              : ([] as const)),
           ]),
           org_id: user.org_id,
           status: sourcePetition?.is_template ? null : "DRAFT",
@@ -1919,7 +1925,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadUnreadPetitionUserNotificationsByUserId = this.buildLoadMultipleBy(
     "petition_user_notification",
     "user_id",
-    (q) => q.where({ is_read: false })
+    (q) => q.where({ is_read: false }).orderBy("created_at", "desc")
   );
 
   async loadPetitionUserNotificationsByUserId(

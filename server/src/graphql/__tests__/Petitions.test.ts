@@ -821,6 +821,102 @@ describe("GraphQL/Petitions", () => {
       expect(data?.createPetition).toEqual({ remindersConfig: null });
     });
 
+    it("don't copy signature configuration when creating a petition from a public template of another organization", async () => {
+      const [publicTemplateWithSignature] = await mocks.createRandomPetitions(
+        otherOrg.id,
+        otherUser.id,
+        1,
+        () => ({
+          template_public: true,
+          is_template: true,
+          status: null,
+          name: "KYC",
+          signature_config: {
+            title: "aaaa",
+            review: false,
+            provider: "SIGNATURIT",
+            timezone: "Europe/Madrid",
+            contactIds: [30],
+            letRecipientsChooseSigners: true,
+          },
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $name: String
+            $locale: PetitionLocale!
+            $petitionId: GID
+            $type: PetitionBaseType
+          ) {
+            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
+              signatureConfig {
+                title
+              }
+            }
+          }
+        `,
+        variables: {
+          name: "Test signature",
+          locale: "es",
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", publicTemplateWithSignature.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({ signatureConfig: null });
+    });
+
+    it("copy signature configuration when creating a petition from a public template in the same organization", async () => {
+      const [publicTemplateWithSignature] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          template_public: true,
+          is_template: true,
+          status: null,
+          name: "KYC",
+          signature_config: {
+            title: "aaaa",
+            review: false,
+            provider: "SIGNATURIT",
+            timezone: "Europe/Madrid",
+            contactIds: [30],
+            letRecipientsChooseSigners: true,
+          },
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $name: String
+            $locale: PetitionLocale!
+            $petitionId: GID
+            $type: PetitionBaseType
+          ) {
+            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
+              signatureConfig {
+                title
+              }
+            }
+          }
+        `,
+        variables: {
+          name: "Test signature",
+          locale: "es",
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", publicTemplateWithSignature.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({ signatureConfig: { title: "aaaa" } });
+    });
+
     it("don't copy deadline configuration when creating a petition from a template", async () => {
       const [template] = await mocks.createRandomPetitions(
         organization.id,
