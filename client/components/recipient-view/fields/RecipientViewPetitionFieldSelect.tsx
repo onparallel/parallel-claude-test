@@ -97,7 +97,7 @@ export function RecipientViewPetitionFieldSelect({
 
   function handleAddNewReply() {
     setShowNewReply(true);
-    setTimeout(() => newReplyRef.current!.focus());
+    setTimeout(() => newReplyRef.current?.focus());
   }
 
   const rsProps = useRecipientViewReactSelectProps({
