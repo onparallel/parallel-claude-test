@@ -130,14 +130,26 @@ export function SignatureConfigDialog({
         as: "form",
         onSubmit: handleSubmit(
           ({ contacts, provider, review, title, letRecipientsChooseSigners }) => {
-            props.onResolve({
-              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-              contactIds: contacts.map((c) => c!.id),
-              provider,
-              review: petitionIsCompleted ? false : review,
-              title,
-              letRecipientsChooseSigners: contacts.length === 0 ? true : letRecipientsChooseSigners,
-            });
+            if (review) {
+              props.onResolve({
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                contactIds: [],
+                provider,
+                review: petitionIsCompleted ? false : review,
+                title,
+                letRecipientsChooseSigners: false,
+              });
+            } else {
+              props.onResolve({
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                contactIds: contacts.map((c) => c!.id),
+                provider,
+                review: false,
+                title,
+                letRecipientsChooseSigners:
+                  contacts.length === 0 ? true : letRecipientsChooseSigners,
+              });
+            }
           }
         ),
       }}
@@ -269,9 +281,18 @@ export function SignatureConfigDialog({
                 />
               )}
             />
+            {petition.__typename === "PetitionTemplate" && selectedContacts.length > 0 ? (
+              <CloseableAlert status="info" borderRadius="base" marginTop={2}>
+                <AlertIcon />
+                <FormattedMessage
+                  id="component.signature-config-dialog.alert"
+                  defaultMessage="These signers will be assigned to all the petitions that are created from this template."
+                />
+              </CloseableAlert>
+            ) : null}
           </FormControl>
           <FormControl
-            hidden={selectedContacts.length === 0 || petitionIsCompleted}
+            hidden={selectedContacts.length === 0 || petitionIsCompleted || review}
             alignItems="center"
             display="flex"
           >
@@ -288,15 +309,6 @@ export function SignatureConfigDialog({
               />
             </HelpPopover>
           </FormControl>
-          {petition.__typename === "PetitionTemplate" ? (
-            <CloseableAlert status="info" borderRadius="base">
-              <AlertIcon />
-              <FormattedMessage
-                id="component.signature-config-dialog.alert"
-                defaultMessage="These signers will be assigned to all the petitions that are created from this template."
-              />
-            </CloseableAlert>
-          ) : null}
         </Stack>
       }
       confirm={
