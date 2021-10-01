@@ -1,22 +1,20 @@
 import {
-  Alert,
   AlertDescription,
   AlertIcon,
   Box,
   Button,
   Circle,
-  CloseButton,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   IconButton,
+  ListItem,
   Radio,
   RadioGroup,
   Stack,
   Text,
   UnorderedList,
-  ListItem,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { withError } from "@parallel/utils/promises/withError";
@@ -25,6 +23,7 @@ import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, uniq, uniqBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { CloseableAlert } from "./CloseableAlert";
 import { ConfirmDialog } from "./ConfirmDialog";
 import {
   ContactSelect,
@@ -57,9 +56,6 @@ export function RecipientSelectGroups({
   const intl = useIntl();
   const recipientGroupSelectRef = useMultipleRefs<ContactSelectInstance>();
   const recipientGroupFormControlRef = useMultipleRefs<HTMLDivElement>();
-
-  const [isAlertVisible, setAlertVisible] = useState(true);
-  const [isBouncedAlertVisible, setBouncedAlertVisible] = useState(true);
 
   function handleRecipientsChange(groupNumber: number) {
     return (recipients: ContactSelectSelection[]) => {
@@ -310,40 +306,37 @@ export function RecipientSelectGroups({
           </Button>
         </Flex>
       ) : null}
-      {isBouncedAlertVisible && bouncedEmailRecipients.length ? (
-        <Alert status="warning" backgroundColor="orange.100" borderRadius="base" marginTop={4}>
-          <Flex alignItems="center" justifyContent="flex-start">
-            <AlertIcon color="yellow.500" />
-            <AlertDescription>
-              <Text>
-                <FormattedMessage
-                  id="component.recipient-select-groups.emails-bounced-warning"
-                  defaultMessage="The following {count, plural, =1{email has} other{emails have}} bounced previously. Please, make sure the email addresses are valid."
-                  values={{
-                    count: bouncedEmailRecipients.length,
-                  }}
-                />
-              </Text>
-              <UnorderedList paddingLeft={2}>
-                {bouncedEmailRecipients.map((recipient, index) => (
-                  <ListItem key={index}>{`${recipient.fullName} <${recipient.email}>`}</ListItem>
-                ))}
-              </UnorderedList>
-            </AlertDescription>
-          </Flex>
-          <CloseButton
-            aria-label={intl.formatMessage({ id: "generic.close", defaultMessage: "Close" })}
-            fontSize="xs"
-            onClick={() => setBouncedAlertVisible(false)}
-          />
-        </Alert>
+      {bouncedEmailRecipients.length ? (
+        <CloseableAlert
+          status="warning"
+          backgroundColor="orange.100"
+          borderRadius="base"
+          marginTop={4}
+        >
+          <AlertIcon color="yellow.500" />
+          <AlertDescription>
+            <Text>
+              <FormattedMessage
+                id="component.recipient-select-groups.emails-bounced-warning"
+                defaultMessage="The following {count, plural, =1{email has} other{emails have}} bounced previously. Please, make sure the email addresses are valid."
+                values={{
+                  count: bouncedEmailRecipients.length,
+                }}
+              />
+            </Text>
+            <UnorderedList paddingLeft={2}>
+              {bouncedEmailRecipients.map((recipient, index) => (
+                <ListItem key={index}>{`${recipient.fullName} <${recipient.email}>`}</ListItem>
+              ))}
+            </UnorderedList>
+          </AlertDescription>
+        </CloseableAlert>
       ) : null}
 
-      {isAlertVisible &&
-      recipientGroups.length === 1 &&
+      {recipientGroups.length === 1 &&
       validRecipients(0).length >= 2 &&
       invalidRecipients(0).length === 0 ? (
-        <Alert status="info" marginTop={4} borderRadius="base">
+        <CloseableAlert status="info" marginTop={4} borderRadius="base">
           <AlertIcon />
           <Text display="block">
             <FormattedMessage
@@ -354,8 +347,7 @@ export function RecipientSelectGroups({
               }}
             />
           </Text>
-          <CloseButton fontSize="xs" onClick={() => setAlertVisible(false)} />
-        </Alert>
+        </CloseableAlert>
       ) : null}
     </>
   );
