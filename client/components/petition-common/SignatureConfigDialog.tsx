@@ -133,7 +133,7 @@ export function SignatureConfigDialog({
             if (review) {
               props.onResolve({
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                contactIds: [],
+                contactIds: contacts.map((c) => c!.id),
                 provider,
                 review: petitionIsCompleted ? false : review,
                 title,
