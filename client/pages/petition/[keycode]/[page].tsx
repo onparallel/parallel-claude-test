@@ -180,7 +180,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           recipients={recipients}
           keycode={keycode}
           isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
-        ></RecipientViewHeader>
+        />
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
           {["COMPLETED", "CLOSED"].includes(petition.status) ? (
             !petition.signature ||

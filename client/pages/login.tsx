@@ -214,56 +214,59 @@ function Login() {
         defaultMessage: "Login to your Parallel account",
       })}
     >
-      {isVerificationRequired ? (
-        <CloseableAlert status="error" variant="subtle" zIndex={2}>
-          <Flex
-            maxWidth="container.lg"
-            alignItems="center"
-            justifyContent="flex-start"
-            marginX="auto"
-            width="100%"
-            paddingLeft={4}
-            paddingRight={12}
-          >
-            <AlertIcon />
-            <Stack spacing={1}>
-              <AlertTitle>
+      <CloseableAlert
+        isOpen={isVerificationRequired}
+        onClose={() => setIsVerificationRequired(false)}
+        status="error"
+        variant="subtle"
+        zIndex={2}
+      >
+        <Flex
+          maxWidth="container.lg"
+          alignItems="center"
+          justifyContent="flex-start"
+          marginX="auto"
+          width="100%"
+          paddingLeft={4}
+          paddingRight={12}
+        >
+          <AlertIcon />
+          <Stack spacing={1}>
+            <AlertTitle>
+              <FormattedMessage
+                id="public.login.activation-pending-title"
+                defaultMessage="Activation pending"
+              />
+            </AlertTitle>
+            <AlertDescription>
+              <Text>
                 <FormattedMessage
-                  id="public.login.activation-pending-title"
-                  defaultMessage="Activation pending"
+                  id="public.login.activation-pending-body"
+                  defaultMessage="Please activate your account through the activation link that was sent to your email."
                 />
-              </AlertTitle>
-              <AlertDescription>
-                <Text>
-                  <FormattedMessage
-                    id="public.login.activation-pending-body"
-                    defaultMessage="Please activate your account through the activation link that was sent to your email."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="public.login.activation-pending-resend"
-                    defaultMessage="Can't find it? <a>Resend email.</a>"
-                    values={{
-                      a: (chunks: any) => (
-                        <Button
-                          isDisabled={isVerificationEmailSent}
-                          variant="link"
-                          fontWeight="bold"
-                          onClick={handleResendVerificationEmail}
-                        >
-                          {chunks}
-                        </Button>
-                      ),
-                    }}
-                  />
-                </Text>
-              </AlertDescription>
-            </Stack>
-          </Flex>
-        </CloseableAlert>
-      ) : null}
-
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="public.login.activation-pending-resend"
+                  defaultMessage="Can't find it? <a>Resend email.</a>"
+                  values={{
+                    a: (chunks: any) => (
+                      <Button
+                        isDisabled={isVerificationEmailSent}
+                        variant="link"
+                        fontWeight="bold"
+                        onClick={handleResendVerificationEmail}
+                      >
+                        {chunks}
+                      </Button>
+                    ),
+                  }}
+                />
+              </Text>
+            </AlertDescription>
+          </Stack>
+        </Flex>
+      </CloseableAlert>
       <PublicUserFormContainer>
         {showContinueAs ? (
           <AlreadyLoggedIn
