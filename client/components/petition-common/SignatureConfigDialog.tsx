@@ -1,10 +1,8 @@
 import { gql } from "@apollo/client";
 import {
-  Alert,
   AlertIcon,
   Button,
   Checkbox,
-  CloseButton,
   FormControl,
   FormLabel,
   Input,
@@ -22,10 +20,11 @@ import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { StylesConfig } from "react-select";
+import { CloseableAlert } from "../common/CloseableAlert";
 import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
 
@@ -121,10 +120,6 @@ export function SignatureConfigDialog({
       } as StylesConfig<any, any, any>,
     }),
     [petitionIsCompleted]
-  );
-
-  const [isSignatureAlertVisible, setIsSignatureAlertVisible] = useState(
-    petition.__typename === "PetitionTemplate"
   );
 
   return (
@@ -293,15 +288,14 @@ export function SignatureConfigDialog({
               />
             </HelpPopover>
           </FormControl>
-          {isSignatureAlertVisible ? (
-            <Alert status="info" borderRadius="base">
+          {petition.__typename === "PetitionTemplate" ? (
+            <CloseableAlert status="info" borderRadius="base">
               <AlertIcon />
               <FormattedMessage
                 id="component.signature-config-dialog.alert"
                 defaultMessage="These signers will be assigned to all the petitions that are created from this template."
               />
-              <CloseButton onClick={() => setIsSignatureAlertVisible(false)} />
-            </Alert>
+            </CloseableAlert>
           ) : null}
         </Stack>
       }
