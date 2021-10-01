@@ -970,6 +970,7 @@ export class PetitionRepository extends BaseRepository {
         "updated_at",
         "validated",
         "is_fixed",
+        "from_petition_field_id",
       ]),
       field.position + 1,
       user
@@ -1514,6 +1515,7 @@ export class PetitionRepository extends BaseRepository {
               fields.map((field) => ({
                 ...omit(field, ["id", "petition_id", "created_at", "updated_at", "validated"]),
                 petition_id: cloned.id,
+                from_petition_field_id: field.id,
                 created_by: `User:${user.id}`,
                 updated_by: `User:${user.id}`,
               })),
