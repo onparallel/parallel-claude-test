@@ -1,11 +1,9 @@
 import { gql, useApolloClient } from "@apollo/client";
 import {
-  Alert,
   AlertDescription,
   AlertIcon,
   AlertTitle,
   Button,
-  CloseButton,
   Flex,
   Stack,
   Text,
@@ -18,6 +16,7 @@ import {
   PasswordChangeForm,
 } from "@parallel/components/auth/PasswordChangeForm";
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
+import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { NormalLink } from "@parallel/components/common/Link";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -216,7 +215,7 @@ function Login() {
       })}
     >
       {isVerificationRequired ? (
-        <Alert status="error" variant="subtle" zIndex={2}>
+        <CloseableAlert status="error" variant="subtle" zIndex={2}>
           <Flex
             maxWidth="container.lg"
             alignItems="center"
@@ -262,13 +261,7 @@ function Login() {
               </AlertDescription>
             </Stack>
           </Flex>
-          <CloseButton
-            position="absolute"
-            right="8px"
-            top="8px"
-            onClick={() => setIsVerificationRequired(false)}
-          />
-        </Alert>
+        </CloseableAlert>
       ) : null}
 
       <PublicUserFormContainer>

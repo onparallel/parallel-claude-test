@@ -1,16 +1,15 @@
 import { gql } from "@apollo/client";
 import {
-  Alert,
   AlertDescription,
   AlertIcon,
   Box,
   Button,
-  CloseButton,
   Flex,
   Stack,
   Text,
   useToast,
 } from "@chakra-ui/react";
+import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
@@ -71,7 +70,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const message = access!.message;
 
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage);
-  const [showAlert, setShowAlert] = useState(true);
 
   const [finalized, setFinalized] = useState(false);
   const [publicCompletePetition] = useRecipientView_publicCompletePetitionMutation();
@@ -181,13 +179,13 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           message={message}
           recipients={recipients}
           keycode={keycode}
-          isClosed={showAlert && ["COMPLETED", "CLOSED"].includes(petition.status)}
+          isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
         ></RecipientViewHeader>
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
-          {showAlert && ["COMPLETED", "CLOSED"].includes(petition.status) ? (
+          {["COMPLETED", "CLOSED"].includes(petition.status) ? (
             !petition.signature ||
             (petition.signature && petition.signatureStatus === "COMPLETED") ? (
-              <Alert status="success" variant="subtle" zIndex={2}>
+              <CloseableAlert status="success" variant="subtle" zIndex={2}>
                 <Flex
                   maxWidth="container.lg"
                   alignItems="center"
@@ -228,15 +226,9 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                     )}
                   </AlertDescription>
                 </Flex>
-                <CloseButton
-                  position="absolute"
-                  right="8px"
-                  top="8px"
-                  onClick={() => setShowAlert(false)}
-                />
-              </Alert>
+              </CloseableAlert>
             ) : (
-              <Alert backgroundColor="yellow.100" zIndex={2}>
+              <CloseableAlert backgroundColor="yellow.100" zIndex={2}>
                 <Flex
                   maxWidth="container.lg"
                   alignItems="center"
@@ -311,13 +303,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                     />
                   </AlertDescription>
                 </Flex>
-                <CloseButton
-                  position="absolute"
-                  right="8px"
-                  top="8px"
-                  onClick={() => setShowAlert(false)}
-                />
-              </Alert>
+              </CloseableAlert>
             )
           ) : null}
           <ResizeObserver onResize={readjustHeight} />
