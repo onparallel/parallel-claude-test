@@ -3686,6 +3686,7 @@ export class PetitionRepository extends BaseRepository {
         this.from("contact")
           .join("petition_access", "contact.id", "petition_access.contact_id")
           .whereNull("contact.deleted_at")
+          .where("contact.last_email_bounced", !hasBounced) // make sure to update only if there is a change
           .where("petition_access.id", petitionAccessId)
           .select("contact.id")
       );
