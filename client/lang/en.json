@@ -2486,8 +2486,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.link-error",
-    "definition": "The link is in use or contains banned words",
-    "context": "The link is in use or contains banned words"
+    "definition": "The link is invalid, please choose another",
+    "context": "The link is invalid, please choose another"
   },
   {
     "term": "component.settings-public-link-dialog.link-label",

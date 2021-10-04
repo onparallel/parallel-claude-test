@@ -2481,17 +2481,17 @@
   },
   {
     "term": "component.settings-public-link-dialog.link-edited-alert",
-    "definition": "",
+    "definition": "El enlace ha sido editado, si guarda, ya no podrá acceder a la solicitud a través del enlace anterior:",
     "context": "The link has been edited, if you save, you will no longer be able to access the request through the old link:"
   },
   {
     "term": "component.settings-public-link-dialog.link-error",
-    "definition": "",
-    "context": "The link is in use or contains banned words"
+    "definition": "El enlace no es válido, por favor, escoja otro",
+    "context": "The link is invalid, please choose another"
   },
   {
     "term": "component.settings-public-link-dialog.link-label",
-    "definition": "",
+    "definition": "Enlace:",
     "context": "Link:"
   },
   {

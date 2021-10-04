@@ -657,6 +657,7 @@ export type MutationcreatePublicPetitionLinkArgs = {
   description: Scalars["String"];
   otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
   ownerId: Scalars["GID"];
+  slug?: Maybe<Scalars["String"]>;
   templateId: Scalars["GID"];
   title: Scalars["String"];
 };
@@ -1097,6 +1098,7 @@ export type MutationupdatePublicPetitionLinkArgs = {
   otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
   ownerId?: Maybe<Scalars["GID"]>;
   publicPetitionLinkId: Scalars["GID"];
+  slug?: Maybe<Scalars["String"]>;
   title?: Maybe<Scalars["String"]>;
 };
 
@@ -2170,12 +2172,14 @@ export type Query = {
   contactsByEmail: Array<Maybe<Contact>>;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
+  getSlugForPublicPetitionLink: Scalars["String"];
   /** Get users or groups from IDs */
   getUsersOrGroups: Array<UserOrUserGroup>;
   /** Decodes the given Global ID into an entity in the database. */
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
   globalIdEncode: SupportMethodResponse;
+  isValidPublicPetitionLinkSlug: Scalars["Boolean"];
   landingTemplateBySlug: Maybe<LandingTemplate>;
   landingTemplates: LandingTemplatePagination;
   landingTemplatesSamples: Array<LandingTemplateSample>;
@@ -2228,6 +2232,10 @@ export type QueryemailIsAvailableArgs = {
   email: Scalars["String"];
 };
 
+export type QuerygetSlugForPublicPetitionLinkArgs = {
+  petitionName?: Maybe<Scalars["String"]>;
+};
+
 export type QuerygetUsersOrGroupsArgs = {
   ids: Array<Scalars["ID"]>;
 };
@@ -2239,6 +2247,10 @@ export type QueryglobalIdDecodeArgs = {
 export type QueryglobalIdEncodeArgs = {
   id: Scalars["Int"];
   type: EntityType;
+};
+
+export type QueryisValidPublicPetitionLinkSlugArgs = {
+  slug: Scalars["String"];
 };
 
 export type QuerylandingTemplateBySlugArgs = {

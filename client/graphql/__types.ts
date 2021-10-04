@@ -691,6 +691,7 @@ export interface MutationcreatePublicPetitionLinkArgs {
   description: Scalars["String"];
   otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
   ownerId: Scalars["GID"];
+  slug?: Maybe<Scalars["String"]>;
   templateId: Scalars["GID"];
   title: Scalars["String"];
 }
@@ -1131,6 +1132,7 @@ export interface MutationupdatePublicPetitionLinkArgs {
   otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
   ownerId?: Maybe<Scalars["GID"]>;
   publicPetitionLinkId: Scalars["GID"];
+  slug?: Maybe<Scalars["String"]>;
   title?: Maybe<Scalars["String"]>;
 }
 
@@ -2258,12 +2260,14 @@ export interface Query {
   contactsByEmail: Array<Maybe<Contact>>;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
+  getSlugForPublicPetitionLink: Scalars["String"];
   /** Get users or groups from IDs */
   getUsersOrGroups: Array<UserOrUserGroup>;
   /** Decodes the given Global ID into an entity in the database. */
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
   globalIdEncode: SupportMethodResponse;
+  isValidPublicPetitionLinkSlug: Scalars["Boolean"];
   landingTemplateBySlug?: Maybe<LandingTemplate>;
   landingTemplates: LandingTemplatePagination;
   landingTemplatesSamples: Array<LandingTemplateSample>;
@@ -2316,6 +2320,10 @@ export interface QueryemailIsAvailableArgs {
   email: Scalars["String"];
 }
 
+export interface QuerygetSlugForPublicPetitionLinkArgs {
+  petitionName?: Maybe<Scalars["String"]>;
+}
+
 export interface QuerygetUsersOrGroupsArgs {
   ids: Array<Scalars["ID"]>;
 }
@@ -2327,6 +2335,10 @@ export interface QueryglobalIdDecodeArgs {
 export interface QueryglobalIdEncodeArgs {
   id: Scalars["Int"];
   type: EntityType;
+}
+
+export interface QueryisValidPublicPetitionLinkSlugArgs {
+  slug: Scalars["String"];
 }
 
 export interface QuerylandingTemplateBySlugArgs {
@@ -6198,6 +6210,7 @@ export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
   otherPermissions?: Maybe<
     Array<UserOrUserGroupPublicLinkPermission> | UserOrUserGroupPublicLinkPermission
   >;
+  slug?: Maybe<Scalars["String"]>;
 }>;
 
 export type PetitionSettings_createPublicPetitionLinkMutation = {
@@ -6233,6 +6246,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
   otherPermissions?: Maybe<
     Array<UserOrUserGroupPublicLinkPermission> | UserOrUserGroupPublicLinkPermission
   >;
+  slug?: Maybe<Scalars["String"]>;
 }>;
 
 export type PetitionSettings_updatePublicPetitionLinkMutation = {
@@ -6640,6 +6654,22 @@ export type PetitionSharingModal_PetitionsQuery = {
         }
     >
   >;
+};
+
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables = Exact<{
+  slug: Scalars["String"];
+}>;
+
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery = {
+  isValidPublicPetitionLinkSlug: boolean;
+};
+
+export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables = Exact<{
+  petitionName?: Maybe<Scalars["String"]>;
+}>;
+
+export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery = {
+  getSlugForPublicPetitionLink: string;
 };
 
 export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
@@ -18233,6 +18263,7 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
     $description: String!
     $ownerId: GID!
     $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+    $slug: String
   ) {
     createPublicPetitionLink(
       templateId: $templateId
@@ -18240,6 +18271,7 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
       description: $description
       ownerId: $ownerId
       otherPermissions: $otherPermissions
+      slug: $slug
     ) {
       id
       publicLink {
@@ -18277,6 +18309,7 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
     $description: String
     $ownerId: GID
     $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+    $slug: String
   ) {
     updatePublicPetitionLink(
       publicPetitionLinkId: $publicPetitionLinkId
@@ -18285,6 +18318,7 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
       description: $description
       ownerId: $ownerId
       otherPermissions: $otherPermissions
+      slug: $slug
     ) {
       id
       title
@@ -18442,6 +18476,76 @@ export type PetitionSharingModal_PetitionsQueryHookResult = ReturnType<
 >;
 export type PetitionSharingModal_PetitionsLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionsLazyQuery
+>;
+export const PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument = gql`
+  query PublicLinkSettingsDialog_isValidPublicPetitionLinkSlug($slug: String!) {
+    isValidPublicPetitionLinkSlug(slug: $slug)
+  }
+`;
+export function usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  >(PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument, options);
+}
+export function usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  >(PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument, options);
+}
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryHookResult = ReturnType<
+  typeof usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery
+>;
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQueryHookResult = ReturnType<
+  typeof usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQuery
+>;
+export const PublicLinkSettingsDialog_getSlugForPublicPetitionLinkDocument = gql`
+  query PublicLinkSettingsDialog_getSlugForPublicPetitionLink($petitionName: String) {
+    getSlugForPublicPetitionLink(petitionName: $petitionName)
+  }
+`;
+export function usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
+    PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
+    PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables
+  >(PublicLinkSettingsDialog_getSlugForPublicPetitionLinkDocument, options);
+}
+export function usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
+    PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
+    PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables
+  >(PublicLinkSettingsDialog_getSlugForPublicPetitionLinkDocument, options);
+}
+export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryHookResult = ReturnType<
+  typeof usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery
+>;
+export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQueryHookResult = ReturnType<
+  typeof usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQuery
 >;
 export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
   mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(

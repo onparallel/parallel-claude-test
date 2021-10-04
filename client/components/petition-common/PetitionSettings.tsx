@@ -191,9 +191,11 @@ function _PetitionSettings({
           petitionName: petition.name ?? "",
         });
 
-        const { title, description, ownerId, otherPermissions } = publicLinkSettings;
         const { data } = await createPublicPetitionLink({
-          variables: { templateId: petition.id, title, description, ownerId, otherPermissions },
+          variables: {
+            templateId: petition.id,
+            ...publicLinkSettings,
+          },
         });
 
         if (data) {
@@ -215,14 +217,10 @@ function _PetitionSettings({
         petitionName: petition.name ?? "",
       });
 
-      const { title, description, ownerId, otherPermissions } = publicLinkSettings;
       await updatePublicPetitionLink({
         variables: {
           publicPetitionLinkId: publicLink.id,
-          title,
-          description,
-          ownerId,
-          otherPermissions,
+          ...publicLinkSettings,
         },
       });
     } catch {}
@@ -492,6 +490,7 @@ const mutations = [
       $description: String!
       $ownerId: GID!
       $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+      $slug: String
     ) {
       createPublicPetitionLink(
         templateId: $templateId
@@ -499,6 +498,7 @@ const mutations = [
         description: $description
         ownerId: $ownerId
         otherPermissions: $otherPermissions
+        slug: $slug
       ) {
         id
         publicLink {
@@ -521,6 +521,7 @@ const mutations = [
       $description: String
       $ownerId: GID
       $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
+      $slug: String
     ) {
       updatePublicPetitionLink(
         publicPetitionLinkId: $publicPetitionLinkId
@@ -529,6 +530,7 @@ const mutations = [
         description: $description
         ownerId: $ownerId
         otherPermissions: $otherPermissions
+        slug: $slug
       ) {
         id
         title

@@ -19,6 +19,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { petitionsArePublicTemplates, userHasAccessToPetitions } from "./authorizers";
 import { validateAuthTokenPayload, validatePublicPetitionLinkSlug } from "./validations";
+import ASCIIFolder from "fold-to-ascii";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {

@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -9,20 +9,26 @@ import {
   Input,
   InputGroup,
   InputLeftAddon,
+  InputRightElement,
+  Spinner,
   Stack,
   Text,
   Textarea,
-  InputRightElement,
 } from "@chakra-ui/react";
-import { CheckIcon } from "@parallel/chakra/icons";
+import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
+  PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+  PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
+  usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQuery,
   UserOrUserGroupPublicLinkPermission,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useCallback, useRef } from "react";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { useCallback, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { UserSelect, useSearchUsers } from "../common/UserSelect";
@@ -31,7 +37,7 @@ interface PublicLinkSettingsData {
   title: string;
   description: string;
   ownerId: string;
-  link: string;
+  slug: string;
   petitionName: string;
   otherPermissions: UserOrUserGroupPublicLinkPermission[];
 }
@@ -51,6 +57,10 @@ export function PublicLinkSettingsDialog({
   },
   PublicLinkSettingsData
 >) {
+  const apollo = useApolloClient();
+  const intl = useIntl();
+  const _handleSearchUsers = useSearchUsers();
+
   const owner = publicLink?.linkPermissions.find((p) => p.permissionType === "OWNER");
 
   const {
@@ -58,13 +68,14 @@ export function PublicLinkSettingsDialog({
     register,
     watch,
     control,
+    setValue,
     formState: { errors, isDirty, dirtyFields },
   } = useForm<PublicLinkSettingsData>({
     mode: "onChange",
     defaultValues: {
       title: publicLink?.title ?? "",
       description: publicLink?.description ?? "",
-      link: publicLink?.slug ?? (petitionName || "random"),
+      slug: publicLink?.slug ?? "",
       ownerId:
         owner?.__typename === "PublicPetitionLinkUserPermission" ? owner.user.id : ownerId ?? "",
       otherPermissions:
@@ -86,8 +97,30 @@ export function PublicLinkSettingsDialog({
     },
   });
 
-  const intl = useIntl();
-  const _handleSearchUsers = useSearchUsers();
+  const [getSlugLazy, { data: getSlugData, loading: getSlugLoading }] =
+    usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQuery({
+      fetchPolicy: "network-only",
+    });
+
+  useEffect(() => {
+    if (!publicLink) {
+      getSlugLazy({
+        variables: {
+          petitionName,
+        },
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    // console.log(errors.slug);
+  }, [errors.slug]);
+
+  useEffect(() => {
+    if (getSlugData?.getSlugForPublicPetitionLink) {
+      setValue("slug", getSlugData?.getSlugForPublicPetitionLink);
+    }
+  }, [getSlugData]);
 
   const titleRef = useRef<HTMLInputElement>(null);
   const titleRegisterProps = useRegisterWithRef(titleRef, register, "title", {
@@ -115,6 +148,41 @@ export function PublicLinkSettingsDialog({
     [_handleSearchUsers, watchOwnerId]
   );
 
+  const debouncedIsValidSlug = useDebouncedAsync(
+    async (slug: string) => {
+      const { data } = await apollo.query<
+        PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+        PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+      >({
+        query: gql`
+          query PublicLinkSettingsDialog_isValidPublicPetitionLinkSlug($slug: String!) {
+            isValidPublicPetitionLinkSlug(slug: $slug)
+          }
+        `,
+        variables: { slug },
+        fetchPolicy: "no-cache",
+      });
+      return data.isValidPublicPetitionLinkSlug;
+    },
+    300,
+    []
+  );
+
+  const isValidSlug = async (value: string) => {
+    try {
+      return await debouncedIsValidSlug(value);
+    } catch (e) {
+      // "DEBOUNCED" error means the search was cancelled because user kept typing
+      if (e === "DEBOUNCED") {
+        return "DEBOUNCED";
+      } else if (isApolloError(e)) {
+        return e.graphQLErrors[0]?.extensions?.code as string;
+      } else {
+        throw e;
+      }
+    }
+  };
+
   return (
     <ConfirmDialog
       size="xl"
@@ -139,7 +207,7 @@ export function PublicLinkSettingsDialog({
       }
       body={
         <Stack>
-          {publicLink && dirtyFields.link === true ? (
+          {publicLink && dirtyFields.slug === true ? (
             <Alert status="warning" rounded="md">
               <AlertIcon color="yellow.500" />
               <Stack>
@@ -281,7 +349,7 @@ export function PublicLinkSettingsDialog({
               )}
             />
           </FormControl>
-          <FormControl>
+          <FormControl isInvalid={errors.slug?.message !== "DEBOUNCED" && !!errors.slug}>
             <FormLabel>
               <FormattedMessage
                 id="component.settings-public-link-dialog.link-label"
@@ -290,15 +358,30 @@ export function PublicLinkSettingsDialog({
             </FormLabel>
             <InputGroup>
               <InputLeftAddon>{`${process.env.NEXT_PUBLIC_PARALLEL_URL}/${locale}/pp/`}</InputLeftAddon>
-              <Input type="text" {...register("link", { required: true })} />
-              <InputRightElement>
-                <CheckIcon color="green.500" />
-              </InputRightElement>
+              <Input
+                type="text"
+                {...register("slug", {
+                  required: true,
+                  validate: { isValidSlug },
+                })}
+                disabled={getSlugLoading}
+              />
+              {!publicLink || dirtyFields.slug === true ? (
+                <InputRightElement>
+                  {getSlugLoading || errors.slug?.message === "DEBOUNCED" ? (
+                    <Spinner thickness="2px" speed="0.65s" emptyColor="gray.200" color="gray.500" />
+                  ) : !errors.slug ? (
+                    <CheckIcon color="green.500" />
+                  ) : errors.slug ? (
+                    <CloseIcon color="red.500" fontSize="sm" />
+                  ) : null}
+                </InputRightElement>
+              ) : null}
             </InputGroup>
             <FormErrorMessage>
               <FormattedMessage
                 id="component.settings-public-link-dialog.link-error"
-                defaultMessage="The link is in use or contains banned words"
+                defaultMessage="The link is invalid, please choose another"
               />
             </FormErrorMessage>
           </FormControl>
@@ -320,6 +403,14 @@ export function PublicLinkSettingsDialog({
     />
   );
 }
+
+PublicLinkSettingsDialog.queries = [
+  gql`
+    query PublicLinkSettingsDialog_getSlugForPublicPetitionLink($petitionName: String) {
+      getSlugForPublicPetitionLink(petitionName: $petitionName)
+    }
+  `,
+];
 
 PublicLinkSettingsDialog.fragments = {
   PublicPetitionLink: gql`
