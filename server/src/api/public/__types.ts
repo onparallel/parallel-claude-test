@@ -490,11 +490,6 @@ export type Mutation = {
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
-  /**
-   * Marks the specified comments as read or unread.
-   * @deprecated Use `updatePetitionUserNotificationReadStatus` instead.
-   */
-  updatePetitionFieldCommentsReadStatus: Array<PetitionFieldComment>;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the metada of the specified petition field reply */
@@ -1067,12 +1062,6 @@ export type MutationupdatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-};
-
-export type MutationupdatePetitionFieldCommentsReadStatusArgs = {
-  isRead: Scalars["Boolean"];
-  petitionFieldCommentIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
 };
 

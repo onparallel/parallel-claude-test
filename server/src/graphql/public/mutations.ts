@@ -9,7 +9,7 @@ import {
   objectType,
   stringArg,
 } from "nexus";
-import { countBy, isDefined, prop } from "remeda";
+import { countBy, isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { ApiContext } from "../../context";
 import { Petition, PetitionSignatureRequest } from "../../db/__types";
@@ -699,7 +699,7 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
       keycode: nonNull(idArg()),
       petitionFieldCommentIds: nonNull(list(nonNull(globalIdArg("PetitionFieldComment")))),
     },
-    validateArgs: notEmptyArray(prop("petitionFieldCommentIds"), "petitionFieldCommentIds"),
+    validateArgs: notEmptyArray((args) => args.petitionFieldCommentIds, "petitionFieldCommentIds"),
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.markPetitionFieldCommentsAsReadForAccess(
         args.petitionFieldCommentIds,

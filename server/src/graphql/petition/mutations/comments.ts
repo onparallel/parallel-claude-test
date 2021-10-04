@@ -1,9 +1,7 @@
-import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
-import { prop } from "remeda";
-import { and, authenticate, authenticateAnd, chain, ifArgEquals } from "../../helpers/authorize";
+import { booleanArg, mutationField, nonNull, stringArg } from "nexus";
+import { and, authenticate, chain, ifArgEquals } from "../../helpers/authorize";
 import { WhitelistedError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import {
   commentsBelongsToPetition,
   fieldsBelongsToPetition,
@@ -104,29 +102,3 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
     return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
 });
-
-export const updatePetitionFieldCommentsReadStatus = mutationField(
-  "updatePetitionFieldCommentsReadStatus",
-  {
-    deprecation: "Use `updatePetitionUserNotificationReadStatus` instead.",
-    description: "Marks the specified comments as read or unread.",
-    type: list(nonNull("PetitionFieldComment")),
-    authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId"),
-      commentsBelongsToPetition("petitionId", "petitionFieldCommentIds")
-    ),
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      isRead: nonNull(booleanArg()),
-      petitionFieldCommentIds: nonNull(list(nonNull(globalIdArg("PetitionFieldComment")))),
-    },
-    validateArgs: notEmptyArray(prop("petitionFieldCommentIds"), "petitionFieldCommentIds"),
-    resolve: async (_, args, ctx) => {
-      return await ctx.petitions.updatePetitionFieldCommentsReadStatusForUser(
-        args.petitionFieldCommentIds,
-        args.isRead,
-        ctx.user!
-      );
-    },
-  }
-);

@@ -892,7 +892,6 @@ export interface NexusGenFieldTypes {
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    updatePetitionFieldCommentsReadStatus: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
@@ -2033,7 +2032,6 @@ export interface NexusGenFieldTypeNames {
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionBaseAndField";
     updatePetitionFieldComment: "PetitionField";
-    updatePetitionFieldCommentsReadStatus: "PetitionFieldComment";
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionPermissionSubscription: "Petition";
@@ -3424,12 +3422,6 @@ export interface NexusGenArgTypes {
       content: string; // String!
       petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    updatePetitionFieldCommentsReadStatus: {
-      // args
-      isRead: boolean; // Boolean!
-      petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionFieldRepliesStatus: {

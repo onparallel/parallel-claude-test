@@ -1154,16 +1154,6 @@ type Mutation {
   ): PetitionField!
 
   """
-  Marks the specified comments as read or unread.
-  """
-  updatePetitionFieldCommentsReadStatus(
-    isRead: Boolean!
-    petitionFieldCommentIds: [GID!]!
-    petitionId: GID!
-  ): [PetitionFieldComment!]!
-    @deprecated(reason: "Use `updatePetitionUserNotificationReadStatus` instead.")
-
-  """
   Updates the status of a petition field reply and sets the petition as closed if all fields are validated.
   """
   updatePetitionFieldRepliesStatus(
