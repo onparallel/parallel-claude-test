@@ -1463,6 +1463,8 @@ export type PetitionBase = {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The signature configuration for the petition. */
+  signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
@@ -1869,6 +1871,8 @@ export type PetitionTemplate = PetitionBase & {
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
   publicLink: Maybe<PublicPetitionLink>;
+  /** The signature configuration for the petition. */
+  signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */

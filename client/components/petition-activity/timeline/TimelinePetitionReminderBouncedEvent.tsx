@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { EmailXIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -22,7 +22,7 @@ export function TimelinePetitionReminderBouncedEvent({
         id="timeline.petition-reminder-bounced-description"
         defaultMessage="We could not send a reminder to contact {contactName} {timeAgo}"
         values={{
-          contactName: <ContactLink contact={event.reminder.access.contact} />,
+          contactName: <ContactReference contact={event.reminder.access.contact} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
@@ -38,12 +38,12 @@ TimelinePetitionReminderBouncedEvent.fragments = {
       reminder {
         access {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
       }
       createdAt
     }
-    ${ContactLink.fragments.Contact}
+    ${ContactReference.fragments.Contact}
   `,
 };

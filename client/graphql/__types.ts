@@ -127,6 +127,7 @@ export interface Contact extends Timestamps {
   firstName?: Maybe<Scalars["String"]>;
   /** The full name of the contact. */
   fullName?: Maybe<Scalars["String"]>;
+  hasBouncedEmail: Scalars["Boolean"];
   /** The ID of the contact. */
   id: Scalars["GID"];
   /** The last name of the contact. */
@@ -488,6 +489,10 @@ export interface Mutation {
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
+  /** Sends a reminder email to the pending signers */
+  sendSignatureRequestReminders: Result;
+  /** Sets the locale passed as arg as the preferred language of the user to see the page */
+  setUserPreferredLocale: User;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
@@ -809,8 +814,9 @@ export interface MutationpublicCheckVerificationCodeArgs {
 }
 
 export interface MutationpublicCompletePetitionArgs {
+  additionalSigners?: Maybe<Array<PublicPetitionSignerDataInput>>;
   keycode: Scalars["ID"];
-  signer?: Maybe<PublicPetitionSignerData>;
+  message?: Maybe<Scalars["String"]>;
 }
 
 export interface MutationpublicCreateAndSendPetitionFromPublicLinkArgs {
@@ -999,6 +1005,14 @@ export interface MutationsendRemindersArgs {
   accessIds: Array<Scalars["GID"]>;
   body?: Maybe<Scalars["JSON"]>;
   petitionId: Scalars["GID"];
+}
+
+export interface MutationsendSignatureRequestRemindersArgs {
+  petitionSignatureRequestId: Scalars["GID"];
+}
+
+export interface MutationsetUserPreferredLocaleArgs {
+  locale: Scalars["String"];
 }
 
 export interface MutationsignedPetitionDownloadLinkArgs {
@@ -1349,6 +1363,8 @@ export interface Petition extends PetitionBase {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
+  /** The template GID used for this petition */
+  fromTemplateId?: Maybe<Scalars["GID"]>;
   /** Whether comments are enabled or not. */
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
@@ -1409,7 +1425,7 @@ export interface PetitionAccess extends Timestamps {
   contact?: Maybe<Contact>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  /** The user who granted the access. */
+  /** The user who granted the original access. */
   granter?: Maybe<User>;
   /** The ID of the petition access. */
   id: Scalars["GID"];
@@ -1493,6 +1509,8 @@ export interface PetitionBase {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The signature configuration for the petition. */
+  signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
@@ -1851,10 +1869,19 @@ export interface PetitionSignatureRequest extends Timestamps {
   /** The signature configuration for the request. */
   signatureConfig: SignatureConfig;
   signedDocumentFilename?: Maybe<Scalars["String"]>;
+  signerStatus: Array<PetitionSignatureRequestSignerStatus>;
   /** The status of the petition signature. */
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+}
+
+export interface PetitionSignatureRequestSignerStatus {
+  __typename?: "PetitionSignatureRequestSignerStatus";
+  /** The contact that need to sign the generated document. */
+  contact: Contact;
+  /** The signing status of the individual contact. */
+  status: Scalars["String"];
 }
 
 export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
@@ -1913,6 +1940,8 @@ export interface PetitionTemplate extends PetitionBase {
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
   publicLink?: Maybe<PublicPetitionLink>;
+  /** The signature configuration for the petition. */
+  signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
@@ -2190,16 +2219,19 @@ export interface PublicPetitionMessage {
   subject?: Maybe<Scalars["String"]>;
 }
 
-export interface PublicPetitionSignerData {
+export interface PublicPetitionSignerDataInput {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
-  message?: Maybe<Scalars["String"]>;
 }
 
 /** The public signature settings of a petition */
 export interface PublicSignatureConfig {
   __typename?: "PublicSignatureConfig";
+  /** The contacts assigned by the petition recipient to sign */
+  additionalSigners: Array<Maybe<PublicContact>>;
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The contacts that need to sign the generated document. */
@@ -2433,6 +2465,13 @@ export type QueryPetitions_OrderBy =
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
 
+export interface RecipientSignedEvent extends PetitionEvent {
+  __typename?: "RecipientSignedEvent";
+  contact?: Maybe<Contact>;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+}
+
 export interface ReminderEmailBouncedUserNotification extends PetitionUserNotification {
   __typename?: "ReminderEmailBouncedUserNotification";
   access: PetitionAccess;
@@ -2567,6 +2606,8 @@ export interface SignatureConfig {
   __typename?: "SignatureConfig";
   /** The contacts that need to sign the generated document. */
   contacts: Array<Maybe<Contact>>;
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -2581,6 +2622,8 @@ export interface SignatureConfig {
 export interface SignatureConfigInput {
   /** The contacts that need to sign the generated document. */
   contactIds: Array<Scalars["ID"]>;
+  /** If true, allows the recipients of the petition to select additional signers */
+  letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -2697,6 +2740,7 @@ export interface User extends Timestamps {
   authenticationTokens: UserAuthenticationTokenPagination;
   /** URL to the user avatar */
   avatarUrl?: Maybe<Scalars["String"]>;
+  canCreateUsers: Scalars["Boolean"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
@@ -2720,6 +2764,7 @@ export interface User extends Timestamps {
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
+  preferredLocale?: Maybe<Scalars["String"]>;
   role: OrganizationRole;
   status: UserStatus;
   unreadNotificationIds: Array<Scalars["ID"]>;
@@ -2870,13 +2915,6 @@ export interface VerificationCodeRequest {
   token: Scalars["ID"];
 }
 
-export type ContactLink_ContactFragment = {
-  __typename?: "Contact";
-  id: string;
-  fullName?: Maybe<string>;
-  email: string;
-};
-
 export type ContactListPopover_ContactFragment = {
   __typename?: "Contact";
   id: string;
@@ -2891,11 +2929,19 @@ export type ContactListPopover_PublicContactFragment = {
   fullName?: Maybe<string>;
 };
 
+export type ContactReference_ContactFragment = {
+  __typename?: "Contact";
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
+};
+
 export type ContactSelect_ContactFragment = {
   __typename?: "Contact";
   id: string;
   fullName?: Maybe<string>;
   email: string;
+  hasBouncedEmail: boolean;
 };
 
 export type PetitionFieldSelect_PetitionFieldFragment = {
@@ -3140,6 +3186,12 @@ export type UserSelect_UserGroupFragment = {
   }>;
 };
 
+export type UserSelect_canCreateUsersQueryVariables = Exact<{ [key: string]: never }>;
+
+export type UserSelect_canCreateUsersQuery = {
+  me: { __typename?: "User"; canCreateUsers: boolean };
+};
+
 export type useSearchUsers_searchUsersQueryVariables = Exact<{
   search: Scalars["String"];
   excludeUsers?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
@@ -3212,8 +3264,11 @@ export type AppLayout_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -3348,8 +3403,11 @@ export type PetitionLayout_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -3381,8 +3439,11 @@ export type SettingsLayout_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -3401,6 +3462,7 @@ export type UserMenu_UserFragment = {
   __typename?: "User";
   isSuperAdmin: boolean;
   role: OrganizationRole;
+  email: string;
   fullName?: Maybe<string>;
   avatarUrl?: Maybe<string>;
   initials?: Maybe<string>;
@@ -4272,7 +4334,13 @@ export type AddPetitionAccessDialog_contactsByEmailQueryVariables = Exact<{
 
 export type AddPetitionAccessDialog_contactsByEmailQuery = {
   contactsByEmail: Array<
-    Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+    Maybe<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+      hasBouncedEmail: boolean;
+    }>
   >;
 };
 
@@ -4734,6 +4802,17 @@ export type PetitionActivityTimeline_PetitionFragment = {
             id: string;
             fullName?: Maybe<string>;
             status: UserStatus;
+          }>;
+        }
+      | {
+          __typename?: "RecipientSignedEvent";
+          id: string;
+          createdAt: string;
+          contact?: Maybe<{
+            __typename?: "Contact";
+            id: string;
+            fullName?: Maybe<string>;
+            email: string;
           }>;
         }
       | {
@@ -5254,6 +5333,13 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragmen
   user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
 };
 
+export type PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment = {
+  __typename?: "RecipientSignedEvent";
+  id: string;
+  createdAt: string;
+  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+};
+
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
   __typename?: "ReminderSentEvent";
   id: string;
@@ -5447,6 +5533,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
@@ -5819,6 +5906,12 @@ export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
   user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
 };
 
+export type TimelineRecipientSignedEvent_RecipientSignedEventFragment = {
+  __typename?: "RecipientSignedEvent";
+  createdAt: string;
+  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+};
+
 export type TimelineReminderSentEvent_ReminderSentEventFragment = {
   __typename?: "ReminderSentEvent";
   createdAt: string;
@@ -6018,8 +6111,15 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     provider: string;
     title: string;
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
   }>;
 };
@@ -6033,6 +6133,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
   isReadOnly: boolean;
+  name?: Maybe<string>;
   publicLink?: Maybe<{
     __typename?: "PublicPetitionLink";
     id: string;
@@ -6054,6 +6155,22 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     >;
   }>;
   owner: { __typename?: "User"; id: string };
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    provider: string;
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    contacts: Array<
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
+    >;
+  }>;
 };
 
 export type PetitionSettings_PetitionBaseFragment =
@@ -6557,20 +6674,52 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   >;
 };
 
-export type SignatureConfigDialog_PetitionFragment = {
+export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  name?: Maybe<string>;
   status: PetitionStatus;
+  name?: Maybe<string>;
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
     provider: string;
     title: string;
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
   }>;
 };
+
+export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  name?: Maybe<string>;
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    provider: string;
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    contacts: Array<
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
+    >;
+  }>;
+};
+
+export type SignatureConfigDialog_PetitionBaseFragment =
+  | SignatureConfigDialog_PetitionBase_Petition_Fragment
+  | SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment;
 
 export type SignatureConfigDialog_OrgIntegrationFragment = {
   __typename?: "OrgIntegration";
@@ -6578,51 +6727,12 @@ export type SignatureConfigDialog_OrgIntegrationFragment = {
   value: string;
 };
 
-export type useTemplateDetailsModalPetitionQueryVariables = Exact<{
-  templateId: Scalars["GID"];
-}>;
-
-export type useTemplateDetailsModalPetitionQuery = {
-  petition?: Maybe<
-    | { __typename?: "Petition" }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        descriptionHtml?: Maybe<string>;
-        name?: Maybe<string>;
-        updatedAt: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          title?: Maybe<string>;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-        }>;
-        owner: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          organization: { __typename?: "Organization"; id: string; name: string };
-        };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        }>;
-        publicLink?: Maybe<{
-          __typename?: "PublicPetitionLink";
-          id: string;
-          isActive: boolean;
-          slug: string;
-        }>;
-      }
-  >;
-};
-
 export type TemplateDetailsModal_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   descriptionHtml?: Maybe<string>;
   name?: Maybe<string>;
+  locale: PetitionLocale;
   updatedAt: string;
   fields: Array<{
     __typename?: "PetitionField";
@@ -6942,6 +7052,17 @@ export type TemplateCard_PetitionTemplateFragment = {
   publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
 };
 
+export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+  id: string;
+  status: PetitionSignatureRequestStatus;
+  signerStatus: Array<{
+    __typename?: "PetitionSignatureRequestSignerStatus";
+    status: string;
+    contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+  }>;
+};
+
 export type ExportRepliesDialog_UserFragment = {
   __typename?: "User";
   hasExportCuatrecasas: boolean;
@@ -7065,6 +7186,33 @@ export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation =
     id: string;
     metadata: { [key: string]: any };
   };
+};
+
+export type NewSignatureRequestRow_PetitionFragment = {
+  __typename?: "Petition";
+  status: PetitionStatus;
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    letRecipientsChooseSigners: boolean;
+    provider: string;
+    review: boolean;
+    timezone: string;
+    title: string;
+    contacts: Array<
+      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+    >;
+  }>;
+};
+
+export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+  id: string;
+  status: PetitionSignatureRequestStatus;
+  signerStatus: Array<{
+    __typename?: "PetitionSignatureRequestSignerStatus";
+    status: string;
+    contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+  }>;
 };
 
 export type PetitionRepliesField_PetitionFieldFragment = {
@@ -7228,41 +7376,35 @@ export type PetitionSignaturesCard_PetitionFragment = {
   id: string;
   status: PetitionStatus;
   name?: Maybe<string>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    timezone: string;
-    provider: string;
-    title: string;
-    review: boolean;
-    contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-    >;
-  }>;
   signatureRequests?: Maybe<
     Array<{
       __typename?: "PetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        contacts: Array<
-          Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-        >;
-      };
+      signerStatus: Array<{
+        __typename?: "PetitionSignatureRequestSignerStatus";
+        status: string;
+        contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+      }>;
     }>
   >;
-};
-
-export type PetitionSignaturesCard_PetitionSignatureRequestFragment = {
-  __typename?: "PetitionSignatureRequest";
-  id: string;
-  status: PetitionSignatureRequestStatus;
-  signatureConfig: {
+  signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
+    provider: string;
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    timezone: string;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
-  };
+  }>;
 };
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables = Exact<{
@@ -7277,34 +7419,40 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         id: string;
         status: PetitionStatus;
         name?: Maybe<string>;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          timezone: string;
-          provider: string;
-          title: string;
-          review: boolean;
-          contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-          >;
-        }>;
         signatureRequests?: Maybe<
           Array<{
             __typename?: "PetitionSignatureRequest";
             id: string;
             status: PetitionSignatureRequestStatus;
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              contacts: Array<
-                Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>
-              >;
-            };
+            signerStatus: Array<{
+              __typename?: "PetitionSignatureRequestSignerStatus";
+              status: string;
+              contact: {
+                __typename?: "Contact";
+                id: string;
+                fullName?: Maybe<string>;
+                email: string;
+              };
+            }>;
           }>
         >;
+        signatureConfig?: Maybe<{
+          __typename?: "SignatureConfig";
+          provider: string;
+          title: string;
+          review: boolean;
+          letRecipientsChooseSigners: boolean;
+          timezone: string;
+          contacts: Array<
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
+          >;
+        }>;
       }
     | { __typename?: "PetitionTemplate" };
 };
@@ -7344,6 +7492,14 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
     result: Result;
     url?: Maybe<string>;
   };
+};
+
+export type PetitionSignaturesCard_sendSignatureRequestRemindersMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
+
+export type PetitionSignaturesCard_sendSignatureRequestRemindersMutation = {
+  sendSignatureRequestReminders: Result;
 };
 
 export type PublicSignupForm_emailIsAvailableQueryVariables = Exact<{
@@ -7934,8 +8090,11 @@ export type Admin_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -7957,8 +8116,11 @@ export type AdminQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -7993,8 +8155,11 @@ export type AdminOrganizations_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8045,8 +8210,11 @@ export type AdminOrganizationsUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8066,8 +8234,11 @@ export type AdminSupportMethods_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8089,8 +8260,11 @@ export type AdminSupportMethodsUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8252,8 +8426,11 @@ export type Contact_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8292,8 +8469,11 @@ export type ContactUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8388,8 +8568,11 @@ export type Contacts_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8440,8 +8623,11 @@ export type ContactsUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8479,8 +8665,11 @@ export type OrganizationBrandingQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8522,8 +8711,11 @@ export type OrganizationGroup_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8651,8 +8843,11 @@ export type OrganizationGroupUserQuery = {
     id: string;
     role: OrganizationRole;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
@@ -8709,8 +8904,11 @@ export type OrganizationGroups_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -8817,8 +9015,11 @@ export type OrganizationGroupsUserQuery = {
     id: string;
     role: OrganizationRole;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
@@ -8840,8 +9041,11 @@ export type OrganizationSettingsQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8864,8 +9068,11 @@ export type OrganizationUsageQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -8965,8 +9172,11 @@ export type OrganizationUsersQuery = {
     id: string;
     role: OrganizationRole;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
@@ -9430,6 +9640,17 @@ export type PetitionActivity_PetitionFragment = {
           }>;
         }
       | {
+          __typename?: "RecipientSignedEvent";
+          id: string;
+          createdAt: string;
+          contact?: Maybe<{
+            __typename?: "Contact";
+            id: string;
+            fullName?: Maybe<string>;
+            email: string;
+          }>;
+        }
+      | {
           __typename?: "ReminderSentEvent";
           id: string;
           createdAt: string;
@@ -9646,8 +9867,11 @@ export type PetitionActivity_UserFragment = {
   id: string;
   unreadNotificationIds: Array<string>;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -10107,6 +10331,17 @@ export type PetitionActivity_updatePetitionMutation = {
                   id: string;
                   fullName?: Maybe<string>;
                   status: UserStatus;
+                }>;
+              }
+            | {
+                __typename?: "RecipientSignedEvent";
+                id: string;
+                createdAt: string;
+                contact?: Maybe<{
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: Maybe<string>;
+                  email: string;
                 }>;
               }
             | {
@@ -10859,6 +11094,17 @@ export type PetitionActivityQuery = {
                 }>;
               }
             | {
+                __typename?: "RecipientSignedEvent";
+                id: string;
+                createdAt: string;
+                contact?: Maybe<{
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: Maybe<string>;
+                  email: string;
+                }>;
+              }
+            | {
                 __typename?: "ReminderSentEvent";
                 id: string;
                 createdAt: string;
@@ -11100,8 +11346,11 @@ export type PetitionActivityUserQuery = {
     id: string;
     unreadNotificationIds: Array<string>;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -11165,8 +11414,15 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     provider: string;
     title: string;
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
     >;
   }>;
   remindersConfig?: Maybe<{
@@ -11259,6 +11515,22 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     >;
   }>;
   owner: { __typename?: "User"; id: string };
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    provider: string;
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    contacts: Array<
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
+    >;
+  }>;
 };
 
 export type PetitionCompose_PetitionBaseFragment =
@@ -11299,8 +11571,11 @@ export type PetitionCompose_UserFragment = {
   id: string;
   unreadNotificationIds: Array<string>;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -11361,8 +11636,15 @@ export type PetitionCompose_updatePetitionMutation = {
           provider: string;
           title: string;
           review: boolean;
+          letRecipientsChooseSigners: boolean;
           contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
           >;
         }>;
         remindersConfig?: Maybe<{
@@ -11424,6 +11706,22 @@ export type PetitionCompose_updatePetitionMutation = {
           >;
         }>;
         owner: { __typename?: "User"; id: string };
+        signatureConfig?: Maybe<{
+          __typename?: "SignatureConfig";
+          provider: string;
+          title: string;
+          review: boolean;
+          letRecipientsChooseSigners: boolean;
+          contacts: Array<
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
+          >;
+        }>;
       };
 };
 
@@ -11877,8 +12175,11 @@ export type PetitionComposeUserQuery = {
     id: string;
     unreadNotificationIds: Array<string>;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -11953,8 +12254,15 @@ export type PetitionComposeQuery = {
           provider: string;
           title: string;
           review: boolean;
+          letRecipientsChooseSigners: boolean;
           contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
           >;
         }>;
         remindersConfig?: Maybe<{
@@ -12050,6 +12358,22 @@ export type PetitionComposeQuery = {
           >;
         }>;
         owner: { __typename?: "User"; id: string };
+        signatureConfig?: Maybe<{
+          __typename?: "SignatureConfig";
+          provider: string;
+          title: string;
+          review: boolean;
+          letRecipientsChooseSigners: boolean;
+          contacts: Array<
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
+          >;
+        }>;
       }
   >;
 };
@@ -12145,29 +12469,35 @@ export type PetitionReplies_PetitionFragment = {
         user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
       }
   >;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    timezone: string;
-    review: boolean;
-    provider: string;
-    title: string;
-    contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-    >;
-  }>;
   signatureRequests?: Maybe<
     Array<{
       __typename?: "PetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        contacts: Array<
-          Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-        >;
-      };
+      signerStatus: Array<{
+        __typename?: "PetitionSignatureRequestSignerStatus";
+        status: string;
+        contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+      }>;
     }>
   >;
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    review: boolean;
+    provider: string;
+    title: string;
+    letRecipientsChooseSigners: boolean;
+    timezone: string;
+    contacts: Array<
+      Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+        hasBouncedEmail: boolean;
+      }>
+    >;
+  }>;
   myEffectivePermission?: Maybe<{
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -12233,8 +12563,11 @@ export type PetitionReplies_UserFragment = {
   id: string;
   unreadNotificationIds: Array<string>;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -12492,8 +12825,11 @@ export type PetitionRepliesUserQuery = {
     id: string;
     unreadNotificationIds: Array<string>;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -12602,34 +12938,40 @@ export type PetitionRepliesQuery = {
               user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
             }
         >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          timezone: string;
-          review: boolean;
-          provider: string;
-          title: string;
-          contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-          >;
-        }>;
         signatureRequests?: Maybe<
           Array<{
             __typename?: "PetitionSignatureRequest";
             id: string;
             status: PetitionSignatureRequestStatus;
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              contacts: Array<
-                Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>
-              >;
-            };
+            signerStatus: Array<{
+              __typename?: "PetitionSignatureRequestSignerStatus";
+              status: string;
+              contact: {
+                __typename?: "Contact";
+                id: string;
+                fullName?: Maybe<string>;
+                email: string;
+              };
+            }>;
           }>
         >;
+        signatureConfig?: Maybe<{
+          __typename?: "SignatureConfig";
+          review: boolean;
+          provider: string;
+          title: string;
+          letRecipientsChooseSigners: boolean;
+          timezone: string;
+          contacts: Array<
+            Maybe<{
+              __typename?: "Contact";
+              id: string;
+              fullName?: Maybe<string>;
+              email: string;
+              hasBouncedEmail: boolean;
+            }>
+          >;
+        }>;
         myEffectivePermission?: Maybe<{
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -12816,8 +13158,11 @@ export type Petitions_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -12840,8 +13185,11 @@ export type PetitionsUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -12976,8 +13324,11 @@ export type NewPetition_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -13032,8 +13383,11 @@ export type NewPetitionUserQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -13062,6 +13416,7 @@ export type NewPetitionUserTemplateQuery = {
         id: string;
         descriptionHtml?: Maybe<string>;
         name?: Maybe<string>;
+        locale: PetitionLocale;
         updatedAt: string;
         fields: Array<{
           __typename?: "PetitionField";
@@ -13095,10 +13450,12 @@ export type Account_UserFragment = {
   firstName?: Maybe<string>;
   lastName?: Maybe<string>;
   isSsoUser: boolean;
+  email: string;
+  preferredLocale?: Maybe<string>;
   id: string;
   fullName?: Maybe<string>;
-  email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -13130,6 +13487,38 @@ export type Account_updateAccountMutation = {
   };
 };
 
+export type Account_setUserPreferredLocaleMutationVariables = Exact<{
+  locale: Scalars["String"];
+}>;
+
+export type Account_setUserPreferredLocaleMutation = {
+  setUserPreferredLocale: {
+    __typename?: "User";
+    id: string;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    isSsoUser: boolean;
+    email: string;
+    preferredLocale?: Maybe<string>;
+    fullName?: Maybe<string>;
+    createdAt: string;
+    canCreateUsers: boolean;
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+    hasApiTokens: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+};
+
 export type AccountQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AccountQuery = {
@@ -13139,9 +13528,11 @@ export type AccountQuery = {
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     isSsoUser: boolean;
-    fullName?: Maybe<string>;
     email: string;
+    preferredLocale?: Maybe<string>;
+    fullName?: Maybe<string>;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -13162,8 +13553,11 @@ export type Settings_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   createdAt: string;
+  canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
   avatarUrl?: Maybe<string>;
@@ -13186,8 +13580,11 @@ export type SettingsQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -13219,8 +13616,11 @@ export type SecurityQuery = {
     isSsoUser: boolean;
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -13263,8 +13663,11 @@ export type TokensQuery = {
     __typename?: "User";
     id: string;
     fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
     email: string;
     createdAt: string;
+    canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
@@ -13307,6 +13710,7 @@ export type CurrentUserQuery = {
     id: string;
     email: string;
     fullName?: Maybe<string>;
+    preferredLocale?: Maybe<string>;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
   };
@@ -13317,6 +13721,7 @@ export type Login_UserFragment = {
   id: string;
   email: string;
   fullName?: Maybe<string>;
+  preferredLocale?: Maybe<string>;
   avatarUrl?: Maybe<string>;
   initials?: Maybe<string>;
 };
@@ -13368,8 +13773,26 @@ export type RecipientView_PublicPetitionAccessFragment = {
     signature?: Maybe<{
       __typename?: "PublicSignatureConfig";
       review: boolean;
+      letRecipientsChooseSigners: boolean;
       signers: Array<
-        Maybe<{ __typename?: "PublicContact"; id: string; fullName?: Maybe<string>; email: string }>
+        Maybe<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: Maybe<string>;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          email: string;
+        }>
+      >;
+      additionalSigners: Array<
+        Maybe<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: Maybe<string>;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          email: string;
+        }>
       >;
     }>;
     recipients: Array<{
@@ -13450,8 +13873,26 @@ export type RecipientView_PublicPetitionFragment = {
   signature?: Maybe<{
     __typename?: "PublicSignatureConfig";
     review: boolean;
+    letRecipientsChooseSigners: boolean;
     signers: Array<
-      Maybe<{ __typename?: "PublicContact"; id: string; fullName?: Maybe<string>; email: string }>
+      Maybe<{
+        __typename?: "PublicContact";
+        id: string;
+        fullName?: Maybe<string>;
+        firstName?: Maybe<string>;
+        lastName?: Maybe<string>;
+        email: string;
+      }>
+    >;
+    additionalSigners: Array<
+      Maybe<{
+        __typename?: "PublicContact";
+        id: string;
+        fullName?: Maybe<string>;
+        firstName?: Maybe<string>;
+        lastName?: Maybe<string>;
+        email: string;
+      }>
     >;
   }>;
   recipients: Array<{
@@ -13467,6 +13908,8 @@ export type RecipientView_PublicContactFragment = {
   __typename?: "PublicContact";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
 };
 
@@ -13516,11 +13959,86 @@ export type RecipientView_PublicUserFragment = {
 
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  signer?: Maybe<PublicPetitionSignerData>;
+  additionalSigners?: Maybe<Array<PublicPetitionSignerDataInput> | PublicPetitionSignerDataInput>;
+  message?: Maybe<Scalars["String"]>;
 }>;
 
 export type RecipientView_publicCompletePetitionMutation = {
-  publicCompletePetition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+  publicCompletePetition: {
+    __typename?: "PublicPetition";
+    id: string;
+    status: PetitionStatus;
+    deadline?: Maybe<string>;
+    hasCommentsEnabled: boolean;
+    isRecipientViewContentsHidden: boolean;
+    signatureStatus?: Maybe<PublicSignatureStatus>;
+    fields: Array<{
+      __typename?: "PublicPetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: Maybe<string>;
+      options: { [key: string]: any };
+      optional: boolean;
+      validated: boolean;
+      isReadOnly: boolean;
+      commentCount: number;
+      unreadCommentCount: number;
+      visibility?: Maybe<{ [key: string]: any }>;
+      description?: Maybe<string>;
+      multiple: boolean;
+      replies: Array<{
+        __typename?: "PublicPetitionFieldReply";
+        id: string;
+        status: PetitionFieldReplyStatus;
+        content: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+      attachments: Array<{
+        __typename?: "PetitionFieldAttachment";
+        id: string;
+        file: {
+          __typename?: "FileUpload";
+          filename: string;
+          contentType: string;
+          size: number;
+          isComplete: boolean;
+        };
+      }>;
+    }>;
+    signature?: Maybe<{
+      __typename?: "PublicSignatureConfig";
+      review: boolean;
+      letRecipientsChooseSigners: boolean;
+      signers: Array<
+        Maybe<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: Maybe<string>;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          email: string;
+        }>
+      >;
+      additionalSigners: Array<
+        Maybe<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: Maybe<string>;
+          firstName?: Maybe<string>;
+          lastName?: Maybe<string>;
+          email: string;
+        }>
+      >;
+    }>;
+    recipients: Array<{
+      __typename?: "PublicContact";
+      id: string;
+      fullName?: Maybe<string>;
+      firstName?: Maybe<string>;
+      email: string;
+    }>;
+  };
 };
 
 export type PublicPetitionQueryVariables = Exact<{
@@ -13575,11 +14093,24 @@ export type PublicPetitionQuery = {
       signature?: Maybe<{
         __typename?: "PublicSignatureConfig";
         review: boolean;
+        letRecipientsChooseSigners: boolean;
         signers: Array<
           Maybe<{
             __typename?: "PublicContact";
             id: string;
             fullName?: Maybe<string>;
+            firstName?: Maybe<string>;
+            lastName?: Maybe<string>;
+            email: string;
+          }>
+        >;
+        additionalSigners: Array<
+          Maybe<{
+            __typename?: "PublicContact";
+            id: string;
+            fullName?: Maybe<string>;
+            firstName?: Maybe<string>;
+            lastName?: Maybe<string>;
             email: string;
           }>
         >;
@@ -13755,6 +14286,7 @@ export type PetitionPdf_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   name?: Maybe<string>;
+  fromTemplateId?: Maybe<string>;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -13808,6 +14340,7 @@ export type PdfViewPetitionQuery = {
     __typename?: "Petition";
     id: string;
     name?: Maybe<string>;
+    fromTemplateId?: Maybe<string>;
     fields: Array<{
       __typename?: "PetitionField";
       id: string;
@@ -14073,6 +14606,7 @@ export type useCreateContact_createContactMutation = {
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     fullName?: Maybe<string>;
+    hasBouncedEmail: boolean;
   };
 };
 
@@ -14280,7 +14814,13 @@ export type PetitionComposeSearchContactsQueryVariables = Exact<{
 export type PetitionComposeSearchContactsQuery = {
   contacts: {
     __typename?: "ContactPagination";
-    items: Array<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+    items: Array<{
+      __typename?: "Contact";
+      id: string;
+      fullName?: Maybe<string>;
+      email: string;
+      hasBouncedEmail: boolean;
+    }>;
   };
 };
 
@@ -14371,8 +14911,8 @@ export const UserReference_UserFragmentDoc = gql`
     status
   }
 `;
-export const ContactLink_ContactFragmentDoc = gql`
-  fragment ContactLink_Contact on Contact {
+export const ContactReference_ContactFragmentDoc = gql`
+  fragment ContactReference_Contact on Contact {
     id
     fullName
     email
@@ -14394,7 +14934,7 @@ export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragme
         }
         ... on PetitionAccess {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
       }
@@ -14402,43 +14942,43 @@ export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragme
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragmentDoc = gql`
   fragment MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotification on MessageEmailBouncedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragmentDoc = gql`
   fragment ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotification on ReminderEmailBouncedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragmentDoc = gql`
   fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionSharedUserNotification_PetitionSharedUserNotificationFragmentDoc = gql`
   fragment PetitionSharedUserNotification_PetitionSharedUserNotification on PetitionSharedUserNotification {
@@ -14480,26 +15020,26 @@ export const RemindersOptOutNotification_RemindersOptOutNotificationFragmentDoc 
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     reason
     other
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragmentDoc = gql`
   fragment AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotification on AccessActivatedFromPublicPetitionLinkUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
   fragment NotificationsList_PetitionUserNotification on PetitionUserNotification {
@@ -14635,6 +15175,7 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
     id
     descriptionHtml
     name
+    locale
     fields {
       id
       title
@@ -14851,6 +15392,7 @@ export const UserMenu_UserFragmentDoc = gql`
   fragment UserMenu_User on User {
     isSuperAdmin
     role
+    email
     ...UserAvatar_User
   }
   ${UserAvatar_UserFragmentDoc}
@@ -14876,8 +15418,11 @@ export const AppLayout_UserFragmentDoc = gql`
   fragment AppLayout_User on User {
     id
     fullName
+    firstName
+    lastName
     email
     createdAt
+    canCreateUsers
     ...AppLayoutNavbar_User
   }
   ${AppLayoutNavbar_UserFragmentDoc}
@@ -15192,7 +15737,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
   fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
     id
     contact {
-      ...ContactLink_Contact
+      ...ContactReference_Contact
     }
     status
     nextReminderAt
@@ -15205,7 +15750,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc}
 `;
 export const PetitionAccessTable_PetitionFragmentDoc = gql`
@@ -15230,12 +15775,12 @@ export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = 
   fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
   fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
@@ -15244,13 +15789,13 @@ export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
     }
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = gql`
   fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
@@ -15259,24 +15804,24 @@ export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = 
     }
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc = gql`
   fragment TimelineAccessOpenedEvent_AccessOpenedEvent on AccessOpenedEvent {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const SentPetitionMessageDialog_PetitionMessageFragmentDoc = gql`
   fragment SentPetitionMessageDialog_PetitionMessage on PetitionMessage {
@@ -15286,11 +15831,11 @@ export const SentPetitionMessageDialog_PetitionMessageFragmentDoc = gql`
     scheduledAt
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gql`
   fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
@@ -15303,7 +15848,7 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
       emailSubject
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       ...SentPetitionMessageDialog_PetitionMessage
@@ -15311,7 +15856,7 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
 `;
 export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gql`
@@ -15322,7 +15867,7 @@ export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gq
       emailSubject
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15331,7 +15876,7 @@ export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gq
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${UserReference_UserFragmentDoc}
 `;
 export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
@@ -15351,7 +15896,7 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
       scheduledAt
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       ...MessageEventsIndicator_PetitionMessage
@@ -15360,7 +15905,7 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${MessageEventsIndicator_PetitionMessageFragmentDoc}
   ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
 `;
@@ -15368,13 +15913,13 @@ export const SentReminderMessageDialog_PetitionReminderFragmentDoc = gql`
   fragment SentReminderMessageDialog_PetitionReminder on PetitionReminder {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
     emailBody
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
   fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {
@@ -15385,7 +15930,7 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
       }
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
       ...SentReminderMessageDialog_PetitionReminder
@@ -15393,7 +15938,7 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${SentReminderMessageDialog_PetitionReminderFragmentDoc}
 `;
 export const PetitionFieldReference_PetitionFieldFragmentDoc = gql`
@@ -15412,7 +15957,7 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15420,7 +15965,7 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
   fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
@@ -15433,7 +15978,7 @@ export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15441,7 +15986,7 @@ export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
   fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
@@ -15454,7 +15999,7 @@ export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15462,7 +16007,7 @@ export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gql`
   fragment TimelineCommentPublishedEvent_CommentPublishedEvent on CommentPublishedEvent {
@@ -15476,7 +16021,7 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
         }
         ... on PetitionAccess {
           contact {
-            ...ContactLink_Contact
+            ...ContactReference_Contact
           }
         }
       }
@@ -15487,7 +16032,7 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
   fragment TimelineCommentDeletedEvent_CommentDeletedEvent on CommentDeletedEvent {
@@ -15500,7 +16045,7 @@ export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -15508,7 +16053,7 @@ export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc = gql`
   fragment TimelineUserPermissionAddedEvent_UserPermissionAddedEvent on UserPermissionAddedEvent {
@@ -15579,13 +16124,13 @@ export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFrag
     }
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc = gql`
   fragment TimelinePetitionReopenedEvent_PetitionReopenedEvent on PetitionReopenedEvent {
@@ -15612,30 +16157,30 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
       ...UserReference_User
     }
     contact {
-      ...ContactLink_Contact
+      ...ContactReference_Contact
     }
     cancelType
     cancellerReason
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
   fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
     originalAccess {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     newAccess {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc = gql`
   fragment TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent on GroupPermissionAddedEvent {
@@ -15688,51 +16233,60 @@ export const TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc = gql`
   fragment TimelineRemindersOptOutEvent_RemindersOptOutEvent on RemindersOptOutEvent {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
     reason
     other
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc = gql`
   fragment TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent on AccessActivatedFromPublicPetitionLinkEvent {
     access {
       contact {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+`;
+export const TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc = gql`
+  fragment TimelineRecipientSignedEvent_RecipientSignedEvent on RecipientSignedEvent {
+    contact {
+      ...ContactReference_Contact
+    }
+    createdAt
+  }
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc = gql`
   fragment TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent on PetitionMessageBouncedEvent {
     message {
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc = gql`
   fragment TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEvent on PetitionReminderBouncedEvent {
     reminder {
       access {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
     createdAt
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
@@ -15833,6 +16387,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on AccessActivatedFromPublicPetitionLinkEvent {
       ...TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent
     }
+    ... on RecipientSignedEvent {
+      ...TimelineRecipientSignedEvent_RecipientSignedEvent
+    }
     ... on PetitionMessageBouncedEvent {
       ...TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent
     }
@@ -15871,6 +16428,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc}
   ${TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc}
   ${TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc}
+  ${TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc}
   ${TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc}
   ${TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc}
 `;
@@ -15994,12 +16552,12 @@ export const ContactSelect_ContactFragmentDoc = gql`
     id
     fullName
     email
+    hasBouncedEmail
   }
 `;
-export const SignatureConfigDialog_PetitionFragmentDoc = gql`
-  fragment SignatureConfigDialog_Petition on Petition {
+export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
+  fragment SignatureConfigDialog_PetitionBase on PetitionBase {
     name
-    status
     signatureConfig {
       provider
       contacts {
@@ -16007,6 +16565,10 @@ export const SignatureConfigDialog_PetitionFragmentDoc = gql`
       }
       title
       review
+      letRecipientsChooseSigners
+    }
+    ... on Petition {
+      status
     }
   }
   ${ContactSelect_ContactFragmentDoc}
@@ -16044,10 +16606,10 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     owner {
       id
     }
+    ...SignatureConfigDialog_PetitionBase @include(if: $hasPetitionSignature)
     ... on Petition {
       status
       deadline
-      ...SignatureConfigDialog_Petition @include(if: $hasPetitionSignature)
       currentSignatureRequest @include(if: $hasPetitionSignature) {
         id
         status
@@ -16060,7 +16622,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
       }
     }
   }
-  ${SignatureConfigDialog_PetitionFragmentDoc}
+  ${SignatureConfigDialog_PetitionBaseFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 `;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
@@ -16239,7 +16801,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
       }
       ... on PetitionAccess {
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
       }
     }
@@ -16250,7 +16812,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
     isInternal @include(if: $hasInternalComments)
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
@@ -16312,36 +16874,63 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${ExportRepliesDialog_PetitionFieldFragmentDoc}
   ${useFieldVisibility_PetitionFieldFragmentDoc}
 `;
-export const PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc = gql`
-  fragment PetitionSignaturesCard_PetitionSignatureRequest on PetitionSignatureRequest {
-    id
+export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
+  fragment NewSignatureRequestRow_Petition on Petition {
     status
     signatureConfig {
       contacts {
-        ...ContactLink_Contact
+        ...ContactReference_Contact
       }
+      letRecipientsChooseSigners
+      provider
+      review
+      timezone
+      title
     }
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+`;
+export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gql`
+  fragment CurrentSignatureRequestRow_PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    status
+    signerStatus {
+      contact {
+        ...ContactReference_Contact
+      }
+      status
+    }
+  }
+  ${ContactReference_ContactFragmentDoc}
+`;
+export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql`
+  fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    status
+    signerStatus {
+      contact {
+        ...ContactReference_Contact
+      }
+      status
+    }
+  }
+  ${ContactReference_ContactFragmentDoc}
 `;
 export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   fragment PetitionSignaturesCard_Petition on Petition {
     id
     status
-    signatureConfig {
-      timezone
-      contacts {
-        ...ContactLink_Contact
-      }
-    }
+    ...SignatureConfigDialog_PetitionBase
+    ...NewSignatureRequestRow_Petition
     signatureRequests {
-      ...PetitionSignaturesCard_PetitionSignatureRequest
+      ...CurrentSignatureRequestRow_PetitionSignatureRequest
+      ...OlderSignatureRequestRows_PetitionSignatureRequest
     }
-    ...SignatureConfigDialog_Petition
   }
-  ${ContactLink_ContactFragmentDoc}
-  ${PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc}
-  ${SignatureConfigDialog_PetitionFragmentDoc}
+  ${SignatureConfigDialog_PetitionBaseFragmentDoc}
+  ${NewSignatureRequestRow_PetitionFragmentDoc}
+  ${CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc}
+  ${OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc}
 `;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
@@ -16442,7 +17031,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
       accesses {
         status
         contact {
-          ...ContactLink_Contact
+          ...ContactReference_Contact
         }
         nextReminderAt
         reminders {
@@ -16460,7 +17049,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   ${UserAvatarList_UserFragmentDoc}
   ${UserAvatarList_UserGroupFragmentDoc}
   ${PetitionTagListCellContent_PetitionBaseFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
   ${PetitionStatusCellContent_PetitionFragmentDoc}
   ${PetitionSignatureCellContent_PetitionFragmentDoc}
 `;
@@ -16542,6 +17131,8 @@ export const Account_UserFragmentDoc = gql`
     firstName
     lastName
     isSsoUser
+    email
+    preferredLocale
     ...SettingsLayout_User
     ...useSettingsSections_User
   }
@@ -16569,6 +17160,7 @@ export const Login_UserFragmentDoc = gql`
     id
     email
     fullName
+    preferredLocale
     ...UserAvatar_User
   }
   ${UserAvatar_UserFragmentDoc}
@@ -16689,6 +17281,8 @@ export const RecipientView_PublicContactFragmentDoc = gql`
   fragment RecipientView_PublicContact on PublicContact {
     id
     fullName
+    firstName
+    lastName
     email
   }
 `;
@@ -16732,7 +17326,12 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
       ...RecipientView_PublicPetitionField
     }
     signature {
+      review
+      letRecipientsChooseSigners
       signers {
+        ...RecipientView_PublicContact
+      }
+      additionalSigners {
         ...RecipientView_PublicContact
       }
     }
@@ -16888,6 +17487,7 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
       name
       logoUrl
     }
+    fromTemplateId
     currentSignatureRequest(token: $token) {
       signatureConfig {
         contacts {
@@ -17123,6 +17723,43 @@ export function useTagEditDialog_updateTagMutation(
 }
 export type TagEditDialog_updateTagMutationHookResult = ReturnType<
   typeof useTagEditDialog_updateTagMutation
+>;
+export const UserSelect_canCreateUsersDocument = gql`
+  query UserSelect_canCreateUsers {
+    me {
+      canCreateUsers
+    }
+  }
+`;
+export function useUserSelect_canCreateUsersQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    UserSelect_canCreateUsersQuery,
+    UserSelect_canCreateUsersQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserSelect_canCreateUsersQuery, UserSelect_canCreateUsersQueryVariables>(
+    UserSelect_canCreateUsersDocument,
+    options
+  );
+}
+export function useUserSelect_canCreateUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserSelect_canCreateUsersQuery,
+    UserSelect_canCreateUsersQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UserSelect_canCreateUsersQuery,
+    UserSelect_canCreateUsersQueryVariables
+  >(UserSelect_canCreateUsersDocument, options);
+}
+export type UserSelect_canCreateUsersQueryHookResult = ReturnType<
+  typeof useUserSelect_canCreateUsersQuery
+>;
+export type UserSelect_canCreateUsersLazyQueryHookResult = ReturnType<
+  typeof useUserSelect_canCreateUsersLazyQuery
 >;
 export const useSearchUsers_searchUsersDocument = gql`
   query useSearchUsers_searchUsers(
@@ -17816,44 +18453,6 @@ export type PetitionSharingModal_PetitionsQueryHookResult = ReturnType<
 export type PetitionSharingModal_PetitionsLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionsLazyQuery
 >;
-export const useTemplateDetailsModalPetitionDocument = gql`
-  query useTemplateDetailsModalPetition($templateId: GID!) {
-    petition(id: $templateId) {
-      ...TemplateDetailsModal_PetitionTemplate
-    }
-  }
-  ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
-`;
-export function useuseTemplateDetailsModalPetitionQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    useTemplateDetailsModalPetitionQuery,
-    useTemplateDetailsModalPetitionQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    useTemplateDetailsModalPetitionQuery,
-    useTemplateDetailsModalPetitionQueryVariables
-  >(useTemplateDetailsModalPetitionDocument, options);
-}
-export function useuseTemplateDetailsModalPetitionLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    useTemplateDetailsModalPetitionQuery,
-    useTemplateDetailsModalPetitionQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    useTemplateDetailsModalPetitionQuery,
-    useTemplateDetailsModalPetitionQueryVariables
-  >(useTemplateDetailsModalPetitionDocument, options);
-}
-export type useTemplateDetailsModalPetitionQueryHookResult = ReturnType<
-  typeof useuseTemplateDetailsModalPetitionQuery
->;
-export type useTemplateDetailsModalPetitionLazyQueryHookResult = ReturnType<
-  typeof useuseTemplateDetailsModalPetitionLazyQuery
->;
 export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
   mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
     $petitionId: GID!
@@ -18354,6 +18953,26 @@ export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
 }
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
+>;
+export const PetitionSignaturesCard_sendSignatureRequestRemindersDocument = gql`
+  mutation PetitionSignaturesCard_sendSignatureRequestReminders($petitionSignatureRequestId: GID!) {
+    sendSignatureRequestReminders(petitionSignatureRequestId: $petitionSignatureRequestId)
+  }
+`;
+export function usePetitionSignaturesCard_sendSignatureRequestRemindersMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSignaturesCard_sendSignatureRequestRemindersMutation,
+    PetitionSignaturesCard_sendSignatureRequestRemindersMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionSignaturesCard_sendSignatureRequestRemindersMutation,
+    PetitionSignaturesCard_sendSignatureRequestRemindersMutationVariables
+  >(PetitionSignaturesCard_sendSignatureRequestRemindersDocument, options);
+}
+export type PetitionSignaturesCard_sendSignatureRequestRemindersMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_sendSignatureRequestRemindersMutation
 >;
 export const PublicSignupForm_emailIsAvailableDocument = gql`
   query PublicSignupForm_emailIsAvailable($email: String!) {
@@ -20987,6 +21606,30 @@ export function useAccount_updateAccountMutation(
 export type Account_updateAccountMutationHookResult = ReturnType<
   typeof useAccount_updateAccountMutation
 >;
+export const Account_setUserPreferredLocaleDocument = gql`
+  mutation Account_setUserPreferredLocale($locale: String!) {
+    setUserPreferredLocale(locale: $locale) {
+      id
+      ...Account_User
+    }
+  }
+  ${Account_UserFragmentDoc}
+`;
+export function useAccount_setUserPreferredLocaleMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    Account_setUserPreferredLocaleMutation,
+    Account_setUserPreferredLocaleMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    Account_setUserPreferredLocaleMutation,
+    Account_setUserPreferredLocaleMutationVariables
+  >(Account_setUserPreferredLocaleDocument, options);
+}
+export type Account_setUserPreferredLocaleMutationHookResult = ReturnType<
+  typeof useAccount_setUserPreferredLocaleMutation
+>;
 export const AccountDocument = gql`
   query Account {
     me {
@@ -21181,12 +21824,21 @@ export function useCurrentUserLazyQuery(
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
 export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
 export const RecipientView_publicCompletePetitionDocument = gql`
-  mutation RecipientView_publicCompletePetition($keycode: ID!, $signer: PublicPetitionSignerData) {
-    publicCompletePetition(keycode: $keycode, signer: $signer) {
+  mutation RecipientView_publicCompletePetition(
+    $keycode: ID!
+    $additionalSigners: [PublicPetitionSignerDataInput!]
+    $message: String
+  ) {
+    publicCompletePetition(
+      keycode: $keycode
+      additionalSigners: $additionalSigners
+      message: $message
+    ) {
       id
-      status
+      ...RecipientView_PublicPetition
     }
   }
+  ${RecipientView_PublicPetitionFragmentDoc}
 `;
 export function useRecipientView_publicCompletePetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -21831,6 +22483,7 @@ export const useCreateContact_createContactDocument = gql`
       firstName
       lastName
       fullName
+      hasBouncedEmail
     }
   }
 `;
