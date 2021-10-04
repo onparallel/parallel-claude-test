@@ -4,6 +4,7 @@ import pMap from "p-map";
 import { chunk } from "remeda";
 import { ApiContext } from "../../context";
 import { Petition, PetitionMessage, User } from "../../db/__types";
+import { chunkWhile } from "../../util/arrays";
 import { calculateNextReminder } from "../../util/reminderUtils";
 import { RESULT } from "./result";
 
@@ -27,7 +28,10 @@ export async function presendPetition(
   // this helps us distribute massive sends in time and avoid getting flagged as spam.
   const CHUNK_SIZE = 20;
   return await pMap(
-    chunk(petitionSendGroups, CHUNK_SIZE),
+    chunkWhile(
+      petitionSendGroups,
+      (group, current) => current.reduce((acc, g) => acc + g.length, 0) + group.length < CHUNK_SIZE
+    ),
     async (currentChunk, index) => {
       return await pMap(
         currentChunk,
