@@ -43,7 +43,7 @@ import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { jsonArg, jsonObjectArg } from "../../helpers/json";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
-import { presendPetition } from "../../helpers/presendPetition";
+import { presendPetition, sendPetitionMessageEmails } from "../../helpers/presendPetition";
 import { RESULT } from "../../helpers/result";
 import { uploadArg } from "../../helpers/upload";
 import { validateAnd, validateIf, validateOr } from "../../helpers/validateArgs";
@@ -1097,28 +1097,20 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       ]);
     }
 
-    const results = await pMap(
+    const results = await presendPetition(
       zip([petition, ...clonedPetitions], args.contactIdGroups),
-      async ([petition, contactIds]) =>
-        await presendPetition(petition, contactIds, args, ctx.user!, false, ctx),
-      { concurrency: 5 }
+      args,
+      ctx.user!,
+      false,
+      ctx
     );
 
     const successfulSends = results.filter((r) => r.result === "SUCCESS");
-    const messages = successfulSends.map((r) => r.messages!).flat();
 
-    if (!args.scheduledAt) {
-      await Promise.all([
-        ctx.emails.sendPetitionMessageEmail(messages.map((m) => m.id)),
-        ctx.petitions.createEvent(
-          messages.map((message) => ({
-            type: "MESSAGE_SENT",
-            data: { petition_message_id: message.id },
-            petition_id: message.petition_id,
-          }))
-        ),
-      ]);
-    }
+    await sendPetitionMessageEmails(
+      successfulSends.flatMap((s) => s.messages?.filter((m) => !isDefined(m.scheduled_at)) ?? []),
+      ctx
+    );
 
     const usedCredits = await getRequiredPetitionSendCredits(
       args.petitionId,
@@ -1170,13 +1162,8 @@ export const sendPetition = mutationField("sendPetition", {
     if (!petition) {
       throw new Error("Petition not available");
     }
-    const {
-      result,
-      error,
-      accesses,
-      messages,
-      petition: updatedPetition,
-    } = await presendPetition(petition, args.contactIds, args, ctx.user!, false, ctx);
+    const [{ result, error, accesses, messages, petition: updatedPetition }] =
+      await presendPetition([[petition, args.contactIds]], args, ctx.user!, false, ctx);
 
     if (result === "FAILURE" && error.constraint === "petition_access__petition_id_contact_id") {
       throw new WhitelistedError(
@@ -1186,19 +1173,12 @@ export const sendPetition = mutationField("sendPetition", {
     }
 
     if (result === "SUCCESS") {
-      if (!args.scheduledAt) {
-        await Promise.all([
-          ctx.emails.sendPetitionMessageEmail(messages!.map((s) => s.id)),
-          ctx.petitions.createEvent(
-            messages!.map((message) => ({
-              type: "MESSAGE_SENT",
-              data: { petition_message_id: message.id },
-              petition_id: message.petition_id,
-            }))
-          ),
-        ]);
-      }
+      await sendPetitionMessageEmails(
+        messages?.filter((m) => !isDefined(m.scheduled_at)) ?? [],
+        ctx
+      );
     }
+
     const usedCredits = await getRequiredPetitionSendCredits(
       args.petitionId,
       [args.contactIds],

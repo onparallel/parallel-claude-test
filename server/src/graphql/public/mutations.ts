@@ -1079,10 +1079,9 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         ]);
 
         // presend petition to contact and insert petition_permissions
-        const [{ result, messages, error }] = await Promise.all([
+        const [[{ result, messages, error }]] = await Promise.all([
           presendPetition(
-            newPetition,
-            [contact.id],
+            [[newPetition, [contact.id]]],
             {
               subject: newPetition.email_subject ?? publicPetitionLink!.title,
               body: JSON.parse(newPetition.email_body!),
@@ -1102,16 +1101,17 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
 
         if (error) throw error; // transaction rollback
 
-        return { messages, result };
+        return { messages: messages ?? [], result };
       });
 
       // trigger emails and events
-      if (result === "SUCCESS") {
+      // in this case the messages array should always have one unscheduled message, so there is no need to check what to send
+      if (result === "SUCCESS" && messages.length > 0) {
         await Promise.all([
-          ctx.emails.sendPublicPetitionLinkAccessEmail(messages!.map((s) => s.id)),
+          ctx.emails.sendPublicPetitionLinkAccessEmail(messages.map((s) => s.id)),
           ctx.petitions.createEvent(
-            messages!.map((message) => ({
-              type: "MESSAGE_SENT" as const,
+            messages.map((message) => ({
+              type: "MESSAGE_SENT",
               data: { petition_message_id: message.id },
               petition_id: message.petition_id,
             }))
