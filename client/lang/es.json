@@ -2516,7 +2516,7 @@
   },
   {
     "term": "component.signature-config-dialog.contact-select.label",
-    "definition": "Quién tiene que firmar la petición?",
+    "definition": "¿Quién tiene que firmar la petición?",
     "context": "Who has to sign the petition?"
   },
   {
