@@ -4320,16 +4320,6 @@
     "context": "Live chat"
   },
   {
-    "term": "page.pricing.modal-body",
-    "definition": "Complete the following information and we will contact you as soon as possible.",
-    "context": "Complete the following information and we will contact you as soon as possible."
-  },
-  {
-    "term": "page.pricing.modal-title",
-    "definition": "Contact with sales",
-    "context": "Contact with sales"
-  },
-  {
     "term": "page.pricing.only-one-user",
     "definition": "{count, plural, one {Only <b>#</b> user} other {Up to <b>#</b> users}}",
     "context": "{count, plural, one {Only <b>#</b> user} other {Up to <b>#</b> users}}"
@@ -5580,51 +5570,6 @@
     "context": "Book a demo"
   },
   {
-    "term": "public.book-demo.basic-functions",
-    "definition": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
-    "context": "<b>Basic functions of our platform:</b> petitions, contacts and document management."
-  },
-  {
-    "term": "public.book-demo.checklist",
-    "definition": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
-    "context": "<b>How to send a checklist:</b> to several recipients, types of information fields."
-  },
-  {
-    "term": "public.book-demo.contact-soon",
-    "definition": "Someone from our team will contact you as soon as possible.",
-    "context": "Someone from our team will contact you as soon as possible."
-  },
-  {
-    "term": "public.book-demo.follow",
-    "definition": "<b>Follow the status of your petitions:</b> progress, delivery and read receipts.",
-    "context": "<b>Follow the status of your petitions:</b> progress, delivery and read receipts."
-  },
-  {
-    "term": "public.book-demo.other-functionalities",
-    "definition": "<b>Other functionalities:</b> additional security layers, reminders.",
-    "context": "<b>Other functionalities:</b> additional security layers, reminders."
-  },
-  {
-    "term": "public.book-demo.request-invite",
-    "definition": "Book a demo!",
-    "context": "Book a demo!"
-  },
-  {
-    "term": "public.book-demo.review-and-download",
-    "definition": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
-    "context": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents."
-  },
-  {
-    "term": "public.book-demo.title",
-    "definition": "Book a demo",
-    "context": "Book a demo"
-  },
-  {
-    "term": "public.book-demo.what-we-explain",
-    "definition": "In this demo we will explain:",
-    "context": "In this demo we will explain:"
-  },
-  {
     "term": "public.careers",
     "definition": "Careers",
     "context": "Careers"
@@ -6118,16 +6063,6 @@
     "term": "public.how-it-works-hero.title",
     "definition": "How it works",
     "context": "How it works"
-  },
-  {
-    "term": "public.invite.consent",
-    "definition": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
-    "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time."
-  },
-  {
-    "term": "public.invite.review-privacy",
-    "definition": "For more information, please review our <a>Privacy Policy</a>.",
-    "context": "For more information, please review our <a>Privacy Policy</a>."
   },
   {
     "term": "public.law-firms",
