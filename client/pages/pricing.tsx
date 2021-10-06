@@ -15,7 +15,7 @@ function Pricing() {
 
   const [billing, setBilling] = useState<PublicSwitchValues>("monthly");
 
-  const handleSwithBillingTime = (e: PublicSwitchValues) => {
+  const handleSwitchBillingTime = (e: PublicSwitchValues) => {
     setBilling(e);
   };
 
@@ -45,7 +45,7 @@ function Pricing() {
         </Heading>
 
         <Center p={10}>
-          <PublicSwitchPricing onChange={handleSwithBillingTime} />
+          <PublicSwitchPricing onChange={handleSwitchBillingTime} />
         </Center>
         <PublicPricingCards pt={4} pb={20} billing={billing} />
         <PublicPricingTable display={{ base: "none", md: "block" }} />

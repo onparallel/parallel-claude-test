@@ -15,7 +15,7 @@ import { Card, CardProps } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
-import { PricingListFeatures, usePricingList } from "../../../utils/usePricingList";
+import { usePricingList } from "../../../utils/usePricingList";
 import { PublicSwitchValues } from "./PublicSwitchPricing";
 
 interface PublicPricingCardsProps extends GridProps {
@@ -89,9 +89,7 @@ export function PublicPricingCards({ billing, hideFeatures, ...props }: PublicPr
     window.open(`${HUBSPOT_FORM[locale as "es" | "en"]}?desired_plan=enterprise`, "_blank");
   };
 
-  const features = list.reduce<PricingListFeatures[]>((acc, value) => {
-    return [...acc, ...value.features];
-  }, []);
+  const features = list.flatMap((value) => value.features);
 
   function trackCTAClick() {
     window.analytics?.track("Register CTA Clicked", { from: "public-pricing" });
