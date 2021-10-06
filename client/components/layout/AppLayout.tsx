@@ -1,14 +1,17 @@
 import { gql } from "@apollo/client";
-import { Center, Flex, Spinner } from "@chakra-ui/react";
+import { AlertDescription, AlertIcon, Button, Center, Flex, Spinner } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
+import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { FormattedMessage } from "react-intl";
 import userflow from "userflow.js";
+import { CloseableAlert } from "../common/CloseableAlert";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
 import { Zendesk } from "../scripts/Zendesk";
@@ -27,6 +30,7 @@ export const AppLayout = Object.assign(
     const rehydrated = useRehydrated();
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const hasNewVersion = useCheckForNewVersion();
 
     const timeoutRef = useRef<number>();
     // Show spinner if a page takes more than 1s to load
@@ -160,6 +164,29 @@ export const AppLayout = Object.assign(
                 overflow="auto"
                 {...props}
               >
+                {hasNewVersion ? (
+                  <CloseableAlert status="info">
+                    <AlertIcon />
+                    <AlertDescription display="block" flex="1">
+                      <FormattedMessage
+                        id="component.app-layout.new-version-available"
+                        defaultMessage="There's a new release of Parallel available. Please refresh your browser for it to take effect."
+                      />
+                    </AlertDescription>
+                    <Button
+                      variant="outline"
+                      colorScheme="blue"
+                      size="sm"
+                      marginX={2}
+                      onClick={() => window.location.reload()}
+                    >
+                      <FormattedMessage
+                        id="component.app-layout.refresh-button"
+                        defaultMessage="Refresh"
+                      />
+                    </Button>
+                  </CloseableAlert>
+                ) : null}
                 {rehydrated && !isLoading ? (
                   children
                 ) : (

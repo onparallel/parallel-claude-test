@@ -65,6 +65,16 @@
     "context": "Recipients"
   },
   {
+    "term": "component.app-layout.new-version-available",
+    "definition": "Hay una nueva versión de Parallel disponible. Por favor, refresca tu navegador para actualizar.",
+    "context": "There's a new release of Parallel available. Please refresh your browser for it to take effect."
+  },
+  {
+    "term": "component.app-layout.refresh-button",
+    "definition": "Refrescar",
+    "context": "Refresh"
+  },
+  {
     "term": "component.burger-button.label-close",
     "definition": "Cerrar menú",
     "context": "Close menu"
