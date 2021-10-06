@@ -2,7 +2,7 @@ import { Box, BoxProps, HStack, Stack, StackProps, Text } from "@chakra-ui/layou
 import { useRadio, useRadioGroup, UseRadioProps } from "@chakra-ui/radio";
 import { ArrowRightUpIcon } from "@parallel/chakra/icons";
 import { AnimateSharedLayout, motion } from "framer-motion";
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export type PublicSwitchValues = "monthly" | "yearly";
