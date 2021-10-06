@@ -136,13 +136,7 @@ export function PetitionListTagFilter({
   const id = useId(undefined, "tag-filter");
 
   return (
-    <Flex
-      flex="1"
-      direction="column"
-      onKeyDown={handleKeyDown}
-      overflow="hidden"
-      borderBottomRadius="5px"
-    >
+    <Flex flex="1" direction="column" onKeyDown={handleKeyDown} borderBottomRadius="5px">
       <Box paddingX={2} marginBottom={2}>
         <Input
           size="sm"
