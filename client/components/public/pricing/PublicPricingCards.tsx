@@ -350,7 +350,7 @@ export function PublicPricingCards({ billing, hideFeatures, ...props }: PublicPr
       {/* End Pro Plan */}
       {/* Start Enterprise Plan*/}
       <PricingCard>
-        <DetailsStack>
+        <DetailsStack minHeight="246px">
           <Stack>
             <Heading as="h2" fontSize="2xl" color="purple.600">
               <FormattedMessage id="page.pricing.enterprise" defaultMessage="Enterprise" />
@@ -362,7 +362,15 @@ export function PublicPricingCards({ billing, hideFeatures, ...props }: PublicPr
               />
             </Text>
           </Stack>
-          <Text fontWeight="bold" fontSize="2xl">
+          <Text
+            fontWeight="bold"
+            fontSize="2xl"
+            minHeight="45px"
+            lineHeight="39px"
+            display="flex"
+            alignItems="flex-end"
+            justifyContent="center"
+          >
             <FormattedMessage id="page.pricing.plan-suit-you" defaultMessage="A plan to suit you" />
           </Text>
           <Button colorScheme="purple" onClick={handleEnterprisePlanClick}>
