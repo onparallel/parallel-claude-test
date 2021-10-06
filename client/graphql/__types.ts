@@ -1233,6 +1233,8 @@ export interface Organization extends Timestamps {
   _id: Scalars["Int"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Custom subdomain. */
+  customHost?: Maybe<Scalars["String"]>;
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];
   /** The ID of the organization. */
@@ -6106,6 +6108,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   }>;
+  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
   owner: { __typename?: "User"; id: string };
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
@@ -6155,6 +6158,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
         }
     >;
   }>;
+  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
   owner: { __typename?: "User"; id: string };
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
@@ -11454,6 +11458,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   organization: {
     __typename?: "Organization";
     id: string;
+    customHost?: Maybe<string>;
     usageLimits: {
       __typename?: "OrganizationUsageLimit";
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11533,6 +11538,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         }
     >;
   }>;
+  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
   owner: { __typename?: "User"; id: string };
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
@@ -11649,6 +11655,19 @@ export type PetitionCompose_updatePetitionMutation = {
           id: string;
           status: PetitionSignatureRequestStatus;
         }>;
+        organization: {
+          __typename?: "Organization";
+          customHost?: Maybe<string>;
+          id: string;
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              limit: number;
+              used: number;
+            };
+          };
+        };
         owner: { __typename?: "User"; id: string };
         signatureConfig?: Maybe<{
           __typename?: "SignatureConfig";
@@ -11673,18 +11692,6 @@ export type PetitionCompose_updatePetitionMutation = {
           timezone: string;
           weekdaysOnly: boolean;
         }>;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
-            };
-          };
-        };
         myEffectivePermission?: Maybe<{
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -11724,6 +11731,7 @@ export type PetitionCompose_updatePetitionMutation = {
               }
           >;
         }>;
+        organization: { __typename?: "Organization"; customHost?: Maybe<string> };
         owner: { __typename?: "User"; id: string };
         signatureConfig?: Maybe<{
           __typename?: "SignatureConfig";
@@ -12294,6 +12302,7 @@ export type PetitionComposeQuery = {
         organization: {
           __typename?: "Organization";
           id: string;
+          customHost?: Maybe<string>;
           usageLimits: {
             __typename?: "OrganizationUsageLimit";
             petitions: {
@@ -12376,6 +12385,7 @@ export type PetitionComposeQuery = {
               }
           >;
         }>;
+        organization: { __typename?: "Organization"; customHost?: Maybe<string> };
         owner: { __typename?: "User"; id: string };
         signatureConfig?: Maybe<{
           __typename?: "SignatureConfig";
@@ -16623,6 +16633,9 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     isRecipientViewContentsHidden
     isReadOnly
     name
+    organization {
+      customHost
+    }
     owner {
       id
     }

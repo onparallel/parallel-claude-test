@@ -1333,6 +1333,11 @@ type Organization implements Timestamps {
   createdAt: DateTime!
 
   """
+  Custom subdomain.
+  """
+  customHost: String
+
+  """
   Whether the organization has an SSO provider configured.
   """
   hasSsoProvider: Boolean!

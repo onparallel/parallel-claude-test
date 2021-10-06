@@ -153,7 +153,9 @@ function _PetitionSettings({
     } catch {}
   }
 
-  const publicLinkURL = `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${petition.locale}/pp/${publicLink?.slug}`;
+  const publicLinkURL = petition.organization.customHost
+    ? `https://${petition.organization.customHost}/${petition.locale}/pp/${publicLink?.slug}`
+    : `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${petition.locale}/pp/${publicLink?.slug}`;
 
   const { onCopy: onCopyPublicLink, onCopyValue } = useClipboardWithToast({
     value: publicLinkURL,
@@ -189,6 +191,7 @@ function _PetitionSettings({
           ownerId: _ownerId,
           locale: petition.locale,
           petitionName: petition.name ?? null,
+          customHost: petition.organization.customHost,
         });
 
         const { data } = await createPublicPetitionLink({
@@ -215,6 +218,7 @@ function _PetitionSettings({
         publicLink: publicLink as PublicLinkSettingsDialog_PublicPetitionLinkFragment,
         locale: petition.locale,
         petitionName: petition.name ?? null,
+        customHost: petition.organization.customHost,
       });
 
       await updatePublicPetitionLink({
@@ -443,6 +447,9 @@ const fragments = {
       isRecipientViewContentsHidden
       isReadOnly
       name
+      organization {
+        customHost
+      }
       owner {
         id
       }

@@ -919,6 +919,7 @@ export interface NexusGenFieldTypes {
     // field return type
     _id: number; // Int!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     integrations: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
@@ -2061,6 +2062,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     _id: "Int";
     createdAt: "DateTime";
+    customHost: "String";
     hasSsoProvider: "Boolean";
     id: "GID";
     integrations: "OrgIntegration";

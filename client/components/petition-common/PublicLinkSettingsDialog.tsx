@@ -27,6 +27,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { Maybe } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useCallback, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -40,6 +41,7 @@ interface PublicLinkSettingsData {
   ownerId: string;
   slug: string;
   petitionName: string | null;
+  customHost: Maybe<string> | undefined;
   otherPermissions: UserOrUserGroupPublicLinkPermission[];
 }
 
@@ -48,6 +50,7 @@ export function PublicLinkSettingsDialog({
   ownerId,
   locale,
   petitionName,
+  customHost,
   ...props
 }: DialogProps<
   {
@@ -55,6 +58,7 @@ export function PublicLinkSettingsDialog({
     ownerId?: string;
     locale: string;
     petitionName: string | null;
+    customHost: Maybe<string> | undefined;
   },
   PublicLinkSettingsData
 >) {
@@ -176,9 +180,11 @@ export function PublicLinkSettingsDialog({
     }
   };
 
+  const PARALLEL_URL = customHost ? `https://${customHost}` : process.env.NEXT_PUBLIC_PARALLEL_URL;
+
   return (
     <ConfirmDialog
-      size="xl"
+      size="2xl"
       hasCloseButton
       content={{
         as: "form",
@@ -210,9 +216,7 @@ export function PublicLinkSettingsDialog({
                     defaultMessage="The link has been edited. If you save, you will no longer be able to access the request through the old link:"
                   />
                 </Text>
-                <Text as="b">
-                  {`${process.env.NEXT_PUBLIC_PARALLEL_URL}/${locale}/pp/${publicLink?.slug}`}
-                </Text>
+                <Text as="b">{`${PARALLEL_URL}/${locale}/pp/${publicLink?.slug}`}</Text>
               </Stack>
             </Alert>
           ) : null}
@@ -380,7 +384,7 @@ export function PublicLinkSettingsDialog({
               </HelpPopover>
             </FormLabel>
             <InputGroup>
-              <InputLeftAddon>{`${process.env.NEXT_PUBLIC_PARALLEL_URL}/${locale}/pp/`}</InputLeftAddon>
+              <InputLeftAddon>{`${PARALLEL_URL}/${locale}/pp/`}</InputLeftAddon>
               <Input
                 type="text"
                 {...register("slug", {

@@ -56,6 +56,10 @@ export const Organization = objectType({
     t.string("name", {
       description: "The name of the organization.",
     });
+    t.nullable.string("customHost", {
+      description: "Custom subdomain.",
+      resolve: (o) => o.custom_host,
+    });
     t.nullable.string("logoUrl", {
       description: "URL of the organization logo",
       resolve: async (root, args, ctx) => {
