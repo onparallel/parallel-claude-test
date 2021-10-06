@@ -24,7 +24,7 @@ export const webhooks = Router()
         handler?.(req.context, body, petitionId);
         res.sendStatus(200).end();
       } catch (error: any) {
-        req.context.logger.error(error);
+        req.context.logger.error(error.message, { stack: error.stack });
         next(error);
       }
     }

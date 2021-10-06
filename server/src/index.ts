@@ -1,9 +1,14 @@
 import "./init";
+import {
+  ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { json } from "express";
+import { graphqlUploadExpress } from "graphql-upload";
 import { api } from "./api";
 import { createContainer } from "./container";
 import { ApiContext } from "./context";
@@ -11,11 +16,6 @@ import { UnknownError } from "./graphql/helpers/errors";
 import { schema } from "./schema";
 import { LOGGER, Logger } from "./services/logger";
 import { stopwatchEnd } from "./util/stopwatch";
-import { graphqlUploadExpress } from "graphql-upload";
-import {
-  ApolloServerPluginLandingPageDisabled,
-  ApolloServerPluginLandingPageGraphQLPlayground,
-} from "apollo-server-core";
 
 const app = express();
 const container = createContainer();
@@ -24,6 +24,7 @@ app.use("/api", json(), cors(), cookieParser(), api(container));
 
 app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({
+  debug: true,
   schema,
   plugins: [
     process.env.NODE_ENV === "production"
@@ -38,14 +39,16 @@ const server = new ApolloServer({
               response.errors = response.errors.map((error) => {
                 switch (error.extensions?.code) {
                   case "INTERNAL_SERVER_ERROR": {
-                    context.logger.error(error.message, error.extensions?.exception);
+                    const stack = error.extensions?.exception.stacktrace;
+                    context.logger.error(error.message, stack && { stack });
                     return new UnknownError("Internal server error");
                   }
-                  case "GRAPHQL_VALIDATION_FAILED": {
-                    context.logger.error(error.message, error.extensions?.exception);
-                    return error;
-                  }
                   default:
+                    const stack = error.extensions?.exception.stacktrace;
+                    context.logger.warn(error.message, stack && { stack });
+                    if (error.extensions?.exception) {
+                      delete error.extensions.exception;
+                    }
                     return error;
                 }
               });

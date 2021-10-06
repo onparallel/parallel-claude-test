@@ -17,6 +17,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { petitionsArePublicTemplates, userHasAccessToPetitions } from "./authorizers";
 import { validateAuthTokenPayload } from "./validations";
+import { isDefined } from "remeda";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -75,7 +76,11 @@ export const petitionsQuery = queryField((t) => {
         if (filters.tagIds.length > 10) {
           throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
         }
-        const tags = await ctx.tags.loadTag(fromGlobalIds(filters?.tagIds, "Tag").ids);
+        const tagIds = fromGlobalIds(filters.tagIds, "Tag").ids;
+        if (tagIds.some((id) => !isDefined(id))) {
+          throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
+        }
+        const tags = await ctx.tags.loadTag(tagIds);
         if (!tags.every((tag) => tag?.organization_id === ctx.user!.org_id)) {
           throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
         }
