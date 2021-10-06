@@ -1,4 +1,4 @@
-import { chunk } from "remeda";
+import { PredIndexed } from "remeda/dist/commonjs/_types";
 import { MaybeArray } from "./types";
 
 export function unMaybeArray<T>(items: MaybeArray<T>) {
@@ -26,11 +26,11 @@ export function partition<T>(array: T[], predicate: (value: T) => unknown) {
 /**
  * Chunk the input array and keep adding elements to the current chunk as long as `predicate` returns true.
  */
-export function chunkWhile<T>(array: T[], predicate: (value: T, current: T[]) => boolean) {
+export function chunkWhile<T>(array: T[], predicate: (current: T[], value: T) => boolean) {
   let current: T[] = [];
   const chunks = [current];
   for (const element of array) {
-    if (current.length === 0 || predicate(element, current)) {
+    if (predicate(current, element)) {
       current.push(element);
     } else {
       current = [element];
@@ -38,4 +38,8 @@ export function chunkWhile<T>(array: T[], predicate: (value: T, current: T[]) =>
     }
   }
   return chunks;
+}
+
+export function sumBy<T>(array: T[], fn: PredIndexed<T, number>) {
+  return array.reduce((acc, curr, index) => acc + fn(curr, index, array), 0);
 }

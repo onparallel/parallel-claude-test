@@ -1089,6 +1089,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             linkOwner!,
             true,
             ctx,
+            new Date(),
             t
           ),
           ctx.petitions.clonePublicPetitionLinkUsersIntoPetitionPermission(
