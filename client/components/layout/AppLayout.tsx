@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { FormattedMessage } from "react-intl";
+import { isDefined } from "remeda";
 import userflow from "userflow.js";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
@@ -43,10 +44,12 @@ export const AppLayout = Object.assign(
         router.events.off("routeChangeComplete", handleRouteChangeComplete);
       };
       function handleRouteChangeStart() {
-        timeoutRef.current = window.setTimeout(() => {
-          timeoutRef.current = undefined;
-          setIsLoading(true);
-        }, 1000);
+        if (!isDefined(timeoutRef.current)) {
+          timeoutRef.current = window.setTimeout(() => {
+            timeoutRef.current = undefined;
+            setIsLoading(true);
+          }, 1000);
+        }
       }
       function handleRouteChangeComplete() {
         if (timeoutRef.current) {
