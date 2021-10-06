@@ -1,5 +1,5 @@
-import { addDays, addHours, addMinutes } from "date-fns";
-import { format, toDate, utcToZonedTime } from "date-fns-tz";
+import { addDays, addMinutes } from "date-fns";
+import { format, toDate } from "date-fns-tz";
 import { Knex } from "knex";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { createTestContainer } from "../../../test/testContainer";
