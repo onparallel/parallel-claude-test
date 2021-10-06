@@ -2466,8 +2466,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.editors-label",
-    "definition": "Editores:",
-    "context": "Editors:"
+    "definition": "Editores",
+    "context": "Editors"
   },
   {
     "term": "component.settings-public-link-dialog.editors-placeholder",
@@ -2481,23 +2481,33 @@
   },
   {
     "term": "component.settings-public-link-dialog.link-edited-alert",
-    "definition": "El enlace ha sido editado, si guarda, ya no podrá acceder a la solicitud a través del enlace anterior:",
-    "context": "The link has been edited, if you save, you will no longer be able to access the request through the old link:"
+    "definition": "El enlace ha sido editado. Si guarda, ya no podrá acceder a la solicitud a través del enlace anterior:",
+    "context": "The link has been edited. If you save, you will no longer be able to access the request through the old link:"
   },
   {
     "term": "component.settings-public-link-dialog.link-error",
-    "definition": "El enlace no es válido, por favor, escoja otro",
-    "context": "The link is invalid, please choose another"
+    "definition": "Enlace no válido, por favor, asegúrate de que cumpla con los requisitos.",
+    "context": "Invalid link, please make sure it meets the requirements."
+  },
+  {
+    "term": "component.settings-public-link-dialog.link-error-exemple",
+    "definition": "Ej: abc-ABC-123",
+    "context": "E.g: abc-ABC-123"
   },
   {
     "term": "component.settings-public-link-dialog.link-label",
-    "definition": "Enlace:",
-    "context": "Link:"
+    "definition": "Enlace",
+    "context": "Link"
+  },
+  {
+    "term": "component.settings-public-link-dialog.link-popover",
+    "definition": "Personaliza tu enlace público. Añade entre 8 y 30 caracteres, sin espacios, símbolos ni caracteres especiales.",
+    "context": "Customize your public link. Add between 8 and 30 characters, no spaces, symbols or special characters."
   },
   {
     "term": "component.settings-public-link-dialog.owner-label",
-    "definition": "Propietario:",
-    "context": "Owner:"
+    "definition": "Propietario",
+    "context": "Owner"
   },
   {
     "term": "component.settings-public-link-dialog.owner-placeholder",

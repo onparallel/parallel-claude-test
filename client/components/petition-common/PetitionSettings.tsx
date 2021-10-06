@@ -188,7 +188,7 @@ function _PetitionSettings({
         const publicLinkSettings = await publicLinkSettingDialog({
           ownerId: _ownerId,
           locale: petition.locale,
-          petitionName: petition.name ?? "",
+          petitionName: petition.name ?? null,
         });
 
         const { data } = await createPublicPetitionLink({
@@ -214,7 +214,7 @@ function _PetitionSettings({
       const publicLinkSettings = await publicLinkSettingDialog({
         publicLink: publicLink as PublicLinkSettingsDialog_PublicPetitionLinkFragment,
         locale: petition.locale,
-        petitionName: petition.name ?? "",
+        petitionName: petition.name ?? null,
       });
 
       await updatePublicPetitionLink({

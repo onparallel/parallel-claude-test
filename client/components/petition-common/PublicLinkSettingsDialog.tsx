@@ -31,6 +31,7 @@ import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useCallback, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { HelpPopover } from "../common/HelpPopover";
 import { UserSelect, useSearchUsers } from "../common/UserSelect";
 
 interface PublicLinkSettingsData {
@@ -38,7 +39,7 @@ interface PublicLinkSettingsData {
   description: string;
   ownerId: string;
   slug: string;
-  petitionName: string;
+  petitionName: string | null;
   otherPermissions: UserOrUserGroupPublicLinkPermission[];
 }
 
@@ -53,7 +54,7 @@ export function PublicLinkSettingsDialog({
     publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment;
     ownerId?: string;
     locale: string;
-    petitionName: string;
+    petitionName: string | null;
   },
   PublicLinkSettingsData
 >) {
@@ -113,10 +114,6 @@ export function PublicLinkSettingsDialog({
   }, []);
 
   useEffect(() => {
-    // console.log(errors.slug);
-  }, [errors.slug]);
-
-  useEffect(() => {
     if (getSlugData?.getSlugForPublicPetitionLink) {
       setValue("slug", getSlugData?.getSlugForPublicPetitionLink);
     }
@@ -154,11 +151,7 @@ export function PublicLinkSettingsDialog({
         PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
         PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
       >({
-        query: gql`
-          query PublicLinkSettingsDialog_isValidPublicPetitionLinkSlug($slug: String!) {
-            isValidPublicPetitionLinkSlug(slug: $slug)
-          }
-        `,
+        query: PublicLinkSettingsDialog.queries.slugIsValid,
         variables: { slug },
         fetchPolicy: "no-cache",
       });
@@ -206,7 +199,7 @@ export function PublicLinkSettingsDialog({
         </Text>
       }
       body={
-        <Stack>
+        <Stack spacing={4}>
           {publicLink && dirtyFields.slug === true ? (
             <Alert status="warning" rounded="md">
               <AlertIcon color="yellow.500" />
@@ -214,7 +207,7 @@ export function PublicLinkSettingsDialog({
                 <Text>
                   <FormattedMessage
                     id="component.settings-public-link-dialog.link-edited-alert"
-                    defaultMessage="The link has been edited, if you save, you will no longer be able to access the request through the old link:"
+                    defaultMessage="The link has been edited. If you save, you will no longer be able to access the request through the old link:"
                   />
                 </Text>
                 <Text as="b">
@@ -232,10 +225,15 @@ export function PublicLinkSettingsDialog({
           </Text>
           <FormControl id="title" isInvalid={!!errors.title}>
             <FormLabel>
-              <FormattedMessage
-                id="component.settings-public-link-dialog.page-title-label"
-                defaultMessage="Title of the page"
-              />
+              <Text as="span">
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.page-title-label"
+                  defaultMessage="Title of the page"
+                />
+              </Text>
+              <Text as="span" marginLeft={0.5}>
+                *
+              </Text>
             </FormLabel>
             <Input
               {...titleRegisterProps}
@@ -255,10 +253,15 @@ export function PublicLinkSettingsDialog({
           </FormControl>
           <FormControl id="description" isInvalid={!!errors.description}>
             <FormLabel>
-              <FormattedMessage
-                id="component.settings-public-link-dialog.description-label"
-                defaultMessage="Description"
-              />
+              <Text as="span">
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.description-label"
+                  defaultMessage="Description"
+                />
+              </Text>
+              <Text as="span" marginLeft={0.5}>
+                *
+              </Text>
             </FormLabel>
             <Textarea
               {...register("description", { required: true })}
@@ -279,10 +282,15 @@ export function PublicLinkSettingsDialog({
           </FormControl>
           <FormControl id="owner">
             <FormLabel>
-              <FormattedMessage
-                id="component.settings-public-link-dialog.owner-label"
-                defaultMessage="Owner:"
-              />
+              <Text as="span">
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.owner-label"
+                  defaultMessage="Owner"
+                />
+              </Text>
+              <Text as="span" marginLeft={0.5}>
+                *
+              </Text>
             </FormLabel>
             <Controller
               name="ownerId"
@@ -314,7 +322,7 @@ export function PublicLinkSettingsDialog({
             <FormLabel>
               <FormattedMessage
                 id="component.settings-public-link-dialog.editors-label"
-                defaultMessage="Editors:"
+                defaultMessage="Editors"
               />
             </FormLabel>
             <Controller
@@ -349,12 +357,27 @@ export function PublicLinkSettingsDialog({
               )}
             />
           </FormControl>
-          <FormControl isInvalid={errors.slug?.message !== "DEBOUNCED" && !!errors.slug}>
-            <FormLabel>
-              <FormattedMessage
-                id="component.settings-public-link-dialog.link-label"
-                defaultMessage="Link:"
-              />
+          <FormControl
+            isInvalid={errors.slug?.message !== "DEBOUNCED" && !!errors.slug && dirtyFields.slug}
+          >
+            <FormLabel display="flex" alignItems="center">
+              <Text as="span">
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.link-label"
+                  defaultMessage="Link"
+                />
+              </Text>
+              <Text as="span" marginLeft={0.5}>
+                *
+              </Text>
+              <HelpPopover marginLeft={2}>
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="component.settings-public-link-dialog.link-popover"
+                    defaultMessage="Customize your public link. Add between 8 and 30 characters, no spaces, symbols or special characters."
+                  />
+                </Text>
+              </HelpPopover>
             </FormLabel>
             <InputGroup>
               <InputLeftAddon>{`${process.env.NEXT_PUBLIC_PARALLEL_URL}/${locale}/pp/`}</InputLeftAddon>
@@ -379,10 +402,20 @@ export function PublicLinkSettingsDialog({
               ) : null}
             </InputGroup>
             <FormErrorMessage>
-              <FormattedMessage
-                id="component.settings-public-link-dialog.link-error"
-                defaultMessage="The link is invalid, please choose another"
-              />
+              <Stack spacing={1}>
+                <Text>
+                  <FormattedMessage
+                    id="component.settings-public-link-dialog.link-error"
+                    defaultMessage="Invalid link, please make sure it meets the requirements."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="component.settings-public-link-dialog.link-error-exemple"
+                    defaultMessage="E.g: abc-ABC-123"
+                  />
+                </Text>
+              </Stack>
             </FormErrorMessage>
           </FormControl>
         </Stack>
@@ -404,13 +437,18 @@ export function PublicLinkSettingsDialog({
   );
 }
 
-PublicLinkSettingsDialog.queries = [
-  gql`
+PublicLinkSettingsDialog.queries = {
+  getSlug: gql`
     query PublicLinkSettingsDialog_getSlugForPublicPetitionLink($petitionName: String) {
       getSlugForPublicPetitionLink(petitionName: $petitionName)
     }
   `,
-];
+  slugIsValid: gql`
+    query PublicLinkSettingsDialog_isValidPublicPetitionLinkSlug($slug: String!) {
+      isValidPublicPetitionLinkSlug(slug: $slug)
+    }
+  `,
+};
 
 PublicLinkSettingsDialog.fragments = {
   PublicPetitionLink: gql`

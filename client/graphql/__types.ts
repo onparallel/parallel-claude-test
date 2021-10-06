@@ -6656,20 +6656,20 @@ export type PetitionSharingModal_PetitionsQuery = {
   >;
 };
 
-export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables = Exact<{
-  slug: Scalars["String"];
-}>;
-
-export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery = {
-  isValidPublicPetitionLinkSlug: boolean;
-};
-
 export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables = Exact<{
   petitionName?: Maybe<Scalars["String"]>;
 }>;
 
 export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery = {
   getSlugForPublicPetitionLink: string;
+};
+
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables = Exact<{
+  slug: Scalars["String"];
+}>;
+
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery = {
+  isValidPublicPetitionLinkSlug: boolean;
 };
 
 export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
@@ -18477,41 +18477,6 @@ export type PetitionSharingModal_PetitionsQueryHookResult = ReturnType<
 export type PetitionSharingModal_PetitionsLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionsLazyQuery
 >;
-export const PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument = gql`
-  query PublicLinkSettingsDialog_isValidPublicPetitionLinkSlug($slug: String!) {
-    isValidPublicPetitionLinkSlug(slug: $slug)
-  }
-`;
-export function usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
-    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
-    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
-  >(PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument, options);
-}
-export function usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
-    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
-    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
-  >(PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument, options);
-}
-export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryHookResult = ReturnType<
-  typeof usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery
->;
-export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQueryHookResult = ReturnType<
-  typeof usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQuery
->;
 export const PublicLinkSettingsDialog_getSlugForPublicPetitionLinkDocument = gql`
   query PublicLinkSettingsDialog_getSlugForPublicPetitionLink($petitionName: String) {
     getSlugForPublicPetitionLink(petitionName: $petitionName)
@@ -18546,6 +18511,41 @@ export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryHookResult
 >;
 export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQueryHookResult = ReturnType<
   typeof usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQuery
+>;
+export const PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument = gql`
+  query PublicLinkSettingsDialog_isValidPublicPetitionLinkSlug($slug: String!) {
+    isValidPublicPetitionLinkSlug(slug: $slug)
+  }
+`;
+export function usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  >(PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument, options);
+}
+export function usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
+    PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  >(PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument, options);
+}
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryHookResult = ReturnType<
+  typeof usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery
+>;
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQueryHookResult = ReturnType<
+  typeof usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQuery
 >;
 export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
   mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
