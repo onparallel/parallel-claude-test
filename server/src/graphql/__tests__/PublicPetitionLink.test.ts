@@ -1,6 +1,5 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { createTrue } from "typescript";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";

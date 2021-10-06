@@ -123,8 +123,8 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
         { code: "MAX_SLUG_LENGTH_VALIDATION_ERROR" }
       );
     }
-    if (!slug.match(/^[a-z0-9-]*$/)) {
-      throw new ArgValidationError(info, argName, `Slug must match /^[a-z0-9-]*$/`, {
+    if (!slug.match(/^[a-zA-Z0-9-]*$/)) {
+      throw new ArgValidationError(info, argName, `Slug must match /^[a-zA-Z0-9-]*$/`, {
         code: "INVALID_SLUG_CHARS_VALIDATION_ERROR",
       });
     }
