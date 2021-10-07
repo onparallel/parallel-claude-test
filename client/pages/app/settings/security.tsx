@@ -103,8 +103,8 @@ function Security() {
         </Heading>
       }
     >
-      <Stack padding={6} spacing={8}>
-        <Stack maxWidth="container.2xs" spacing={4}>
+      <Stack padding={6} spacing={8} maxWidth="container.2xs" width="100%">
+        <Stack spacing={4}>
           <Heading as="h4" size="md" fontWeight="semibold">
             <FormattedMessage
               id="settings.security.password-header"

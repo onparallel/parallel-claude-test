@@ -148,9 +148,9 @@ function SettingsLayoutMenuItem({ path, children }: SettingsLayoutMenuItemProps)
         display="block"
         borderBottom="1px solid"
         borderBottomColor="gray.100"
-        backgroundColor={active ? "gray.75" : "white"}
+        backgroundColor={active ? "gray.50" : "white"}
         _hover={{
-          backgroundColor: "gray.75",
+          backgroundColor: "gray.50",
         }}
       >
         <Flex
