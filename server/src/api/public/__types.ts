@@ -1197,7 +1197,7 @@ export type Organization = Timestamps & {
   _id: Scalars["Int"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  /** Custom subdomain. */
+  /** Custom host used in petition links and public links. */
   customHost: Maybe<Scalars["String"]>;
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];

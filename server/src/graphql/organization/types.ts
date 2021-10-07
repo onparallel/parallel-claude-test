@@ -57,7 +57,7 @@ export const Organization = objectType({
       description: "The name of the organization.",
     });
     t.nullable.string("customHost", {
-      description: "Custom subdomain.",
+      description: "Custom host used in petition links and public links.",
       resolve: (o) => o.custom_host,
     });
     t.nullable.string("logoUrl", {

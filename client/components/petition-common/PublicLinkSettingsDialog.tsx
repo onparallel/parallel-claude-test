@@ -180,7 +180,9 @@ export function PublicLinkSettingsDialog({
     }
   };
 
-  const PARALLEL_URL = customHost ? `https://${customHost}` : process.env.NEXT_PUBLIC_PARALLEL_URL;
+  const parallelUrl = customHost
+    ? `${process.env.NODE_ENV === "production" ? "https" : "http"}://${customHost}`
+    : process.env.NEXT_PUBLIC_PARALLEL_URL;
 
   return (
     <ConfirmDialog
@@ -216,7 +218,7 @@ export function PublicLinkSettingsDialog({
                     defaultMessage="The link has been edited. If you save, you will no longer be able to access the request through the old link:"
                   />
                 </Text>
-                <Text as="b">{`${PARALLEL_URL}/${locale}/pp/${publicLink?.slug}`}</Text>
+                <Text as="b">{`${parallelUrl}/${locale}/pp/${publicLink?.slug}`}</Text>
               </Stack>
             </Alert>
           ) : null}
@@ -384,7 +386,7 @@ export function PublicLinkSettingsDialog({
               </HelpPopover>
             </FormLabel>
             <InputGroup>
-              <InputLeftAddon>{`${PARALLEL_URL}/${locale}/pp/`}</InputLeftAddon>
+              <InputLeftAddon>{`${parallelUrl}/${locale}/pp/`}</InputLeftAddon>
               <Input
                 type="text"
                 {...register("slug", {

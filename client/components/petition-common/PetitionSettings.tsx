@@ -152,13 +152,14 @@ function _PetitionSettings({
       await onUpdatePetition({ skipForwardSecurity: value });
     } catch {}
   }
-
-  const publicLinkURL = petition.organization.customHost
-    ? `https://${petition.organization.customHost}/${petition.locale}/pp/${publicLink?.slug}`
-    : `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${petition.locale}/pp/${publicLink?.slug}`;
+  const { customHost } = petition.organization;
+  const url = customHost
+    ? `${process.env.NODE_ENV === "production" ? "https" : "http"}://${customHost}`
+    : process.env.NEXT_PUBLIC_PARALLEL_URL;
+  const publicLinkUrl = `${url}/${petition.locale}/pp/${publicLink?.slug}`;
 
   const { onCopy: onCopyPublicLink, onCopyValue } = useClipboardWithToast({
-    value: publicLinkURL,
+    value: publicLinkUrl,
     text: intl.formatMessage({
       id: "component.petition-settings.link-copied-toast",
       defaultMessage: "Link copied to clipboard",
@@ -362,7 +363,7 @@ function _PetitionSettings({
       {isSharedByLink ? (
         <HStack paddingLeft={5}>
           <InputGroup>
-            <Input type="text" value={publicLinkURL} readOnly />
+            <Input type="text" value={publicLinkUrl} readOnly />
             <InputRightAddon padding={0}>
               <Button onClick={onCopyPublicLink}>
                 <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />

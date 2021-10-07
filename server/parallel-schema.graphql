@@ -1333,7 +1333,7 @@ type Organization implements Timestamps {
   createdAt: DateTime!
 
   """
-  Custom subdomain.
+  Custom host used in petition links and public links.
   """
   customHost: String
 
