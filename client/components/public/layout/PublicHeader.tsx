@@ -173,9 +173,6 @@ function PublicHeaderMenu(props: StackProps) {
       <PublicHeaderLink href="/templates" variant="ghost">
         <FormattedMessage id="public.templates-link" defaultMessage="Templates" />
       </PublicHeaderLink>
-      <PublicHeaderLink href="/about" variant="ghost">
-        <FormattedMessage id="public.about-link" defaultMessage="About" />
-      </PublicHeaderLink>
       <PublicHeaderLink href="/pricing" variant="ghost">
         <FormattedMessage id="public.pricing-link" defaultMessage="Pricing" />
       </PublicHeaderLink>
