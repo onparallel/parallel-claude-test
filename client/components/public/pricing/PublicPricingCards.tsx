@@ -19,7 +19,7 @@ import { usePricingList } from "../../../utils/usePricingList";
 import { PublicSwitchValues } from "./PublicSwitchPricing";
 
 interface PublicPricingCardsProps extends GridProps {
-  billing: PublicSwitchValues;
+  billing?: PublicSwitchValues;
   hideFeatures?: boolean;
 }
 
@@ -46,7 +46,11 @@ const DetailsStack = ({ children, ...props }: DetailsStackProps) => {
   );
 };
 
-export function PublicPricingCards({ billing, hideFeatures, ...props }: PublicPricingCardsProps) {
+export function PublicPricingCards({
+  billing = "monthly",
+  hideFeatures,
+  ...props
+}: PublicPricingCardsProps) {
   const list = usePricingList();
   const { locale = "es", push } = useRouter();
 
