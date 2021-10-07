@@ -8,6 +8,7 @@ import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Contact, Organization, Petition, User } from "../../db/__types";
 import { deleteAllData } from "../../util/knexUtils";
+import { calculateNextReminder } from "../../util/reminderUtils";
 import { presendPetition } from "./../../graphql/helpers/presendPetition";
 
 describe("presendPetition", () => {
@@ -173,18 +174,19 @@ describe("presendPetition", () => {
   it("considers deferred sends when setting next reminder date on massive sends with reminders enabled", async () => {
     const morePetitions = await mocks.createRandomPetitions(organization.id, user.id, 300);
     const now = new Date(2021, 10, 5);
+    const remindersConfig = {
+      offset: 1,
+      time: "08:30",
+      weekdaysOnly: false,
+      timezone: "Europe/Madrid",
+    };
     const results = await presendPetition(
       // massive send of 300 different petitions to 1 contact each
       morePetitions.map((petition) => [petition, [contactIds[0]]]),
       {
         body: [],
         subject: "test",
-        remindersConfig: {
-          offset: 1,
-          time: "08:30",
-          weekdaysOnly: false,
-          timezone: "Europe/Madrid",
-        },
+        remindersConfig,
         scheduledAt: null,
       },
       user,
@@ -207,24 +209,15 @@ describe("presendPetition", () => {
     );
 
     expect(results.flatMap((r) => r.accesses)).toMatchObject(
-      morePetitions.map((p, index) => ({
-        contact_id: contactIds[0],
-        petition_id: p.id,
-        reminders_active: true,
-        next_reminder_at: toDate(
-          `${format(
-            addDays(
-              now,
-              // reminders offset + extra day if the message is scheduled to be sent 24 hours later
-              1 + Math.floor(index / (24 * 60))
-            ),
-            "yyyy-MM-dd"
-          )}T08:30:00`,
-          {
-            timeZone: "Europe/Madrid",
-          }
-        ),
-      }))
+      morePetitions.map((p, i) => {
+        const sentAt = i < 20 ? now : addMinutes(now, 5 * Math.floor(i / 20));
+        return {
+          contact_id: contactIds[0],
+          petition_id: p.id,
+          reminders_active: true,
+          next_reminder_at: calculateNextReminder(sentAt, remindersConfig),
+        };
+      })
     );
   });
 
