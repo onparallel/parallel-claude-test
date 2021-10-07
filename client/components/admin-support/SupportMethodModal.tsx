@@ -64,7 +64,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
     const argsAssignment = field.args.map((arg) => `${arg.name}: $${arg.name}`).join(", ");
 
     const query = `
-      ${queryType}(${argsDef}) {
+      ${queryType} support_${field.name}(${argsDef}) {
         ${field.name}(${argsAssignment}) {
           result
           message

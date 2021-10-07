@@ -357,7 +357,16 @@ LandingTemplateDetails.fragments = {
 export const getServerSideProps: GetServerSideProps<{
   template: Assert<LandingTemplateDetails_landingTemplateBySlugQuery["landingTemplateBySlug"]>;
   relatedTemplates: LandingTemplateDetails_landingTemplatesQuery["landingTemplates"];
-}> = async function getServerSideProps({ query: { template: slug }, req, locale }) {
+}> = async function getServerSideProps({ query, req, locale }) {
+  const slug = query.template as string;
+  if (slug.includes("_")) {
+    return {
+      redirect: {
+        destination: `/${locale}/templates/${slug.replaceAll("_", "-")}`,
+        permanent: true,
+      },
+    };
+  }
   try {
     const client = createApolloClient({}, { req });
 

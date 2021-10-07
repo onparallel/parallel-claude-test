@@ -9,6 +9,7 @@ import { uploadArg } from "../helpers/upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { validateFile } from "../helpers/validators/validateFile";
+import { validateRegex } from "../helpers/validators/validateRegex";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
@@ -278,6 +279,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
   },
   validateArgs: validateAnd(
     validateHexColor((args) => args.backgroundColor, "backgroundColor"),
+    validateRegex((args) => args.slug, "slug", /^[a-z-]+$/),
     validateIf(
       (args) => isDefined(args.image),
       validateFile(
