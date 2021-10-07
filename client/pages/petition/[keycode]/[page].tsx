@@ -14,6 +14,7 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { useTone } from "@parallel/components/common/toneContext";
 import {
   RedirectError,
   withApolloData,
@@ -68,6 +69,8 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const signers = petition!.signature?.signers ?? [];
   const recipients = petition!.recipients;
   const message = access!.message;
+
+  const { tone } = useTone();
 
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage);
 
@@ -202,9 +205,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                         <Text>
                           <FormattedMessage
                             id="recipient-view.petition-completed-alert-1"
-                            defaultMessage="This petition has been completed and {name} has been notified for its revision and validation."
+                            defaultMessage="{tone, select, informal{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
                             values={{
                               name: <b>{granter.fullName}</b>,
+                              tone,
                             }}
                           />
                         </Text>
@@ -212,6 +216,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           <FormattedMessage
                             id="recipient-view.petition-completed-alert-2"
                             defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                            values={{ tone }}
                           />
                         </Text>
                       </>

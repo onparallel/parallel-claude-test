@@ -1,5 +1,6 @@
 import { Text, TextProps } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
+import { useTone } from "../common/toneContext";
 
 export interface CheckboxTypeLabelProps extends TextProps {
   options: any;
@@ -8,6 +9,8 @@ export interface CheckboxTypeLabelProps extends TextProps {
 export function CheckboxTypeLabel({ options, ...props }: CheckboxTypeLabelProps) {
   const { type = "UNLIMITED", min = 1, max = 1 } = options.limit ?? {};
 
+  const { tone } = useTone();
+
   const getText = () => {
     switch (type) {
       case "UNLIMITED":
@@ -15,6 +18,7 @@ export function CheckboxTypeLabel({ options, ...props }: CheckboxTypeLabelProps)
           <FormattedMessage
             id="component.checkbox-type-label.unlimited"
             defaultMessage="Choose as many options as you want"
+            values={{ tone }}
           />
         );
 
@@ -24,7 +28,7 @@ export function CheckboxTypeLabel({ options, ...props }: CheckboxTypeLabelProps)
           <FormattedMessage
             id="component.checkbox-type-label.exact"
             defaultMessage="Choose {X, plural, =1{# option} other{# options}}"
-            values={{ X: max }}
+            values={{ X: max, tone }}
           />
         );
 
@@ -33,13 +37,13 @@ export function CheckboxTypeLabel({ options, ...props }: CheckboxTypeLabelProps)
           <FormattedMessage
             id="component.checkbox-type-label.up-to"
             defaultMessage="Choose up to {X, plural, =1{# option} other{# options}}"
-            values={{ X: max }}
+            values={{ X: max, tone }}
           />
         ) : (
           <FormattedMessage
             id="component.checkbox-type-label.range"
             defaultMessage="Choose between {Y} and {X} options"
-            values={{ Y: min, X: max }}
+            values={{ Y: min, X: max, tone }}
           />
         );
 
@@ -48,6 +52,7 @@ export function CheckboxTypeLabel({ options, ...props }: CheckboxTypeLabelProps)
           <FormattedMessage
             id="component.checkbox-type-label.unlimited"
             defaultMessage="Choose as many options as you want"
+            values={{ tone }}
           />
         );
     }

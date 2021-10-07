@@ -19,10 +19,13 @@ import { DialogProps, useDialog } from "../common/DialogProvider";
 import { NormalLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
+import { useTone } from "../common/toneContext";
 
 export function RecipientViewHelpDialog(props: DialogProps<{}, void>) {
   const intl = useIntl();
   const router = useRouter();
+  const { tone } = useTone();
+
   const supportUrl = {
     en: "https://support.onparallel.com/hc/en-us",
     es: "https://support.onparallel.com/hc/es",
@@ -49,20 +52,29 @@ export function RecipientViewHelpDialog(props: DialogProps<{}, void>) {
           </Text>
           <Stack as={List} listStylePosition="outside" spacing={4} marginTop={4}>
             {[
-              intl.formatMessage({
-                id: "recipient-view.first-time.claim-1",
-                defaultMessage: "The information will be saved automatically as you add it.",
-              }),
-              intl.formatMessage({
-                id: "recipient-view.first-time.claim-2",
-                defaultMessage:
-                  "You can come back as many times as you'd like using the link you received in your email.",
-              }),
-              intl.formatMessage({
-                id: "recipient-view.first-time.claim-3",
-                defaultMessage:
-                  "You can add any comments and questions you'd like. Submit them at once whenever you decide.",
-              }),
+              intl.formatMessage(
+                {
+                  id: "recipient-view.first-time.claim-1",
+                  defaultMessage: "The information will be saved automatically as you add it.",
+                },
+                { tone }
+              ),
+              intl.formatMessage(
+                {
+                  id: "recipient-view.first-time.claim-2",
+                  defaultMessage:
+                    "You can come back as many times as you'd like using the link you received in your email.",
+                },
+                { tone }
+              ),
+              intl.formatMessage(
+                {
+                  id: "recipient-view.first-time.claim-3",
+                  defaultMessage:
+                    "You can add any comments and questions you'd like. Submit them at once whenever you decide.",
+                },
+                { tone }
+              ),
             ].map((claim, index) => (
               <ListItem display="flex" key={index}>
                 <ListIcon as={CheckIcon} boxSize="20px" color="purple.500" marginTop={1} />

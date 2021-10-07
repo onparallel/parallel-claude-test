@@ -17,6 +17,7 @@ import {
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
+import { useTone } from "@parallel/components/common/toneContext";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import {
   RecipientView_verifyPublicAccessMutation,
@@ -60,6 +61,8 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl }: RecipientViewVerify
   const intl = useIntl();
   const router = useRouter();
   const keycode = query.keycode as string;
+
+  const { tone } = useTone();
 
   const [state, setState] = useState<RecipientViewVerifyState>({
     step: "REQUEST",
@@ -179,6 +182,7 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl }: RecipientViewVerify
                 <FormattedMessage
                   id="recipient-view.verify-1"
                   defaultMessage="It looks like you are trying to access this page from a new device."
+                  values={{ tone }}
                 />
               </Text>
               <Text>

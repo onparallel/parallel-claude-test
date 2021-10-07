@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
+import { useTone } from "../common/toneContext";
 
 type NewSignerInfo = {
   firstName: string;
@@ -25,6 +26,7 @@ function AddNewSignerDialog({
     shouldFocusError: true,
     mode: "onSubmit",
   });
+  const { tone } = useTone();
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
@@ -45,6 +47,7 @@ function AddNewSignerDialog({
         <FormattedMessage
           id="components.add-new-signer-dialog.header"
           defaultMessage="Enter the signer's information"
+          values={{ tone }}
         />
       }
       body={

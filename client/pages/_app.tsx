@@ -1,6 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
+import { ToneProvider } from "@parallel/components/common/toneContext";
 import { init as initSentry } from "@parallel/utils/sentry";
 import { AppProps } from "next/app";
 import Router from "next/router";
@@ -23,10 +24,13 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     Router.events.on("routeChangeComplete", handleRouteChange);
     return () => Router.events.off("routeChangeComplete", handleRouteChange);
   }, []);
+
   return (
     <I18nProvider {...props}>
       <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
-        <Component {...pageProps} />
+        <ToneProvider>
+          <Component {...pageProps} />
+        </ToneProvider>
       </ChakraProvider>
     </I18nProvider>
   );

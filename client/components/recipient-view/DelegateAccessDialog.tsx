@@ -22,6 +22,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
+import { useTone } from "../common/toneContext";
 
 type DelegateAccessDialogData = {
   email: string;
@@ -63,6 +64,7 @@ function DelegateAccessDialog({
   DelegateAccessDialogData
 >) {
   const intl = useIntl();
+  const { tone } = useTone();
 
   const {
     control,
@@ -117,13 +119,15 @@ function DelegateAccessDialog({
             <Text>
               <FormattedMessage
                 id="recipient-view.invite-collaborator-dialog.subtitle-1"
-                defaultMessage="Please fill out the contact details of the person you want to delegate your access."
+                defaultMessage="{tone, select, informal{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
+                values={{ tone }}
               />
             </Text>
             <Text>
               <FormattedMessage
                 id="recipient-view.invite-collaborator-dialog.subtitle-2"
                 defaultMessage="We will send them an email with instructions on how to proceed."
+                values={{ tone }}
               />
             </Text>
           </Box>
