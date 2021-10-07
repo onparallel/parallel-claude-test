@@ -143,10 +143,11 @@ describe("GraphQL/Contacts", () => {
       `,
     });
 
-    const orderedContacts = userContacts.sort((a, b) =>
-      a.first_name!.localeCompare(b.first_name!, "en-us", {
-        ignorePunctuation: true,
-      })
+    const orderedContacts = userContacts.sort(
+      (a, b) =>
+        a.first_name!.localeCompare(b.first_name!, "en-us", {
+          ignorePunctuation: true,
+        }) || a.id - b.id // sort by id ascending if names are the same
     );
 
     expect(errors).toBeUndefined();
