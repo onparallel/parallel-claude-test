@@ -3,6 +3,7 @@ import {
   Alert,
   AlertIcon,
   Button,
+  Divider,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -10,7 +11,6 @@ import {
   Stack,
   useToast,
 } from "@chakra-ui/react";
-import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -103,9 +103,9 @@ function Security() {
         </Heading>
       }
     >
-      <Card margin={4} height="fit-content">
-        <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs" spacing={4}>
-          <Heading as="h4" size="md" fontWeight="normal">
+      <Stack padding={6} spacing={8}>
+        <Stack maxWidth="container.2xs" spacing={4}>
+          <Heading as="h4" size="md" fontWeight="semibold">
             <FormattedMessage
               id="settings.security.password-header"
               defaultMessage="Change password"
@@ -120,15 +120,18 @@ function Security() {
               />
             </Alert>
           ) : null}
-          <Stack as="form" onSubmit={handleSubmit(onChangePassword)}>
+          <Stack as="form" onSubmit={handleSubmit(onChangePassword)} spacing={4}>
             <FormControl id="password" isInvalid={!!errors.password} isDisabled={me.isSsoUser}>
-              <FormLabel>
+              <FormLabel fontWeight="semibold">
                 <FormattedMessage
                   id="generic.forms.old-password-label"
                   defaultMessage="Old password"
                 />
               </FormLabel>
-              <PasswordInput {...register("password", { required: true })} />
+              <PasswordInput
+                backgroundColor="white"
+                {...register("password", { required: true })}
+              />
               <FormErrorMessage>
                 {errors.password?.type === "required" ? (
                   <FormattedMessage
@@ -148,13 +151,14 @@ function Security() {
               isInvalid={!!errors.newPassword}
               isDisabled={me.isSsoUser}
             >
-              <FormLabel>
+              <FormLabel fontWeight="semibold">
                 <FormattedMessage
                   id="generic.forms.new-password-label"
                   defaultMessage="New password"
                 />
               </FormLabel>
               <PasswordInput
+                backgroundColor="white"
                 {...register("newPassword", {
                   required: true,
                   validate: (value) => value.length >= 8,
@@ -180,13 +184,14 @@ function Security() {
               isDisabled={me.isSsoUser}
               mb={2}
             >
-              <FormLabel>
+              <FormLabel fontWeight="semibold">
                 <FormattedMessage
                   id="generic.forms.confirm-password-label"
                   defaultMessage="Confirm password"
                 />
               </FormLabel>
               <PasswordInput
+                backgroundColor="white"
                 {...register("newPassword2", {
                   required: true,
                   validate: (value) => value === getValues().newPassword,
@@ -207,7 +212,8 @@ function Security() {
             </Button>
           </Stack>
         </Stack>
-      </Card>
+        <Divider borderColor="gray.300" />
+      </Stack>
     </SettingsLayout>
   );
 }

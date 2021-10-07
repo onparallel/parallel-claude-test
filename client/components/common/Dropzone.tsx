@@ -69,14 +69,14 @@ export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(func
       color={state.isDragActive ? (state.isDragReject ? "red.500" : "gray.600") : "gray.500"}
       border="2px dashed"
       borderRadius="md"
-      borderColor={state.isDragActive ? (state.isDragReject ? "red.500" : "gray.400") : "gray.300"}
+      borderColor={state.isDragActive ? (state.isDragReject ? "red.500" : "gray.400") : "gray.200"}
       padding={4}
       {...(inputProps.disabled
         ? {
             opacity: 0.4,
             cursor: "not-allowed",
           }
-        : {})}
+        : { cursor: "pointer" })}
       sx={
         state.isDragActive
           ? generateCssStripe({

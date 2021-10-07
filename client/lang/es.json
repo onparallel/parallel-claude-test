@@ -4090,6 +4090,21 @@
     "context": "Error loading image. Please upload again."
   },
   {
+    "term": "organization.branding.logo-atach-help",
+    "definition": "Adjunta una imagen que quieras que mostremos en tus correos.",
+    "context": "Attach an image that you would like us to display in your emails."
+  },
+  {
+    "term": "organization.branding.logo-atach-requirements-dropbox",
+    "definition": "(Imagen PNG, máx. {size})",
+    "context": "(PNG image, max. {size})"
+  },
+  {
+    "term": "organization.branding.logo-atach-requirements-help",
+    "definition": "Requisitos: Imagen PNG, máx. {size}",
+    "context": "Requirements: PNG image, max. {size}"
+  },
+  {
     "term": "organization.branding.logo-error",
     "definition": "El logo debe ser una imagen PNG de hasta {size} de tamaño.",
     "context": "The logo must be a PNG file of size up to {size}."
@@ -4098,11 +4113,6 @@
     "term": "organization.branding.logo-header",
     "definition": "Logo de la organización",
     "context": "Organization logo"
-  },
-  {
-    "term": "organization.branding.logo-help",
-    "definition": "Usaremos este logo en todas las comunicaciones con tus clientes. Debe ser una imagen PNG de hasta {size} de tamaño.",
-    "context": "We will use this logo in all communications with your clients. Must be a PNG file of size up to {size}."
   },
   {
     "term": "organization.branding.title",

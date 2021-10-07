@@ -3,6 +3,7 @@ import {
   Alert,
   AlertIcon,
   Button,
+  Divider,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -12,7 +13,6 @@ import {
   RadioGroup,
   Stack,
 } from "@chakra-ui/react";
-import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -86,84 +86,85 @@ function Account() {
         </Heading>
       }
     >
-      <Stack padding={6} spacing={6} width="full">
-        <Card height="fit-content" width="full" maxWidth="container.2xs">
-          <Stack padding={4}>
-            <Heading as="h4" size="md" marginBottom={2}>
-              <FormattedMessage id="settings.account.name-header" defaultMessage="Name" />
-            </Heading>
-            {me.isSsoUser ? (
-              <Alert>
-                <AlertIcon />
+      <Stack padding={6} spacing={8}>
+        <Stack>
+          <Heading as="h4" size="md" marginBottom={2}>
+            <FormattedMessage id="settings.account.name-header" defaultMessage="Name" />
+          </Heading>
+          {me.isSsoUser ? (
+            <Alert>
+              <AlertIcon />
+              <FormattedMessage
+                id="settings.account.sso-user-explanation"
+                defaultMessage="SSO users are not able to change their name"
+              />
+            </Alert>
+          ) : null}
+          <Stack as="form" onSubmit={handleSubmit(onSaveName)} spacing={4}>
+            <FormControl id="first-name" isInvalid={!!errors.firstName} isDisabled={me.isSsoUser}>
+              <FormLabel fontWeight="semibold">
+                <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+              </FormLabel>
+              <Input
+                backgroundColor="white"
+                {...register("firstName", { required: true, maxLength: 255 })}
+              />
+              <FormErrorMessage>
                 <FormattedMessage
-                  id="settings.account.sso-user-explanation"
-                  defaultMessage="SSO users are not able to change their name"
+                  id="generic.forms.required-first-name-error"
+                  defaultMessage="First name is required"
                 />
-              </Alert>
-            ) : null}
-            <Stack as="form" onSubmit={handleSubmit(onSaveName)} spacing={4}>
-              <FormControl id="first-name" isInvalid={!!errors.firstName} isDisabled={me.isSsoUser}>
-                <FormLabel>
-                  <FormattedMessage
-                    id="generic.forms.first-name-label"
-                    defaultMessage="First name"
-                  />
-                </FormLabel>
-                <Input {...register("firstName", { required: true, maxLength: 255 })} />
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.required-first-name-error"
-                    defaultMessage="First name is required"
-                  />
-                </FormErrorMessage>
-              </FormControl>
-              <FormControl
-                id="last-name"
-                isInvalid={!!errors.lastName}
-                isDisabled={me.isSsoUser}
-                mb={2}
-              >
-                <FormLabel>
-                  <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
-                </FormLabel>
-                <Input {...register("lastName", { required: true, maxLength: 255 })} />
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.required-last-name-error"
-                    defaultMessage="Last name is required"
-                  />
-                </FormErrorMessage>
-              </FormControl>
-              <Button
-                type="submit"
-                colorScheme="purple"
-                isDisabled={me.isSsoUser}
-                width="min-content"
-              >
+              </FormErrorMessage>
+            </FormControl>
+            <FormControl
+              id="last-name"
+              isInvalid={!!errors.lastName}
+              isDisabled={me.isSsoUser}
+              mb={2}
+            >
+              <FormLabel fontWeight="semibold">
+                <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+              </FormLabel>
+              <Input
+                backgroundColor="white"
+                {...register("lastName", { required: true, maxLength: 255 })}
+              />
+              <FormErrorMessage>
                 <FormattedMessage
-                  id="settings.account.update-name-button"
-                  defaultMessage="Save changes"
+                  id="generic.forms.required-last-name-error"
+                  defaultMessage="Last name is required"
                 />
-              </Button>
+              </FormErrorMessage>
+            </FormControl>
+            <Button
+              type="submit"
+              colorScheme="purple"
+              isDisabled={me.isSsoUser}
+              width="min-content"
+            >
+              <FormattedMessage
+                id="settings.account.update-name-button"
+                defaultMessage="Save changes"
+              />
+            </Button>
+          </Stack>
+        </Stack>
+        <Divider borderColor="gray.300" />
+        <Stack>
+          <Heading as="h4" size="md" marginBottom={2}>
+            <FormattedMessage id="settings.account.language" defaultMessage="Language" />
+          </Heading>
+          <RadioGroup onChange={handleLocaleChange} value={me.preferredLocale ?? intl.locale}>
+            <Stack>
+              {locales.map(({ key, localizedLabel }) => (
+                <Radio backgroundColor="white" key={key} value={key}>
+                  {localizedLabel}
+                </Radio>
+              ))}
             </Stack>
-          </Stack>
-        </Card>
-        <Card height="fit-content" width="full" maxWidth="container.2xs">
-          <Stack padding={4}>
-            <Heading as="h4" size="md" marginBottom={2}>
-              <FormattedMessage id="settings.account.language" defaultMessage="Language" />
-            </Heading>
-            <RadioGroup onChange={handleLocaleChange} value={me.preferredLocale ?? intl.locale}>
-              <Stack>
-                {locales.map(({ key, localizedLabel }) => (
-                  <Radio key={key} value={key}>
-                    {localizedLabel}
-                  </Radio>
-                ))}
-              </Stack>
-            </RadioGroup>
-          </Stack>
-        </Card>
+          </RadioGroup>
+        </Stack>
+        <Divider borderColor="gray.300" />
       </Stack>
     </SettingsLayout>
   );

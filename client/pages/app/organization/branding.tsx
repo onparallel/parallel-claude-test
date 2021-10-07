@@ -1,11 +1,20 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, Heading, Image, Spinner } from "@chakra-ui/react";
+import {
+  Button,
+  Center,
+  Flex,
+  Heading,
+  Image,
+  Spinner,
+  Text,
+  Stack,
+  Divider,
+} from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { FileSize } from "@parallel/components/common/FileSize";
-import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -79,69 +88,94 @@ function OrganizationBranding() {
         </Heading>
       }
     >
-      <Box padding={4}>
-        <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
-          <FormattedMessage
-            id="organization.branding.logo-header"
-            defaultMessage="Organization logo"
-          />
-          <HelpPopover marginLeft={2}>
+      <Stack padding={6} spacing={8}>
+        <Stack spacing={4}>
+          <Heading as="h4" size="md" fontWeight="semibold">
             <FormattedMessage
-              id="organization.branding.logo-help"
-              defaultMessage="We will use this logo in all communications with your clients. Must be a PNG file of size up to {size}."
-              values={{
-                size: <FileSize value={MAX_FILE_SIZE} />,
-              }}
+              id="organization.branding.logo-header"
+              defaultMessage="Organization logo"
             />
-          </HelpPopover>
-        </Heading>
-        <Card padding={4} width="fit-content">
-          <Dropzone
-            ref={dropzoneRef}
-            as={Center}
-            onDrop={handleLogoUpload}
-            accept={["image/png"]}
-            maxSize={MAX_FILE_SIZE}
-            multiple={false}
-            height="150px"
-            width="300px"
-            textAlign="center"
-          >
-            {loading ? (
-              <Spinner
-                thickness="4px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="purple.500"
-                size="xl"
-              />
-            ) : (
-              <Image
-                boxSize="300px"
-                height="150px"
-                objectFit="contain"
-                alt={me.organization.name}
-                src={logoSrc}
-                fallback={
-                  <FormattedMessage
-                    id="organization.branding.image-error"
-                    defaultMessage="Error loading image. Please upload again."
-                  />
-                }
-              />
-            )}
-          </Dropzone>
-
-          <Flex marginTop={4}>
-            <Button flex="1" colorScheme="purple" onClick={() => dropzoneRef.current?.open()}>
+          </Heading>
+          <Stack spacing={1}>
+            <Text fontSize="sm">
               <FormattedMessage
-                id="organization.branding.upload-logo"
-                defaultMessage="Upload a new logo"
+                id="organization.branding.logo-atach-help"
+                defaultMessage="Attach an image that you would like us to display in your emails."
+                values={{
+                  size: <FileSize value={MAX_FILE_SIZE} />,
+                }}
               />
-            </Button>
-          </Flex>
-        </Card>
-      </Box>
+            </Text>
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="organization.branding.logo-atach-requirements-help"
+                defaultMessage="Requirements: PNG image, max. {size}"
+                values={{
+                  size: <FileSize value={MAX_FILE_SIZE} />,
+                }}
+              />
+            </Text>
+          </Stack>
+          <Card padding={4}>
+            <Dropzone
+              ref={dropzoneRef}
+              as={Center}
+              onDrop={handleLogoUpload}
+              accept={["image/png"]}
+              maxSize={MAX_FILE_SIZE}
+              multiple={false}
+              maxHeight="200px"
+              maxWidth="360px"
+              textAlign="center"
+            >
+              {loading ? (
+                <Spinner
+                  thickness="4px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color="purple.500"
+                  size="xl"
+                />
+              ) : (
+                <Image
+                  boxSize="300px"
+                  height="150px"
+                  objectFit="contain"
+                  alt={me.organization.name}
+                  src={logoSrc}
+                  fallback={
+                    <FormattedMessage
+                      id="organization.branding.image-error"
+                      defaultMessage="Error loading image. Please upload again."
+                    />
+                  }
+                />
+              )}
+            </Dropzone>
+
+            <Flex marginTop={4}>
+              <Button flex="1" colorScheme="purple" onClick={() => dropzoneRef.current?.open()}>
+                <FormattedMessage
+                  id="organization.branding.upload-logo"
+                  defaultMessage="Upload a new logo"
+                />
+              </Button>
+            </Flex>
+            <Center marginTop={2}>
+              <Text fontSize="sm" color="gray.600">
+                <FormattedMessage
+                  id="organization.branding.logo-atach-requirements-dropbox"
+                  defaultMessage="(PNG image, max. {size})"
+                  values={{
+                    size: <FileSize value={MAX_FILE_SIZE} />,
+                  }}
+                />
+              </Text>
+            </Center>
+          </Card>
+        </Stack>
+        <Divider borderColor="gray.300" />
+      </Stack>
     </SettingsLayout>
   );
 }
