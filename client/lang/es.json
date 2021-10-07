@@ -2501,8 +2501,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.link-popover",
-    "definition": "Personaliza tu enlace público. Añade entre 8 y 30 caracteres, sin espacios, símbolos ni caracteres especiales.",
-    "context": "Customize your public link. Add between 8 and 30 characters, no spaces, symbols or special characters."
+    "definition": "Personaliza tu enlace público. Añade entre 8 y 30 caracteres, solamente se permiten alfanuméricos y guiones.",
+    "context": "Customize your public link. Add between 8 and 30 characters, only alphanumeric and hyphens are allowed."
   },
   {
     "term": "component.settings-public-link-dialog.owner-label",

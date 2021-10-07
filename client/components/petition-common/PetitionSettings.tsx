@@ -11,7 +11,6 @@ import {
   IconButton,
   Input,
   InputGroup,
-  InputRightAddon,
   InputRightElement,
   Select,
   Stack,
@@ -47,6 +46,7 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
+import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { Spacer } from "../common/Spacer";
@@ -362,14 +362,8 @@ function _PetitionSettings({
       ) : null}
       {isSharedByLink ? (
         <HStack paddingLeft={5}>
-          <InputGroup>
-            <Input type="text" value={publicLinkUrl} readOnly />
-            <InputRightAddon padding={0}>
-              <Button onClick={onCopyPublicLink}>
-                <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
-              </Button>
-            </InputRightAddon>
-          </InputGroup>
+          <Input type="text" value={publicLinkUrl} readOnly />
+          <CopyToClipboardButton text={publicLinkUrl} />
           <IconButton
             variant="outline"
             aria-label="public link settings"

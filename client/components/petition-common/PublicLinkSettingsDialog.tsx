@@ -365,6 +365,7 @@ export function PublicLinkSettingsDialog({
           </FormControl>
           <FormControl
             isInvalid={errors.slug?.message !== "DEBOUNCED" && !!errors.slug && dirtyFields.slug}
+            isDisabled={getSlugLoading}
           >
             <FormLabel display="flex" alignItems="center">
               <Text as="span">
@@ -380,33 +381,44 @@ export function PublicLinkSettingsDialog({
                 <Text fontSize="sm">
                   <FormattedMessage
                     id="component.settings-public-link-dialog.link-popover"
-                    defaultMessage="Customize your public link. Add between 8 and 30 characters, no spaces, symbols or special characters."
+                    defaultMessage="Customize your public link. Add between 8 and 30 characters, only alphanumeric and hyphens are allowed."
                   />
                 </Text>
               </HelpPopover>
             </FormLabel>
-            <InputGroup>
-              <InputLeftAddon>{`${parallelUrl}/${locale}/pp/`}</InputLeftAddon>
-              <Input
-                type="text"
-                {...register("slug", {
-                  required: true,
-                  validate: { isValidSlug },
-                })}
-                disabled={getSlugLoading}
-              />
-              {!publicLink || dirtyFields.slug === true ? (
-                <InputRightElement>
-                  {getSlugLoading || errors.slug?.message === "DEBOUNCED" ? (
-                    <Spinner thickness="2px" speed="0.65s" emptyColor="gray.200" color="gray.500" />
-                  ) : !errors.slug ? (
-                    <CheckIcon color="green.500" />
-                  ) : errors.slug ? (
-                    <CloseIcon color="red.500" fontSize="sm" />
+            <Controller
+              name="slug"
+              control={control}
+              rules={{
+                required: true,
+                validate: { isValidSlug },
+              }}
+              render={({ field: { onChange, ...field } }) => (
+                <InputGroup>
+                  <InputLeftAddon>{`${parallelUrl}/${locale}/pp/`}</InputLeftAddon>
+                  <Input
+                    onChange={(e) => onChange(e.target.value.replace(/[^a-z0-9-]/g, ""))}
+                    {...field}
+                  />
+                  {!publicLink || dirtyFields.slug === true ? (
+                    <InputRightElement>
+                      {getSlugLoading || errors.slug?.message === "DEBOUNCED" ? (
+                        <Spinner
+                          thickness="2px"
+                          speed="0.65s"
+                          emptyColor="gray.200"
+                          color="gray.500"
+                        />
+                      ) : !errors.slug ? (
+                        <CheckIcon color="green.500" />
+                      ) : errors.slug ? (
+                        <CloseIcon color="red.500" fontSize="sm" />
+                      ) : null}
+                    </InputRightElement>
                   ) : null}
-                </InputRightElement>
-              ) : null}
-            </InputGroup>
+                </InputGroup>
+              )}
+            />
             <FormErrorMessage>
               <Stack spacing={1}>
                 <Text>
