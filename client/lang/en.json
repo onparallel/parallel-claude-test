@@ -3715,6 +3715,26 @@
     "context": "Petitions"
   },
   {
+    "term": "generic.plans.basic",
+    "definition": "Basic",
+    "context": "Basic"
+  },
+  {
+    "term": "generic.plans.enterprise",
+    "definition": "Enterprise",
+    "context": "Enterprise"
+  },
+  {
+    "term": "generic.plans.free",
+    "definition": "Free",
+    "context": "Free"
+  },
+  {
+    "term": "generic.plans.professional",
+    "definition": "Professional",
+    "context": "Professional"
+  },
+  {
     "term": "generic.please-try-again-later",
     "definition": "Please try again later",
     "context": "Please try again later"
@@ -4205,11 +4225,6 @@
     "context": "Automatic reminders"
   },
   {
-    "term": "page.pricing.basic",
-    "definition": "Basic",
-    "context": "Basic"
-  },
-  {
     "term": "page.pricing.bulk-petitions",
     "definition": "Bulk petitions",
     "context": "Bulk petitions"
@@ -4270,11 +4285,6 @@
     "context": "Encrypted storage"
   },
   {
-    "term": "page.pricing.enterprise",
-    "definition": "Enterprise",
-    "context": "Enterprise"
-  },
-  {
     "term": "page.pricing.esignature",
     "definition": "eSignature (Signaturit)",
     "context": "eSignature (Signaturit)"
@@ -4298,11 +4308,6 @@
     "term": "page.pricing.forward-security",
     "definition": "Forward security",
     "context": "Forward security"
-  },
-  {
-    "term": "page.pricing.free",
-    "definition": "Free",
-    "context": "Free"
   },
   {
     "term": "page.pricing.increase-control",
@@ -4348,11 +4353,6 @@
     "term": "page.pricing.priority-support",
     "definition": "Priority support",
     "context": "Priority support"
-  },
-  {
-    "term": "page.pricing.professional",
-    "definition": "Professional",
-    "context": "Professional"
   },
   {
     "term": "page.pricing.remove-branding",

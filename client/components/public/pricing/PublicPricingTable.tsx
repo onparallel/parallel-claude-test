@@ -69,7 +69,7 @@ export function PublicPricingTable(props: CardProps) {
                             fontSize="sm"
                           >
                             <Text isTruncated>
-                              <FormattedMessage id="page.pricing.free" defaultMessage="Free" />
+                              <FormattedMessage id="generic.plans.free" defaultMessage="Free" />
                             </Text>
                           </Th>
                           <Th
@@ -80,7 +80,7 @@ export function PublicPricingTable(props: CardProps) {
                             fontSize="sm"
                           >
                             <Text isTruncated>
-                              <FormattedMessage id="page.pricing.basic" defaultMessage="Basic" />
+                              <FormattedMessage id="generic.plans.basic" defaultMessage="Basic" />
                             </Text>
                           </Th>
                           <Th
@@ -92,7 +92,7 @@ export function PublicPricingTable(props: CardProps) {
                           >
                             <Text isTruncated>
                               <FormattedMessage
-                                id="page.pricing.professional"
+                                id="generic.plans.professional"
                                 defaultMessage="Professional"
                               />
                             </Text>
@@ -106,7 +106,7 @@ export function PublicPricingTable(props: CardProps) {
                           >
                             <Text isTruncated>
                               <FormattedMessage
-                                id="page.pricing.enterprise"
+                                id="generic.plans.enterprise"
                                 defaultMessage="Enterprise"
                               />
                             </Text>

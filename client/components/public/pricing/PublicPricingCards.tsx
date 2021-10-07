@@ -112,7 +112,7 @@ export function PublicPricingCards({
         <DetailsStack>
           <Stack>
             <Heading as="h2" fontSize="2xl" color="gray.500">
-              <FormattedMessage id="page.pricing.free" defaultMessage="Free" />
+              <FormattedMessage id="generic.plans.free" defaultMessage="Free" />
             </Heading>
             <Text fontSize="sm">
               <FormattedMessage
@@ -187,7 +187,7 @@ export function PublicPricingCards({
         <DetailsStack>
           <Stack>
             <Heading as="h2" fontSize="2xl" color="gray.600">
-              <FormattedMessage id="page.pricing.basic" defaultMessage="Basic" />
+              <FormattedMessage id="generic.plans.basic" defaultMessage="Basic" />
             </Heading>
             <Text fontSize="sm">
               <FormattedMessage
@@ -271,7 +271,7 @@ export function PublicPricingCards({
         <DetailsStack>
           <Stack>
             <Heading as="h2" fontSize="2xl" color="blue.700">
-              <FormattedMessage id="page.pricing.professional" defaultMessage="Professional" />
+              <FormattedMessage id="generic.plans.professional" defaultMessage="Professional" />
             </Heading>
             <Text fontSize="sm">
               <FormattedMessage
@@ -355,7 +355,7 @@ export function PublicPricingCards({
         <DetailsStack minHeight="246px">
           <Stack>
             <Heading as="h2" fontSize="2xl" color="purple.600">
-              <FormattedMessage id="page.pricing.enterprise" defaultMessage="Enterprise" />
+              <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
             </Heading>
             <Text fontSize="sm">
               <FormattedMessage

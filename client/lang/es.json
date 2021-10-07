@@ -3715,6 +3715,26 @@
     "context": "Petitions"
   },
   {
+    "term": "generic.plans.basic",
+    "definition": "Basic",
+    "context": "Basic"
+  },
+  {
+    "term": "generic.plans.enterprise",
+    "definition": "Enterprise",
+    "context": "Enterprise"
+  },
+  {
+    "term": "generic.plans.free",
+    "definition": "Gratuito",
+    "context": "Free"
+  },
+  {
+    "term": "generic.plans.professional",
+    "definition": "Professional",
+    "context": "Professional"
+  },
+  {
     "term": "generic.please-try-again-later",
     "definition": "Por favor, inténtelo de nuevo más tarde",
     "context": "Please try again later"
@@ -4181,7 +4201,7 @@
   },
   {
     "term": "page.pricing.all-basic-plan",
-    "definition": "Todo lo del Plan Básico, y además:",
+    "definition": "Todo lo del Plan Basic, y además:",
     "context": "All included in Basic, and also:"
   },
   {
@@ -4191,7 +4211,7 @@
   },
   {
     "term": "page.pricing.all-professional-plan",
-    "definition": "Todo lo del Plan Profesional, y además:",
+    "definition": "Todo lo del Plan Professional, y además:",
     "context": "All included in Professional, and also:"
   },
   {
@@ -4203,11 +4223,6 @@
     "term": "page.pricing.automatic-reminders",
     "definition": "Recordatorios automáticos",
     "context": "Automatic reminders"
-  },
-  {
-    "term": "page.pricing.basic",
-    "definition": "Basic",
-    "context": "Basic"
   },
   {
     "term": "page.pricing.bulk-petitions",
@@ -4270,11 +4285,6 @@
     "context": "Encrypted storage"
   },
   {
-    "term": "page.pricing.enterprise",
-    "definition": "Enterprise",
-    "context": "Enterprise"
-  },
-  {
     "term": "page.pricing.esignature",
     "definition": "Firma electrónica (Signaturit)",
     "context": "eSignature (Signaturit)"
@@ -4298,11 +4308,6 @@
     "term": "page.pricing.forward-security",
     "definition": "Protección de reenvío",
     "context": "Forward security"
-  },
-  {
-    "term": "page.pricing.free",
-    "definition": "Gratuito",
-    "context": "Free"
   },
   {
     "term": "page.pricing.increase-control",
@@ -4348,11 +4353,6 @@
     "term": "page.pricing.priority-support",
     "definition": "Priorización de soporte",
     "context": "Priority support"
-  },
-  {
-    "term": "page.pricing.professional",
-    "definition": "Professional",
-    "context": "Professional"
   },
   {
     "term": "page.pricing.remove-branding",
