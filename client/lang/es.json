@@ -5570,6 +5570,51 @@
     "context": "Book a demo"
   },
   {
+    "term": "public.book-demo.basic-functions",
+    "definition": "<b>Funcionalidades básicas para nuestra plataforma:</b> peticiones, contactos y gestión de documentos.",
+    "context": "<b>Basic functions of our platform:</b> petitions, contacts and document management."
+  },
+  {
+    "term": "public.book-demo.checklist",
+    "definition": "<b>Cómo enviar un checklist:</b> a varios destinatarios, tipos de campos de información.",
+    "context": "<b>How to send a checklist:</b> to several recipients, types of information fields."
+  },
+  {
+    "term": "public.book-demo.contact-soon",
+    "definition": "Alguien de nuestro equipo se pondrá en contacto contigo lo antes posible.",
+    "context": "Someone from our team will contact you as soon as possible."
+  },
+  {
+    "term": "public.book-demo.follow",
+    "definition": "<b>Seguir el estado de tus peticiones:</b> progreso, confirmación de entrega y lectura.",
+    "context": "<b>Follow the status of your petitions:</b> progress, delivery and read receipts."
+  },
+  {
+    "term": "public.book-demo.other-functionalities",
+    "definition": "<b>Otras funcionalidades:</b> capas de seguridad adicionales, recordatorios.",
+    "context": "<b>Other functionalities:</b> additional security layers, reminders."
+  },
+  {
+    "term": "public.book-demo.request-invite",
+    "definition": "¡Solicita una demo!",
+    "context": "Book a demo!"
+  },
+  {
+    "term": "public.book-demo.review-and-download",
+    "definition": "<b>Revisar y descargar la información recibida:</b> revisar checklists completados y descargar documentos.",
+    "context": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents."
+  },
+  {
+    "term": "public.book-demo.title",
+    "definition": "Solicita una demo",
+    "context": "Book a demo"
+  },
+  {
+    "term": "public.book-demo.what-we-explain",
+    "definition": "En esta demo explicaremos:",
+    "context": "In this demo we will explain:"
+  },
+  {
     "term": "public.careers",
     "definition": "Trabaja con nosotros",
     "context": "Careers"
@@ -6063,6 +6108,16 @@
     "term": "public.how-it-works-hero.title",
     "definition": "Cómo funciona",
     "context": "How it works"
+  },
+  {
+    "term": "public.invite.consent",
+    "definition": "Parallel necesita la información que nos proporcionas para ponernos en contacto contigo acerca de nuestros productos. Puedes darte de baja de estas comunicaciones en cualquier momento.",
+    "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time."
+  },
+  {
+    "term": "public.invite.review-privacy",
+    "definition": "Para más información, por favor revisa nuestra <a>Política de Privacidad</a>.",
+    "context": "For more information, please review our <a>Privacy Policy</a>."
   },
   {
     "term": "public.law-firms",
