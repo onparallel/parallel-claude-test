@@ -397,7 +397,7 @@ export function PublicLinkSettingsDialog({
                 <InputGroup>
                   <InputLeftAddon>{`${parallelUrl}/${locale}/pp/`}</InputLeftAddon>
                   <Input
-                    onChange={(e) => onChange(e.target.value.replace(/[^a-z0-9-]/g, ""))}
+                    onChange={(e) => onChange(e.target.value.replace(/[^a-z0-9-]/gi, ""))}
                     {...field}
                   />
                   {!publicLink || dirtyFields.slug === true ? (

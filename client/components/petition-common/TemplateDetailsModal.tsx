@@ -58,7 +58,7 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
     ? `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${template.locale}/pp/${template.publicLink.slug}`
     : undefined;
 
-  const { onCopy: onCopyPublicLink } = useClipboardWithToast({
+  const onCopyPublicLink = useClipboardWithToast({
     value: publicLinkURL!,
     text: intl.formatMessage({
       id: "component.petition-settings.link-copied-toast",
@@ -198,7 +198,7 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
                         <MenuItem
                           justifyContent="left"
                           icon={<LinkIcon display="block" boxSize={4} />}
-                          onClick={onCopyPublicLink}
+                          onClick={() => onCopyPublicLink()}
                         >
                           <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
                         </MenuItem>
