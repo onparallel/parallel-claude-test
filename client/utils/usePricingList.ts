@@ -103,7 +103,7 @@ export function usePricingList(): PricingListCategory[] {
           {
             label: intl.formatMessage({
               id: "page.pricing.remove-branding",
-              defaultMessage: "Remove parallel branding",
+              defaultMessage: "Remove Parallel branding",
             }),
             plan: "PROFESSIONAL",
           },

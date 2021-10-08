@@ -246,7 +246,7 @@ export function PublicPricingCards({
               <Text fontSize="xl" fontWeight="bold">
                 <FormattedMessage
                   id="page.pricing.all-free-plan"
-                  defaultMessage="All included in Free, and also:"
+                  defaultMessage="Everything in Free, plus:"
                 />
               </Text>
               <List spacing={4} pl={1}>
@@ -330,7 +330,7 @@ export function PublicPricingCards({
               <Text fontSize="xl" fontWeight="bold">
                 <FormattedMessage
                   id="page.pricing.all-basic-plan"
-                  defaultMessage="All included in Basic, and also:"
+                  defaultMessage="Everything in Basic, plus:"
                 />
               </Text>
               <List spacing={4} pl={1}>
@@ -397,7 +397,7 @@ export function PublicPricingCards({
               <Text fontSize="xl" fontWeight="bold">
                 <FormattedMessage
                   id="page.pricing.all-professional-plan"
-                  defaultMessage="All included in Professional, and also:"
+                  defaultMessage="Everything in Professional, plus:"
                 />
               </Text>
               <List spacing={4} pl={1}>

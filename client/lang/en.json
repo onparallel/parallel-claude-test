@@ -4236,18 +4236,18 @@
   },
   {
     "term": "page.pricing.all-basic-plan",
-    "definition": "All included in Basic, and also:",
-    "context": "All included in Basic, and also:"
+    "definition": "Everything in Basic, plus:",
+    "context": "Everything in Basic, plus:"
   },
   {
     "term": "page.pricing.all-free-plan",
-    "definition": "All included in Free, and also:",
-    "context": "All included in Free, and also:"
+    "definition": "Everything in Free, plus:",
+    "context": "Everything in Free, plus:"
   },
   {
     "term": "page.pricing.all-professional-plan",
-    "definition": "All included in Professional, and also:",
-    "context": "All included in Professional, and also:"
+    "definition": "Everything in Professional, plus:",
+    "context": "Everything in Professional, plus:"
   },
   {
     "term": "page.pricing.api-access",
@@ -4391,8 +4391,8 @@
   },
   {
     "term": "page.pricing.remove-branding",
-    "definition": "Remove parallel branding",
-    "context": "Remove parallel branding"
+    "definition": "Remove Parallel branding",
+    "context": "Remove Parallel branding"
   },
   {
     "term": "page.pricing.reporting",
