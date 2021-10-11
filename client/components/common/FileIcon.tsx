@@ -1,22 +1,34 @@
 import { createIcon } from "@chakra-ui/react";
+import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useIntl } from "react-intl";
 
 export interface FileIconProps {
   filename: string;
   contentType: string;
+  hasFailed?: boolean;
 }
 
 export const FileIcon = chakraForwardRef<"svg", FileIconProps>(function FileIcon(
-  { filename, contentType, ...props },
+  { filename, contentType, hasFailed, ...props },
   ref
 ) {
-  const [Icon, label] = useGetIconAndLabelForFile(filename, contentType);
-  return <Icon alt={label} {...props} />;
+  const [Icon, label] = useGetIconAndLabelForFile(filename, contentType, hasFailed);
+  return <Icon color={hasFailed ? "red.500" : "inherit"} alt={label} {...props} />;
 });
 
-function useGetIconAndLabelForFile(filename: string, contentType: string) {
+function useGetIconAndLabelForFile(filename: string, contentType: string, hasFailed?: boolean) {
   const intl = useIntl();
+
+  if (hasFailed) {
+    return [
+      ExclamationOutlineIcon,
+      intl.formatMessage({
+        id: "component.file-icon.upload-failed",
+        defaultMessage: "This file did not upload correctly",
+      }),
+    ];
+  }
   if (
     [
       "application/vnd.ms-word",

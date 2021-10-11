@@ -176,13 +176,17 @@ export function RecipientViewPetitionFieldReplyFileUpload({
       return url!;
     });
   }
+
+  const uploadHasFailed =
+    reply.content.uploadComplete === false && reply.content.progress === undefined;
+
   return (
     <Stack direction="row" alignItems="center" backgroundColor="white">
       <Center
         boxSize={10}
         borderRadius="md"
         border="1px solid"
-        borderColor="gray.300"
+        borderColor={uploadHasFailed ? "red.500" : "gray.300"}
         color="gray.600"
         boxShadow="sm"
         fontSize="xs"
@@ -193,6 +197,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           boxSize={5}
           filename={reply.content!.filename}
           contentType={reply.content!.contentType}
+          hasFailed={uploadHasFailed}
         />
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
@@ -218,7 +223,16 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           </Center>
         ) : (
           <Text fontSize="xs">
-            <DateTime value={reply.createdAt} format={FORMATS.LLL} useRelativeTime />
+            {uploadHasFailed ? (
+              <Text color="red.500">
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-reply.damaged-file"
+                  defaultMessage="This file was not uploaded correctly. Please, delete it and try again."
+                />
+              </Text>
+            ) : (
+              <DateTime value={reply.createdAt} format={FORMATS.LLL} useRelativeTime />
+            )}
           </Text>
         )}
       </Box>
@@ -246,6 +260,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         </Center>
       ) : null}
       <IconButtonWithTooltip
+        isDisabled={uploadHasFailed || reply.content!.progress < 1}
         onClick={handleDownloadClick}
         variant="ghost"
         icon={<DownloadIcon />}

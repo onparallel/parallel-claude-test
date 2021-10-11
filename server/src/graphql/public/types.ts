@@ -351,6 +351,7 @@ export const PublicPetitionFieldReply = objectType({
                   size: file.size,
                   contentType: file.content_type,
                   extension: extension(file.content_type) || null,
+                  uploadComplete: file.upload_complete,
                 }
               : {};
           }

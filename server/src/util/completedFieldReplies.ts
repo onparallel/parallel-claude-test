@@ -22,6 +22,8 @@ export function completedFieldReplies<T extends PartialField>(field: T) {
           return reply.content.choices.length >= field.options.limit.min;
         }
       });
+    case "FILE_UPLOAD":
+      return field.replies.filter((reply) => reply.content.uploadComplete);
 
     default:
       return field.replies;

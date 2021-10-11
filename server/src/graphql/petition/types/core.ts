@@ -1,5 +1,5 @@
-import { enumType, inputObjectType, interfaceType, nullable, objectType, stringArg } from "nexus";
 import { extension } from "mime-types";
+import { enumType, inputObjectType, interfaceType, nullable, objectType, stringArg } from "nexus";
 import { isDefined, minBy } from "remeda";
 import { toGlobalId } from "../../../util/globalId";
 import { safeJsonParse } from "../../../util/safeJsonParse";
@@ -631,6 +631,7 @@ export const PetitionFieldReply = objectType({
                   size: file.size,
                   contentType: file.content_type,
                   extension: extension(file.content_type) || null,
+                  uploadComplete: file.upload_complete,
                 }
               : {};
           }

@@ -665,6 +665,11 @@
     "context": "Spreadsheet file"
   },
   {
+    "term": "component.file-icon.upload-failed",
+    "definition": "This file did not upload correctly",
+    "context": "This file did not upload correctly"
+  },
+  {
     "term": "component.file-icon.video-file",
     "definition": "Video file",
     "context": "Video file"
@@ -2263,6 +2268,11 @@
     "term": "component.recipient-view-petition-field-reply.approved-reply",
     "definition": "This reply has been approved",
     "context": "This reply has been approved"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.damaged-file",
+    "definition": "This file was not uploaded correctly. Please, delete it and try again.",
+    "context": "This file was not uploaded correctly. Please, delete it and try again."
   },
   {
     "term": "component.recipient-view-petition-field-reply.download-label",
@@ -4633,6 +4643,11 @@
     "term": "petition-replies.petition-field-reply.file-preview-download",
     "definition": "Preview file. ⇧ + click to download",
     "context": "Preview file. ⇧ + click to download"
+  },
+  {
+    "term": "petition-replies.petition-field-reply.file-upload.damaged-file",
+    "definition": "Error loading file.",
+    "context": "Error loading file."
   },
   {
     "term": "petition-replies.petition-field-reply.netdocuments-link",

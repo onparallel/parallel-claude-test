@@ -142,7 +142,7 @@ async function* getPetitionFiles(
     } else if (field.type === "FILE_UPLOAD") {
       for (const reply of field.replies) {
         const file = filesById[reply.content["file_upload_id"]];
-        if (file) {
+        if (file?.upload_complete) {
           const extension = file.filename.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
           const name = rename(pattern, placeholders, (placeholder) => {
             switch (placeholder) {
@@ -187,7 +187,7 @@ async function* getPetitionFiles(
   if (latestPetitionSignature?.status === "COMPLETED") {
     if (isDefined(latestPetitionSignature.file_upload_id)) {
       const signedPetition = await ctx.files.loadFileUpload(latestPetitionSignature.file_upload_id);
-      if (signedPetition) {
+      if (signedPetition?.upload_complete) {
         yield {
           filename: signedPetition.filename,
           stream: ctx.aws.fileUploads.downloadFile(signedPetition.path),
@@ -198,7 +198,7 @@ async function* getPetitionFiles(
       const auditTrail = await ctx.files.loadFileUpload(
         latestPetitionSignature.file_upload_audit_trail_id
       );
-      if (auditTrail) {
+      if (auditTrail?.upload_complete) {
         yield {
           filename: auditTrail.filename,
           stream: ctx.aws.fileUploads.downloadFile(auditTrail.path),

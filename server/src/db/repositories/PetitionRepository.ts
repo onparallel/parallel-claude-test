@@ -6,6 +6,7 @@ import { countBy, groupBy, indexBy, isDefined, maxBy, omit, sortBy, uniq, zip } 
 import { PetitionPermissionTypeRW } from "../../api/public/__types";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { partition, unMaybeArray } from "../../util/arrays";
+import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId } from "../../util/globalId";
@@ -30,6 +31,7 @@ import {
   CreatePetitionMessage,
   CreatePetitionReminder,
   CreatePublicPetitionLink,
+  FileUpload,
   Petition,
   PetitionAccess,
   PetitionContactNotification,
@@ -442,7 +444,23 @@ export class PetitionRepository extends BaseRepository {
           this.knex.raw(`"pfr"."content"::text as "content"`) as any
         );
 
-      const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
+      const fieldsByPetition = groupBy(
+        fields.map((f) => ({ ...f, content: JSON.parse(f.content) })),
+        (f) => f.petition_id
+      );
+
+      const fileUploadIds = uniq(
+        Object.values(fieldsByPetition)
+          .flat()
+          .filter((f) => f.content?.file_upload_id)
+          .map((f) => f.content.file_upload_id as number)
+      );
+
+      const uploadedFiles = await this.knex
+        .from<FileUpload>("file_upload")
+        .whereIn("id", fileUploadIds)
+        .whereNull("deleted_at");
+
       return ids.map((id) => {
         const fields = groupBy(fieldsByPetition[id] ?? [], (f) => f.id);
         // group fields by replies to remove duplicated rows
@@ -450,7 +468,21 @@ export class PetitionRepository extends BaseRepository {
         const fieldsWithReplies = Object.values(fields).map((arr) => ({
           ...arr[0],
           replies: arr
-            .map((a) => ({ content: JSON.parse(a.content) }))
+            .map((a) => {
+              // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
+              const file =
+                a.type === "FILE_UPLOAD" && isDefined(a.content?.file_upload_id)
+                  ? uploadedFiles.find((f) => f.id === a.content!.file_upload_id)
+                  : undefined;
+              return {
+                content: a.content
+                  ? {
+                      ...a.content,
+                      uploadComplete: file?.upload_complete,
+                    }
+                  : null,
+              };
+            })
             .filter((r) => r.content !== null),
         }));
 
@@ -460,10 +492,13 @@ export class PetitionRepository extends BaseRepository {
 
         return {
           validated: countBy(visibleFields, (f) => f.validated),
-          replied: countBy(visibleFields, (f) => f.replies.length > 0 && !f.validated),
+          replied: countBy(
+            visibleFields,
+            (f) => completedFieldReplies(f).length > 0 && !f.validated
+          ),
           optional: countBy(
             visibleFields,
-            (f) => f.optional && f.replies.length === 0 && !f.validated
+            (f) => f.optional && completedFieldReplies(f).length === 0 && !f.validated
           ),
           total: visibleFields.length,
         };

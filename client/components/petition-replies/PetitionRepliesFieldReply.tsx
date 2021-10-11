@@ -17,7 +17,7 @@ import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import useMergedRef from "@react-hook/merged-ref";
 import { useRef } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
@@ -47,6 +47,7 @@ export function PetitionRepliesFieldReply({
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Stack spacing={1}>
             <ReplyDownloadButton
+              isDisabled={reply.content.uploadComplete === false}
               contentType={reply.content.contentType}
               onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
             />
@@ -133,7 +134,16 @@ export function PetitionRepliesFieldReply({
           </List>
         ) : null}
         <Box fontSize="sm">
-          <DateTime as="span" color="gray.500" value={reply.createdAt} format={FORMATS.LLL} />
+          {reply.field?.type === "FILE_UPLOAD" && reply.content.uploadComplete === false ? (
+            <Text color="red.500">
+              <FormattedMessage
+                id="petition-replies.petition-field-reply.file-upload.damaged-file"
+                defaultMessage="Error loading file."
+              />
+            </Text>
+          ) : (
+            <DateTime as="span" color="gray.500" value={reply.createdAt} format={FORMATS.LLL} />
+          )}
         </Box>
       </Flex>
       <Stack direction="row" spacing={1}>
@@ -185,7 +195,7 @@ PetitionRepliesFieldReply.fragments = {
 
 const ReplyDownloadButton = chakraForwardRef<
   "button",
-  { contentType: string; onDownload: (preview: boolean) => void }
+  { contentType: string; onDownload: (preview: boolean) => void; isDisabled: boolean }
 >(function ReplyDownloadButton({ contentType, onDownload, ...props }, ref) {
   const intl = useIntl();
   const isPreviewable = contentType === "application/pdf" || contentType.startsWith("image/");
