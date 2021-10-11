@@ -70,21 +70,6 @@ async function main() {
     console.log(chalk`Workers started on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
   }
 
-  await waitFor(
-    async () => {
-      const result = await elbv2
-        .describeTargetHealth({
-          TargetGroupArn: targetGroupArn,
-        })
-        .promise();
-      return (
-        result.TargetHealthDescriptions?.every((t) => t.TargetHealth?.State === "healthy") ?? false
-      );
-    },
-    "Target not healthy. Waiting 5 more seconds...",
-    5000
-  );
-
   console.log("Create invalidation for static files");
   const result = await cloudfront.listDistributions().promise();
   // find distribution for
@@ -120,6 +105,21 @@ async function main() {
       ],
     })
     .promise();
+
+  await waitFor(
+    async () => {
+      const result = await elbv2
+        .describeTargetHealth({
+          TargetGroupArn: targetGroupArn,
+        })
+        .promise();
+      return (
+        result.TargetHealthDescriptions?.every((t) => t.TargetHealth?.State === "healthy") ?? false
+      );
+    },
+    "Target not healthy. Waiting 5 more seconds...",
+    5000
+  );
 }
 
 run(main);

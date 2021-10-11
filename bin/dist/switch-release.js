@@ -67,15 +67,6 @@ async function main() {
       ${ipAddress} /home/ec2-user/workers.sh start`);
         console.log((0, chalk_1.default) `Workers started on ${(_d = instance.Tags) === null || _d === void 0 ? void 0 : _d.find((t) => t.Key === "Name").Value}`);
     }
-    await (0, wait_1.waitFor)(async () => {
-        var _a, _b;
-        const result = await elbv2
-            .describeTargetHealth({
-            TargetGroupArn: targetGroupArn,
-        })
-            .promise();
-        return ((_b = (_a = result.TargetHealthDescriptions) === null || _a === void 0 ? void 0 : _a.every((t) => { var _a; return ((_a = t.TargetHealth) === null || _a === void 0 ? void 0 : _a.State) === "healthy"; })) !== null && _b !== void 0 ? _b : false);
-    }, "Target not healthy. Waiting 5 more seconds...", 5000);
     console.log("Create invalidation for static files");
     const result = await cloudfront.listDistributions().promise();
     // find distribution for
@@ -106,6 +97,15 @@ async function main() {
         ],
     })
         .promise();
+    await (0, wait_1.waitFor)(async () => {
+        var _a, _b;
+        const result = await elbv2
+            .describeTargetHealth({
+            TargetGroupArn: targetGroupArn,
+        })
+            .promise();
+        return ((_b = (_a = result.TargetHealthDescriptions) === null || _a === void 0 ? void 0 : _a.every((t) => { var _a; return ((_a = t.TargetHealth) === null || _a === void 0 ? void 0 : _a.State) === "healthy"; })) !== null && _b !== void 0 ? _b : false);
+    }, "Target not healthy. Waiting 5 more seconds...", 5000);
 }
 (0, run_1.run)(main);
 async function getTargetGroupInstances(targetGroupArn) {
