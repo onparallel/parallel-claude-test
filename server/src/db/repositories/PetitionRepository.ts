@@ -415,17 +415,19 @@ export class PetitionRepository extends BaseRepository {
         total: number;
       }
     >(async (ids) => {
-      const fields = await this.knex<PetitionField>("petition_field")
-        .whereIn("petition_id", ids)
-        .whereNull("deleted_at")
-        .whereNot("type", "HEADING");
-
-      const fieldReplies = await this.knex<PetitionFieldReply>("petition_field_reply")
-        .whereIn(
-          "petition_field_id",
-          fields.map((f) => f.id)
-        )
-        .whereNull("deleted_at");
+      const [fields, fieldReplies] = await Promise.all([
+        this.knex<PetitionField>("petition_field")
+          .whereIn("petition_id", ids)
+          .whereNull("deleted_at")
+          .whereNot("type", "HEADING"),
+        this.knex("petition_field_reply as pfr")
+          .leftJoin("petition_field as pf", function () {
+            this.on("pf.id", "pfr.petition_field_id").andOnNull("pfr.deleted_at");
+          })
+          .whereIn("pf.petition_id", ids)
+          .whereNull("pf.deleted_at")
+          .select<PetitionFieldReply[]>("pfr.*"),
+      ]);
 
       const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
 
@@ -438,7 +440,8 @@ export class PetitionRepository extends BaseRepository {
       const uploadedFiles = await this.knex
         .from<FileUpload>("file_upload")
         .whereIn("id", fileUploadIds)
-        .whereNull("deleted_at");
+        .whereNull("deleted_at")
+        .select("*");
 
       return ids.map((id) => {
         const fieldsWithReplies = (fieldsByPetition[id] ?? []).map((field) => ({
