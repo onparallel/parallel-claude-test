@@ -1,6 +1,6 @@
 # e2e testing
 
-Run tests with the following command
+Run tests with the following command from the e2e folder
 
 ```
 ENV=xxx BROWSER=xxx yarn test
