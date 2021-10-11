@@ -20,6 +20,8 @@ import { stopwatchEnd } from "./util/stopwatch";
 const app = express();
 const container = createContainer();
 
+app.get("/ping", (req, res, next) => res.status(200).send("pong"));
+
 app.use("/api", json(), cors(), cookieParser(), api(container));
 
 app.use("/graphql", graphqlUploadExpress());
