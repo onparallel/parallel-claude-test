@@ -67,7 +67,7 @@ async function main() {
       ${ipAddress} /home/ec2-user/workers.sh start`);
         console.log((0, chalk_1.default) `Workers started on ${(_d = instance.Tags) === null || _d === void 0 ? void 0 : _d.find((t) => t.Key === "Name").Value}`);
     }
-    (0, wait_1.waitFor)(async () => {
+    await (0, wait_1.waitFor)(async () => {
         var _a, _b;
         const result = await elbv2
             .describeTargetHealth({

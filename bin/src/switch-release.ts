@@ -70,7 +70,7 @@ async function main() {
     console.log(chalk`Workers started on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
   }
 
-  waitFor(
+  await waitFor(
     async () => {
       const result = await elbv2
         .describeTargetHealth({
