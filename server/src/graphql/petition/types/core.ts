@@ -179,7 +179,7 @@ export const Petition = objectType({
       type: "PetitionProgress",
       description: "The progress of the petition.",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadStatusForPetition(root.id);
+        return await ctx.petitions.loadPetitionProgress(root.id);
       },
     });
     t.nullable.datetime("sentAt", {

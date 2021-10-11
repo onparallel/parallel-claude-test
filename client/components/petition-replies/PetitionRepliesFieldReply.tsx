@@ -138,7 +138,7 @@ export function PetitionRepliesFieldReply({
             <Text color="red.500">
               <FormattedMessage
                 id="petition-replies.petition-field-reply.file-upload.damaged-file"
-                defaultMessage="Error loading file."
+                defaultMessage="File is damaged."
               />
             </Text>
           ) : (

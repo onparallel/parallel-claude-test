@@ -4646,8 +4646,8 @@
   },
   {
     "term": "petition-replies.petition-field-reply.file-upload.damaged-file",
-    "definition": "Error loading file.",
-    "context": "Error loading file."
+    "definition": "File is damaged.",
+    "context": "File is damaged."
   },
   {
     "term": "petition-replies.petition-field-reply.netdocuments-link",

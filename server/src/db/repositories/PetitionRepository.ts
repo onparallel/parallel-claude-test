@@ -405,7 +405,7 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadStatusForPetition = fromDataLoader(
+  readonly loadPetitionProgress = fromDataLoader(
     new DataLoader<
       number,
       {
@@ -415,44 +415,23 @@ export class PetitionRepository extends BaseRepository {
         total: number;
       }
     >(async (ids) => {
-      const fields: (Pick<
-        PetitionField,
-        "id" | "petition_id" | "validated" | "optional" | "visibility" | "type" | "options"
-      > & { content: string })[] = await this.knex<PetitionField>("petition_field as pf")
-        .leftJoin<PetitionFieldReply>("petition_field_reply as pfr", function () {
-          this.on("pf.id", "pfr.petition_field_id").andOnNull("pfr.deleted_at");
-        })
-        .whereIn("pf.petition_id", ids)
-        .whereNull("pf.deleted_at")
-        .whereNotIn("pf.type", ["HEADING"])
-        .groupBy(
-          "pf.id",
-          "pf.petition_id",
-          "pf.validated",
-          "pf.optional",
-          "pf.visibility",
-          this.knex.raw(`"pfr"."content"::text`)
-        )
-        .select(
-          "pf.id",
-          "pf.petition_id",
-          "pf.validated",
-          "pf.optional",
-          "pf.visibility",
-          "pf.type",
-          "pf.options",
-          this.knex.raw(`"pfr"."content"::text as "content"`) as any
-        );
+      const fields = await this.knex<PetitionField>("petition_field")
+        .whereIn("petition_id", ids)
+        .whereNull("deleted_at")
+        .whereNot("type", "HEADING");
 
-      const fieldsByPetition = groupBy(
-        fields.map((f) => ({ ...f, content: JSON.parse(f.content) })),
-        (f) => f.petition_id
-      );
+      const fieldReplies = await this.knex<PetitionFieldReply>("petition_field_reply")
+        .whereIn(
+          "petition_field_id",
+          fields.map((f) => f.id)
+        )
+        .whereNull("deleted_at");
+
+      const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
 
       const fileUploadIds = uniq(
-        Object.values(fieldsByPetition)
-          .flat()
-          .filter((f) => f.content?.file_upload_id)
+        fieldReplies
+          .filter((f) => f.type === "FILE_UPLOAD" && f.content?.file_upload_id)
           .map((f) => f.content.file_upload_id as number)
       );
 
@@ -462,22 +441,21 @@ export class PetitionRepository extends BaseRepository {
         .whereNull("deleted_at");
 
       return ids.map((id) => {
-        const fields = groupBy(fieldsByPetition[id] ?? [], (f) => f.id);
-        // group fields by replies to remove duplicated rows
-        // also we need the right object structure for evaluateFieldVisibility
-        const fieldsWithReplies = Object.values(fields).map((arr) => ({
-          ...arr[0],
-          replies: arr
-            .map((a) => {
+        const fieldsWithReplies = (fieldsByPetition[id] ?? []).map((field) => ({
+          ...field,
+          replies: fieldReplies
+            .filter((r) => r.petition_field_id === field.id)
+            .map((reply) => {
               // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
               const file =
-                a.type === "FILE_UPLOAD" && isDefined(a.content?.file_upload_id)
-                  ? uploadedFiles.find((f) => f.id === a.content!.file_upload_id)
+                reply.type === "FILE_UPLOAD" && isDefined(reply.content?.file_upload_id)
+                  ? uploadedFiles.find((f) => f.id === reply.content!.file_upload_id)
                   : undefined;
+
               return {
-                content: a.content
+                content: reply.content
                   ? {
-                      ...a.content,
+                      ...reply.content,
                       uploadComplete: file?.upload_complete,
                     }
                   : null,
