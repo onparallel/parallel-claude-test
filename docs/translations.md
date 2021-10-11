@@ -1,14 +1,14 @@
 # Translations
 
-The Parallel fully supports the following languages:
+Parallel is fully translated in the following languages:
 
 - English
 - Spanish
 
-In order to do this we use the [react-intl](https://github.com/formatjs/react-intl). Both the `client` and the `emails` workspaces have the same 2 commands
+In order to do this we use the [react-intl](https://github.com/formatjs/react-intl). Both the `client` and the `server` workspaces have the same 2 commands.
 
 - `yarn extract-i18n-terms`: Extracts the translation terms.
-- `yarn generate-i18n-files`: Generates the translations files.
+- `yarn generate-i18n-files`: Generates the translations files. _This is run during the build, there's no need to run this manually_
 
 ## Message Syntax
 
@@ -18,10 +18,10 @@ The library uses the ICU Message syntax. Check [this](https://formatjs.io/guides
 
 In order to use from React you can use the `<FormattedMessage/>` or you can inject the `intl` service with the `useIntl` hook. Check the examples at the end to see how use them.
 
-If you have used any of these 2 methods to localize some text:
+After using any of these 2 methods to localize some text you will have to run the `extract-i18n-terms` and make sure to populate the new terms in the translation files located in:
 
-- Run the `extract-i18n-terms` and make sure to populate the new translations in the files.
-- Run the `generate-i18n-files` and make sure the texts render fine in the different languages.
+- `client/lang/[locale].json` for tranlations from the client.
+- `server/lang/[locale].json` for translations in the emails.
 
 ### Examples
 
