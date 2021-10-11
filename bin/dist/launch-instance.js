@@ -68,7 +68,7 @@ async function main() {
                 Tags: [
                     {
                         Key: "Name",
-                        Value: `server-${env}-${commit}`,
+                        Value: `server-${env}`,
                     },
                     {
                         Key: "Release",
