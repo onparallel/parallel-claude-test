@@ -226,7 +226,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
             {uploadHasFailed ? (
               <Text color="red.500">
                 <FormattedMessage
-                  id="component.recipient-view-petition-field-reply.damaged-file"
+                  id="component.recipient-view-petition-field-reply.file-incomplete"
                   defaultMessage="This file was not uploaded correctly. Please, delete it and try again."
                 />
               </Text>

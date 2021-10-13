@@ -137,8 +137,8 @@ export function PetitionRepliesFieldReply({
           {reply.field?.type === "FILE_UPLOAD" && reply.content.uploadComplete === false ? (
             <Text color="red.500">
               <FormattedMessage
-                id="petition-replies.petition-field-reply.file-upload.damaged-file"
-                defaultMessage="File is damaged."
+                id="petition-replies.petition-field-reply.file-upload.file-incomplete"
+                defaultMessage="File upload is incomplete"
               />
             </Text>
           ) : (
