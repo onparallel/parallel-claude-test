@@ -30,12 +30,12 @@
     "context": "Activate your Parallel account"
   },
   {
-    "term": "closing.formal.regards",
+    "term": "closing-thanks.regards",
     "definition": "{tone, select, INFORMAL{Saludos.} other{Reciba un cordial saludo.}}",
     "context": "{tone, select, INFORMAL{Regards.} other{Best regards.}}"
   },
   {
-    "term": "closing.formal.thank-you",
+    "term": "closing-thanks.thank-you",
     "definition": "Muchas gracias.",
     "context": "Thank you very much."
   },
@@ -140,22 +140,22 @@
     "context": "Untitled petition"
   },
   {
-    "term": "greeting",
+    "term": "greeting-user",
     "definition": "{name, select, null {Hola,} other {Hola {name},}}",
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
-    "term": "greeting.contact",
+    "term": "greeting-contact.informal",
     "definition": "{name, select, null {Hola,} other {Hola {name},}}",
     "context": "{name, select, null {Hello,} other {Hello {name},}}"
   },
   {
-    "term": "greeting.formal",
+    "term": "greeting-contact.formal",
     "definition": "{fullName, select, null {Estimado/a Sr./Sra.,} other {Estimado/a {fullName},}}",
     "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
   },
   {
-    "term": "greeting.informal-reminder",
+    "term": "greeting-reminder.informal",
     "definition": "{name, select, null {🔔 ¡Hola!} other {🔔 ¡Hola, {name}!}}",
     "context": "{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}"
   },

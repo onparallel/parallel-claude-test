@@ -213,18 +213,12 @@ function OrganizationBranding() {
               <Stack spacing={4}>
                 <Radio backgroundColor="white" value="INFORMAL">
                   <Text fontWeight="semibold">
-                    <FormattedMessage
-                      id="organization.branding.tone-informal"
-                      defaultMessage="Informal"
-                    />
+                    <FormattedMessage id="generic.tone-informal" defaultMessage="Informal" />
                   </Text>
                 </Radio>
                 <Radio backgroundColor="white" value="FORMAL">
                   <Text fontWeight="semibold">
-                    <FormattedMessage
-                      id="organization.branding.tone-formal"
-                      defaultMessage="Formal"
-                    />
+                    <FormattedMessage id="generic.tone-formal" defaultMessage="Formal" />
                   </Text>
                 </Radio>
               </Stack>

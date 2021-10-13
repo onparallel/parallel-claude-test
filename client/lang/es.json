@@ -2851,7 +2851,7 @@
   },
   {
     "term": "components.add-new-signer-dialog.header",
-    "definition": "{tone, select, INFORMAL{Introduce los datos del firmante} other{Introduzca los datos del firmante}}",
+    "definition": "{tone, select, INFORMAL{Introduce} other{Introduzca}} los datos del firmante",
     "context": "Enter the signer's information"
   },
   {
@@ -3885,6 +3885,16 @@
     "context": "Tomorrow at {time}"
   },
   {
+    "term": "generic.tone-formal",
+    "definition": "Formal",
+    "context": "Formal"
+  },
+  {
+    "term": "generic.tone-informal",
+    "definition": "Informal",
+    "context": "Informal"
+  },
+  {
     "term": "generic.transfer-ownership",
     "definition": "Transferir propiedad",
     "context": "Transfer ownership"
@@ -4180,19 +4190,9 @@
     "context": "Branding"
   },
   {
-    "term": "organization.branding.tone-formal",
-    "definition": "Formal",
-    "context": "Formal"
-  },
-  {
     "term": "organization.branding.tone-header",
     "definition": "Tono de los mensajes",
     "context": "Tone of the messages"
-  },
-  {
-    "term": "organization.branding.tone-informal",
-    "definition": "Informal",
-    "context": "Informal"
   },
   {
     "term": "organization.branding.upload-logo",
@@ -7402,7 +7402,7 @@
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle",
     "definition": "{tone, select, INFORMAL{Para completar esta petición se necesita una <b>firma digital</b>.} other{Esta petición requiere de firma digital para ser completada.}}",
-    "context": "{tone, select, INFORMAL{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
+    "context": "{tone, select, INFORMAL{An <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle.recipient-can-add",
@@ -7412,7 +7412,7 @@
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle.with-signers",
     "definition": "{tone, select, INFORMAL{Clica en <b>Continuar con firma digital</b> y enviaremos un email con información sobre cómo completarla a las siguientes personas:} other{Al hacer click en <b>Continuar con firma digital</b>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:}}",
-    "context": "{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}"
+    "context": "{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and} other{After you click on <b>Continue with eSignature</b>,}} we will send an email with information on how to complete the process to the following people:"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
@@ -7471,8 +7471,8 @@
   },
   {
     "term": "recipient-view.first-time.claim-3",
-    "definition": "{tone, select, INFORMAL{¡No te quedes con dudas! Puedes agregar cualquier comentario y pregunta que quieras en los campos.} other{Puede agregar cualquier comentario y pregunta que desee. Envíelos de inmediato cuando lo desee.}}",
-    "context": "{tone, select, INFORMAL{Don't be left with doubts! You can add any comments and questions you want in the fields.} other{You can add any comments and questions you'd like. Submit them at once whenever you decide.}}"
+    "definition": "{tone, select, INFORMAL{¡No te quedes con dudas! Puedes agregar cualquier comentario y pregunta que quieras en los campos.} other{Puede agregar cualquier comentario y pregunta que desee.}}",
+    "context": "{tone, select, INFORMAL{Don't be left with doubts! } other{}}You can add any comments and questions you want in the fields."
   },
   {
     "term": "recipient-view.first-time.intro",

@@ -5,7 +5,7 @@ export function GreetingUser({ name }: { name: string | null }) {
   return (
     <MjmlText>
       <FormattedMessage
-        id="greeting"
+        id="greeting-user"
         defaultMessage="{name, select, null {Hi,} other {Hi {name},}}"
         values={{ name }}
       />
@@ -26,13 +26,13 @@ export function GreetingContact({
     <MjmlText>
       {tone === "INFORMAL" ? (
         <FormattedMessage
-          id="greeting.contact"
+          id="greeting-contact.informal"
           defaultMessage="{name, select, null {Hello,} other {Hello {name},}}"
           values={{ name }}
         />
       ) : (
         <FormattedMessage
-          id="greeting.formal"
+          id="greeting-contact.formal"
           defaultMessage="{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
           values={{ fullName }}
         />
@@ -54,13 +54,13 @@ export function GreetingReminder({
     <MjmlText>
       {tone === "INFORMAL" ? (
         <FormattedMessage
-          id="greeting.informal-reminder"
+          id="greeting-reminder.informal"
           defaultMessage="{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}"
           values={{ name }}
         />
       ) : (
         <FormattedMessage
-          id="greeting.formal"
+          id="greeting-contact.formal"
           defaultMessage="{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
           values={{ fullName }}
         />

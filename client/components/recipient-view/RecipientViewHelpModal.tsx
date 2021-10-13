@@ -70,7 +70,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
                 {
                   id: "recipient-view.first-time.claim-3",
                   defaultMessage:
-                    "{tone, select, INFORMAL{Don't be left with doubts! You can add any comments and questions you want in the fields.} other{You can add any comments and questions you'd like. Submit them at once whenever you decide.}}",
+                    "{tone, select, INFORMAL{Don't be left with doubts! } other{}}You can add any comments and questions you want in the fields.",
                 },
                 { tone }
               ),

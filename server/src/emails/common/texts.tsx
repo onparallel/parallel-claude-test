@@ -19,7 +19,7 @@ export function closing({}, intl: IntlShape) {
 export function greetingUser({ name }: { name: string | null }, intl: IntlShape) {
   return intl.formatMessage(
     {
-      id: "greeting",
+      id: "greeting-user",
       defaultMessage: "{name, select, null {Hi,} other {Hi {name},}}",
     },
     { name }
@@ -33,14 +33,14 @@ export function greetingContact(
   return tone === "INFORMAL"
     ? intl.formatMessage(
         {
-          id: "greeting.contact",
+          id: "greeting-contact.informal",
           defaultMessage: "{name, select, null {Hello,} other {Hello {name},}}",
         },
         { name }
       )
     : intl.formatMessage(
         {
-          id: "greeting.formal",
+          id: "greeting-contact.formal",
           defaultMessage: "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
         },
         { fullName }

@@ -139,7 +139,7 @@ function CompleteSignerInfoDialog({
         <Stack>
           <FormattedMessage
             id="recipient-view.complete-signer-info-dialog.subtitle"
-            defaultMessage="{tone, select, INFORMAL{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
+            defaultMessage="{tone, select, INFORMAL{An <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
             values={{ tone }}
           />
           {[...signers, additionalSigners].length > 0 ? (
@@ -150,7 +150,7 @@ function CompleteSignerInfoDialog({
                   <Text>
                     <FormattedMessage
                       id="recipient-view.complete-signer-info-dialog.subtitle.with-signers"
-                      defaultMessage="{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}"
+                      defaultMessage="{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and} other{After you click on <b>Continue with eSignature</b>,}} we will send an email with information on how to complete the process to the following people:"
                       values={{ tone }}
                     />
                   </Text>
