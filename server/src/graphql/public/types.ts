@@ -148,7 +148,7 @@ export const PublicPetition = objectType({
         return signature ? (signature.status === "COMPLETED" ? "COMPLETED" : "STARTED") : null;
       },
     });
-    t.nonNull.field("preferedTone", {
+    t.nonNull.field("tone", {
       type: "Tone",
       description: "The prefered tone of organization.",
       resolve: async (root, _, ctx) => {

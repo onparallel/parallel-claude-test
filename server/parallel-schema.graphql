@@ -459,7 +459,7 @@ type Mutation {
   """
   Changes the organization prefered tone
   """
-  changeOrganizationPreferedTone(orgId: GID!, tone: Tone!): Organization!
+  changeOrganizationPreferedTone(tone: Tone!): Organization!
 
   """
   Changes the password for the current logged in user.
@@ -1128,7 +1128,7 @@ type Mutation {
   """
   Updates the logo of an organization
   """
-  updateOrganizationLogo(file: Upload!, orgId: GID!): Organization!
+  updateOrganizationLogo(file: Upload!): Organization!
 
   """
   Updates the role of another user in the organization.
@@ -1612,11 +1612,6 @@ type Petition implements PetitionBase {
   permissions: [PetitionPermission!]!
 
   """
-  The prefered tone of organization.
-  """
-  preferedTone: Tone!
-
-  """
   The progress of the petition.
   """
   progress: PetitionProgress!
@@ -1660,6 +1655,11 @@ type Petition implements PetitionBase {
   The tags linked to the petition
   """
   tags: [Tag!]!
+
+  """
+  The prefered tone of organization.
+  """
+  tone: Tone!
 
   """
   Time when the resource was last updated.
@@ -1843,11 +1843,6 @@ interface PetitionBase {
   permissions: [PetitionPermission!]!
 
   """
-  The prefered tone of organization.
-  """
-  preferedTone: Tone!
-
-  """
   The signature configuration for the petition.
   """
   signatureConfig: SignatureConfig
@@ -1861,6 +1856,11 @@ interface PetitionBase {
   The tags linked to the petition
   """
   tags: [Tag!]!
+
+  """
+  The prefered tone of organization.
+  """
+  tone: Tone!
 
   """
   Time when the resource was last updated.
@@ -2606,11 +2606,6 @@ type PetitionTemplate implements PetitionBase {
   permissions: [PetitionPermission!]!
 
   """
-  The prefered tone of organization.
-  """
-  preferedTone: Tone!
-
-  """
   The public link linked to this template
   """
   publicLink: PublicPetitionLink
@@ -2629,6 +2624,11 @@ type PetitionTemplate implements PetitionBase {
   The tags linked to the petition
   """
   tags: [Tag!]!
+
+  """
+  The prefered tone of organization.
+  """
+  tone: Tone!
 
   """
   Time when the resource was last updated.
@@ -2755,7 +2755,7 @@ type PublicAccessVerification {
   isAllowed: Boolean!
   orgLogoUrl: String
   orgName: String
-  preferedTone: Tone
+  tone: Tone
 }
 
 """
@@ -2848,11 +2848,6 @@ type PublicPetition implements Timestamps {
   locale: PetitionLocale!
 
   """
-  The prefered tone of organization.
-  """
-  preferedTone: Tone!
-
-  """
   The recipients of the petition
   """
   recipients: [PublicContact!]!
@@ -2867,6 +2862,11 @@ type PublicPetition implements Timestamps {
   The status of the petition.
   """
   status: PetitionStatus!
+
+  """
+  The prefered tone of organization.
+  """
+  tone: Tone!
 
   """
   Time when the resource was last updated.

@@ -51,7 +51,7 @@ export async function petitionMessage(
       bodyPlainText: toPlainText(bodyJson, renderContext),
       deadline: petition.deadline,
       keycode: access.keycode,
-      tone: organization?.prefered_tone ?? "FORMAL",
+      tone: organization!.prefered_tone,
       ...layoutProps,
     },
     { locale: petition.locale }

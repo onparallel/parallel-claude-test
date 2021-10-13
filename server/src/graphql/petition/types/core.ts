@@ -156,7 +156,7 @@ export const PetitionBase = interfaceType({
         return root.signature_config;
       },
     });
-    t.nonNull.field("preferedTone", {
+    t.nonNull.field("tone", {
       type: "Tone",
       description: "The prefered tone of organization.",
       resolve: async (root, _, ctx) => {

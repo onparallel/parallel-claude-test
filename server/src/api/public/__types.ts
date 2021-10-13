@@ -575,7 +575,6 @@ export type MutationcancelSignatureRequestArgs = {
 };
 
 export type MutationchangeOrganizationPreferedToneArgs = {
-  orgId: Scalars["GID"];
   tone: Tone;
 };
 
@@ -1047,7 +1046,6 @@ export type MutationupdateOnboardingStatusArgs = {
 
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
-  orgId: Scalars["GID"];
 };
 
 export type MutationupdateOrganizationUserArgs = {

@@ -677,7 +677,7 @@ PetitionCompose.fragments = {
         ...AddPetitionAccessDialog_Petition
         ...PetitionTemplateComposeMessageEditor_Petition
         ...PetitionSettings_PetitionBase
-        preferedTone
+        tone
         fields {
           ...PetitionCompose_PetitionField
         }

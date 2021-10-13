@@ -71,7 +71,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const recipients = petition!.recipients;
   const message = access!.message;
 
-  const tone = petition.preferedTone;
+  const tone = petition.tone;
 
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage);
 
@@ -479,7 +479,7 @@ RecipientView.fragments = {
         deadline
         hasCommentsEnabled
         isRecipientViewContentsHidden
-        preferedTone
+        tone
         fields {
           ...RecipientView_PublicPetitionField
         }

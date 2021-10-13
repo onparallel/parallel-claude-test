@@ -247,7 +247,7 @@ export interface NexusGenEnums {
     | "sentAt_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
-  Tone: db.Tone;
+  Tone: "FORMAL" | "INFORMAL";
   UserAuthenticationTokens_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -443,7 +443,7 @@ export interface NexusGenObjects {
     isAllowed: boolean; // Boolean!
     orgLogoUrl?: string | null; // String
     orgName?: string | null; // String
-    preferedTone?: NexusGenEnums["Tone"] | null; // Tone
+    tone?: NexusGenEnums["Tone"] | null; // Tone
   };
   PublicContact: db.Contact;
   PublicOrganization: db.Organization;
@@ -984,7 +984,6 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
-    preferedTone: NexusGenEnums["Tone"]; // Tone!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     sentAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -994,6 +993,7 @@ export interface NexusGenFieldTypes {
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     subscriptions: NexusGenRootTypes["Subscription"][]; // [Subscription!]!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
+    tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   PetitionAccess: {
@@ -1224,11 +1224,11 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
-    preferedTone: NexusGenEnums["Tone"]; // Tone!
     publicLink: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
+    tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   PetitionTemplateAndField: {
@@ -1273,7 +1273,7 @@ export interface NexusGenFieldTypes {
     isAllowed: boolean; // Boolean!
     orgLogoUrl: string | null; // String
     orgName: string | null; // String
-    preferedTone: NexusGenEnums["Tone"] | null; // Tone
+    tone: NexusGenEnums["Tone"] | null; // Tone
   };
   PublicContact: {
     // field return type
@@ -1298,11 +1298,11 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    preferedTone: NexusGenEnums["Tone"]; // Tone!
     recipients: NexusGenRootTypes["PublicContact"][]; // [PublicContact!]!
     signature: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
     signatureStatus: NexusGenEnums["PublicSignatureStatus"] | null; // PublicSignatureStatus
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
+    tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   PublicPetitionAccess: {
@@ -1698,10 +1698,10 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
-    preferedTone: NexusGenEnums["Tone"]; // Tone!
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
+    tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   PetitionBaseAndField: {
@@ -2134,7 +2134,6 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     permissions: "PetitionPermission";
-    preferedTone: "Tone";
     progress: "PetitionProgress";
     remindersConfig: "RemindersConfig";
     sentAt: "DateTime";
@@ -2144,6 +2143,7 @@ export interface NexusGenFieldTypeNames {
     status: "PetitionStatus";
     subscriptions: "Subscription";
     tags: "Tag";
+    tone: "Tone";
     updatedAt: "DateTime";
   };
   PetitionAccess: {
@@ -2374,11 +2374,11 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     permissions: "PetitionPermission";
-    preferedTone: "Tone";
     publicLink: "PublicPetitionLink";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
     tags: "Tag";
+    tone: "Tone";
     updatedAt: "DateTime";
   };
   PetitionTemplateAndField: {
@@ -2423,7 +2423,7 @@ export interface NexusGenFieldTypeNames {
     isAllowed: "Boolean";
     orgLogoUrl: "String";
     orgName: "String";
-    preferedTone: "Tone";
+    tone: "Tone";
   };
   PublicContact: {
     // field return type name
@@ -2448,11 +2448,11 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
-    preferedTone: "Tone";
     recipients: "PublicContact";
     signature: "PublicSignatureConfig";
     signatureStatus: "PublicSignatureStatus";
     status: "PetitionStatus";
+    tone: "Tone";
     updatedAt: "DateTime";
   };
   PublicPetitionAccess: {
@@ -2848,10 +2848,10 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     permissions: "PetitionPermission";
-    preferedTone: "Tone";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
     tags: "Tag";
+    tone: "Tone";
     updatedAt: "DateTime";
   };
   PetitionBaseAndField: {
@@ -2955,7 +2955,6 @@ export interface NexusGenArgTypes {
     };
     changeOrganizationPreferedTone: {
       // args
-      orgId: NexusGenScalars["GID"]; // GID!
       tone: NexusGenEnums["Tone"]; // Tone!
     };
     changePassword: {
@@ -3427,7 +3426,6 @@ export interface NexusGenArgTypes {
     updateOrganizationLogo: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
-      orgId: NexusGenScalars["GID"]; // GID!
     };
     updateOrganizationUser: {
       // args

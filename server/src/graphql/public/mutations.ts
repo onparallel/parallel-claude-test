@@ -63,7 +63,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       t.nullable.string("email");
       t.nullable.string("orgLogoUrl");
       t.nullable.string("orgName");
-      t.nullable.field("preferedTone", {
+      t.nullable.field("tone", {
         type: "Tone",
       });
     },
@@ -117,7 +117,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
           email: anonymizeEmail(ctx.contact!.email),
           orgName: org!.name,
           orgLogoUrl: logoUrl,
-          preferedTone: org!.prefered_tone,
+          tone: org!.prefered_tone,
         };
       }
     } else {

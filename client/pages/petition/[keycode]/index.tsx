@@ -20,9 +20,9 @@ import { Logo } from "@parallel/components/common/Logo";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import {
-  Tone,
   RecipientView_verifyPublicAccessMutation,
   RecipientView_verifyPublicAccessMutationVariables,
+  Tone,
   usepublicCheckVerificationCodeMutation,
   usepublicSendVerificationCodeMutation,
 } from "@parallel/graphql/__types";
@@ -43,7 +43,7 @@ interface RecipientViewVerifyProps {
   email: string;
   orgName: string;
   orgLogoUrl: string;
-  preferedTone: Tone;
+  tone: Tone;
 }
 
 type RecipientViewVerifyState =
@@ -57,12 +57,7 @@ type RecipientViewVerifyState =
     }
   | { step: "VERIFIED" };
 
-function RecipientViewVerify({
-  email,
-  orgName,
-  orgLogoUrl,
-  preferedTone: tone,
-}: RecipientViewVerifyProps) {
+function RecipientViewVerify({ email, orgName, orgLogoUrl, tone }: RecipientViewVerifyProps) {
   const { query } = useRouter();
   const toast = useToast();
   const intl = useIntl();
@@ -312,7 +307,7 @@ export async function getServerSideProps({
           email
           orgName
           orgLogoUrl
-          preferedTone
+          tone
         }
       }
     `,
