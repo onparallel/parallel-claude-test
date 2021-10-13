@@ -14,7 +14,7 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { ToneProvider, useTone } from "@parallel/components/common/toneContext";
+import { ToneProvider, useTone } from "@parallel/components/common/ToneProvider";
 import {
   RedirectError,
   withApolloData,
@@ -32,7 +32,7 @@ import { useRecipientViewHelpDialog } from "@parallel/components/recipient-view/
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
-  OrgPreferedTone,
+  Tone,
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
   RecipientView_PublicPetitionFieldFragment,
@@ -571,7 +571,7 @@ function useGetPageFields(fields: RecipientView_PublicPetitionFieldFragment[], p
   }, [fields, page, visibility]);
 }
 
-function useHelpModal({ tone }: { tone: OrgPreferedTone }) {
+function useHelpModal({ tone }: { tone: Tone }) {
   const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
   useEffect(() => {
     showHelp();

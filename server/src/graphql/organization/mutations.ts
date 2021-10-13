@@ -1,5 +1,5 @@
 import { arg, mutationField, nonNull } from "nexus";
-import { OrgPreferedTone } from "../../db/__types";
+import { Tone } from "../../db/__types";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -52,11 +52,11 @@ export const changeOrganizationPreferedTone = mutationField("changeOrganizationP
   type: "Organization",
   args: {
     orgId: nonNull(globalIdArg()),
-    tone: nonNull(arg({ type: "OrgPreferedTone" })),
+    tone: nonNull(arg({ type: "Tone" })),
   },
   authorize: authenticateAnd(contextUserIsAdmin(), contextUserBelongsToOrg("orgId")),
   resolve: async (root, args, ctx) => {
-    const tone = (await args.tone) as OrgPreferedTone;
+    const tone = (await args.tone) as Tone;
     return await ctx.organizations.updateOrganization(
       args.orgId,
       { prefered_tone: tone },

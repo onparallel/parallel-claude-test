@@ -459,7 +459,7 @@ type Mutation {
   """
   Changes the organization prefered tone
   """
-  changeOrganizationPreferedTone(orgId: GID!, tone: OrgPreferedTone!): Organization!
+  changeOrganizationPreferedTone(orgId: GID!, tone: Tone!): Organization!
 
   """
   Changes the password for the current logged in user.
@@ -1327,14 +1327,6 @@ type OrgIntegration {
 }
 
 """
-The prefered tone of organization
-"""
-enum OrgPreferedTone {
-  FORMAL
-  INFORMAL
-}
-
-"""
 An organization in the system.
 """
 type Organization implements Timestamps {
@@ -1379,7 +1371,7 @@ type Organization implements Timestamps {
   """
   The prefered tone of organization.
   """
-  preferedTone: OrgPreferedTone!
+  preferedTone: Tone!
 
   """
   The status of the organization.
@@ -1622,7 +1614,7 @@ type Petition implements PetitionBase {
   """
   The prefered tone of organization.
   """
-  preferedTone: OrgPreferedTone!
+  preferedTone: Tone!
 
   """
   The progress of the petition.
@@ -1853,7 +1845,7 @@ interface PetitionBase {
   """
   The prefered tone of organization.
   """
-  preferedTone: OrgPreferedTone!
+  preferedTone: Tone!
 
   """
   The signature configuration for the petition.
@@ -2616,7 +2608,7 @@ type PetitionTemplate implements PetitionBase {
   """
   The prefered tone of organization.
   """
-  preferedTone: OrgPreferedTone!
+  preferedTone: Tone!
 
   """
   The public link linked to this template
@@ -2763,7 +2755,7 @@ type PublicAccessVerification {
   isAllowed: Boolean!
   orgLogoUrl: String
   orgName: String
-  preferedTone: OrgPreferedTone
+  preferedTone: Tone
 }
 
 """
@@ -2858,7 +2850,7 @@ type PublicPetition implements Timestamps {
   """
   The prefered tone of organization.
   """
-  preferedTone: OrgPreferedTone!
+  preferedTone: Tone!
 
   """
   The recipients of the petition
@@ -3751,6 +3743,14 @@ interface Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+"""
+The prefered tone of organization
+"""
+enum Tone {
+  FORMAL
+  INFORMAL
 }
 
 input UpdateContactInput {

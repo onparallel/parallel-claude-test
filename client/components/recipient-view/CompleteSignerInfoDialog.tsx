@@ -3,7 +3,7 @@ import { Button, Checkbox, ListItem, Spacer, Stack, Text, UnorderedList } from "
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import {
   Maybe,
-  OrgPreferedTone,
+  Tone,
   PetitionLocale,
   PublicPetitionSignerDataInput,
   RecipientView_PublicContactFragment,
@@ -52,7 +52,7 @@ type CompleteSignerInfoDialogProps = {
   contact: useCompleteSignerInfoDialog_PublicContactFragment;
   organization: string;
   recipientCanAddSigners: boolean;
-  tone: OrgPreferedTone;
+  tone: Tone;
 };
 
 export type CompleteSignerInfoDialogResult = {

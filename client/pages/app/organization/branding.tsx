@@ -25,7 +25,7 @@ import { withAdminOrganizationRole } from "@parallel/components/common/withAdmin
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
-  OrgPreferedTone,
+  Tone,
   useOrganizationBrandingQuery,
   useOrganizationBranding_changeOrganizationPreferedToneMutation,
   useOrganizationBranding_updateOrgLogoMutation,
@@ -82,7 +82,7 @@ function OrganizationBranding() {
 
   const [changePreferedTone] = useOrganizationBranding_changeOrganizationPreferedToneMutation();
 
-  const handleToneChange = async (tone: OrgPreferedTone) => {
+  const handleToneChange = async (tone: Tone) => {
     changePreferedTone({
       variables: {
         orgId: me.organization.id,
@@ -349,10 +349,7 @@ OrganizationBranding.mutations = [
     }
   `,
   gql`
-    mutation OrganizationBranding_changeOrganizationPreferedTone(
-      $orgId: GID!
-      $tone: OrgPreferedTone!
-    ) {
+    mutation OrganizationBranding_changeOrganizationPreferedTone($orgId: GID!, $tone: Tone!) {
       changeOrganizationPreferedTone(orgId: $orgId, tone: $tone) {
         id
         preferedTone

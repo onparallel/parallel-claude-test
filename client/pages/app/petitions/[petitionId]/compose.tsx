@@ -18,7 +18,7 @@ import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
-import { ToneProvider } from "@parallel/components/common/toneContext";
+import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
@@ -91,9 +91,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const {
     data: { me },
   } = assertQuery(usePetitionComposeUserQuery());
-  const {
-    data: { petition },
-  } = assertQuery(
+  const { data } = assertQuery(
     usePetitionComposeQuery({
       variables: {
         id: petitionId,
@@ -101,28 +99,29 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       },
     })
   );
+  const petition = data.petition!;
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
     updateIsReadNotification({ isRead: true, filter: "SHARED" });
   }, []);
 
-  const isReadOnly = petition!.isReadOnly;
+  const isReadOnly = petition.isReadOnly;
   const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
 
   const isSharedByLink =
     (petition?.__typename === "PetitionTemplate" && petition.publicLink?.isActive) ?? false;
 
-  const indices = useFieldIndices(petition!.fields);
-  const petitionDataRef = useUpdatingRef({ fields: petition!.fields, indices });
+  const indices = useFieldIndices(petition.fields);
+  const petitionDataRef = useUpdatingRef({ fields: petition.fields, indices });
 
   const wrapper = usePetitionStateWrapper();
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
 
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
-    return activeFieldId ? petition!.fields?.find((f) => f.id === activeFieldId) ?? null : null;
-  }, [activeFieldId, petition!.fields]);
+    return activeFieldId ? petition.fields?.find((f) => f.id === activeFieldId) ?? null : null;
+  }, [activeFieldId, petition.fields]);
   const activeFieldElement = useMemo(() => {
     return activeFieldId ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)! : null;
   }, [activeFieldId]);
@@ -260,9 +259,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, fieldId, data },
         optimisticResponse: {
           updatePetitionField: {
-            __typename: `${petition!.__typename}AndField` as any,
+            __typename: `${petition.__typename}AndField` as any,
             petition: {
-              __typename: petition!.__typename! as any,
+              __typename: petition.__typename! as any,
               id: petitionId,
               status: (petition as any).status,
               updatedAt: new Date().toISOString(),
@@ -524,11 +523,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     petition.status === "DRAFT";
 
   return (
-    <ToneProvider value={petition?.preferedTone}>
+    <ToneProvider value={petition.preferedTone}>
       <PetitionLayout
-        key={petition!.id}
+        key={petition.id}
         user={me}
-        petition={petition!}
+        petition={petition}
         onUpdatePetition={handleUpdatePetition}
         section="compose"
         scrollBody
@@ -558,7 +557,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
               {activeField ? (
                 <PetitionComposeFieldSettings
-                  petitionId={petition!.id}
+                  petitionId={petition.id}
                   key={activeField.id}
                   field={activeField}
                   onFieldEdit={handleFieldEdit}
@@ -590,7 +589,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     <TabPanels {...extendFlexColumn}>
                       <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
                         <PetitionContents
-                          fields={petition!.fields}
+                          fields={petition.fields}
                           fieldIndices={indices}
                           onFieldClick={handleIndexFieldClick}
                         />
@@ -598,7 +597,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                       <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
                         <PetitionSettings
                           user={me}
-                          petition={petition!}
+                          petition={petition}
                           onUpdatePetition={handleUpdatePetition}
                           validPetitionFields={validPetitionFields}
                         />
@@ -612,9 +611,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         >
           <Box padding={4}>
             <PetitionComposeFieldList
-              petitionId={petition!.id}
+              petitionId={petition.id}
               showErrors={showErrors}
-              fields={petition!.fields}
+              fields={petition.fields}
               active={activeFieldId}
               onAddField={handleAddField}
               onCloneField={handleCloneField}
@@ -634,7 +633,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               />
             ) : null}
             {petition && petition.__typename === "Petition" ? (
-              petition!.status !== "DRAFT" ? (
+              petition.status !== "DRAFT" ? (
                 <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
                   <Text>
                     <FormattedMessage
@@ -658,7 +657,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             ) : petition?.__typename === "PetitionTemplate" ? (
               <PetitionTemplateComposeMessageEditor
                 marginTop={4}
-                petition={petition!}
+                petition={petition}
                 onUpdatePetition={handleUpdatePetition}
               />
             ) : null}

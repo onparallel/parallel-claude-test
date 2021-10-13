@@ -17,8 +17,8 @@ export const OrganizationStatus = enumType({
   description: "The status of the organization.",
 });
 
-export const OrgPreferedTone = enumType({
-  name: "OrgPreferedTone",
+export const Tone = enumType({
+  name: "Tone",
   members: ["FORMAL", "INFORMAL"],
   description: "The prefered tone of organization",
 });
@@ -185,7 +185,7 @@ export const Organization = objectType({
       },
     });
     t.nonNull.field("preferedTone", {
-      type: "OrgPreferedTone",
+      type: "Tone",
       description: "The prefered tone of organization.",
       resolve: async (o) => {
         return o.prefered_tone;

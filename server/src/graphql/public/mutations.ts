@@ -64,7 +64,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       t.nullable.string("orgLogoUrl");
       t.nullable.string("orgName");
       t.nullable.field("preferedTone", {
-        type: "OrgPreferedTone",
+        type: "Tone",
       });
     },
   }),

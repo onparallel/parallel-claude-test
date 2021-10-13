@@ -576,7 +576,7 @@ export type MutationcancelSignatureRequestArgs = {
 
 export type MutationchangeOrganizationPreferedToneArgs = {
   orgId: Scalars["GID"];
-  tone: OrgPreferedTone;
+  tone: Tone;
 };
 
 export type MutationchangePasswordArgs = {
@@ -1199,7 +1199,7 @@ export type OrgIntegration = {
 };
 
 /** The prefered tone of organization */
-export type OrgPreferedTone = "FORMAL" | "INFORMAL";
+export type Tone = "FORMAL" | "INFORMAL";
 
 /** An organization in the system. */
 export type Organization = Timestamps & {
@@ -1219,7 +1219,7 @@ export type Organization = Timestamps & {
   /** The name of the organization. */
   name: Scalars["String"];
   /** The prefered tone of organization. */
-  preferedTone: OrgPreferedTone;
+  preferedTone: Tone;
   /** The status of the organization. */
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
@@ -1349,7 +1349,7 @@ export type Petition = PetitionBase & {
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The prefered tone of organization. */
-  preferedTone: OrgPreferedTone;
+  preferedTone: Tone;
   /** The progress of the petition. */
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
@@ -1471,7 +1471,7 @@ export type PetitionBase = {
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The prefered tone of organization. */
-  preferedTone: OrgPreferedTone;
+  preferedTone: Tone;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -1879,7 +1879,7 @@ export type PetitionTemplate = PetitionBase & {
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The prefered tone of organization. */
-  preferedTone: OrgPreferedTone;
+  preferedTone: Tone;
   /** The public link linked to this template */
   publicLink: Maybe<PublicPetitionLink>;
   /** The signature configuration for the petition. */
@@ -1967,7 +1967,7 @@ export type PublicAccessVerification = {
   isAllowed: Scalars["Boolean"];
   orgLogoUrl: Maybe<Scalars["String"]>;
   orgName: Maybe<Scalars["String"]>;
-  preferedTone: Maybe<OrgPreferedTone>;
+  preferedTone: Maybe<Tone>;
 };
 
 /** A public view of a contact */
@@ -2014,7 +2014,7 @@ export type PublicPetition = Timestamps & {
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The prefered tone of organization. */
-  preferedTone: OrgPreferedTone;
+  preferedTone: Tone;
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */

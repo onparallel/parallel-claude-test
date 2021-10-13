@@ -10,7 +10,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
-import { OrgPreferedTone, PetitionLocale } from "@parallel/graphql/__types";
+import { Tone, PetitionLocale } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { plainTextToRTEValue } from "@parallel/utils/slate/RichTextEditor/plainTextToRTEValue";
@@ -60,7 +60,7 @@ function DelegateAccessDialog({
     keycode: string;
     contactName: string;
     organizationName: string;
-    tone: OrgPreferedTone;
+    tone: Tone;
   },
   DelegateAccessDialogData
 >) {

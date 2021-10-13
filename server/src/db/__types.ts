@@ -18,7 +18,7 @@ export type FeatureFlagName =
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
-export type OrgPreferedTone = "FORMAL" | "INFORMAL";
+export type Tone = "FORMAL" | "INFORMAL";
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV" | "ROOT";
 
@@ -394,7 +394,7 @@ export interface Organization {
   custom_email_from: Maybe<string>; // varchar
   logo_public_file_id: Maybe<number>; // int4
   usage_details: Maybe<any>; // jsonb
-  prefered_tone: OrgPreferedTone; // org_prefered_tone
+  prefered_tone: Tone; // org_prefered_tone
 }
 
 export type CreateOrganization = PartialProps<

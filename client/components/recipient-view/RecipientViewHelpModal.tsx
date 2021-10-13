@@ -12,7 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { OrgPreferedTone } from "@parallel/graphql/__types";
+import { Tone } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog } from "../common/BaseDialog";
@@ -21,10 +21,7 @@ import { NormalLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 
-export function RecipientViewHelpDialog({
-  tone,
-  ...props
-}: DialogProps<{ tone: OrgPreferedTone }, void>) {
+export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: Tone }, void>) {
   const intl = useIntl();
   const router = useRouter();
 

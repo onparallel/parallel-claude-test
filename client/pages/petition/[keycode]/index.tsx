@@ -17,10 +17,10 @@ import {
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
-import { ToneProvider } from "@parallel/components/common/toneContext";
+import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import {
-  OrgPreferedTone,
+  Tone,
   RecipientView_verifyPublicAccessMutation,
   RecipientView_verifyPublicAccessMutationVariables,
   usepublicCheckVerificationCodeMutation,
@@ -43,7 +43,7 @@ interface RecipientViewVerifyProps {
   email: string;
   orgName: string;
   orgLogoUrl: string;
-  preferedTone: OrgPreferedTone;
+  preferedTone: Tone;
 }
 
 type RecipientViewVerifyState =

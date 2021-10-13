@@ -157,7 +157,7 @@ export const PetitionBase = interfaceType({
       },
     });
     t.nonNull.field("preferedTone", {
-      type: "OrgPreferedTone",
+      type: "Tone",
       description: "The prefered tone of organization.",
       resolve: async (root, _, ctx) => {
         const org = (await ctx.organizations.loadOrg(root.org_id))!;

@@ -195,7 +195,6 @@ export interface NexusGenEnums {
     | "PETITION_COMPOSE"
     | "PETITION_REVIEW";
   OnboardingStatus: "FINISHED" | "SKIPPED";
-  OrgPreferedTone: db.OrgPreferedTone;
   OrganizationRole: "ADMIN" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
   OrganizationUsers_OrderBy:
@@ -248,6 +247,7 @@ export interface NexusGenEnums {
     | "sentAt_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
+  Tone: db.Tone;
   UserAuthenticationTokens_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -443,7 +443,7 @@ export interface NexusGenObjects {
     isAllowed: boolean; // Boolean!
     orgLogoUrl?: string | null; // String
     orgName?: string | null; // String
-    preferedTone?: NexusGenEnums["OrgPreferedTone"] | null; // OrgPreferedTone
+    preferedTone?: NexusGenEnums["Tone"] | null; // Tone
   };
   PublicContact: db.Contact;
   PublicOrganization: db.Organization;
@@ -928,7 +928,7 @@ export interface NexusGenFieldTypes {
     integrations: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
     logoUrl: string | null; // String
     name: string; // String!
-    preferedTone: NexusGenEnums["OrgPreferedTone"]; // OrgPreferedTone!
+    preferedTone: NexusGenEnums["Tone"]; // Tone!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     usageLimits: NexusGenRootTypes["OrganizationUsageLimit"]; // OrganizationUsageLimit!
@@ -984,7 +984,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
-    preferedTone: NexusGenEnums["OrgPreferedTone"]; // OrgPreferedTone!
+    preferedTone: NexusGenEnums["Tone"]; // Tone!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     sentAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -1224,7 +1224,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
-    preferedTone: NexusGenEnums["OrgPreferedTone"]; // OrgPreferedTone!
+    preferedTone: NexusGenEnums["Tone"]; // Tone!
     publicLink: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
@@ -1273,7 +1273,7 @@ export interface NexusGenFieldTypes {
     isAllowed: boolean; // Boolean!
     orgLogoUrl: string | null; // String
     orgName: string | null; // String
-    preferedTone: NexusGenEnums["OrgPreferedTone"] | null; // OrgPreferedTone
+    preferedTone: NexusGenEnums["Tone"] | null; // Tone
   };
   PublicContact: {
     // field return type
@@ -1298,7 +1298,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    preferedTone: NexusGenEnums["OrgPreferedTone"]; // OrgPreferedTone!
+    preferedTone: NexusGenEnums["Tone"]; // Tone!
     recipients: NexusGenRootTypes["PublicContact"][]; // [PublicContact!]!
     signature: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
     signatureStatus: NexusGenEnums["PublicSignatureStatus"] | null; // PublicSignatureStatus
@@ -1698,7 +1698,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
-    preferedTone: NexusGenEnums["OrgPreferedTone"]; // OrgPreferedTone!
+    preferedTone: NexusGenEnums["Tone"]; // Tone!
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
@@ -2078,7 +2078,7 @@ export interface NexusGenFieldTypeNames {
     integrations: "OrgIntegration";
     logoUrl: "String";
     name: "String";
-    preferedTone: "OrgPreferedTone";
+    preferedTone: "Tone";
     status: "OrganizationStatus";
     updatedAt: "DateTime";
     usageLimits: "OrganizationUsageLimit";
@@ -2134,7 +2134,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     permissions: "PetitionPermission";
-    preferedTone: "OrgPreferedTone";
+    preferedTone: "Tone";
     progress: "PetitionProgress";
     remindersConfig: "RemindersConfig";
     sentAt: "DateTime";
@@ -2374,7 +2374,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     permissions: "PetitionPermission";
-    preferedTone: "OrgPreferedTone";
+    preferedTone: "Tone";
     publicLink: "PublicPetitionLink";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
@@ -2423,7 +2423,7 @@ export interface NexusGenFieldTypeNames {
     isAllowed: "Boolean";
     orgLogoUrl: "String";
     orgName: "String";
-    preferedTone: "OrgPreferedTone";
+    preferedTone: "Tone";
   };
   PublicContact: {
     // field return type name
@@ -2448,7 +2448,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
-    preferedTone: "OrgPreferedTone";
+    preferedTone: "Tone";
     recipients: "PublicContact";
     signature: "PublicSignatureConfig";
     signatureStatus: "PublicSignatureStatus";
@@ -2848,7 +2848,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     permissions: "PetitionPermission";
-    preferedTone: "OrgPreferedTone";
+    preferedTone: "Tone";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
     tags: "Tag";
@@ -2956,7 +2956,7 @@ export interface NexusGenArgTypes {
     changeOrganizationPreferedTone: {
       // args
       orgId: NexusGenScalars["GID"]; // GID!
-      tone: NexusGenEnums["OrgPreferedTone"]; // OrgPreferedTone!
+      tone: NexusGenEnums["Tone"]; // Tone!
     };
     changePassword: {
       // args
