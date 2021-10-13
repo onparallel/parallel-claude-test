@@ -4150,6 +4150,11 @@
     "context": "Organization logo"
   },
   {
+    "term": "organization.branding.preview",
+    "definition": "Preview",
+    "context": "Preview"
+  },
+  {
     "term": "organization.branding.preview-body",
     "definition": "We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted.",
     "context": "We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted."

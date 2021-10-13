@@ -255,7 +255,7 @@ function OrganizationBranding() {
               borderBottomLeftRadius="md"
             >
               <Text color="white" fontSize="sm">
-                Preview
+                <FormattedMessage id="organization.branding.preview" defaultMessage="Preview" />
               </Text>
             </Box>
             <Stack padding={8} spacing={5}>

@@ -4150,6 +4150,11 @@
     "context": "Organization logo"
   },
   {
+    "term": "organization.branding.preview",
+    "definition": "Ejemplo",
+    "context": "Preview"
+  },
+  {
     "term": "organization.branding.preview-body",
     "definition": "{tone, select, INFORMAL{Te recordamos que <b>[Tu nombre]</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió una petición de la que queda información pendiente de completar.}}",
     "context": "We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted."
