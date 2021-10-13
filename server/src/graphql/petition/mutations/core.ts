@@ -23,7 +23,7 @@ import {
   PetitionPermission,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
-import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
 import { random } from "../../../util/token";
@@ -398,8 +398,17 @@ export const SignatureConfigInput = inputObjectType({
     t.nonNull.string("provider", {
       description: "The selected provider for the signature.",
     });
-    t.nonNull.list.nonNull.id("contactIds", {
-      description: "The contacts that need to sign the generated document.",
+    t.nonNull.list.nonNull.field("signersInfo", {
+      type: inputObjectType({
+        name: "SignatureConfigInputSigner",
+        description: "The signer that need to sign the generated document.",
+        definition(t) {
+          t.nonNull.id("contactId");
+          t.nonNull.string("firstName");
+          t.nonNull.string("lastName");
+          t.nonNull.string("email");
+        },
+      }),
     });
     t.nonNull.string("timezone", {
       description: "The timezone used to generate the document.",
@@ -525,7 +534,10 @@ export const updatePetition = mutationField("updatePetition", {
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig && {
         ...signatureConfig,
-        contactIds: fromGlobalIds(signatureConfig.contactIds, "Contact").ids,
+        signersInfo: signatureConfig.signersInfo.map((signer) => ({
+          ...signer,
+          contactId: fromGlobalId(signer.contactId, "Contact").id,
+        })),
       };
     }
     if (description !== undefined) {
@@ -1066,7 +1078,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
             args.batchSendSigningMode === "LET_RECIPIENT_CHOOSE"
               ? {
                   ...petition.signature_config!,
-                  contactIds: [],
+                  signersInfo: [],
                   review: false,
                   letRecipientsChooseSigners: true,
                 }

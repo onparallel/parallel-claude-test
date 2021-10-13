@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
+import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
+import { fullName } from "../../util/fullName";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { random } from "../../util/token";
 
@@ -64,25 +66,22 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
     throw new Error(`petition with id ${petitionId} not found.`);
   }
 
-  const contact = (await ctx.contacts.loadContactByEmail({
-    orgId: petition.org_id,
-    email: data.document.email,
-  }))!;
-
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
     `SIGNATURIT/${data.document.signature.id}`
   );
 
+  const [signer, signerIndex] = findSigner(signature!.signature_config.signersInfo, data.document);
+
   await Promise.all([
     ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${data.document.signature.id}`, {
-      signer_status: { ...signature?.signer_status, [contact.id]: "SIGNED" },
+      signer_status: { ...signature!.signer_status, [signerIndex]: "SIGNED" },
     }),
     appendEventLogs(ctx, data),
     ctx.petitions.createEvent({
       type: "RECIPIENT_SIGNED",
       petition_id: petition.id,
       data: {
-        contact_id: contact.id,
+        signer,
         petition_signature_request_id: signature!.id,
       },
     }),
@@ -96,28 +95,30 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
     throw new Error(`Can't find petition with id ${petitionId}`);
   }
 
-  const contact = (await ctx.contacts.loadContactByEmail({
-    orgId: petition.org_id,
-    email: data.document.email,
-  }))!;
-
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
     `SIGNATURIT/${data.document.signature.id}`
   );
 
+  const [canceller, cancellerIndex] = findSigner(
+    signature!.signature_config.signersInfo,
+    data.document
+  );
+
   const [signatureRequest] = await Promise.all([
-    ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${data.document.signature.id}`, {
-      status: "CANCELLED",
-      cancel_reason: "DECLINED_BY_SIGNER",
-      cancel_data: {
-        contact_id: contact?.id,
+    ctx.petitions.cancelPetitionSignatureRequestByExternalId(
+      `SIGNATURIT/${data.document.signature.id}`,
+      "DECLINED_BY_SIGNER",
+      {
+        canceller,
         decline_reason: data.document.decline_reason,
       },
-      signer_status: {
-        ...signature?.signer_status,
-        [contact.id]: "DECLINED",
-      },
-    }),
+      {
+        signer_status: {
+          ...signature!.signer_status,
+          [cancellerIndex]: "DECLINED",
+        },
+      }
+    ),
     appendEventLogs(ctx, data),
   ]);
 
@@ -127,10 +128,7 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
     data: {
       petition_signature_request_id: signatureRequest.id,
       cancel_reason: "DECLINED_BY_SIGNER",
-      cancel_data: {
-        canceller_id: contact?.id,
-        canceller_reason: data.document.decline_reason,
-      },
+      cancel_data: { canceller, decline_reason: data.document.decline_reason },
     },
   });
 }
@@ -143,17 +141,6 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
   }
 
   const orgIntegration = await ctx.integrations.loadEnabledIntegrationsForOrgId(petition.org_id);
-
-  const contact = await ctx.contacts.loadContactByEmail({
-    orgId: petition.org_id,
-    email: data.document.email,
-  });
-
-  if (!contact) {
-    throw new Error(
-      `Can't find contact on Org ${petition.org_id} with email ${data.document.email}`
-    );
-  }
 
   const signaturitIntegration = orgIntegration.find(
     (i) => i.type === "SIGNATURE" && i.provider === "SIGNATURIT"
@@ -193,9 +180,11 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
     }
   );
 
+  const [signer] = findSigner(signature!.signature_config.signersInfo, data.document);
+
   await Promise.all([
     ctx.emails.sendPetitionCompletedEmail(petition.id, {
-      contactId: contact.id,
+      signer,
     }),
     appendEventLogs(ctx, data),
     ctx.petitions.createEvent({
@@ -208,7 +197,7 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
     }),
     ctx.petitions.updatePetition(
       petitionId,
-      { signature_config: null },
+      { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
       `OrgIntegration:${signaturitIntegration.id}`
     ),
   ]);
@@ -296,4 +285,27 @@ async function storeDocument(
     },
     `OrgIntegration:${integrationId}`
   );
+}
+
+function findSigner(
+  signers: PetitionSignatureConfigSigner[],
+  document: SignaturItEventBody["document"]
+): [PetitionSignatureConfigSigner, number] {
+  const signerIndex = signers.findIndex(
+    (signer) =>
+      signer.email === document.email &&
+      fullName(signer.firstName, signer.lastName) === document.name
+  );
+
+  const signer = signers[signerIndex];
+
+  if (!signer) {
+    throw new Error(
+      `Can't find signer on signature_config. Document: ${JSON.stringify(
+        document
+      )}, signersInfo: ${JSON.stringify(signers)}`
+    );
+  }
+
+  return [signer, signerIndex];
 }

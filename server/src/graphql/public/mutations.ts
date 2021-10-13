@@ -9,10 +9,11 @@ import {
   objectType,
   stringArg,
 } from "nexus";
-import { countBy, isDefined } from "remeda";
+import { countBy, isDefined, omit } from "remeda";
 import { getClientIp } from "request-ip";
 import { ApiContext } from "../../context";
-import { Petition, PetitionSignatureRequest } from "../../db/__types";
+import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
+import { Petition } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { random } from "../../util/token";
@@ -600,9 +601,9 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
     let petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!.id);
 
     if (petition.signature_config?.review === false) {
-      const updatedPetition = await startSignatureRequest(
+      const updatedPetition = await publicStartSignatureRequest(
         petition,
-        args.additionalSigners ?? null,
+        args.additionalSigners ?? [],
         args.message ?? null,
         ctx
       );
@@ -831,42 +832,27 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
   },
 });
 
-async function startSignatureRequest(
+async function publicStartSignatureRequest(
   petition: Petition,
-  additionalSigners:
-    | {
-        email: string;
-        firstName: string;
-        lastName: string;
-      }[]
-    | null,
+  additionalSignersInfo: Omit<PetitionSignatureConfigSigner, "contactId">[], // additional signers don't have a contactId
   message: string | null,
   ctx: ApiContext
 ) {
   let updatedPetition = null;
-  const specifiedByUser = petition.signature_config.contactIds.length > 0;
-  const specifiedByRecipient = (additionalSigners ?? []).length > 0;
+  const userSigners = petition.signature_config.signersInfo as PetitionSignatureConfigSigner[];
 
-  if (!specifiedByUser && !specifiedByRecipient) {
-    throw new Error(
-      `Can't complete petition with id ${petition.id}. Signer info is not specified.`
-    );
+  if (userSigners.length === 0 && additionalSignersInfo.length === 0) {
+    throw new Error(`Can't complete Petition:${petition.id}. Signer info is not specified.`);
   }
 
-  const userSignersIds: number[] = petition.signature_config?.contactIds ?? [];
-  const recipientSigners = await ctx.contacts.loadOrCreate(
-    (additionalSigners ?? []).map((signer) => ({ ...signer, orgId: ctx.contact!.org_id })),
-    `Contact:${ctx.contact!.id}`
-  );
-
-  if (recipientSigners.length > 0 && isDefined(petition.signature_config)) {
+  if (additionalSignersInfo.length > 0 && isDefined(petition.signature_config)) {
     [updatedPetition] = await ctx.petitions.updatePetition(
       petition.id,
       {
         signature_config: {
           ...petition.signature_config,
-          // save the ids of the signer contacts specified by the recipient, so we can show this info later on recipient view
-          additionalSignerContactIds: recipientSigners.map((s) => s.id),
+          // save the signer info specified by the recipient, so we can show this later on recipient view
+          additionalSignersInfo,
         },
       },
       `Contact:${ctx.contact!.id}`
@@ -894,12 +880,27 @@ async function startSignatureRequest(
 
   // cancel pending signature request before starting a new one
   if (pendingSignatureRequest) {
-    await cancelSignatureRequest(pendingSignatureRequest, ctx);
+    await Promise.all([
+      ctx.petitions.cancelPetitionSignatureRequest(
+        pendingSignatureRequest.id,
+        "REQUEST_RESTARTED",
+        {
+          canceller_id: ctx.contact!.id,
+        }
+      ),
+      ctx.aws.enqueueMessages("signature-worker", {
+        groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
+        body: {
+          type: "cancel-signature-process",
+          payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
+        },
+      }),
+    ]);
   }
 
   const signatureRequest = await ctx.petitions.createPetitionSignature(petition.id, {
-    ...petition.signature_config,
-    contactIds: userSignersIds.concat(...recipientSigners.map((s) => s.id)),
+    ...(omit(petition.signature_config, ["additionalSignersInfo"]) as any),
+    signersInfo: userSigners.concat(additionalSignersInfo),
     message,
   });
 
@@ -912,26 +913,6 @@ async function startSignatureRequest(
   });
 
   return updatedPetition;
-}
-
-async function cancelSignatureRequest(
-  petitionSignatureRequest: PetitionSignatureRequest,
-  ctx: ApiContext
-) {
-  await ctx.petitions.updatePetitionSignature(petitionSignatureRequest.id, {
-    status: "CANCELLED",
-    cancel_reason: "REQUEST_RESTARTED",
-    cancel_data: {
-      contact_id: ctx.contact!.id,
-    },
-  });
-  await ctx.aws.enqueueMessages("signature-worker", {
-    groupId: `signature-${toGlobalId("Petition", petitionSignatureRequest.petition_id)}`,
-    body: {
-      type: "cancel-signature-process",
-      payload: { petitionSignatureRequestId: petitionSignatureRequest.id },
-    },
-  });
 }
 
 export const publicPetitionFieldAttachmentDownloadLink = mutationField(

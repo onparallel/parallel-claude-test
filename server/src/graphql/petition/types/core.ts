@@ -468,6 +468,26 @@ export const RemindersConfig = objectType({
   }`,
 });
 
+export const PetitionSigner = objectType({
+  name: "PetitionSigner",
+  description: "Information about a signer of the petition",
+  definition(t) {
+    t.nullable.globalId("contactId", {
+      prefixName: "Contact",
+      resolve: (root) => root.contactId ?? null,
+    });
+    t.string("firstName");
+    t.string("lastName");
+    t.string("email");
+  },
+  sourceType: /* ts */ `{
+    contactId?: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }`,
+});
+
 export const SignatureConfig = objectType({
   name: "SignatureConfig",
   description: "The signature settings of a petition",
@@ -475,12 +495,10 @@ export const SignatureConfig = objectType({
     t.string("provider", {
       description: "The selected provider for the signature.",
     });
-    t.list.nullable.field("contacts", {
-      type: "Contact",
-      description: "The contacts that need to sign the generated document.",
-      resolve: async (root, _, ctx) => {
-        return await ctx.contacts.loadContact(root.contactIds);
-      },
+    t.list.field("signers", {
+      type: "PetitionSigner",
+      description: "The signers of the generated document.",
+      resolve: (o) => o.signersInfo,
     });
     t.string("timezone", {
       description: "The timezone used to generate the document.",
@@ -500,7 +518,11 @@ export const SignatureConfig = objectType({
   },
   sourceType: /* ts */ `{
     provider: string;
-    contactIds: number[];
+    signersInfo: {
+      firstName: string;
+      lastName: string;
+      email: string;
+    }[];
     timezone: string;
     title: string;
     review?: boolean;

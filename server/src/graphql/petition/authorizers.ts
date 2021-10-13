@@ -1,6 +1,6 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { countBy, isDefined } from "remeda";
-import { FeatureFlagName, PetitionPermissionType } from "../../db/__types";
+import { FeatureFlagName, IntegrationType, PetitionPermissionType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
@@ -352,6 +352,18 @@ export function templateDoesNotHavePublicPetitionLink<
     try {
       const publicLinks = await ctx.petitions.loadPublicPetitionLinksByTemplateId(args[argName]);
       return publicLinks.length === 0;
+    } catch {}
+    return false;
+  };
+}
+
+export function userHasEnabledIntegration<TypeName extends string, FieldName extends string>(
+  type: IntegrationType
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(ctx.user!.org_id);
+      return integrations.some((i) => i.type === type);
     } catch {}
     return false;
   };

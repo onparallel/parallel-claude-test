@@ -7,25 +7,21 @@ export const PetitionSignatureRequestStatus = enumType({
 
 export const PetitionSignatureCancelReason = enumType({
   name: "PetitionSignatureCancelReason",
-  members: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR"],
+  members: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR", "REQUEST_RESTARTED"],
 });
 
 export const PetitionSignatureRequestSignerStatus = objectType({
   name: "PetitionSignatureRequestSignerStatus",
   sourceType: /* ts */ `{
-    contactId: number;
+    firstName: string;
+    lastName: string;
+    email: string;
     status?: "SIGNED" | "DECLINED" | undefined;
   }`,
   definition(t) {
-    t.field("contact", {
-      type: "Contact",
-      description: "The contact that need to sign the generated document.",
-      resolve: async (root, _, ctx) => {
-        const contact = await ctx.contacts.loadContact(root.contactId);
-        if (!contact) throw new Error(`Contact:${root.contactId} not found`);
-        return contact;
-      },
-    });
+    t.string("email");
+    t.string("firstName");
+    t.string("lastName");
     t.string("status", {
       description: "The signing status of the individual contact.",
       resolve: (o) => o.status ?? "PENDING",
@@ -57,9 +53,9 @@ export const PetitionSignatureRequest = objectType({
     t.nonNull.list.nonNull.field("signerStatus", {
       type: "PetitionSignatureRequestSignerStatus",
       resolve: (o) =>
-        ((o.signature_config.contactIds as number[]) ?? []).map((contactId) => ({
-          contactId,
-          status: o.signer_status[contactId],
+        ((o.signature_config.signersInfo as any[]) ?? []).map((signer, index) => ({
+          ...signer,
+          status: o.signer_status[index],
         })),
     });
     t.nullable.string("signedDocumentFilename", {

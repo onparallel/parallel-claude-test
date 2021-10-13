@@ -42,21 +42,15 @@ export const PublicSignatureConfig = objectType({
   name: "PublicSignatureConfig",
   description: "The public signature settings of a petition",
   definition(t) {
-    t.list.nullable.field("signers", {
-      type: "PublicContact",
+    t.nonNull.list.nonNull.field("signers", {
+      type: "PetitionSigner",
       description: "The contacts that need to sign the generated document.",
-      resolve: async (root, _, ctx) => {
-        return await ctx.contacts.loadContact(root.contactIds);
-      },
+      resolve: (root) => root.signersInfo,
     });
-    t.list.nullable.field("additionalSigners", {
-      type: "PublicContact",
-      description: "The contacts assigned by the petition recipient to sign",
-      resolve: async (root, _, ctx) => {
-        return root.additionalSignerContactIds
-          ? await ctx.contacts.loadContact(root.additionalSignerContactIds)
-          : [];
-      },
+    t.nonNull.list.nonNull.field("additionalSigners", {
+      type: "PetitionSigner",
+      description: "The signers assigned by the petition recipient",
+      resolve: (root) => root.additionalSignersInfo ?? [],
     });
     t.boolean("review", {
       description:
@@ -69,10 +63,10 @@ export const PublicSignatureConfig = objectType({
     });
   },
   sourceType: /* ts */ `{
-    contactIds: number[];
+    signersInfo: any[];
     review?: boolean;
     letRecipientsChooseSigners?: boolean;
-    additionalSignerContactIds?: number[];
+    additionalSignersInfo?: any[];
   }`,
 });
 

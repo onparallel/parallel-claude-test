@@ -37,7 +37,7 @@ function petitionsBuilder(orgId: number) {
     signature_config:
       index === 5
         ? {
-            contactIds: [],
+            signersInfo: [],
             provider: "SIGNATURIT",
             review: false,
             timezone: "Europe/Madrid",
@@ -836,7 +836,14 @@ describe("GraphQL/Petitions", () => {
             review: false,
             provider: "SIGNATURIT",
             timezone: "Europe/Madrid",
-            contactIds: [30],
+            signersInfo: [
+              {
+                firstName: "Michael",
+                lastName: "Scott",
+                email: "michael@dundermifflin.com",
+                contactId: 30,
+              },
+            ],
             letRecipientsChooseSigners: true,
           },
         })
@@ -884,7 +891,14 @@ describe("GraphQL/Petitions", () => {
             review: false,
             provider: "SIGNATURIT",
             timezone: "Europe/Madrid",
-            contactIds: [30],
+            signersInfo: [
+              {
+                firstName: "Michael",
+                lastName: "Scott",
+                email: "michael@dundermifflin.com",
+                contactId: 30,
+              },
+            ],
             letRecipientsChooseSigners: true,
           },
         })
@@ -1384,8 +1398,8 @@ describe("GraphQL/Petitions", () => {
             clonePetitions(petitionIds: $petitionIds) {
               ... on Petition {
                 signatureConfig {
-                  contacts {
-                    id
+                  signers {
+                    email
                   }
                   provider
                   review
@@ -1404,7 +1418,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data?.clonePetitions[0]).toEqual({
         signatureConfig: {
-          contacts: [],
+          signers: [],
           provider: "SIGNATURIT",
           review: false,
           timezone: "Europe/Madrid",

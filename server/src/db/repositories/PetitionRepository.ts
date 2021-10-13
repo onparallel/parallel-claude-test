@@ -43,6 +43,7 @@ import {
   PetitionFieldType,
   PetitionPermission,
   PetitionPermissionType,
+  PetitionSignatureCancelReason,
   PetitionSignatureRequest,
   PetitionStatus,
   PublicPetitionLink,
@@ -80,17 +81,34 @@ type EffectivePetitionPermission = Pick<
   PetitionPermission,
   "petition_id" | "user_id" | "type" | "is_subscribed"
 >;
+export type PetitionSignatureConfigSigner = {
+  contactId?: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+};
 
 export type PetitionSignatureConfig = {
   provider: string;
-  contactIds: number[];
+  signersInfo: PetitionSignatureConfigSigner[];
   timezone: string;
   title: string;
   review?: boolean;
   letRecipientsChooseSigners?: boolean;
   message?: string;
-  additionalSignerContactIds?: number[];
+  additionalSignersInfo?: PetitionSignatureConfigSigner[];
 };
+
+export type PetitionSignatureRequestCancelData<CancelReason extends PetitionSignatureCancelReason> =
+  {
+    CANCELLED_BY_USER: { canceller_id: number };
+    DECLINED_BY_SIGNER: {
+      canceller: Maybe<{ firstName: string; lastName: string; email: string }>;
+      decline_reason?: string;
+    };
+    REQUEST_ERROR: { error: any; file?: string };
+    REQUEST_RESTARTED: { canceller_id: number }; // id of the contact that restarted the signature request (modify replies and finish petition)
+  }[CancelReason];
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
@@ -3169,6 +3187,46 @@ export class PetitionRepository extends BaseRepository {
       .where("external_id", prefixedExternalId)
       .update({
         ...data,
+        updated_at: this.now(),
+      })
+      .returning("*");
+
+    return row;
+  }
+
+  async cancelPetitionSignatureRequest<CancelReason extends PetitionSignatureCancelReason>(
+    petitionSignatureId: number,
+    reason: CancelReason,
+    cancelData: PetitionSignatureRequestCancelData<CancelReason>
+  ) {
+    const [row] = await this.from("petition_signature_request")
+      .where("id", petitionSignatureId)
+      .update({
+        status: "CANCELLED",
+        cancel_reason: reason,
+        cancel_data: cancelData,
+        updated_at: this.now(),
+      })
+      .returning("*");
+
+    return row;
+  }
+
+  async cancelPetitionSignatureRequestByExternalId<
+    CancelReason extends PetitionSignatureCancelReason
+  >(
+    prefixedExternalId: string,
+    reason: CancelReason,
+    cancelData: PetitionSignatureRequestCancelData<CancelReason>,
+    extraData?: Partial<PetitionSignatureRequest>
+  ) {
+    const [row] = await this.from("petition_signature_request")
+      .where("external_id", prefixedExternalId)
+      .update({
+        ...extraData,
+        status: "CANCELLED",
+        cancel_reason: reason,
+        cancel_data: cancelData,
         updated_at: this.now(),
       })
       .returning("*");

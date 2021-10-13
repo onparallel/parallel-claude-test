@@ -135,20 +135,42 @@ function mapEventPayload(event: PetitionEvent) {
       };
     }
     case "SIGNATURE_CANCELLED": {
+      const cancelReason = event.data.cancel_reason;
+      let cancelData = {};
+      switch (cancelReason) {
+        case "CANCELLED_BY_USER":
+          cancelData = {
+            userId:
+              event.data.cancel_data?.canceller_id !== undefined
+                ? toGlobalId("User", event.data.cancel_data.canceller_id)
+                : undefined,
+          };
+          break;
+        case "DECLINED_BY_SIGNER":
+          cancelData = {
+            canceller: event.data.cancel_data?.canceller,
+            declineReason: event.data.cancel_data?.decline_reason,
+          };
+          break;
+        case "REQUEST_ERROR":
+          cancelData = {
+            error: event.data.cancel_data?.error,
+          };
+          break;
+        case "REQUEST_RESTARTED":
+          cancelData = {
+            contactId:
+              event.data.cancel_data?.canceller_id !== undefined
+                ? toGlobalId("Contact", event.data.cancel_data.canceller_id)
+                : undefined,
+          };
+          break;
+        default:
+          break;
+      }
       return {
-        cancelData: {
-          userId:
-            event.data.cancel_data?.canceller_id && event.data.cancel_reason === "CANCELLED_BY_USER"
-              ? toGlobalId("User", event.data.cancel_data.canceller_id)
-              : null,
-          contactId:
-            event.data.cancel_data?.canceller_id &&
-            event.data.cancel_reason === "DECLINED_BY_SIGNER"
-              ? toGlobalId("Contact", event.data.cancel_data.canceller_id)
-              : null,
-          reason: event.data.cancel_data?.canceller_reason,
-        },
-        cancelReason: event.data.cancel_reason,
+        cancelData,
+        cancelReason,
         petitionSignatureRequestId: toGlobalId(
           "PetitionSignatureRequest",
           event.data.petition_signature_request_id
@@ -242,7 +264,7 @@ function mapEventPayload(event: PetitionEvent) {
     }
     case "RECIPIENT_SIGNED": {
       return {
-        contactId: toGlobalId("Contact", event.data.contact_id),
+        signer: event.data.signer,
         petitionSignatureRequestId: toGlobalId(
           "PetitionSignatureRequest",
           event.data.petition_signature_request_id

@@ -1,9 +1,9 @@
 import { core } from "nexus";
 import { isDefined } from "remeda";
-import { fromGlobalIds } from "../../../util/globalId";
 import { isValidTimezone } from "../../../util/validators";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
+import { EMAIL_REGEX } from "./validEmail";
 
 export function validSignatureConfig<TypeName extends string, FieldName extends string>(
   prop: (
@@ -14,11 +14,10 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
     if (signatureConfig) {
-      const { provider, contactIds, timezone, title, letRecipientsChooseSigners, review } =
+      const { provider, signersInfo, timezone, title, letRecipientsChooseSigners, review } =
         signatureConfig;
-      const [hasFeatureFlag, contacts, integrations] = await Promise.all([
+      const [hasFeatureFlag, integrations] = await Promise.all([
         ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, "PETITION_SIGNATURE"),
-        ctx.contacts.loadContact(fromGlobalIds(contactIds, "Contact").ids),
         ctx.integrations.loadEnabledIntegrationsForOrgId(ctx.user!.org_id),
       ]);
       if (!hasFeatureFlag) {
@@ -35,8 +34,9 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
       ) {
         throw new ArgValidationError(info, `${argName}.provider`, `Invalid signature provider.`);
       }
-      if (contacts.some((c) => c === null || c.org_id !== ctx.user!.org_id)) {
-        throw new ArgValidationError(info, `${argName}.contactIds`, `Invalid list of contacts.`);
+
+      if (signersInfo.some((signer) => !EMAIL_REGEX.test(signer.email))) {
+        throw new ArgValidationError(info, `${argName}.signersInfo`, `Invalid list of emails.`);
       }
       if (!isValidTimezone(timezone)) {
         throw new ArgValidationError(
@@ -50,11 +50,11 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
         throw new ArgValidationError(info, `${argName}.title`, "Value must be defined");
       }
 
-      if (!letRecipientsChooseSigners && contactIds.length === 0 && !review) {
+      if (!letRecipientsChooseSigners && signersInfo.length === 0 && !review) {
         throw new ArgValidationError(
           info,
           `${argName}.letRecipientsChooseSigners`,
-          "Invalid value with empty list of contacts"
+          "Invalid value with empty list of signers"
         );
       }
     }

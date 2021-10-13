@@ -515,16 +515,22 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
     type: "Contact",
     resolve: async ({ data }, _, ctx) => {
       const cancellerId = data.cancel_data?.canceller_id;
-      if (data.cancel_reason === "DECLINED_BY_SIGNER" && cancellerId) {
+      if (data.cancel_reason === "REQUEST_RESTARTED" && cancellerId) {
         return await ctx.contacts.loadContact(cancellerId);
       }
       return null;
     },
   });
+  t.nullable.field("canceller", {
+    type: "PetitionSigner",
+    resolve: ({ data }) => {
+      return data.cancel_data.canceller;
+    },
+  });
   t.nullable.field("cancellerReason", {
     type: "String",
     resolve: ({ data }) => {
-      return data.cancel_data?.canceller_reason ?? null;
+      return data.cancel_data?.decline_reason ?? null;
     },
   });
   t.field("cancelType", {
@@ -573,9 +579,9 @@ export const AccessActivatedFromPublicPetitionLinkEvent = createPetitionEvent(
 );
 
 export const RecipientSignedEvent = createPetitionEvent("RecipientSignedEvent", (t) => {
-  t.nullable.field("contact", {
-    type: "Contact",
-    resolve: async (root, _, ctx) => await ctx.contacts.loadContact(root.data.contact_id),
+  t.nullable.field("signer", {
+    type: "PetitionSigner",
+    resolve: (root) => root.data.signer,
   });
 });
 

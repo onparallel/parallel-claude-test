@@ -3,6 +3,7 @@ import { unMaybeArray } from "../util/arrays";
 import { MaybeArray, Maybe } from "../util/types";
 import { Aws, AWS_SERVICE } from "./aws";
 import { EmailPayload } from "../workers/email-sender";
+import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
@@ -11,10 +12,10 @@ export interface IEmailsService {
     petitionId: number,
     {
       accessIds,
-      contactId,
+      signer,
     }: {
       accessIds?: MaybeArray<number>;
-      contactId?: number;
+      signer?: PetitionSignatureConfigSigner;
     }
   ): Promise<void>;
   sendPetitionCommentsContactNotificationEmail(
@@ -93,13 +94,13 @@ export class EmailsService implements IEmailsService {
     petitionId: number,
     {
       accessId,
-      contactId,
+      signer,
     }: {
       accessId?: number;
-      contactId?: number;
+      signer?: PetitionSignatureConfigSigner;
     }
   ) {
-    if (!accessId && !contactId) {
+    if (!accessId && !signer) {
       return;
     }
     const payload = accessId
@@ -111,7 +112,7 @@ export class EmailsService implements IEmailsService {
       : {
           id: this.buildQueueId("PetitionSigned", petitionId),
           petition_id: petitionId,
-          signer_contact_id: contactId,
+          signer,
         };
     return await this.enqueueEmail("petition-completed", payload);
   }

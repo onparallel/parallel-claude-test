@@ -100,10 +100,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   SIGNATURE_CANCELLED: {
     petition_signature_request_id: number;
     cancel_reason: PetitionSignatureCancelReason;
-    cancel_data?: {
-      canceller_id?: number; // User or Contact
-      canceller_reason?: string;
-    };
+    cancel_data?: any; // cancel_data structure varies with cancel_reason. see PetitionRepository.PetitionSignatureRequestCancelData
   };
   SIGNATURE_COMPLETED: {
     petition_signature_request_id: number;
@@ -111,7 +108,11 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   RECIPIENT_SIGNED: {
     petition_signature_request_id: number;
-    contact_id: number;
+    signer: {
+      firstName: string;
+      lastName: string;
+      email: string;
+    };
   };
   TEMPLATE_USED: {
     new_petition_id: number;

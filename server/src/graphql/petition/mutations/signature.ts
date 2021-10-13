@@ -8,6 +8,7 @@ import { RESULT } from "../../helpers/result";
 import {
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
+  userHasEnabledIntegration,
   userHasFeatureFlag,
 } from "../authorizers";
 
@@ -18,6 +19,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   },
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
+    userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
   ),
   resolve: async (_, { petitionId }, ctx) => {
@@ -33,8 +35,11 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       throw new Error(`Signature configuration not found for petition with id ${petitionId}`);
     }
     if (process.env.NODE_ENV !== "production") {
-      const contacts = await ctx.contacts.loadContact(petition.signature_config.contactIds);
-      if (!contacts.every((c) => c && c.email.endsWith("@onparallel.com"))) {
+      if (
+        !petition.signature_config.signersInfo.every(({ email }) =>
+          email.endsWith("@onparallel.com")
+        )
+      ) {
         throw new WhitelistedError(
           "DEVELOPMENT: All recipients must have a parallel email.",
           "403"
@@ -66,6 +71,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   },
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
+    userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
   ),
   resolve: async (_, { petitionSignatureRequestId }, ctx) => {
@@ -91,12 +97,8 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
     }
 
     const [signatureRequest] = await Promise.all([
-      ctx.petitions.updatePetitionSignature(signature.id, {
-        status: "CANCELLED",
-        cancel_reason: "CANCELLED_BY_USER",
-        cancel_data: {
-          user_id: ctx.user!.id,
-        },
+      ctx.petitions.cancelPetitionSignatureRequest(signature.id, "CANCELLED_BY_USER", {
+        canceller_id: ctx.user!.id,
       }),
       signature.status === "PROCESSING"
         ? ctx.aws.enqueueMessages("signature-worker", {
@@ -128,6 +130,7 @@ export const updateSignatureRequestMetadata = mutationField("updateSignatureRequ
   type: nonNull("PetitionSignatureRequest"),
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
+    userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
   ),
   args: {
@@ -146,6 +149,7 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
   type: "FileUploadDownloadLinkResult",
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
+    userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
   ),
   args: {
@@ -204,6 +208,7 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
   type: "Result",
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
+    userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
   ),
   args: {

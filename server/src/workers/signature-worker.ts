@@ -1,7 +1,6 @@
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
-import { isDefined } from "remeda";
 import { URLSearchParams } from "url";
 import { WorkerContext } from "../context";
 import { fullName } from "../util/fullName";
@@ -30,29 +29,28 @@ async function startSignatureProcess(
     throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
 
-  const settings = signature.signature_config;
+  const { title, provider, signersInfo, message } = signature.signature_config;
 
   let removeGeneratedPdf = true;
   const tmpPdfPath = resolve(
     tmpdir(),
     "print",
     random(16),
-    sanitizeFilenameWithSuffix(settings.title, ".pdf")
+    sanitizeFilenameWithSuffix(title, ".pdf")
   );
 
   try {
-    const signatureIntegration = await fetchOrgSignatureIntegration(
-      petition.org_id,
-      settings.provider,
-      ctx
-    );
+    const signatureIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
 
-    const recipients = await fetchSignatureRecipients(settings.contactIds, ctx);
+    const recipients = signersInfo.map((signer) => ({
+      name: fullName(signer.firstName, signer.lastName),
+      email: signer.email,
+    }));
 
     const token = ctx.security.generateAuthToken({
       petitionId: petition.id,
       showSignatureBoxes: true,
-      documentTitle: settings.title,
+      documentTitle: title,
     });
 
     const buffer = await ctx.printer.pdf(
@@ -86,18 +84,16 @@ async function startSignatureProcess(
         templateData: await getLayoutProps(petition.org_id, ctx),
         signingMode: "parallel",
         signatureBoxPositions,
-        initialMessage: settings.message,
+        initialMessage: message,
       }
     );
-
-    const provider = signatureIntegration.provider.toUpperCase();
 
     // remove events array from data before saving to DB
     data.documents = data.documents.map((doc) => removeKeys(doc, ([key]) => key !== "events"));
 
     await Promise.all([
       ctx.petitions.updatePetitionSignature(signature.id, {
-        external_id: `${provider}/${data.id}`,
+        external_id: `${provider.toUpperCase()}/${data.id}`,
         data,
         status: "PROCESSING",
       }),
@@ -119,11 +115,7 @@ async function startSignatureProcess(
       cancelData.file = tmpPdfPath;
       removeGeneratedPdf = false;
     }
-    await ctx.petitions.updatePetitionSignature(signature.id, {
-      status: "CANCELLED",
-      cancel_reason: "REQUEST_ERROR",
-      cancel_data: cancelData,
-    });
+    await ctx.petitions.cancelPetitionSignatureRequest(signature.id, "REQUEST_ERROR", cancelData);
     throw error;
   } finally {
     try {
@@ -147,12 +139,8 @@ async function cancelSignatureProcess(
   }
 
   const petition = await fetchPetition(signature.petition_id, ctx);
-  const config = signature.signature_config;
-  const signatureIntegration = await fetchOrgSignatureIntegration(
-    petition.org_id,
-    config.provider,
-    ctx
-  );
+  const { provider } = signature.signature_config;
+  const signatureIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
 
   const signatureClient = ctx.signature.getClient(signatureIntegration);
   await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
@@ -174,12 +162,8 @@ async function sendSignatureReminder(
     );
   }
   const petition = await fetchPetition(signature.petition_id, ctx);
-  const config = signature.signature_config;
-  const signatureIntegration = await fetchOrgSignatureIntegration(
-    petition.org_id,
-    config.provider,
-    ctx
-  );
+  const { provider } = signature.signature_config;
+  const signatureIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
 
   const signatureClient = ctx.signature.getClient(signatureIntegration);
   await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
@@ -230,19 +214,6 @@ async function fetchPetition(id: number, ctx: WorkerContext) {
     throw new Error(`Couldn't find petition with id ${id}`);
   }
   return petition;
-}
-
-async function fetchSignatureRecipients(contactIds: number[], ctx: WorkerContext) {
-  const contacts = (await ctx.contacts.loadContact(contactIds)).filter(isDefined);
-
-  if (contacts.length !== contactIds.length) {
-    throw new Error(`Couldn't load all required contacts: ${contactIds.toString()}`);
-  }
-
-  return contacts.map((c) => ({
-    email: c.email,
-    name: fullName(c.first_name, c.last_name) ?? "",
-  }));
 }
 
 async function fetchPetitionSignature(petitionSignatureRequestId: number, ctx: WorkerContext) {

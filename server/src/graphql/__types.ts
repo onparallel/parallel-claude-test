@@ -121,12 +121,19 @@ export interface NexusGenInputs {
   };
   SignatureConfigInput: {
     // input type
-    contactIds: string[]; // [ID!]!
     letRecipientsChooseSigners: boolean; // Boolean!
     provider: string; // String!
     review: boolean; // Boolean!
+    signersInfo: NexusGenInputs["SignatureConfigInputSigner"][]; // [SignatureConfigInputSigner!]!
     timezone: string; // String!
     title: string; // String!
+  };
+  SignatureConfigInputSigner: {
+    // input type
+    contactId: string; // ID!
+    email: string; // String!
+    firstName: string; // String!
+    lastName: string; // String!
   };
   UpdateContactInput: {
     // input type
@@ -413,8 +420,16 @@ export interface NexusGenObjects {
   PetitionSharedUserNotification: notifications.PetitionSharedUserNotification;
   PetitionSignatureRequest: db.PetitionSignatureRequest;
   PetitionSignatureRequestSignerStatus: {
-    contactId: number;
+    firstName: string;
+    lastName: string;
+    email: string;
     status?: "SIGNED" | "DECLINED" | undefined;
+  };
+  PetitionSigner: {
+    contactId?: number;
+    firstName: string;
+    lastName: string;
+    email: string;
   };
   PetitionTemplate: db.Petition;
   PetitionTemplateAndField: {
@@ -462,10 +477,10 @@ export interface NexusGenObjects {
   PublicPetitionLinkUserPermission: db.PublicPetitionLinkUser;
   PublicPetitionMessage: db.PetitionMessage;
   PublicSignatureConfig: {
-    contactIds: number[];
+    signersInfo: any[];
     review?: boolean;
     letRecipientsChooseSigners?: boolean;
-    additionalSignerContactIds?: number[];
+    additionalSignersInfo?: any[];
   };
   PublicUser: db.User;
   Query: {};
@@ -495,7 +510,11 @@ export interface NexusGenObjects {
   SignatureCompletedUserNotification: notifications.SignatureCompletedUserNotification;
   SignatureConfig: {
     provider: string;
-    contactIds: number[];
+    signersInfo: {
+      firstName: string;
+      lastName: string;
+      email: string;
+    }[];
     timezone: string;
     title: string;
     review?: boolean;
@@ -1200,8 +1219,17 @@ export interface NexusGenFieldTypes {
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type
-    contact: NexusGenRootTypes["Contact"]; // Contact!
+    email: string; // String!
+    firstName: string; // String!
+    lastName: string; // String!
     status: string; // String!
+  };
+  PetitionSigner: {
+    // field return type
+    contactId: NexusGenScalars["GID"] | null; // GID
+    email: string; // String!
+    firstName: string; // String!
+    lastName: string; // String!
   };
   PetitionTemplate: {
     // field return type
@@ -1384,10 +1412,10 @@ export interface NexusGenFieldTypes {
   };
   PublicSignatureConfig: {
     // field return type
-    additionalSigners: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
+    additionalSigners: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
     letRecipientsChooseSigners: boolean; // Boolean!
     review: boolean; // Boolean!
-    signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
+    signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
   };
   PublicUser: {
     // field return type
@@ -1432,9 +1460,9 @@ export interface NexusGenFieldTypes {
   };
   RecipientSignedEvent: {
     // field return type
-    contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    signer: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
   };
   ReminderEmailBouncedUserNotification: {
     // field return type
@@ -1507,6 +1535,7 @@ export interface NexusGenFieldTypes {
   SignatureCancelledEvent: {
     // field return type
     cancelType: NexusGenEnums["PetitionSignatureCancelReason"]; // PetitionSignatureCancelReason!
+    canceller: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
     cancellerReason: string | null; // String
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1534,10 +1563,10 @@ export interface NexusGenFieldTypes {
   };
   SignatureConfig: {
     // field return type
-    contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     letRecipientsChooseSigners: boolean; // Boolean!
     provider: string; // String!
     review: boolean; // Boolean!
+    signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
     timezone: string; // String!
     title: string; // String!
   };
@@ -2350,8 +2379,17 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type name
-    contact: "Contact";
+    email: "String";
+    firstName: "String";
+    lastName: "String";
     status: "String";
+  };
+  PetitionSigner: {
+    // field return type name
+    contactId: "GID";
+    email: "String";
+    firstName: "String";
+    lastName: "String";
   };
   PetitionTemplate: {
     // field return type name
@@ -2534,10 +2572,10 @@ export interface NexusGenFieldTypeNames {
   };
   PublicSignatureConfig: {
     // field return type name
-    additionalSigners: "PublicContact";
+    additionalSigners: "PetitionSigner";
     letRecipientsChooseSigners: "Boolean";
     review: "Boolean";
-    signers: "PublicContact";
+    signers: "PetitionSigner";
   };
   PublicUser: {
     // field return type name
@@ -2582,9 +2620,9 @@ export interface NexusGenFieldTypeNames {
   };
   RecipientSignedEvent: {
     // field return type name
-    contact: "Contact";
     createdAt: "DateTime";
     id: "GID";
+    signer: "PetitionSigner";
   };
   ReminderEmailBouncedUserNotification: {
     // field return type name
@@ -2657,6 +2695,7 @@ export interface NexusGenFieldTypeNames {
   SignatureCancelledEvent: {
     // field return type name
     cancelType: "PetitionSignatureCancelReason";
+    canceller: "PetitionSigner";
     cancellerReason: "String";
     contact: "Contact";
     createdAt: "DateTime";
@@ -2684,10 +2723,10 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureConfig: {
     // field return type name
-    contacts: "Contact";
     letRecipientsChooseSigners: "Boolean";
     provider: "String";
     review: "Boolean";
+    signers: "PetitionSigner";
     timezone: "String";
     title: "String";
   };

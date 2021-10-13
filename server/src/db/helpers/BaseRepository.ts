@@ -3,7 +3,7 @@ import { injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
-import { KeysOfType, MaybeArray, UnwrapPromise } from "../../util/types";
+import { KeysOfType, MaybeArray, Replace, UnwrapPromise } from "../../util/types";
 import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
@@ -31,8 +31,6 @@ export interface TableTypes
     { signature_config: PetitionSignatureConfig }
   >;
 }
-
-type Replace<T, U> = Omit<T, keyof U> & U;
 
 export interface TableCreateTypes
   extends Omit<

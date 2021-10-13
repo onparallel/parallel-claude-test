@@ -995,7 +995,7 @@ export const PetitionEvent = schema({
         cancelReason: {
           description: "The reason of the cancel.",
           type: "string",
-          enum: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR"],
+          enum: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR", "REQUEST_RESTARTED"],
           example: "CANCELLED_BY_USER",
         },
         cancelData: {
@@ -1014,14 +1014,29 @@ export const PetitionEvent = schema({
               type: ["string", "null"],
               description: outdent`
                 The ID of the contact that declined the signature.  
-                Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
+                Only set if cancelReason is \`REQUEST_RESTARTED\`.
               `,
               example: toGlobalId("Contact", 2),
             },
-            reason: {
+            declineReason: {
               type: ["string", "null"],
-              description: "Reason of cancellation",
+              description: outdent`
+                Reason of cancellation.  
+                Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
+            `,
               example: "This document is outdated.",
+            },
+            canceller: {
+              description: outdent`
+                Information about the signer that declined the request.
+                Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
+              `,
+              type: ["object", "null"],
+              properties: {
+                firstName: { type: "string" },
+                lastName: { type: "string" },
+                email: { type: "string" },
+              },
             },
           },
         },
@@ -1224,12 +1239,17 @@ export const PetitionEvent = schema({
     },
     RECIPIENT_SIGNED: {
       description: "A recipient has signed the document.",
-      required: ["contactId", "petitionSignatureRequestId"],
+      required: ["signer", "petitionSignatureRequestId"],
       properties: {
-        contactId: {
-          type: "string",
-          description: "The ID of the contact that signed the document",
-          example: toGlobalId("Contact", 2),
+        signer: {
+          type: "object",
+          required: ["firstName", "lastName", "email"],
+          description: "Information about the signer",
+          properties: {
+            firstName: { type: "string" },
+            lastName: { type: "string" },
+            email: { type: "string" },
+          },
         },
         petitionSignatureRequestId: {
           type: "string",

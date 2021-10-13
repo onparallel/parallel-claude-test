@@ -8,6 +8,8 @@ export type UnwrapPromise<T> = T extends Promise<infer U> ? U : never;
 
 export type Maybe<T> = T | null;
 
+export type Replace<T, U> = Omit<T, keyof U> & U;
+
 export type If<Condition extends boolean | undefined, Then, Else = never> = Condition extends true
   ? Then
   : Else;

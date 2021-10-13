@@ -2439,6 +2439,7 @@ enum PetitionSignatureCancelReason {
   CANCELLED_BY_USER
   DECLINED_BY_SIGNER
   REQUEST_ERROR
+  REQUEST_RESTARTED
 }
 
 type PetitionSignatureRequest implements Timestamps {
@@ -2475,10 +2476,9 @@ type PetitionSignatureRequest implements Timestamps {
 }
 
 type PetitionSignatureRequestSignerStatus {
-  """
-  The contact that need to sign the generated document.
-  """
-  contact: Contact!
+  email: String!
+  firstName: String!
+  lastName: String!
 
   """
   The signing status of the individual contact.
@@ -2491,6 +2491,16 @@ enum PetitionSignatureRequestStatus {
   COMPLETED
   ENQUEUED
   PROCESSING
+}
+
+"""
+Information about a signer of the petition
+"""
+type PetitionSigner {
+  contactId: GID
+  email: String!
+  firstName: String!
+  lastName: String!
 }
 
 """
@@ -3101,9 +3111,9 @@ The public signature settings of a petition
 """
 type PublicSignatureConfig {
   """
-  The contacts assigned by the petition recipient to sign
+  The signers assigned by the petition recipient
   """
-  additionalSigners: [PublicContact]!
+  additionalSigners: [PetitionSigner!]!
 
   """
   If true, allows the recipients of the petition to select additional signers
@@ -3118,7 +3128,7 @@ type PublicSignatureConfig {
   """
   The contacts that need to sign the generated document.
   """
-  signers: [PublicContact]!
+  signers: [PetitionSigner!]!
 }
 
 enum PublicSignatureStatus {
@@ -3452,9 +3462,9 @@ enum QueryUserGroups_OrderBy {
 }
 
 type RecipientSignedEvent implements PetitionEvent {
-  contact: Contact
   createdAt: DateTime!
   id: GID!
+  signer: PetitionSigner
 }
 
 type ReminderEmailBouncedUserNotification implements PetitionUserNotification {
@@ -3578,6 +3588,7 @@ type SendPetitionResult {
 
 type SignatureCancelledEvent implements PetitionEvent {
   cancelType: PetitionSignatureCancelReason!
+  canceller: PetitionSigner
   cancellerReason: String
   contact: Contact
   createdAt: DateTime!
@@ -3609,11 +3620,6 @@ The signature settings of a petition
 """
 type SignatureConfig {
   """
-  The contacts that need to sign the generated document.
-  """
-  contacts: [Contact]!
-
-  """
   If true, allows the recipients of the petition to select additional signers
   """
   letRecipientsChooseSigners: Boolean!
@@ -3627,6 +3633,11 @@ type SignatureConfig {
   If true, lets the user review the replies before starting the signature process
   """
   review: Boolean!
+
+  """
+  The signers of the generated document.
+  """
+  signers: [PetitionSigner!]!
 
   """
   The timezone used to generate the document.
@@ -3644,11 +3655,6 @@ The signature settings for the petition
 """
 input SignatureConfigInput {
   """
-  The contacts that need to sign the generated document.
-  """
-  contactIds: [ID!]!
-
-  """
   If true, allows the recipients of the petition to select additional signers
   """
   letRecipientsChooseSigners: Boolean!
@@ -3662,6 +3668,7 @@ input SignatureConfigInput {
   If true, lets the user review the replies before starting the signature process
   """
   review: Boolean!
+  signersInfo: [SignatureConfigInputSigner!]!
 
   """
   The timezone used to generate the document.
@@ -3672,6 +3679,16 @@ input SignatureConfigInput {
   The title of the signing document
   """
   title: String!
+}
+
+"""
+The signer that need to sign the generated document.
+"""
+input SignatureConfigInputSigner {
+  contactId: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
 }
 
 type SignatureStartedEvent implements PetitionEvent {
