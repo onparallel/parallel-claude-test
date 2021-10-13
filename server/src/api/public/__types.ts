@@ -1198,9 +1198,6 @@ export type OrgIntegration = {
   type: IntegrationType;
 };
 
-/** The prefered tone of organization */
-export type Tone = "FORMAL" | "INFORMAL";
-
 /** An organization in the system. */
 export type Organization = Timestamps & {
   /** @deprecated Temporal solution for support methods, don't use */
@@ -2603,6 +2600,9 @@ export type Timestamps = {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
+
+/** The prefered tone of organization */
+export type Tone = "FORMAL" | "INFORMAL";
 
 export type UpdateContactInput = {
   firstName?: Maybe<Scalars["String"]>;

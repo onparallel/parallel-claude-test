@@ -1233,9 +1233,6 @@ export interface OrgIntegration {
   type: IntegrationType;
 }
 
-/** The prefered tone of organization */
-export type Tone = "FORMAL" | "INFORMAL";
-
 /** An organization in the system. */
 export interface Organization extends Timestamps {
   __typename?: "Organization";
@@ -2712,6 +2709,9 @@ export interface Timestamps {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 }
+
+/** The prefered tone of organization */
+export type Tone = "FORMAL" | "INFORMAL";
 
 export interface UpdateContactInput {
   firstName?: Maybe<Scalars["String"]>;
@@ -8708,11 +8708,7 @@ export type OrganizationBranding_changeOrganizationPreferedToneMutationVariables
 }>;
 
 export type OrganizationBranding_changeOrganizationPreferedToneMutation = {
-  changeOrganizationPreferedTone: {
-    __typename?: "Organization";
-    id: string;
-    preferedTone: Tone;
-  };
+  changeOrganizationPreferedTone: { __typename?: "Organization"; id: string; preferedTone: Tone };
 };
 
 export type OrganizationBrandingQueryVariables = Exact<{ [key: string]: never }>;

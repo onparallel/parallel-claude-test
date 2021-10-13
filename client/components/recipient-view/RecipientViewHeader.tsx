@@ -30,7 +30,7 @@ import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactListPopover } from "../common/ContactListPopover";
 import { HelpPopover } from "../common/HelpPopover";
-import { useTone } from "../common/toneContext";
+import { useTone } from "../common/ToneProvider";
 import { useDelegateAccessDialog } from "./DelegateAccessDialog";
 
 function Contact({

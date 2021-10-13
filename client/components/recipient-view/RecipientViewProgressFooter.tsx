@@ -22,7 +22,7 @@ import { zip } from "remeda";
 import { Card, CardProps } from "../common/Card";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { Spacer } from "../common/Spacer";
-import { useTone } from "../common/toneContext";
+import { useTone } from "../common/ToneProvider";
 
 export interface RecipientViewProgressFooterProps extends CardProps {
   petition: RecipientViewProgressFooter_PublicPetitionFragment;

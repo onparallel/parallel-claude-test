@@ -14,7 +14,7 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { ToneProvider, useTone } from "@parallel/components/common/ToneProvider";
+import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import {
   RedirectError,
   withApolloData,
@@ -32,11 +32,11 @@ import { useRecipientViewHelpDialog } from "@parallel/components/recipient-view/
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
-  Tone,
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
   RecipientView_PublicPetitionFieldFragment,
   RecipientView_PublicUserFragment,
+  Tone,
   usePublicPetitionQuery,
   useRecipientView_publicCompletePetitionMutation,
 } from "@parallel/graphql/__types";
@@ -111,7 +111,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             },
           });
           if (petition.signature?.review) {
-            await showReviewBeforeSigningDialog({ granter });
+            await showReviewBeforeSigningDialog({ granter, tone });
           }
           if (!toast.isActive("petition-completed-toast")) {
             toast({
@@ -307,6 +307,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                     <FormattedMessage
                       id="recipient-view.petition-completed-alert-2"
                       defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                      values={{ tone }}
                     />
                   </AlertDescription>
                 </Flex>
@@ -393,9 +394,9 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
 
 function ReviewBeforeSignDialog({
   granter,
+  tone,
   ...props
-}: DialogProps<{ granter: RecipientView_PublicUserFragment }>) {
-  const tone = useTone();
+}: DialogProps<{ granter: RecipientView_PublicUserFragment; tone: Tone }>) {
   return (
     <ConfirmDialog
       closeOnEsc={false}
