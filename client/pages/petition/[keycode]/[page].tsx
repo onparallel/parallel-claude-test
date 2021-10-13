@@ -53,7 +53,6 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
-import { isDefined } from "remeda";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
@@ -67,7 +66,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const petition = access!.petition!;
   const granter = access!.granter!;
   const contact = access!.contact!;
-  const signers = petition!.signature?.signers ?? [];
+  const signers = petition!.signatureConfig?.signers ?? [];
   const recipients = petition!.recipients;
   const message = access!.message;
 
@@ -93,10 +92,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
         );
         if (canFinalize) {
           let completeSignerInfoData: CompleteSignerInfoDialogResult | null = null;
-          if (petition.signature?.review === false) {
+          if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showCompleteSignerInfoDialog({
-              recipientCanAddSigners: petition.signature.letRecipientsChooseSigners,
-              signers: signers.filter(isDefined),
+              recipientCanAddSigners: petition.signatureConfig.letRecipientsChooseSigners,
+              signers,
               keycode,
               organization: granter.organization.name,
               contact,
@@ -110,7 +109,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               message: completeSignerInfoData?.message,
             },
           });
-          if (petition.signature?.review) {
+          if (petition.signatureConfig?.review) {
             await showReviewBeforeSigningDialog({ granter, tone });
           }
           if (!toast.isActive("petition-completed-toast")) {
@@ -188,8 +187,8 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
         />
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
           {["COMPLETED", "CLOSED"].includes(petition.status) ? (
-            !petition.signature ||
-            (petition.signature && petition.signatureStatus === "COMPLETED") ? (
+            !petition.signatureConfig ||
+            (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
               <CloseableAlert status="success" variant="subtle" zIndex={2}>
                 <Flex
                   maxWidth="container.lg"
@@ -247,7 +246,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                 >
                   <AlertIcon color="yellow.400" />
                   <AlertDescription>
-                    {petition.signature.review ? (
+                    {petition.signatureConfig.review ? (
                       <>
                         <Text>
                           <FormattedMessage
@@ -264,7 +263,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                       </>
                     ) : (
                       <Text>
-                        {petition.signature.signers.length > 0 ? (
+                        {petition.signatureConfig.signers.length > 0 ? (
                           <FormattedMessage
                             id="recipient-view.petition-signature-request-sent-alert"
                             defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
@@ -272,11 +271,8 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                               a: (chunks: any) => (
                                 <ContactListPopover
                                   contacts={petition
-                                    .signature!.signers.filter(isDefined)
-                                    .slice(1)
-                                    .concat(
-                                      petition.signature!.additionalSigners.filter(isDefined)
-                                    )}
+                                    .signatureConfig!.signers.slice(1)
+                                    .concat(petition.signatureConfig!.additionalSigners)}
                                 >
                                   <Text
                                     display="initial"
@@ -288,11 +284,11 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                                   </Text>
                                 </ContactListPopover>
                               ),
-                              name: petition.signature.signers[0]!.fullName,
-                              email: petition.signature.signers[0]!.email,
+                              name: petition.signatureConfig.signers[0]!.fullName,
+                              email: petition.signatureConfig.signers[0]!.email,
                               count:
-                                petition.signature.signers.length +
-                                petition.signature.additionalSigners.length -
+                                petition.signatureConfig.signers.length +
+                                petition.signatureConfig.additionalSigners.length -
                                 1,
                             }}
                           />
@@ -483,14 +479,15 @@ RecipientView.fragments = {
         fields {
           ...RecipientView_PublicPetitionField
         }
-        signature {
+        signatureConfig {
           review
           letRecipientsChooseSigners
           signers {
-            ...RecipientView_PublicContact
+            fullName
+            ...useCompleteSignerInfoDialog_PetitionSigner
           }
           additionalSigners {
-            ...RecipientView_PublicContact
+            ...useCompleteSignerInfoDialog_PetitionSigner
           }
         }
         recipients {
@@ -502,21 +499,10 @@ RecipientView.fragments = {
       }
 
       ${this.PublicPetitionField}
-      ${this.PublicContact}
+      ${useCompleteSignerInfoDialog.fragments.PetitionSigner}
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}
-    `;
-  },
-  get PublicContact() {
-    return gql`
-      fragment RecipientView_PublicContact on PublicContact {
-        id
-        fullName
-        firstName
-        lastName
-        email
-      }
     `;
   },
   get PublicPetitionField() {

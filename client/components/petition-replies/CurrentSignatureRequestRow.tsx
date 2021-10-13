@@ -5,8 +5,8 @@ import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@pa
 import { withError } from "@parallel/utils/promises/withError";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
-import { ContactReference } from "../common/ContactReference";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { SignerReference } from "../common/SignerReference";
 import { useConfirmSendSignatureReminderDialog } from "./ConfirmSendSignatureReminderDialog";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
@@ -26,7 +26,7 @@ export function CurrentSignatureRequestRow({
 }: CurrentSignatureRequestRowProps) {
   const intl = useIntl();
   const status = signatureRequest.status;
-  const signers = signatureRequest.signerStatus;
+  const signerStatus = signatureRequest.signerStatus;
   const isAwaitingSignature = ["ENQUEUED", "PROCESSING"].includes(status);
   const isSigned = status === "COMPLETED";
 
@@ -34,7 +34,9 @@ export function CurrentSignatureRequestRow({
   async function handleConfirmSendSignatureReminders() {
     const [, sendReminder] = await withError(
       showConfirmSendSignatureReminderDialog({
-        pendingSigners: signers.filter((s) => s.status === "PENDING").map((s) => s.contact),
+        pendingSigners: signerStatus
+          .filter(({ status }) => status === "PENDING")
+          .map(({ signer }) => signer),
       })
     );
 
@@ -63,13 +65,11 @@ export function CurrentSignatureRequestRow({
         </Heading>
         <Box>
           <FormattedList
-            value={signers.map(({ contact, status }) => [
-              <Fragment key={contact.id}>
-                <ContactReference contact={contact} />
-                {isAwaitingSignature ? (
-                  <PetitionSignatureRequestSignerStatusIcon status={status} marginBottom={1} />
-                ) : null}
-              </Fragment>,
+            value={signerStatus.map(({ signer, status }, index) => [
+              <SignerReference signer={signer} key={index} />,
+              isAwaitingSignature ? (
+                <PetitionSignatureRequestSignerStatusIcon status={status} marginBottom={1} />
+              ) : null,
             ])}
           />
         </Box>
@@ -106,12 +106,12 @@ CurrentSignatureRequestRow.fragments = {
       id
       status
       signerStatus {
-        contact {
-          ...ContactReference_Contact
+        signer {
+          ...SignerReference_PetitionSigner
         }
         status
       }
     }
-    ${ContactReference.fragments.Contact}
+    ${SignerReference.fragments.PetitionSigner}
   `,
 };

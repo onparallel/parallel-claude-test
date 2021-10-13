@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
-import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { SignerReference } from "@parallel/components/common/SignerReference";
 import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -23,7 +23,7 @@ export function TimelineSignatureCancelledEvent({
   async function handleSeeMessageClick() {
     try {
       await showDeclinedSignatureReason({
-        contact: event.contact ?? null,
+        signer: event.canceller ?? null,
         declineReason: event.cancellerReason!,
       });
     } catch {}
@@ -51,9 +51,9 @@ export function TimelineSignatureCancelledEvent({
           {event.cancelType === "DECLINED_BY_SIGNER" && (
             <FormattedMessage
               id="timeline.signature-declined-description"
-              defaultMessage="{contact} has declined the eSignature process {timeAgo}"
+              defaultMessage="{signer} has declined the eSignature process {timeAgo}"
               values={{
-                contact: <ContactReference contact={event.contact} />,
+                signer: <SignerReference signer={event.canceller} />,
                 timeAgo: (
                   <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
@@ -80,14 +80,14 @@ TimelineSignatureCancelledEvent.fragments = {
       user {
         ...UserReference_User
       }
-      contact {
-        ...ContactReference_Contact
+      canceller {
+        ...SignerReference_PetitionSigner
       }
       cancelType
       cancellerReason
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
+    ${SignerReference.fragments.PetitionSigner}
   `,
 };

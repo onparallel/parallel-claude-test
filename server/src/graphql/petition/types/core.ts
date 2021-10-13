@@ -6,6 +6,7 @@ import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
 import { or } from "../../helpers/authorize";
 import { userHasFeatureFlag } from "../authorizers";
+import { fullName } from "../../../util/fullName";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -478,6 +479,7 @@ export const PetitionSigner = objectType({
     });
     t.string("firstName");
     t.string("lastName");
+    t.string("fullName", { resolve: (o) => fullName(o.firstName, o.lastName) });
     t.string("email");
   },
   sourceType: /* ts */ `{

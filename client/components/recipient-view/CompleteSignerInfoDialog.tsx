@@ -6,7 +6,7 @@ import {
   Tone,
   PetitionLocale,
   PublicPetitionSignerDataInput,
-  RecipientView_PublicContactFragment,
+  useCompleteSignerInfoDialog_PetitionSignerFragment,
   useCompleteSignerInfoDialog_PublicContactFragment,
 } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
@@ -14,7 +14,7 @@ import autosize from "autosize";
 import outdent from "outdent";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, uniqBy } from "remeda";
+import { isDefined } from "remeda";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
@@ -47,7 +47,7 @@ function fullName(firstName: Maybe<string> | undefined, lastName: Maybe<string> 
 }
 
 type CompleteSignerInfoDialogProps = {
-  signers: RecipientView_PublicContactFragment[];
+  signers: useCompleteSignerInfoDialog_PetitionSignerFragment[];
   keycode: string;
   contact: useCompleteSignerInfoDialog_PublicContactFragment;
   organization: string;
@@ -119,7 +119,7 @@ function CompleteSignerInfoDialog({
       : additionalSigners;
 
     props.onResolve({
-      additionalSigners: uniqBy(signers, (s) => s.email),
+      additionalSigners: signers,
       message: showMessage ? message : null,
     });
   }
@@ -276,6 +276,14 @@ function CompleteSignerInfoDialog({
 }
 
 useCompleteSignerInfoDialog.fragments = {
+  PetitionSigner: gql`
+    fragment useCompleteSignerInfoDialog_PetitionSigner on PetitionSigner {
+      firstName
+      lastName
+      fullName
+      email
+    }
+  `,
   PublicContact: gql`
     fragment useCompleteSignerInfoDialog_PublicContact on PublicContact {
       firstName

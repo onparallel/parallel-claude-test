@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { SignaturePlusIcon } from "@parallel/chakra/icons";
-import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { SignerReference } from "@parallel/components/common/SignerReference";
 import { TimelineRecipientSignedEvent_RecipientSignedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -12,7 +12,7 @@ export type TimelineRecipientSignedEventProps = {
 };
 
 export function TimelineRecipientSignedEvent({
-  event: { contact, createdAt },
+  event: { signer, createdAt },
 }: TimelineRecipientSignedEventProps) {
   return (
     <TimelineItem
@@ -20,9 +20,9 @@ export function TimelineRecipientSignedEvent({
     >
       <FormattedMessage
         id="timeline.recipient-signed-description"
-        defaultMessage="{contact} signed the document {timeAgo}"
+        defaultMessage="{signer} signed the document {timeAgo}"
         values={{
-          contact: <ContactReference contact={contact} />,
+          signer: <SignerReference signer={signer} />,
           timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
       />
@@ -33,11 +33,11 @@ export function TimelineRecipientSignedEvent({
 TimelineRecipientSignedEvent.fragments = {
   RecipientSignedEvent: gql`
     fragment TimelineRecipientSignedEvent_RecipientSignedEvent on RecipientSignedEvent {
-      contact {
-        ...ContactReference_Contact
+      signer {
+        ...SignerReference_PetitionSigner
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
+    ${SignerReference.fragments.PetitionSigner}
   `,
 };

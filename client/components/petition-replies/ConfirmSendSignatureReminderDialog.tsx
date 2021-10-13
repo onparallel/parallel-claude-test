@@ -1,14 +1,14 @@
 import { Button } from "@chakra-ui/react";
-import { ContactReference_ContactFragment } from "@parallel/graphql/__types";
+import { SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
-import { ContactReference } from "../common/ContactReference";
 import { DialogProps, useDialog } from "../common/DialogProvider";
+import { SignerReference } from "../common/SignerReference";
 
 function ConfirmSendSignatureReminderDialog({
   pendingSigners,
   ...props
-}: DialogProps<{ pendingSigners: ContactReference_ContactFragment[] }, boolean>) {
+}: DialogProps<{ pendingSigners: SignerReference_PetitionSignerFragment[] }, boolean>) {
   return (
     <ConfirmDialog
       {...props}
@@ -26,13 +26,8 @@ function ConfirmSendSignatureReminderDialog({
             count: pendingSigners.length,
             contactsList: (
               <FormattedList
-                value={pendingSigners.map((signer) => (
-                  <ContactReference
-                    key={signer.id}
-                    contact={signer}
-                    isLink={false}
-                    fontWeight="bold"
-                  />
+                value={pendingSigners.map((signer, index) => (
+                  <SignerReference key={index} signer={signer} fontWeight="bold" />
                 ))}
               />
             ),

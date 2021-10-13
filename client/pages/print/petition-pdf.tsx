@@ -41,7 +41,7 @@ function PetitionPdf({ token }: { token: string }) {
     fromTemplateId,
   } = petition;
 
-  const contacts = currentSignatureRequest?.signatureConfig.contacts;
+  const signers = currentSignatureRequest?.signatureConfig.signers;
   const timezone = currentSignatureRequest?.signatureConfig.timezone;
 
   const fieldVisibility = useFieldVisibility(petition.fields);
@@ -71,7 +71,7 @@ function PetitionPdf({ token }: { token: string }) {
           ))}
           {tokenPayload.showSignatureBoxes &&
             pageNum === pages.length - 1 &&
-            (contacts ?? []).length > 0 && (
+            (signers ?? []).length > 0 && (
               <Box sx={{ pageBreakInside: "avoid" }}>
                 <Text textAlign="center" margin="15mm 4mm 5mm 4mm" fontStyle="italic">
                   <FormattedMessage
@@ -81,16 +81,13 @@ function PetitionPdf({ token }: { token: string }) {
                 </Text>
                 {fromTemplateId ? <HardcodedSignatures fromTemplateId={fromTemplateId} /> : null}
                 <SignaturesGrid>
-                  {contacts?.map(
-                    (signer, index) =>
-                      signer && (
-                        <SignatureBox
-                          key={signer.id}
-                          signer={{ ...signer!, key: index }}
-                          timezone={timezone!}
-                        />
-                      )
-                  )}
+                  {signers!.map(({ email, fullName }, key) => (
+                    <SignatureBox
+                      key={key}
+                      signer={{ email, fullName, key }}
+                      timezone={timezone!}
+                    />
+                  ))}
                 </SignaturesGrid>
               </Box>
             )}
@@ -116,8 +113,7 @@ PetitionPdf.fragments = {
         fromTemplateId
         currentSignatureRequest(token: $token) {
           signatureConfig {
-            contacts {
-              id
+            signers {
               fullName
               email
             }

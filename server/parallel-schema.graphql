@@ -2476,9 +2476,7 @@ type PetitionSignatureRequest implements Timestamps {
 }
 
 type PetitionSignatureRequestSignerStatus {
-  email: String!
-  firstName: String!
-  lastName: String!
+  signer: PetitionSigner!
 
   """
   The signing status of the individual contact.
@@ -2500,6 +2498,7 @@ type PetitionSigner {
   contactId: GID
   email: String!
   firstName: String!
+  fullName: String!
   lastName: String!
 }
 
@@ -2865,7 +2864,7 @@ type PublicPetition implements Timestamps {
   """
   The signature config of the petition
   """
-  signature: PublicSignatureConfig
+  signatureConfig: PublicSignatureConfig
   signatureStatus: PublicSignatureStatus
 
   """

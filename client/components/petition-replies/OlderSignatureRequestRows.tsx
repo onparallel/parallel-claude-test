@@ -3,8 +3,8 @@ import { Button, Flex, GridItem, Heading } from "@chakra-ui/react";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
-import { ContactReference } from "../common/ContactReference";
 import { Divider } from "../common/Divider";
+import { SignerReference } from "../common/SignerReference";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
 
 export function OlderSignatureRequestRows({
@@ -35,8 +35,8 @@ export function OlderSignatureRequestRows({
           <PetitionSignatureRequestStatusText status={signature.status} />
           <GridItem colSpan={signature.status === "COMPLETED" ? 1 : 2}>
             <FormattedList
-              value={signature.signerStatus.map(({ contact }) => (
-                <ContactReference contact={contact} key={contact.id} />
+              value={signature.signatureConfig.signers.map((signer, index) => (
+                <SignerReference signer={signer} key={index} />
               ))}
             />
           </GridItem>
@@ -58,13 +58,12 @@ OlderSignatureRequestRows.fragments = {
     fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
       id
       status
-      signerStatus {
-        contact {
-          ...ContactReference_Contact
+      signatureConfig {
+        signers {
+          ...SignerReference_PetitionSigner
         }
-        status
       }
     }
-    ${ContactReference.fragments.Contact}
+    ${SignerReference.fragments.PetitionSigner}
   `,
 };

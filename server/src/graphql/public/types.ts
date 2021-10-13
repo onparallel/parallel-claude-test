@@ -126,7 +126,7 @@ export const PublicPetition = objectType({
         return await ctx.petitions.loadFieldsForPetition(root.id);
       },
     });
-    t.nullable.field("signature", {
+    t.nullable.field("signatureConfig", {
       type: "PublicSignatureConfig",
       description: "The signature config of the petition",
       resolve: (o) => o.signature_config,

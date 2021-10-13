@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import {
   ContactListPopover_ContactFragment,
+  ContactListPopover_PetitionSignerFragment,
   ContactListPopover_PublicContactFragment,
 } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
@@ -19,7 +20,8 @@ import { FormattedMessage } from "react-intl";
 
 type ContactSelection =
   | ContactListPopover_ContactFragment
-  | ContactListPopover_PublicContactFragment;
+  | ContactListPopover_PublicContactFragment
+  | ContactListPopover_PetitionSignerFragment;
 interface ContactListPopoverProps<T extends ContactSelection> {
   children: ReactNode;
   contacts: Array<T>;
@@ -31,6 +33,12 @@ export function ContactListPopover<T extends ContactSelection>({
   onContactClick,
 }: ContactListPopoverProps<T>) {
   const isClickable = Boolean(onContactClick);
+
+  function handleContactClick(c: ContactSelection) {
+    if (c.__typename === "Contact" || c.__typename === "PublicContact") {
+      onContactClick?.(c.id);
+    }
+  }
   return (
     <Popover trigger="hover">
       <PopoverTrigger>{children}</PopoverTrigger>
@@ -45,10 +53,10 @@ export function ContactListPopover<T extends ContactSelection>({
             onClick={(e) => e.stopPropagation()}
           >
             <List>
-              {contacts.map((c) => (
+              {contacts.map((c, index) => (
                 <ListItem
-                  key={c.id}
-                  onClick={onContactClick && (() => onContactClick?.(c.id))}
+                  key={index}
+                  onClick={() => handleContactClick(c)}
                   paddingX={4}
                   paddingY={0.5}
                   backgroundColor="white"
@@ -89,6 +97,12 @@ ContactListPopover.fragments = {
   PublicContact: gql`
     fragment ContactListPopover_PublicContact on PublicContact {
       id
+      email
+      fullName
+    }
+  `,
+  PetitionSigner: gql`
+    fragment ContactListPopover_PetitionSigner on PetitionSigner {
       email
       fullName
     }

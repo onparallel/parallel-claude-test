@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Button, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
-import { CopySignatureConfigDialog_ContactFragment } from "@parallel/graphql/__types";
+import { CopySignatureConfigDialog_PetitionSignerFragment } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
 
@@ -14,7 +14,10 @@ export type BatchSendSigningMode =
 export function CopySignatureConfigDialog({
   signers,
   ...props
-}: DialogProps<{ signers: CopySignatureConfigDialog_ContactFragment[] }, BatchSendSigningMode>) {
+}: DialogProps<
+  { signers: CopySignatureConfigDialog_PetitionSignerFragment[] },
+  BatchSendSigningMode
+>) {
   const [option, setOption] = useState<BatchSendSigningMode>();
 
   return (
@@ -36,9 +39,9 @@ export function CopySignatureConfigDialog({
             values={{
               contacts: (
                 <FormattedList
-                  value={signers.map((contact, i) => [
+                  value={signers.map((signer, i) => [
                     <Text as="strong" key={i}>
-                      {contact.fullName ?? contact.email}
+                      {signer.fullName ?? signer.email}
                     </Text>,
                   ])}
                 />
@@ -100,11 +103,10 @@ export function CopySignatureConfigDialog({
 }
 
 CopySignatureConfigDialog.fragments = {
-  Contact: gql`
-    fragment CopySignatureConfigDialog_Contact on Contact {
-      id
-      fullName
+  PetitionSigner: gql`
+    fragment CopySignatureConfigDialog_PetitionSigner on PetitionSigner {
       email
+      fullName
     }
   `,
 };

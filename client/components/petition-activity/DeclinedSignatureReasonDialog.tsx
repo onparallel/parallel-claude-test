@@ -1,18 +1,18 @@
 import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
-import { ContactReference_ContactFragment, Maybe } from "@parallel/graphql/__types";
+import { Maybe, SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
-import { ContactReference } from "../common/ContactReference";
 import { DialogProps, useDialog } from "../common/DialogProvider";
+import { SignerReference } from "../common/SignerReference";
 
 export type DeclinedSignatureReasonDialogProps = {
   declineReason: string;
-  contact: Maybe<ContactReference_ContactFragment>;
+  signer: Maybe<SignerReference_PetitionSignerFragment>;
 };
 
 export function DeclinedSignatureReasonDialog({
   declineReason,
-  contact,
+  signer,
   ...props
 }: DialogProps<DeclinedSignatureReasonDialogProps, void>) {
   return (
@@ -22,7 +22,7 @@ export function DeclinedSignatureReasonDialog({
       {...props}
       header={
         <Heading size="md">
-          <ContactReference contact={contact} />
+          <SignerReference signer={signer} />
         </Heading>
       }
       body={

@@ -7,7 +7,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { omit } from "remeda";
-import { ContactReference } from "../common/ContactReference";
+import { SignerReference } from "../common/SignerReference";
 import { useSignerSelectDialog } from "./SignerSelectDialog";
 
 interface NewSignatureRequestRowProps {
@@ -21,15 +21,15 @@ export function NewSignatureRequestRow({
   onUpdateConfig,
   onStart,
 }: NewSignatureRequestRowProps) {
-  const signers = petition.signatureConfig?.contacts ?? [];
+  const signers = petition.signatureConfig?.signers ?? [];
   const showSignerSelectDialog = useSignerSelectDialog();
   const handleStartSignature = async () => {
     try {
       if (signers.length === 0) {
-        const { contactIds } = await showSignerSelectDialog({});
+        const { signersInfo } = await showSignerSelectDialog({});
         await onUpdateConfig({
-          ...omit(petition.signatureConfig!, ["contacts", "__typename"]),
-          contactIds,
+          ...omit(petition.signatureConfig!, ["signers", "__typename"]),
+          signersInfo,
         });
       }
       onStart();
@@ -65,7 +65,9 @@ export function NewSignatureRequestRow({
         <Box>
           {signers.length > 0 ? (
             <FormattedList
-              value={signers.map((contact, i) => [<ContactReference contact={contact} key={i} />])}
+              value={signers.map((signer, i) => (
+                <SignerReference signer={signer} key={i} />
+              ))}
             />
           ) : (
             <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
@@ -104,8 +106,8 @@ NewSignatureRequestRow.fragments = {
     fragment NewSignatureRequestRow_Petition on Petition {
       status
       signatureConfig {
-        contacts {
-          ...ContactReference_Contact
+        signers {
+          ...SignerReference_PetitionSigner
         }
         letRecipientsChooseSigners
         provider
@@ -114,6 +116,6 @@ NewSignatureRequestRow.fragments = {
         title
       }
     }
-    ${ContactReference.fragments.Contact}
+    ${SignerReference.fragments.PetitionSigner}
   `,
 };

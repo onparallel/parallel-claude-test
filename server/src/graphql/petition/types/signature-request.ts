@@ -19,9 +19,14 @@ export const PetitionSignatureRequestSignerStatus = objectType({
     status?: "SIGNED" | "DECLINED" | undefined;
   }`,
   definition(t) {
-    t.string("email");
-    t.string("firstName");
-    t.string("lastName");
+    t.field("signer", {
+      type: "PetitionSigner",
+      resolve: (o) => ({
+        firstName: o.firstName,
+        lastName: o.lastName,
+        email: o.email,
+      }),
+    });
     t.string("status", {
       description: "The signing status of the individual contact.",
       resolve: (o) => o.status ?? "PENDING",

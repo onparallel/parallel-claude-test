@@ -113,7 +113,7 @@ export function RecipientViewProgressFooter({
       >
         <PopoverTrigger>
           <Button colorScheme="purple" size="sm" isDisabled={isCompleted} onClick={onFinalize}>
-            {petition.signature?.review === false ? (
+            {petition.signatureConfig?.review === false ? (
               <FormattedMessage
                 id="recipient-view.submit-and-sign-button-short"
                 defaultMessage="Finalize and sign"
@@ -148,7 +148,7 @@ RecipientViewProgressFooter.fragments = {
         fields {
           ...RecipientViewProgressFooter_PublicPetitionField
         }
-        signature {
+        signatureConfig {
           review
         }
       }

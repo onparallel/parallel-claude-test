@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 
 export function SignerSelectDialog(
-  props: DialogProps<{}, Pick<SignatureConfigInput, "contactIds">>
+  props: DialogProps<{}, Pick<SignatureConfigInput, "signersInfo">>
 ) {
   const {
     control,
@@ -33,7 +33,12 @@ export function SignerSelectDialog(
         as: "form",
         onSubmit: handleSubmit(({ contacts }) => {
           props.onResolve({
-            contactIds: contacts.map((c) => c!.id),
+            signersInfo: contacts.map((c) => ({
+              contactId: c.id,
+              firstName: c.firstName ?? "",
+              lastName: c.lastName ?? "",
+              email: c.email,
+            })),
           });
         }),
       }}

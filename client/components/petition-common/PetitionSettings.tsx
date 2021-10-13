@@ -45,6 +45,7 @@ import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { pick } from "remeda";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DialogProps, useDialog } from "../common/DialogProvider";
@@ -103,7 +104,14 @@ function _PetitionSettings({
       const previous = petition.signatureConfig;
       const signatureConfigHasChanged = [
         [signatureConfig.provider, previous?.provider],
-        [signatureConfig.contactIds.join(","), previous?.contacts.map((c) => c?.id).join(",")],
+        [
+          signatureConfig.signersInfo
+            .map((s) => JSON.stringify(pick(s, ["email", "firstName", "lastName"])))
+            .join(","),
+          previous?.signers
+            .map((s) => JSON.stringify(pick(s, ["email", "firstName", "lastName"])))
+            .join(","),
+        ],
         [signatureConfig.title, previous?.title],
         [signatureConfig.letRecipientsChooseSigners, previous?.letRecipientsChooseSigners],
       ].some(([after, before]) => after !== before);

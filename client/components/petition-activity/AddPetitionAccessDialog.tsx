@@ -6,7 +6,6 @@ import {
   AddPetitionAccessDialog_contactsByEmailQuery,
   AddPetitionAccessDialog_contactsByEmailQueryVariables,
   AddPetitionAccessDialog_PetitionFragment,
-  CopySignatureConfigDialog_ContactFragment,
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
@@ -125,11 +124,11 @@ export function AddPetitionAccessDialog({
       let batchSendSigningMode: BatchSendSigningMode | undefined;
       if (
         petition.signatureConfig &&
-        petition.signatureConfig.contacts.length > 0 &&
+        petition.signatureConfig.signers.length > 0 &&
         recipientGroups.length > 1
       ) {
         const option = await showCopySignatureConfigDialog({
-          signers: petition.signatureConfig.contacts as CopySignatureConfigDialog_ContactFragment[],
+          signers: petition.signatureConfig.signers,
         });
 
         batchSendSigningMode = option;
@@ -284,8 +283,8 @@ AddPetitionAccessDialog.fragments = {
       emailSubject
       emailBody
       signatureConfig {
-        contacts {
-          ...CopySignatureConfigDialog_Contact
+        signers {
+          ...CopySignatureConfigDialog_PetitionSigner
         }
       }
       remindersConfig {
@@ -304,7 +303,7 @@ AddPetitionAccessDialog.fragments = {
         }
       }
     }
-    ${CopySignatureConfigDialog.fragments.Contact}
+    ${CopySignatureConfigDialog.fragments.PetitionSigner}
   `,
 };
 

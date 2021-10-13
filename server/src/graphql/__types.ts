@@ -1219,9 +1219,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type
-    email: string; // String!
-    firstName: string; // String!
-    lastName: string; // String!
+    signer: NexusGenRootTypes["PetitionSigner"]; // PetitionSigner!
     status: string; // String!
   };
   PetitionSigner: {
@@ -1229,6 +1227,7 @@ export interface NexusGenFieldTypes {
     contactId: NexusGenScalars["GID"] | null; // GID
     email: string; // String!
     firstName: string; // String!
+    fullName: string; // String!
     lastName: string; // String!
   };
   PetitionTemplate: {
@@ -1327,7 +1326,7 @@ export interface NexusGenFieldTypes {
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     recipients: NexusGenRootTypes["PublicContact"][]; // [PublicContact!]!
-    signature: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
+    signatureConfig: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
     signatureStatus: NexusGenEnums["PublicSignatureStatus"] | null; // PublicSignatureStatus
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     tone: NexusGenEnums["Tone"]; // Tone!
@@ -2379,9 +2378,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type name
-    email: "String";
-    firstName: "String";
-    lastName: "String";
+    signer: "PetitionSigner";
     status: "String";
   };
   PetitionSigner: {
@@ -2389,6 +2386,7 @@ export interface NexusGenFieldTypeNames {
     contactId: "GID";
     email: "String";
     firstName: "String";
+    fullName: "String";
     lastName: "String";
   };
   PetitionTemplate: {
@@ -2487,7 +2485,7 @@ export interface NexusGenFieldTypeNames {
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     recipients: "PublicContact";
-    signature: "PublicSignatureConfig";
+    signatureConfig: "PublicSignatureConfig";
     signatureStatus: "PublicSignatureStatus";
     status: "PetitionStatus";
     tone: "Tone";

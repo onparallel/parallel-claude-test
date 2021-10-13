@@ -24,6 +24,7 @@ import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { StylesConfig } from "react-select";
+import { omit } from "remeda";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
@@ -60,16 +61,16 @@ export function SignatureConfigDialog({
   }>({
     mode: "onChange",
     defaultValues: {
-      contacts:
-        petition.signatureConfig?.contacts.map(
-          (contact, index) =>
-            contact ?? {
+      contacts: (petition.signatureConfig?.signers ?? []).map((signer, index) =>
+        signer
+          ? { ...omit(signer, ["contactId", "__typename"]), id: signer.contactId! } // signers specified by the user will always have contactId key
+          : {
               id: "" + index,
               email: "",
               isInvalid: true,
               isDeleted: true,
             }
-        ) ?? [],
+      ),
       provider: providers[0].value,
       review: petition.signatureConfig?.review ?? true,
       title: petition.signatureConfig?.title ?? petition.name ?? "",
@@ -133,7 +134,12 @@ export function SignatureConfigDialog({
             if (review) {
               props.onResolve({
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                contactIds: contacts.map((c) => c!.id),
+                signersInfo: contacts.map((c) => ({
+                  contactId: c.id,
+                  email: c.email,
+                  firstName: c.firstName ?? "",
+                  lastName: c.lastName ?? "",
+                })),
                 provider,
                 review: petitionIsCompleted ? false : review,
                 title,
@@ -142,7 +148,12 @@ export function SignatureConfigDialog({
             } else {
               props.onResolve({
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                contactIds: contacts.map((c) => c!.id),
+                signersInfo: contacts.map((c) => ({
+                  contactId: c.id,
+                  email: c.email,
+                  firstName: c.firstName ?? "",
+                  lastName: c.lastName ?? "",
+                })),
                 provider,
                 review: false,
                 title,
@@ -336,8 +347,11 @@ SignatureConfigDialog.fragments = {
       name
       signatureConfig {
         provider
-        contacts {
-          ...ContactSelect_Contact
+        signers {
+          contactId
+          firstName
+          lastName
+          email
         }
         title
         review
@@ -347,7 +361,6 @@ SignatureConfigDialog.fragments = {
         status
       }
     }
-    ${ContactSelect.fragments.Contact}
   `,
   OrgIntegration: gql`
     fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {

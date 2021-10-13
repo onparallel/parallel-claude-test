@@ -1859,7 +1859,8 @@ export interface PetitionSharedWithFilterLine {
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
-  | "REQUEST_ERROR";
+  | "REQUEST_ERROR"
+  | "REQUEST_RESTARTED";
 
 export interface PetitionSignatureRequest extends Timestamps {
   __typename?: "PetitionSignatureRequest";
@@ -1882,13 +1883,22 @@ export interface PetitionSignatureRequest extends Timestamps {
 
 export interface PetitionSignatureRequestSignerStatus {
   __typename?: "PetitionSignatureRequestSignerStatus";
-  /** The contact that need to sign the generated document. */
-  contact: Contact;
+  signer: PetitionSigner;
   /** The signing status of the individual contact. */
   status: Scalars["String"];
 }
 
 export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+
+/** Information about a signer of the petition */
+export interface PetitionSigner {
+  __typename?: "PetitionSigner";
+  contactId?: Maybe<Scalars["GID"]>;
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  fullName: Scalars["String"];
+  lastName: Scalars["String"];
+}
 
 /** The status of a petition. */
 export type PetitionStatus =
@@ -2087,7 +2097,7 @@ export interface PublicPetition extends Timestamps {
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
-  signature?: Maybe<PublicSignatureConfig>;
+  signatureConfig?: Maybe<PublicSignatureConfig>;
   signatureStatus?: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
@@ -2237,14 +2247,14 @@ export interface PublicPetitionSignerDataInput {
 /** The public signature settings of a petition */
 export interface PublicSignatureConfig {
   __typename?: "PublicSignatureConfig";
-  /** The contacts assigned by the petition recipient to sign */
-  additionalSigners: Array<Maybe<PublicContact>>;
+  /** The signers assigned by the petition recipient */
+  additionalSigners: Array<PetitionSigner>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The contacts that need to sign the generated document. */
-  signers: Array<Maybe<PublicContact>>;
+  signers: Array<PetitionSigner>;
 }
 
 export type PublicSignatureStatus = "COMPLETED" | "STARTED";
@@ -2486,9 +2496,9 @@ export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name
 
 export interface RecipientSignedEvent extends PetitionEvent {
   __typename?: "RecipientSignedEvent";
-  contact?: Maybe<Contact>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  signer?: Maybe<PetitionSigner>;
 }
 
 export interface ReminderEmailBouncedUserNotification extends PetitionUserNotification {
@@ -2591,6 +2601,7 @@ export interface SendPetitionResult {
 export interface SignatureCancelledEvent extends PetitionEvent {
   __typename?: "SignatureCancelledEvent";
   cancelType: PetitionSignatureCancelReason;
+  canceller?: Maybe<PetitionSigner>;
   cancellerReason?: Maybe<Scalars["String"]>;
   contact?: Maybe<Contact>;
   createdAt: Scalars["DateTime"];
@@ -2623,14 +2634,14 @@ export interface SignatureCompletedUserNotification extends PetitionUserNotifica
 /** The signature settings of a petition */
 export interface SignatureConfig {
   __typename?: "SignatureConfig";
-  /** The contacts that need to sign the generated document. */
-  contacts: Array<Maybe<Contact>>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
+  /** The signers of the generated document. */
+  signers: Array<PetitionSigner>;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** Title of the signature document */
@@ -2639,18 +2650,25 @@ export interface SignatureConfig {
 
 /** The signature settings for the petition */
 export interface SignatureConfigInput {
-  /** The contacts that need to sign the generated document. */
-  contactIds: Array<Scalars["ID"]>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
+  signersInfo: Array<SignatureConfigInputSigner>;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** The title of the signing document */
   title: Scalars["String"];
+}
+
+/** The signer that need to sign the generated document. */
+export interface SignatureConfigInputSigner {
+  contactId: Scalars["ID"];
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
 }
 
 export interface SignatureStartedEvent extends PetitionEvent {
@@ -2951,6 +2969,12 @@ export type ContactListPopover_PublicContactFragment = {
   fullName?: Maybe<string>;
 };
 
+export type ContactListPopover_PetitionSignerFragment = {
+  __typename?: "PetitionSigner";
+  email: string;
+  fullName: string;
+};
+
 export type ContactReference_ContactFragment = {
   __typename?: "Contact";
   id: string;
@@ -2961,6 +2985,8 @@ export type ContactReference_ContactFragment = {
 export type ContactSelect_ContactFragment = {
   __typename?: "Contact";
   id: string;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   fullName?: Maybe<string>;
   email: string;
   hasBouncedEmail: boolean;
@@ -3119,6 +3145,12 @@ export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
 export type ShareButton_PetitionBaseFragment =
   | ShareButton_PetitionBase_Petition_Fragment
   | ShareButton_PetitionBase_PetitionTemplate_Fragment;
+
+export type SignerReference_PetitionSignerFragment = {
+  __typename?: "PetitionSigner";
+  email: string;
+  fullName: string;
+};
 
 export type Tag_TagFragment = { __typename?: "Tag"; name: string; color: string };
 
@@ -4329,9 +4361,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   emailBody?: Maybe<any>;
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
-    contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-    >;
+    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
   }>;
   remindersConfig?: Maybe<{
     __typename?: "RemindersConfig";
@@ -4359,6 +4389,8 @@ export type AddPetitionAccessDialog_contactsByEmailQuery = {
     Maybe<{
       __typename?: "Contact";
       id: string;
+      firstName?: Maybe<string>;
+      lastName?: Maybe<string>;
       fullName?: Maybe<string>;
       email: string;
       hasBouncedEmail: boolean;
@@ -4830,12 +4862,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "RecipientSignedEvent";
           id: string;
           createdAt: string;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
         }
       | {
           __typename?: "ReminderSentEvent";
@@ -4945,12 +4972,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: Maybe<string>;
             status: UserStatus;
           }>;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
       | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
@@ -5359,7 +5381,7 @@ export type PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment
   __typename?: "RecipientSignedEvent";
   id: string;
   createdAt: string;
-  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+  signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
@@ -5470,7 +5492,7 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragm
   cancellerReason?: Maybe<string>;
   createdAt: string;
   user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+  canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment = {
@@ -5931,7 +5953,7 @@ export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
 export type TimelineRecipientSignedEvent_RecipientSignedEventFragment = {
   __typename?: "RecipientSignedEvent";
   createdAt: string;
-  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+  signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
 };
 
 export type TimelineReminderSentEvent_ReminderSentEventFragment = {
@@ -6036,7 +6058,7 @@ export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   cancellerReason?: Maybe<string>;
   createdAt: string;
   user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
+  canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
 };
 
 export type TimelineSignatureCompletedEvent_SignatureCompletedEventFragment = {
@@ -6135,15 +6157,13 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     title: string;
     review: boolean;
     letRecipientsChooseSigners: boolean;
-    contacts: Array<
-      Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-        hasBouncedEmail: boolean;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: Maybe<string>;
+      firstName: string;
+      lastName: string;
+      email: string;
+    }>;
   }>;
 };
 
@@ -6185,15 +6205,13 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     review: boolean;
     letRecipientsChooseSigners: boolean;
-    contacts: Array<
-      Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-        hasBouncedEmail: boolean;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: Maybe<string>;
+      firstName: string;
+      lastName: string;
+      email: string;
+    }>;
   }>;
 };
 
@@ -6726,15 +6744,13 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     title: string;
     review: boolean;
     letRecipientsChooseSigners: boolean;
-    contacts: Array<
-      Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-        hasBouncedEmail: boolean;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: Maybe<string>;
+      firstName: string;
+      lastName: string;
+      email: string;
+    }>;
   }>;
 };
 
@@ -6747,15 +6763,13 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     review: boolean;
     letRecipientsChooseSigners: boolean;
-    contacts: Array<
-      Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-        hasBouncedEmail: boolean;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: Maybe<string>;
+      firstName: string;
+      lastName: string;
+      email: string;
+    }>;
   }>;
 };
 
@@ -6801,11 +6815,10 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
   }>;
 };
 
-export type CopySignatureConfigDialog_ContactFragment = {
-  __typename?: "Contact";
-  id: string;
-  fullName?: Maybe<string>;
+export type CopySignatureConfigDialog_PetitionSignerFragment = {
+  __typename?: "PetitionSigner";
   email: string;
+  fullName: string;
 };
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
@@ -7101,7 +7114,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   signerStatus: Array<{
     __typename?: "PetitionSignatureRequestSignerStatus";
     status: string;
-    contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+    signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
   }>;
 };
 
@@ -7240,9 +7253,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
     review: boolean;
     timezone: string;
     title: string;
-    contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-    >;
+    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
   }>;
 };
 
@@ -7250,11 +7261,10 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
   id: string;
   status: PetitionSignatureRequestStatus;
-  signerStatus: Array<{
-    __typename?: "PetitionSignatureRequestSignerStatus";
-    status: string;
-    contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
-  }>;
+  signatureConfig: {
+    __typename?: "SignatureConfig";
+    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+  };
 };
 
 export type PetitionRepliesField_PetitionFieldFragment = {
@@ -7426,8 +7436,12 @@ export type PetitionSignaturesCard_PetitionFragment = {
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
-        contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+        signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
       }>;
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+      };
     }>
   >;
   signatureConfig?: Maybe<{
@@ -7437,15 +7451,14 @@ export type PetitionSignaturesCard_PetitionFragment = {
     review: boolean;
     letRecipientsChooseSigners: boolean;
     timezone: string;
-    contacts: Array<
-      Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-        hasBouncedEmail: boolean;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: Maybe<string>;
+      firstName: string;
+      lastName: string;
+      email: string;
+      fullName: string;
+    }>;
   }>;
 };
 
@@ -7469,13 +7482,12 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             signerStatus: Array<{
               __typename?: "PetitionSignatureRequestSignerStatus";
               status: string;
-              contact: {
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              };
+              signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
             }>;
+            signatureConfig: {
+              __typename?: "SignatureConfig";
+              signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+            };
           }>
         >;
         signatureConfig?: Maybe<{
@@ -7485,15 +7497,14 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           review: boolean;
           letRecipientsChooseSigners: boolean;
           timezone: string;
-          contacts: Array<
-            Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-              hasBouncedEmail: boolean;
-            }>
-          >;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: Maybe<string>;
+            firstName: string;
+            lastName: string;
+            email: string;
+            fullName: string;
+          }>;
         }>;
       }
     | { __typename?: "PetitionTemplate" };
@@ -7560,6 +7571,14 @@ export type PublicTemplateCard_LandingTemplateFragment = {
   backgroundColor?: Maybe<string>;
   ownerFullName: string;
   organizationName: string;
+};
+
+export type useCompleteSignerInfoDialog_PetitionSignerFragment = {
+  __typename?: "PetitionSigner";
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
 };
 
 export type useCompleteSignerInfoDialog_PublicContactFragment = {
@@ -7677,7 +7696,7 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
       content: { [key: string]: any };
     }>;
   }>;
-  signature?: Maybe<{ __typename?: "PublicSignatureConfig"; review: boolean }>;
+  signatureConfig?: Maybe<{ __typename?: "PublicSignatureConfig"; review: boolean }>;
 };
 
 export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
@@ -9693,12 +9712,7 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "RecipientSignedEvent";
           id: string;
           createdAt: string;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
         }
       | {
           __typename?: "ReminderSentEvent";
@@ -9808,12 +9822,7 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: Maybe<string>;
             status: UserStatus;
           }>;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
       | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
@@ -9887,9 +9896,7 @@ export type PetitionActivity_PetitionFragment = {
   >;
   signatureConfig?: Maybe<{
     __typename?: "SignatureConfig";
-    contacts: Array<
-      Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-    >;
+    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
   }>;
   remindersConfig?: Maybe<{
     __typename?: "RemindersConfig";
@@ -10387,12 +10394,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "RecipientSignedEvent";
                 id: string;
                 createdAt: string;
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
               }
             | {
                 __typename?: "ReminderSentEvent";
@@ -10517,11 +10519,10 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: Maybe<string>;
                   status: UserStatus;
                 }>;
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
+                canceller?: Maybe<{
+                  __typename?: "PetitionSigner";
                   email: string;
+                  fullName: string;
                 }>;
               }
             | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
@@ -10596,9 +10597,7 @@ export type PetitionActivity_updatePetitionMutation = {
         >;
         signatureConfig?: Maybe<{
           __typename?: "SignatureConfig";
-          contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-          >;
+          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
         }>;
         remindersConfig?: Maybe<{
           __typename?: "RemindersConfig";
@@ -11147,12 +11146,7 @@ export type PetitionActivityQuery = {
                 __typename?: "RecipientSignedEvent";
                 id: string;
                 createdAt: string;
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
               }
             | {
                 __typename?: "ReminderSentEvent";
@@ -11277,11 +11271,10 @@ export type PetitionActivityQuery = {
                   fullName?: Maybe<string>;
                   status: UserStatus;
                 }>;
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
+                canceller?: Maybe<{
+                  __typename?: "PetitionSigner";
                   email: string;
+                  fullName: string;
                 }>;
               }
             | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
@@ -11356,9 +11349,7 @@ export type PetitionActivityQuery = {
         >;
         signatureConfig?: Maybe<{
           __typename?: "SignatureConfig";
-          contacts: Array<
-            Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-          >;
+          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
         }>;
         remindersConfig?: Maybe<{
           __typename?: "RemindersConfig";
@@ -11466,15 +11457,14 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     title: string;
     review: boolean;
     letRecipientsChooseSigners: boolean;
-    contacts: Array<
-      Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-        hasBouncedEmail: boolean;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: Maybe<string>;
+      firstName: string;
+      lastName: string;
+      email: string;
+      fullName: string;
+    }>;
   }>;
   remindersConfig?: Maybe<{
     __typename?: "RemindersConfig";
@@ -11575,15 +11565,13 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     review: boolean;
     letRecipientsChooseSigners: boolean;
-    contacts: Array<
-      Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-        hasBouncedEmail: boolean;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: Maybe<string>;
+      firstName: string;
+      lastName: string;
+      email: string;
+    }>;
   }>;
 };
 
@@ -11704,15 +11692,14 @@ export type PetitionCompose_updatePetitionMutation = {
           title: string;
           review: boolean;
           letRecipientsChooseSigners: boolean;
-          contacts: Array<
-            Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-              hasBouncedEmail: boolean;
-            }>
-          >;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: Maybe<string>;
+            firstName: string;
+            lastName: string;
+            email: string;
+            fullName: string;
+          }>;
         }>;
         remindersConfig?: Maybe<{
           __typename?: "RemindersConfig";
@@ -11768,15 +11755,13 @@ export type PetitionCompose_updatePetitionMutation = {
           title: string;
           review: boolean;
           letRecipientsChooseSigners: boolean;
-          contacts: Array<
-            Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-              hasBouncedEmail: boolean;
-            }>
-          >;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: Maybe<string>;
+            firstName: string;
+            lastName: string;
+            email: string;
+          }>;
         }>;
       };
 };
@@ -12312,15 +12297,14 @@ export type PetitionComposeQuery = {
           title: string;
           review: boolean;
           letRecipientsChooseSigners: boolean;
-          contacts: Array<
-            Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-              hasBouncedEmail: boolean;
-            }>
-          >;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: Maybe<string>;
+            firstName: string;
+            lastName: string;
+            email: string;
+            fullName: string;
+          }>;
         }>;
         remindersConfig?: Maybe<{
           __typename?: "RemindersConfig";
@@ -12424,15 +12408,13 @@ export type PetitionComposeQuery = {
           title: string;
           review: boolean;
           letRecipientsChooseSigners: boolean;
-          contacts: Array<
-            Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-              hasBouncedEmail: boolean;
-            }>
-          >;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: Maybe<string>;
+            firstName: string;
+            lastName: string;
+            email: string;
+          }>;
         }>;
       }
   >;
@@ -12537,8 +12519,12 @@ export type PetitionReplies_PetitionFragment = {
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
-        contact: { __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string };
+        signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
       }>;
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+      };
     }>
   >;
   signatureConfig?: Maybe<{
@@ -12548,15 +12534,14 @@ export type PetitionReplies_PetitionFragment = {
     title: string;
     letRecipientsChooseSigners: boolean;
     timezone: string;
-    contacts: Array<
-      Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-        hasBouncedEmail: boolean;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: Maybe<string>;
+      firstName: string;
+      lastName: string;
+      email: string;
+      fullName: string;
+    }>;
   }>;
   myEffectivePermission?: Maybe<{
     __typename?: "EffectivePetitionUserPermission";
@@ -13006,13 +12991,12 @@ export type PetitionRepliesQuery = {
             signerStatus: Array<{
               __typename?: "PetitionSignatureRequestSignerStatus";
               status: string;
-              contact: {
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              };
+              signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
             }>;
+            signatureConfig: {
+              __typename?: "SignatureConfig";
+              signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+            };
           }>
         >;
         signatureConfig?: Maybe<{
@@ -13022,15 +13006,14 @@ export type PetitionRepliesQuery = {
           title: string;
           letRecipientsChooseSigners: boolean;
           timezone: string;
-          contacts: Array<
-            Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-              hasBouncedEmail: boolean;
-            }>
-          >;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: Maybe<string>;
+            firstName: string;
+            lastName: string;
+            email: string;
+            fullName: string;
+          }>;
         }>;
         myEffectivePermission?: Maybe<{
           __typename?: "EffectivePetitionUserPermission";
@@ -13831,30 +13814,24 @@ export type RecipientView_PublicPetitionAccessFragment = {
         };
       }>;
     }>;
-    signature?: Maybe<{
+    signatureConfig?: Maybe<{
       __typename?: "PublicSignatureConfig";
       review: boolean;
       letRecipientsChooseSigners: boolean;
-      signers: Array<
-        Maybe<{
-          __typename?: "PublicContact";
-          id: string;
-          fullName?: Maybe<string>;
-          firstName?: Maybe<string>;
-          lastName?: Maybe<string>;
-          email: string;
-        }>
-      >;
-      additionalSigners: Array<
-        Maybe<{
-          __typename?: "PublicContact";
-          id: string;
-          fullName?: Maybe<string>;
-          firstName?: Maybe<string>;
-          lastName?: Maybe<string>;
-          email: string;
-        }>
-      >;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        fullName: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+      }>;
+      additionalSigners: Array<{
+        __typename?: "PetitionSigner";
+        firstName: string;
+        lastName: string;
+        fullName: string;
+        email: string;
+      }>;
     }>;
     recipients: Array<{
       __typename?: "PublicContact";
@@ -13932,30 +13909,24 @@ export type RecipientView_PublicPetitionFragment = {
       };
     }>;
   }>;
-  signature?: Maybe<{
+  signatureConfig?: Maybe<{
     __typename?: "PublicSignatureConfig";
     review: boolean;
     letRecipientsChooseSigners: boolean;
-    signers: Array<
-      Maybe<{
-        __typename?: "PublicContact";
-        id: string;
-        fullName?: Maybe<string>;
-        firstName?: Maybe<string>;
-        lastName?: Maybe<string>;
-        email: string;
-      }>
-    >;
-    additionalSigners: Array<
-      Maybe<{
-        __typename?: "PublicContact";
-        id: string;
-        fullName?: Maybe<string>;
-        firstName?: Maybe<string>;
-        lastName?: Maybe<string>;
-        email: string;
-      }>
-    >;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      fullName: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+    }>;
+    additionalSigners: Array<{
+      __typename?: "PetitionSigner";
+      firstName: string;
+      lastName: string;
+      fullName: string;
+      email: string;
+    }>;
   }>;
   recipients: Array<{
     __typename?: "PublicContact";
@@ -13964,15 +13935,6 @@ export type RecipientView_PublicPetitionFragment = {
     firstName?: Maybe<string>;
     email: string;
   }>;
-};
-
-export type RecipientView_PublicContactFragment = {
-  __typename?: "PublicContact";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
 };
 
 export type RecipientView_PublicPetitionFieldFragment = {
@@ -14069,30 +14031,24 @@ export type RecipientView_publicCompletePetitionMutation = {
         };
       }>;
     }>;
-    signature?: Maybe<{
+    signatureConfig?: Maybe<{
       __typename?: "PublicSignatureConfig";
       review: boolean;
       letRecipientsChooseSigners: boolean;
-      signers: Array<
-        Maybe<{
-          __typename?: "PublicContact";
-          id: string;
-          fullName?: Maybe<string>;
-          firstName?: Maybe<string>;
-          lastName?: Maybe<string>;
-          email: string;
-        }>
-      >;
-      additionalSigners: Array<
-        Maybe<{
-          __typename?: "PublicContact";
-          id: string;
-          fullName?: Maybe<string>;
-          firstName?: Maybe<string>;
-          lastName?: Maybe<string>;
-          email: string;
-        }>
-      >;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        fullName: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+      }>;
+      additionalSigners: Array<{
+        __typename?: "PetitionSigner";
+        firstName: string;
+        lastName: string;
+        fullName: string;
+        email: string;
+      }>;
     }>;
     recipients: Array<{
       __typename?: "PublicContact";
@@ -14154,30 +14110,24 @@ export type PublicPetitionQuery = {
           };
         }>;
       }>;
-      signature?: Maybe<{
+      signatureConfig?: Maybe<{
         __typename?: "PublicSignatureConfig";
         review: boolean;
         letRecipientsChooseSigners: boolean;
-        signers: Array<
-          Maybe<{
-            __typename?: "PublicContact";
-            id: string;
-            fullName?: Maybe<string>;
-            firstName?: Maybe<string>;
-            lastName?: Maybe<string>;
-            email: string;
-          }>
-        >;
-        additionalSigners: Array<
-          Maybe<{
-            __typename?: "PublicContact";
-            id: string;
-            fullName?: Maybe<string>;
-            firstName?: Maybe<string>;
-            lastName?: Maybe<string>;
-            email: string;
-          }>
-        >;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          fullName: string;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }>;
+        additionalSigners: Array<{
+          __typename?: "PetitionSigner";
+          firstName: string;
+          lastName: string;
+          fullName: string;
+          email: string;
+        }>;
       }>;
       recipients: Array<{
         __typename?: "PublicContact";
@@ -14373,9 +14323,7 @@ export type PetitionPdf_PetitionFragment = {
     signatureConfig: {
       __typename?: "SignatureConfig";
       timezone: string;
-      contacts: Array<
-        Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-      >;
+      signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
     };
   }>;
 };
@@ -14427,9 +14375,7 @@ export type PdfViewPetitionQuery = {
       signatureConfig: {
         __typename?: "SignatureConfig";
         timezone: string;
-        contacts: Array<
-          Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>
-        >;
+        signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
       };
     }>;
   }>;
@@ -14882,6 +14828,8 @@ export type PetitionComposeSearchContactsQuery = {
     items: Array<{
       __typename?: "Contact";
       id: string;
+      firstName?: Maybe<string>;
+      lastName?: Maybe<string>;
       fullName?: Maybe<string>;
       email: string;
       hasBouncedEmail: boolean;
@@ -14911,6 +14859,22 @@ export const ContactListPopover_PublicContactFragmentDoc = gql`
     id
     email
     fullName
+  }
+`;
+export const ContactListPopover_PetitionSignerFragmentDoc = gql`
+  fragment ContactListPopover_PetitionSigner on PetitionSigner {
+    email
+    fullName
+  }
+`;
+export const ContactSelect_ContactFragmentDoc = gql`
+  fragment ContactSelect_Contact on Contact {
+    id
+    firstName
+    lastName
+    fullName
+    email
+    hasBouncedEmail
   }
 `;
 export const Tag_TagFragmentDoc = gql`
@@ -16216,20 +16180,26 @@ export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc 
     createdAt
   }
 `;
+export const SignerReference_PetitionSignerFragmentDoc = gql`
+  fragment SignerReference_PetitionSigner on PetitionSigner {
+    email
+    fullName
+  }
+`;
 export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc = gql`
   fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
     user {
       ...UserReference_User
     }
-    contact {
-      ...ContactReference_Contact
+    canceller {
+      ...SignerReference_PetitionSigner
     }
     cancelType
     cancellerReason
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
+  ${SignerReference_PetitionSignerFragmentDoc}
 `;
 export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
   fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
@@ -16320,12 +16290,12 @@ export const TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetit
 `;
 export const TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc = gql`
   fragment TimelineRecipientSignedEvent_RecipientSignedEvent on RecipientSignedEvent {
-    contact {
-      ...ContactReference_Contact
+    signer {
+      ...SignerReference_PetitionSigner
     }
     createdAt
   }
-  ${ContactReference_ContactFragmentDoc}
+  ${SignerReference_PetitionSignerFragmentDoc}
 `;
 export const TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc = gql`
   fragment TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent on PetitionMessageBouncedEvent {
@@ -16526,11 +16496,10 @@ export const ShareButton_PetitionBaseFragmentDoc = gql`
     }
   }
 `;
-export const CopySignatureConfigDialog_ContactFragmentDoc = gql`
-  fragment CopySignatureConfigDialog_Contact on Contact {
-    id
-    fullName
+export const CopySignatureConfigDialog_PetitionSignerFragmentDoc = gql`
+  fragment CopySignatureConfigDialog_PetitionSigner on PetitionSigner {
     email
+    fullName
   }
 `;
 export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
@@ -16538,8 +16507,8 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
     emailSubject
     emailBody
     signatureConfig {
-      contacts {
-        ...CopySignatureConfigDialog_Contact
+      signers {
+        ...CopySignatureConfigDialog_PetitionSigner
       }
     }
     remindersConfig {
@@ -16558,7 +16527,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       }
     }
   }
-  ${CopySignatureConfigDialog_ContactFragmentDoc}
+  ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
 `;
 export const PetitionActivity_PetitionFragmentDoc = gql`
   fragment PetitionActivity_Petition on Petition {
@@ -16612,21 +16581,16 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
     isReadOnly
   }
 `;
-export const ContactSelect_ContactFragmentDoc = gql`
-  fragment ContactSelect_Contact on Contact {
-    id
-    fullName
-    email
-    hasBouncedEmail
-  }
-`;
 export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
   fragment SignatureConfigDialog_PetitionBase on PetitionBase {
     name
     signatureConfig {
       provider
-      contacts {
-        ...ContactSelect_Contact
+      signers {
+        contactId
+        firstName
+        lastName
+        email
       }
       title
       review
@@ -16636,7 +16600,6 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
       status
     }
   }
-  ${ContactSelect_ContactFragmentDoc}
 `;
 export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
   fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
@@ -16948,8 +16911,8 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   fragment NewSignatureRequestRow_Petition on Petition {
     status
     signatureConfig {
-      contacts {
-        ...ContactReference_Contact
+      signers {
+        ...SignerReference_PetitionSigner
       }
       letRecipientsChooseSigners
       provider
@@ -16958,33 +16921,32 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
       title
     }
   }
-  ${ContactReference_ContactFragmentDoc}
+  ${SignerReference_PetitionSignerFragmentDoc}
 `;
 export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gql`
   fragment CurrentSignatureRequestRow_PetitionSignatureRequest on PetitionSignatureRequest {
     id
     status
     signerStatus {
-      contact {
-        ...ContactReference_Contact
+      signer {
+        ...SignerReference_PetitionSigner
       }
       status
     }
   }
-  ${ContactReference_ContactFragmentDoc}
+  ${SignerReference_PetitionSignerFragmentDoc}
 `;
 export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql`
   fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
     id
     status
-    signerStatus {
-      contact {
-        ...ContactReference_Contact
+    signatureConfig {
+      signers {
+        ...SignerReference_PetitionSigner
       }
-      status
     }
   }
-  ${ContactReference_ContactFragmentDoc}
+  ${SignerReference_PetitionSignerFragmentDoc}
 `;
 export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   fragment PetitionSignaturesCard_Petition on Petition {
@@ -17347,12 +17309,11 @@ export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
   ${RecipientViewContentsCard_PublicPetitionFieldFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
 `;
-export const RecipientView_PublicContactFragmentDoc = gql`
-  fragment RecipientView_PublicContact on PublicContact {
-    id
-    fullName
+export const useCompleteSignerInfoDialog_PetitionSignerFragmentDoc = gql`
+  fragment useCompleteSignerInfoDialog_PetitionSigner on PetitionSigner {
     firstName
     lastName
+    fullName
     email
   }
 `;
@@ -17379,7 +17340,7 @@ export const RecipientViewProgressFooter_PublicPetitionFragmentDoc = gql`
     fields {
       ...RecipientViewProgressFooter_PublicPetitionField
     }
-    signature {
+    signatureConfig {
       review
     }
   }
@@ -17396,14 +17357,15 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     fields {
       ...RecipientView_PublicPetitionField
     }
-    signature {
+    signatureConfig {
       review
       letRecipientsChooseSigners
       signers {
-        ...RecipientView_PublicContact
+        fullName
+        ...useCompleteSignerInfoDialog_PetitionSigner
       }
       additionalSigners {
-        ...RecipientView_PublicContact
+        ...useCompleteSignerInfoDialog_PetitionSigner
       }
     }
     recipients {
@@ -17414,7 +17376,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     ...RecipientViewProgressFooter_PublicPetition
   }
   ${RecipientView_PublicPetitionFieldFragmentDoc}
-  ${RecipientView_PublicContactFragmentDoc}
+  ${useCompleteSignerInfoDialog_PetitionSignerFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
@@ -17561,8 +17523,7 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
     fromTemplateId
     currentSignatureRequest(token: $token) {
       signatureConfig {
-        contacts {
-          id
+        signers {
           fullName
           email
         }
