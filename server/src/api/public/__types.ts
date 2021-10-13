@@ -1343,8 +1343,6 @@ export type Petition = PetitionBase & {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
-  /** The prefered tone of organization. */
-  preferedTone: Tone;
   /** The progress of the petition. */
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
@@ -1363,6 +1361,8 @@ export type Petition = PetitionBase & {
   subscriptions: Array<Subscription>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
+  /** The prefered tone of organization. */
+  tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -1465,14 +1465,14 @@ export type PetitionBase = {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
-  /** The prefered tone of organization. */
-  preferedTone: Tone;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
+  /** The prefered tone of organization. */
+  tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -1873,8 +1873,6 @@ export type PetitionTemplate = PetitionBase & {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
-  /** The prefered tone of organization. */
-  preferedTone: Tone;
   /** The public link linked to this template */
   publicLink: Maybe<PublicPetitionLink>;
   /** The signature configuration for the petition. */
@@ -1883,6 +1881,8 @@ export type PetitionTemplate = PetitionBase & {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
+  /** The prefered tone of organization. */
+  tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -1962,7 +1962,7 @@ export type PublicAccessVerification = {
   isAllowed: Scalars["Boolean"];
   orgLogoUrl: Maybe<Scalars["String"]>;
   orgName: Maybe<Scalars["String"]>;
-  preferedTone: Maybe<Tone>;
+  tone: Maybe<Tone>;
 };
 
 /** A public view of a contact */
@@ -2008,8 +2008,6 @@ export type PublicPetition = Timestamps & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The prefered tone of organization. */
-  preferedTone: Tone;
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
@@ -2017,6 +2015,8 @@ export type PublicPetition = Timestamps & {
   signatureStatus: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
+  /** The prefered tone of organization. */
+  tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
