@@ -2,16 +2,18 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage } from "react-intl";
 import { Email } from "../buildEmail";
-import { Closing } from "../common/Closing";
-import { GreetingFormal } from "../common/Greeting";
+import { ClosingParallelTeam } from "../common/ClosingParallelTeam";
+import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greetingFormal } from "../common/texts";
+import { closing, greetingContact } from "../common/texts";
 
 export type ContactAuthenticationRequest = {
+  name: string | null;
   fullName: string | null;
   browserName: string;
   osName: string;
   code: string;
+  tone: string;
 } & LayoutProps;
 
 const email: Email<ContactAuthenticationRequest> = {
@@ -21,22 +23,25 @@ const email: Email<ContactAuthenticationRequest> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ code }, intl) {
+  subject({ code, tone }, intl) {
     return intl.formatMessage(
       {
         id: "verification-code-request.subject",
         defaultMessage: "{code} is your verification code on Parallel",
       },
-      { code }
+      { code, tone }
     );
   },
-  text({ fullName, code, browserName, osName }, intl) {
+  text({ name, fullName, code, browserName, osName, tone }, intl) {
     return outdent`
-      ${greetingFormal({ fullName }, intl)}
-      ${intl.formatMessage({
-        id: "verification-code-request.instructions",
-        defaultMessage: "Please use the following verification code on the unrecognized device.",
-      })}
+      ${greetingContact({ name, fullName, tone }, intl)}
+      ${intl.formatMessage(
+        {
+          id: "verification-code-request.instructions",
+          defaultMessage: "Please use the following verification code on the unrecognized device.",
+        },
+        { tone }
+      )}
 
       ${intl.formatMessage({
         id: "verification-code-request.device-label",
@@ -53,16 +58,20 @@ const email: Email<ContactAuthenticationRequest> = {
         defaultMessage: "Verification code:",
       })} ${code}
 
-      ${intl.formatMessage({
-        id: "verification-code-request.expiry",
-        defaultMessage:
-          "This verification code will expire in 30 minutes, please make sure you use it as soon as possible.",
-      })}
+      ${intl.formatMessage(
+        {
+          id: "verification-code-request.expiry",
+          defaultMessage:
+            "This verification code will expire in 30 minutes, please make sure you use it as soon as possible.",
+        },
+        { tone }
+      )}
       
       ${closing({}, intl)}
     `;
   },
   html({
+    name,
     fullName,
     browserName,
     osName,
@@ -71,6 +80,7 @@ const email: Email<ContactAuthenticationRequest> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    tone,
   }: ContactAuthenticationRequest) {
     return (
       <Layout
@@ -79,14 +89,16 @@ const email: Email<ContactAuthenticationRequest> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingFormal fullName={fullName} />
+            <GreetingContact name={name} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="verification-code-request.instructions"
                 defaultMessage="Please use the following verification code on the unrecognized device."
+                values={{ tone }}
               />
             </MjmlText>
           </MjmlColumn>
@@ -115,9 +127,10 @@ const email: Email<ContactAuthenticationRequest> = {
               <FormattedMessage
                 id="verification-code-request.expiry"
                 defaultMessage="This verification code will expire in 30 minutes, please make sure you use it as soon as possible."
+                values={{ tone }}
               />
             </MjmlText>
-            <Closing />
+            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

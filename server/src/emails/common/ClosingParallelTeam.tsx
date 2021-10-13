@@ -1,7 +1,7 @@
 import { MjmlText } from "mjml-react";
 import { FormattedMessage } from "react-intl";
 
-export function Closing() {
+export function ClosingParallelTeam() {
   return (
     <>
       <MjmlText>

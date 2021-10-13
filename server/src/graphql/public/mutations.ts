@@ -63,6 +63,9 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       t.nullable.string("email");
       t.nullable.string("orgLogoUrl");
       t.nullable.string("orgName");
+      t.nullable.field("preferedTone", {
+        type: "OrgPreferedTone",
+      });
     },
   }),
   authorize: chain(checkClientServerToken("token"), fetchPetitionAccess("keycode")),
@@ -114,6 +117,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
           email: anonymizeEmail(ctx.contact!.email),
           orgName: org!.name,
           orgLogoUrl: logoUrl,
+          preferedTone: org!.prefered_tone,
         };
       }
     } else {

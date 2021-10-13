@@ -1,12 +1,14 @@
+import { OrgPreferedTone } from "@parallel/graphql/__types";
 import { createContext, ReactNode, useContext } from "react";
 
-type ToneProviderProps = { children: ReactNode };
-type ToneType = "formal" | "informal";
+type ToneProviderProps = {
+  value?: OrgPreferedTone;
+  children: ReactNode;
+};
 
-const ToneStateContext = createContext<{ tone: ToneType } | undefined>(undefined);
+const ToneStateContext = createContext<OrgPreferedTone | undefined>(undefined);
 
-function ToneProvider({ children }: ToneProviderProps) {
-  const value = { tone: "informal" as ToneType };
+function ToneProvider({ value = "FORMAL", children }: ToneProviderProps) {
   return <ToneStateContext.Provider value={value}>{children}</ToneStateContext.Provider>;
 }
 

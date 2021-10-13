@@ -3,10 +3,10 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Closing } from "../common/Closing";
-import { Greeting } from "../common/Greeting";
+import { ClosingParallelTeam } from "../common/ClosingParallelTeam";
+import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greeting } from "../common/texts";
+import { closing, greetingUser } from "../common/texts";
 
 export type PetitionCompletedProps = {
   isSigned: boolean;
@@ -46,7 +46,7 @@ const email: Email<PetitionCompletedProps> = {
     intl: IntlShape
   ) {
     return outdent`
-      ${greeting({ name: userName }, intl)}
+      ${greetingUser({ name: userName }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-completed.text",
@@ -90,7 +90,7 @@ const email: Email<PetitionCompletedProps> = {
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0">
           <MjmlColumn>
-            <Greeting name={userName} />
+            <GreetingUser name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-completed.text"
@@ -126,7 +126,7 @@ const email: Email<PetitionCompletedProps> = {
             <AccessInfoButton
               href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
             />
-            <Closing />
+            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

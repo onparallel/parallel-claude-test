@@ -4,16 +4,18 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Maybe } from "../../util/types";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
-import { GreetingFormal } from "../common/Greeting";
+import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { greetingFormal } from "../common/texts";
+import { greetingContact } from "../common/texts";
 
 export type PublicPetitionLinkAccessProps = {
   emailSubject: Maybe<string>;
+  name: string | null;
   fullName: string | null;
   senderName: string;
   petitionTitle: string;
   keycode: string;
+  tone: string;
 } & LayoutProps;
 
 const email: Email<PublicPetitionLinkAccessProps> = {
@@ -29,10 +31,10 @@ const email: Email<PublicPetitionLinkAccessProps> = {
   subject({ emailSubject, petitionTitle }) {
     return emailSubject || petitionTitle;
   },
-  text({ fullName, petitionTitle, keycode, parallelUrl }, intl) {
+  text({ name, fullName, petitionTitle, keycode, parallelUrl, tone }, intl) {
     return outdent`
-      ${greetingFormal({ fullName }, intl)}
-
+      ${greetingContact({ name, fullName, tone }, intl)}
+      
       ${intl.formatMessage(
         {
           id: "public-petition-link.text-1",
@@ -41,17 +43,23 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         { petitionTitle }
       )}
 
-      ${intl.formatMessage({
-        id: "public-petition-link.text-2",
-        defaultMessage:
-          "The information will be automatically saved on the platform, and you can continue the process later through the same link.",
-      })}
+      ${intl.formatMessage(
+        {
+          id: "public-petition-link.text-2",
+          defaultMessage:
+            "The information will be automatically saved on the platform, and you can continue the process later through the same link.",
+        },
+        { tone }
+      )}
 
-      ${intl.formatMessage({
-        id: "public-petition-link.text-3",
-        defaultMessage:
-          "If you have any questions or comments you can contact us in the designated spaces on the platform.",
-      })}
+      ${intl.formatMessage(
+        {
+          id: "public-petition-link.text-3",
+          defaultMessage:
+            "If you have any questions or comments you can contact us in the designated spaces on the platform.",
+        },
+        { tone }
+      )}
 
       ${intl.formatMessage({
         id: "generic.complete-information-click-link",
@@ -62,6 +70,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
     `;
   },
   html({
+    name,
     fullName,
     petitionTitle,
     keycode,
@@ -69,6 +78,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    tone,
   }: PublicPetitionLinkAccessProps) {
     const { locale } = useIntl();
     return (
@@ -78,27 +88,30 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingFormal fullName={fullName} />
+            <GreetingContact name={name} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="public-petition-link.text-1"
                 defaultMessage="We send you the requested access to {petitionTitle}."
-                values={{ petitionTitle: <b>{petitionTitle}</b> }}
+                values={{ petitionTitle: <b>{petitionTitle}</b>, tone }}
               />
             </MjmlText>
             <MjmlText>
               <FormattedMessage
                 id="public-petition-link.text-2"
                 defaultMessage="The information will be automatically saved on the platform, and you can continue the process later through the same link."
+                values={{ tone }}
               />
             </MjmlText>
             <MjmlText>
               <FormattedMessage
                 id="public-petition-link.text-3"
                 defaultMessage="If you have any questions or comments you can contact us in the designated spaces on the platform."
+                values={{ tone }}
               />
             </MjmlText>
           </MjmlColumn>
@@ -106,7 +119,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
 
         <MjmlSection>
           <MjmlColumn>
-            <CompleteInfoButton href={`${parallelUrl}/${locale}/petition/${keycode}`} />
+            <CompleteInfoButton tone={tone} href={`${parallelUrl}/${locale}/petition/${keycode}`} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

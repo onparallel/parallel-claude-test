@@ -1,4 +1,5 @@
-import { injectable, inject } from "inversify";
+import { EventEmitter } from "events";
+import { inject, injectable } from "inversify";
 import "reflect-metadata";
 import SignaturitSDK, {
   BrandingParams,
@@ -6,23 +7,22 @@ import SignaturitSDK, {
   Document,
   SignatureParams,
 } from "signaturit-sdk";
+import { URLSearchParams } from "url";
 import {
   IntegrationRepository,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
+import { OrgIntegration } from "../db/__types";
+import { buildEmail } from "../emails/buildEmail";
+import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmail";
+import SignatureCompletedEmail from "../emails/components/SignatureCompletedEmail";
+import SignatureReminderEmail from "../emails/components/SignatureReminderEmail";
+import SignatureRequestedEmail from "../emails/components/SignatureRequestedEmail";
+import { toGlobalId } from "../util/globalId";
+import { downloadImageBase64 } from "../util/images";
+import { removeNotDefined } from "../util/remedaExtensions";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
-import { removeNotDefined } from "../util/remedaExtensions";
-import { EventEmitter } from "events";
-import { buildEmail } from "../emails/buildEmail";
-import SignatureRequestedEmail from "../emails/components/SignatureRequestedEmail";
-import SignatureCompletedEmail from "../emails/components/SignatureCompletedEmail";
-import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmail";
-import SignatureReminderEmail from "../emails/components/SignatureReminderEmail";
-import { OrgIntegration } from "../db/__types";
-import { downloadImageBase64 } from "../util/images";
-import { toGlobalId } from "../util/globalId";
-import { URLSearchParams } from "url";
 
 type SignerBox = {
   email?: string;
@@ -226,8 +226,10 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signButton: "{{sign_button}}",
           signerName: "{{signer_name}}",
+          signerFullName: "{{signer_full_name}}",
           documentName: "{{filename}}",
           emailBody: "{{email_body}}",
+          tone: "{{tone}}",
           ...opts.templateData,
         },
         { locale: opts.locale }
@@ -237,7 +239,9 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
+          signerFullName: "{{signer_full_name}}",
           documentName: "{{filename}}",
+          tone: "{{tone}}",
           ...opts.templateData,
         },
         { locale: opts.locale }
@@ -247,6 +251,8 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
+          signerFullName: "{{signer_full_name}}",
+          tone: "{{tone}}",
           ...opts.templateData,
         },
         { locale: opts.locale }
@@ -256,7 +262,9 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           documentName: "{{filename}}",
           signerName: "{{signer_name}}",
+          signerFullName: "{{signer_full_name}}",
           signButton: "{{sign_button}}",
+          tone: "{{tone}}",
           ...opts.templateData,
         },
         { locale: opts.locale }

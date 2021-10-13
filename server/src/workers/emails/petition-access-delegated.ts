@@ -54,6 +54,8 @@ export async function petitionAccessDelegated(
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
+  const organization = await context.organizations.loadOrg(petition.org_id);
+
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
     {
@@ -66,6 +68,7 @@ export async function petitionAccessDelegated(
       bodyPlainText: toPlainText(payload.message_body),
       emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
+      tone: organization?.prefered_tone ?? "FORMAL",
       ...layoutProps,
     },
     { locale: petition.locale }

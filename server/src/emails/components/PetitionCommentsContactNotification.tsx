@@ -3,19 +3,21 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { GreetingFormal } from "../common/Greeting";
+import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import {
   PetitionFieldAndComments,
   PetitionFieldAndCommentsProps,
 } from "../common/PetitionFieldAndCommentsList";
-import { closing, greetingFormal } from "../common/texts";
+import { closing, greetingContact } from "../common/texts";
 
 export type PetitionCommentsContactNotificationProps = {
   contactFullName: string;
+  contactName: string;
   keycode: string;
   emailSubject: string | null;
   fields: PetitionFieldAndCommentsProps["fields"];
+  tone: string;
 } & LayoutProps;
 
 const email: Email<PetitionCommentsContactNotificationProps> = {
@@ -25,28 +27,31 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ emailSubject }, intl: IntlShape) {
+  subject({ emailSubject, tone }, intl: IntlShape) {
     return intl.formatMessage(
       {
         id: "petition-comments-contact-notification.subject",
         defaultMessage: "New comments on {subject, select, null{your petition} other{{subject}}}",
       },
-      { subject: emailSubject }
+      { subject: emailSubject, tone }
     );
   },
   text(
     {
       fields,
-      contactFullName,
+      contactName: name,
+      contactFullName: fullName,
       keycode,
       parallelUrl,
       emailSubject,
+      tone,
     }: PetitionCommentsContactNotificationProps,
     intl: IntlShape
   ) {
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
     return outdent`
-      ${greetingFormal({ fullName: contactFullName }, intl)}
+      ${greetingContact({ name, fullName, tone }, intl)}
+
       ${intl.formatMessage(
         {
           id: "petition-comments-contact-notification.intro-text",
@@ -66,7 +71,8 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     `;
   },
   html({
-    contactFullName,
+    contactName: name,
+    contactFullName: fullName,
     keycode,
     fields,
     parallelUrl,
@@ -74,6 +80,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     logoUrl,
     logoAlt,
     emailSubject,
+    tone,
   }: PetitionCommentsContactNotificationProps) {
     const { locale } = useIntl();
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
@@ -85,10 +92,12 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingFormal fullName={contactFullName} />
+            <GreetingContact name={name} fullName={fullName} tone={tone} />
+
             <MjmlText>
               <FormattedMessage
                 id="petition-comments-contact-notification.intro-text"
@@ -96,6 +105,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
                 values={{
                   count: commentCount,
                   subject: emailSubject ? <b>{emailSubject}</b> : null,
+                  tone,
                 }}
               />
             </MjmlText>
@@ -114,6 +124,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
               <FormattedMessage
                 id="petition-comments-contact-notification.access-button"
                 defaultMessage="Reply to the comments"
+                values={{ tone }}
               />
             </Button>
           </MjmlColumn>

@@ -145,24 +145,29 @@ function SettingsLayoutMenuItem({ path, children }: SettingsLayoutMenuItemProps)
     <NakedLink href={path}>
       <Box
         as="a"
-        display="block"
+        display="flex"
         borderBottom="1px solid"
         borderBottomColor="gray.100"
-        backgroundColor={active ? "gray.50" : "white"}
+        borderRight="4px solid"
+        borderRightColor="transparent"
+        backgroundColor="white"
+        alignItems="center"
+        aria-current={active ? "page" : undefined}
+        _activeLink={{
+          backgroundColor: "gray.75",
+          borderRightColor: "purple.500",
+        }}
         _hover={{
           backgroundColor: "gray.50",
+          _activeLink: {
+            backgroundColor: "gray.75",
+          },
         }}
       >
-        <Flex
-          borderRight="4px solid"
-          alignItems="center"
-          borderRightColor={active ? "purple.500" : "transparent"}
-        >
-          <Box flex="1" padding={3}>
-            <Text fontSize="md">{children}</Text>
-          </Box>
-          <ChevronRightIcon boxSize="6" marginRight={2} />
-        </Flex>
+        <Box flex="1" padding={3}>
+          <Text fontSize="md">{children}</Text>
+        </Box>
+        <ChevronRightIcon boxSize="6" marginRight={2} />
       </Box>
     </NakedLink>
   );

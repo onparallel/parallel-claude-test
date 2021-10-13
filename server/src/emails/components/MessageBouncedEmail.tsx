@@ -3,10 +3,10 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Closing } from "../common/Closing";
-import { Greeting } from "../common/Greeting";
+import { ClosingParallelTeam } from "../common/ClosingParallelTeam";
+import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greeting } from "../common/texts";
+import { closing, greetingUser } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
 
 export type MessageBouncedEmailProps = {
@@ -52,7 +52,7 @@ const email: Email<MessageBouncedEmailProps> = {
         })
         .toUpperCase()}**
 
-      ${greeting({ name: senderName }, intl)}
+      ${greetingUser({ name: senderName }, intl)}
 
       ${intl.formatMessage(
         {
@@ -120,7 +120,7 @@ const email: Email<MessageBouncedEmailProps> = {
       >
         <MjmlSection padding="10px 0 0 0">
           <MjmlColumn>
-            <Greeting name={senderName} />
+            <GreetingUser name={senderName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-message-bounced.intro-text"
@@ -157,7 +157,7 @@ const email: Email<MessageBouncedEmailProps> = {
                 defaultMessage="Access the petition"
               />
             </Button>
-            <Closing />
+            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

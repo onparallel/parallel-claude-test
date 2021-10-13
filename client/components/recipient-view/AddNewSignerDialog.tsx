@@ -1,4 +1,5 @@
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { OrgPreferedTone } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
@@ -6,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
-import { useTone } from "../common/toneContext";
 
 type NewSignerInfo = {
   firstName: string;
@@ -15,8 +15,9 @@ type NewSignerInfo = {
 };
 function AddNewSignerDialog({
   emails,
+  tone,
   ...props
-}: DialogProps<{ emails: string[] }, NewSignerInfo>) {
+}: DialogProps<{ emails: string[]; tone: OrgPreferedTone }, NewSignerInfo>) {
   const intl = useIntl();
   const {
     register,
@@ -26,7 +27,6 @@ function AddNewSignerDialog({
     shouldFocusError: true,
     mode: "onSubmit",
   });
-  const { tone } = useTone();
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,

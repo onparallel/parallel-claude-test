@@ -17,6 +17,11 @@ export const OrganizationStatus = enumType({
   description: "The status of the organization.",
 });
 
+export const OrgPreferedTone = enumType({
+  name: "OrgPreferedTone",
+  members: ["FORMAL", "INFORMAL"],
+  description: "The prefered tone of organization",
+});
 export const IntegrationType = enumType({
   name: "IntegrationType",
   members: ["SIGNATURE"],
@@ -177,6 +182,13 @@ export const Organization = objectType({
             limit: organization!.usage_details.USER_LIMIT,
           },
         };
+      },
+    });
+    t.nonNull.field("preferedTone", {
+      type: "OrgPreferedTone",
+      description: "The prefered tone of organization.",
+      resolve: async (o) => {
+        return o.prefered_tone;
       },
     });
   },

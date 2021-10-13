@@ -14,7 +14,7 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { useTone } from "@parallel/components/common/toneContext";
+import { ToneProvider, useTone } from "@parallel/components/common/toneContext";
 import {
   RedirectError,
   withApolloData,
@@ -32,6 +32,7 @@ import { useRecipientViewHelpDialog } from "@parallel/components/recipient-view/
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
+  OrgPreferedTone,
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
   RecipientView_PublicPetitionFieldFragment,
@@ -70,7 +71,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const recipients = petition!.recipients;
   const message = access!.message;
 
-  const { tone } = useTone();
+  const tone = petition.preferedTone;
 
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage);
 
@@ -99,6 +100,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               keycode,
               organization: granter.organization.name,
               contact,
+              tone,
             });
           }
           await publicCompletePetition({
@@ -157,11 +159,11 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
     setSidebarTop(rect.height + 16);
   }, []);
 
-  const handleHelpClick = useHelpModal();
+  const handleHelpClick = useHelpModal({ tone });
 
   const breakpoint = "md";
   return (
-    <>
+    <ToneProvider value={tone}>
       <Head>
         {fields[0]?.type === "HEADING" && fields[0].title ? (
           <title>{fields[0].title} | Parallel</title>
@@ -205,7 +207,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                         <Text>
                           <FormattedMessage
                             id="recipient-view.petition-completed-alert-1"
-                            defaultMessage="{tone, select, informal{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+                            defaultMessage="{tone, select, INFORMAL{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
                             values={{
                               name: <b>{granter.fullName}</b>,
                               tone,
@@ -385,7 +387,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           <RecipientViewProgressFooter petition={petition} onFinalize={handleFinalize} />
         )}
       </Flex>
-    </>
+    </ToneProvider>
   );
 }
 
@@ -393,6 +395,7 @@ function ReviewBeforeSignDialog({
   granter,
   ...props
 }: DialogProps<{ granter: RecipientView_PublicUserFragment }>) {
+  const tone = useTone();
   return (
     <ConfirmDialog
       closeOnEsc={false}
@@ -409,13 +412,15 @@ function ReviewBeforeSignDialog({
           <FormattedMessage
             id="recipient-view.review-before-sign.body-1"
             defaultMessage="This petition requires an <b>eSignature</b> in order to be completed."
+            values={{ tone }}
           />
           <Spacer marginTop={2} />
           <FormattedMessage
             id="recipient-view.review-before-sign.body-2"
-            defaultMessage="We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people."
+            defaultMessage="{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
             values={{
               name: <b>{granter.fullName}</b>,
+              tone,
             }}
           />
         </>
@@ -473,6 +478,7 @@ RecipientView.fragments = {
         deadline
         hasCommentsEnabled
         isRecipientViewContentsHidden
+        preferedTone
         fields {
           ...RecipientView_PublicPetitionField
         }
@@ -565,7 +571,7 @@ function useGetPageFields(fields: RecipientView_PublicPetitionFieldFragment[], p
   }, [fields, page, visibility]);
 }
 
-function useHelpModal() {
+function useHelpModal({ tone }: { tone: OrgPreferedTone }) {
   const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
   useEffect(() => {
     showHelp();
@@ -575,14 +581,14 @@ function useHelpModal() {
     const key = "recipient-first-time-check";
     if (isLocalStorageAvailable() && !localStorage.getItem(key)) {
       try {
-        await showRecipientViewHelpDialog({});
+        await showRecipientViewHelpDialog({ tone });
         localStorage.setItem(key, "check");
       } catch {}
     }
   }
   return async function () {
     try {
-      await showRecipientViewHelpDialog({});
+      await showRecipientViewHelpDialog({ tone });
     } catch {}
   };
 }

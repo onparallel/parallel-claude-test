@@ -9,7 +9,7 @@ export interface CheckboxTypeLabelProps extends TextProps {
 export function CheckboxTypeLabel({ options, ...props }: CheckboxTypeLabelProps) {
   const { type = "UNLIMITED", min = 1, max = 1 } = options.limit ?? {};
 
-  const { tone } = useTone();
+  const tone = useTone();
 
   const getText = () => {
     switch (type) {

@@ -1,4 +1,5 @@
-import { mutationField, nonNull } from "nexus";
+import { arg, mutationField, nonNull } from "nexus";
+import { OrgPreferedTone } from "../../db/__types";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -41,6 +42,24 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     return await ctx.organizations.updateOrganization(
       args.orgId,
       { logo_public_file_id: logoFile.id },
+      `User:${ctx.user!.id}`
+    );
+  },
+});
+
+export const changeOrganizationPreferedTone = mutationField("changeOrganizationPreferedTone", {
+  description: "Changes the organization prefered tone",
+  type: "Organization",
+  args: {
+    orgId: nonNull(globalIdArg()),
+    tone: nonNull(arg({ type: "OrgPreferedTone" })),
+  },
+  authorize: authenticateAnd(contextUserIsAdmin(), contextUserBelongsToOrg("orgId")),
+  resolve: async (root, args, ctx) => {
+    const tone = (await args.tone) as OrgPreferedTone;
+    return await ctx.organizations.updateOrganization(
+      args.orgId,
+      { prefered_tone: tone },
       `User:${ctx.user!.id}`
     );
   },

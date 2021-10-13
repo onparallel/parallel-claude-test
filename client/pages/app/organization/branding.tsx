@@ -1,17 +1,20 @@
 import { gql } from "@apollo/client";
 import {
+  Box,
   Button,
   Center,
   Divider,
   Flex,
   Heading,
   Image,
-  Spinner,
-  Stack,
+  ListItem,
   Radio,
   RadioGroup,
+  SkeletonText,
+  Spinner,
+  Stack,
   Text,
-  Box,
+  UnorderedList,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -22,7 +25,9 @@ import { withAdminOrganizationRole } from "@parallel/components/common/withAdmin
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
+  OrgPreferedTone,
   useOrganizationBrandingQuery,
+  useOrganizationBranding_changeOrganizationPreferedToneMutation,
   useOrganizationBranding_updateOrgLogoMutation,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
@@ -31,7 +36,6 @@ import { useOrganizationSections } from "@parallel/utils/useOrganizationSections
 import { useRef, useState } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-
 const MAX_FILE_SIZE = 50 * 1024;
 
 function OrganizationBranding() {
@@ -47,6 +51,9 @@ function OrganizationBranding() {
   const [logoSrc, setLogoSrc] = useState<string>(
     me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`
   );
+
+  const tone = me.organization.preferedTone;
+
   const showErrorDialog = useErrorDialog();
   const [updateLogo, { loading }] = useOrganizationBranding_updateOrgLogoMutation();
   const handleLogoUpload = async (files: File[], rejected: FileRejection[]) => {
@@ -73,9 +80,16 @@ function OrganizationBranding() {
     }
   };
 
-  const [tone, setTone] = useState<string>("formal");
+  const [changePreferedTone] = useOrganizationBranding_changeOrganizationPreferedToneMutation();
 
-  const handleToneChange = () => {};
+  const handleToneChange = async (tone: OrgPreferedTone) => {
+    changePreferedTone({
+      variables: {
+        orgId: me.organization.id,
+        tone,
+      },
+    });
+  };
 
   return (
     <SettingsLayout
@@ -95,8 +109,13 @@ function OrganizationBranding() {
         </Heading>
       }
     >
-      <Box padding={6}>
-        <Stack paddingBottom={6} spacing={8} maxWidth="container.2xs" width="100%">
+      <Stack
+        padding={6}
+        flexDirection={{ base: "column", xl: "row" }}
+        gridGap={{ base: 8, xl: 16 }}
+        w="100%"
+      >
+        <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
           <Stack spacing={4}>
             <Heading as="h4" size="md" fontWeight="semibold">
               <FormattedMessage
@@ -190,57 +209,132 @@ function OrganizationBranding() {
                 defaultMessage="Tone of the messages"
               />
             </Heading>
-            <RadioGroup onChange={(tone: string) => setTone(tone)} value={tone}>
+            <RadioGroup onChange={handleToneChange} value={tone}>
               <Stack spacing={4}>
-                <Box>
-                  <Radio backgroundColor="white" value="informal">
-                    <Text fontWeight="semibold">
-                      <FormattedMessage
-                        id="organization.branding.tone-informal"
-                        defaultMessage="Informal"
-                      />
-                    </Text>
-                  </Radio>
-                  <Text fontSize="sm" color="gray.600" pl={6}>
+                <Radio backgroundColor="white" value="INFORMAL">
+                  <Text fontWeight="semibold">
                     <FormattedMessage
-                      id="organization.branding.tone-informal-description"
-                      defaultMessage="For example: Hello [Recipient’s name], remember that Harvey Specter shared an access to Parallel with you."
+                      id="organization.branding.tone-informal"
+                      defaultMessage="Informal"
                     />
                   </Text>
-                </Box>
-                <Box>
-                  <Radio backgroundColor="white" value="formal">
-                    <Text fontWeight="semibold">
-                      <FormattedMessage
-                        id="organization.branding.tone-formal"
-                        defaultMessage="Formal"
-                      />
-                    </Text>
-                  </Radio>
-                  <Text fontSize="sm" color="gray.600" pl={6}>
+                </Radio>
+                <Radio backgroundColor="white" value="FORMAL">
+                  <Text fontWeight="semibold">
                     <FormattedMessage
-                      id="organization.branding.tone-formal-description"
-                      defaultMessage="For example: Dear [Recipient’s name], we remind you that Harvey Specter has shared an access to Parallel with you."
+                      id="organization.branding.tone-formal"
+                      defaultMessage="Formal"
                     />
                   </Text>
-                </Box>
-                <Button
-                  type="button"
-                  colorScheme="purple"
-                  width="min-content"
-                  onClick={handleToneChange}
-                >
-                  <FormattedMessage
-                    id="settings.account.update-name-button"
-                    defaultMessage="Save changes"
-                  />
-                </Button>
+                </Radio>
               </Stack>
             </RadioGroup>
           </Stack>
           <Divider borderColor="gray.300" />
         </Stack>
-      </Box>
+        <Box width="100%" paddingBottom={8}>
+          <Box
+            backgroundColor="white"
+            rounded="md"
+            boxShadow="short"
+            maxWidth="container.sm"
+            width="100%"
+            border="1px solid"
+            borderColor="gray.200"
+            position="relative"
+            overflow="hidden"
+            margin="0 auto"
+          >
+            <Box
+              position="absolute"
+              right="0"
+              top="0"
+              paddingX={5}
+              paddingY={1.5}
+              backgroundColor="gray.700"
+              borderBottomLeftRadius="md"
+            >
+              <Text color="white" fontSize="sm">
+                Preview
+              </Text>
+            </Box>
+            <Stack padding={8} spacing={5}>
+              <Stack>
+                <Center minHeight="100px">
+                  <Image
+                    boxSize="200px"
+                    height="100px"
+                    objectFit="contain"
+                    alt={me.organization.name}
+                    src={logoSrc}
+                  />
+                </Center>
+                <Text>
+                  <FormattedMessage
+                    id="organization.branding.preview-grettings"
+                    defaultMessage="{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}"
+                    values={{ tone }}
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="organization.branding.preview-body"
+                    defaultMessage="We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted."
+                    values={{ tone }}
+                  />
+                </Text>
+              </Stack>
+
+              <Stack padding={4} spacing={2.5} backgroundColor="gray.100" borderRadius="md">
+                <SkeletonText noOfLines={1} width="20%" speed={0} endColor="gray.400" />
+                <SkeletonText noOfLines={1} width="100%" speed={0} endColor="gray.400" />
+                <SkeletonText
+                  noOfLines={1}
+                  width="70%"
+                  paddingBottom={3}
+                  speed={0}
+                  endColor="gray.400"
+                />
+
+                <SkeletonText noOfLines={1} width="10%" speed={0} endColor="gray.400" />
+                <SkeletonText noOfLines={1} width="30%" speed={0} endColor="gray.400" />
+              </Stack>
+              <UnorderedList paddingLeft={4}>
+                <ListItem>
+                  <FormattedMessage
+                    id="organization.branding.preview-fields-pending"
+                    defaultMessage="{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}"
+                    values={{ tone }}
+                  />
+                </ListItem>
+              </UnorderedList>
+
+              <Stack width="100%" justifyContent="center" align="center" spacing={2.5}>
+                <Box
+                  backgroundColor="purple.500"
+                  paddingX={5}
+                  paddingY={3}
+                  maxWidth="140px"
+                  width="100%"
+                  rounded="md"
+                  marginY={4}
+                >
+                  <SkeletonText noOfLines={1} width="100%" speed={0} endColor="white" />
+                </Box>
+
+                <SkeletonText noOfLines={1} width="95%" speed={0} endColor="gray.300" />
+                <SkeletonText noOfLines={1} width="40%" speed={0} endColor="gray.300" />
+              </Stack>
+            </Stack>
+          </Box>
+          <Text width="full" textAlign="center" fontSize="sm" color="gray.600" mt={4}>
+            <FormattedMessage
+              id="organization.branding.preview-footer"
+              defaultMessage="An example of the emails your customers will receive."
+            />
+          </Text>
+        </Box>
+      </Stack>
     </SettingsLayout>
   );
 }
@@ -251,6 +345,17 @@ OrganizationBranding.mutations = [
       updateOrganizationLogo(orgId: $orgId, file: $file) {
         id
         logoUrl
+      }
+    }
+  `,
+  gql`
+    mutation OrganizationBranding_changeOrganizationPreferedTone(
+      $orgId: GID!
+      $tone: OrgPreferedTone!
+    ) {
+      changeOrganizationPreferedTone(orgId: $orgId, tone: $tone) {
+        id
+        preferedTone
       }
     }
   `,
@@ -266,6 +371,7 @@ OrganizationBranding.getInitialProps = async ({ fetchQuery }: WithApolloDataCont
             id
             logoUrl
             name
+            preferedTone
           }
         }
       }

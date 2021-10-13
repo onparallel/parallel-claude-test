@@ -2,15 +2,17 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
-import { ClosingFormal } from "../common/Closing Formal";
-import { GreetingFormal } from "../common/Greeting";
+import { ClosingThanks } from "../common/ClosingThanks";
+import { GreetingReminder } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, gdprDisclaimer, greetingFormal } from "../common/texts";
+import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
 
 type SignatureReminderProps = {
   signerName: string;
+  signerFullName: string;
   documentName: string;
   signButton: string;
+  tone: string;
 } & LayoutProps;
 
 /** Email sent to signers with access to the signing URL. */
@@ -28,11 +30,18 @@ const email: Email<SignatureReminderProps> = {
     });
   },
   text(
-    { signerName: fullName, documentName, signButton }: SignatureReminderProps,
+    {
+      signerFullName: fullName,
+      signerName: name,
+      documentName,
+      signButton,
+      tone,
+    }: SignatureReminderProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingFormal({ fullName }, intl)}
+      ${greetingContact({ fullName, name: fullName, tone: tone }, intl)}
+
       ${intl.formatMessage(
         {
           id: "signature-reminder.text",
@@ -55,13 +64,15 @@ const email: Email<SignatureReminderProps> = {
     `;
   },
   html({
-    signerName: fullName,
+    signerFullName: fullName,
+    signerName: name,
     assetsUrl,
     parallelUrl,
     logoAlt,
     logoUrl,
     signButton,
     documentName,
+    tone,
   }: SignatureReminderProps) {
     const intl = useIntl();
     return (
@@ -75,15 +86,16 @@ const email: Email<SignatureReminderProps> = {
           id: "signature-reminder.subject",
           defaultMessage: "Signature reminder",
         })}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingFormal fullName={fullName} />
+            <GreetingReminder name={name} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-reminder.text"
                 defaultMessage="You have a pending signature request to sign a document titled {documentName}."
-                values={{ documentName }}
+                values={{ documentName, tone }}
               />
             </MjmlText>
 
@@ -96,7 +108,7 @@ const email: Email<SignatureReminderProps> = {
             <MjmlText align="center" fontSize="16px">
               {`${signButton}`}
             </MjmlText>
-            <ClosingFormal />
+            <ClosingThanks tone={tone} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

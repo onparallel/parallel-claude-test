@@ -1,12 +1,10 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
-import { ToneProvider } from "@parallel/components/common/toneContext";
 import { init as initSentry } from "@parallel/utils/sentry";
 import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect } from "react";
-
 type MyAppProps = AppProps & I18nProps;
 
 initSentry();
@@ -28,9 +26,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
   return (
     <I18nProvider {...props}>
       <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
-        <ToneProvider>
-          <Component {...pageProps} />
-        </ToneProvider>
+        <Component {...pageProps} />
       </ChakraProvider>
     </I18nProvider>
   );

@@ -3,10 +3,10 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Closing } from "../common/Closing";
-import { Greeting } from "../common/Greeting";
+import { ClosingParallelTeam } from "../common/ClosingParallelTeam";
+import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { greeting } from "../common/texts";
+import { greetingUser } from "../common/texts";
 
 export type InvitationProps = {
   email: string;
@@ -37,7 +37,7 @@ const email: Email<InvitationProps> = {
     intl: IntlShape
   ) {
     return outdent`
-    ${greeting({ name: userName }, intl)}
+    ${greetingUser({ name: userName }, intl)}
     
     ${intl.formatMessage(
       {
@@ -87,7 +87,7 @@ const email: Email<InvitationProps> = {
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0">
           <MjmlColumn>
-            <Greeting name={userName} />
+            <GreetingUser name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="invitation.text"
@@ -118,7 +118,7 @@ const email: Email<InvitationProps> = {
             <Button href={`${parallelUrl}/${locale}/login`} fontWeight={500}>
               <FormattedMessage id="invitation.login-button" defaultMessage="Log in" />
             </Button>
-            <Closing />
+            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

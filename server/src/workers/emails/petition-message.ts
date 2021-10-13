@@ -38,6 +38,9 @@ export async function petitionMessage(
   const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const renderContext = { contact, user: sender, petition };
+
+  const organization = await context.organizations.loadOrg(petition.org_id);
+
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
@@ -48,6 +51,7 @@ export async function petitionMessage(
       bodyPlainText: toPlainText(bodyJson, renderContext),
       deadline: petition.deadline,
       keycode: access.keycode,
+      tone: organization?.prefered_tone ?? "FORMAL",
       ...layoutProps,
     },
     { locale: petition.locale }

@@ -1,7 +1,7 @@
 import { FormattedMessage } from "react-intl";
 import { Button } from "./Button";
 
-export function CompleteInfoButton({ href }: { href: string }) {
+export function CompleteInfoButton({ href, tone }: { href: string; tone: string }) {
   return (
     <Button href={href} fontWeight={500}>
       <FormattedMessage

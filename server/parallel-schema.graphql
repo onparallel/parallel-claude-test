@@ -457,6 +457,11 @@ type Mutation {
   cancelSignatureRequest(petitionSignatureRequestId: GID!): PetitionSignatureRequest!
 
   """
+  Changes the organization prefered tone
+  """
+  changeOrganizationPreferedTone(orgId: GID!, tone: OrgPreferedTone!): Organization!
+
+  """
   Changes the password for the current logged in user.
   """
   changePassword(newPassword: String!, password: String!): ChangePasswordResult!
@@ -1322,6 +1327,14 @@ type OrgIntegration {
 }
 
 """
+The prefered tone of organization
+"""
+enum OrgPreferedTone {
+  FORMAL
+  INFORMAL
+}
+
+"""
 An organization in the system.
 """
 type Organization implements Timestamps {
@@ -1362,6 +1375,11 @@ type Organization implements Timestamps {
   The name of the organization.
   """
   name: String!
+
+  """
+  The prefered tone of organization.
+  """
+  preferedTone: OrgPreferedTone!
 
   """
   The status of the organization.
@@ -1602,6 +1620,11 @@ type Petition implements PetitionBase {
   permissions: [PetitionPermission!]!
 
   """
+  The prefered tone of organization.
+  """
+  preferedTone: OrgPreferedTone!
+
+  """
   The progress of the petition.
   """
   progress: PetitionProgress!
@@ -1826,6 +1849,11 @@ interface PetitionBase {
   The permissions linked to the petition
   """
   permissions: [PetitionPermission!]!
+
+  """
+  The prefered tone of organization.
+  """
+  preferedTone: OrgPreferedTone!
 
   """
   The signature configuration for the petition.
@@ -2586,6 +2614,11 @@ type PetitionTemplate implements PetitionBase {
   permissions: [PetitionPermission!]!
 
   """
+  The prefered tone of organization.
+  """
+  preferedTone: OrgPreferedTone!
+
+  """
   The public link linked to this template
   """
   publicLink: PublicPetitionLink
@@ -2730,6 +2763,7 @@ type PublicAccessVerification {
   isAllowed: Boolean!
   orgLogoUrl: String
   orgName: String
+  preferedTone: OrgPreferedTone
 }
 
 """
@@ -2820,6 +2854,11 @@ type PublicPetition implements Timestamps {
   The locale of the petition.
   """
   locale: PetitionLocale!
+
+  """
+  The prefered tone of organization.
+  """
+  preferedTone: OrgPreferedTone!
 
   """
   The recipients of the petition

@@ -2,17 +2,19 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
-import { ClosingFormal } from "../common/Closing Formal";
-import { GreetingFormal } from "../common/Greeting";
+import { ClosingThanks } from "../common/ClosingThanks";
+import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, gdprDisclaimer, greetingFormal } from "../common/texts";
+import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
 
 type SignatureRequestedProps = {
   emailBody: string | null;
   signerName: string;
+  signerFullName: string;
   documentName: string;
   signButton: string;
+  tone: string;
 } & LayoutProps;
 
 /** Email sent to signers with access to the signing URL. */
@@ -30,18 +32,26 @@ const email: Email<SignatureRequestedProps> = {
     });
   },
   text(
-    { signerName: fullName, documentName, signButton, emailBody }: SignatureRequestedProps,
+    {
+      signerFullName: fullName,
+      signerName: name,
+      documentName,
+      signButton,
+      emailBody,
+      tone,
+    }: SignatureRequestedProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingFormal({ fullName }, intl)}
+      ${greetingContact({ name, fullName, tone }, intl)}
+
       ${intl.formatMessage(
         {
           id: "signature-requested.text",
           defaultMessage:
             "You have received a signature request to sign a document titled {documentName}.",
         },
-        { documentName }
+        { documentName, tone }
       )}
 
       ${emailBody}
@@ -59,7 +69,8 @@ const email: Email<SignatureRequestedProps> = {
     `;
   },
   html({
-    signerName: fullName,
+    signerFullName: fullName,
+    signerName: name,
     assetsUrl,
     parallelUrl,
     logoAlt,
@@ -67,6 +78,7 @@ const email: Email<SignatureRequestedProps> = {
     signButton,
     documentName,
     emailBody,
+    tone,
   }: SignatureRequestedProps) {
     const intl = useIntl();
     return (
@@ -80,15 +92,16 @@ const email: Email<SignatureRequestedProps> = {
           id: "signature-requested.subject",
           defaultMessage: "Signature requested",
         })}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingFormal fullName={fullName} />
+            <GreetingContact name={name} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-requested.text"
                 defaultMessage="You have received a signature request to sign a document titled {documentName}."
-                values={{ documentName }}
+                values={{ documentName, tone }}
               />
             </MjmlText>
 
@@ -103,7 +116,7 @@ const email: Email<SignatureRequestedProps> = {
             <MjmlText align="center" fontSize="16px">
               {`${signButton}`}
             </MjmlText>
-            <ClosingFormal />
+            <ClosingThanks tone={tone} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

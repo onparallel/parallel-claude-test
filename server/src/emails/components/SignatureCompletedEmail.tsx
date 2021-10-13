@@ -2,15 +2,17 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
-import { ClosingFormal } from "../common/Closing Formal";
-import { GreetingFormal } from "../common/Greeting";
+import { ClosingThanks } from "../common/ClosingThanks";
+import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, gdprDisclaimer, greetingFormal } from "../common/texts";
+import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
 
 type SignatureCompletedProps = {
   documentName: string | null;
   signerName: string | null;
+  signerFullName: string | null;
   signatureProvider: string;
+  tone: string;
 } & LayoutProps;
 
 /** Email sent to signers to let them know the signature process has been completed. Comes with the signed document attached. */
@@ -27,9 +29,18 @@ const email: Email<SignatureCompletedProps> = {
       defaultMessage: "Signature request completed",
     });
   },
-  text({ signerName, signatureProvider }: SignatureCompletedProps, intl: IntlShape) {
+  text(
+    {
+      signerFullName: fullName,
+      signerName: name,
+      signatureProvider,
+      tone,
+    }: SignatureCompletedProps,
+    intl: IntlShape
+  ) {
     return outdent`
-      ${greetingFormal({ fullName: signerName }, intl)}
+      ${greetingContact({ name, fullName, tone }, intl)}
+
       ${intl.formatMessage(
         {
           id: "signature-completed.text",
@@ -45,12 +56,14 @@ const email: Email<SignatureCompletedProps> = {
     `;
   },
   html({
-    signerName,
+    signerFullName: fullName,
+    signerName: name,
     assetsUrl,
     parallelUrl,
     logoAlt,
     logoUrl,
     signatureProvider,
+    tone,
   }: SignatureCompletedProps) {
     const intl = useIntl();
     return (
@@ -64,20 +77,22 @@ const email: Email<SignatureCompletedProps> = {
           id: "signature-completed.subject",
           defaultMessage: "Signature request completed",
         })}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingFormal fullName={signerName} />
+            <GreetingContact name={name} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-completed.text"
                 defaultMessage="Please find attached a copy of the document you just signed through {signatureProvider}."
                 values={{
                   signatureProvider,
+                  tone,
                 }}
               />
             </MjmlText>
-            <ClosingFormal />
+            <ClosingThanks tone={tone} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

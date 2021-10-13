@@ -43,15 +43,19 @@ export async function publicPetitionLinkAccess(
     throw new Error(`PublicPetitionLink:${petition.from_public_petition_link_id} not found`);
   }
 
+  const organization = await context.organizations.loadOrg(petition.org_id);
+
   const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
   const { html, text, subject, from } = await buildEmail(
     PublicPetitionLinkAccess,
     {
+      name: contact.first_name!,
       fullName: fullName(contact.first_name, contact.last_name)!,
       senderName: fullName(sender.first_name, sender.last_name)!,
       emailSubject: petition.email_subject,
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
+      tone: organization?.prefered_tone ?? "FORMAL",
       ...layoutProps,
     },
     { locale: petition.locale }

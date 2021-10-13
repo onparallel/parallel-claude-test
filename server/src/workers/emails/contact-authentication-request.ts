@@ -38,13 +38,17 @@ export async function contactAuthenticationRequest(
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
+  const organization = await context.organizations.loadOrg(petition.org_id);
+
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,
     {
+      name: contact.first_name,
       fullName: fullName(contact.first_name, contact.last_name),
       code: request.code,
       browserName: ua?.getBrowser()?.name ?? "Unknown",
       osName: ua?.getOS()?.name ?? "Unknown",
+      tone: organization?.prefered_tone ?? "FORMAL",
       ...layoutProps,
     },
     { locale: petition.locale }

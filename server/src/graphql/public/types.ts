@@ -148,6 +148,15 @@ export const PublicPetition = objectType({
         return signature ? (signature.status === "COMPLETED" ? "COMPLETED" : "STARTED") : null;
       },
     });
+    t.nonNull.field("preferedTone", {
+      type: "OrgPreferedTone",
+      description: "The prefered tone of organization.",
+      resolve: async (root, _, ctx) => {
+        const org = (await ctx.organizations.loadOrg(root.org_id))!;
+
+        return org.prefered_tone;
+      },
+    });
   },
 });
 
@@ -521,6 +530,7 @@ export const PublicPetitionLink = objectType({
         return await ctx.petitions.loadPublicPetitionLinkUserByPublicPetitionLinkId(root.id);
       },
     });
+
     t.nonNull.field("organization", {
       type: objectType({
         name: "PublicPetitionLinkOwnerOrganization",

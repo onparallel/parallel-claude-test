@@ -31,8 +31,8 @@
   },
   {
     "term": "closing.formal.regards",
-    "definition": "Best regards.",
-    "context": "Best regards."
+    "definition": "{tone, select, INFORMAL{Regards.} other{Best regards.}}",
+    "context": "{tone, select, INFORMAL{Regards.} other{Best regards.}}"
   },
   {
     "term": "closing.formal.thank-you",
@@ -145,9 +145,19 @@
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
+    "term": "greeting.contact",
+    "definition": "{name, select, null {Hello,} other {Hello {name},}}",
+    "context": "{name, select, null {Hello,} other {Hello {name},}}"
+  },
+  {
     "term": "greeting.formal",
     "definition": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
     "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
+  },
+  {
+    "term": "greeting.informal-reminder",
+    "definition": "{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}",
+    "context": "{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}"
   },
   {
     "term": "invitation.details",

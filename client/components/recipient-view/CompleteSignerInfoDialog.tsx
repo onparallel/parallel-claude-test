@@ -3,6 +3,7 @@ import { Button, Checkbox, ListItem, Spacer, Stack, Text, UnorderedList } from "
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import {
   Maybe,
+  OrgPreferedTone,
   PetitionLocale,
   PublicPetitionSignerDataInput,
   RecipientView_PublicContactFragment,
@@ -19,7 +20,6 @@ import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PaddedCollapse } from "../common/PaddedCollapse";
-import { useTone } from "../common/toneContext";
 import { useAddNewSignerDialog } from "./AddNewSignerDialog";
 
 const messages: Record<PetitionLocale, (organization: string, contactName: string) => string> = {
@@ -52,6 +52,7 @@ type CompleteSignerInfoDialogProps = {
   contact: useCompleteSignerInfoDialog_PublicContactFragment;
   organization: string;
   recipientCanAddSigners: boolean;
+  tone: OrgPreferedTone;
 };
 
 export type CompleteSignerInfoDialogResult = {
@@ -65,6 +66,7 @@ function CompleteSignerInfoDialog({
   organization,
   signers,
   recipientCanAddSigners,
+  tone,
   ...props
 }: DialogProps<CompleteSignerInfoDialogProps, CompleteSignerInfoDialogResult>) {
   const intl = useIntl();
@@ -76,7 +78,6 @@ function CompleteSignerInfoDialog({
     )
   );
   const messageRef = useRef<HTMLTextAreaElement>(null);
-  const { tone } = useTone();
 
   useEffect(() => {
     if (showMessage) {
@@ -95,7 +96,10 @@ function CompleteSignerInfoDialog({
   const showAddNewSignerDialog = useAddNewSignerDialog();
   async function handleAddAdditionalSigner() {
     const [error, newSignerInfo] = await withError(
-      showAddNewSignerDialog({ emails: [...signers, ...additionalSigners].map((s) => s.email) })
+      showAddNewSignerDialog({
+        emails: [...signers, ...additionalSigners].map((s) => s.email),
+        tone,
+      })
     );
     if (!error && newSignerInfo) {
       setAdditionalSigners([...additionalSigners, newSignerInfo]);
@@ -135,7 +139,7 @@ function CompleteSignerInfoDialog({
         <Stack>
           <FormattedMessage
             id="recipient-view.complete-signer-info-dialog.subtitle"
-            defaultMessage="{tone, select, informal{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
+            defaultMessage="{tone, select, INFORMAL{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
             values={{ tone }}
           />
           {[...signers, additionalSigners].length > 0 ? (
@@ -146,7 +150,7 @@ function CompleteSignerInfoDialog({
                   <Text>
                     <FormattedMessage
                       id="recipient-view.complete-signer-info-dialog.subtitle.with-signers"
-                      defaultMessage="{tone, select, informal{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}"
+                      defaultMessage="{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}"
                       values={{ tone }}
                     />
                   </Text>

@@ -17,9 +17,10 @@ import {
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
-import { useTone } from "@parallel/components/common/toneContext";
+import { ToneProvider } from "@parallel/components/common/toneContext";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import {
+  OrgPreferedTone,
   RecipientView_verifyPublicAccessMutation,
   RecipientView_verifyPublicAccessMutationVariables,
   usepublicCheckVerificationCodeMutation,
@@ -42,6 +43,7 @@ interface RecipientViewVerifyProps {
   email: string;
   orgName: string;
   orgLogoUrl: string;
+  preferedTone: OrgPreferedTone;
 }
 
 type RecipientViewVerifyState =
@@ -55,14 +57,17 @@ type RecipientViewVerifyState =
     }
   | { step: "VERIFIED" };
 
-function RecipientViewVerify({ email, orgName, orgLogoUrl }: RecipientViewVerifyProps) {
+function RecipientViewVerify({
+  email,
+  orgName,
+  orgLogoUrl,
+  preferedTone: tone,
+}: RecipientViewVerifyProps) {
   const { query } = useRouter();
   const toast = useToast();
   const intl = useIntl();
   const router = useRouter();
   const keycode = query.keycode as string;
-
-  const { tone } = useTone();
 
   const [state, setState] = useState<RecipientViewVerifyState>({
     step: "REQUEST",
@@ -145,8 +150,9 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl }: RecipientViewVerify
       }
     }
   }
+
   return (
-    <>
+    <ToneProvider value={tone}>
       <Head>
         <title>Parallel</title>
       </Head>
@@ -269,7 +275,7 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl }: RecipientViewVerify
           </Card>
         </Container>
       </Box>
-    </>
+    </ToneProvider>
   );
 }
 
@@ -306,6 +312,7 @@ export async function getServerSideProps({
           email
           orgName
           orgLogoUrl
+          preferedTone
         }
       }
     `,

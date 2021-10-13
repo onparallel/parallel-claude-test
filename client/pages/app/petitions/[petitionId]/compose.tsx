@@ -18,6 +18,7 @@ import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
+import { ToneProvider } from "@parallel/components/common/toneContext";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
@@ -523,138 +524,148 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     petition.status === "DRAFT";
 
   return (
-    <PetitionLayout
-      key={petition!.id}
-      user={me}
-      petition={petition!}
-      onUpdatePetition={handleUpdatePetition}
-      section="compose"
-      scrollBody
-      headerActions={
-        petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
-          <ResponsiveButtonIcon
-            data-action="compose-next"
-            id="petition-next"
-            colorScheme="purple"
-            icon={<ArrowForwardIcon fontSize="18px" />}
-            label={intl.formatMessage({
-              id: "generic.next",
-              defaultMessage: "Next",
-            })}
-            onClick={handleNextClick}
-          />
-        ) : null
-      }
-    >
-      {displayPetitionLimitReachedAlert ? (
-        <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
-      ) : null}
-      <PaneWithFlyout
-        isFlyoutActive={Boolean(activeField)}
-        alignWith={activeField ? activeFieldElement : null}
-        flyout={
-          <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
-            {activeField ? (
-              <PetitionComposeFieldSettings
-                petitionId={petition!.id}
-                key={activeField.id}
-                field={activeField}
-                onFieldEdit={handleFieldEdit}
-                onFieldTypeChange={handleFieldTypeChange}
-                onClose={handleSettingsClose}
-                isReadOnly={isReadOnly}
-              />
-            ) : (
-              <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 6rem)`}>
-                <Tabs variant="enclosed" {...extendFlexColumn}>
-                  <TabList marginX="-1px" marginTop="-1px" flex="none">
-                    <Tab padding={4} lineHeight={5} fontWeight="bold">
-                      <ListIcon fontSize="18px" marginRight={2} />
-                      <FormattedMessage id="petition.contents" defaultMessage="Contents" />
-                    </Tab>
-                    <Tab className="petition-settings" padding={4} lineHeight={5} fontWeight="bold">
-                      <SettingsIcon fontSize="16px" marginRight={2} />
-                      <FormattedMessage id="petition-compose.settings" defaultMessage="Settings" />
-                    </Tab>
-                  </TabList>
-                  <TabPanels {...extendFlexColumn}>
-                    <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                      <PetitionContents
-                        fields={petition!.fields}
-                        fieldIndices={indices}
-                        onFieldClick={handleIndexFieldClick}
-                      />
-                    </TabPanel>
-                    <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                      <PetitionSettings
-                        user={me}
-                        petition={petition!}
-                        onUpdatePetition={handleUpdatePetition}
-                        validPetitionFields={validPetitionFields}
-                      />
-                    </TabPanel>
-                  </TabPanels>
-                </Tabs>
-              </Card>
-            )}
-          </Box>
+    <ToneProvider value={petition?.preferedTone}>
+      <PetitionLayout
+        key={petition!.id}
+        user={me}
+        petition={petition!}
+        onUpdatePetition={handleUpdatePetition}
+        section="compose"
+        scrollBody
+        headerActions={
+          petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
+            <ResponsiveButtonIcon
+              data-action="compose-next"
+              id="petition-next"
+              colorScheme="purple"
+              icon={<ArrowForwardIcon fontSize="18px" />}
+              label={intl.formatMessage({
+                id: "generic.next",
+                defaultMessage: "Next",
+              })}
+              onClick={handleNextClick}
+            />
+          ) : null
         }
       >
-        <Box padding={4}>
-          <PetitionComposeFieldList
-            petitionId={petition!.id}
-            showErrors={showErrors}
-            fields={petition!.fields}
-            active={activeFieldId}
-            onAddField={handleAddField}
-            onCloneField={handleCloneField}
-            onDeleteField={handleDeleteField}
-            onUpdateFieldPositions={handleUpdateFieldPositions}
-            onFieldEdit={handleFieldEdit}
-            onFieldSettingsClick={handleFieldSettingsClick}
-            isReadOnly={isReadOnly}
-            isPublicTemplate={isPublicTemplate}
-          />
-          {petition?.__typename === "PetitionTemplate" ? (
-            <PetitionTemplateDescriptionEdit
-              marginTop="4"
-              description={petition.description}
-              onUpdatePetition={handleUpdatePetition}
+        {displayPetitionLimitReachedAlert ? (
+          <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+        ) : null}
+        <PaneWithFlyout
+          isFlyoutActive={Boolean(activeField)}
+          alignWith={activeField ? activeFieldElement : null}
+          flyout={
+            <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
+              {activeField ? (
+                <PetitionComposeFieldSettings
+                  petitionId={petition!.id}
+                  key={activeField.id}
+                  field={activeField}
+                  onFieldEdit={handleFieldEdit}
+                  onFieldTypeChange={handleFieldTypeChange}
+                  onClose={handleSettingsClose}
+                  isReadOnly={isReadOnly}
+                />
+              ) : (
+                <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 6rem)`}>
+                  <Tabs variant="enclosed" {...extendFlexColumn}>
+                    <TabList marginX="-1px" marginTop="-1px" flex="none">
+                      <Tab padding={4} lineHeight={5} fontWeight="bold">
+                        <ListIcon fontSize="18px" marginRight={2} />
+                        <FormattedMessage id="petition.contents" defaultMessage="Contents" />
+                      </Tab>
+                      <Tab
+                        className="petition-settings"
+                        padding={4}
+                        lineHeight={5}
+                        fontWeight="bold"
+                      >
+                        <SettingsIcon fontSize="16px" marginRight={2} />
+                        <FormattedMessage
+                          id="petition-compose.settings"
+                          defaultMessage="Settings"
+                        />
+                      </Tab>
+                    </TabList>
+                    <TabPanels {...extendFlexColumn}>
+                      <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
+                        <PetitionContents
+                          fields={petition!.fields}
+                          fieldIndices={indices}
+                          onFieldClick={handleIndexFieldClick}
+                        />
+                      </TabPanel>
+                      <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
+                        <PetitionSettings
+                          user={me}
+                          petition={petition!}
+                          onUpdatePetition={handleUpdatePetition}
+                          validPetitionFields={validPetitionFields}
+                        />
+                      </TabPanel>
+                    </TabPanels>
+                  </Tabs>
+                </Card>
+              )}
+            </Box>
+          }
+        >
+          <Box padding={4}>
+            <PetitionComposeFieldList
+              petitionId={petition!.id}
+              showErrors={showErrors}
+              fields={petition!.fields}
+              active={activeFieldId}
+              onAddField={handleAddField}
+              onCloneField={handleCloneField}
+              onDeleteField={handleDeleteField}
+              onUpdateFieldPositions={handleUpdateFieldPositions}
+              onFieldEdit={handleFieldEdit}
+              onFieldSettingsClick={handleFieldSettingsClick}
               isReadOnly={isReadOnly}
+              isPublicTemplate={isPublicTemplate}
             />
-          ) : null}
-          {petition && petition.__typename === "Petition" ? (
-            petition!.status !== "DRAFT" ? (
-              <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
-                <Text>
-                  <FormattedMessage
-                    id="petition.already-sent"
-                    defaultMessage="This petition has already been sent."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="petition.send-from-activity"
-                    defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
-                    values={{
-                      a: (chunks: any) => (
-                        <Link href={`/app/petitions/${petitionId}/activity`}>{chunks}</Link>
-                      ),
-                    }}
-                  />
-                </Text>
-              </Box>
-            ) : null
-          ) : petition?.__typename === "PetitionTemplate" ? (
-            <PetitionTemplateComposeMessageEditor
-              marginTop={4}
-              petition={petition!}
-              onUpdatePetition={handleUpdatePetition}
-            />
-          ) : null}
-        </Box>
-      </PaneWithFlyout>
-    </PetitionLayout>
+            {petition?.__typename === "PetitionTemplate" ? (
+              <PetitionTemplateDescriptionEdit
+                marginTop="4"
+                description={petition.description}
+                onUpdatePetition={handleUpdatePetition}
+                isReadOnly={isReadOnly}
+              />
+            ) : null}
+            {petition && petition.__typename === "Petition" ? (
+              petition!.status !== "DRAFT" ? (
+                <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
+                  <Text>
+                    <FormattedMessage
+                      id="petition.already-sent"
+                      defaultMessage="This petition has already been sent."
+                    />
+                  </Text>
+                  <Text>
+                    <FormattedMessage
+                      id="petition.send-from-activity"
+                      defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+                      values={{
+                        a: (chunks: any) => (
+                          <Link href={`/app/petitions/${petitionId}/activity`}>{chunks}</Link>
+                        ),
+                      }}
+                    />
+                  </Text>
+                </Box>
+              ) : null
+            ) : petition?.__typename === "PetitionTemplate" ? (
+              <PetitionTemplateComposeMessageEditor
+                marginTop={4}
+                petition={petition!}
+                onUpdatePetition={handleUpdatePetition}
+              />
+            ) : null}
+          </Box>
+        </PaneWithFlyout>
+      </PetitionLayout>
+    </ToneProvider>
   );
 }
 
@@ -667,6 +678,7 @@ PetitionCompose.fragments = {
         ...AddPetitionAccessDialog_Petition
         ...PetitionTemplateComposeMessageEditor_Petition
         ...PetitionSettings_PetitionBase
+        preferedTone
         fields {
           ...PetitionCompose_PetitionField
         }

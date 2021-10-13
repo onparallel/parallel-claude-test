@@ -22,6 +22,7 @@ import { zip } from "remeda";
 import { Card, CardProps } from "../common/Card";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { Spacer } from "../common/Spacer";
+import { useTone } from "../common/toneContext";
 
 export interface RecipientViewProgressFooterProps extends CardProps {
   petition: RecipientViewProgressFooter_PublicPetitionFragment;
@@ -49,6 +50,8 @@ export function RecipientViewProgressFooter({
     }
     return { replied, optional, total };
   }, [petition.fields, fieldVisibility]);
+
+  const tone = useTone();
 
   const isCompleted = petition.status === "COMPLETED";
   return (
@@ -128,6 +131,7 @@ export function RecipientViewProgressFooter({
             <FormattedMessage
               id="component.recipient-view.reminder-submit"
               defaultMessage="Remember to click Finalize when you finish entering all the information."
+              values={{ tone }}
             />
           </PopoverBody>
         </PopoverContent>

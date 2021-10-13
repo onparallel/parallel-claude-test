@@ -6,15 +6,16 @@ import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
-import { GreetingFormal } from "../common/Greeting";
+import { GreetingReminder } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { disclaimer, greetingFormal } from "../common/texts";
+import { disclaimer, greetingContact } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionReminderProps = {
   emailSubject: Maybe<string>;
   contactFullName: string;
+  contactName: string;
   senderName: string;
   senderEmail: string;
   missingFieldCount: number;
@@ -23,6 +24,7 @@ export type PetitionReminderProps = {
   bodyPlainText: string | null;
   deadline: Date | null;
   keycode: string;
+  tone: string;
 } & LayoutProps;
 
 const email: Email<PetitionReminderProps> = {
@@ -55,7 +57,8 @@ const email: Email<PetitionReminderProps> = {
   },
   text(
     {
-      contactFullName,
+      contactFullName: fullName,
+      contactName: name,
       senderName,
       senderEmail,
       bodyPlainText,
@@ -64,18 +67,20 @@ const email: Email<PetitionReminderProps> = {
       deadline,
       keycode,
       parallelUrl,
+      tone,
     }: PetitionReminderProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingFormal({ fullName: contactFullName }, intl)}
+      ${greetingContact({ name, fullName, tone }, intl)}
+      
       ${intl.formatMessage(
         {
           id: "reminder.text",
           defaultMessage:
             "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted.",
         },
-        { senderName, senderEmail }
+        { senderName, senderEmail, tone }
       )}
       
       ${bodyPlainText}
@@ -85,7 +90,7 @@ const email: Email<PetitionReminderProps> = {
           id: "reminder.pending-fields-count",
           defaultMessage: "You have {pending}/{total} fields pending.",
         },
-        { pending: missingFieldCount, total: totalFieldCount }
+        { pending: missingFieldCount, total: totalFieldCount, tone }
       )}
       ${
         deadline
@@ -131,7 +136,8 @@ const email: Email<PetitionReminderProps> = {
     `;
   },
   html({
-    contactFullName,
+    contactFullName: fullName,
+    contactName: name,
     senderName,
     senderEmail,
     bodyHtml,
@@ -143,6 +149,7 @@ const email: Email<PetitionReminderProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    tone,
   }: PetitionReminderProps) {
     const intl = useIntl();
 
@@ -158,10 +165,12 @@ const email: Email<PetitionReminderProps> = {
           id: "layout.stop-reminders",
           defaultMessage: "Stop receiving reminders",
         })}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingFormal fullName={contactFullName} />
+            <GreetingReminder name={name} fullName={fullName} tone={tone} />
+
             <MjmlText lineHeight="24px">
               <FormattedMessage
                 id="reminder.text"
@@ -169,6 +178,7 @@ const email: Email<PetitionReminderProps> = {
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
+                  tone,
                 }}
               />
             </MjmlText>
@@ -184,7 +194,7 @@ const email: Email<PetitionReminderProps> = {
                 <FormattedMessage
                   id="reminder.pending-fields-count"
                   defaultMessage="You have {pending}/{total} fields pending."
-                  values={{ pending: missingFieldCount, total: totalFieldCount }}
+                  values={{ pending: missingFieldCount, total: totalFieldCount, tone }}
                 />
               </li>
             </MjmlText>
@@ -212,7 +222,10 @@ const email: Email<PetitionReminderProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton href={`${parallelUrl}/${intl.locale}/petition/${keycode}`} />
+            <CompleteInfoButton
+              tone={tone}
+              href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
+            />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

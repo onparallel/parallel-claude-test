@@ -19,7 +19,8 @@
         "parallelUrl": "https://staging.onparallel.com",
         "assetsUrl": "https://static-staging.onparallel.com",
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
-        "logoAlt": "Parallel"
+        "logoAlt": "Parallel",
+        "tone": "FORMAL"
       },
       "argsTypes": {
         "senderName": { "control": { "type": "text" } },
@@ -35,7 +36,8 @@
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },
         "logoUrl": { "control": { "type": "text" } },
-        "logoAlt": { "control": { "type": "text" } }
+        "logoAlt": { "control": { "type": "text" } },
+        "tone": { "control": { "type": "text" } }
       }
     }
   ]

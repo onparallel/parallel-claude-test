@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
+import { OrgPreferedTone } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog } from "../common/BaseDialog";
@@ -19,12 +20,13 @@ import { DialogProps, useDialog } from "../common/DialogProvider";
 import { NormalLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
-import { useTone } from "../common/toneContext";
 
-export function RecipientViewHelpDialog(props: DialogProps<{}, void>) {
+export function RecipientViewHelpDialog({
+  tone,
+  ...props
+}: DialogProps<{ tone: OrgPreferedTone }, void>) {
   const intl = useIntl();
   const router = useRouter();
-  const { tone } = useTone();
 
   const supportUrl = {
     en: "https://support.onparallel.com/hc/en-us",
@@ -71,7 +73,7 @@ export function RecipientViewHelpDialog(props: DialogProps<{}, void>) {
                 {
                   id: "recipient-view.first-time.claim-3",
                   defaultMessage:
-                    "You can add any comments and questions you'd like. Submit them at once whenever you decide.",
+                    "{tone, select, INFORMAL{Don't be left with doubts! You can add any comments and questions you want in the fields.} other{You can add any comments and questions you'd like. Submit them at once whenever you decide.}}",
                 },
                 { tone }
               ),

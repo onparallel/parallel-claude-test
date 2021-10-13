@@ -4150,6 +4150,26 @@
     "context": "Organization logo"
   },
   {
+    "term": "organization.branding.preview-body",
+    "definition": "We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted.",
+    "context": "We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted."
+  },
+  {
+    "term": "organization.branding.preview-fields-pending",
+    "definition": "{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}",
+    "context": "{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}"
+  },
+  {
+    "term": "organization.branding.preview-footer",
+    "definition": "An example of the emails your customers will receive.",
+    "context": "An example of the emails your customers will receive."
+  },
+  {
+    "term": "organization.branding.preview-grettings",
+    "definition": "{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}",
+    "context": "{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}"
+  },
+  {
     "term": "organization.branding.title",
     "definition": "Branding",
     "context": "Branding"
@@ -4160,11 +4180,6 @@
     "context": "Formal"
   },
   {
-    "term": "organization.branding.tone-formal-description",
-    "definition": "For example: Dear [Recipient’s name], we remind you that Harvey Specter has shared an access to Parallel with you.",
-    "context": "For example: Dear [Recipient’s name], we remind you that Harvey Specter has shared an access to Parallel with you."
-  },
-  {
     "term": "organization.branding.tone-header",
     "definition": "Tone of the messages",
     "context": "Tone of the messages"
@@ -4173,11 +4188,6 @@
     "term": "organization.branding.tone-informal",
     "definition": "Informal",
     "context": "Informal"
-  },
-  {
-    "term": "organization.branding.tone-informal-description",
-    "definition": "For example: Hello [Recipient’s name], remember that Harvey Specter shared an access to Parallel with you.",
-    "context": "For example: Hello [Recipient’s name], remember that Harvey Specter shared an access to Parallel with you."
   },
   {
     "term": "organization.branding.upload-logo",
@@ -7386,8 +7396,8 @@
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle",
-    "definition": "{tone, select, informal{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}",
-    "context": "{tone, select, informal{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
+    "definition": "{tone, select, INFORMAL{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}",
+    "context": "{tone, select, INFORMAL{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle.recipient-can-add",
@@ -7396,8 +7406,8 @@
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle.with-signers",
-    "definition": "{tone, select, informal{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}",
-    "context": "{tone, select, informal{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}"
+    "definition": "{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}",
+    "context": "{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
@@ -7456,8 +7466,8 @@
   },
   {
     "term": "recipient-view.first-time.claim-3",
-    "definition": "You can add any comments and questions you'd like. Submit them at once whenever you decide.",
-    "context": "You can add any comments and questions you'd like. Submit them at once whenever you decide."
+    "definition": "{tone, select, INFORMAL{Don't be left with doubts! You can add any comments and questions you want in the fields.} other{You can add any comments and questions you'd like. Submit them at once whenever you decide.}}",
+    "context": "{tone, select, INFORMAL{Don't be left with doubts! You can add any comments and questions you want in the fields.} other{You can add any comments and questions you'd like. Submit them at once whenever you decide.}}"
   },
   {
     "term": "recipient-view.first-time.intro",
@@ -7481,8 +7491,8 @@
   },
   {
     "term": "recipient-view.invite-collaborator-dialog.subtitle-1",
-    "definition": "{tone, select, informal{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}",
-    "context": "{tone, select, informal{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
+    "definition": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}",
+    "context": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
   },
   {
     "term": "recipient-view.invite-collaborator-dialog.subtitle-2",
@@ -7511,8 +7521,8 @@
   },
   {
     "term": "recipient-view.petition-completed-alert-1",
-    "definition": "{tone, select, informal{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}",
-    "context": "{tone, select, informal{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+    "definition": "{tone, select, INFORMAL{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}",
+    "context": "{tone, select, INFORMAL{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
   },
   {
     "term": "recipient-view.petition-completed-alert-2",
@@ -7586,8 +7596,8 @@
   },
   {
     "term": "recipient-view.review-before-sign.body-2",
-    "definition": "We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.",
-    "context": "We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people."
+    "definition": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}",
+    "context": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
   },
   {
     "term": "recipient-view.review-before-sign.header",

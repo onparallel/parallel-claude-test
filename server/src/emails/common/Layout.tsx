@@ -31,6 +31,7 @@ export type LayoutProps = {
   optOutUrl?: string;
   useAlternativeSlogan?: boolean;
   optOutText?: string;
+  tone?: string;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -43,6 +44,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   optOutUrl,
   useAlternativeSlogan,
   optOutText,
+  tone,
 }) {
   const { locale } = useIntl();
   return (
@@ -104,6 +106,7 @@ export const Layout: FC<LayoutProps> = function Layout({
                 <FormattedMessage
                   id="footer.slogan.alternative"
                   defaultMessage="Create your own <b>parallel</b>"
+                  values={{ tone }}
                 />
               </MjmlButton>
             ) : (

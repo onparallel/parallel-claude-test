@@ -69,10 +69,14 @@ export async function petitionReminder(
 
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
     const renderContext = { contact, user: granter, petition };
+
+    const organization = await context.organizations.loadOrg(petition.org_id);
+
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
         emailSubject: originalMessage?.email_subject ?? null,
+        contactName: contact.first_name!,
         contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,
@@ -82,6 +86,7 @@ export async function petitionReminder(
         bodyPlainText: bodyJson ? toPlainText(bodyJson, renderContext) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
+        tone: organization?.prefered_tone ?? "FORMAL",
         ...layoutProps,
       },
       { locale: petition.locale }

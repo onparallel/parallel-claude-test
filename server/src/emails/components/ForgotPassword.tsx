@@ -2,10 +2,10 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { Email } from "../buildEmail";
-import { Closing } from "../common/Closing";
-import { Greeting } from "../common/Greeting";
+import { ClosingParallelTeam } from "../common/ClosingParallelTeam";
+import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greeting } from "../common/texts";
+import { closing, greetingUser } from "../common/texts";
 
 export type ForgotPasswordProps = {
   name: string | null;
@@ -27,7 +27,7 @@ const email: Email<ForgotPasswordProps> = {
   },
   text({ name, verificationCode }: ForgotPasswordProps, intl: IntlShape) {
     return outdent`
-    ${greeting({ name }, intl)}
+    ${greetingUser({ name }, intl)}
 
     ${intl.formatMessage({
       id: "forgot-password.verification-code-1",
@@ -50,8 +50,7 @@ const email: Email<ForgotPasswordProps> = {
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0">
           <MjmlColumn>
-            <Greeting name={name} />
-
+            <GreetingUser name={name} />
             <MjmlText>
               <FormattedMessage
                 id="forgot-password.verification-code-1"
@@ -77,7 +76,7 @@ const email: Email<ForgotPasswordProps> = {
               />
             </MjmlText>
 
-            <Closing />
+            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

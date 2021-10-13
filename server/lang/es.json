@@ -1,12 +1,12 @@
 [
   {
     "term": "access-delegated-email.subject",
-    "definition": "{senderName} le ha invitado a colaborar en {subject, select, null{su petición} other{{subject}}}",
+    "definition": "{senderName} {tone, select, INFORMAL{te} other{le}} ha invitado a colaborar en {subject, select, null{su petición} other{{subject}}}",
     "context": "{senderName} has invited you to collaborate on {subject, select, null{a petition} other{{subject}}}"
   },
   {
     "term": "access-delegated.text",
-    "definition": "{senderName} ({senderEmail}) le ha pedido que complete la información solicitada por {petitionOwnerFullName} ({petitionOwnerEmail}):",
+    "definition": "{senderName} ({senderEmail})  {tone, select, INFORMAL{te ha invitado a colaborar juntos para completar} other{le ha pedido que complete}} la información solicitada por {petitionOwnerFullName} ({petitionOwnerEmail}):",
     "context": "{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
   },
   {
@@ -31,8 +31,8 @@
   },
   {
     "term": "closing.formal.regards",
-    "definition": "Reciba un cordial saludo.",
-    "context": "Best regards."
+    "definition": "{tone, select, INFORMAL{Saludos.} other{Reciba un cordial saludo.}}",
+    "context": "{tone, select, INFORMAL{Regards.} other{Best regards.}}"
   },
   {
     "term": "closing.formal.thank-you",
@@ -76,7 +76,7 @@
   },
   {
     "term": "footer.slogan.alternative",
-    "definition": "Crea tu propio <b>parallel</b>",
+    "definition": "{tone, select, INFORMAL{Crea tu propio <b>parallel</b>} other{Cree su propio <b>parallel</b>}}",
     "context": "Create your own <b>parallel</b>"
   },
   {
@@ -116,7 +116,7 @@
   },
   {
     "term": "generic.complete-information-button",
-    "definition": "Complete aquí la información",
+    "definition": "{tone, select, INFORMAL{Completar la información} other{Complete aquí la información}}",
     "context": "Complete the information"
   },
   {
@@ -145,9 +145,19 @@
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
+    "term": "greeting.contact",
+    "definition": "{name, select, null {Hola,} other {Hola {name},}}",
+    "context": "{name, select, null {Hello,} other {Hello {name},}}"
+  },
+  {
     "term": "greeting.formal",
     "definition": "{fullName, select, null {Estimado/a Sr./Sra.,} other {Estimado/a {fullName},}}",
     "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
+  },
+  {
+    "term": "greeting.informal-reminder",
+    "definition": "{name, select, null {🔔 ¡Hola!} other {🔔 ¡Hola, {name}!}}",
+    "context": "{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}"
   },
   {
     "term": "invitation.details",
@@ -206,7 +216,7 @@
   },
   {
     "term": "new-petition.text",
-    "definition": "{senderName} ({senderEmail}) le ha compartido un acceso a Parallel:",
+    "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) te ha compartido un acceso a Parallel:} other{{senderName} ({senderEmail}) le ha compartido un acceso a Parallel:}}",
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"
   },
   {
@@ -221,7 +231,7 @@
   },
   {
     "term": "petition-comments-contact-notification.access-button",
-    "definition": "Responda a los comentarios",
+    "definition": "{tone, select, INFORMAL{Responder los comentarios} other{Responda aquí a los comentarios}}",
     "context": "Reply to the comments"
   },
   {
@@ -231,12 +241,12 @@
   },
   {
     "term": "petition-comments-contact-notification.intro-text",
-    "definition": "Tiene {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en {subject, select, null{su petición} other{{subject}}}:",
+    "definition": "{tone, select, INFORMAL{Tienes {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en {subject, select, null{tu petición} other{{subject}}}:} other{Tiene {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en {subject, select, null{su petición} other{{subject}}}:}}",
     "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your petition} other{{subject}}}:"
   },
   {
     "term": "petition-comments-contact-notification.subject",
-    "definition": "Nuevos comentarios en {subject, select, null{su petición} other{{subject}}}",
+    "definition": "{tone, select, INFORMAL{Nuevos comentarios en {subject, select, null{su petición} other{{subject}}}} other{Tiene comentarios nuevos en {subject, select, null{su petición} other{{subject}}}}}",
     "context": "New comments on {subject, select, null{your petition} other{{subject}}}"
   },
   {
@@ -336,17 +346,17 @@
   },
   {
     "term": "public-petition-link.text-1",
-    "definition": "Le enviamos el acceso solicitado al formulario de {petitionTitle}.",
+    "definition": "{tone, select, INFORMAL{Te enviamos el acceso que has solicitado al formulario de Some petition {petitionTitle}.} other{Le enviamos el acceso solicitado al formulario de {petitionTitle}.}}",
     "context": "We send you the requested access to {petitionTitle}."
   },
   {
     "term": "public-petition-link.text-2",
-    "definition": "La información se irá guardando automáticamente en la plataforma, pudiendo continuar el proceso más tarde a través del mismo enlace.",
+    "definition": "{tone, select, INFORMAL{Tus respuestas se irán guardando automáticamente en la plataforma, pudiendo volver y continuar el proceso más tarde a través del mismo enlace.} other{La información se irá guardando automáticamente en la plataforma, pudiendo continuar el proceso más tarde a través del mismo enlace.}}",
     "context": "The information will be automatically saved on the platform, and you can continue the process later through the same link."
   },
   {
     "term": "public-petition-link.text-3",
-    "definition": "Para cualquier duda o comentario puede comunicarse con nosotros en los espacios señalados en la propia plataforma.",
+    "definition": "{tone, select, INFORMAL{Si tienes cualquier duda o comentario puedes dejarlos en los espacios señalados de la plataforma.} other{Para cualquier duda o comentario puede comunicarse con nosotros en los espacios señalados en la propia plataforma.}}",
     "context": "If you have any questions or comments you can contact us in the designated spaces on the platform."
   },
   {
@@ -356,12 +366,12 @@
   },
   {
     "term": "reminder.pending-fields-count",
-    "definition": "Tienes {pending}/{total} campos pendientes.",
+    "definition": "{tone, select, INFORMAL{En este momento hay {pending}/{total} campos pendientes.} other{Tienes {pending}/{total} campos pendientes.}}",
     "context": "You have {pending}/{total} fields pending."
   },
   {
     "term": "reminder.text",
-    "definition": "Le recordamos que {senderName} ({senderEmail}) le envió una petición de la que queda información pendiente de completar.",
+    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le envió una petición de la que queda información pendiente de completar.}}",
     "context": "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
   },
   {
@@ -371,7 +381,7 @@
   },
   {
     "term": "signature-cancelled.text",
-    "definition": "El proceso de firma enviado a través de {signatureProvider} ha sido cancelado por el remitente.",
+    "definition": "{tone, select, INFORMAL{Tu remitente ha cancelado el proceso de firma enviado a través de Signaturit.} other{El proceso de firma enviado a través de {signatureProvider} ha sido cancelado por el remitente.}}",
     "context": "The signing process sent through {signatureProvider} has been cancelled by the sender."
   },
   {
@@ -381,7 +391,7 @@
   },
   {
     "term": "signature-completed.text",
-    "definition": "Adjuntamos una copia del documento acabado de firmar a través de {signatureProvider}.",
+    "definition": "{tone, select, INFORMAL{Te adjuntamos una copia del documento que acabas de firmar a través de {signatureProvider}.} other{Adjuntamos una copia del documento acabado de firmar a través de {signatureProvider}.}}",
     "context": "Please find attached a copy of the document you just signed through {signatureProvider}."
   },
   {
@@ -396,7 +406,7 @@
   },
   {
     "term": "signature-reminder.text",
-    "definition": "Tiene una solicitud de firma pendiente para firmar un documento con el nombre de {documentName}",
+    "definition": "{tone, select, INFORMAL{Has recibido una petición para firmar un documento con el nombre de {documentName}} other{Tiene una solicitud de firma pendiente para firmar un documento con el nombre de {documentName}}}",
     "context": "You have a pending signature request to sign a document titled {documentName}."
   },
   {
@@ -411,7 +421,7 @@
   },
   {
     "term": "signature-requested.text",
-    "definition": "Ha recibido una petición para firmar un documento con el nombre de {documentName}.",
+    "definition": "{tone, select, INFORMAL{Has} other{Ha}} recibido una petición para firmar un documento con el nombre de {documentName}.",
     "context": "You have received a signature request to sign a document titled {documentName}."
   },
   {
@@ -431,17 +441,17 @@
   },
   {
     "term": "verification-code-request.expiry",
-    "definition": "Este código de verificación caducará en 30 minutos, intente utilizarlo lo antes posible.",
+    "definition": "Este código de verificación caducará en 30 minutos, {tone, select, INFORMAL{intenta} other{intente}} utilizarlo lo antes posible.",
     "context": "This verification code will expire in 30 minutes, please make sure you use it as soon as possible."
   },
   {
     "term": "verification-code-request.instructions",
-    "definition": "Por favor, use el siguiente código de verificación en el dispositivo nuevo.",
+    "definition": "Por favor, {tone, select, INFORMAL{usa} other{use}} el siguiente código de verificación en el dispositivo nuevo.",
     "context": "Please use the following verification code on the unrecognized device."
   },
   {
     "term": "verification-code-request.subject",
-    "definition": "{code} es su código de verificación en Parallel",
+    "definition": "{code} es {tone, select, INFORMAL{tu} other{su}} código de verificación en Parallel",
     "context": "{code} is your verification code on Parallel"
   }
 ]

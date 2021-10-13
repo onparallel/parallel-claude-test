@@ -3,9 +3,9 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Greeting } from "../common/Greeting";
+import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { greeting } from "../common/texts";
+import { greetingUser } from "../common/texts";
 
 export type AccountVerificationProps = {
   userName: string | null;
@@ -27,7 +27,7 @@ const email: Email<AccountVerificationProps> = {
   },
   text({ userName, activationUrl }: AccountVerificationProps, intl: IntlShape) {
     return outdent`
-      ${greeting({ name: userName }, intl)}
+      ${greetingUser({ name: userName }, intl)}
 
       ${intl.formatMessage({
         id: "account-verification.intro-text.plain",
@@ -50,7 +50,7 @@ const email: Email<AccountVerificationProps> = {
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0">
           <MjmlColumn>
-            <Greeting name={userName} />
+            <GreetingUser name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="account-verification.intro-text.html"

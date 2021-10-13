@@ -42,13 +42,16 @@ export async function commentsContactNotification(
     sortBy(_fields, (f) => f.position),
     (f) => buildFieldWithComments(f, commentsByField, context)
   );
+  const organization = await context.organizations.loadOrg(petition.org_id);
 
   const { html, text, subject, from } = await buildEmail(
     PetitionCommentsContactNotification,
     {
       emailSubject: originalMessage?.email_subject ?? null,
+      contactName: contact.first_name!,
       contactFullName: fullName(contact.first_name, contact.last_name),
       keycode: access.keycode,
+      tone: organization?.prefered_tone ?? "FORMAL",
       fields,
       ...layoutProps,
     },

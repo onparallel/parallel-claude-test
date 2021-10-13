@@ -3,13 +3,13 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Greeting } from "../common/Greeting";
+import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import {
   PetitionFieldAndComments,
   PetitionFieldAndCommentsProps,
 } from "../common/PetitionFieldAndCommentsList";
-import { closing, greeting } from "../common/texts";
+import { closing, greetingUser } from "../common/texts";
 
 export type PetitionCommentsUserNotificationProps = {
   userName: string | null;
@@ -48,7 +48,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
 
     return outdent`
-      ${greeting({ name: userName }, intl)}
+      ${greetingUser({ name: userName }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-comments-user-notification.intro-text",
@@ -83,7 +83,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0">
           <MjmlColumn>
-            <Greeting name={userName} />
+            <GreetingUser name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-comments-user-notification.intro-text"

@@ -5,9 +5,9 @@ import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
-import { UserMessageBox } from "../common/UserMessageBox";
 import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer } from "../common/texts";
+import { UserMessageBox } from "../common/UserMessageBox";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionMessageProps = {
@@ -18,6 +18,7 @@ export type PetitionMessageProps = {
   bodyPlainText: string;
   deadline: Date | null;
   keycode: string;
+  tone: string;
 } & LayoutProps;
 
 const email: Email<PetitionMessageProps> = {
@@ -33,14 +34,14 @@ const email: Email<PetitionMessageProps> = {
   subject({ subject }) {
     return subject || "";
   },
-  text({ senderName, senderEmail, bodyPlainText, deadline, keycode, parallelUrl }, intl) {
+  text({ senderName, senderEmail, bodyPlainText, deadline, keycode, parallelUrl, tone }, intl) {
     return outdent`
       ${intl.formatMessage(
         {
           id: "new-petition.text",
           defaultMessage: "{senderName} ({senderEmail}) has sent you the following petition:",
         },
-        { senderName, senderEmail }
+        { senderName, senderEmail, tone }
       )}
 
       ${bodyPlainText}
@@ -87,6 +88,7 @@ const email: Email<PetitionMessageProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    tone,
   }: PetitionMessageProps) {
     const intl = useIntl();
 
@@ -102,6 +104,7 @@ const email: Email<PetitionMessageProps> = {
           id: "layout.stop-receiving-emails",
           defaultMessage: "Stop receiving emails",
         })}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -112,6 +115,7 @@ const email: Email<PetitionMessageProps> = {
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
+                  tone,
                 }}
               />
             </MjmlText>
@@ -138,7 +142,10 @@ const email: Email<PetitionMessageProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton href={`${parallelUrl}/${intl.locale}/petition/${keycode}`} />
+            <CompleteInfoButton
+              tone={tone}
+              href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
+            />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

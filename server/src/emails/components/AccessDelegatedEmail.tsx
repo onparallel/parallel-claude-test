@@ -20,6 +20,7 @@ export type AccessDelegatedEmailProps = {
   bodyPlainText: string;
   deadline: Date | null;
   keycode: string;
+  tone: string;
 } & LayoutProps;
 
 const email: Email<AccessDelegatedEmailProps> = {
@@ -32,7 +33,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       { senderName }
     );
   },
-  subject({ senderName, emailSubject }, intl) {
+  subject({ senderName, emailSubject, tone }, intl) {
     return intl.formatMessage(
       {
         id: "access-delegated-email.subject",
@@ -42,6 +43,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       {
         senderName,
         subject: emailSubject,
+        tone,
       }
     );
   },
@@ -55,6 +57,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       deadline,
       keycode,
       parallelUrl,
+      tone,
     },
     intl
   ) {
@@ -65,7 +68,7 @@ const email: Email<AccessDelegatedEmailProps> = {
           defaultMessage:
             "{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):",
         },
-        { senderName, senderEmail, petitionOwnerFullName, petitionOwnerEmail }
+        { senderName, senderEmail, petitionOwnerFullName, petitionOwnerEmail, tone }
       )}
 
       ${bodyPlainText}
@@ -106,6 +109,7 @@ const email: Email<AccessDelegatedEmailProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    tone,
   }: AccessDelegatedEmailProps) {
     const { locale } = useIntl();
     return (
@@ -115,6 +119,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        tone={tone}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -127,6 +132,7 @@ const email: Email<AccessDelegatedEmailProps> = {
                   senderEmail: <b>{senderEmail}</b>,
                   petitionOwnerFullName: <b>{petitionOwnerFullName}</b>,
                   petitionOwnerEmail: <b>{petitionOwnerEmail}</b>,
+                  tone,
                 }}
               />
             </MjmlText>
@@ -153,7 +159,7 @@ const email: Email<AccessDelegatedEmailProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton href={`${parallelUrl}/${locale}/petition/${keycode}`} />
+            <CompleteInfoButton tone={tone} href={`${parallelUrl}/${locale}/petition/${keycode}`} />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

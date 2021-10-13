@@ -3,9 +3,9 @@ import outdent from "outdent";
 import { FormattedMessage } from "react-intl";
 import { Email } from "../buildEmail";
 import { Disclaimer } from "../common/Disclaimer";
-import { GreetingFormal } from "../common/Greeting";
+import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { disclaimer, greetingFormal } from "../common/texts";
+import { disclaimer, greetingContact } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
 
 export type PetitionClosedNotificationProps = {
@@ -35,9 +35,9 @@ const email: Email<PetitionClosedNotificationProps> = {
       { senderName }
     );
   },
-  text({ contactFullName, senderName, senderEmail, bodyPlainText }, intl) {
+  text({ contactFullName: fullName, senderName, senderEmail, bodyPlainText }, intl) {
     return outdent`
-      ${greetingFormal({ fullName: contactFullName }, intl)}
+      ${greetingContact({ fullName, name: fullName, tone: "FORMAL" }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-closed-notification.text",
@@ -71,7 +71,7 @@ const email: Email<PetitionClosedNotificationProps> = {
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingFormal fullName={contactFullName} />
+            <GreetingContact fullName={contactFullName} name={contactFullName} tone="FORMAL" />
             <MjmlText>
               <FormattedMessage
                 id="petition-closed-notification.text"

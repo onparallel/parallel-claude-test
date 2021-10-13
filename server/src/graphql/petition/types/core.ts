@@ -156,6 +156,15 @@ export const PetitionBase = interfaceType({
         return root.signature_config;
       },
     });
+    t.nonNull.field("preferedTone", {
+      type: "OrgPreferedTone",
+      description: "The prefered tone of organization.",
+      resolve: async (root, _, ctx) => {
+        const org = (await ctx.organizations.loadOrg(root.org_id))!;
+
+        return org.prefered_tone;
+      },
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

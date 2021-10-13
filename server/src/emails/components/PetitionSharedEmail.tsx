@@ -4,10 +4,10 @@ import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { BreakLines } from "../common/BreakLines";
 import { Button } from "../common/Button";
-import { Closing } from "../common/Closing";
-import { Greeting } from "../common/Greeting";
+import { ClosingParallelTeam } from "../common/ClosingParallelTeam";
+import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greeting } from "../common/texts";
+import { closing, greetingUser } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
 
 export type PetitionSharedEmailProps = {
@@ -53,7 +53,7 @@ const email: Email<PetitionSharedEmailProps> = {
     intl: IntlShape
   ) {
     return outdent`
-      ${greeting({ name }, intl)}
+      ${greetingUser({ name }, intl)}
 
       ${intl.formatMessage(
         {
@@ -104,7 +104,7 @@ const email: Email<PetitionSharedEmailProps> = {
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0">
           <MjmlColumn>
-            <Greeting name={name} />
+            <GreetingUser name={name} />
             <MjmlText>
               <FormattedMessage
                 id="petition-shared-email.text"
@@ -150,7 +150,7 @@ const email: Email<PetitionSharedEmailProps> = {
                 values={{ isTemplate }}
               />
             </Button>
-            <Closing />
+            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

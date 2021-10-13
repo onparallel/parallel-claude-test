@@ -352,6 +352,8 @@ export interface Mutation {
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
+  /** Changes the organization prefered tone */
+  changeOrganizationPreferedTone: Organization;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
@@ -604,6 +606,11 @@ export interface MutationcancelScheduledMessageArgs {
 
 export interface MutationcancelSignatureRequestArgs {
   petitionSignatureRequestId: Scalars["GID"];
+}
+
+export interface MutationchangeOrganizationPreferedToneArgs {
+  orgId: Scalars["GID"];
+  tone: OrgPreferedTone;
 }
 
 export interface MutationchangePasswordArgs {
@@ -1226,6 +1233,9 @@ export interface OrgIntegration {
   type: IntegrationType;
 }
 
+/** The prefered tone of organization */
+export type OrgPreferedTone = "FORMAL" | "INFORMAL";
+
 /** An organization in the system. */
 export interface Organization extends Timestamps {
   __typename?: "Organization";
@@ -1244,6 +1254,8 @@ export interface Organization extends Timestamps {
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The status of the organization. */
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
@@ -1378,6 +1390,8 @@ export interface Petition extends PetitionBase {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The progress of the petition. */
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
@@ -1502,6 +1516,8 @@ export interface PetitionBase {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -1931,6 +1947,8 @@ export interface PetitionTemplate extends PetitionBase {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The public link linked to this template */
   publicLink?: Maybe<PublicPetitionLink>;
   /** The signature configuration for the petition. */
@@ -2022,6 +2040,7 @@ export interface PublicAccessVerification {
   isAllowed: Scalars["Boolean"];
   orgLogoUrl?: Maybe<Scalars["String"]>;
   orgName?: Maybe<Scalars["String"]>;
+  preferedTone?: Maybe<OrgPreferedTone>;
 }
 
 /** A public view of a contact */
@@ -2070,6 +2089,8 @@ export interface PublicPetition extends Timestamps {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
@@ -8681,6 +8702,19 @@ export type OrganizationBranding_updateOrgLogoMutation = {
   updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: Maybe<string> };
 };
 
+export type OrganizationBranding_changeOrganizationPreferedToneMutationVariables = Exact<{
+  orgId: Scalars["GID"];
+  tone: OrgPreferedTone;
+}>;
+
+export type OrganizationBranding_changeOrganizationPreferedToneMutation = {
+  changeOrganizationPreferedTone: {
+    __typename?: "Organization";
+    id: string;
+    preferedTone: OrgPreferedTone;
+  };
+};
+
 export type OrganizationBrandingQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationBrandingQuery = {
@@ -8702,6 +8736,7 @@ export type OrganizationBrandingQuery = {
       id: string;
       logoUrl?: Maybe<string>;
       name: string;
+      preferedTone: OrgPreferedTone;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11394,6 +11429,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   status: PetitionStatus;
   id: string;
+  preferedTone: OrgPreferedTone;
   name?: Maybe<string>;
   emailSubject?: Maybe<string>;
   emailBody?: Maybe<any>;
@@ -11480,6 +11516,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
   id: string;
+  preferedTone: OrgPreferedTone;
   name?: Maybe<string>;
   emailSubject?: Maybe<string>;
   emailBody?: Maybe<any>;
@@ -12238,6 +12275,7 @@ export type PetitionComposeQuery = {
         __typename?: "Petition";
         status: PetitionStatus;
         id: string;
+        preferedTone: OrgPreferedTone;
         name?: Maybe<string>;
         emailSubject?: Maybe<string>;
         emailBody?: Maybe<any>;
@@ -12327,6 +12365,7 @@ export type PetitionComposeQuery = {
         __typename?: "PetitionTemplate";
         isPublic: boolean;
         id: string;
+        preferedTone: OrgPreferedTone;
         name?: Maybe<string>;
         emailSubject?: Maybe<string>;
         emailBody?: Maybe<any>;
@@ -13764,6 +13803,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
     deadline?: Maybe<string>;
     hasCommentsEnabled: boolean;
     isRecipientViewContentsHidden: boolean;
+    preferedTone: OrgPreferedTone;
     signatureStatus?: Maybe<PublicSignatureStatus>;
     fields: Array<{
       __typename?: "PublicPetitionField";
@@ -13864,6 +13904,7 @@ export type RecipientView_PublicPetitionFragment = {
   deadline?: Maybe<string>;
   hasCommentsEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
+  preferedTone: OrgPreferedTone;
   signatureStatus?: Maybe<PublicSignatureStatus>;
   fields: Array<{
     __typename?: "PublicPetitionField";
@@ -14000,6 +14041,7 @@ export type RecipientView_publicCompletePetitionMutation = {
     deadline?: Maybe<string>;
     hasCommentsEnabled: boolean;
     isRecipientViewContentsHidden: boolean;
+    preferedTone: OrgPreferedTone;
     signatureStatus?: Maybe<PublicSignatureStatus>;
     fields: Array<{
       __typename?: "PublicPetitionField";
@@ -14084,6 +14126,7 @@ export type PublicPetitionQuery = {
       deadline?: Maybe<string>;
       hasCommentsEnabled: boolean;
       isRecipientViewContentsHidden: boolean;
+      preferedTone: OrgPreferedTone;
       signatureStatus?: Maybe<PublicSignatureStatus>;
       fields: Array<{
         __typename?: "PublicPetitionField";
@@ -14188,6 +14231,7 @@ export type RecipientView_verifyPublicAccessMutation = {
     email?: Maybe<string>;
     orgName?: Maybe<string>;
     orgLogoUrl?: Maybe<string>;
+    preferedTone?: Maybe<OrgPreferedTone>;
   };
 };
 
@@ -16711,6 +16755,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     ...AddPetitionAccessDialog_Petition
     ...PetitionTemplateComposeMessageEditor_Petition
     ...PetitionSettings_PetitionBase
+    preferedTone
     fields {
       ...PetitionCompose_PetitionField
     }
@@ -17355,6 +17400,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     deadline
     hasCommentsEnabled
     isRecipientViewContentsHidden
+    preferedTone
     fields {
       ...RecipientView_PublicPetitionField
     }
@@ -19979,6 +20025,32 @@ export function useOrganizationBranding_updateOrgLogoMutation(
 export type OrganizationBranding_updateOrgLogoMutationHookResult = ReturnType<
   typeof useOrganizationBranding_updateOrgLogoMutation
 >;
+export const OrganizationBranding_changeOrganizationPreferedToneDocument = gql`
+  mutation OrganizationBranding_changeOrganizationPreferedTone(
+    $orgId: GID!
+    $tone: OrgPreferedTone!
+  ) {
+    changeOrganizationPreferedTone(orgId: $orgId, tone: $tone) {
+      id
+      preferedTone
+    }
+  }
+`;
+export function useOrganizationBranding_changeOrganizationPreferedToneMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OrganizationBranding_changeOrganizationPreferedToneMutation,
+    OrganizationBranding_changeOrganizationPreferedToneMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    OrganizationBranding_changeOrganizationPreferedToneMutation,
+    OrganizationBranding_changeOrganizationPreferedToneMutationVariables
+  >(OrganizationBranding_changeOrganizationPreferedToneDocument, options);
+}
+export type OrganizationBranding_changeOrganizationPreferedToneMutationHookResult = ReturnType<
+  typeof useOrganizationBranding_changeOrganizationPreferedToneMutation
+>;
 export const OrganizationBrandingDocument = gql`
   query OrganizationBranding {
     me {
@@ -19987,6 +20059,7 @@ export const OrganizationBrandingDocument = gql`
         id
         logoUrl
         name
+        preferedTone
       }
     }
   }
@@ -22004,6 +22077,7 @@ export const RecipientView_verifyPublicAccessDocument = gql`
       email
       orgName
       orgLogoUrl
+      preferedTone
     }
   }
 `;

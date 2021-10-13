@@ -16,7 +16,7 @@ export function closing({}, intl: IntlShape) {
     `;
 }
 
-export function greeting({ name }: { name: string | null }, intl: IntlShape) {
+export function greetingUser({ name }: { name: string | null }, intl: IntlShape) {
   return intl.formatMessage(
     {
       id: "greeting",
@@ -26,14 +26,25 @@ export function greeting({ name }: { name: string | null }, intl: IntlShape) {
   );
 }
 
-export function greetingFormal({ fullName }: { fullName: string | null }, intl: IntlShape) {
-  return intl.formatMessage(
-    {
-      id: "greeting.formal",
-      defaultMessage: "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
-    },
-    { fullName }
-  );
+export function greetingContact(
+  { name, fullName, tone }: { name: string | null; fullName: string | null; tone: string },
+  intl: IntlShape
+) {
+  return tone === "INFORMAL"
+    ? intl.formatMessage(
+        {
+          id: "greeting.contact",
+          defaultMessage: "{name, select, null {Hello,} other {Hello {name},}}",
+        },
+        { name }
+      )
+    : intl.formatMessage(
+        {
+          id: "greeting.formal",
+          defaultMessage: "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
+        },
+        { fullName }
+      );
 }
 
 export function petitionFieldList(

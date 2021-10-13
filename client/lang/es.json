@@ -86,22 +86,22 @@
   },
   {
     "term": "component.checkbox-type-label.exact",
-    "definition": "{tone, select, informal {Elige} other{Escoja}} {X, plural, =1{# opción} other{# opciones}}",
+    "definition": "{tone, select, INFORMAL{Elige} other{Escoja}} {X, plural, =1{# opción} other{# opciones}}",
     "context": "Choose {X, plural, =1{# option} other{# options}}"
   },
   {
     "term": "component.checkbox-type-label.range",
-    "definition": "{tone, select, informal {Elige} other{Escoja}} entre {Y} y {X} opciones",
+    "definition": "{tone, select, INFORMAL{Elige} other{Escoja}} entre {Y} y {X} opciones",
     "context": "Choose between {Y} and {X} options"
   },
   {
     "term": "component.checkbox-type-label.unlimited",
-    "definition": "{tone, select, informal {Elige tantas opciones como quieras} other{Escoja tantas opciones como desee}}",
+    "definition": "{tone, select, INFORMAL{Elige tantas opciones como quieras} other{Escoja tantas opciones como desee}}",
     "context": "Choose as many options as you want"
   },
   {
     "term": "component.checkbox-type-label.up-to",
-    "definition": "{tone, select, informal {Elige} other{Escoja}} hasta {X, plural, =1{# opción} other{# opciones}}",
+    "definition": "{tone, select, INFORMAL{Elige} other{Escoja}} hasta {X, plural, =1{# opción} other{# opciones}}",
     "context": "Choose up to {X, plural, =1{# option} other{# options}}"
   },
   {
@@ -2311,7 +2311,7 @@
   },
   {
     "term": "component.recipient-view.reminder-submit",
-    "definition": "Recuerde finalizar una vez haya completado todos los campos.",
+    "definition": "{tone, select, INFORMAL{Recuerda finalizar cuando completes todos los campos.} other{Recuerde finalizar una vez haya completado todos los campos.}}",
     "context": "Remember to click Finalize when you finish entering all the information."
   },
   {
@@ -2851,7 +2851,7 @@
   },
   {
     "term": "components.add-new-signer-dialog.header",
-    "definition": "{tone, select, informal{Introduce los datos del firmante} other{Introduzca los datos del firmante}}",
+    "definition": "{tone, select, INFORMAL{Introduce los datos del firmante} other{Introduzca los datos del firmante}}",
     "context": "Enter the signer's information"
   },
   {
@@ -4150,34 +4150,44 @@
     "context": "Organization logo"
   },
   {
+    "term": "organization.branding.preview-body",
+    "definition": "{tone, select, INFORMAL{Te recordamos que <b>[Tu nombre]</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió una petición de la que queda información pendiente de completar.}}",
+    "context": "We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted."
+  },
+  {
+    "term": "organization.branding.preview-fields-pending",
+    "definition": "{tone, select, INFORMAL{En este momento hay 12/40 campos pendientes} other{Tiene 12/40 campos pendientes}}",
+    "context": "{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}"
+  },
+  {
+    "term": "organization.branding.preview-footer",
+    "definition": "Previsualización de los correos que recibirán tus clientes.",
+    "context": "An example of the emails your customers will receive."
+  },
+  {
+    "term": "organization.branding.preview-grettings",
+    "definition": "{tone, select, INFORMAL{🔔 ¡Hola <b>[Nombre destinatario]</b>!} other{Estimado/a <b>[Nombre destinatario],</b>}}",
+    "context": "{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}"
+  },
+  {
     "term": "organization.branding.title",
     "definition": "Branding",
     "context": "Branding"
   },
   {
     "term": "organization.branding.tone-formal",
-    "definition": "",
+    "definition": "Formal",
     "context": "Formal"
   },
   {
-    "term": "organization.branding.tone-formal-description",
-    "definition": "",
-    "context": "For example: Dear [Recipient’s name], we remind you that Harvey Specter has shared an access to Parallel with you."
-  },
-  {
     "term": "organization.branding.tone-header",
-    "definition": "",
+    "definition": "Tono de los mensajes",
     "context": "Tone of the messages"
   },
   {
     "term": "organization.branding.tone-informal",
-    "definition": "",
+    "definition": "Informal",
     "context": "Informal"
-  },
-  {
-    "term": "organization.branding.tone-informal-description",
-    "definition": "",
-    "context": "For example: Hello [Recipient’s name], remember that Harvey Specter shared an access to Parallel with you."
   },
   {
     "term": "organization.branding.upload-logo",
@@ -7386,8 +7396,8 @@
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle",
-    "definition": "{tone, select, informal {Para completar esta petición se necesita una <b>firma digital</b>.} other{Esta petición requiere de firma digital para ser completada.}}",
-    "context": "{tone, select, informal{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
+    "definition": "{tone, select, INFORMAL{Para completar esta petición se necesita una <b>firma digital</b>.} other{Esta petición requiere de firma digital para ser completada.}}",
+    "context": "{tone, select, INFORMAL{A <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle.recipient-can-add",
@@ -7396,8 +7406,8 @@
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle.with-signers",
-    "definition": "{tone, select, informal{Clica en <b>Continuar con firma digital</b> y enviaremos un email con información sobre cómo completarla a las siguientes personas:} other{Al hacer click en <b>Continuar con firma digital</b>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:}",
-    "context": "{tone, select, informal{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}"
+    "definition": "{tone, select, INFORMAL{Clica en <b>Continuar con firma digital</b> y enviaremos un email con información sobre cómo completarla a las siguientes personas:} other{Al hacer click en <b>Continuar con firma digital</b>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:}}",
+    "context": "{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and we will send an e-mail with information on how to complete the process to the following people:} other{After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:}}"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
@@ -7446,18 +7456,18 @@
   },
   {
     "term": "recipient-view.first-time.claim-1",
-    "definition": "{tone, select, informal{La información se guardará automáticamente a medida que vayas completando la petición.} other{La información se irá guardando a medida que vaya completando la petición.}}",
+    "definition": "{tone, select, INFORMAL{La información se guardará automáticamente a medida que vayas completando la petición.} other{La información se irá guardando a medida que vaya completando la petición.}}",
     "context": "The information will be saved automatically as you add it."
   },
   {
     "term": "recipient-view.first-time.claim-2",
-    "definition": "{tone, select, informal{Puedes volver tantas veces como quieras utilizando este mismo enlace.} other{Puede volver tantas veces como desee utilizando el enlace que recibió en su correo electrónico.}}",
+    "definition": "{tone, select, INFORMAL{Puedes volver tantas veces como quieras utilizando este mismo enlace.} other{Puede volver tantas veces como desee utilizando el enlace que recibió en su correo electrónico.}}",
     "context": "You can come back as many times as you'd like using the link you received in your email."
   },
   {
     "term": "recipient-view.first-time.claim-3",
-    "definition": "{tone, select, informal{¡No te quedes con dudas! Puedes agregar cualquier comentario y pregunta que quieras en los campos.} other{Puede agregar cualquier comentario y pregunta que desee. Envíelos de inmediato cuando lo desee.}}",
-    "context": "You can add any comments and questions you'd like. Submit them at once whenever you decide."
+    "definition": "{tone, select, INFORMAL{¡No te quedes con dudas! Puedes agregar cualquier comentario y pregunta que quieras en los campos.} other{Puede agregar cualquier comentario y pregunta que desee. Envíelos de inmediato cuando lo desee.}}",
+    "context": "{tone, select, INFORMAL{Don't be left with doubts! You can add any comments and questions you want in the fields.} other{You can add any comments and questions you'd like. Submit them at once whenever you decide.}}"
   },
   {
     "term": "recipient-view.first-time.intro",
@@ -7481,12 +7491,12 @@
   },
   {
     "term": "recipient-view.invite-collaborator-dialog.subtitle-1",
-    "definition": "{tone, select, informal{Completa los datos de la persona a la que quieras invitar como colaborador.} other{Por favor, rellene los datos de la persona a la que quiere delegar su acceso.}}",
-    "context": "{tone, select, informal{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
+    "definition": "{tone, select, INFORMAL{Completa los datos de la persona a la que quieras invitar como colaborador.} other{Por favor, rellene los datos de la persona a la que quiere delegar su acceso.}}",
+    "context": "{tone, select, INFORMAL{Fill in the data of the person you want to invite as a collaborator.} other{Please fill out the contact details of the person you want to delegate your access.}}"
   },
   {
     "term": "recipient-view.invite-collaborator-dialog.subtitle-2",
-    "definition": "{tone, select, informal{Le enviaremos un correo electrónico con instrucciones para que pueda acceder.} other{Le enviaremos un correo electrónico con instrucciones sobre cómo proceder.}}",
+    "definition": "{tone, select, INFORMAL{Le enviaremos un correo electrónico con instrucciones para que pueda acceder.} other{Le enviaremos un correo electrónico con instrucciones sobre cómo proceder.}}",
     "context": "We will send them an email with instructions on how to proceed."
   },
   {
@@ -7511,12 +7521,12 @@
   },
   {
     "term": "recipient-view.petition-completed-alert-1",
-    "definition": "{tone, select, informal{¡Perfecto! Has completado la petición y hemos avisado a {name} para que la revise y valide.} other{Esta petición ha sido completada y hemos notificado a {name} para su revisión y validación.}}",
-    "context": "{tone, select, informal{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+    "definition": "{tone, select, INFORMAL{¡Perfecto! Has completado la petición y hemos avisado a {name} para que la revise y valide.} other{Esta petición ha sido completada y hemos notificado a {name} para su revisión y validación.}}",
+    "context": "{tone, select, INFORMAL{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
   },
   {
     "term": "recipient-view.petition-completed-alert-2",
-    "definition": "{tone, select, informal{Puedes hacer cambios si quieres} other{Puede realizar cambios si así lo desea}}, pero no olvide hacer click de nuevo en el botón de <b>Finalizar</b>.",
+    "definition": "{tone, select, INFORMAL{Puedes hacer cambios si quieres} other{Puede realizar cambios si así lo desea}}, pero no olvide hacer click de nuevo en el botón de <b>Finalizar</b>.",
     "context": "If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
   },
   {
@@ -7581,13 +7591,13 @@
   },
   {
     "term": "recipient-view.review-before-sign.body-1",
-    "definition": "Esta petición requiere de <b>firma digital</b> para ser completada.",
+    "definition": "{tone, select, INFORMAL{Para completar esta petición se necesita una <b>firma digital</b>.} other{Esta petición requiere de <b>firma digital</b> para ser completada.}}",
     "context": "This petition requires an <b>eSignature</b> in order to be completed."
   },
   {
     "term": "recipient-view.review-before-sign.body-2",
-    "definition": "Hemos notificado a {name} para que proceda a la revisión de las respuestas y una vez validadas enviaremos un email con el documento a firmar a las personas que correspondan.",
-    "context": "We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people."
+    "definition": "{tone, select, INFORMAL{Hemos avisado a {name} para que revise las respuestas. Cuando esté todo validado, enviaremos un correo con el documento a firmar a las personas indicadas.} other{Hemos notificado a {name} para que proceda a la revisión de las respuestas y una vez validadas enviaremos un email con el documento a firmar a las personas que correspondan.}}",
+    "context": "{tone, select, INFORMAL{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to people who has to sign it.} other{We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people.}}"
   },
   {
     "term": "recipient-view.review-before-sign.header",
@@ -7621,7 +7631,7 @@
   },
   {
     "term": "recipient-view.verify-1",
-    "definition": "Parece que {tone, select, informal{estás} other{está}} intentando acceder a esta página desde un dispositivo nuevo.",
+    "definition": "Parece que {tone, select, INFORMAL{estás} other{está}} intentando acceder a esta página desde un dispositivo nuevo.",
     "context": "It looks like you are trying to access this page from a new device."
   },
   {

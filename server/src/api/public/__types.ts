@@ -318,6 +318,8 @@ export type Mutation = {
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
+  /** Changes the organization prefered tone */
+  changeOrganizationPreferedTone: Organization;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
@@ -570,6 +572,11 @@ export type MutationcancelScheduledMessageArgs = {
 
 export type MutationcancelSignatureRequestArgs = {
   petitionSignatureRequestId: Scalars["GID"];
+};
+
+export type MutationchangeOrganizationPreferedToneArgs = {
+  orgId: Scalars["GID"];
+  tone: OrgPreferedTone;
 };
 
 export type MutationchangePasswordArgs = {
@@ -1191,6 +1198,9 @@ export type OrgIntegration = {
   type: IntegrationType;
 };
 
+/** The prefered tone of organization */
+export type OrgPreferedTone = "FORMAL" | "INFORMAL";
+
 /** An organization in the system. */
 export type Organization = Timestamps & {
   /** @deprecated Temporal solution for support methods, don't use */
@@ -1208,6 +1218,8 @@ export type Organization = Timestamps & {
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The status of the organization. */
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
@@ -1336,6 +1348,8 @@ export type Petition = PetitionBase & {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The progress of the petition. */
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
@@ -1456,6 +1470,8 @@ export type PetitionBase = {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -1862,6 +1878,8 @@ export type PetitionTemplate = PetitionBase & {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The public link linked to this template */
   publicLink: Maybe<PublicPetitionLink>;
   /** The signature configuration for the petition. */
@@ -1949,6 +1967,7 @@ export type PublicAccessVerification = {
   isAllowed: Scalars["Boolean"];
   orgLogoUrl: Maybe<Scalars["String"]>;
   orgName: Maybe<Scalars["String"]>;
+  preferedTone: Maybe<OrgPreferedTone>;
 };
 
 /** A public view of a contact */
@@ -1994,6 +2013,8 @@ export type PublicPetition = Timestamps & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** The prefered tone of organization. */
+  preferedTone: OrgPreferedTone;
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */

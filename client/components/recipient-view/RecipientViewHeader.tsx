@@ -30,6 +30,7 @@ import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactListPopover } from "../common/ContactListPopover";
 import { HelpPopover } from "../common/HelpPopover";
+import { useTone } from "../common/toneContext";
 import { useDelegateAccessDialog } from "./DelegateAccessDialog";
 
 function Contact({
@@ -86,12 +87,15 @@ export function RecipientViewHeader({
     md: "vertical",
   });
 
+  const tone = useTone();
+
   const handleDelegateAccess = async () => {
     try {
       const data = await showDelegateAccessDialog({
         keycode,
         contactName: contact.firstName ?? "",
         organizationName: sender?.organization.name ?? "",
+        tone,
       });
       await publicDelegateAccessToContact({
         variables: {
