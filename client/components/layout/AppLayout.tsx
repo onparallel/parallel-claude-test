@@ -168,7 +168,7 @@ export const AppLayout = Object.assign(
                 {...props}
               >
                 {hasNewVersion ? (
-                  <CloseableAlert status="info">
+                  <CloseableAlert status="info" flexShrink={0}>
                     <AlertIcon />
                     <AlertDescription display="block" flex="1">
                       <FormattedMessage
