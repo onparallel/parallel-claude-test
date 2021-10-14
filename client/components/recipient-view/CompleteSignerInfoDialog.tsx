@@ -89,18 +89,13 @@ function CompleteSignerInfoDialog({
   const [recipientWillSign, setRecipientWillSign] = useState(false);
   const [additionalSigners, setAdditionalSigners] = useState<PublicPetitionSignerDataInput[]>([]);
 
-  function handleRemoveAdditionalSigner(email: string) {
-    setAdditionalSigners(additionalSigners.filter((s) => s.email !== email));
+  function handleRemoveAdditionalSigner(index: number) {
+    setAdditionalSigners(additionalSigners.filter((_, i) => i !== index));
   }
 
   const showAddNewSignerDialog = useAddNewSignerDialog();
   async function handleAddAdditionalSigner() {
-    const [error, newSignerInfo] = await withError(
-      showAddNewSignerDialog({
-        emails: [...signers, ...additionalSigners].map((s) => s.email),
-        tone,
-      })
-    );
+    const [error, newSignerInfo] = await withError(showAddNewSignerDialog({ tone }));
     if (!error && newSignerInfo) {
       setAdditionalSigners([...additionalSigners, newSignerInfo]);
     }
@@ -193,7 +188,7 @@ function CompleteSignerInfoDialog({
                       {fullName(s.firstName, s.lastName)} {`<${s.email}> `}
                       {i >= signers.length ? (
                         <IconButtonWithTooltip
-                          onClick={() => handleRemoveAdditionalSigner(s.email)}
+                          onClick={() => handleRemoveAdditionalSigner(i - signers.length)}
                           variant="ghost"
                           size="xs"
                           label={intl.formatMessage({

@@ -2870,11 +2870,6 @@
     "context": "User group"
   },
   {
-    "term": "components.add-new-signer-dialog.email-already-used.error",
-    "definition": "This email is already on the list of signers",
-    "context": "This email is already on the list of signers"
-  },
-  {
     "term": "components.add-new-signer-dialog.header",
     "definition": "Enter the signer's information",
     "context": "Enter the signer's information"
@@ -7951,8 +7946,8 @@
   },
   {
     "term": "timeline.recipient-signed-description",
-    "definition": "{contact} signed the document {timeAgo}",
-    "context": "{contact} signed the document {timeAgo}"
+    "definition": "{signer} signed the document {timeAgo}",
+    "context": "{signer} signed the document {timeAgo}"
   },
   {
     "term": "timeline.reminder-sent-description-automatic",
@@ -8006,8 +8001,8 @@
   },
   {
     "term": "timeline.signature-declined-description",
-    "definition": "{contact} has declined the eSignature process {timeAgo}",
-    "context": "{contact} has declined the eSignature process {timeAgo}"
+    "definition": "{signer} has declined the eSignature process {timeAgo}",
+    "context": "{signer} has declined the eSignature process {timeAgo}"
   },
   {
     "term": "timeline.signature-declined.see-reason",

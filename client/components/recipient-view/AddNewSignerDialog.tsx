@@ -13,11 +13,7 @@ type NewSignerInfo = {
   lastName: string;
   email: string;
 };
-function AddNewSignerDialog({
-  emails,
-  tone,
-  ...props
-}: DialogProps<{ emails: string[]; tone: Tone }, NewSignerInfo>) {
+function AddNewSignerDialog({ tone, ...props }: DialogProps<{ tone: Tone }, NewSignerInfo>) {
   const intl = useIntl();
   const {
     register,
@@ -31,7 +27,6 @@ function AddNewSignerDialog({
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
     pattern: EMAIL_REGEX,
-    validate: (email: string) => !emails.includes(email),
   });
 
   return (
@@ -41,7 +36,13 @@ function AddNewSignerDialog({
       initialFocusRef={emailRef}
       content={{
         as: "form",
-        onSubmit: handleSubmit<NewSignerInfo>(props.onResolve),
+        onSubmit: handleSubmit<NewSignerInfo>((data) =>
+          props.onResolve({
+            firstName: data.firstName.trim(),
+            lastName: data.lastName.trim(),
+            email: data.email.toLowerCase(),
+          })
+        ),
       }}
       header={
         <FormattedMessage
@@ -64,17 +65,10 @@ function AddNewSignerDialog({
               })}
             />
             <FormErrorMessage>
-              {errors.email?.type === "validate" ? (
-                <FormattedMessage
-                  id="components.add-new-signer-dialog.email-already-used.error"
-                  defaultMessage="This email is already on the list of signers"
-                />
-              ) : (
-                <FormattedMessage
-                  id="generic.forms.invalid-email-error"
-                  defaultMessage="Please, enter a valid email"
-                />
-              )}
+              <FormattedMessage
+                id="generic.forms.invalid-email-error"
+                defaultMessage="Please, enter a valid email"
+              />
             </FormErrorMessage>
           </FormControl>
           <Stack direction="row">

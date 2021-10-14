@@ -22,18 +22,9 @@ import SignatureRequestedEmail from "../emails/components/SignatureRequestedEmai
 import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
 import { removeNotDefined } from "../util/remedaExtensions";
+import { PageSignatureMetadata } from "../workers/helpers/calculateSignatureBoxPositions";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
-
-type SignerBox = {
-  email?: string;
-  box?: {
-    top: number;
-    left: number;
-    height: number;
-    width: number;
-  };
-};
 
 type SignatureOptions = {
   locale: string;
@@ -50,7 +41,7 @@ type SignatureOptions = {
    *  Each element on the array represents a page in the document.
    *  Inside each page, there's an array with the signers information.
    */
-  signatureBoxPositions?: Array<SignerBox[]>;
+  signatureBoxPositions?: PageSignatureMetadata[][];
   /**
    * Optional plain-text custom message to include in the "signature requested" emails
    */
@@ -194,14 +185,14 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
           o: toGlobalId("Organization", this.orgId),
         })}`,
-        recipients: recipients.map((r) => ({
+        recipients: recipients.map((r, recipientIndex) => ({
           email: r.email,
           name: r.name,
           require_signature_in_coordinates: opts?.signatureBoxPositions?.map(
-            (boxPosition) => boxPosition?.find((bp) => bp.email === r.email)?.box ?? {}
+            (pageBoxes) => pageBoxes.find((pb) => pb.signerIndex === recipientIndex)?.box ?? {}
           ),
         })),
-        expire_time: 0, // disable signaturit reminder emails
+        expire_time: 0, // disable signaturit automatic reminder emails
         reminders: 0,
       }) as any
     );

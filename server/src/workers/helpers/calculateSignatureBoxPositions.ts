@@ -3,18 +3,19 @@ import { countBy, groupBy } from "remeda";
 
 export type PageSignatureMetadata = {
   email: string;
+  signerIndex: number;
   box: {
     top: number;
     left: number;
     height: number;
     width: number;
   };
-}[];
+};
 
 export async function calculateSignatureBoxPositions(
   pdfBuffer: Buffer,
   recipients: { email: string }[]
-): Promise<PageSignatureMetadata[]> {
+): Promise<PageSignatureMetadata[][]> {
   const parser = new PDFParser();
   const metadata = await new Promise<any>((resolve, reject) => {
     parser.on("pdfParser_dataReady", resolve);
@@ -22,7 +23,7 @@ export async function calculateSignatureBoxPositions(
     parser.parseBuffer(pdfBuffer);
   });
   const pageWidth = metadata.formImage.Width as number;
-  const positions: PageSignatureMetadata[] = metadata.formImage.Pages.map(
+  const positions: PageSignatureMetadata[][] = metadata.formImage.Pages.map(
     (page: { Texts: { R: { T: string }[]; x: number; y: number }[]; Height: number }) => {
       /**
        * pdf parser can't guarantee that the extracted texts will be complete words.
@@ -66,6 +67,7 @@ export async function calculateSignatureBoxPositions(
         const signerIndex = parseInt(sb.text.split("SIGNER_")[1], 10);
         return {
           email: recipients[signerIndex].email,
+          signerIndex,
           box: {
             top: (sb.box.y / page.Height) * 100,
             left: Math.ceil((sb.box.x / pageWidth) * 100),
