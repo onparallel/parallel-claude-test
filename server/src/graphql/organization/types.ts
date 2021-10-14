@@ -187,7 +187,7 @@ export const Organization = objectType({
     t.nonNull.field("preferedTone", {
       type: "Tone",
       description: "The prefered tone of organization.",
-      resolve: async (o) => {
+      resolve: (o) => {
         return o.prefered_tone;
       },
     });

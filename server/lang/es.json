@@ -140,9 +140,9 @@
     "context": "Untitled petition"
   },
   {
-    "term": "greeting-user",
-    "definition": "{name, select, null {Hola,} other {Hola {name},}}",
-    "context": "{name, select, null {Hi,} other {Hi {name},}}"
+    "term": "greeting-contact.formal",
+    "definition": "{fullName, select, null {Estimado/a Sr./Sra.,} other {Estimado/a {fullName},}}",
+    "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
   },
   {
     "term": "greeting-contact.informal",
@@ -150,14 +150,14 @@
     "context": "{name, select, null {Hello,} other {Hello {name},}}"
   },
   {
-    "term": "greeting-contact.formal",
-    "definition": "{fullName, select, null {Estimado/a Sr./Sra.,} other {Estimado/a {fullName},}}",
-    "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
-  },
-  {
     "term": "greeting-reminder.informal",
     "definition": "{name, select, null {🔔 ¡Hola!} other {🔔 ¡Hola, {name}!}}",
     "context": "{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}"
+  },
+  {
+    "term": "greeting-user",
+    "definition": "{name, select, null {Hola,} other {Hola {name},}}",
+    "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
     "term": "invitation.details",
@@ -346,7 +346,7 @@
   },
   {
     "term": "public-petition-link.text-1",
-    "definition": "{tone, select, INFORMAL{Te enviamos el acceso que has solicitado al formulario de Some petition {petitionTitle}.} other{Le enviamos el acceso solicitado al formulario de {petitionTitle}.}}",
+    "definition": "{tone, select, INFORMAL{Te enviamos el acceso que has solicitado al formulario de {petitionTitle}.} other{Le enviamos el acceso solicitado al formulario de {petitionTitle}.}}",
     "context": "We send you the requested access to {petitionTitle}."
   },
   {

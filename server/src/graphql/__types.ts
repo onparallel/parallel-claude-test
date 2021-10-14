@@ -807,7 +807,6 @@ export interface NexusGenFieldTypes {
     bulkCreateContacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
-    changeOrganizationPreferedTone: NexusGenRootTypes["Organization"]; // Organization!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
@@ -891,6 +890,7 @@ export interface NexusGenFieldTypes {
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
+    updateOrganizationPreferedTone: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
@@ -1957,7 +1957,6 @@ export interface NexusGenFieldTypeNames {
     bulkCreateContacts: "Contact";
     cancelScheduledMessage: "PetitionMessage";
     cancelSignatureRequest: "PetitionSignatureRequest";
-    changeOrganizationPreferedTone: "Organization";
     changePassword: "ChangePasswordResult";
     changePetitionFieldType: "PetitionBaseAndField";
     clonePetitionField: "PetitionBaseAndField";
@@ -2041,6 +2040,7 @@ export interface NexusGenFieldTypeNames {
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOnboardingStatus: "User";
     updateOrganizationLogo: "Organization";
+    updateOrganizationPreferedTone: "Organization";
     updateOrganizationUser: "User";
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionBaseAndField";
@@ -2953,10 +2953,6 @@ export interface NexusGenArgTypes {
       // args
       petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
     };
-    changeOrganizationPreferedTone: {
-      // args
-      tone: NexusGenEnums["Tone"]; // Tone!
-    };
     changePassword: {
       // args
       newPassword: string; // String!
@@ -3426,6 +3422,10 @@ export interface NexusGenArgTypes {
     updateOrganizationLogo: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
+    };
+    updateOrganizationPreferedTone: {
+      // args
+      tone: NexusGenEnums["Tone"]; // Tone!
     };
     updateOrganizationUser: {
       // args

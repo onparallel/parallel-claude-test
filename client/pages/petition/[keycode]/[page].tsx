@@ -207,7 +207,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                         <Text>
                           <FormattedMessage
                             id="recipient-view.petition-completed-alert-1"
-                            defaultMessage="{tone, select, INFORMAL{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+                            defaultMessage="{tone, select, INFORMAL{Great! You have completed the petition and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
                             values={{
                               name: <b>{granter.fullName}</b>,
                               tone,

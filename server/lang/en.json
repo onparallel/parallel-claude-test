@@ -140,9 +140,9 @@
     "context": "Untitled petition"
   },
   {
-    "term": "greeting-user",
-    "definition": "{name, select, null {Hi,} other {Hi {name},}}",
-    "context": "{name, select, null {Hi,} other {Hi {name},}}"
+    "term": "greeting-contact.formal",
+    "definition": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
+    "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
   },
   {
     "term": "greeting-contact.informal",
@@ -150,14 +150,14 @@
     "context": "{name, select, null {Hello,} other {Hello {name},}}"
   },
   {
-    "term": "greeting-contact.formal",
-    "definition": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
-    "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
-  },
-  {
     "term": "greeting-reminder.informal",
     "definition": "{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}",
     "context": "{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}"
+  },
+  {
+    "term": "greeting-user",
+    "definition": "{name, select, null {Hi,} other {Hi {name},}}",
+    "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
     "term": "invitation.details",

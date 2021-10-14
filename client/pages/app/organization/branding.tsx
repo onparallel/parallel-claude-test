@@ -24,7 +24,7 @@ import { BrandingPreview } from "@parallel/components/organization/BrandingPrevi
 import {
   Tone,
   useOrganizationBrandingQuery,
-  useOrganizationBranding_changeOrganizationPreferedToneMutation,
+  useOrganizationBranding_updateOrganizationPreferedToneMutation,
   useOrganizationBranding_updateOrgLogoMutation,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
@@ -76,7 +76,7 @@ function OrganizationBranding() {
     }
   };
 
-  const [changePreferedTone] = useOrganizationBranding_changeOrganizationPreferedToneMutation();
+  const [changePreferedTone] = useOrganizationBranding_updateOrganizationPreferedToneMutation();
 
   const handleToneChange = async (tone: Tone) => {
     changePreferedTone({
@@ -237,8 +237,8 @@ OrganizationBranding.mutations = [
     }
   `,
   gql`
-    mutation OrganizationBranding_changeOrganizationPreferedTone($tone: Tone!) {
-      changeOrganizationPreferedTone(tone: $tone) {
+    mutation OrganizationBranding_updateOrganizationPreferedTone($tone: Tone!) {
+      updateOrganizationPreferedTone(tone: $tone) {
         id
         preferedTone
       }

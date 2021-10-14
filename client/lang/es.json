@@ -7527,7 +7527,7 @@
   {
     "term": "recipient-view.petition-completed-alert-1",
     "definition": "{tone, select, INFORMAL{¡Perfecto! Has completado la petición y hemos avisado a {name} para que la revise y valide.} other{Esta petición ha sido completada y hemos notificado a {name} para su revisión y validación.}}",
-    "context": "{tone, select, INFORMAL{Great! You have completed the request and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+    "context": "{tone, select, INFORMAL{Great! You have completed the petition and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
   },
   {
     "term": "recipient-view.petition-completed-alert-2",

@@ -352,8 +352,6 @@ export interface Mutation {
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
-  /** Changes the organization prefered tone */
-  changeOrganizationPreferedTone: Organization;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
@@ -518,6 +516,8 @@ export interface Mutation {
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
+  /** Changes the organization prefered tone */
+  updateOrganizationPreferedTone: Organization;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
   /** Updates a petition. */
@@ -606,10 +606,6 @@ export interface MutationcancelScheduledMessageArgs {
 
 export interface MutationcancelSignatureRequestArgs {
   petitionSignatureRequestId: Scalars["GID"];
-}
-
-export interface MutationchangeOrganizationPreferedToneArgs {
-  tone: Tone;
 }
 
 export interface MutationchangePasswordArgs {
@@ -1080,6 +1076,10 @@ export interface MutationupdateOnboardingStatusArgs {
 
 export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
+}
+
+export interface MutationupdateOrganizationPreferedToneArgs {
+  tone: Tone;
 }
 
 export interface MutationupdateOrganizationUserArgs {
@@ -8699,12 +8699,12 @@ export type OrganizationBranding_updateOrgLogoMutation = {
   updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: Maybe<string> };
 };
 
-export type OrganizationBranding_changeOrganizationPreferedToneMutationVariables = Exact<{
+export type OrganizationBranding_updateOrganizationPreferedToneMutationVariables = Exact<{
   tone: Tone;
 }>;
 
-export type OrganizationBranding_changeOrganizationPreferedToneMutation = {
-  changeOrganizationPreferedTone: { __typename?: "Organization"; id: string; preferedTone: Tone };
+export type OrganizationBranding_updateOrganizationPreferedToneMutation = {
+  updateOrganizationPreferedTone: { __typename?: "Organization"; id: string; preferedTone: Tone };
 };
 
 export type OrganizationBrandingQueryVariables = Exact<{ [key: string]: never }>;
@@ -20017,28 +20017,28 @@ export function useOrganizationBranding_updateOrgLogoMutation(
 export type OrganizationBranding_updateOrgLogoMutationHookResult = ReturnType<
   typeof useOrganizationBranding_updateOrgLogoMutation
 >;
-export const OrganizationBranding_changeOrganizationPreferedToneDocument = gql`
-  mutation OrganizationBranding_changeOrganizationPreferedTone($tone: Tone!) {
-    changeOrganizationPreferedTone(tone: $tone) {
+export const OrganizationBranding_updateOrganizationPreferedToneDocument = gql`
+  mutation OrganizationBranding_updateOrganizationPreferedTone($tone: Tone!) {
+    updateOrganizationPreferedTone(tone: $tone) {
       id
       preferedTone
     }
   }
 `;
-export function useOrganizationBranding_changeOrganizationPreferedToneMutation(
+export function useOrganizationBranding_updateOrganizationPreferedToneMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    OrganizationBranding_changeOrganizationPreferedToneMutation,
-    OrganizationBranding_changeOrganizationPreferedToneMutationVariables
+    OrganizationBranding_updateOrganizationPreferedToneMutation,
+    OrganizationBranding_updateOrganizationPreferedToneMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    OrganizationBranding_changeOrganizationPreferedToneMutation,
-    OrganizationBranding_changeOrganizationPreferedToneMutationVariables
-  >(OrganizationBranding_changeOrganizationPreferedToneDocument, options);
+    OrganizationBranding_updateOrganizationPreferedToneMutation,
+    OrganizationBranding_updateOrganizationPreferedToneMutationVariables
+  >(OrganizationBranding_updateOrganizationPreferedToneDocument, options);
 }
-export type OrganizationBranding_changeOrganizationPreferedToneMutationHookResult = ReturnType<
-  typeof useOrganizationBranding_changeOrganizationPreferedToneMutation
+export type OrganizationBranding_updateOrganizationPreferedToneMutationHookResult = ReturnType<
+  typeof useOrganizationBranding_updateOrganizationPreferedToneMutation
 >;
 export const OrganizationBrandingDocument = gql`
   query OrganizationBranding {

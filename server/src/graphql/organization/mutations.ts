@@ -43,7 +43,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   },
 });
 
-export const changeOrganizationPreferedTone = mutationField("changeOrganizationPreferedTone", {
+export const updateOrganizationPreferedTone = mutationField("updateOrganizationPreferedTone", {
   description: "Changes the organization prefered tone",
   type: "Organization",
   args: {
@@ -51,10 +51,9 @@ export const changeOrganizationPreferedTone = mutationField("changeOrganizationP
   },
   authorize: authenticateAnd(contextUserIsAdmin()),
   resolve: async (root, args, ctx) => {
-    const tone = await args.tone;
     return await ctx.organizations.updateOrganization(
       ctx.user!.org_id,
-      { prefered_tone: tone },
+      { prefered_tone: args.tone },
       `User:${ctx.user!.id}`
     );
   },

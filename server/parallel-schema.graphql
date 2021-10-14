@@ -457,11 +457,6 @@ type Mutation {
   cancelSignatureRequest(petitionSignatureRequestId: GID!): PetitionSignatureRequest!
 
   """
-  Changes the organization prefered tone
-  """
-  changeOrganizationPreferedTone(tone: Tone!): Organization!
-
-  """
   Changes the password for the current logged in user.
   """
   changePassword(newPassword: String!, password: String!): ChangePasswordResult!
@@ -1129,6 +1124,11 @@ type Mutation {
   Updates the logo of an organization
   """
   updateOrganizationLogo(file: Upload!): Organization!
+
+  """
+  Changes the organization prefered tone
+  """
+  updateOrganizationPreferedTone(tone: Tone!): Organization!
 
   """
   Updates the role of another user in the organization.

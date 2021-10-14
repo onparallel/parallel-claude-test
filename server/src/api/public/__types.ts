@@ -318,8 +318,6 @@ export type Mutation = {
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
-  /** Changes the organization prefered tone */
-  changeOrganizationPreferedTone: Organization;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
@@ -484,6 +482,8 @@ export type Mutation = {
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
+  /** Changes the organization prefered tone */
+  updateOrganizationPreferedTone: Organization;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
   /** Updates a petition. */
@@ -572,10 +572,6 @@ export type MutationcancelScheduledMessageArgs = {
 
 export type MutationcancelSignatureRequestArgs = {
   petitionSignatureRequestId: Scalars["GID"];
-};
-
-export type MutationchangeOrganizationPreferedToneArgs = {
-  tone: Tone;
 };
 
 export type MutationchangePasswordArgs = {
@@ -1046,6 +1042,10 @@ export type MutationupdateOnboardingStatusArgs = {
 
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
+};
+
+export type MutationupdateOrganizationPreferedToneArgs = {
+  tone: Tone;
 };
 
 export type MutationupdateOrganizationUserArgs = {
