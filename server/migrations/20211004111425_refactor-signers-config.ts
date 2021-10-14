@@ -198,11 +198,11 @@ const PetitionsMigration = {
             "signature_config",
             JSON.stringify({
               ...omit(petition.signature_config, ["signersInfo", "additionalSignersInfo"]),
-              contactIds: (petition.signature_config.signersInfo as MappedContact[])
+              contactIds: ((petition.signature_config.signersInfo ?? []) as MappedContact[])
                 .map((signer) => signer.contactId)
                 .filter(isDefined),
               additionalSignerContactIds: (
-                petition.signature_config.additionalSignersInfo as MappedContact[]
+                (petition.signature_config.additionalSignersInfo ?? []) as MappedContact[]
               )
                 .map((signer) => signer.contactId)
                 .filter(isDefined),
