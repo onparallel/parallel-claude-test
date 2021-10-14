@@ -2,12 +2,12 @@ import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
 import { isDefined } from "remeda";
-import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
 import { WorkerContext } from "../context";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { removeKeys } from "../util/remedaExtensions";
+import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { createQueueWorker } from "./helpers/createQueueWorker";
@@ -33,7 +33,12 @@ async function startSignatureProcess(
   const settings = signature.signature_config;
 
   let removeGeneratedPdf = true;
-  const tmpPdfPath = resolve(tmpdir(), "print", random(16), sanitize(`${settings.title}.pdf`));
+  const tmpPdfPath = resolve(
+    tmpdir(),
+    "print",
+    random(16),
+    sanitizeFilenameWithSuffix(settings.title, ".pdf")
+  );
 
   try {
     const signatureIntegration = await fetchOrgSignatureIntegration(

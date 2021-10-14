@@ -39,6 +39,7 @@
     "apollo-upload-client": "^16.0.0",
     "autosize": "^5.0.1",
     "beautiful-react-hooks": "^1.0.1",
+    "byte-length": "^1.0.2",
     "clipboard-copy": "^4.0.1",
     "compare-versions": "^3.6.0",
     "cookie": "^0.4.1",
@@ -80,6 +81,7 @@
     "slate-react": "^0.66.2",
     "smooth-scroll-into-view-if-needed": "^1.1.32",
     "styled-components": "^5.3.1",
+    "truncate-utf8-bytes": "^1.0.2",
     "ua-parser-js": "^0.7.28",
     "userflow.js": "^2.2.0"
   },
@@ -101,6 +103,7 @@
     "@types/react-select": "^4.0.18",
     "@types/react-window": "^1.8.5",
     "@types/request-ip": "^0.0.37",
+    "@types/truncate-utf8-bytes": "^1.0.0",
     "@types/ua-parser-js": "^0.7.36",
     "cross-env": "^7.0.3",
     "rimraf": "^3.0.2",

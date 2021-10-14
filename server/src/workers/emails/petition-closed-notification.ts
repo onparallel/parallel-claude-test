@@ -1,4 +1,3 @@
-import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
@@ -6,6 +5,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionClosedNotification from "../../emails/components/PetitionClosedNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { toHtml, toPlainText } from "../../util/slate";
 import { random } from "../../util/token";
 import { getLayoutProps } from "../helpers/getLayoutProps";
@@ -92,7 +92,7 @@ export async function petitionClosedNotification(
         {
           path,
           content_type: "application/pdf",
-          filename: sanitize(`${payload.pdf_export_title ?? "_"}.pdf`),
+          filename: sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf"),
           size: buffer.byteLength.toString(),
         },
         `User:${sender.id}`

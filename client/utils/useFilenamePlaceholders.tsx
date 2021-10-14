@@ -7,7 +7,7 @@ import { getFieldIndices } from "@parallel/utils/fieldIndices";
 import escapeStringRegexp from "escape-string-regexp";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
-import sanitize from "sanitize-filename";
+import { sanitizeFilenameWithSuffix } from "./sanitizeFilenameWithSuffix";
 
 export function useFilenamePlaceholders() {
   const intl = useIntl();
@@ -79,13 +79,14 @@ export function useFilenamePlaceholdersRename() {
             return part;
           })
           .join("");
-        let filename = sanitize(`${name}${extension}`);
+
+        let filename = sanitizeFilenameWithSuffix(name, extension.toLowerCase());
         let counter = 1;
         while (seen.has(filename)) {
-          filename = sanitize(`${name} ${++counter}${extension}`);
+          filename = sanitizeFilenameWithSuffix(name, ` ${counter++}${extension.toLowerCase()}`);
         }
         seen.add(filename);
-        return sanitize(filename);
+        return filename;
       };
     },
     [placeholders]

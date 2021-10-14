@@ -2,12 +2,12 @@ import contentDisposition from "content-disposition";
 import escapeStringRegexp from "escape-string-regexp";
 import { Router } from "express";
 import { indexBy, isDefined, zip } from "remeda";
-import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
 import { ApiContext } from "../context";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { fromGlobalId } from "../util/globalId";
+import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { authenticate } from "./helpers/authenticate";
 import { PetitionExcelExport } from "./helpers/PetitionExcelExport";
 
@@ -32,7 +32,7 @@ export const downloads = Router()
       const name = petition?.name?.replace(/\./g, "_") ?? "files";
       res.header(
         "content-disposition",
-        contentDisposition(sanitize(`${name}.zip`), { type: "attachment" })
+        contentDisposition(sanitizeFilenameWithSuffix(name, ".zip"), { type: "attachment" })
       );
       const zipFile = createZipFile(getPetitionFiles(ctx, petitionId, pattern, petition?.locale));
       zipFile.pipe(res);
@@ -87,7 +87,7 @@ export const downloads = Router()
       res
         .header(
           "content-disposition",
-          contentDisposition(sanitize(`${petition.name}.pdf`), {
+          contentDisposition(sanitizeFilenameWithSuffix(petition.name ?? "parallel", ".pdf"), {
             type: "inline",
           })
         )
@@ -155,10 +155,10 @@ async function* getPetitionFiles(
                 return file.filename.replace(/\.[a-z0-9]+$/, "");
             }
           });
-          let filename = sanitize(`${name}${extension.toLowerCase()}`);
+          let filename = sanitizeFilenameWithSuffix(name, extension.toLowerCase());
           let counter = 1;
           while (seen.has(filename)) {
-            filename = sanitize(`${name} ${++counter}${extension.toLowerCase()}`);
+            filename = sanitizeFilenameWithSuffix(name, ` ${counter++}${extension.toLowerCase()}`);
           }
           seen.add(filename);
           yield {

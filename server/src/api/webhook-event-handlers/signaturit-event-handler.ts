@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import sanitize from "sanitize-filename";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
+import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { random } from "../../util/token";
 
 export async function validateSignaturitRequest(
@@ -180,7 +180,7 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
 
   const signedDoc = await storeDocument(
     await client.downloadSignedDocument(`${signatureId}/${documentId}`),
-    sanitize(`${title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`),
+    sanitizeFilenameWithSuffix(title, `_${petition.locale === "es" ? "firmado" : "signed"}.pdf`),
     signaturitIntegration.id,
     ctx
   );
@@ -249,7 +249,7 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
 
   const auditTrail = await storeDocument(
     await client.downloadAuditTrail(`${signatureId}/${documentId}`),
-    sanitize(`${title}_audit_trail.pdf`),
+    sanitizeFilenameWithSuffix(title, "_audit_trail.pdf"),
     signaturitIntegration.id,
     ctx
   );
