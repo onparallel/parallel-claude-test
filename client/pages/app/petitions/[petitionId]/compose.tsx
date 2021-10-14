@@ -523,7 +523,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     petition.status === "DRAFT";
 
   return (
-    <ToneProvider value={petition.preferedTone}>
+    <ToneProvider value={petition.tone}>
       <PetitionLayout
         key={petition.id}
         user={me}

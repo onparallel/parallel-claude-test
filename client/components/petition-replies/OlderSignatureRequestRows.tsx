@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Button, Flex, GridItem, Heading } from "@chakra-ui/react";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
+import { Fragment } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { ContactReference } from "../common/ContactReference";
 import { Divider } from "../common/Divider";
@@ -29,8 +30,8 @@ export function OlderSignatureRequestRows({
       <GridItem colSpan={3}>
         <Divider />
       </GridItem>
-      {signatures.map((signature) => (
-        <>
+      {signatures.map((signature, i) => (
+        <Fragment key={i}>
           <PetitionSignatureRequestStatusText status={signature.status} />
           <GridItem colSpan={signature.status === "COMPLETED" ? 1 : 2}>
             <FormattedList
@@ -46,7 +47,7 @@ export function OlderSignatureRequestRows({
               </Button>
             </Flex>
           ) : null}
-        </>
+        </Fragment>
       ))}
     </>
   );

@@ -3,6 +3,7 @@ import { Box, Button, Heading } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
+import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { ContactReference } from "../common/ContactReference";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -63,10 +64,12 @@ export function CurrentSignatureRequestRow({
         <Box>
           <FormattedList
             value={signers.map(({ contact, status }) => [
-              <ContactReference contact={contact} key={contact.id} />,
-              isAwaitingSignature ? (
-                <PetitionSignatureRequestSignerStatusIcon status={status} marginBottom={1} />
-              ) : null,
+              <Fragment key={contact.id}>
+                <ContactReference contact={contact} />
+                {isAwaitingSignature ? (
+                  <PetitionSignatureRequestSignerStatusIcon status={status} marginBottom={1} />
+                ) : null}
+              </Fragment>,
             ])}
           />
         </Box>
