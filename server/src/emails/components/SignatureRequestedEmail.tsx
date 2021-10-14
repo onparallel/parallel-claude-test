@@ -11,7 +11,6 @@ import { UserMessageBox } from "../common/UserMessageBox";
 type SignatureRequestedProps = {
   emailBody: string | null;
   signerName: string;
-  signerFullName: string;
   documentName: string;
   signButton: string;
   tone: string;
@@ -32,18 +31,11 @@ const email: Email<SignatureRequestedProps> = {
     });
   },
   text(
-    {
-      signerFullName: fullName,
-      signerName: name,
-      documentName,
-      signButton,
-      emailBody,
-      tone,
-    }: SignatureRequestedProps,
+    { signerName: fullName, documentName, signButton, emailBody, tone }: SignatureRequestedProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ name, fullName, tone }, intl)}
+      ${greetingContact({ name: fullName, fullName, tone }, intl)}
 
       ${intl.formatMessage(
         {
@@ -69,8 +61,7 @@ const email: Email<SignatureRequestedProps> = {
     `;
   },
   html({
-    signerFullName: fullName,
-    signerName: name,
+    signerName: fullName,
     assetsUrl,
     parallelUrl,
     logoAlt,
@@ -96,7 +87,7 @@ const email: Email<SignatureRequestedProps> = {
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={name} fullName={fullName} tone={tone} />
+            <GreetingContact name={fullName} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-requested.text"

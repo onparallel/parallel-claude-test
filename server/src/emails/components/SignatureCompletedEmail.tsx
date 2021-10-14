@@ -10,7 +10,6 @@ import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
 type SignatureCompletedProps = {
   documentName: string | null;
   signerName: string | null;
-  signerFullName: string | null;
   signatureProvider: string;
   tone: string;
 } & LayoutProps;
@@ -30,16 +29,11 @@ const email: Email<SignatureCompletedProps> = {
     });
   },
   text(
-    {
-      signerFullName: fullName,
-      signerName: name,
-      signatureProvider,
-      tone,
-    }: SignatureCompletedProps,
+    { signerName: fullName, signatureProvider, tone }: SignatureCompletedProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ name, fullName, tone }, intl)}
+      ${greetingContact({ name: fullName, fullName, tone }, intl)}
 
       ${intl.formatMessage(
         {
@@ -56,8 +50,7 @@ const email: Email<SignatureCompletedProps> = {
     `;
   },
   html({
-    signerFullName: fullName,
-    signerName: name,
+    signerName: fullName,
     assetsUrl,
     parallelUrl,
     logoAlt,
@@ -81,7 +74,7 @@ const email: Email<SignatureCompletedProps> = {
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={name} fullName={fullName} tone={tone} />
+            <GreetingContact name={fullName} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-completed.text"

@@ -8,8 +8,10 @@ export type IntegrationSettings<K extends IntegrationType> = {
   SIGNATURE: {
     API_KEY: string;
     ENVIRONMENT?: "production" | "sandbox";
-    EN_BRANDING_ID?: string;
-    ES_BRANDING_ID?: string;
+    EN_FORMAL_BRANDING_ID?: string;
+    ES_FORMAL_BRANDING_ID?: string;
+    EN_INFORMAL_BRANDING_ID?: string;
+    ES_INFORMAL_BRANDING_ID?: string;
   };
   SSO: {
     EMAIL_DOMAINS: string[];
@@ -71,7 +73,7 @@ export class IntegrationRepository extends BaseRepository {
     await this.knex.raw(
       /* sql */ `
       update org_integration 
-      set settings = settings - 'ES_BRANDING_ID' - 'EN_BRANDING_ID'
+      set settings = settings - 'EN_FORMAL_BRANDING_ID' - 'ES_FORMAL_BRANDING_ID' - 'EN_INFORMAL_BRANDING_ID' - 'ES_INFORMAL_BRANDING_ID'
       where org_id = ? and provider = 'SIGNATURIT'`,
       [orgId]
     );

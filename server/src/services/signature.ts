@@ -8,6 +8,7 @@ import SignaturitSDK, {
   SignatureParams,
 } from "signaturit-sdk";
 import { URLSearchParams } from "url";
+import { Tone } from "../api/public/__types";
 import {
   IntegrationRepository,
   IntegrationSettings,
@@ -41,6 +42,7 @@ type SignatureOptions = {
     logoAlt: string;
     parallelUrl: string;
     assetsUrl: string;
+    tone: Tone;
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";
@@ -103,13 +105,19 @@ export class SignatureService {
     const client = new SignaturItClient(settings, this.config, integration.org_id);
     client.on(
       "branding_updated",
-      ({ locale, brandingId }: { locale: string; brandingId: string }) => {
-        switch (locale) {
-          case "en":
-            settings.EN_BRANDING_ID = brandingId;
+      ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
+        switch (`${locale}_${tone}`) {
+          case "en_FORMAL":
+            settings.EN_FORMAL_BRANDING_ID = brandingId;
             break;
-          case "es":
-            settings.ES_BRANDING_ID = brandingId;
+          case "es_FORMAL":
+            settings.ES_FORMAL_BRANDING_ID = brandingId;
+            break;
+          case "en_INFORMAL":
+            settings.EN_INFORMAL_BRANDING_ID = brandingId;
+            break;
+          case "es_INFORMAL":
+            settings.ES_INFORMAL_BRANDING_ID = brandingId;
             break;
           default:
             break;
@@ -146,7 +154,26 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     opts: SignatureOptions
   ) {
     const locale = opts?.locale ?? "en";
-    let brandingId = locale === "en" ? this.settings.EN_BRANDING_ID : this.settings.ES_BRANDING_ID;
+    const tone = opts.templateData.tone;
+
+    let brandingId;
+
+    switch (`${locale}_${tone}`) {
+      case "en_FORMAL":
+        brandingId = this.settings.EN_FORMAL_BRANDING_ID;
+        break;
+      case "es_FORMAL":
+        brandingId = this.settings.ES_FORMAL_BRANDING_ID;
+        break;
+      case "en_INFORMAL":
+        brandingId = this.settings.EN_INFORMAL_BRANDING_ID;
+        break;
+      case "es_INFORMAL":
+        brandingId = this.settings.ES_INFORMAL_BRANDING_ID;
+        break;
+      default:
+        break;
+    }
 
     if (!brandingId) {
       brandingId = (await this.createOrgBranding(opts)).id;
@@ -226,10 +253,8 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signButton: "{{sign_button}}",
           signerName: "{{signer_name}}",
-          signerFullName: "{{signer_full_name}}",
           documentName: "{{filename}}",
           emailBody: "{{email_body}}",
-          tone: "{{tone}}",
           ...opts.templateData,
         },
         { locale: opts.locale }
@@ -239,9 +264,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
-          signerFullName: "{{signer_full_name}}",
           documentName: "{{filename}}",
-          tone: "{{tone}}",
           ...opts.templateData,
         },
         { locale: opts.locale }
@@ -251,8 +274,6 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
-          signerFullName: "{{signer_full_name}}",
-          tone: "{{tone}}",
           ...opts.templateData,
         },
         { locale: opts.locale }
@@ -262,9 +283,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           documentName: "{{filename}}",
           signerName: "{{signer_name}}",
-          signerFullName: "{{signer_full_name}}",
           signButton: "{{sign_button}}",
-          tone: "{{tone}}",
           ...opts.templateData,
         },
         { locale: opts.locale }

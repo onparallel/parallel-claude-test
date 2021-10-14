@@ -9,6 +9,12 @@ export async function up(knex: Knex): Promise<any> {
       .notNullable()
       .defaultTo("FORMAL");
   });
+
+  // there is a new branding ids
+  await knex.raw(/* sql */ `
+    update org_integration 
+    set settings = settings - 'ES_BRANDING_ID' - 'EN_BRANDING_ID'
+    where type = 'SIGNATURE' and provider = 'SIGNATURIT'`);
 }
 
 export async function down(knex: Knex): Promise<any> {

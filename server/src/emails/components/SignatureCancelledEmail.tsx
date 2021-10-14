@@ -9,7 +9,6 @@ import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
 
 type SignatureCancelledProps = {
   signerName: string | null;
-  signerFullName: string | null;
   signatureProvider: string;
   tone: string;
 } & LayoutProps;
@@ -29,16 +28,11 @@ const email: Email<SignatureCancelledProps> = {
     });
   },
   text(
-    {
-      signerFullName: fullName,
-      signerName: name,
-      signatureProvider,
-      tone,
-    }: SignatureCancelledProps,
+    { signerName: fullName, signatureProvider, tone }: SignatureCancelledProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ name, fullName, tone }, intl)}
+      ${greetingContact({ name: fullName, fullName, tone }, intl)}
       
       ${intl.formatMessage(
         {
@@ -56,8 +50,7 @@ const email: Email<SignatureCancelledProps> = {
     `;
   },
   html({
-    signerFullName: fullName,
-    signerName: name,
+    signerName: fullName,
     assetsUrl,
     parallelUrl,
     logoAlt,
@@ -81,7 +74,7 @@ const email: Email<SignatureCancelledProps> = {
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={name} fullName={fullName} tone={tone} />
+            <GreetingContact name={fullName} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-cancelled.text"

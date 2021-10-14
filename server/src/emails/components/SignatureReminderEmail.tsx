@@ -9,7 +9,6 @@ import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
 
 type SignatureReminderProps = {
   signerName: string;
-  signerFullName: string;
   documentName: string;
   signButton: string;
   tone: string;
@@ -30,17 +29,11 @@ const email: Email<SignatureReminderProps> = {
     });
   },
   text(
-    {
-      signerFullName: fullName,
-      signerName: name,
-      documentName,
-      signButton,
-      tone,
-    }: SignatureReminderProps,
+    { signerName: fullName, documentName, signButton, tone }: SignatureReminderProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ fullName, name: fullName, tone: tone }, intl)}
+      ${greetingContact({ fullName, name: fullName, tone }, intl)}
 
       ${intl.formatMessage(
         {
@@ -64,8 +57,7 @@ const email: Email<SignatureReminderProps> = {
     `;
   },
   html({
-    signerFullName: fullName,
-    signerName: name,
+    signerName: fullName,
     assetsUrl,
     parallelUrl,
     logoAlt,
@@ -90,7 +82,7 @@ const email: Email<SignatureReminderProps> = {
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingReminder name={name} fullName={fullName} tone={tone} />
+            <GreetingReminder name={fullName} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-reminder.text"
