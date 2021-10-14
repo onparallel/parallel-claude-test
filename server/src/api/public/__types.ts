@@ -1793,7 +1793,8 @@ export type PetitionSharedWithFilterLine = {
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
-  | "REQUEST_ERROR";
+  | "REQUEST_ERROR"
+  | "REQUEST_RESTARTED";
 
 export type PetitionSignatureRequest = Timestamps & {
   auditTrailFilename: Maybe<Scalars["String"]>;
@@ -1814,13 +1815,21 @@ export type PetitionSignatureRequest = Timestamps & {
 };
 
 export type PetitionSignatureRequestSignerStatus = {
-  /** The contact that need to sign the generated document. */
-  contact: Contact;
+  signer: PetitionSigner;
   /** The signing status of the individual contact. */
   status: Scalars["String"];
 };
 
 export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+
+/** Information about a signer of the petition */
+export type PetitionSigner = {
+  contactId: Maybe<Scalars["GID"]>;
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  fullName: Scalars["String"];
+  lastName: Scalars["String"];
+};
 
 /** The status of a petition. */
 export type PetitionStatus =
@@ -2011,7 +2020,7 @@ export type PublicPetition = Timestamps & {
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
-  signature: Maybe<PublicSignatureConfig>;
+  signatureConfig: Maybe<PublicSignatureConfig>;
   signatureStatus: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
@@ -2151,14 +2160,14 @@ export type PublicPetitionSignerDataInput = {
 
 /** The public signature settings of a petition */
 export type PublicSignatureConfig = {
-  /** The contacts assigned by the petition recipient to sign */
-  additionalSigners: Array<Maybe<PublicContact>>;
+  /** The signers assigned by the petition recipient */
+  additionalSigners: Array<PetitionSigner>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The contacts that need to sign the generated document. */
-  signers: Array<Maybe<PublicContact>>;
+  signers: Array<PetitionSigner>;
 };
 
 export type PublicSignatureStatus = "COMPLETED" | "STARTED";
@@ -2397,9 +2406,9 @@ export type QueryPetitions_OrderBy =
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
 
 export type RecipientSignedEvent = PetitionEvent & {
-  contact: Maybe<Contact>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  signer: Maybe<PetitionSigner>;
 };
 
 export type ReminderEmailBouncedUserNotification = PetitionUserNotification & {
@@ -2492,6 +2501,7 @@ export type SendPetitionResult = {
 
 export type SignatureCancelledEvent = PetitionEvent & {
   cancelType: PetitionSignatureCancelReason;
+  canceller: Maybe<PetitionSigner>;
   cancellerReason: Maybe<Scalars["String"]>;
   contact: Maybe<Contact>;
   createdAt: Scalars["DateTime"];
@@ -2520,14 +2530,14 @@ export type SignatureCompletedUserNotification = PetitionUserNotification & {
 
 /** The signature settings of a petition */
 export type SignatureConfig = {
-  /** The contacts that need to sign the generated document. */
-  contacts: Array<Maybe<Contact>>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
+  /** The signers of the generated document. */
+  signers: Array<PetitionSigner>;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** Title of the signature document */
@@ -2536,18 +2546,25 @@ export type SignatureConfig = {
 
 /** The signature settings for the petition */
 export type SignatureConfigInput = {
-  /** The contacts that need to sign the generated document. */
-  contactIds: Array<Scalars["ID"]>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** The selected provider for the signature. */
   provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
+  signersInfo: Array<SignatureConfigInputSigner>;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** The title of the signing document */
   title: Scalars["String"];
+};
+
+/** The signer that need to sign the generated document. */
+export type SignatureConfigInputSigner = {
+  contactId: Scalars["ID"];
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
 };
 
 export type SignatureStartedEvent = PetitionEvent & {

@@ -7946,7 +7946,7 @@
   },
   {
     "term": "timeline.recipient-signed-description",
-    "definition": "{contact} firmó el documento {timeAgo}",
+    "definition": "{signer} firmó el documento {timeAgo}",
     "context": "{signer} signed the document {timeAgo}"
   },
   {
@@ -8001,7 +8001,7 @@
   },
   {
     "term": "timeline.signature-declined-description",
-    "definition": "{contact} ha rechazado el proceso de firma digital {timeAgo}",
+    "definition": "{signer} ha rechazado el proceso de firma digital {timeAgo}",
     "context": "{signer} has declined the eSignature process {timeAgo}"
   },
   {

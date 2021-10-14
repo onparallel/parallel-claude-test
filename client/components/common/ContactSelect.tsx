@@ -161,10 +161,11 @@ export const ContactSelect = Object.assign(
   }),
   {
     fragments: {
+      // firstName and lastName are needed for converting from Contact to PetitionSigner in some dialogs
       Contact: gql`
         fragment ContactSelect_Contact on Contact {
           id
-          firstName # firstName and lastName are needed for converting from Contact to PetitionSigner in some dialogs
+          firstName
           lastName
           fullName
           email
