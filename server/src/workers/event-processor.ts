@@ -90,6 +90,7 @@ createQueueWorker(
         "PETITION_COMPLETED",
         "PETITION_CREATED",
         "PETITION_REOPENED",
+        "PETITION_DELETED",
         "REMINDER_SENT",
         "REPLY_CREATED",
         "REPLY_DELETED",

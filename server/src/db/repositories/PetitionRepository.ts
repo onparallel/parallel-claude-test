@@ -98,8 +98,6 @@ export class PetitionRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadAnyPetitionById = this.buildLoadBy("petition", "id");
-
   readonly loadPetition = this.buildLoadBy("petition", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadField = this.buildLoadBy("petition_field", "id", (q) => q.whereNull("deleted_at"));

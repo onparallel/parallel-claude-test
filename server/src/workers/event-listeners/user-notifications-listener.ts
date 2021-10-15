@@ -17,6 +17,9 @@ async function createPetitionCompletedUserNotifications(
   event: PetitionCompletedEvent,
   ctx: WorkerContext
 ) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
@@ -34,6 +37,9 @@ async function createCommentPublishedUserNotifications(
   event: CommentPublishedEvent,
   ctx: WorkerContext
 ) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const comment = await ctx.petitions.loadPetitionFieldComment(
     event.data.petition_field_comment_id
   );
@@ -86,6 +92,9 @@ async function createPetitionMessageBouncedUserNotifications(
   event: PetitionMessageBouncedEvent,
   ctx: WorkerContext
 ) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const message = await ctx.petitions.loadMessage(event.data.petition_message_id);
   if (!message) {
     throw new Error(`PetitionMessage:${event.data.petition_message_id} not found.`);
@@ -112,6 +121,9 @@ async function createPetitionReminderBouncedUserNotifications(
   event: PetitionReminderBouncedEvent,
   ctx: WorkerContext
 ) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const reminder = await ctx.petitions.loadReminder(event.data.petition_reminder_id);
   if (!reminder) {
     throw new Error(`PetitionReminder:${event.data.petition_reminder_id} not found.`);
@@ -138,6 +150,9 @@ async function createSignatureCompletedUserNotifications(
   event: SignatureCompletedEvent,
   ctx: WorkerContext
 ) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
@@ -157,6 +172,9 @@ async function createSignatureCancelledUserNotifications(
   event: SignatureCancelledEvent,
   ctx: WorkerContext
 ) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
@@ -176,6 +194,9 @@ async function createPetitionSharedUserNotifications(
   event: UserPermissionAddedEvent | GroupPermissionAddedEvent,
   ctx: WorkerContext
 ) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   if (event.type === "USER_PERMISSION_ADDED") {
     await ctx.petitions.createPetitionUserNotification([
       {
@@ -211,6 +232,9 @@ async function createPetitionSharedUserNotifications(
 }
 
 async function createRemindersOptOutNotifications(event: RemindersOptOutEvent, ctx: WorkerContext) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
@@ -232,6 +256,9 @@ async function createAccessActivatedFromPublicPetitionLinkUserNotifications(
   event: AccessActivatedFromPublicPetitionLinkEvent,
   ctx: WorkerContext
 ) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({

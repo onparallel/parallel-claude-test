@@ -22,18 +22,6 @@ import {
 } from "../../db/events";
 import { EventListener } from "../event-processor";
 
-async function loadPetition(petitionId: number, ctx: WorkerContext) {
-  // when receiving different events, the petition could be already deleted in the database
-  // example: creating and immediately after deleting a petition.
-  // the PETITION_CREATED event will reference to a deleted petition.
-  // because of this, we need to also search for deleted petitions.
-  const petition = await ctx.petitions.loadAnyPetitionById(petitionId);
-  if (!petition) {
-    throw new Error(`Petition not found with id ${petitionId}`);
-  }
-  return petition;
-}
-
 async function loadPetitionOwner(petitionId: number, ctx: WorkerContext) {
   const user = await ctx.petitions.loadPetitionOwner(petitionId);
   if (!user) {
@@ -86,7 +74,8 @@ async function loadPetitionFieldComment(petitionFieldCommentId: number, ctx: Wor
 }
 
 async function trackPetitionCreatedEvent(event: PetitionCreatedEvent, ctx: WorkerContext) {
-  const petition = await loadPetition(event.petition_id, ctx);
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
   await ctx.analytics.trackEvent({
     type: "PETITION_CREATED",
     user_id: event.data.user_id,
@@ -100,6 +89,9 @@ async function trackPetitionCreatedEvent(event: PetitionCreatedEvent, ctx: Worke
 }
 
 async function trackPetitionClonedEvent(event: PetitionClonedEvent, ctx: WorkerContext) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   await ctx.analytics.trackEvent({
     type: "PETITION_CLONED",
     user_id: event.data.user_id,
@@ -111,7 +103,9 @@ async function trackPetitionClonedEvent(event: PetitionClonedEvent, ctx: WorkerC
 }
 
 async function trackPetitionClosedEvent(event: PetitionClosedEvent, ctx: WorkerContext) {
-  const petition = await loadPetition(event.petition_id, ctx);
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   await ctx.analytics.trackEvent({
     type: "PETITION_CLOSED",
     user_id: event.data.user_id,
@@ -124,8 +118,10 @@ async function trackPetitionClosedEvent(event: PetitionClosedEvent, ctx: WorkerC
 }
 
 async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: WorkerContext) {
-  const [petition, user, contact] = await Promise.all([
-    loadPetition(event.petition_id, ctx),
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
+  const [user, contact] = await Promise.all([
     loadPetitionOwner(event.petition_id, ctx),
     loadContactByAccessId(event.data.petition_access_id, ctx),
   ]);
@@ -149,8 +145,10 @@ async function trackAccessActivatedFromPublicLinkEvent(
   event: AccessActivatedFromPublicPetitionLinkEvent,
   ctx: WorkerContext
 ) {
-  const [petition, user, contact] = await Promise.all([
-    loadPetition(event.petition_id, ctx),
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
+  const [user, contact] = await Promise.all([
     loadPetitionOwner(event.petition_id, ctx),
     loadContactByAccessId(event.data.petition_access_id, ctx),
   ]);
@@ -171,9 +169,11 @@ async function trackAccessActivatedFromPublicLinkEvent(
 }
 
 async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: WorkerContext) {
-  const [contact, petition, user] = await Promise.all([
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
+  const [contact, user] = await Promise.all([
     loadContactByAccessId(event.data.petition_access_id, ctx),
-    loadPetition(event.petition_id, ctx),
     loadPetitionOwner(event.petition_id, ctx),
   ]);
 
@@ -191,7 +191,9 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
 }
 
 async function trackPetitionDeletedEvent(event: PetitionDeletedEvent, ctx: WorkerContext) {
-  const petition = await loadPetition(event.petition_id, ctx);
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   await ctx.analytics.trackEvent({
     type: "PETITION_DELETED",
     user_id: event.data.user_id,
@@ -222,15 +224,15 @@ async function trackUserLoggedInEvent(event: UserLoggedInEvent, ctx: WorkerConte
 }
 
 async function trackReminderSentEvent(event: ReminderSentEvent, ctx: WorkerContext) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const reminder = await ctx.petitions.loadReminder(event.data.petition_reminder_id);
   if (!reminder) {
     throw new Error(`Reminder not found with id ${event.data.petition_reminder_id}`);
   }
+  const access = await loadPetitionAccess(reminder.petition_access_id, ctx);
 
-  const [access, petition] = await Promise.all([
-    loadPetitionAccess(reminder.petition_access_id, ctx),
-    loadPetition(event.petition_id, ctx),
-  ]);
   await ctx.analytics.trackEvent({
     type: "REMINDER_EMAIL_SENT",
     user_id: access.granter_id,
@@ -246,6 +248,9 @@ async function trackReminderSentEvent(event: ReminderSentEvent, ctx: WorkerConte
 }
 
 async function trackTemplateUsedEvent(event: TemplateUsedEvent, ctx: WorkerContext) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   await ctx.analytics.trackEvent({
     type: "TEMPLATE_USED",
     user_id: event.data.user_id,
@@ -274,10 +279,11 @@ async function trackUserCreatedEvent(event: UserCreatedEvent, ctx: WorkerContext
 }
 
 async function trackAccessOpenedEvent(event: AccessOpenedEvent, ctx: WorkerContext) {
-  const [access, petition] = await Promise.all([
-    loadPetitionAccess(event.data.petition_access_id, ctx),
-    loadPetition(event.petition_id, ctx),
-  ]);
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
+  const access = await loadPetitionAccess(event.data.petition_access_id, ctx);
+
   await ctx.analytics.trackEvent({
     type: "ACCESS_OPENED",
     user_id: access.granter_id,
@@ -301,6 +307,9 @@ async function trackEmailVerifiedEvent(event: EmailVerifiedSystemEvent, ctx: Wor
 }
 
 async function trackRemindersOptOutEvent(event: RemindersOptOutEvent, ctx: WorkerContext) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const access = await loadPetitionAccess(event.data.petition_access_id, ctx);
   await ctx.analytics.trackEvent({
     type: "REMINDER_OPTED_OUT",
@@ -329,6 +338,9 @@ async function trackInviteSentEvent(event: InviteSentSystemEvent, ctx: WorkerCon
 }
 
 async function trackFirstReplyCreatedEvent(event: ReplyCreatedEvent, ctx: WorkerContext) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const [replyCreatedEvents, petitionOwner] = await Promise.all([
     ctx.petitions.getPetitionEventsByType(event.petition_id, "REPLY_CREATED"),
     loadPetitionOwner(event.petition_id, ctx),
@@ -349,6 +361,9 @@ async function trackFirstReplyCreatedEvent(event: ReplyCreatedEvent, ctx: Worker
 }
 
 async function trackCommentPublishedEvent(event: CommentPublishedEvent, ctx: WorkerContext) {
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+
   const [user, comment] = await Promise.all([
     loadPetitionOwner(event.petition_id, ctx),
     loadPetitionFieldComment(event.data.petition_field_comment_id, ctx),
@@ -368,6 +383,9 @@ async function trackCommentPublishedEvent(event: CommentPublishedEvent, ctx: Wor
 }
 
 async function trackEmailOpenedEvent(event: EmailOpenedSystemEvent, ctx: WorkerContext) {
+  const petition = await ctx.petitions.loadPetition(event.data.petition_id);
+  if (!petition) return;
+
   const user = await loadPetitionOwner(event.data.petition_id, ctx);
   await ctx.analytics.trackEvent({
     type: "EMAIL_OPENED",
