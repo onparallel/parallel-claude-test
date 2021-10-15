@@ -8,6 +8,7 @@ export const PetitionFragment = gql`
     deadline
     locale
     createdAt
+    fromTemplateId
   }
 `;
 

@@ -2803,6 +2803,7 @@ export type PetitionFragment = {
   deadline: Maybe<string>;
   locale: PetitionLocale;
   createdAt: string;
+  fromTemplateId: Maybe<string>;
 };
 
 export type TemplateFragment = {
@@ -2900,6 +2901,7 @@ export type GetPetitions_PetitionsQuery = {
           deadline: Maybe<string>;
           locale: PetitionLocale;
           createdAt: string;
+          fromTemplateId: Maybe<string>;
         }
       | {}
     >;
@@ -2921,6 +2923,7 @@ export type CreatePetition_PetitionMutation = {
         deadline: Maybe<string>;
         locale: PetitionLocale;
         createdAt: string;
+        fromTemplateId: Maybe<string>;
       }
     | {};
 };
@@ -2938,6 +2941,7 @@ export type GetPetition_PetitionQuery = {
         deadline: Maybe<string>;
         locale: PetitionLocale;
         createdAt: string;
+        fromTemplateId: Maybe<string>;
       }
     | {}
   >;
@@ -2957,6 +2961,7 @@ export type UpdatePetition_PetitionMutation = {
         deadline: Maybe<string>;
         locale: PetitionLocale;
         createdAt: string;
+        fromTemplateId: Maybe<string>;
       }
     | {};
 };

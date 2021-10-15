@@ -43,6 +43,11 @@ const _Petition = {
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
+    fromTemplateId: {
+      description: "ID of the template used to create the petition",
+      type: ["string", "null"],
+      example: toGlobalId("Petition", 1),
+    },
   },
 } as const;
 
