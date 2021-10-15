@@ -8,10 +8,6 @@ import {
 } from "./webhook-event-handlers/signaturit-event-handler";
 
 export const webhooks = Router()
-  .get("/ping", async (_, res) => {
-    // used to check localtunnel status on develop
-    res.sendStatus(200).end();
-  })
   .post(
     "/signaturit/:petitionId/events",
     urlencoded({ extended: true }),
