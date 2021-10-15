@@ -74,9 +74,9 @@ function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSide
           <FormattedMessage id="public.templates.we-show-you" defaultMessage="Let us show you!" />
         </Heading>
         <Flex marginTop={10} justifyContent="center">
-          <NakedLink href="/book-demo">
+          <NakedLink href="/signup">
             <Button as="a" colorScheme="purple" size="lg">
-              <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
+              <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
             </Button>
           </NakedLink>
         </Flex>
