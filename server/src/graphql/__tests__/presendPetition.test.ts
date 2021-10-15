@@ -1,5 +1,5 @@
-import { addDays, addMinutes } from "date-fns";
-import { format, toDate } from "date-fns-tz";
+import { addMinutes } from "date-fns";
+import { toDate } from "date-fns-tz";
 import { Knex } from "knex";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { createTestContainer } from "../../../test/testContainer";
@@ -10,6 +10,8 @@ import { Contact, Organization, Petition, User } from "../../db/__types";
 import { deleteAllData } from "../../util/knexUtils";
 import { calculateNextReminder } from "../../util/reminderUtils";
 import { presendPetition } from "./../../graphql/helpers/presendPetition";
+
+jest.setTimeout(10000);
 
 describe("presendPetition", () => {
   let mocks: Mocks;
