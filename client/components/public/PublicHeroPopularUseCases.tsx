@@ -151,7 +151,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
                 defaultMessage="Can't find your use case?"
               />
             </Heading>
-            <NakedLink href="/book-demo">
+            <NakedLink href="mailto:support@onparallel.com">
               <Button as="a" colorScheme="purple">
                 <FormattedMessage
                   id="public.parallel-use-cases.other-contact"
