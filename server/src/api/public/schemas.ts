@@ -405,6 +405,11 @@ const _PetitionFieldReply = {
       description: "The type of the field this reply originated from",
       example: "TEXT",
     },
+    title: {
+      type: ["string", "null"],
+      description: "Title of the field linked to the reply",
+      example: "Please, tell us your name",
+    },
     content: {
       oneOf: [
         {

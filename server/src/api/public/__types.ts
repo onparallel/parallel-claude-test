@@ -3081,6 +3081,7 @@ export type PetitionReplies_RepliesQuery = {
           id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
+          title: Maybe<string>;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3094,6 +3095,7 @@ export type PetitionReplies_RepliesQuery = {
           id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
+          title: Maybe<string>;
           replies: Array<{
             id: string;
             content: { [key: string]: any };

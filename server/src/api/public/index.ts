@@ -651,6 +651,7 @@ api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
               id
               type
               options
+              title
               replies {
                 ...PetitionFieldReply
               }
@@ -668,6 +669,7 @@ api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
         field.replies.map((reply) => ({
           id: reply.id,
           type: field.type as Exclude<PetitionFieldType, "HEADING">,
+          title: field.title,
           content:
             field.type === "FILE_UPLOAD"
               ? (reply.content as {
