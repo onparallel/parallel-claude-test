@@ -4,7 +4,8 @@ import { calculateNextReminder } from "../reminderUtils";
 
 describe("reminderUtils", () => {
   it("calculateNextReminder with round date", () => {
-    const nextReminder = calculateNextReminder(new Date("2021-11-15"), {
+    const fromDate = toDate(`2021-11-15T00:00:00`, { timeZone: "Europe/Madrid" });
+    const nextReminder = calculateNextReminder(fromDate, {
       offset: 2,
       time: "10:45",
       timezone: "Europe/Madrid",
@@ -15,7 +16,8 @@ describe("reminderUtils", () => {
   });
 
   it("calculateNextReminder with date and time", () => {
-    const nextReminder = calculateNextReminder(new Date("2021-10-15T23:50"), {
+    const fromDate = toDate("2021-10-15T23:50:00", { timeZone: "America/Argentina/Buenos_Aires" });
+    const nextReminder = calculateNextReminder(fromDate, {
       offset: 1,
       time: "12:00",
       timezone: "America/Argentina/Buenos_Aires",
@@ -28,7 +30,8 @@ describe("reminderUtils", () => {
   });
 
   it("calculateNextReminder with long offset", () => {
-    const nextReminder = calculateNextReminder(new Date("2021-04-01"), {
+    const fromDate = toDate("2021-04-01T00:00:00", { timeZone: "Europe/Madrid" });
+    const nextReminder = calculateNextReminder(fromDate, {
       offset: 6,
       time: "00:00",
       timezone: "Europe/Madrid",
@@ -39,7 +42,8 @@ describe("reminderUtils", () => {
   });
 
   it("calculateNextReminder first minute of the day", () => {
-    const nextReminder = calculateNextReminder(new Date("2021-10-15T00:01"), {
+    const fromDate = toDate("2021-10-15T00:01:00", { timeZone: "Singapore" });
+    const nextReminder = calculateNextReminder(fromDate, {
       offset: 1,
       time: "00:00",
       timezone: "Singapore",
@@ -50,23 +54,25 @@ describe("reminderUtils", () => {
   });
 
   it("calculateNextReminder last minute of the day", () => {
-    const nextReminder = calculateNextReminder(new Date("2019-12-31T23:59"), {
+    const fromDate = toDate(`2019-12-31T23:59:00`, { timeZone: "Portugal" });
+    const nextReminder = calculateNextReminder(fromDate, {
       offset: 1,
       time: "00:00",
-      timezone: "Europe/Madrid",
+      timezone: "Portugal",
       weekdaysOnly: false,
     });
-    expect(nextReminder).toEqual(toDate(`2020-01-01T00:00:00`, { timeZone: "Europe/Madrid" }));
+    expect(nextReminder).toEqual(toDate(`2020-01-01T00:00:00`, { timeZone: "Portugal" }));
   });
 
   it("calculateNextReminder weekDaysOnly", () => {
+    const fromDate = toDate("2021-10-15T00:00:00", { timeZone: "Europe/Berlin" });
     const nextReminder = calculateNextReminder(new Date("2021-10-15"), {
       offset: 2,
       time: "23:50",
-      timezone: "Portugal",
+      timezone: "Europe/Berlin",
       weekdaysOnly: true,
     });
 
-    expect(nextReminder).toEqual(toDate(`2021-10-18T23:50:00`, { timeZone: "Portugal" }));
+    expect(nextReminder).toEqual(toDate(`2021-10-18T23:50:00`, { timeZone: "Europe/Berlin" }));
   });
 });
