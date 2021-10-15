@@ -119,7 +119,7 @@ export const AppLayoutNavbar = Object.assign(
                   transform: "scale(1.1)",
                 }}
               >
-                <Logo width="40px" hideText={true} />
+                <Logo width="40px" hideText={true} color="gray.800" />
               </Box>
             </Box>
           </NakedLink>
