@@ -62,6 +62,7 @@ export function PublicSwitchPricing({ onChange }: PublicSwitchPricingProps) {
           );
         })}
       </MotionHStack>
+
       <HStack>
         <Text fontWeight="600">
           <FormattedMessage
@@ -92,7 +93,7 @@ function RadioCard({ children, ...props }: RadioCardProps) {
     <Box as="label" position="relative">
       {props.isChecked ? (
         <MotionBox
-          layoutId="underline"
+          layoutId="underline-checkbox-pricing"
           width="full"
           height="full"
           borderRadius="full"

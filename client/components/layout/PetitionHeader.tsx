@@ -3,7 +3,6 @@ import { getOperationName } from "@apollo/client/utilities";
 import {
   Box,
   BoxProps,
-  Button,
   Center,
   Flex,
   IconButton,
@@ -28,7 +27,6 @@ import {
   MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionActivityDocument,
   PetitionHeader_PetitionFragment,
@@ -43,7 +41,7 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
-import { ReactNode, Ref, useCallback, useMemo } from "react";
+import { ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { LocaleBadge } from "../common/LocaleBadge";
@@ -53,6 +51,8 @@ import { Spacer } from "../common/Spacer";
 import { usePetitionSharingDialog } from "../petition-common/PetitionSharingDialog";
 import { useConfirmReopenPetitionDialog } from "../petition-replies/ConfirmReopenPetitionDialog";
 import { HeaderNameEditable } from "./HeaderNameEditable";
+import { PetitionHeaderTab } from "./PetitionHeaderTab";
+import { PetitionHeaderTabs } from "./PetitionHeaderTabs";
 
 export interface PetitionHeaderProps extends BoxProps {
   petition: PetitionHeader_PetitionFragment;
@@ -398,17 +398,7 @@ export function PetitionHeader({
           </Box>
         </Stack>
       </Flex>
-      <Stack
-        alignItems="center"
-        justifyContent="center"
-        transform={{ base: "none", md: "translate(-50%)" }}
-        left={{ base: 0, md: "50%" }}
-        bottom="0"
-        position={{ base: "relative", md: "absolute" }}
-        height={{ base: "40px", md: "64px" }}
-        marginBottom={{ base: "10px", md: 0 }}
-        direction="row"
-      >
+      <PetitionHeaderTabs>
         {sections.map(({ section, label, isDisabled, popoverContent, rightIcon }) => {
           return isDisabled ? (
             <PetitionHeaderTab
@@ -428,48 +418,10 @@ export function PetitionHeader({
             </NakedLink>
           );
         })}
-      </Stack>
+      </PetitionHeaderTabs>
     </Box>
   );
 }
-
-const PetitionHeaderTab = chakraForwardRef<
-  "a",
-  {
-    isActive?: boolean;
-    isDisabled?: boolean;
-    popoverContent?: ReactNode;
-    rightIcon?: ReactNode;
-    children: ReactNode;
-  }
->(function (
-  { isActive, isDisabled, children, popoverContent, rightIcon, ...props },
-  ref: Ref<any>
-) {
-  const link = (
-    <Button
-      as="a"
-      ref={ref}
-      textTransform="uppercase"
-      isDisabled={isDisabled}
-      rightIcon={rightIcon}
-      variant={isActive ? "solid" : "ghost"}
-      {...(isActive ? { "aria-current": "page" } : {})}
-      {...(props as any)}
-    >
-      {children}
-    </Button>
-  );
-  if (isDisabled) {
-    return (
-      <SmallPopover placement="bottom" content={popoverContent ?? null}>
-        {link}
-      </SmallPopover>
-    );
-  } else {
-    return link;
-  }
-});
 
 PetitionHeader.fragments = {
   Petition: gql`
