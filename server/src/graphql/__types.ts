@@ -1536,7 +1536,6 @@ export interface NexusGenFieldTypes {
     cancelType: NexusGenEnums["PetitionSignatureCancelReason"]; // PetitionSignatureCancelReason!
     canceller: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
     cancellerReason: string | null; // String
-    contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     user: NexusGenRootTypes["User"] | null; // User
@@ -2695,7 +2694,6 @@ export interface NexusGenFieldTypeNames {
     cancelType: "PetitionSignatureCancelReason";
     canceller: "PetitionSigner";
     cancellerReason: "String";
-    contact: "Contact";
     createdAt: "DateTime";
     id: "GID";
     user: "User";

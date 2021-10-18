@@ -37,7 +37,7 @@ export function TimelineSignatureCancelledEvent({
         <Box>
           {event.cancelType === "CANCELLED_BY_USER" && (
             <FormattedMessage
-              id="timeline.signature-cancelled-description"
+              id="timeline.signature-cancelled-by-user.description"
               defaultMessage="{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}"
               values={{
                 same: userId === event.user?.id,
@@ -50,10 +50,32 @@ export function TimelineSignatureCancelledEvent({
           )}
           {event.cancelType === "DECLINED_BY_SIGNER" && (
             <FormattedMessage
-              id="timeline.signature-declined-description"
+              id="timeline.signature-declined-by-signer.description"
               defaultMessage="{signer} has declined the eSignature process {timeAgo}"
               values={{
                 signer: <SignerReference signer={event.canceller} />,
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          )}
+          {event.cancelType === "REQUEST_RESTARTED" && (
+            <FormattedMessage
+              id="timeline.signature-restarted.description"
+              defaultMessage="The eSignature process has been restarted {timeAgo}"
+              values={{
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          )}
+          {event.cancelType === "REQUEST_ERROR" && (
+            <FormattedMessage
+              id="timeline.signature-cancelled-request-error.description"
+              defaultMessage="The eSignature process has been cancelled due to an unknown error {timeAgo}"
+              values={{
                 timeAgo: (
                   <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),

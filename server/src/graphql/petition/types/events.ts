@@ -511,16 +511,6 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
       return null;
     },
   });
-  t.nullable.field("contact", {
-    type: "Contact",
-    resolve: async ({ data }, _, ctx) => {
-      const cancellerId = data.cancel_data?.canceller_id;
-      if (data.cancel_reason === "REQUEST_RESTARTED" && cancellerId) {
-        return await ctx.contacts.loadContact(cancellerId);
-      }
-      return null;
-    },
-  });
   t.nullable.field("canceller", {
     type: "PetitionSigner",
     resolve: ({ data }) => {

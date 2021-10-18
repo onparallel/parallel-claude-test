@@ -52,13 +52,22 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       petition!.signature_config
     );
 
-    await ctx.aws.enqueueMessages("signature-worker", {
-      groupId: `signature-${toGlobalId("Petition", petitionId)}`,
-      body: {
-        type: "start-signature-process",
-        payload: { petitionSignatureRequestId: signatureRequest.id },
-      },
-    });
+    await Promise.all([
+      ctx.aws.enqueueMessages("signature-worker", {
+        groupId: `signature-${toGlobalId("Petition", petitionId)}`,
+        body: {
+          type: "start-signature-process",
+          payload: { petitionSignatureRequestId: signatureRequest.id },
+        },
+      }),
+      ctx.petitions.createEvent({
+        type: "SIGNATURE_STARTED",
+        petition_id: petition.id,
+        data: {
+          petition_signature_request_id: signatureRequest.id,
+        },
+      }),
+    ]);
 
     return signatureRequest;
   },

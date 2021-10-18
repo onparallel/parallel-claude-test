@@ -1013,7 +1013,7 @@ export const PetitionEvent = schema({
             contactId: {
               type: ["string", "null"],
               description: outdent`
-                The ID of the contact that declined the signature.  
+                The ID of the contact that restarted the signature.  
                 Only set if cancelReason is \`REQUEST_RESTARTED\`.
               `,
               example: toGlobalId("Contact", 2),

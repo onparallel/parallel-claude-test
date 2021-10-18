@@ -51,7 +51,7 @@ export function CopySignatureConfigDialog({
           <Text>
             <FormattedMessage
               id="component.copy-signature-config-dialog.body-2"
-              defaultMessage="Do you want this {count, plural, =1{contact} other{contacts}} to sign the petitions of each recipient group?"
+              defaultMessage="Do you want {count, plural, =1{this contact} other{these contacts}} to sign the petition for each of the recipient groups?"
               values={{ count: signers.length }}
             />
           </Text>

@@ -91,21 +91,11 @@ async function startSignatureProcess(
     // remove events array from data before saving to DB
     data.documents = data.documents.map((doc) => removeKeys(doc, ([key]) => key !== "events"));
 
-    await Promise.all([
-      ctx.petitions.updatePetitionSignature(signature.id, {
-        external_id: `${provider.toUpperCase()}/${data.id}`,
-        data,
-        status: "PROCESSING",
-      }),
-
-      ctx.petitions.createEvent({
-        type: "SIGNATURE_STARTED",
-        petition_id: signature.petition_id,
-        data: {
-          petition_signature_request_id: signature.id,
-        },
-      }),
-    ]);
+    await ctx.petitions.updatePetitionSignature(signature.id, {
+      external_id: `${provider.toUpperCase()}/${data.id}`,
+      data,
+      status: "PROCESSING",
+    });
   } catch (error: any) {
     const cancelData = { error: error.stack ?? JSON.stringify(error) } as {
       error: any;
@@ -115,7 +105,18 @@ async function startSignatureProcess(
       cancelData.file = tmpPdfPath;
       removeGeneratedPdf = false;
     }
-    await ctx.petitions.cancelPetitionSignatureRequest(signature.id, "REQUEST_ERROR", cancelData);
+    await Promise.all([
+      ctx.petitions.cancelPetitionSignatureRequest(signature.id, "REQUEST_ERROR", cancelData),
+      ctx.petitions.createEvent({
+        type: "SIGNATURE_CANCELLED",
+        petition_id: petition.id,
+        data: {
+          petition_signature_request_id: signature.id,
+          cancel_reason: "REQUEST_ERROR",
+          cancel_data: cancelData,
+        },
+      }),
+    ]);
     throw error;
   } finally {
     try {

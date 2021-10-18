@@ -888,6 +888,17 @@ async function publicStartSignatureRequest(
           canceller_id: ctx.contact!.id,
         }
       ),
+      ctx.petitions.createEvent({
+        type: "SIGNATURE_CANCELLED",
+        petition_id: petition.id,
+        data: {
+          petition_signature_request_id: pendingSignatureRequest.id,
+          cancel_reason: "REQUEST_RESTARTED",
+          cancel_data: {
+            canceller_id: ctx.contact!.id,
+          },
+        },
+      }),
       ctx.aws.enqueueMessages("signature-worker", {
         groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
         body: {

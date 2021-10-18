@@ -65,12 +65,14 @@ export function CurrentSignatureRequestRow({
         </Heading>
         <Box>
           <FormattedList
-            value={signerStatus.map(({ signer, status }, index) => [
-              <SignerReference signer={signer} key={index} />,
-              isAwaitingSignature ? (
-                <PetitionSignatureRequestSignerStatusIcon status={status} marginBottom={1} />
-              ) : null,
-            ])}
+            value={signerStatus.map(({ signer, status }, index) => (
+              <Fragment key={index}>
+                <SignerReference signer={signer} />
+                {isAwaitingSignature ? (
+                  <PetitionSignatureRequestSignerStatusIcon status={status} marginBottom={1} />
+                ) : null}
+              </Fragment>
+            ))}
           />
         </Box>
       </Box>

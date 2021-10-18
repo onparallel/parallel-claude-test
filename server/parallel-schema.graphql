@@ -3589,7 +3589,6 @@ type SignatureCancelledEvent implements PetitionEvent {
   cancelType: PetitionSignatureCancelReason!
   canceller: PetitionSigner
   cancellerReason: String
-  contact: Contact
   createdAt: DateTime!
   id: GID!
   user: User

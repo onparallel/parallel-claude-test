@@ -2603,7 +2603,6 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   cancelType: PetitionSignatureCancelReason;
   canceller?: Maybe<PetitionSigner>;
   cancellerReason?: Maybe<Scalars["String"]>;
-  contact?: Maybe<Contact>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user?: Maybe<User>;

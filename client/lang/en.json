@@ -386,8 +386,8 @@
   },
   {
     "term": "component.copy-signature-config-dialog.body-2",
-    "definition": "Do you want this {count, plural, =1{contact} other{contacts}} to sign the petitions of each recipient group?",
-    "context": "Do you want this {count, plural, =1{contact} other{contacts}} to sign the petitions of each recipient group?"
+    "definition": "Do you want {count, plural, =1{this contact} other{these contacts}} to sign the petition for each of the recipient groups?",
+    "context": "Do you want {count, plural, =1{this contact} other{these contacts}} to sign the petition for each of the recipient groups?"
   },
   {
     "term": "component.copy-signature-config-dialog.header",
@@ -7990,9 +7990,14 @@
     "context": "{same, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
   },
   {
-    "term": "timeline.signature-cancelled-description",
+    "term": "timeline.signature-cancelled-by-user.description",
     "definition": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-cancelled-request-error.description",
+    "definition": "The eSignature process has been cancelled due to an unknown error {timeAgo}",
+    "context": "The eSignature process has been cancelled due to an unknown error {timeAgo}"
   },
   {
     "term": "timeline.signature-completed-description",
@@ -8000,7 +8005,7 @@
     "context": "The eSignature process on the petition has been completed {timeAgo}"
   },
   {
-    "term": "timeline.signature-declined-description",
+    "term": "timeline.signature-declined-by-signer.description",
     "definition": "{signer} has declined the eSignature process {timeAgo}",
     "context": "{signer} has declined the eSignature process {timeAgo}"
   },
@@ -8008,6 +8013,11 @@
     "term": "timeline.signature-declined.see-reason",
     "definition": "See reason",
     "context": "See reason"
+  },
+  {
+    "term": "timeline.signature-restarted.description",
+    "definition": "The eSignature process has been restarted {timeAgo}",
+    "context": "The eSignature process has been restarted {timeAgo}"
   },
   {
     "term": "timeline.signature-started-description",

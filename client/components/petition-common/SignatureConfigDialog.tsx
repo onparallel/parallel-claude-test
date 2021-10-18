@@ -61,16 +61,10 @@ export function SignatureConfigDialog({
   }>({
     mode: "onChange",
     defaultValues: {
-      contacts: (petition.signatureConfig?.signers ?? []).map((signer, index) =>
-        signer
-          ? { ...omit(signer, ["contactId", "__typename"]), id: signer.contactId! } // signers specified by the user will always have contactId key
-          : {
-              id: "" + index,
-              email: "",
-              isInvalid: true,
-              isDeleted: true,
-            }
-      ),
+      contacts: (petition.signatureConfig?.signers ?? []).map((signer) => ({
+        ...omit(signer, ["contactId", "__typename"]),
+        id: signer.contactId!,
+      })),
       provider: providers[0].value,
       review: petition.signatureConfig?.review ?? true,
       title: petition.signatureConfig?.title ?? petition.name ?? "",

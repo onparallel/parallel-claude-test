@@ -99,12 +99,18 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
     `SIGNATURIT/${data.document.signature.id}`
   );
 
+  if (!signature) {
+    throw new Error(
+      `Can't find PetitionSignatureRequest with external_id: SIGNATURIT/${data.document.signature.id}`
+    );
+  }
+
   const [canceller, cancellerIndex] = findSigner(
-    signature!.signature_config.signersInfo,
+    signature.signature_config.signersInfo,
     data.document
   );
 
-  const [signatureRequest] = await Promise.all([
+  await Promise.all([
     ctx.petitions.cancelPetitionSignatureRequestByExternalId(
       `SIGNATURIT/${data.document.signature.id}`,
       "DECLINED_BY_SIGNER",
@@ -114,23 +120,22 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
       },
       {
         signer_status: {
-          ...signature!.signer_status,
+          ...signature.signer_status,
           [cancellerIndex]: "DECLINED",
         },
       }
     ),
+    ctx.petitions.createEvent({
+      type: "SIGNATURE_CANCELLED",
+      petition_id: petitionId,
+      data: {
+        petition_signature_request_id: signature.id,
+        cancel_reason: "DECLINED_BY_SIGNER",
+        cancel_data: { canceller, decline_reason: data.document.decline_reason },
+      },
+    }),
     appendEventLogs(ctx, data),
   ]);
-
-  await ctx.petitions.createEvent({
-    type: "SIGNATURE_CANCELLED",
-    petition_id: petitionId,
-    data: {
-      petition_signature_request_id: signatureRequest.id,
-      cancel_reason: "DECLINED_BY_SIGNER",
-      cancel_data: { canceller, decline_reason: data.document.decline_reason },
-    },
-  });
 }
 /** signed document has been completed and is ready to be downloaded */
 async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
