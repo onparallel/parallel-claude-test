@@ -42,11 +42,10 @@ export function RecipientViewContentsCard({
     }
   };
 
-  const filteredFields = fields.filter((field) =>
-    field.type === "HEADING" && !field.title ? false : true
-  );
-
-  const headerHasTitle = !!fields[0].title;
+  const filteredFields = fields
+    .filter((field) => (field.type === "HEADING" && !field.title ? false : true))
+    // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
+    .slice(fields[0].title ? 1 : 0);
 
   return (
     <Card display="flex" flexDirection="column" {...props}>
@@ -101,7 +100,7 @@ export function RecipientViewContentsCard({
             </Text>
             {index + 1 === currentPage ? (
               <Stack as={List} spacing={1}>
-                {filteredFields.slice(headerHasTitle ? 1 : 0).map((field) => {
+                {filteredFields.map((field) => {
                   return (
                     <ListItem key={field.id} position="relative">
                       <Text
