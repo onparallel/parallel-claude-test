@@ -11,6 +11,7 @@ import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer, greetingContact } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
 import { FORMATS } from "../utils/dates";
+import { Tone } from "../utils/types";
 
 export type PetitionReminderProps = {
   emailSubject: Maybe<string>;
@@ -24,7 +25,7 @@ export type PetitionReminderProps = {
   bodyPlainText: string | null;
   deadline: Date | null;
   keycode: string;
-  tone: string;
+  tone: Tone;
 } & LayoutProps;
 
 const email: Email<PetitionReminderProps> = {

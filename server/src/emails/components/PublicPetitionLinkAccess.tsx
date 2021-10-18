@@ -7,6 +7,7 @@ import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { greetingContact } from "../common/texts";
+import { Tone } from "../utils/types";
 
 export type PublicPetitionLinkAccessProps = {
   emailSubject: Maybe<string>;
@@ -15,7 +16,7 @@ export type PublicPetitionLinkAccessProps = {
   senderName: string;
   petitionTitle: string;
   keycode: string;
-  tone: string;
+  tone: Tone;
 } & LayoutProps;
 
 const email: Email<PublicPetitionLinkAccessProps> = {

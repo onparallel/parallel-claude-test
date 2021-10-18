@@ -6,12 +6,13 @@ import { ClosingThanks } from "../common/ClosingThanks";
 import { GreetingReminder } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
+import { Tone } from "../utils/types";
 
 type SignatureReminderProps = {
   signerName: string;
   documentName: string;
   signButton: string;
-  tone: string;
+  tone: Tone;
 } & LayoutProps;
 
 /** Email sent to signers with access to the signing URL. */

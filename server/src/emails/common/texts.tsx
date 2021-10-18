@@ -2,6 +2,7 @@ import { IntlShape } from "react-intl";
 import outdent from "outdent";
 import { DateTimeProps } from "./DateTime";
 import { PetitionField } from "./PetitionFieldList";
+import { Tone } from "../utils/types";
 
 export function closing({}, intl: IntlShape) {
   return outdent`
@@ -27,7 +28,7 @@ export function greetingUser({ name }: { name: string | null }, intl: IntlShape)
 }
 
 export function greetingContact(
-  { name, fullName, tone }: { name: string | null; fullName: string | null; tone: string },
+  { name, fullName, tone }: { name: string | null; fullName: string | null; tone: Tone },
   intl: IntlShape
 ) {
   return tone === "INFORMAL"

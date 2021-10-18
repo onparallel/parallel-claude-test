@@ -6,6 +6,7 @@ import { ClosingParallelTeam } from "../common/ClosingParallelTeam";
 import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, greetingContact } from "../common/texts";
+import { Tone } from "../utils/types";
 
 export type ContactAuthenticationRequest = {
   name: string | null;
@@ -13,7 +14,7 @@ export type ContactAuthenticationRequest = {
   browserName: string;
   osName: string;
   code: string;
-  tone: string;
+  tone: Tone;
 } & LayoutProps;
 
 const email: Email<ContactAuthenticationRequest> = {

@@ -6,11 +6,12 @@ import { ClosingThanks } from "../common/ClosingThanks";
 import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
+import { Tone } from "../utils/types";
 
 type SignatureCancelledProps = {
   signerName: string | null;
   signatureProvider: string;
-  tone: string;
+  tone: Tone;
 } & LayoutProps;
 
 /** Email sent to signers to let them know the signature process has been cancelled by the user. */

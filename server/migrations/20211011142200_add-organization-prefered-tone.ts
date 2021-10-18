@@ -7,8 +7,10 @@ export async function up(knex: Knex): Promise<any> {
       enumName: "tone",
     })
       .notNullable()
-      .defaultTo("FORMAL");
+      .defaultTo("INFORMAL");
   });
+
+  await knex.raw(/* sql */ `update organization set preferred_tone = 'FORMAL'`);
 
   // there is a new branding ids
   await knex.raw(/* sql */ `

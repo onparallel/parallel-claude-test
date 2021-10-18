@@ -10,6 +10,7 @@ import {
   PetitionFieldAndCommentsProps,
 } from "../common/PetitionFieldAndCommentsList";
 import { closing, greetingContact } from "../common/texts";
+import { Tone } from "../utils/types";
 
 export type PetitionCommentsContactNotificationProps = {
   contactFullName: string;
@@ -17,7 +18,7 @@ export type PetitionCommentsContactNotificationProps = {
   keycode: string;
   emailSubject: string | null;
   fields: PetitionFieldAndCommentsProps["fields"];
-  tone: string;
+  tone: Tone;
 } & LayoutProps;
 
 const email: Email<PetitionCommentsContactNotificationProps> = {

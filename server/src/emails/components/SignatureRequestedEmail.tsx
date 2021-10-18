@@ -7,13 +7,14 @@ import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
+import { Tone } from "../utils/types";
 
 type SignatureRequestedProps = {
   emailBody: string | null;
   signerName: string;
   documentName: string;
   signButton: string;
-  tone: string;
+  tone: Tone;
 } & LayoutProps;
 
 /** Email sent to signers with access to the signing URL. */

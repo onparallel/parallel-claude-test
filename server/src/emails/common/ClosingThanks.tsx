@@ -1,7 +1,8 @@
 import { MjmlText } from "mjml-react";
 import { FormattedMessage } from "react-intl";
+import { Tone } from "../utils/types";
 
-export function ClosingThanks({ tone }: { tone: string }) {
+export function ClosingThanks({ tone }: { tone: Tone }) {
   return (
     <>
       <MjmlText>

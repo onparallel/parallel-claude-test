@@ -1,5 +1,6 @@
 import { MjmlText } from "mjml-react";
 import { FormattedMessage } from "react-intl";
+import { Tone } from "../utils/types";
 
 export function GreetingUser({ name }: { name: string | null }) {
   return (
@@ -20,7 +21,7 @@ export function GreetingContact({
 }: {
   name: string | null;
   fullName: string | null;
-  tone: string;
+  tone: Tone;
 }) {
   return (
     <MjmlText>
@@ -48,7 +49,7 @@ export function GreetingReminder({
 }: {
   name: string | null;
   fullName: string | null;
-  tone: string;
+  tone: Tone;
 }) {
   return (
     <MjmlText>

@@ -28,6 +28,8 @@ async function startSignatureProcess(
   if (!petition.signature_config) {
     throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
+  const org = await ctx.organizations.loadOrg(petition.org_id);
+  const tone = org!.preferred_tone;
 
   const { title, provider, signersInfo, message } = signature.signature_config;
 
@@ -81,7 +83,10 @@ async function startSignatureProcess(
       recipients,
       {
         locale: petition.locale,
-        templateData: await getLayoutProps(petition.org_id, ctx),
+        templateData: {
+          ...(await getLayoutProps(petition.org_id, ctx)),
+          tone,
+        },
         signingMode: "parallel",
         signatureBoxPositions,
         initialMessage: message,

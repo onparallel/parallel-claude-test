@@ -9,6 +9,7 @@ import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
 import { FORMATS } from "../utils/dates";
+import { Tone } from "../utils/types";
 
 export type AccessDelegatedEmailProps = {
   senderName: string;
@@ -20,7 +21,7 @@ export type AccessDelegatedEmailProps = {
   bodyPlainText: string;
   deadline: Date | null;
   keycode: string;
-  tone: string;
+  tone: Tone;
 } & LayoutProps;
 
 const email: Email<AccessDelegatedEmailProps> = {
