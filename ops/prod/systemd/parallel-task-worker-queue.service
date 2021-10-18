@@ -1,0 +1,16 @@
+[Unit]
+Description=parallel task worker queue
+After=network.target
+
+[Service]
+Environment=PORT=4000
+Environment=NODE_ENV=production
+Environment=PLAYWRIGHT_BROWSERS_PATH=0
+WorkingDirectory=/home/ec2-user/main/server
+Type=simple
+User=ec2-user
+ExecStart=/usr/bin/node /home/ec2-user/main/server/dist/workers/task-worker.js start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

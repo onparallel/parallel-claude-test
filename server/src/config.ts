@@ -62,6 +62,9 @@ export function buildConfig() {
       "event-processor": Object.freeze({
         endpoint: process.env.WORKERS_EVENT_PROCESSOR_ENDPOINT!,
       }),
+      "task-worker": Object.freeze({
+        endpoint: process.env.WORKERS_TASK_WORKER_ENDPOINT!,
+      }),
     }),
     cronWorkers: Object.freeze({
       "scheduled-trigger": Object.freeze({

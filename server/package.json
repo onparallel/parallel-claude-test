@@ -25,6 +25,7 @@
     "worker:reminder-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/reminder-trigger.ts",
     "worker:scheduled-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/scheduled-trigger.ts",
     "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/signature-worker.ts",
+    "worker:tasks": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/task-worker.ts",
     "worker:petition-notifications": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/petition-notifications.ts",
     "worker:organization-limits": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/organization-limits.ts",
     "localtunnel": "cross-env DEBUG=* ts-node ./bin/launch-localtunnel.ts",
