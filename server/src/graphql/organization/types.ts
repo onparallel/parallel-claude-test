@@ -20,7 +20,7 @@ export const OrganizationStatus = enumType({
 export const Tone = enumType({
   name: "Tone",
   members: ["FORMAL", "INFORMAL"],
-  description: "The prefered tone of organization",
+  description: "The preferred tone of organization",
 });
 export const IntegrationType = enumType({
   name: "IntegrationType",
@@ -184,11 +184,11 @@ export const Organization = objectType({
         };
       },
     });
-    t.nonNull.field("preferedTone", {
+    t.nonNull.field("preferredTone", {
       type: "Tone",
-      description: "The prefered tone of organization.",
+      description: "The preferred tone of organization.",
       resolve: (o) => {
-        return o.prefered_tone;
+        return o.preferred_tone;
       },
     });
   },

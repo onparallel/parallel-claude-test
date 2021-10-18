@@ -516,8 +516,8 @@ export interface Mutation {
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
-  /** Changes the organization prefered tone */
-  updateOrganizationPreferedTone: Organization;
+  /** Changes the organization preferred tone */
+  updateOrganizationPreferredTone: Organization;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
   /** Updates a petition. */
@@ -1078,7 +1078,7 @@ export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
 }
 
-export interface MutationupdateOrganizationPreferedToneArgs {
+export interface MutationupdateOrganizationPreferredToneArgs {
   tone: Tone;
 }
 
@@ -1249,8 +1249,8 @@ export interface Organization extends Timestamps {
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
-  /** The prefered tone of organization. */
-  preferedTone: Tone;
+  /** The preferred tone of organization. */
+  preferredTone: Tone;
   /** The status of the organization. */
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
@@ -1403,7 +1403,7 @@ export interface Petition extends PetitionBase {
   subscriptions: Array<Subscription>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The prefered tone of organization. */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -1517,7 +1517,7 @@ export interface PetitionBase {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The prefered tone of organization. */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -1950,7 +1950,7 @@ export interface PetitionTemplate extends PetitionBase {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The prefered tone of organization. */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2091,7 +2091,7 @@ export interface PublicPetition extends Timestamps {
   signatureStatus?: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
-  /** The prefered tone of organization. */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2708,7 +2708,7 @@ export interface Timestamps {
   updatedAt: Scalars["DateTime"];
 }
 
-/** The prefered tone of organization */
+/** The preferred tone of organization */
 export type Tone = "FORMAL" | "INFORMAL";
 
 export interface UpdateContactInput {
@@ -8699,12 +8699,12 @@ export type OrganizationBranding_updateOrgLogoMutation = {
   updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: Maybe<string> };
 };
 
-export type OrganizationBranding_updateOrganizationPreferedToneMutationVariables = Exact<{
+export type OrganizationBranding_updateOrganizationPreferredToneMutationVariables = Exact<{
   tone: Tone;
 }>;
 
-export type OrganizationBranding_updateOrganizationPreferedToneMutation = {
-  updateOrganizationPreferedTone: { __typename?: "Organization"; id: string; preferedTone: Tone };
+export type OrganizationBranding_updateOrganizationPreferredToneMutation = {
+  updateOrganizationPreferredTone: { __typename?: "Organization"; id: string; preferredTone: Tone };
 };
 
 export type OrganizationBrandingQueryVariables = Exact<{ [key: string]: never }>;
@@ -8728,7 +8728,7 @@ export type OrganizationBrandingQuery = {
       id: string;
       logoUrl?: Maybe<string>;
       name: string;
-      preferedTone: Tone;
+      preferredTone: Tone;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -20017,28 +20017,28 @@ export function useOrganizationBranding_updateOrgLogoMutation(
 export type OrganizationBranding_updateOrgLogoMutationHookResult = ReturnType<
   typeof useOrganizationBranding_updateOrgLogoMutation
 >;
-export const OrganizationBranding_updateOrganizationPreferedToneDocument = gql`
-  mutation OrganizationBranding_updateOrganizationPreferedTone($tone: Tone!) {
-    updateOrganizationPreferedTone(tone: $tone) {
+export const OrganizationBranding_updateOrganizationPreferredToneDocument = gql`
+  mutation OrganizationBranding_updateOrganizationPreferredTone($tone: Tone!) {
+    updateOrganizationPreferredTone(tone: $tone) {
       id
-      preferedTone
+      preferredTone
     }
   }
 `;
-export function useOrganizationBranding_updateOrganizationPreferedToneMutation(
+export function useOrganizationBranding_updateOrganizationPreferredToneMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    OrganizationBranding_updateOrganizationPreferedToneMutation,
-    OrganizationBranding_updateOrganizationPreferedToneMutationVariables
+    OrganizationBranding_updateOrganizationPreferredToneMutation,
+    OrganizationBranding_updateOrganizationPreferredToneMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    OrganizationBranding_updateOrganizationPreferedToneMutation,
-    OrganizationBranding_updateOrganizationPreferedToneMutationVariables
-  >(OrganizationBranding_updateOrganizationPreferedToneDocument, options);
+    OrganizationBranding_updateOrganizationPreferredToneMutation,
+    OrganizationBranding_updateOrganizationPreferredToneMutationVariables
+  >(OrganizationBranding_updateOrganizationPreferredToneDocument, options);
 }
-export type OrganizationBranding_updateOrganizationPreferedToneMutationHookResult = ReturnType<
-  typeof useOrganizationBranding_updateOrganizationPreferedToneMutation
+export type OrganizationBranding_updateOrganizationPreferredToneMutationHookResult = ReturnType<
+  typeof useOrganizationBranding_updateOrganizationPreferredToneMutation
 >;
 export const OrganizationBrandingDocument = gql`
   query OrganizationBranding {
@@ -20048,7 +20048,7 @@ export const OrganizationBrandingDocument = gql`
         id
         logoUrl
         name
-        preferedTone
+        preferredTone
       }
     }
   }

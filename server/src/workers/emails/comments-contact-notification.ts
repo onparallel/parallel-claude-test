@@ -51,7 +51,7 @@ export async function commentsContactNotification(
       contactName: contact.first_name!,
       contactFullName: fullName(contact.first_name, contact.last_name),
       keycode: access.keycode,
-      tone: organization!.prefered_tone,
+      tone: organization!.preferred_tone,
       fields,
       ...layoutProps,
     },

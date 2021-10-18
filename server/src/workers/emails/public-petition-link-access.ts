@@ -55,7 +55,7 @@ export async function publicPetitionLinkAccess(
       emailSubject: petition.email_subject,
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
-      tone: organization!.prefered_tone,
+      tone: organization!.preferred_tone,
       ...layoutProps,
     },
     { locale: petition.locale }

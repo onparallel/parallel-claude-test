@@ -482,8 +482,8 @@ export type Mutation = {
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
-  /** Changes the organization prefered tone */
-  updateOrganizationPreferedTone: Organization;
+  /** Changes the organization preferred tone */
+  updateOrganizationPreferredTone: Organization;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
   /** Updates a petition. */
@@ -1044,7 +1044,7 @@ export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
 };
 
-export type MutationupdateOrganizationPreferedToneArgs = {
+export type MutationupdateOrganizationPreferredToneArgs = {
   tone: Tone;
 };
 
@@ -1213,8 +1213,8 @@ export type Organization = Timestamps & {
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
-  /** The prefered tone of organization. */
-  preferedTone: Tone;
+  /** The preferred tone of organization. */
+  preferredTone: Tone;
   /** The status of the organization. */
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
@@ -1361,7 +1361,7 @@ export type Petition = PetitionBase & {
   subscriptions: Array<Subscription>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The prefered tone of organization. */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -1471,7 +1471,7 @@ export type PetitionBase = {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The prefered tone of organization. */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -1881,7 +1881,7 @@ export type PetitionTemplate = PetitionBase & {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The prefered tone of organization. */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2015,7 +2015,7 @@ export type PublicPetition = Timestamps & {
   signatureStatus: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
-  /** The prefered tone of organization. */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2599,7 +2599,7 @@ export type Timestamps = {
   updatedAt: Scalars["DateTime"];
 };
 
-/** The prefered tone of organization */
+/** The preferred tone of organization */
 export type Tone = "FORMAL" | "INFORMAL";
 
 export type UpdateContactInput = {

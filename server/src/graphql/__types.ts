@@ -890,7 +890,7 @@ export interface NexusGenFieldTypes {
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
-    updateOrganizationPreferedTone: NexusGenRootTypes["Organization"]; // Organization!
+    updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
@@ -928,7 +928,7 @@ export interface NexusGenFieldTypes {
     integrations: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
     logoUrl: string | null; // String
     name: string; // String!
-    preferedTone: NexusGenEnums["Tone"]; // Tone!
+    preferredTone: NexusGenEnums["Tone"]; // Tone!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     usageLimits: NexusGenRootTypes["OrganizationUsageLimit"]; // OrganizationUsageLimit!
@@ -2040,7 +2040,7 @@ export interface NexusGenFieldTypeNames {
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOnboardingStatus: "User";
     updateOrganizationLogo: "Organization";
-    updateOrganizationPreferedTone: "Organization";
+    updateOrganizationPreferredTone: "Organization";
     updateOrganizationUser: "User";
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionBaseAndField";
@@ -2078,7 +2078,7 @@ export interface NexusGenFieldTypeNames {
     integrations: "OrgIntegration";
     logoUrl: "String";
     name: "String";
-    preferedTone: "Tone";
+    preferredTone: "Tone";
     status: "OrganizationStatus";
     updatedAt: "DateTime";
     usageLimits: "OrganizationUsageLimit";
@@ -3423,7 +3423,7 @@ export interface NexusGenArgTypes {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
     };
-    updateOrganizationPreferedTone: {
+    updateOrganizationPreferredTone: {
       // args
       tone: NexusGenEnums["Tone"]; // Tone!
     };

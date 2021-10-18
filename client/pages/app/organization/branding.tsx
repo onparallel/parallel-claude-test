@@ -24,7 +24,7 @@ import { BrandingPreview } from "@parallel/components/organization/BrandingPrevi
 import {
   Tone,
   useOrganizationBrandingQuery,
-  useOrganizationBranding_updateOrganizationPreferedToneMutation,
+  useOrganizationBranding_updateOrganizationPreferredToneMutation,
   useOrganizationBranding_updateOrgLogoMutation,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
@@ -49,7 +49,7 @@ function OrganizationBranding() {
     me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`
   );
 
-  const tone = me.organization.preferedTone;
+  const tone = me.organization.preferredTone;
 
   const showErrorDialog = useErrorDialog();
   const [updateLogo, { loading }] = useOrganizationBranding_updateOrgLogoMutation();
@@ -76,10 +76,10 @@ function OrganizationBranding() {
     }
   };
 
-  const [changePreferedTone] = useOrganizationBranding_updateOrganizationPreferedToneMutation();
+  const [changePreferredTone] = useOrganizationBranding_updateOrganizationPreferredToneMutation();
 
   const handleToneChange = async (tone: Tone) => {
-    changePreferedTone({
+    changePreferredTone({
       variables: {
         tone,
       },
@@ -221,7 +221,12 @@ function OrganizationBranding() {
           </Stack>
           <Divider borderColor="gray.300" />
         </Stack>
-        <BrandingPreview tone={tone} logoSrc={logoSrc} organizationName={me.organization.name} />
+        <BrandingPreview
+          tone={tone}
+          logoSrc={logoSrc}
+          organizationName={me.organization.name}
+          userFullName={me.fullName!}
+        />
       </Stack>
     </SettingsLayout>
   );
@@ -237,10 +242,10 @@ OrganizationBranding.mutations = [
     }
   `,
   gql`
-    mutation OrganizationBranding_updateOrganizationPreferedTone($tone: Tone!) {
-      updateOrganizationPreferedTone(tone: $tone) {
+    mutation OrganizationBranding_updateOrganizationPreferredTone($tone: Tone!) {
+      updateOrganizationPreferredTone(tone: $tone) {
         id
-        preferedTone
+        preferredTone
       }
     }
   `,
@@ -252,11 +257,12 @@ OrganizationBranding.getInitialProps = async ({ fetchQuery }: WithApolloDataCont
       query OrganizationBranding {
         me {
           ...SettingsLayout_User
+          fullName
           organization {
             id
             logoUrl
             name
-            preferedTone
+            preferredTone
           }
         }
       }

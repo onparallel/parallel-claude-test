@@ -48,7 +48,7 @@ export async function contactAuthenticationRequest(
       code: request.code,
       browserName: ua?.getBrowser()?.name ?? "Unknown",
       osName: ua?.getOS()?.name ?? "Unknown",
-      tone: organization!.prefered_tone,
+      tone: organization!.preferred_tone,
       ...layoutProps,
     },
     { locale: petition.locale }

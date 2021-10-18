@@ -86,7 +86,7 @@ export async function petitionReminder(
         bodyPlainText: bodyJson ? toPlainText(bodyJson, renderContext) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
-        tone: organization!.prefered_tone,
+        tone: organization!.preferred_tone,
         ...layoutProps,
       },
       { locale: petition.locale }

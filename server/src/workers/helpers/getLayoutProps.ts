@@ -22,6 +22,6 @@ export async function getLayoutProps(
     logoUrl: logoUrl ?? `${assetsUrl}/static/emails/logo.png`,
     logoAlt: logoUrl ? org.name : "Parallel",
     emailFrom: org.custom_email_from ?? emailFrom,
-    tone: org.prefered_tone,
+    tone: org.preferred_tone,
   };
 }

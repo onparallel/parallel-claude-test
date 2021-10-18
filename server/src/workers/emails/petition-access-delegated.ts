@@ -68,7 +68,7 @@ export async function petitionAccessDelegated(
       bodyPlainText: toPlainText(payload.message_body),
       emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
-      tone: organization!.prefered_tone,
+      tone: organization!.preferred_tone,
       ...layoutProps,
     },
     { locale: petition.locale }

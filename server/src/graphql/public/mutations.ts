@@ -117,7 +117,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
           email: anonymizeEmail(ctx.contact!.email),
           orgName: org!.name,
           orgLogoUrl: logoUrl,
-          tone: org!.prefered_tone,
+          tone: org!.preferred_tone,
         };
       }
     } else {

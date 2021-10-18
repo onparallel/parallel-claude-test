@@ -11,15 +11,19 @@ import {
 import { Tone } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-export function BrandingPreview({
-  organizationName,
-  logoSrc,
-  tone,
-}: {
+interface BrandingPreviewProps {
+  userFullName: string;
   organizationName: string;
   logoSrc: string;
   tone: Tone;
-}) {
+}
+
+export function BrandingPreview({
+  userFullName,
+  organizationName,
+  logoSrc,
+  tone,
+}: BrandingPreviewProps) {
   return (
     <Box width="100%" paddingBottom={8}>
       <Box
@@ -44,7 +48,7 @@ export function BrandingPreview({
           borderBottomLeftRadius="md"
         >
           <Text color="white" fontSize="sm">
-            <FormattedMessage id="organization.branding.preview" defaultMessage="Preview" />
+            <FormattedMessage id="component.branding-preview.label" defaultMessage="Preview" />
           </Text>
         </Box>
         <Stack padding={8} spacing={5}>
@@ -60,16 +64,16 @@ export function BrandingPreview({
             </Center>
             <Text>
               <FormattedMessage
-                id="organization.branding.preview-grettings"
+                id="component.branding-preview.grettings"
                 defaultMessage="{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}"
                 values={{ tone }}
               />
             </Text>
             <Text>
               <FormattedMessage
-                id="organization.branding.preview-body"
-                defaultMessage="We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted."
-                values={{ tone }}
+                id="component.branding-preview.body"
+                defaultMessage="We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted."
+                values={{ tone, name: userFullName }}
               />
             </Text>
           </Stack>
@@ -91,7 +95,7 @@ export function BrandingPreview({
           <UnorderedList paddingLeft={4}>
             <ListItem>
               <FormattedMessage
-                id="organization.branding.preview-fields-pending"
+                id="component.branding-preview.pending-fields"
                 defaultMessage="{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}"
                 values={{ tone }}
               />
@@ -118,7 +122,7 @@ export function BrandingPreview({
       </Box>
       <Text width="full" textAlign="center" fontSize="sm" color="gray.600" mt={4}>
         <FormattedMessage
-          id="organization.branding.preview-footer"
+          id="component.branding-preview.footer"
           defaultMessage="An example of the emails your customers will receive."
         />
       </Text>

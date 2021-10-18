@@ -75,6 +75,31 @@
     "context": "Refresh"
   },
   {
+    "term": "component.branding-preview.body",
+    "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió una petición de la que queda información pendiente de completar.}}",
+    "context": "We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted."
+  },
+  {
+    "term": "component.branding-preview.footer",
+    "definition": "Previsualización de los correos que recibirán tus clientes.",
+    "context": "An example of the emails your customers will receive."
+  },
+  {
+    "term": "component.branding-preview.grettings",
+    "definition": "{tone, select, INFORMAL{🔔 ¡Hola <b>[Nombre destinatario]</b>!} other{Estimado/a <b>[Nombre destinatario],</b>}}",
+    "context": "{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}"
+  },
+  {
+    "term": "component.branding-preview.label",
+    "definition": "Ejemplo",
+    "context": "Preview"
+  },
+  {
+    "term": "component.branding-preview.pending-fields",
+    "definition": "{tone, select, INFORMAL{En este momento hay 12/40 campos pendientes} other{Tiene 12/40 campos pendientes}}",
+    "context": "{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}"
+  },
+  {
     "term": "component.burger-button.label-close",
     "definition": "Cerrar menú",
     "context": "Close menu"
@@ -4158,31 +4183,6 @@
     "term": "organization.branding.logo-header",
     "definition": "Logo de la organización",
     "context": "Organization logo"
-  },
-  {
-    "term": "organization.branding.preview",
-    "definition": "Ejemplo",
-    "context": "Preview"
-  },
-  {
-    "term": "organization.branding.preview-body",
-    "definition": "{tone, select, INFORMAL{Te recordamos que <b>[Tu nombre]</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió una petición de la que queda información pendiente de completar.}}",
-    "context": "We remind you that <b>[Your name]</b> sent you a petition and some of the requested information has not yet been submitted."
-  },
-  {
-    "term": "organization.branding.preview-fields-pending",
-    "definition": "{tone, select, INFORMAL{En este momento hay 12/40 campos pendientes} other{Tiene 12/40 campos pendientes}}",
-    "context": "{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}"
-  },
-  {
-    "term": "organization.branding.preview-footer",
-    "definition": "Previsualización de los correos que recibirán tus clientes.",
-    "context": "An example of the emails your customers will receive."
-  },
-  {
-    "term": "organization.branding.preview-grettings",
-    "definition": "{tone, select, INFORMAL{🔔 ¡Hola <b>[Nombre destinatario]</b>!} other{Estimado/a <b>[Nombre destinatario],</b>}}",
-    "context": "{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}"
   },
   {
     "term": "organization.branding.title",

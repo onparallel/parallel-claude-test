@@ -18,8 +18,6 @@ export type FeatureFlagName =
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
-export type OrgPreferedTone = "FORMAL" | "INFORMAL";
-
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV" | "ROOT";
 
 export type OrganizationUsageLimitName = "PETITION_SEND";
@@ -112,6 +110,8 @@ export type SystemEventType =
   | "INVITE_SENT"
   | "USER_CREATED"
   | "USER_LOGGED_IN";
+
+export type Tone = "FORMAL" | "INFORMAL";
 
 export type UserOrganizationRole = "ADMIN" | "NORMAL" | "OWNER";
 
@@ -394,7 +394,7 @@ export interface Organization {
   custom_email_from: Maybe<string>; // varchar
   logo_public_file_id: Maybe<number>; // int4
   usage_details: Maybe<any>; // jsonb
-  prefered_tone: OrgPreferedTone; // org_prefered_tone
+  preferred_tone: Tone; // tone
 }
 
 export type CreateOrganization = PartialProps<
@@ -409,7 +409,7 @@ export type CreateOrganization = PartialProps<
   | "custom_email_from"
   | "logo_public_file_id"
   | "usage_details"
-  | "prefered_tone"
+  | "preferred_tone"
 >;
 
 export interface OrganizationUsageLimit {

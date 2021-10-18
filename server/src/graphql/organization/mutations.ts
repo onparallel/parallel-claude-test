@@ -43,8 +43,8 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   },
 });
 
-export const updateOrganizationPreferedTone = mutationField("updateOrganizationPreferedTone", {
-  description: "Changes the organization prefered tone",
+export const updateOrganizationPreferredTone = mutationField("updateOrganizationPreferredTone", {
+  description: "Changes the organization preferred tone",
   type: "Organization",
   args: {
     tone: nonNull(arg({ type: "Tone" })),
@@ -53,7 +53,7 @@ export const updateOrganizationPreferedTone = mutationField("updateOrganizationP
   resolve: async (root, args, ctx) => {
     return await ctx.organizations.updateOrganization(
       ctx.user!.org_id,
-      { prefered_tone: args.tone },
+      { preferred_tone: args.tone },
       `User:${ctx.user!.id}`
     );
   },

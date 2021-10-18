@@ -1126,9 +1126,9 @@ type Mutation {
   updateOrganizationLogo(file: Upload!): Organization!
 
   """
-  Changes the organization prefered tone
+  Changes the organization preferred tone
   """
-  updateOrganizationPreferedTone(tone: Tone!): Organization!
+  updateOrganizationPreferredTone(tone: Tone!): Organization!
 
   """
   Updates the role of another user in the organization.
@@ -1369,9 +1369,9 @@ type Organization implements Timestamps {
   name: String!
 
   """
-  The prefered tone of organization.
+  The preferred tone of organization.
   """
-  preferedTone: Tone!
+  preferredTone: Tone!
 
   """
   The status of the organization.
@@ -1657,7 +1657,7 @@ type Petition implements PetitionBase {
   tags: [Tag!]!
 
   """
-  The prefered tone of organization.
+  The preferred tone of organization.
   """
   tone: Tone!
 
@@ -1858,7 +1858,7 @@ interface PetitionBase {
   tags: [Tag!]!
 
   """
-  The prefered tone of organization.
+  The preferred tone of organization.
   """
   tone: Tone!
 
@@ -2626,7 +2626,7 @@ type PetitionTemplate implements PetitionBase {
   tags: [Tag!]!
 
   """
-  The prefered tone of organization.
+  The preferred tone of organization.
   """
   tone: Tone!
 
@@ -2864,7 +2864,7 @@ type PublicPetition implements Timestamps {
   status: PetitionStatus!
 
   """
-  The prefered tone of organization.
+  The preferred tone of organization.
   """
   tone: Tone!
 
@@ -3746,7 +3746,7 @@ interface Timestamps {
 }
 
 """
-The prefered tone of organization
+The preferred tone of organization
 """
 enum Tone {
   FORMAL
