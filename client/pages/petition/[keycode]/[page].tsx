@@ -25,10 +25,10 @@ import {
   useCompleteSignerInfoDialog,
 } from "@parallel/components/recipient-view/CompleteSignerInfoDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
+import { LastSavedProvider } from "@parallel/components/recipient-view/LastSavedProvider";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHeader } from "@parallel/components/recipient-view/RecipientViewHeader";
-import { useRecipientViewHelpDialog } from "@parallel/components/recipient-view/RecipientViewHelpModal";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
@@ -50,7 +50,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 
@@ -158,233 +158,231 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
     setSidebarTop(rect.height + 16);
   }, []);
 
-  const handleHelpClick = useHelpModal({ tone });
-
   const breakpoint = "md";
-  return (
-    <ToneProvider value={tone}>
-      <Head>
-        {fields[0]?.type === "HEADING" && fields[0].title ? (
-          <title>{fields[0].title} | Parallel</title>
-        ) : (
-          <title>Parallel</title>
-        )}
-      </Head>
-      <Flex
-        backgroundColor="gray.50"
-        minHeight="100vh"
-        zIndex={1}
-        flexDirection="column"
-        alignItems="center"
-      >
-        <RecipientViewHeader
-          sender={granter}
-          contact={contact}
-          message={message}
-          recipients={recipients}
-          keycode={keycode}
-          isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
-        />
-        <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
-          {["COMPLETED", "CLOSED"].includes(petition.status) ? (
-            !petition.signatureConfig ||
-            (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
-              <CloseableAlert status="success" variant="subtle" zIndex={2}>
-                <Flex
-                  maxWidth="container.lg"
-                  alignItems="center"
-                  justifyContent="flex-start"
-                  marginX="auto"
-                  width="100%"
-                  paddingLeft={4}
-                  paddingRight={12}
-                >
-                  <AlertIcon />
-                  <AlertDescription>
-                    {petition.status === "COMPLETED" ? (
-                      <>
-                        <Text>
-                          <FormattedMessage
-                            id="recipient-view.petition-completed-alert-1"
-                            defaultMessage="{tone, select, INFORMAL{Great! You have completed the petition and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
-                            values={{
-                              name: <b>{granter.fullName}</b>,
-                              tone,
-                            }}
-                          />
-                        </Text>
-                        <Text>
-                          <FormattedMessage
-                            id="recipient-view.petition-completed-alert-2"
-                            defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
-                            values={{ tone }}
-                          />
-                        </Text>
-                      </>
-                    ) : (
-                      <FormattedMessage
-                        id="recipient-view.petition-closed-alert"
-                        defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
-                        values={{
-                          name: <b>{granter.fullName}</b>,
-                        }}
-                      />
-                    )}
-                  </AlertDescription>
-                </Flex>
-              </CloseableAlert>
-            ) : (
-              <CloseableAlert backgroundColor="yellow.100" zIndex={2}>
-                <Flex
-                  maxWidth="container.lg"
-                  alignItems="center"
-                  justifyContent="flex-start"
-                  marginX="auto"
-                  width="100%"
-                  paddingLeft={4}
-                  paddingRight={12}
-                >
-                  <AlertIcon color="yellow.400" />
-                  <AlertDescription>
-                    {petition.signatureConfig.review ? (
-                      <>
-                        <Text>
-                          <FormattedMessage
-                            id="recipient-view.petition-requires-signature-alert-1"
-                            defaultMessage="This petition requires an <b>eSignature</b> to be completed."
-                          />
-                        </Text>
-                        <Text>
-                          <FormattedMessage
-                            id="recipient-view.petition-requires-signature-alert-2"
-                            defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
-                          />
-                        </Text>
-                      </>
-                    ) : (
-                      <Text>
-                        {petition.signatureConfig.signers.length > 0 ? (
-                          <FormattedMessage
-                            id="recipient-view.petition-signature-request-sent-alert"
-                            defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
-                            values={{
-                              a: (chunks: any) => (
-                                <ContactListPopover
-                                  contacts={petition
-                                    .signatureConfig!.signers.slice(1)
-                                    .concat(petition.signatureConfig!.additionalSigners)}
-                                >
-                                  <Text
-                                    display="initial"
-                                    textDecoration="underline"
-                                    color="purple.600"
-                                    cursor="pointer"
-                                  >
-                                    {chunks}
-                                  </Text>
-                                </ContactListPopover>
-                              ),
-                              name: petition.signatureConfig.signers[0]!.fullName,
-                              email: petition.signatureConfig.signers[0]!.email,
-                              count:
-                                petition.signatureConfig.signers.length +
-                                petition.signatureConfig.additionalSigners.length -
-                                1,
-                            }}
-                          />
-                        ) : (
-                          <FormattedMessage
-                            id="recipient-view.petition-signature-request-sent-alert.unknown-signer"
-                            defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
-                          />
-                        )}
-                      </Text>
-                    )}
-                    <FormattedMessage
-                      id="recipient-view.petition-completed-alert-2"
-                      defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
-                      values={{ tone }}
-                    />
-                  </AlertDescription>
-                </Flex>
-              </CloseableAlert>
-            )
-          ) : null}
-          <ResizeObserver onResize={readjustHeight} />
-        </Box>
-        <Flex
-          flex="1"
-          flexDirection={{ base: "column", [breakpoint]: "row" }}
-          width="100%"
-          maxWidth="container.lg"
-          paddingX={4}
-        >
-          <Box
-            flex={{ base: 0, [breakpoint]: 1 }}
-            minWidth={0}
-            marginRight={{ base: 0, [breakpoint]: 4 }}
-            marginBottom={4}
-          >
-            <Stack
-              spacing={4}
-              position={{ base: "relative", [breakpoint]: "sticky" }}
-              top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
-            >
-              {petition.isRecipientViewContentsHidden ? null : (
-                <RecipientViewContentsCard
-                  currentPage={currentPage}
-                  hasCommentsEnabled={petition.hasCommentsEnabled}
-                  sender={granter}
-                  petition={petition}
-                  display={{ base: "none", [breakpoint]: "flex" }}
-                />
-              )}
-              <Button variant="outline" onClick={handleHelpClick}>
-                <FormattedMessage id="recipient-view.need-help" defaultMessage="Help" />
-              </Button>
-            </Stack>
-          </Box>
-          <Flex flexDirection="column" flex="2" minWidth={0}>
-            <Stack spacing={4} key={currentPage}>
-              <AnimatePresence initial={false}>
-                {fields.map((field) => (
-                  <motion.div key={field.id} layout="position">
-                    <RecipientViewPetitionField
-                      key={field.id}
-                      petitionId={petition.id}
-                      keycode={keycode}
-                      access={access!}
-                      field={field}
-                      isDisabled={field.validated || petition.status === "CLOSED"}
-                      isInvalid={
-                        finalized &&
-                        !field.validated &&
-                        completedFieldReplies(field).length === 0 &&
-                        !field.optional
-                      }
-                      hasCommentsEnabled={petition.hasCommentsEnabled}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </Stack>
-            <Spacer />
-            {pages > 1 ? (
-              <RecipientViewPagination
-                marginTop={8}
-                currentPage={currentPage}
-                pageCount={pageCount}
-              />
-            ) : null}
-            <RecipientViewFooter marginTop={12} />
-          </Flex>
-        </Flex>
 
-        {petition.status !== "CLOSED" && (
-          <RecipientViewProgressFooter petition={petition} onFinalize={handleFinalize} />
-        )}
-      </Flex>
-    </ToneProvider>
+  return (
+    <LastSavedProvider>
+      <ToneProvider value={tone}>
+        <Head>
+          {fields[0]?.type === "HEADING" && fields[0].title ? (
+            <title>{fields[0].title} | Parallel</title>
+          ) : (
+            <title>Parallel</title>
+          )}
+        </Head>
+        <Flex
+          backgroundColor="gray.50"
+          minHeight="100vh"
+          zIndex={1}
+          flexDirection="column"
+          alignItems="center"
+        >
+          <RecipientViewHeader
+            sender={granter}
+            contact={contact}
+            message={message}
+            recipients={recipients}
+            keycode={keycode}
+            isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
+          />
+          <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
+            {["COMPLETED", "CLOSED"].includes(petition.status) ? (
+              !petition.signatureConfig ||
+              (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
+                <CloseableAlert status="success" variant="subtle" zIndex={2}>
+                  <Flex
+                    maxWidth="container.lg"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    marginX="auto"
+                    width="100%"
+                    paddingLeft={4}
+                    paddingRight={12}
+                  >
+                    <AlertIcon />
+                    <AlertDescription>
+                      {petition.status === "COMPLETED" ? (
+                        <>
+                          <Text>
+                            <FormattedMessage
+                              id="recipient-view.petition-completed-alert-1"
+                              defaultMessage="{tone, select, INFORMAL{Great! You have completed the petition and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+                              values={{
+                                name: <b>{granter.fullName}</b>,
+                                tone,
+                              }}
+                            />
+                          </Text>
+                          <Text>
+                            <FormattedMessage
+                              id="recipient-view.petition-completed-alert-2"
+                              defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                              values={{ tone }}
+                            />
+                          </Text>
+                        </>
+                      ) : (
+                        <FormattedMessage
+                          id="recipient-view.petition-closed-alert"
+                          defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
+                          values={{
+                            name: <b>{granter.fullName}</b>,
+                          }}
+                        />
+                      )}
+                    </AlertDescription>
+                  </Flex>
+                </CloseableAlert>
+              ) : (
+                <CloseableAlert backgroundColor="yellow.100" zIndex={2}>
+                  <Flex
+                    maxWidth="container.lg"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    marginX="auto"
+                    width="100%"
+                    paddingLeft={4}
+                    paddingRight={12}
+                  >
+                    <AlertIcon color="yellow.400" />
+                    <AlertDescription>
+                      {petition.signatureConfig.review ? (
+                        <>
+                          <Text>
+                            <FormattedMessage
+                              id="recipient-view.petition-requires-signature-alert-1"
+                              defaultMessage="This petition requires an <b>eSignature</b> to be completed."
+                            />
+                          </Text>
+                          <Text>
+                            <FormattedMessage
+                              id="recipient-view.petition-requires-signature-alert-2"
+                              defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
+                            />
+                          </Text>
+                        </>
+                      ) : (
+                        <Text>
+                          {petition.signatureConfig.signers.length > 0 ? (
+                            <FormattedMessage
+                              id="recipient-view.petition-signature-request-sent-alert"
+                              defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
+                              values={{
+                                a: (chunks: any) => (
+                                  <ContactListPopover
+                                    contacts={petition
+                                      .signatureConfig!.signers.slice(1)
+                                      .concat(petition.signatureConfig!.additionalSigners)}
+                                  >
+                                    <Text
+                                      display="initial"
+                                      textDecoration="underline"
+                                      color="purple.600"
+                                      cursor="pointer"
+                                    >
+                                      {chunks}
+                                    </Text>
+                                  </ContactListPopover>
+                                ),
+                                name: petition.signatureConfig.signers[0]!.fullName,
+                                email: petition.signatureConfig.signers[0]!.email,
+                                count:
+                                  petition.signatureConfig.signers.length +
+                                  petition.signatureConfig.additionalSigners.length -
+                                  1,
+                              }}
+                            />
+                          ) : (
+                            <FormattedMessage
+                              id="recipient-view.petition-signature-request-sent-alert.unknown-signer"
+                              defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
+                            />
+                          )}
+                        </Text>
+                      )}
+                      <FormattedMessage
+                        id="recipient-view.petition-completed-alert-2"
+                        defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                        values={{ tone }}
+                      />
+                    </AlertDescription>
+                  </Flex>
+                </CloseableAlert>
+              )
+            ) : null}
+            <ResizeObserver onResize={readjustHeight} />
+          </Box>
+          <Flex
+            flex="1"
+            flexDirection={{ base: "column", [breakpoint]: "row" }}
+            width="100%"
+            maxWidth="container.lg"
+            paddingX={4}
+          >
+            <Box
+              flex={{ base: 0, [breakpoint]: 1 }}
+              minWidth={0}
+              marginRight={{ base: 0, [breakpoint]: 4 }}
+              marginBottom={4}
+            >
+              <Stack
+                spacing={4}
+                position={{ base: "relative", [breakpoint]: "sticky" }}
+                top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
+              >
+                {petition.isRecipientViewContentsHidden ? null : (
+                  <RecipientViewContentsCard
+                    currentPage={currentPage}
+                    hasCommentsEnabled={petition.hasCommentsEnabled}
+                    sender={granter}
+                    petition={petition}
+                    display={{ base: "none", [breakpoint]: "flex" }}
+                  />
+                )}
+              </Stack>
+            </Box>
+            <Flex flexDirection="column" flex="2" minWidth={0}>
+              <Stack spacing={4} key={currentPage}>
+                <AnimatePresence initial={false}>
+                  {fields.map((field) => (
+                    <motion.div key={field.id} layout="position">
+                      <RecipientViewPetitionField
+                        key={field.id}
+                        petitionId={petition.id}
+                        keycode={keycode}
+                        access={access!}
+                        field={field}
+                        isDisabled={field.validated || petition.status === "CLOSED"}
+                        isInvalid={
+                          finalized &&
+                          !field.validated &&
+                          completedFieldReplies(field).length === 0 &&
+                          !field.optional
+                        }
+                        hasCommentsEnabled={petition.hasCommentsEnabled}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </Stack>
+              <Spacer />
+              {pages > 1 ? (
+                <RecipientViewPagination
+                  marginTop={8}
+                  currentPage={currentPage}
+                  pageCount={pageCount}
+                />
+              ) : null}
+              <RecipientViewFooter marginTop={12} />
+            </Flex>
+          </Flex>
+
+          {petition.status !== "CLOSED" && (
+            <RecipientViewProgressFooter petition={petition} onFinalize={handleFinalize} />
+          )}
+        </Flex>
+      </ToneProvider>
+    </LastSavedProvider>
   );
 }
 
@@ -556,37 +554,6 @@ function useGetPageFields(fields: RecipientView_PublicPetitionFieldFragment[], p
     const pages = groupFieldsByPages(fields, visibility);
     return { fields: pages[page - 1], pages: pages.length, visibility };
   }, [fields, page, visibility]);
-}
-
-function useHelpModal({ tone }: { tone: Tone }) {
-  const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
-  useEffect(() => {
-    showHelp();
-  }, []);
-
-  async function showHelp() {
-    const key = "recipient-first-time-check";
-    if (isLocalStorageAvailable() && !localStorage.getItem(key)) {
-      try {
-        await showRecipientViewHelpDialog({ tone });
-        localStorage.setItem(key, "check");
-      } catch {}
-    }
-  }
-  return async function () {
-    try {
-      await showRecipientViewHelpDialog({ tone });
-    } catch {}
-  };
-}
-
-function isLocalStorageAvailable() {
-  try {
-    localStorage.getItem("");
-    return true;
-  } catch (e: any) {
-    return false;
-  }
 }
 
 RecipientView.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDataContext) => {

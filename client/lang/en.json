@@ -7510,6 +7510,21 @@
     "context": "Invite collaborator"
   },
   {
+    "term": "recipient-view.last-saved-info",
+    "definition": "Your answers are automatically saved.",
+    "context": "Your answers are automatically saved."
+  },
+  {
+    "term": "recipient-view.last-saved-info-date",
+    "definition": "<b>Last saved:</b> {date}",
+    "context": "<b>Last saved:</b> {date}"
+  },
+  {
+    "term": "recipient-view.last-saved-time",
+    "definition": "Last saved {time}",
+    "context": "Last saved {time}"
+  },
+  {
     "term": "recipient-view.need-help",
     "definition": "Help",
     "context": "Help"

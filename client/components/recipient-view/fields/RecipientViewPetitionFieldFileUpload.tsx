@@ -31,6 +31,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useLastSaved } from "../LastSavedProvider";
 import { useCreateFileUploadReply, useDeletePetitionReply } from "./mutations";
 import {
   RecipientViewPetitionFieldCard,
@@ -58,6 +59,8 @@ export function RecipientViewPetitionFieldFileUpload({
 }: RecipientViewPetitionFieldFileUploadProps) {
   const uploads = useRef<Record<string, XMLHttpRequest>>({});
 
+  const { updateLastSaved } = useLastSaved();
+
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const deletePetitionReply = useDeletePetitionReply();
@@ -76,19 +79,22 @@ export function RecipientViewPetitionFieldFileUpload({
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       await deletePetitionReply({ petitionId, fieldId, replyId, keycode });
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
+      updateLastSaved();
     },
     [deletePetitionReply, uploads]
   );
   const createFileUploadReply = useCreateFileUploadReply(uploads);
 
   const handleCreateReply = useCallback(
-    (content: File[]) =>
-      createFileUploadReply({
+    (content: File[]) => {
+      updateLastSaved();
+      return createFileUploadReply({
         petitionId,
         keycode,
         fieldId: field.id,
         content,
-      }),
+      });
+    },
     [createFileUploadReply, keycode, field.id]
   );
 

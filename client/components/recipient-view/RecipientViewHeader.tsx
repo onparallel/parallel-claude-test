@@ -11,6 +11,7 @@ import {
   DividerProps,
   Flex,
   Heading,
+  HStack,
   Img,
   Stack,
   Text,
@@ -18,20 +19,28 @@ import {
   useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
+import { CloudOkIcon, HelpOutlineIcon } from "@parallel/chakra/icons";
 import { CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
   RecipientViewHeader_PublicContactFragment,
   RecipientViewHeader_PublicUserFragment,
   RecipientView_PublicPetitionMessageFragment,
+  Tone,
   useRecipientViewHeader_publicDelegateAccessToContactMutation,
 } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
+import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactListPopover } from "../common/ContactListPopover";
 import { HelpPopover } from "../common/HelpPopover";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { SmallPopover } from "../common/SmallPopover";
 import { useTone } from "../common/ToneProvider";
 import { useDelegateAccessDialog } from "./DelegateAccessDialog";
+import { useLastSaved } from "./LastSavedProvider";
+import { useRecipientViewHelpDialog } from "./RecipientViewHelpModal";
 
 function Contact({
   contact,
@@ -88,6 +97,8 @@ export function RecipientViewHeader({
   });
 
   const tone = useTone();
+  const handleHelpClick = useHelpModal({ tone });
+  const { lastSaved } = useLastSaved();
 
   const handleDelegateAccess = async () => {
     try {
@@ -131,7 +142,7 @@ export function RecipientViewHeader({
           width="100%"
           paddingY={{ base: 2, md: 3 }}
           paddingX={2.5}
-          justifyContent="left"
+          justifyContent="space-between"
         >
           {sender.organization.logoUrl ? (
             <Img
@@ -143,7 +154,58 @@ export function RecipientViewHeader({
           ) : (
             <Logo width="152px" height="40px" />
           )}
+          <HStack spacing={3}>
+            {lastSaved ? (
+              <SmallPopover
+                content={
+                  <Box fontSize="sm">
+                    <Text mb={2}>
+                      <FormattedMessage
+                        id="recipient-view.last-saved-info"
+                        defaultMessage="Your answers are automatically saved."
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="recipient-view.last-saved-info-date"
+                        defaultMessage="<b>Last saved:</b> {date}"
+                        values={{ date: intl.formatDate(lastSaved, FORMATS.LLL) }}
+                      />
+                    </Text>
+                  </Box>
+                }
+                placement="bottom"
+                width="320px"
+              >
+                <HStack>
+                  <CloudOkIcon fontSize="18px" color="green.600" />
+                  <Text fontStyle="italic" color="green.600">
+                    <FormattedMessage
+                      id="recipient-view.last-saved-time"
+                      defaultMessage="Last saved {time}"
+                      values={{ time: intl.formatDate(lastSaved, FORMATS.HHmm) }}
+                    />
+                  </Text>
+                </HStack>
+              </SmallPopover>
+            ) : null}
+
+            <IconButtonWithTooltip
+              label={intl.formatMessage({
+                id: "recipient-view.need-help",
+                defaultMessage: "Help",
+              })}
+              placement="bottom"
+              size="md"
+              variant="ghost"
+              backgroundColor="white"
+              isRound
+              onClick={handleHelpClick}
+              icon={<HelpOutlineIcon fontSize="22px" />}
+            />
+          </HStack>
         </Flex>
+
         <Accordion width="100%" allowMultiple defaultIndex={[isClosed ? 1 : 0]}>
           <AccordionItem justifyContent="center">
             <AccordionButton
@@ -311,3 +373,34 @@ RecipientViewHeader.mutations = [
     }
   `,
 ];
+
+function isLocalStorageAvailable() {
+  try {
+    localStorage.getItem("");
+    return true;
+  } catch (e: any) {
+    return false;
+  }
+}
+
+function useHelpModal({ tone }: { tone: Tone }) {
+  const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
+  useEffect(() => {
+    showHelp();
+  }, []);
+
+  async function showHelp() {
+    const key = "recipient-first-time-check";
+    if (isLocalStorageAvailable() && !localStorage.getItem(key)) {
+      try {
+        await showRecipientViewHelpDialog({ tone });
+        localStorage.setItem(key, "check");
+      } catch {}
+    }
+  }
+  return async function () {
+    try {
+      await showRecipientViewHelpDialog({ tone });
+    } catch {}
+  };
+}

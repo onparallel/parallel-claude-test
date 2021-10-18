@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
+import { useLastSaved } from "../LastSavedProvider";
 import { useCreateSimpleReply, useDeletePetitionReply, useUpdateSimpleReply } from "./mutations";
 import {
   RecipientViewPetitionFieldCard,
@@ -41,6 +42,8 @@ export function RecipientViewPetitionFieldSelect({
 }: RecipientViewPetitionFieldSelectProps) {
   const intl = useIntl();
 
+  const { updateLastSaved } = useLastSaved();
+
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState(toSelectOption(null));
   const [isSaving, setIsSaving] = useState(false);
@@ -56,6 +59,7 @@ export function RecipientViewPetitionFieldSelect({
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
       await updateSimpleReply({ petitionId, replyId, keycode, value });
+      updateLastSaved();
     },
     [keycode, updateSimpleReply]
   );
@@ -68,6 +72,7 @@ export function RecipientViewPetitionFieldSelect({
       if (field.replies.length === 1) {
         setShowNewReply(true);
       }
+      updateLastSaved();
     },
     [keycode, field.id, field.replies, deleteReply]
   );
@@ -93,6 +98,7 @@ export function RecipientViewPetitionFieldSelect({
       }
     } catch {}
     setIsSaving(false);
+    updateLastSaved();
   }
 
   function handleAddNewReply() {

@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { pick } from "remeda";
+import { useLastSaved } from "../LastSavedProvider";
 import { useCreateSimpleReply, useDeletePetitionReply, useUpdateSimpleReply } from "./mutations";
 import {
   RecipientViewPetitionFieldCard,
@@ -42,6 +43,8 @@ export function RecipientViewPetitionFieldText({
 }: RecipientViewPetitionFieldTextProps) {
   const intl = useIntl();
 
+  const { updateLastSaved } = useLastSaved();
+
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -60,6 +63,7 @@ export function RecipientViewPetitionFieldText({
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
       await updateSimpleReply({ petitionId, replyId, keycode, value });
+      updateLastSaved();
     },
     [keycode, updateSimpleReply]
   );
@@ -82,6 +86,8 @@ export function RecipientViewPetitionFieldText({
         }
       }
       await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
+      updateLastSaved();
+
       delete isDeletingReplyRef.current[replyId];
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       if (field.replies.length === 1) {
@@ -125,6 +131,7 @@ export function RecipientViewPetitionFieldText({
         }
       } catch {}
       setIsSaving(false);
+      updateLastSaved();
     },
     1000,
     [keycode, field.id, createSimpleReply]

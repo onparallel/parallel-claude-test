@@ -8730,8 +8730,8 @@ export type OrganizationBrandingQueryVariables = Exact<{ [key: string]: never }>
 export type OrganizationBrandingQuery = {
   me: {
     __typename?: "User";
-    id: string;
     fullName?: Maybe<string>;
+    id: string;
     firstName?: Maybe<string>;
     lastName?: Maybe<string>;
     email: string;
@@ -20004,6 +20004,7 @@ export const OrganizationBrandingDocument = gql`
   query OrganizationBranding {
     me {
       ...SettingsLayout_User
+      fullName
       organization {
         id
         logoUrl

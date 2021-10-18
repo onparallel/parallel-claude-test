@@ -3,6 +3,7 @@ import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { useLastSaved } from "../LastSavedProvider";
 import {
   useCreateCheckboxReply,
   useDeletePetitionReply,
@@ -63,6 +64,8 @@ export function RecipientViewPetitionFieldCheckbox({
   );
   const [isSaving, setIsSaving] = useState(false);
 
+  const { updateLastSaved } = useLastSaved();
+
   const updateCheckboxReply = useUpdateCheckboxReply();
   const handleUpdate = async (values: string[]) => {
     setIsSaving(true);
@@ -73,6 +76,7 @@ export function RecipientViewPetitionFieldCheckbox({
       values,
     });
     setIsSaving(false);
+    updateLastSaved();
   };
 
   const createChekcboxReply = useCreateCheckboxReply();
@@ -85,6 +89,7 @@ export function RecipientViewPetitionFieldCheckbox({
       values,
     });
     setIsSaving(false);
+    updateLastSaved();
   };
 
   const deleteReply = useDeletePetitionReply();
@@ -92,6 +97,7 @@ export function RecipientViewPetitionFieldCheckbox({
     setIsSaving(true);
     await deleteReply({ petitionId, fieldId, replyId, keycode });
     setIsSaving(false);
+    updateLastSaved();
   };
 
   const handleChange = (option: string) => {

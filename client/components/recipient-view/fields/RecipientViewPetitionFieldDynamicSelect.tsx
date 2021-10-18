@@ -17,6 +17,7 @@ import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "reac
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import { countBy } from "remeda";
+import { useLastSaved } from "../LastSavedProvider";
 import {
   useCreateDynamicSelectReply,
   useDeletePetitionReply,
@@ -54,12 +55,15 @@ export function RecipientViewPetitionFieldDynamicSelect({
   const newReplyRef = useRef<SelectInstance>(null);
   const replyRefs = useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
 
+  const { updateLastSaved } = useLastSaved();
+
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
 
   const updateDynamicSelectReply = useUpdateDynamicSelectReply();
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: [string, string | null][]) => {
       await updateDynamicSelectReply({ petitionId, replyId, keycode, value });
+      updateLastSaved();
     },
     [petitionId, keycode, updateDynamicSelectReply]
   );
@@ -73,6 +77,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
       if (field.replies.length === 1) {
         setShowNewReply(true);
       }
+      updateLastSaved();
     },
     [keycode, field.id, field.replies, deleteReply]
   );
@@ -92,6 +97,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
         instance.focus(1);
       });
     }
+    updateLastSaved();
   }
 
   function handleAddNewReply() {

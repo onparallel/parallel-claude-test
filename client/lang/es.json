@@ -2321,7 +2321,7 @@
   },
   {
     "term": "component.recipient-view-petition-field-reply.reply-saved-on",
-    "definition": "Repuesta guardada el {date}",
+    "definition": "Respuesta guardada el {date}",
     "context": "Reply saved on {date}"
   },
   {
@@ -7508,6 +7508,21 @@
     "term": "recipient-view.invite-collaborator.title",
     "definition": "Invitar colaborador",
     "context": "Invite collaborator"
+  },
+  {
+    "term": "recipient-view.last-saved-info",
+    "definition": "Tus respuestas se guardan automáticamente.",
+    "context": "Your answers are automatically saved."
+  },
+  {
+    "term": "recipient-view.last-saved-info-date",
+    "definition": "<b>Último guardado:</b> {date}",
+    "context": "<b>Last saved:</b> {date}"
+  },
+  {
+    "term": "recipient-view.last-saved-time",
+    "definition": "Último guardado {time}",
+    "context": "Last saved {time}"
   },
   {
     "term": "recipient-view.need-help",
