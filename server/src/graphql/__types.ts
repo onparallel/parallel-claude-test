@@ -247,7 +247,7 @@ export interface NexusGenEnums {
     | "sentAt_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
-  Tone: "FORMAL" | "INFORMAL";
+  Tone: db.Tone;
   UserAuthenticationTokens_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
