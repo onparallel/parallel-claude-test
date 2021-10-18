@@ -10,6 +10,8 @@ import { readJson, writeJson } from "./utils/json";
 import { warn } from "./utils/log";
 import { run } from "./utils/run";
 
+const WHITELISTED_EXTRA_TERMS = ["tone"];
+
 async function generate(
   locales: string[],
   input: string,
@@ -45,7 +47,7 @@ async function generate(
               .join(", ")}`
           );
         }
-        const extra = difference(termValues, reference);
+        const extra = difference(termValues, [...reference, ...WHITELISTED_EXTRA_TERMS]);
         if (extra.length) {
           warn(
             `Term "${term}" (${locale}) has some extra values: ${extra

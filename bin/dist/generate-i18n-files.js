@@ -13,6 +13,7 @@ const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
 const log_1 = require("./utils/log");
 const run_1 = require("./utils/run");
+const WHITELISTED_EXTRA_TERMS = ["tone"];
 async function generate(locales, input, rawOutput, compiledOutput) {
     // store the values used in the default (first) locale to make sure they
     // are used in all the other locales
@@ -42,7 +43,7 @@ async function generate(locales, input, rawOutput, compiledOutput) {
                         .map((v) => `"${v}"`)
                         .join(", ")}`);
                 }
-                const extra = (0, remeda_1.difference)(termValues, reference);
+                const extra = (0, remeda_1.difference)(termValues, [...reference, ...WHITELISTED_EXTRA_TERMS]);
                 if (extra.length) {
                     (0, log_1.warn)(`Term "${term}" (${locale}) has some extra values: ${extra
                         .map((v) => `"${v}"`)
