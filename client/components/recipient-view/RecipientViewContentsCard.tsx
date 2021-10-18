@@ -42,6 +42,12 @@ export function RecipientViewContentsCard({
     }
   };
 
+  const filteredFields = fields.filter((field) =>
+    field.type === "HEADING" && !field.title ? false : true
+  );
+
+  const headerHasTitle = !!fields[0].title;
+
   return (
     <Card display="flex" flexDirection="column" {...props}>
       <CardHeader as="h3" size="sm">
@@ -95,67 +101,65 @@ export function RecipientViewContentsCard({
             </Text>
             {index + 1 === currentPage ? (
               <Stack as={List} spacing={1}>
-                {fields.slice(1).map((field) => (
-                  <ListItem key={field.id} position="relative">
-                    <Text
-                      as={field.type === "HEADING" ? "h3" : "div"}
-                      display="flex"
-                      position="relative"
-                    >
-                      <NakedLink href={`/petition/${query.keycode}/${index + 1}#field-${field.id}`}>
-                        <Button
-                          variant="ghost"
-                          as="a"
-                          size="sm"
-                          fontSize="md"
-                          display="flex"
-                          width="100%"
-                          paddingStart={7}
-                          fontWeight={field.type === "HEADING" ? "bold" : "normal"}
-                          _focus={{ outline: "none" }}
-                          onClick={() => handleFocusField(field)}
+                {filteredFields.slice(headerHasTitle ? 1 : 0).map((field) => {
+                  return (
+                    <ListItem key={field.id} position="relative">
+                      <Text
+                        as={field.type === "HEADING" ? "h3" : "div"}
+                        display="flex"
+                        position="relative"
+                      >
+                        <NakedLink
+                          href={`/petition/${query.keycode}/${index + 1}#field-${field.id}`}
                         >
-                          <Box
-                            flex="1"
-                            isTruncated
-                            {...(field.title
-                              ? {
-                                  color: field.replies.some((r) => r.status === "REJECTED")
-                                    ? "red.600"
-                                    : completedFieldReplies(field).length !== 0
-                                    ? "gray.400"
-                                    : "inherit",
-                                }
-                              : {
-                                  color: field.validated ? "gray.500" : "red.600",
-                                  fontWeight: "normal",
-                                  fontStyle: "italic",
-                                })}
+                          <Button
+                            variant="ghost"
+                            as="a"
+                            size="sm"
+                            fontSize="md"
+                            display="flex"
+                            width="100%"
+                            paddingStart={7}
+                            fontWeight={field.type === "HEADING" ? "bold" : "normal"}
+                            _focus={{ outline: "none" }}
+                            onClick={() => handleFocusField(field)}
                           >
-                            {field.title ||
-                              (field.type === "HEADING" ? (
-                                <FormattedMessage
-                                  id="generic.empty-heading"
-                                  defaultMessage="Untitled heading"
-                                />
-                              ) : (
+                            <Box
+                              flex="1"
+                              isTruncated
+                              {...(field.title
+                                ? {
+                                    color: field.replies.some((r) => r.status === "REJECTED")
+                                      ? "red.600"
+                                      : completedFieldReplies(field).length !== 0
+                                      ? "gray.400"
+                                      : "inherit",
+                                  }
+                                : {
+                                    color: field.validated ? "gray.500" : "red.600",
+                                    fontWeight: "normal",
+                                    fontStyle: "italic",
+                                  })}
+                            >
+                              {field.title || (
                                 <FormattedMessage
                                   id="generic.untitled-field"
                                   defaultMessage="Untitled field"
                                 />
-                              ))}
-                          </Box>
-                          {field.commentCount ? (
-                            <RecipientViewContentsIndicators
-                              hasUnreadComments={!!field.unreadCommentCount}
-                              commentCount={field.commentCount}
-                            />
-                          ) : null}
-                        </Button>
-                      </NakedLink>
-                    </Text>
-                  </ListItem>
-                ))}
+                              )}
+                            </Box>
+                            {field.commentCount ? (
+                              <RecipientViewContentsIndicators
+                                hasUnreadComments={!!field.unreadCommentCount}
+                                commentCount={field.commentCount}
+                              />
+                            ) : null}
+                          </Button>
+                        </NakedLink>
+                      </Text>
+                    </ListItem>
+                  );
+                })}
               </Stack>
             ) : null}
           </ListItem>

@@ -52,7 +52,11 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
       ["OWNER", "WRITE"].includes(template.myEffectivePermission.permissionType)
   );
 
-  const indices = useFieldIndices(template.fields);
+  const filteredFields = template.fields.filter((field) =>
+    field.type === "HEADING" && !field.title ? false : true
+  );
+
+  const indices = useFieldIndices(filteredFields);
 
   const publicLinkURL = template.publicLink?.isActive
     ? `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${template.locale}/pp/${template.publicLink.slug}`
@@ -236,22 +240,13 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
               />
             </Heading>
             <Box paddingLeft={8}>
-              {zip(template.fields, indices).map(([field, index]) => {
+              {zip(filteredFields, indices).map(([field, index]) => {
                 return field.type === "HEADING" ? (
                   <Text key={field.id} fontWeight="bold" marginBottom={2}>
                     {index}.{" "}
-                    {field.title ? (
-                      <Text as="span" fontWeight="bold">
-                        {field.title}
-                      </Text>
-                    ) : (
-                      <Text as="span" textStyle="hint">
-                        <FormattedMessage
-                          id="generic.empty-heading"
-                          defaultMessage="Untitled heading"
-                        />
-                      </Text>
-                    )}
+                    <Text as="span" fontWeight="bold">
+                      {field.title}
+                    </Text>
                   </Text>
                 ) : (
                   <Text key={field.id} marginLeft={4} marginBottom={2}>

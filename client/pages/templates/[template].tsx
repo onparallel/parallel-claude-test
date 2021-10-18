@@ -74,7 +74,11 @@ function LandingTemplateDetails({
 
   const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
 
-  const indices = useFieldIndices(fields);
+  const filteredFields = template.fields.filter((field) =>
+    field.type === "HEADING" && !field.title ? false : true
+  );
+
+  const indices = useFieldIndices(filteredFields);
   return (
     <PublicLayout
       title={name as string}
@@ -245,22 +249,13 @@ function LandingTemplateDetails({
                 />
               </Heading>
               <Collapse startingHeight={"300px"} in={fields.length <= 10 ? true : showFields}>
-                {zip(fields, indices).map(([field, index]) => {
+                {zip(filteredFields, indices).map(([field, index]) => {
                   return field.type === "HEADING" ? (
                     <Text key={field.id} fontWeight="bold" marginBottom={2}>
                       {index}.{" "}
-                      {field.title ? (
-                        <Text as="span" fontWeight="bold">
-                          {field.title}
-                        </Text>
-                      ) : (
-                        <Text as="span" textStyle="hint">
-                          <FormattedMessage
-                            id="generic.empty-heading"
-                            defaultMessage="Untitled heading"
-                          />
-                        </Text>
-                      )}
+                      <Text as="span" fontWeight="bold">
+                        {field.title}
+                      </Text>
                     </Text>
                   ) : (
                     <Text key={field.id} marginLeft={4} marginBottom={2}>
