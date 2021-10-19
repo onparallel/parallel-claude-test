@@ -1,7 +1,7 @@
 import { Box, BoxProps, HStack, Stack, StackProps, Text } from "@chakra-ui/layout";
 import { useRadio, useRadioGroup, UseRadioProps } from "@chakra-ui/radio";
 import { ArrowRightUpIcon } from "@parallel/chakra/icons";
-import { AnimateSharedLayout, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -43,27 +43,25 @@ export function PublicSwitchPricing({ onChange }: PublicSwitchPricingProps) {
 
   return (
     <Stack width="min-content" alignItems="center">
-      <AnimateSharedLayout>
-        <MotionHStack
-          ref={group.ref}
-          role={group.role}
-          layout
-          backgroundColor="gray.200"
-          width="min-content"
-          borderRadius="full"
-          alignItems="center"
-        >
-          {options.map((option) => {
-            const { label, value } = option;
-            const radio = getRadioProps({ value });
-            return (
-              <RadioCard key={value} {...radio}>
-                {label}
-              </RadioCard>
-            );
-          })}
-        </MotionHStack>
-      </AnimateSharedLayout>
+      <MotionHStack
+        ref={group.ref}
+        role={group.role}
+        layout
+        backgroundColor="gray.200"
+        width="min-content"
+        borderRadius="full"
+        alignItems="center"
+      >
+        {options.map((option) => {
+          const { label, value } = option;
+          const radio = getRadioProps({ value });
+          return (
+            <RadioCard key={value} {...radio}>
+              {label}
+            </RadioCard>
+          );
+        })}
+      </MotionHStack>
       <HStack>
         <Text fontWeight="600">
           <FormattedMessage
