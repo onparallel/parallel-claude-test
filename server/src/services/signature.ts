@@ -168,7 +168,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
 
     if (!brandingId) {
       brandingId = (await this.createOrgBranding(opts)).id;
-      this.emit("branding_updated", { locale, brandingId });
+      this.emit("branding_updated", { locale, brandingId, tone });
     }
 
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
