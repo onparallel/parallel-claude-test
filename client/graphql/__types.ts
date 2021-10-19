@@ -9129,6 +9129,35 @@ export type OrganizationSettingsQuery = {
   };
 };
 
+export type SubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SubscriptionsQuery = {
+  me: {
+    __typename?: "User";
+    isSsoUser: boolean;
+    id: string;
+    fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    email: string;
+    createdAt: string;
+    canCreateUsers: boolean;
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+    hasApiTokens: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+};
+
 export type OrganizationUsageQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationUsageQuery = {
@@ -13591,6 +13620,64 @@ export type AccountQuery = {
   };
 };
 
+export type Developers_UserAuthenticationTokenFragment = {
+  __typename?: "UserAuthenticationToken";
+  id: string;
+  tokenName: string;
+  createdAt: string;
+  lastUsedAt?: Maybe<string>;
+};
+
+export type RevokeUserAuthTokenMutationVariables = Exact<{
+  authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type RevokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
+
+export type DevelopersQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy> | UserAuthenticationTokens_OrderBy>;
+}>;
+
+export type DevelopersQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    email: string;
+    createdAt: string;
+    canCreateUsers: boolean;
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+    hasApiTokens: boolean;
+    authenticationTokens: {
+      __typename?: "UserAuthenticationTokenPagination";
+      totalCount: number;
+      items: Array<{
+        __typename?: "UserAuthenticationToken";
+        id: string;
+        tokenName: string;
+        createdAt: string;
+        lastUsedAt?: Maybe<string>;
+      }>;
+    };
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+};
+
 export type Settings_UserFragment = {
   __typename?: "User";
   id: string;
@@ -13668,64 +13755,6 @@ export type SecurityQuery = {
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
     hasApiTokens: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
-    };
-  };
-};
-
-export type Tokens_UserAuthenticationTokenFragment = {
-  __typename?: "UserAuthenticationToken";
-  id: string;
-  tokenName: string;
-  createdAt: string;
-  lastUsedAt?: Maybe<string>;
-};
-
-export type RevokeUserAuthTokenMutationVariables = Exact<{
-  authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
-}>;
-
-export type RevokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
-
-export type TokensQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy> | UserAuthenticationTokens_OrderBy>;
-}>;
-
-export type TokensQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasApiTokens: boolean;
-    authenticationTokens: {
-      __typename?: "UserAuthenticationTokenPagination";
-      totalCount: number;
-      items: Array<{
-        __typename?: "UserAuthenticationToken";
-        id: string;
-        tokenName: string;
-        createdAt: string;
-        lastUsedAt?: Maybe<string>;
-      }>;
-    };
     organization: {
       __typename?: "Organization";
       id: string;
@@ -17170,6 +17199,14 @@ export const Account_UserFragmentDoc = gql`
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
 `;
+export const Developers_UserAuthenticationTokenFragmentDoc = gql`
+  fragment Developers_UserAuthenticationToken on UserAuthenticationToken {
+    id
+    tokenName
+    createdAt
+    lastUsedAt
+  }
+`;
 export const Settings_UserFragmentDoc = gql`
   fragment Settings_User on User {
     ...SettingsLayout_User
@@ -17177,14 +17214,6 @@ export const Settings_UserFragmentDoc = gql`
   }
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
-`;
-export const Tokens_UserAuthenticationTokenFragmentDoc = gql`
-  fragment Tokens_UserAuthenticationToken on UserAuthenticationToken {
-    id
-    tokenName
-    createdAt
-    lastUsedAt
-  }
 `;
 export const Login_UserFragmentDoc = gql`
   fragment Login_User on User {
@@ -20402,6 +20431,37 @@ export type OrganizationSettingsQueryHookResult = ReturnType<typeof useOrganizat
 export type OrganizationSettingsLazyQueryHookResult = ReturnType<
   typeof useOrganizationSettingsLazyQuery
 >;
+export const SubscriptionsDocument = gql`
+  query Subscriptions {
+    me {
+      isSsoUser
+      ...SettingsLayout_User
+      ...useSettingsSections_User
+    }
+  }
+  ${SettingsLayout_UserFragmentDoc}
+  ${useSettingsSections_UserFragmentDoc}
+`;
+export function useSubscriptionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<SubscriptionsQuery, SubscriptionsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<SubscriptionsQuery, SubscriptionsQueryVariables>(
+    SubscriptionsDocument,
+    options
+  );
+}
+export function useSubscriptionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<SubscriptionsQuery, SubscriptionsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<SubscriptionsQuery, SubscriptionsQueryVariables>(
+    SubscriptionsDocument,
+    options
+  );
+}
+export type SubscriptionsQueryHookResult = ReturnType<typeof useSubscriptionsQuery>;
+export type SubscriptionsLazyQueryHookResult = ReturnType<typeof useSubscriptionsLazyQuery>;
 export const OrganizationUsageDocument = gql`
   query OrganizationUsage {
     me {
@@ -21783,6 +21843,66 @@ export function useAccountLazyQuery(
 }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
 export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
+export const RevokeUserAuthTokenDocument = gql`
+  mutation RevokeUserAuthToken($authTokenIds: [GID!]!) {
+    revokeUserAuthToken(authTokenIds: $authTokenIds)
+  }
+`;
+export function useRevokeUserAuthTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RevokeUserAuthTokenMutation,
+    RevokeUserAuthTokenMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<RevokeUserAuthTokenMutation, RevokeUserAuthTokenMutationVariables>(
+    RevokeUserAuthTokenDocument,
+    options
+  );
+}
+export type RevokeUserAuthTokenMutationHookResult = ReturnType<
+  typeof useRevokeUserAuthTokenMutation
+>;
+export const DevelopersDocument = gql`
+  query Developers(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [UserAuthenticationTokens_OrderBy!]
+  ) {
+    me {
+      id
+      authenticationTokens(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy) {
+        totalCount
+        items {
+          ...Developers_UserAuthenticationToken
+        }
+      }
+      ...SettingsLayout_User
+      ...useSettingsSections_User
+    }
+  }
+  ${Developers_UserAuthenticationTokenFragmentDoc}
+  ${SettingsLayout_UserFragmentDoc}
+  ${useSettingsSections_UserFragmentDoc}
+`;
+export function useDevelopersQuery(
+  baseOptions: Apollo.QueryHookOptions<DevelopersQuery, DevelopersQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<DevelopersQuery, DevelopersQueryVariables>(DevelopersDocument, options);
+}
+export function useDevelopersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<DevelopersQuery, DevelopersQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DevelopersQuery, DevelopersQueryVariables>(
+    DevelopersDocument,
+    options
+  );
+}
+export type DevelopersQueryHookResult = ReturnType<typeof useDevelopersQuery>;
+export type DevelopersLazyQueryHookResult = ReturnType<typeof useDevelopersLazyQuery>;
 export const SettingsDocument = gql`
   query Settings {
     me {
@@ -21851,63 +21971,6 @@ export function useSecurityLazyQuery(
 }
 export type SecurityQueryHookResult = ReturnType<typeof useSecurityQuery>;
 export type SecurityLazyQueryHookResult = ReturnType<typeof useSecurityLazyQuery>;
-export const RevokeUserAuthTokenDocument = gql`
-  mutation RevokeUserAuthToken($authTokenIds: [GID!]!) {
-    revokeUserAuthToken(authTokenIds: $authTokenIds)
-  }
-`;
-export function useRevokeUserAuthTokenMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RevokeUserAuthTokenMutation,
-    RevokeUserAuthTokenMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<RevokeUserAuthTokenMutation, RevokeUserAuthTokenMutationVariables>(
-    RevokeUserAuthTokenDocument,
-    options
-  );
-}
-export type RevokeUserAuthTokenMutationHookResult = ReturnType<
-  typeof useRevokeUserAuthTokenMutation
->;
-export const TokensDocument = gql`
-  query Tokens(
-    $offset: Int!
-    $limit: Int!
-    $search: String
-    $sortBy: [UserAuthenticationTokens_OrderBy!]
-  ) {
-    me {
-      id
-      authenticationTokens(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy) {
-        totalCount
-        items {
-          ...Tokens_UserAuthenticationToken
-        }
-      }
-      ...SettingsLayout_User
-      ...useSettingsSections_User
-    }
-  }
-  ${Tokens_UserAuthenticationTokenFragmentDoc}
-  ${SettingsLayout_UserFragmentDoc}
-  ${useSettingsSections_UserFragmentDoc}
-`;
-export function useTokensQuery(
-  baseOptions: Apollo.QueryHookOptions<TokensQuery, TokensQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<TokensQuery, TokensQueryVariables>(TokensDocument, options);
-}
-export function useTokensLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<TokensQuery, TokensQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<TokensQuery, TokensQueryVariables>(TokensDocument, options);
-}
-export type TokensQueryHookResult = ReturnType<typeof useTokensQuery>;
-export type TokensLazyQueryHookResult = ReturnType<typeof useTokensLazyQuery>;
 export const Login_resendVerificationCodeDocument = gql`
   mutation Login_resendVerificationCode($email: String!, $locale: String) {
     resendVerificationCode(email: $email, locale: $locale)

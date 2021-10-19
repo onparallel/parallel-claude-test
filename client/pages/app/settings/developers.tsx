@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Heading, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -13,13 +13,14 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useDeleteAccessTokenDialog } from "@parallel/components/settings/DeleteAccessTokenDialog";
+import { EventSubscriptionCard } from "@parallel/components/settings/EventSubscriptionsCard";
 import { useGenerateNewTokenDialog } from "@parallel/components/settings/GenerateNewTokenDialog";
 import {
-  TokensQuery,
-  Tokens_UserAuthenticationTokenFragment,
+  DevelopersQuery,
+  Developers_UserAuthenticationTokenFragment,
+  useDevelopersQuery,
   UserAuthenticationTokens_OrderBy,
   useRevokeUserAuthTokenMutation,
-  useTokensQuery,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -48,7 +49,7 @@ const QUERY_STATE = {
   }),
 };
 
-function Tokens() {
+function Developers() {
   const intl = useIntl();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
 
@@ -57,7 +58,7 @@ function Tokens() {
     loading,
     refetch,
   } = useAssertQueryOrPreviousData(
-    useTokensQuery({
+    useDevelopersQuery({
       variables: {
         offset: state.items * (state.page - 1),
         limit: state.items,
@@ -116,97 +117,123 @@ function Tokens() {
 
   const columns = useAuthTokensTableColumns();
 
+  const [subscription, setSubscription] = useState<{
+    isEnabled: boolean;
+    eventsUrl: string | null;
+  }>({ isEnabled: false, eventsUrl: null });
+
   return (
     <SettingsLayout
       title={intl.formatMessage({
-        id: "settings.api-tokens",
-        defaultMessage: "API Tokens",
+        id: "settings.developers",
+        defaultMessage: "Developers",
       })}
       basePath="/app/settings"
       sections={sections}
       user={me}
       sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
-        <Heading as="h3" size="md">
-          <FormattedMessage id="settings.api-tokens" defaultMessage="API Tokens" />
+        <Heading as="h2" size="md">
+          <FormattedMessage id="settings.developers" defaultMessage="Developers" />
         </Heading>
       }
     >
-      <Flex flexDirection="column" flex="1" minHeight={0} padding={4}>
-        <Text marginBottom={4}>
-          <FormattedMessage
-            id="settings.api-tokens.explainer"
-            defaultMessage="Personal Access Tokens can be used to access the <a>Parallel API</a>."
-            values={{
-              a: (chunks: any) => (
-                <NormalLink href="/developers/api" target="_blank">
-                  {chunks}
-                </NormalLink>
-              ),
-            }}
+      <Stack padding={6} spacing={8} width="100%">
+        <Stack>
+          <Heading as="h4" size="md">
+            <FormattedMessage
+              id="settings.developers.api-tokens.title"
+              defaultMessage="API Tokens"
+            />
+          </Heading>
+          <Text marginBottom={4}>
+            <FormattedMessage
+              id="settings.developers.api-tokens.explainer"
+              defaultMessage="Personal Access Tokens can be used to access the <a>Parallel API</a>."
+              values={{
+                a: (chunks: any) => (
+                  <NormalLink href="/developers/api" target="_blank">
+                    {chunks}
+                  </NormalLink>
+                ),
+              }}
+            />
+          </Text>
+          <TablePage
+            flex="0 1 auto"
+            minHeight={0}
+            isSelectable
+            isHighlightable
+            columns={columns}
+            rows={authTokens.items}
+            rowKeyProp="id"
+            loading={loading}
+            page={state.page}
+            pageSize={state.items}
+            totalCount={authTokens.totalCount}
+            sort={state.sort}
+            onSelectionChange={setSelected}
+            onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+            onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
+            onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+            header={
+              <Stack direction="row" padding={2}>
+                <Box flex="0 1 400px">
+                  <SearchInput
+                    value={search ?? ""}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                  />
+                </Box>
+                <IconButtonWithTooltip
+                  onClick={() => refetch()}
+                  icon={<RepeatIcon />}
+                  placement="bottom"
+                  variant="outline"
+                  label={intl.formatMessage({
+                    id: "generic.reload-data",
+                    defaultMessage: "Reload",
+                  })}
+                />
+                <Spacer />
+
+                <Button
+                  isDisabled={selected.length === 0}
+                  onClick={() => handleRevokeTokens(selected)}
+                >
+                  <Text color="red.500">
+                    <FormattedMessage id="generic.delete" defaultMessage="Delete" />
+                  </Text>
+                </Button>
+
+                <Button colorScheme="purple" onClick={handleGenerateNewToken}>
+                  <FormattedMessage
+                    id="settings.developers.api-tokens.generate-new-token"
+                    defaultMessage="Create token"
+                  />
+                </Button>
+              </Stack>
+            }
           />
-        </Text>
-        <TablePage
-          flex="0 1 auto"
-          minHeight={0}
-          isSelectable
-          isHighlightable
-          columns={columns}
-          rows={authTokens.items}
-          rowKeyProp="id"
-          loading={loading}
-          page={state.page}
-          pageSize={state.items}
-          totalCount={authTokens.totalCount}
-          sort={state.sort}
-          onSelectionChange={setSelected}
-          onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
-          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
-          header={
-            <Stack direction="row" padding={2}>
-              <Box flex="0 1 400px">
-                <SearchInput
-                  value={search ?? ""}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                />
-              </Box>
-              <IconButtonWithTooltip
-                onClick={() => refetch()}
-                icon={<RepeatIcon />}
-                placement="bottom"
-                variant="outline"
-                label={intl.formatMessage({
-                  id: "generic.reload-data",
-                  defaultMessage: "Reload",
-                })}
-              />
-              <Spacer />
-
-              <Button
-                isDisabled={selected.length === 0}
-                onClick={() => handleRevokeTokens(selected)}
-              >
-                <Text color="red.500">
-                  <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-                </Text>
-              </Button>
-
-              <Button colorScheme="purple" onClick={handleGenerateNewToken}>
-                <FormattedMessage
-                  id="settings.api-tokens.generate-new-token"
-                  defaultMessage="Create token"
-                />
-              </Button>
-            </Stack>
-          }
-        />
-      </Flex>
+        </Stack>
+        <Divider borderColor="gray.300" />
+        <Stack paddingBottom={4}>
+          <Heading as="h4" size="md">
+            <FormattedMessage
+              id="settings.developers.subscriptions.title"
+              defaultMessage="Subscriptions"
+            />
+          </Heading>
+          <EventSubscriptionCard
+            subscription={subscription}
+            onUpdateSubscription={setSubscription}
+          />
+        </Stack>
+      </Stack>
     </SettingsLayout>
   );
 }
 
-function useAuthTokensTableColumns(): TableColumn<Tokens_UserAuthenticationTokenFragment>[] {
+function useAuthTokensTableColumns(): TableColumn<Developers_UserAuthenticationTokenFragment>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -214,7 +241,7 @@ function useAuthTokensTableColumns(): TableColumn<Tokens_UserAuthenticationToken
         key: "tokenName",
         isSortable: true,
         header: intl.formatMessage({
-          id: "settings.api-tokens.header.token-name",
+          id: "settings.developers.api-tokens.header.token-name",
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
@@ -273,9 +300,9 @@ function useAuthTokensTableColumns(): TableColumn<Tokens_UserAuthenticationToken
   );
 }
 
-Tokens.fragments = {
+Developers.fragments = {
   UserAuthenticationToken: gql`
-    fragment Tokens_UserAuthenticationToken on UserAuthenticationToken {
+    fragment Developers_UserAuthenticationToken on UserAuthenticationToken {
       id
       tokenName
       createdAt
@@ -284,7 +311,7 @@ Tokens.fragments = {
   `,
 };
 
-Tokens.mutations = [
+Developers.mutations = [
   gql`
     mutation RevokeUserAuthToken($authTokenIds: [GID!]!) {
       revokeUserAuthToken(authTokenIds: $authTokenIds)
@@ -292,12 +319,12 @@ Tokens.mutations = [
   `,
 ];
 
-Tokens.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContext) => {
+Developers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContext) => {
   const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
 
-  await fetchQuery<TokensQuery>(
+  await fetchQuery<DevelopersQuery>(
     gql`
-      query Tokens(
+      query Developers(
         $offset: Int!
         $limit: Int!
         $search: String
@@ -308,16 +335,16 @@ Tokens.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContex
           authenticationTokens(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy) {
             totalCount
             items {
-              ...Tokens_UserAuthenticationToken
+              ...Developers_UserAuthenticationToken
             }
           }
           ...SettingsLayout_User
           ...useSettingsSections_User
         }
       }
+      ${Developers.fragments.UserAuthenticationToken}
       ${SettingsLayout.fragments.User}
       ${useSettingsSections.fragments.User}
-      ${Tokens.fragments.UserAuthenticationToken}
     `,
     {
       variables: {
@@ -330,4 +357,4 @@ Tokens.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContex
   );
 };
 
-export default compose(withDialogs, withFeatureFlag("API_TOKENS"), withApolloData)(Tokens);
+export default compose(withDialogs, withFeatureFlag("API_TOKENS"), withApolloData)(Developers);

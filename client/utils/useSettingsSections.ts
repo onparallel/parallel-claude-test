@@ -26,10 +26,10 @@ export function useSettingsSections(user: useSettingsSections_UserFragment) {
     if (user.hasApiTokens) {
       sections.push({
         title: intl.formatMessage({
-          id: "settings.api-tokens",
-          defaultMessage: "API Tokens",
+          id: "settings.developers",
+          defaultMessage: "Developers",
         }),
-        path: "/app/settings/tokens",
+        path: "/app/settings/developers",
       });
     }
 
