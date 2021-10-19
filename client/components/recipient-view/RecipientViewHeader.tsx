@@ -31,6 +31,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactListPopover } from "../common/ContactListPopover";
@@ -41,7 +42,6 @@ import { useTone } from "../common/ToneProvider";
 import { useDelegateAccessDialog } from "./DelegateAccessDialog";
 import { useLastSaved } from "./LastSavedProvider";
 import { useRecipientViewHelpDialog } from "./RecipientViewHelpModal";
-
 function Contact({
   contact,
   isFull,
@@ -374,29 +374,19 @@ RecipientViewHeader.mutations = [
   `,
 ];
 
-function isLocalStorageAvailable() {
-  try {
-    localStorage.getItem("");
-    return true;
-  } catch (e: any) {
-    return false;
-  }
-}
-
 function useHelpModal({ tone }: { tone: Tone }) {
+  const [firstTime, setFirstTime] = useUserPreference("recipient-first-time-check", "");
   const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
+
   useEffect(() => {
-    showHelp();
+    if (firstTime !== "check") showHelp();
   }, []);
 
   async function showHelp() {
-    const key = "recipient-first-time-check";
-    if (isLocalStorageAvailable() && !localStorage.getItem(key)) {
-      try {
-        await showRecipientViewHelpDialog({ tone });
-        localStorage.setItem(key, "check");
-      } catch {}
-    }
+    try {
+      await showRecipientViewHelpDialog({ tone });
+      setFirstTime("check");
+    } catch {}
   }
   return async function () {
     try {

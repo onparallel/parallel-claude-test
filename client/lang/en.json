@@ -3635,6 +3635,11 @@
     "context": "Go back"
   },
   {
+    "term": "generic.go-back-short",
+    "definition": "Go back",
+    "context": "Go back"
+  },
+  {
     "term": "generic.go-to-page",
     "definition": "Go to page {page}",
     "context": "Go to page {page}"
@@ -3923,6 +3928,11 @@
     "term": "generic.type-to-confirm",
     "definition": "Please type {confirmation} to confirm",
     "context": "Please type {confirmation} to confirm"
+  },
+  {
+    "term": "generic.understood",
+    "definition": "Understood",
+    "context": "Understood"
   },
   {
     "term": "generic.unexpected-error-happened",
@@ -7455,19 +7465,14 @@
     "context": "Ask here your questions and doubts"
   },
   {
-    "term": "recipient-view.first-time.claim-1",
-    "definition": "The information will be saved automatically as you add it.",
-    "context": "The information will be saved automatically as you add it."
+    "term": "recipient-view.first-time.finalize-whenever-body",
+    "definition": "From the previous email or by copying this link, you can return and finalizing the petition some other time.",
+    "context": "From the previous email or by copying this link, you can return and finalizing the petition some other time."
   },
   {
-    "term": "recipient-view.first-time.claim-2",
-    "definition": "You can come back as many times as you'd like using the link you received in your email.",
-    "context": "You can come back as many times as you'd like using the link you received in your email."
-  },
-  {
-    "term": "recipient-view.first-time.claim-3",
-    "definition": "{tone, select, INFORMAL{Don't be left with doubts! } other{}}You can add any comments and questions you want in the fields.",
-    "context": "{tone, select, INFORMAL{Don't be left with doubts! } other{}}You can add any comments and questions you want in the fields."
+    "term": "recipient-view.first-time.finalize-whenever-title",
+    "definition": "Finalize whenever you want",
+    "context": "Finalize whenever you want"
   },
   {
     "term": "recipient-view.first-time.intro",
@@ -7475,9 +7480,24 @@
     "context": "Is this the first time you use Parallel?"
   },
   {
-    "term": "recipient-view.first-time.see-more",
-    "definition": "See more frequently asked questions",
-    "context": "See more frequently asked questions"
+    "term": "recipient-view.first-time.replies-saved-body",
+    "definition": "The information will be automatically saved and synchronized with the sender as you add it.",
+    "context": "The information will be automatically saved and synchronized with the sender as you add it."
+  },
+  {
+    "term": "recipient-view.first-time.replies-saved-title",
+    "definition": "Your replies auto-saved",
+    "context": "Your replies auto-saved"
+  },
+  {
+    "term": "recipient-view.first-time.send-doubts-body",
+    "definition": "You can add your doubts and questions in the corresponding field and your sender will respond them.",
+    "context": "You can add your doubts and questions in the corresponding field and your sender will respond them."
+  },
+  {
+    "term": "recipient-view.first-time.send-doubts-title",
+    "definition": "Send your doubts",
+    "context": "Send your doubts"
   },
   {
     "term": "recipient-view.in-order-to",

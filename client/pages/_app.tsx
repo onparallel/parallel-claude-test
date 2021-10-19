@@ -2,6 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
 import { init as initSentry } from "@parallel/utils/sentry";
+import { AnimateSharedLayout } from "framer-motion";
 import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect } from "react";
@@ -26,7 +27,9 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
   return (
     <I18nProvider {...props}>
       <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
-        <Component {...pageProps} />
+        <AnimateSharedLayout>
+          <Component {...pageProps} />
+        </AnimateSharedLayout>
       </ChakraProvider>
     </I18nProvider>
   );
