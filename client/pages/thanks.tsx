@@ -5,8 +5,8 @@ import { Card } from "@parallel/components/common/Card";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { useThanks_PetitionLogoQuery } from "@parallel/graphql/__types";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -23,14 +23,17 @@ function ThanksForSigning() {
   const logoUrl = data?.publicOrgLogoUrl;
 
   return (
-    <PublicLayout
-      hideHeader
-      hideFooter
-      title={intl.formatMessage({
-        id: "generic.thanks",
-        defaultMessage: "Thanks",
-      })}
-    >
+    <>
+      <Head>
+        <title>
+          {intl.formatMessage({
+            id: "generic.thanks",
+            defaultMessage: "Thanks",
+          })}{" "}
+          | Parallel
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
       <Flex flex="1" paddingX={4} justifyContent="center">
         <Stack
           spacing={8}
@@ -65,7 +68,7 @@ function ThanksForSigning() {
           <ThanksFooter />
         </Stack>
       </Flex>
-    </PublicLayout>
+    </>
   );
 }
 
