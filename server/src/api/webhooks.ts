@@ -17,7 +17,13 @@ export const webhooks = Router()
         const body = req.body as SignaturItEventBody;
         const handler = signaturItEventHandler(body.type);
         const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
-        handler?.(req.context, body, petitionId);
+        (async function () {
+          try {
+            await handler?.(req.context, body, petitionId);
+          } catch (error: any) {
+            req.context.logger.error(error.message, { stack: error.stack });
+          }
+        })();
         res.sendStatus(200).end();
       } catch (error: any) {
         req.context.logger.error(error.message, { stack: error.stack });
