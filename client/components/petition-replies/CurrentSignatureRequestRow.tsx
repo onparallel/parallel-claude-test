@@ -69,7 +69,12 @@ export function CurrentSignatureRequestRow({
               <Fragment key={index}>
                 <SignerReference signer={signer} />
                 {isAwaitingSignature ? (
-                  <PetitionSignatureRequestSignerStatusIcon status={status} marginBottom={1} />
+                  <PetitionSignatureRequestSignerStatusIcon
+                    status={status}
+                    position="relative"
+                    top={-0.5}
+                    marginX={0.5}
+                  />
                 ) : null}
               </Fragment>
             ))}

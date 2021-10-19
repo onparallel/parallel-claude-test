@@ -1,20 +1,20 @@
-import { IconProps } from "@chakra-ui/icon";
 import { CheckIcon, CloseIcon, TimeIcon } from "@parallel/chakra/icons";
-interface PetitionSignatureRequestSignerStatusIconProps extends IconProps {
+import { chakraForwardRef } from "@parallel/chakra/utils";
+interface PetitionSignatureRequestSignerStatusIconProps {
   status: string;
 }
-export function PetitionSignatureRequestSignerStatusIcon({
-  status,
-  ...props
-}: PetitionSignatureRequestSignerStatusIconProps) {
+export const PetitionSignatureRequestSignerStatusIcon = chakraForwardRef<
+  "svg",
+  PetitionSignatureRequestSignerStatusIconProps
+>(function PetitionSignatureRequestSignerStatusIcon({ status, ...props }, ref) {
   switch (status) {
     case "SIGNED":
-      return <CheckIcon marginLeft={1} color="green.500" {...props} />;
+      return <CheckIcon ref={ref} color="green.500" {...props} />;
     case "DECLINED":
-      return <CloseIcon marginLeft={1} color="red.500" fontSize="12px" {...props} />;
+      return <CloseIcon ref={ref} color="red.500" fontSize="12px" {...props} />;
     case "PENDING":
-      return <TimeIcon marginLeft={1} color="yellow.600" {...props} />;
+      return <TimeIcon ref={ref} color="yellow.600" {...props} />;
     default:
       return null;
   }
-}
+});

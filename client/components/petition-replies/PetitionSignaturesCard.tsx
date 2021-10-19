@@ -264,7 +264,7 @@ export const PetitionSignaturesCard = Object.assign(
           <Grid
             paddingX={4}
             paddingY={2}
-            gap={2}
+            gap={4}
             templateColumns="auto 1fr auto"
             alignItems="center"
           >
