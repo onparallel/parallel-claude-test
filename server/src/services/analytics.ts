@@ -209,6 +209,7 @@ export class AnalyticsService implements IAnalyticsService {
         role: user.details?.role,
         position: user.details?.position,
         source: user.details?.source,
+        locale: user.details?.preferredLocale,
         ...extraTraits,
       },
     });

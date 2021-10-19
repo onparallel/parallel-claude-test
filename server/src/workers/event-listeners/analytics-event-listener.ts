@@ -263,6 +263,7 @@ async function trackTemplateUsedEvent(event: TemplateUsedEvent, ctx: WorkerConte
 
 async function trackUserCreatedEvent(event: UserCreatedEvent, ctx: WorkerContext) {
   const user = await loadUser(event.data.user_id, ctx);
+  await ctx.analytics.identifyUser(user);
   await ctx.analytics.trackEvent({
     type: "USER_CREATED",
     user_id: event.data.user_id,
