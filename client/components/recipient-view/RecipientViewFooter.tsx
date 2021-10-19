@@ -26,7 +26,7 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
                 href="/?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
                 passHref
               >
-                <Box as="a" marginLeft="10px" position="relative" top="-1px">
+                <Box as="a" marginLeft={1.5} position="relative" top="-1px">
                   <Logo display="inline-block" width="100px" />
                 </Box>
               </NakedLink>
