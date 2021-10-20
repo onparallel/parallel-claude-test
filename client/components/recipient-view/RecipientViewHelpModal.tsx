@@ -16,7 +16,7 @@ import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog } from "../common/BaseDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
-import { DotIndicator } from "../common/DotIndicator";
+import { StepsIndicator } from "../common/StepsIndicator";
 
 export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: Tone }, void>) {
   const intl = useIntl();
@@ -48,7 +48,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
       <Text>
         <FormattedMessage
           id="recipient-view.first-time.replies-saved-body"
-          defaultMessage="The information will be automatically saved and synchronized with the sender as you add it."
+          defaultMessage="The information you enter will be saved automatically and synchronized with the sender."
           values={{ tone }}
         />
       </Text>
@@ -72,7 +72,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
       <Text>
         <FormattedMessage
           id="recipient-view.first-time.finalize-whenever-body"
-          defaultMessage="From the previous email or by copying this link, you can return and finalizing the petition some other time."
+          defaultMessage="Either from the link in your email or by copying the url of this page, you can return at any point and finalize the petition."
           values={{ tone }}
         />
       </Text>
@@ -96,33 +96,11 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
       <Text>
         <FormattedMessage
           id="recipient-view.first-time.send-doubts-body"
-          defaultMessage="You can add your doubts and questions in the corresponding field and your sender will respond them."
+          defaultMessage="You can add any doubts and questions you have on the corresponding field and your sender will respond them."
           values={{ tone }}
         />
       </Text>
     </Stack>,
-  ];
-
-  const footerElements = [
-    <Button key="1" colorScheme="purple" onClick={() => paginate(1)}>
-      <FormattedMessage id="generic.continue" defaultMessage="Continue" />
-    </Button>,
-    <HStack spacing={2} key="2">
-      <Button variant="outline" onClick={() => paginate(-1)}>
-        <FormattedMessage id="generic.go-back-short" defaultMessage="Go back" />
-      </Button>
-      <Button colorScheme="purple" onClick={() => paginate(1)}>
-        <FormattedMessage id="generic.continue" defaultMessage="Continue" />
-      </Button>
-    </HStack>,
-    <HStack spacing={2} key="3">
-      <Button variant="outline" onClick={() => paginate(-1)}>
-        <FormattedMessage id="generic.go-back-short" defaultMessage="Go back" />
-      </Button>
-      <Button colorScheme="purple" onClick={() => props.onResolve()}>
-        <FormattedMessage id="generic.understood" defaultMessage="Understood" />
-      </Button>
-    </HStack>,
   ];
 
   return (
@@ -144,12 +122,25 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
         </ModalHeader>
         <ModalBody padding={0} position="relative">
           {bodyElements[page]}
+          <StepsIndicator numberOfSteps={bodyElements.length} currentStep={page} paddingTop={6} />
         </ModalBody>
-        <ModalFooter display="flex" justifyContent="center" paddingTop={6} paddingBottom={6}>
-          <Stack spacing={8}>
-            <DotIndicator elements={bodyElements} selected={page} />
-            {footerElements[page]}
-          </Stack>
+        <ModalFooter display="flex" justifyContent="center" paddingTop={8} paddingBottom={6}>
+          <HStack spacing={2} key="3">
+            {page > 0 ? (
+              <Button variant="outline" onClick={() => paginate(-1)}>
+                <FormattedMessage id="generic.go-back-short" defaultMessage="Go back" />
+              </Button>
+            ) : null}
+            {page < 2 ? (
+              <Button colorScheme="purple" onClick={() => paginate(1)}>
+                <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+              </Button>
+            ) : (
+              <Button colorScheme="purple" onClick={() => props.onResolve()}>
+                <FormattedMessage id="generic.understood" defaultMessage="Understood" />
+              </Button>
+            )}
+          </HStack>
         </ModalFooter>
       </ModalContent>
     </BaseDialog>
