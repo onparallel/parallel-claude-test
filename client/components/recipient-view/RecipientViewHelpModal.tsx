@@ -124,23 +124,27 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
           {bodyElements[page]}
           <StepsIndicator numberOfSteps={bodyElements.length} currentStep={page} paddingTop={6} />
         </ModalBody>
-        <ModalFooter display="flex" justifyContent="center" paddingTop={8} paddingBottom={6}>
-          <HStack spacing={2} key="3">
-            {page > 0 ? (
-              <Button variant="outline" onClick={() => paginate(-1)}>
-                <FormattedMessage id="generic.go-back-short" defaultMessage="Go back" />
-              </Button>
-            ) : null}
-            {page < 2 ? (
-              <Button colorScheme="purple" onClick={() => paginate(1)}>
-                <FormattedMessage id="generic.continue" defaultMessage="Continue" />
-              </Button>
-            ) : (
-              <Button colorScheme="purple" onClick={() => props.onResolve()}>
-                <FormattedMessage id="generic.understood" defaultMessage="Understood" />
-              </Button>
-            )}
-          </HStack>
+        <ModalFooter
+          as={HStack}
+          spacing={2}
+          justifyContent="center"
+          paddingTop={8}
+          paddingBottom={6}
+        >
+          {page > 0 ? (
+            <Button variant="outline" onClick={() => paginate(-1)}>
+              <FormattedMessage id="generic.go-back-short" defaultMessage="Go back" />
+            </Button>
+          ) : null}
+          {page < 2 ? (
+            <Button colorScheme="purple" onClick={() => paginate(1)}>
+              <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+            </Button>
+          ) : (
+            <Button colorScheme="purple" onClick={() => props.onResolve()}>
+              <FormattedMessage id="generic.understood" defaultMessage="Understood" />
+            </Button>
+          )}
         </ModalFooter>
       </ModalContent>
     </BaseDialog>
