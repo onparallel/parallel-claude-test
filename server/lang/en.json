@@ -50,6 +50,26 @@
     "context": "Regards,"
   },
   {
+    "term": "component.greeting-new-user",
+    "definition": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}",
+    "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"
+  },
+  {
+    "term": "component.whats-parallel.body",
+    "definition": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way.",
+    "context": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way."
+  },
+  {
+    "term": "component.whats-parallel.contact",
+    "definition": "If you have any questions, please contact us at {contactEmail} and we will be happy to answer them.",
+    "context": "If you have any questions, please contact us at {contactEmail} and we will be happy to answer them."
+  },
+  {
+    "term": "component.whats-parallel.title",
+    "definition": "What’s Parallel?",
+    "context": "What’s Parallel?"
+  },
+  {
     "term": "developer.webhook-error-email.subject",
     "definition": "Error: Event hook",
     "context": "Error: Event hook"
@@ -161,18 +181,23 @@
   },
   {
     "term": "invitation.details",
-    "definition": "Your username is {email} and your temporary password is:",
-    "context": "Your username is {email} and your temporary password is:"
+    "definition": "To get started, log in with your username and temporary password:",
+    "context": "To get started, log in with your username and temporary password:"
   },
   {
-    "term": "invitation.login-button",
-    "definition": "Log in",
-    "context": "Log in"
+    "term": "invitation.join-parallel",
+    "definition": "Join Parallel",
+    "context": "Join Parallel"
+  },
+  {
+    "term": "invitation.password",
+    "definition": "Password: {password}",
+    "context": "Password: {password}"
   },
   {
     "term": "invitation.subject",
-    "definition": "{organizationUser} has invited you to join Parallel",
-    "context": "{organizationUser} has invited you to join Parallel"
+    "definition": "{organizationUser} invited you to join {organizationName} organization in Parallel 🎊",
+    "context": "{organizationUser} invited you to join {organizationName} organization in Parallel 🎊"
   },
   {
     "term": "invitation.text",
@@ -180,9 +205,14 @@
     "context": "{organizationUser} has invited you to join {organizationName} organization in Parallel."
   },
   {
-    "term": "invitation.tmp-password-expiry",
-    "definition": "This password will expire in 30 days, try to use it as soon as possible.",
-    "context": "This password will expire in 30 days, try to use it as soon as possible."
+    "term": "invitation.username",
+    "definition": "Username: {email}",
+    "context": "Username: {email}"
+  },
+  {
+    "term": "invitation.waiting-to-collaborate",
+    "definition": "{organizationUser} is waiting for you to collaborate together! 😁",
+    "context": "{organizationUser} is waiting for you to collaborate together! 😁"
   },
   {
     "term": "invitation.website",

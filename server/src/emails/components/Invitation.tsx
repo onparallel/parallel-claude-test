@@ -1,12 +1,12 @@
-import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { ClosingParallelTeam } from "../common/ClosingParallelTeam";
-import { GreetingUser } from "../common/Greeting";
+import { GreetingNewUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { greetingUser } from "../common/texts";
+import { WhatsParallel } from "../common/WhatsParallel";
 
 export type InvitationProps = {
   email: string;
@@ -23,13 +23,14 @@ const email: Email<InvitationProps> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ organizationUser }, intl) {
+  subject({ organizationUser, organizationName }, intl) {
     return intl.formatMessage(
       {
         id: "invitation.subject",
-        defaultMessage: "{organizationUser} has invited you to join Parallel",
+        defaultMessage:
+          "{organizationUser} invited you to join {organizationName} organization in Parallel 🎊",
       },
-      { organizationUser }
+      { organizationUser, organizationName }
     );
   },
   text(
@@ -48,20 +49,25 @@ const email: Email<InvitationProps> = {
       { organizationName, organizationUser }
     )}
 
+    ${intl.formatMessage({
+      id: "invitation.details",
+      defaultMessage: "To get started, log in with your username and temporary password:",
+    })}
+
     ${intl.formatMessage(
       {
-        id: "invitation.details",
-        defaultMessage: "Your username is {email} and your temporary password is:",
+        id: "invitation.username",
+        defaultMessage: "Username: {email}",
       },
       { email }
     )}
-
-    ${password}
-
-    ${intl.formatMessage({
-      id: "invitation.tmp-password-expiry",
-      defaultMessage: "This password will expire in 30 days, try to use it as soon as possible.",
-    })}
+    ${intl.formatMessage(
+      {
+        id: "invitation.password",
+        defaultMessage: "Password: {password}",
+      },
+      { password }
+    )}
 
     ${intl.formatMessage({
       id: "invitation.website",
@@ -87,7 +93,7 @@ const email: Email<InvitationProps> = {
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingUser name={userName} />
+            <GreetingNewUser name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="invitation.text"
@@ -98,17 +104,31 @@ const email: Email<InvitationProps> = {
             <MjmlText>
               <FormattedMessage
                 id="invitation.details"
-                defaultMessage="Your username is {email} and your temporary password is:"
-                values={{ email: <b>{email}</b> }}
+                defaultMessage="To get started, log in with your username and temporary password:"
               />
             </MjmlText>
-            <MjmlText>
-              <b>{password}</b>
-            </MjmlText>
+            <MjmlSection backgroundColor="#F4F7F9" borderRadius="5px" padding="12px 16px">
+              <MjmlText>
+                <FormattedMessage
+                  id="invitation.username"
+                  defaultMessage="Username: {email}"
+                  values={{ email: <b>{email}</b> }}
+                />
+              </MjmlText>
+              <MjmlSpacer height="10px" />
+              <MjmlText>
+                <FormattedMessage
+                  id="invitation.password"
+                  defaultMessage="Password: {password}"
+                  values={{ password: <b>{password}</b> }}
+                />
+              </MjmlText>
+            </MjmlSection>
             <MjmlText>
               <FormattedMessage
-                id="invitation.tmp-password-expiry"
-                defaultMessage="This password will expire in 30 days, try to use it as soon as possible."
+                id="invitation.waiting-to-collaborate"
+                defaultMessage="{organizationUser} is waiting for you to collaborate together! 😁"
+                values={{ organizationUser }}
               />
             </MjmlText>
           </MjmlColumn>
@@ -116,10 +136,10 @@ const email: Email<InvitationProps> = {
         <MjmlSection>
           <MjmlColumn>
             <Button href={`${parallelUrl}/${locale}/login`} fontWeight={500}>
-              <FormattedMessage id="invitation.login-button" defaultMessage="Log in" />
+              <FormattedMessage id="invitation.join-parallel" defaultMessage="Join Parallel" />
             </Button>
-            <ClosingParallelTeam />
           </MjmlColumn>
+          <WhatsParallel />
         </MjmlSection>
       </Layout>
     );

@@ -14,6 +14,18 @@ export function GreetingUser({ name }: { name: string | null }) {
   );
 }
 
+export function GreetingNewUser({ name }: { name: string | null }) {
+  return (
+    <MjmlText>
+      <FormattedMessage
+        id="component.greeting-new-user"
+        defaultMessage="{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"
+        values={{ name }}
+      />
+    </MjmlText>
+  );
+}
+
 export function GreetingContact({
   name,
   fullName,
