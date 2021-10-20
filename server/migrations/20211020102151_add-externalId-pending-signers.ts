@@ -9,23 +9,27 @@ export async function up(knex: Knex): Promise<void> {
     .where("status", "PROCESSING")
     .select("*");
 
-  await pMap(signatures, async (signature) => {
-    const updatedSignersInfo = (
-      signature.signature_config.signersInfo as PetitionSignatureConfigSigner[]
-    ).map((signer, signerIndex) => ({
-      ...signer,
-      externalId: findSignerExternalId(signature.data.documents, signer, signerIndex),
-    }));
-    await knex
-      .from("petition_signature_request")
-      .where("id", signature.id)
-      .update({
-        signature_config: {
-          ...signature.signature_config,
-          signersInfo: updatedSignersInfo,
-        },
-      });
-  });
+  await pMap(
+    signatures,
+    async (signature) => {
+      const updatedSignersInfo = (
+        signature.signature_config.signersInfo as PetitionSignatureConfigSigner[]
+      ).map((signer, signerIndex) => ({
+        ...signer,
+        externalId: findSignerExternalId(signature.data.documents, signer, signerIndex),
+      }));
+      await knex
+        .from("petition_signature_request")
+        .where("id", signature.id)
+        .update({
+          signature_config: {
+            ...signature.signature_config,
+            signersInfo: updatedSignersInfo,
+          },
+        });
+    },
+    { concurrency: 10 }
+  );
 }
 
 export async function down(knex: Knex): Promise<void> {}
