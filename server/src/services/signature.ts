@@ -48,7 +48,7 @@ type SignatureOptions = {
   initialMessage?: string;
 };
 
-type SignatureResponse = {
+export type SignatureResponse = {
   id: string;
   created_at: Date;
   data: any[];

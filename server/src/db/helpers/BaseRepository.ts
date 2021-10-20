@@ -7,7 +7,10 @@ import { KeysOfType, MaybeArray, Replace, UnwrapPromise } from "../../util/types
 import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
-import { PetitionSignatureConfig } from "../repositories/PetitionRepository";
+import {
+  PetitionSignatureConfig,
+  PetitionSignatureConfigSigner,
+} from "../repositories/PetitionRepository";
 import {
   CreatePetition,
   CreatePetitionSignatureRequest,
@@ -28,7 +31,12 @@ export interface TableTypes
   petition: Replace<Petition, { signature_config: PetitionSignatureConfig | null }>;
   petition_signature_request: Replace<
     PetitionSignatureRequest,
-    { signature_config: PetitionSignatureConfig }
+    {
+      signature_config: Replace<
+        PetitionSignatureConfig,
+        { signersInfo: (PetitionSignatureConfigSigner & { externalId?: string })[] }
+      >;
+    }
   >;
 }
 

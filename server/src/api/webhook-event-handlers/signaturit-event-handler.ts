@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
-import { fullName } from "../../util/fullName";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { random } from "../../util/token";
 
@@ -293,14 +292,10 @@ async function storeDocument(
 }
 
 function findSigner(
-  signers: PetitionSignatureConfigSigner[],
+  signers: (PetitionSignatureConfigSigner & { externalId?: string })[],
   document: SignaturItEventBody["document"]
 ): [PetitionSignatureConfigSigner, number] {
-  const signerIndex = signers.findIndex(
-    (signer) =>
-      signer.email === document.email &&
-      fullName(signer.firstName, signer.lastName) === document.name
-  );
+  const signerIndex = signers.findIndex((signer) => signer.externalId === document.id);
 
   const signer = signers[signerIndex];
 

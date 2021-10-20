@@ -3,6 +3,8 @@ import { tmpdir } from "os";
 import { resolve } from "path";
 import { URLSearchParams } from "url";
 import { WorkerContext } from "../context";
+import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
+import { SignatureResponse } from "../services/signature";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { removeKeys } from "../util/remedaExtensions";
@@ -96,9 +98,21 @@ async function startSignatureProcess(
     // remove events array from data before saving to DB
     data.documents = data.documents.map((doc) => removeKeys(doc, ([key]) => key !== "events"));
 
+    // update signers on signature_config to include the externalId provided by signaturit so we can match it later
+    const updatedSignersInfo = signature.signature_config.signersInfo.map(
+      (signer, signerIndex) => ({
+        ...signer,
+        externalId: findSignerExternalId(data.documents, signer, signerIndex),
+      })
+    );
+
     await ctx.petitions.updatePetitionSignature(signature.id, {
       external_id: `${provider.toUpperCase()}/${data.id}`,
       data,
+      signature_config: {
+        ...signature.signature_config,
+        signersInfo: updatedSignersInfo,
+      },
       status: "PROCESSING",
     });
   } catch (error: any) {
@@ -231,4 +245,35 @@ async function fetchPetitionSignature(petitionSignatureRequestId: number, ctx: W
   }
 
   return signature;
+}
+
+function findSignerExternalId(
+  documents: SignatureResponse["documents"],
+  signer: PetitionSignatureConfigSigner,
+  signerIndex: number
+) {
+  const signerByEmail = documents.filter((d) => d.email === signer.email);
+
+  if (signerByEmail.length === 1) {
+    // first search by email, if only 1 result found it's a match
+    return signerByEmail[0].id;
+  } else if (signerByEmail.length > 1) {
+    // if more than 1 signer found with the same email, match by position in the array
+    const externalId = documents[signerIndex]?.id;
+    if (!externalId) {
+      throw new Error(
+        `Index out of bounds on signature document. document:${JSON.stringify(
+          documents
+        )}, index: ${signerIndex} `
+      );
+    }
+    return externalId;
+  } else if (signerByEmail.length === 0) {
+    // if no signers were found with that email, there's an error
+    throw new Error(
+      `Can't find signer by email on document. signer:${JSON.stringify(
+        signer
+      )}. documents: ${JSON.stringify(documents)}`
+    );
+  }
 }
