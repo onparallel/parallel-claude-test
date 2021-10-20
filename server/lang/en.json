@@ -50,6 +50,41 @@
     "context": "Regards,"
   },
   {
+    "term": "component.why-we-use-parallel.autosave-body",
+    "definition": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later.",
+    "context": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later."
+  },
+  {
+    "term": "component.why-we-use-parallel.autosave-title",
+    "definition": "Your replies auto-saved",
+    "context": "Your replies auto-saved"
+  },
+  {
+    "term": "component.why-we-use-parallel.invite-body",
+    "definition": "Users can only access the link with permission, once inside, they can <b>invite the collaborators</b> they need to complete the information collaboratively.",
+    "context": "Users can only access the link with permission, once inside, they can <b>invite the collaborators</b> they need to complete the information collaboratively."
+  },
+  {
+    "term": "component.why-we-use-parallel.invite-title",
+    "definition": "Invite collaborators",
+    "context": "Invite collaborators"
+  },
+  {
+    "term": "component.why-we-use-parallel.security-body",
+    "definition": "Parallel is a private space where you can <b>share information and documents</b> with third parties securely.",
+    "context": "Parallel is a private space where you can <b>share information and documents</b> with third parties securely."
+  },
+  {
+    "term": "component.why-we-use-parallel.security-title",
+    "definition": "Private portal for your information",
+    "context": "Private portal for your information"
+  },
+  {
+    "term": "component.why-we-use-parallel.title",
+    "definition": "Why we use Parallel?",
+    "context": "Why we use Parallel?"
+  },
+  {
     "term": "component.greeting-new-user",
     "definition": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}",
     "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"

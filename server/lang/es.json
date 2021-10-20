@@ -50,6 +50,41 @@
     "context": "Regards,"
   },
   {
+    "term": "component.why-we-use-parallel.autosave-body",
+    "definition": "{tone, select, INFORMAL{Tus <b>respuestas se autoguardan y sincronizan</b> con el remitente para que puedas cerrar y volver a completarlo cuando quieras.} other{Cada <b>respuesta se autoguarda y sincroniza</b> con el remitente para permitirle cerrar en cualquier momento y terminar de completarlo más adelante.}}",
+    "context": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later."
+  },
+  {
+    "term": "component.why-we-use-parallel.autosave-title",
+    "definition": "{tone, select, INFORMAL{Puedes completarlo a tu ritmo} other{Autoguardamos sus respuestas}}",
+    "context": "Your replies auto-saved"
+  },
+  {
+    "term": "component.why-we-use-parallel.invite-body",
+    "definition": "{tone, select, INFORMAL{Solo podrán entrar al enlace usuarios con acceso. Si lo necesitas, puedes <b>invitar colaboradores</b> para que te ayuden a completar la información.} other{Solo usuarios con permiso podrán acceder al enlace. Si lo necesita, puede <b>invitar colaboradores</b> para completar la información colaborativamente.}}",
+    "context": "Users can only access the link with permission, once inside, they can <b>invite the collaborators</b> they need to complete the information collaboratively."
+  },
+  {
+    "term": "component.why-we-use-parallel.invite-title",
+    "definition": "{tone, select, INFORMAL{Invite colaboradores} other{Invita los colaboradores que necesites}}",
+    "context": "Invite collaborators"
+  },
+  {
+    "term": "component.why-we-use-parallel.security-body",
+    "definition": "{tone, select, INFORMAL{Parallel es un espacio privado donde puedes <b>compartir información y documentos</b> de forma segura.} other{Parallel es un espacio privado donde <b>compartir información y documentos</b> con terceros de forma segura.}}",
+    "context": "Parallel is a private space where you can <b>share information and documents</b> with third parties securely."
+  },
+  {
+    "term": "component.why-we-use-parallel.security-title",
+    "definition": "Espacio seguro para {tone, select, INFORMAL{tu} other{su}} información",
+    "context": "Private portal for your information"
+  },
+  {
+    "term": "component.why-we-use-parallel.title",
+    "definition": "¿Por qué usamos Parallel?",
+    "context": "Why we use Parallel?"
+  },
+  {
     "term": "component.greeting-new-user",
     "definition": "{name, select, null {Hola! 👋} other {Hola {name}! 👋}}",
     "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"

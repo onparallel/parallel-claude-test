@@ -7,6 +7,7 @@ import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { greetingContact } from "../common/texts";
+import { WhyWeUseParallel } from "../common/WhyWeUseParallel";
 import { Tone } from "../utils/types";
 
 export type PublicPetitionLinkAccessProps = {
@@ -123,6 +124,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
             <CompleteInfoButton tone={tone} href={`${parallelUrl}/${locale}/petition/${keycode}`} />
           </MjmlColumn>
         </MjmlSection>
+        <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
       </Layout>
     );
   },

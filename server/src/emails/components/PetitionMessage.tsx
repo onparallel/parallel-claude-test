@@ -8,6 +8,7 @@ import { Disclaimer } from "../common/Disclaimer";
 import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
+import { WhyWeUseParallel } from "../common/WhyWeUseParallel";
 import { FORMATS } from "../utils/dates";
 import { Tone } from "../utils/types";
 
@@ -151,6 +152,7 @@ const email: Email<PetitionMessageProps> = {
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
         </MjmlSection>
+        <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
       </Layout>
     );
   },

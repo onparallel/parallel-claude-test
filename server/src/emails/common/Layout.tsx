@@ -123,20 +123,34 @@ export const Layout: FC<LayoutProps> = function Layout({
                 />
               </>
             )}
-            <MjmlSocial align="center" icon-padding="1px">
-              <MjmlSocialElement
-                alt="LinkedIn"
-                name="linkedin-noshare"
-                href="https://www.linkedin.com/company/onparallel"
-                backgroundColor="#6059f7"
-              />
-              <MjmlSocialElement
-                alt="Twitter"
-                name="twitter-noshare"
-                href="https://twitter.com/Parallel_SO"
-                backgroundColor="#6059f7"
-              />
-            </MjmlSocial>
+            {useAlternativeSlogan ? null : (
+              <MjmlSocial align="center" icon-padding="1px">
+                <MjmlSocialElement
+                  alt="LinkedIn"
+                  name="linkedin-noshare"
+                  href="https://www.linkedin.com/company/onparallel"
+                  backgroundColor="#6059f7"
+                />
+                <MjmlSocialElement
+                  alt="Slack"
+                  src={`${assetsUrl}/static/emails/slack.png`}
+                  href="https://twitter.com/Parallel_SO"
+                  backgroundColor="#6059f7"
+                />
+                <MjmlSocialElement
+                  alt="Facebook"
+                  name="facebook-noshare"
+                  href="https://twitter.com/Parallel_SO"
+                  backgroundColor="#6059f7"
+                />
+                <MjmlSocialElement
+                  alt="Twitter"
+                  name="twitter-noshare"
+                  href="https://twitter.com/Parallel_SO"
+                  backgroundColor="#6059f7"
+                />
+              </MjmlSocial>
+            )}
             <MjmlText align="center" color="#1A202C" lineHeight="20px">
               <FormattedMessage
                 id="layout.email-sent-by"
