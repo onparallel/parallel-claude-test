@@ -50,6 +50,26 @@
     "context": "Regards,"
   },
   {
+    "term": "component.greeting-new-user",
+    "definition": "{name, select, null {Hola! 👋} other {Hola {name}! 👋}}",
+    "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"
+  },
+  {
+    "term": "component.whats-parallel.body",
+    "definition": "Parallel es una plataforma que te ayudará a gestionar la documentación e información de tus clientes de forma ágil y segura.",
+    "context": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way."
+  },
+  {
+    "term": "component.whats-parallel.contact",
+    "definition": "Si tienes dudas, puedes contactar con nosotros en {contactEmail} y estaremos encantados de resolvértelas.",
+    "context": "If you have any questions, please contact us at {contactEmail} and we will be happy to answer them."
+  },
+  {
+    "term": "component.whats-parallel.title",
+    "definition": "¿Qué es Parallel?",
+    "context": "What’s Parallel?"
+  },
+  {
     "term": "component.why-we-use-parallel.autosave-body",
     "definition": "{tone, select, INFORMAL{Tus <b>respuestas se autoguardan y sincronizan</b> con el remitente para que puedas cerrar y volver a completarlo cuando quieras.} other{Cada <b>respuesta se autoguarda y sincroniza</b> con el remitente para permitirle cerrar en cualquier momento y terminar de completarlo más adelante.}}",
     "context": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later."
@@ -83,26 +103,6 @@
     "term": "component.why-we-use-parallel.title",
     "definition": "¿Por qué usamos Parallel?",
     "context": "Why we use Parallel?"
-  },
-  {
-    "term": "component.greeting-new-user",
-    "definition": "{name, select, null {Hola! 👋} other {Hola {name}! 👋}}",
-    "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"
-  },
-  {
-    "term": "component.whats-parallel.body",
-    "definition": "Parallel es una plataforma que te ayudará a gestionar la documentación e información de tus clientes de forma ágil y segura.",
-    "context": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way."
-  },
-  {
-    "term": "component.whats-parallel.contact",
-    "definition": "Si tienes dudas, puedes contactar con nosotros en {contactEmail} y estaremos encantados de resolvértelas.",
-    "context": "If you have any questions, please contact us at {contactEmail} and we will be happy to answer them."
-  },
-  {
-    "term": "component.whats-parallel.title",
-    "definition": "¿Qué es Parallel?",
-    "context": "What’s Parallel?"
   },
   {
     "term": "developer.webhook-error-email.subject",
@@ -218,11 +218,6 @@
     "term": "invitation.details",
     "definition": "Para empezar, accede con tu dirección de correo y contraseña temporal:",
     "context": "To get started, log in with your email address and temporary password:"
-  },
-  {
-    "term": "invitation.email",
-    "definition": "Correo electrónico: {email}",
-    "context": "Email: {email}"
   },
   {
     "term": "invitation.email",

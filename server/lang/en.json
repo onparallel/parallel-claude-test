@@ -50,6 +50,26 @@
     "context": "Regards,"
   },
   {
+    "term": "component.greeting-new-user",
+    "definition": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}",
+    "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"
+  },
+  {
+    "term": "component.whats-parallel.body",
+    "definition": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way.",
+    "context": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way."
+  },
+  {
+    "term": "component.whats-parallel.contact",
+    "definition": "If you have any questions, please contact us at {contactEmail} and we will be happy to answer them.",
+    "context": "If you have any questions, please contact us at {contactEmail} and we will be happy to answer them."
+  },
+  {
+    "term": "component.whats-parallel.title",
+    "definition": "What’s Parallel?",
+    "context": "What’s Parallel?"
+  },
+  {
     "term": "component.why-we-use-parallel.autosave-body",
     "definition": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later.",
     "context": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later."
@@ -83,26 +103,6 @@
     "term": "component.why-we-use-parallel.title",
     "definition": "Why we use Parallel?",
     "context": "Why we use Parallel?"
-  },
-  {
-    "term": "component.greeting-new-user",
-    "definition": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}",
-    "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"
-  },
-  {
-    "term": "component.whats-parallel.body",
-    "definition": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way.",
-    "context": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way."
-  },
-  {
-    "term": "component.whats-parallel.contact",
-    "definition": "If you have any questions, please contact us at {contactEmail} and we will be happy to answer them.",
-    "context": "If you have any questions, please contact us at {contactEmail} and we will be happy to answer them."
-  },
-  {
-    "term": "component.whats-parallel.title",
-    "definition": "What’s Parallel?",
-    "context": "What’s Parallel?"
   },
   {
     "term": "developer.webhook-error-email.subject",
@@ -218,11 +218,6 @@
     "term": "invitation.details",
     "definition": "To get started, log in with your email address and temporary password:",
     "context": "To get started, log in with your email address and temporary password:"
-  },
-  {
-    "term": "invitation.email",
-    "definition": "Email: {email}",
-    "context": "Email: {email}"
   },
   {
     "term": "invitation.email",
