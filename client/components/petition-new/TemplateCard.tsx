@@ -21,7 +21,7 @@ export const TemplateCard = Object.assign(
     ref
   ) {
     const intl = useIntl();
-    const buttonProps = useRoleButton(onPress, [onPress]);
+    const buttonProps = useRoleButton(onPress);
 
     return (
       <Card

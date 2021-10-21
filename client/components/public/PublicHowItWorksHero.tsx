@@ -9,6 +9,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { useRoleButton } from "@parallel/utils/useRoleButton";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { ReactNode, useRef, useState } from "react";
@@ -141,14 +142,13 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       {...props}
       wrapper={{
         paddingY: 16,
-        textAlign: "center",
         backgroundColor: "white",
       }}
     >
-      <Heading as="h2" size="xl" fontWeight="bold">
+      <Heading as="h2" size="xl" fontWeight="bold" textAlign="center">
         <FormattedMessage id="public.how-it-works-hero.title" defaultMessage="How it works" />
       </Heading>
-      <Heading as="h3" size="md" fontWeight="light" marginTop={4}>
+      <Heading as="h3" size="md" fontWeight="light" marginTop={4} textAlign="center">
         <FormattedMessage
           id="public.how-it-works-hero.description"
           defaultMessage="Designed to make work easier for you, your team, and your clients."
@@ -245,24 +245,38 @@ function Step({
   header,
   description,
   isActive,
+  onClick,
   ...props
 }: {
   header: ReactNode;
   description: ReactNode;
   isActive: boolean;
 } & BoxProps) {
+  const buttonProps = useRoleButton(onClick);
   return (
     <Card
-      padding={5}
-      backgroundColor={{ base: "white", md: isActive ? "gray.75" : "white" }}
-      cursor={{ base: "default", md: "pointer" }}
-      role="button"
-      textAlign="left"
-      boxShadow={isActive ? "long" : "short"}
-      transition="0.3s ease all"
-      borderColor={isActive ? "gray.300" : "gray.200"}
-      _hover={{ backgroundColor: isActive ? "gray.75" : "gray.50" }}
+      {...buttonProps}
       {...props}
+      aria-pressed={isActive}
+      padding={5}
+      backgroundColor="white"
+      boxShadow="short"
+      borderColor="gray.200"
+      cursor={{ base: "default", md: "pointer" }}
+      transition="all 0.3s ease"
+      _hover={{
+        md: { backgroundColor: "gray.50" },
+      }}
+      _pressed={{
+        md: {
+          backgroundColor: "gray.75",
+          borderColor: "gray.300",
+          boxShadow: "long",
+          _hover: {
+            backgroundColor: "gray.75",
+          },
+        },
+      }}
     >
       <Heading as="h4" size="sm">
         {header}
