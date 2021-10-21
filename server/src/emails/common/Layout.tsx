@@ -134,13 +134,13 @@ export const Layout: FC<LayoutProps> = function Layout({
                 <MjmlSocialElement
                   alt="Slack"
                   src={`${assetsUrl}/static/emails/slack.png`}
-                  href="https://twitter.com/Parallel_SO"
+                  href="https://onparallel.slack.com"
                   backgroundColor="#6059f7"
                 />
                 <MjmlSocialElement
                   alt="Facebook"
                   name="facebook-noshare"
-                  href="https://twitter.com/Parallel_SO"
+                  href=""
                   backgroundColor="#6059f7"
                 />
                 <MjmlSocialElement
