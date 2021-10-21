@@ -56,8 +56,8 @@ const email: Email<InvitationProps> = {
 
     ${intl.formatMessage(
       {
-        id: "invitation.username",
-        defaultMessage: "Username: {email}",
+        id: "invitation.email",
+        defaultMessage: "Email: {email}",
       },
       { email }
     )}
@@ -110,8 +110,8 @@ const email: Email<InvitationProps> = {
             <MjmlSection backgroundColor="#F4F7F9" borderRadius="5px" padding="12px 16px">
               <MjmlText>
                 <FormattedMessage
-                  id="invitation.username"
-                  defaultMessage="Username: {email}"
+                  id="invitation.email"
+                  defaultMessage="Email: {email}"
                   values={{ email: <b>{email}</b> }}
                 />
               </MjmlText>

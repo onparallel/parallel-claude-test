@@ -185,6 +185,11 @@
     "context": "To get started, log in with your username and temporary password:"
   },
   {
+    "term": "invitation.email",
+    "definition": "Correo electrónico: {email}",
+    "context": "Email: {email}"
+  },
+  {
     "term": "invitation.join-parallel",
     "definition": "Unirme a Parallel",
     "context": "Join Parallel"
@@ -203,11 +208,6 @@
     "term": "invitation.text",
     "definition": "{organizationUser} te ha invitado a unirte a la organización {organizationName} en Parallel.",
     "context": "{organizationUser} has invited you to join {organizationName} organization in Parallel."
-  },
-  {
-    "term": "invitation.username",
-    "definition": "Usuario: {email}",
-    "context": "Username: {email}"
   },
   {
     "term": "invitation.waiting-to-collaborate",
