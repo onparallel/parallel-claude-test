@@ -1,8 +1,9 @@
 import { inputObjectType, mutationField, nonNull } from "nexus";
 import { isDefined } from "remeda";
+import { RESULT } from "..";
 import { OrgIntegration } from "../../db/__types";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
-import { ArgValidationError } from "../helpers/errors";
+import { ArgValidationError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { validIntegrationSettings } from "../helpers/validators/validIntegrationSettings";
@@ -36,11 +37,10 @@ export const createOrgIntegration = mutationField("createOrgIntegration", {
       );
     } catch (error: any) {
       if (error.constraint === "org_integration__org_id__type__provider") {
-        const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
-          ctx.user!.org_id,
-          args.type
+        throw new WhitelistedError(
+          "You already have a subscription",
+          "EXISTING_SUBSCRIPTION_ERROR"
         );
-        return integration;
       } else {
         throw error;
       }
@@ -90,9 +90,35 @@ export const updateOrgIntegration = mutationField("updateOrgIntegration", {
     }
     const [integration] = await ctx.integrations.updateOrgIntegration(
       args.id,
+      args.type,
       data,
       `User:${ctx.user!.id}`
     );
     return integration;
+  },
+});
+
+export const deleteOrgIntegration = mutationField("deleteOrgIntegration", {
+  type: "Result",
+  description: "Deletes an integration",
+  authorize: authenticateAnd(userHasAccessToIntegration("id")),
+  args: {
+    id: nonNull(globalIdArg("OrgIntegration")),
+    type: nonNull("IntegrationType"), // type here is to make sure we are deleting the right type of integration
+  },
+  resolve: async (_, { id, type }, ctx) => {
+    try {
+      await ctx.integrations.updateOrgIntegration(
+        id,
+        type,
+        {
+          deleted_at: new Date(),
+          deleted_by: `User:${ctx.user!.id}`,
+        },
+        `User:${ctx.user!.id}`
+      );
+      return RESULT.SUCCESS;
+    } catch {}
+    return RESULT.FAILURE;
   },
 });

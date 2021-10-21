@@ -851,6 +851,7 @@ export interface NexusGenFieldTypes {
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
+    deleteOrgIntegration: NexusGenEnums["Result"]; // Result!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -2004,6 +2005,7 @@ export interface NexusGenFieldTypeNames {
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
     deleteContacts: "Result";
+    deleteOrgIntegration: "Result";
     deletePetition: "SupportMethodResponse";
     deletePetitionField: "PetitionBase";
     deletePetitionFieldComment: "PetitionField";
@@ -3106,6 +3108,11 @@ export interface NexusGenArgTypes {
     deleteContacts: {
       // args
       ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    deleteOrgIntegration: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
+      type: NexusGenEnums["IntegrationType"]; // IntegrationType!
     };
     deletePetition: {
       // args

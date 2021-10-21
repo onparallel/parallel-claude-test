@@ -106,3 +106,11 @@ export const PetitionReplyFragment = gql`
     updatedAt
   }
 `;
+
+export const SubscriptionFragment = gql`
+  fragment Subscription on OrgIntegration {
+    id
+    settings
+    isEnabled
+  }
+`;

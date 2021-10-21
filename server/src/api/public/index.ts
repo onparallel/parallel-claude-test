@@ -24,6 +24,7 @@ import {
   PetitionFieldFragment,
   PetitionFragment,
   PetitionReplyFragment,
+  SubscriptionFragment,
   TemplateFragment,
   UserFragment,
 } from "./fragments";
@@ -32,9 +33,11 @@ import {
   Contact,
   CreateContact,
   CreatePetition,
+  CreateSubscription,
   ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfPetitionFieldsWithReplies,
+  ListOfSubscriptions,
   PaginatedContacts,
   PaginatedPetitions,
   PaginatedTemplates,
@@ -42,6 +45,7 @@ import {
   Petition,
   SendPetition,
   SharePetition,
+  Subscription,
   Template,
   UpdatePetition,
 } from "./schemas";
@@ -82,6 +86,11 @@ import {
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
+  OrgIntegration_CreateSubscriptionMutation,
+  OrgIntegration_CreateSubscriptionMutationVariables,
+  OrgIntegration_DeleteSubscriptionMutation,
+  OrgIntegration_DeleteSubscriptionMutationVariables,
+  OrgIntegration_GetSubscriptionsQuery,
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
@@ -138,7 +147,7 @@ export const api = new RestApi({
   "x-tagGroups": [
     {
       name: "Endpoints",
-      tags: ["Petitions", "Petition Sharing", "Templates", "Contacts", "Users"],
+      tags: ["Petitions", "Petition Sharing", "Templates", "Contacts", "Users", "Subscriptions"],
     },
   ],
   tags: [
@@ -162,6 +171,10 @@ export const api = new RestApi({
     {
       name: "Users",
       description: "Users are members of your organization",
+    },
+    {
+      name: "Subscriptions",
+      description: "Subscribe to our events to get real time updates on your petitions",
     },
   ],
   context: ({ req }) => {
@@ -1253,5 +1266,122 @@ api.path("/users").get(
       query
     );
     return Ok(result.me.organization.users);
+  }
+);
+
+const subscriptionId = idParam({
+  type: "OrgIntegration",
+  description: "The ID of the subscription",
+});
+
+api
+  .path("/subscriptions")
+  .get(
+    {
+      operationId: "GetSubscriptions",
+      summary: "Get your subscriptions info",
+      description: "Return a list with all your event subscriptions",
+      responses: { 200: SuccessResponse(ListOfSubscriptions) },
+      tags: ["Subscriptions"],
+    },
+    async ({ client }) => {
+      const result = await client.request<OrgIntegration_GetSubscriptionsQuery>(gql`
+        query OrgIntegration_GetSubscriptions {
+          me {
+            organization {
+              integrations(type: EVENT_SUBSCRIPTION) {
+                ...Subscription
+              }
+            }
+          }
+        }
+        ${SubscriptionFragment}
+      `);
+
+      return Ok(
+        result.me.organization.integrations.map((subscription) => ({
+          id: subscription.id,
+          eventsUrl: subscription.settings.EVENTS_URL,
+          isEnabled: subscription.isEnabled,
+        }))
+      );
+    }
+  )
+  .post(
+    {
+      operationId: "CreateSubscription",
+      summary: "Create subscription",
+      description: outdent`Creates a new subscription.`,
+      body: JsonBody(CreateSubscription),
+      responses: {
+        201: SuccessResponse(Subscription),
+        400: ErrorResponse({ description: "Invalid request body" }),
+        409: ErrorResponse({ description: "You already have a subscription" }),
+      },
+      tags: ["Subscriptions"],
+    },
+    async ({ client, body }) => {
+      try {
+        const result = await client.request<
+          OrgIntegration_CreateSubscriptionMutation,
+          OrgIntegration_CreateSubscriptionMutationVariables
+        >(
+          gql`
+            mutation OrgIntegration_CreateSubscription($eventsUrl: String!) {
+              createOrgIntegration(
+                type: EVENT_SUBSCRIPTION
+                provider: "PARALLEL"
+                settings: { EVENTS_URL: $eventsUrl }
+              ) {
+                ...Subscription
+              }
+            }
+            ${SubscriptionFragment}
+          `,
+          body
+        );
+        const subscription = result.createOrgIntegration;
+        assert("id" in subscription);
+        return Created({
+          id: subscription.id,
+          isEnabled: subscription.isEnabled,
+          eventsUrl: subscription.settings.EVENTS_URL,
+        });
+      } catch (error: any) {
+        if (error instanceof ClientError && containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+          throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
+        }
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "EXISTING_SUBSCRIPTION_ERROR")
+        ) {
+          throw new BadRequestError("You already have a subscription.");
+        }
+        throw error;
+      }
+    }
+  );
+
+api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delete(
+  {
+    operationId: "DeleteSubscription",
+    summary: "Delete subscription",
+    description: "Delete the specified subscription.",
+    responses: { 204: SuccessResponse() },
+    tags: ["Subscriptions"],
+  },
+  async ({ client, params }) => {
+    await client.request<
+      OrgIntegration_DeleteSubscriptionMutation,
+      OrgIntegration_DeleteSubscriptionMutationVariables
+    >(
+      gql`
+        mutation OrgIntegration_DeleteSubscription($id: GID!) {
+          deleteOrgIntegration(id: $id, type: EVENT_SUBSCRIPTION)
+        }
+      `,
+      { id: params.subscriptionId }
+    );
+    return NoContent();
   }
 );

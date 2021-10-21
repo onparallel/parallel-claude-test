@@ -674,6 +674,45 @@ export const FieldReplyDownloadContent = schema({
   description: "The text-content of the reply, or a download URL for `FILE` replies",
 } as const);
 
+const _Subscription = {
+  title: "Subscription",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "eventsUrl", "isEnabled"],
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the subscription",
+      example: toGlobalId("OrgIntegration", 10),
+    },
+    eventsUrl: {
+      type: "string",
+      description: "URL where we will send POST requests with real-time petition events",
+      example: "https://www.example.com/events",
+    },
+    isEnabled: {
+      type: "boolean",
+      description: "Wether this subscription is currently enabled or not",
+      example: true,
+    },
+  },
+} as const;
+export const ListOfSubscriptions = ListOf(_Subscription);
+export const Subscription = schema(_Subscription);
+export const CreateSubscription = schema({
+  title: "CreateSubscription",
+  type: "object",
+  additionalProperties: false,
+  required: ["eventsUrl"],
+  properties: {
+    eventsUrl: {
+      description: "The URL where you will receive POST requests with real time petition events",
+      type: "string",
+      example: "https://www.example.com/events",
+    },
+  },
+} as const);
+
 function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
   return schema({
     title: `PaginatedList<${item.title ?? "*missing item title*"}>`,

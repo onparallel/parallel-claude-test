@@ -360,6 +360,8 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
   deleteContacts: Result;
+  /** Deletes an integration */
+  deleteOrgIntegration: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Deletes a petition field. */
@@ -698,6 +700,11 @@ export type MutationdeactivateAccessesArgs = {
 
 export type MutationdeleteContactsArgs = {
   ids: Array<Scalars["GID"]>;
+};
+
+export type MutationdeleteOrgIntegrationArgs = {
+  id: Scalars["GID"];
+  type: IntegrationType;
 };
 
 export type MutationdeletePetitionArgs = {
@@ -2835,27 +2842,27 @@ export type VerificationCodeRequest = {
 
 export type PetitionFragment = {
   id: string;
-  name: Maybe<string>;
+  name: string | null;
   status: PetitionStatus;
-  deadline: Maybe<string>;
+  deadline: string | null;
   locale: PetitionLocale;
   createdAt: string;
-  fromTemplateId: Maybe<string>;
+  fromTemplateId: string | null;
 };
 
 export type TemplateFragment = {
   id: string;
-  name: Maybe<string>;
-  description: Maybe<any>;
+  name: string | null;
+  description: any | null;
   locale: PetitionLocale;
   createdAt: string;
 };
 
 export type UserFragment = {
   id: string;
-  fullName: Maybe<string>;
-  firstName: Maybe<string>;
-  lastName: Maybe<string>;
+  fullName: string | null;
+  firstName: string | null;
+  lastName: string | null;
 };
 
 export type UserGroupFragment = { id: string; name: string };
@@ -2863,9 +2870,9 @@ export type UserGroupFragment = { id: string; name: string };
 export type ContactFragment = {
   id: string;
   email: string;
-  fullName: Maybe<string>;
-  firstName: Maybe<string>;
-  lastName: Maybe<string>;
+  fullName: string | null;
+  firstName: string | null;
+  lastName: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -2876,23 +2883,23 @@ export type PetitionAccessFragment = {
   reminderCount: number;
   remindersLeft: number;
   remindersActive: boolean;
-  nextReminderAt: Maybe<string>;
+  nextReminderAt: string | null;
   createdAt: string;
-  contact: Maybe<{
+  contact: {
     id: string;
     email: string;
-    fullName: Maybe<string>;
-    firstName: Maybe<string>;
-    lastName: Maybe<string>;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
     createdAt: string;
     updatedAt: string;
-  }>;
-  granter: Maybe<{
+  } | null;
+  granter: {
     id: string;
-    fullName: Maybe<string>;
-    firstName: Maybe<string>;
-    lastName: Maybe<string>;
-  }>;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  } | null;
 };
 
 export type Permission_PetitionUserGroupPermission_Fragment = {
@@ -2904,7 +2911,7 @@ export type Permission_PetitionUserGroupPermission_Fragment = {
 export type Permission_PetitionUserPermission_Fragment = {
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user: { id: string; fullName: Maybe<string>; firstName: Maybe<string>; lastName: Maybe<string> };
+  user: { id: string; fullName: string | null; firstName: string | null; lastName: string | null };
 };
 
 export type PermissionFragment =
@@ -2913,9 +2920,9 @@ export type PermissionFragment =
 
 export type PetitionFieldFragment = {
   id: string;
-  title: Maybe<string>;
+  title: string | null;
   type: PetitionFieldType;
-  fromPetitionFieldId: Maybe<string>;
+  fromPetitionFieldId: string | null;
 };
 
 export type PetitionFieldReplyFragment = {
@@ -2923,6 +2930,12 @@ export type PetitionFieldReplyFragment = {
   content: { [key: string]: any };
   createdAt: string;
   updatedAt: string;
+};
+
+export type SubscriptionFragment = {
+  id: string;
+  settings: { [key: string]: any };
+  isEnabled: boolean;
 };
 
 export type GetPetitions_PetitionsQueryVariables = Exact<{
@@ -2938,12 +2951,12 @@ export type GetPetitions_PetitionsQuery = {
     items: Array<
       | {
           id: string;
-          name: Maybe<string>;
+          name: string | null;
           status: PetitionStatus;
-          deadline: Maybe<string>;
+          deadline: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          fromTemplateId: Maybe<string>;
+          fromTemplateId: string | null;
         }
       | {}
     >;
@@ -2959,12 +2972,12 @@ export type CreatePetition_PetitionMutation = {
   createPetition:
     | {
         id: string;
-        name: Maybe<string>;
+        name: string | null;
         status: PetitionStatus;
-        deadline: Maybe<string>;
+        deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: Maybe<string>;
+        fromTemplateId: string | null;
       }
     | {};
 };
@@ -2974,18 +2987,18 @@ export type GetPetition_PetitionQueryVariables = Exact<{
 }>;
 
 export type GetPetition_PetitionQuery = {
-  petition: Maybe<
+  petition:
     | {
         id: string;
-        name: Maybe<string>;
+        name: string | null;
         status: PetitionStatus;
-        deadline: Maybe<string>;
+        deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: Maybe<string>;
+        fromTemplateId: string | null;
       }
     | {}
-  >;
+    | null;
 };
 
 export type UpdatePetition_PetitionMutationVariables = Exact<{
@@ -2997,12 +3010,12 @@ export type UpdatePetition_PetitionMutation = {
   updatePetition:
     | {
         id: string;
-        name: Maybe<string>;
+        name: string | null;
         status: PetitionStatus;
-        deadline: Maybe<string>;
+        deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: Maybe<string>;
+        fromTemplateId: string | null;
       }
     | {};
 };
@@ -3019,7 +3032,7 @@ export type GetPetitionRecipients_PetitionAccessesQueryVariables = Exact<{
 }>;
 
 export type GetPetitionRecipients_PetitionAccessesQuery = {
-  petition: Maybe<
+  petition:
     | {
         accesses: Array<{
           id: string;
@@ -3027,27 +3040,27 @@ export type GetPetitionRecipients_PetitionAccessesQuery = {
           reminderCount: number;
           remindersLeft: number;
           remindersActive: boolean;
-          nextReminderAt: Maybe<string>;
+          nextReminderAt: string | null;
           createdAt: string;
-          contact: Maybe<{
+          contact: {
             id: string;
             email: string;
-            fullName: Maybe<string>;
-            firstName: Maybe<string>;
-            lastName: Maybe<string>;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
             createdAt: string;
             updatedAt: string;
-          }>;
-          granter: Maybe<{
+          } | null;
+          granter: {
             id: string;
-            fullName: Maybe<string>;
-            firstName: Maybe<string>;
-            lastName: Maybe<string>;
-          }>;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          } | null;
         }>;
       }
     | {}
-  >;
+    | null;
 };
 
 export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
@@ -3055,7 +3068,7 @@ export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
 }>;
 
 export type CreatePetitionRecipients_ContactQuery = {
-  contacts: Array<Maybe<{ id: string; firstName: Maybe<string>; lastName: Maybe<string> }>>;
+  contacts: Array<{ id: string; firstName: string | null; lastName: string | null } | null>;
 };
 
 export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
@@ -3082,32 +3095,30 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
   sendPetition: {
-    accesses: Maybe<
-      Array<{
+    accesses: Array<{
+      id: string;
+      status: PetitionAccessStatus;
+      reminderCount: number;
+      remindersLeft: number;
+      remindersActive: boolean;
+      nextReminderAt: string | null;
+      createdAt: string;
+      contact: {
         id: string;
-        status: PetitionAccessStatus;
-        reminderCount: number;
-        remindersLeft: number;
-        remindersActive: boolean;
-        nextReminderAt: Maybe<string>;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
         createdAt: string;
-        contact: Maybe<{
-          id: string;
-          email: string;
-          fullName: Maybe<string>;
-          firstName: Maybe<string>;
-          lastName: Maybe<string>;
-          createdAt: string;
-          updatedAt: string;
-        }>;
-        granter: Maybe<{
-          id: string;
-          fullName: Maybe<string>;
-          firstName: Maybe<string>;
-          lastName: Maybe<string>;
-        }>;
-      }>
-    >;
+        updatedAt: string;
+      } | null;
+      granter: {
+        id: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      } | null;
+    }> | null;
   };
 };
 
@@ -3116,13 +3127,13 @@ export type PetitionReplies_RepliesQueryVariables = Exact<{
 }>;
 
 export type PetitionReplies_RepliesQuery = {
-  petition: Maybe<
+  petition:
     | {
         fields: Array<{
           id: string;
-          title: Maybe<string>;
+          title: string | null;
           type: PetitionFieldType;
-          fromPetitionFieldId: Maybe<string>;
+          fromPetitionFieldId: string | null;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3134,9 +3145,9 @@ export type PetitionReplies_RepliesQuery = {
     | {
         fields: Array<{
           id: string;
-          title: Maybe<string>;
+          title: string | null;
           type: PetitionFieldType;
-          fromPetitionFieldId: Maybe<string>;
+          fromPetitionFieldId: string | null;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3145,7 +3156,7 @@ export type PetitionReplies_RepliesQuery = {
           }>;
         }>;
       }
-  >;
+    | null;
 };
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exact<{
@@ -3154,7 +3165,7 @@ export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exa
 }>;
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
-  fileUploadReplyDownloadLink: { url: Maybe<string> };
+  fileUploadReplyDownloadLink: { url: string | null };
 };
 
 export type GetPermissions_PermissionsQueryVariables = Exact<{
@@ -3162,7 +3173,7 @@ export type GetPermissions_PermissionsQueryVariables = Exact<{
 }>;
 
 export type GetPermissions_PermissionsQuery = {
-  petition: Maybe<
+  petition:
     | {
         permissions: Array<
           | {
@@ -3175,9 +3186,9 @@ export type GetPermissions_PermissionsQuery = {
               createdAt: string;
               user: {
                 id: string;
-                fullName: Maybe<string>;
-                firstName: Maybe<string>;
-                lastName: Maybe<string>;
+                fullName: string | null;
+                firstName: string | null;
+                lastName: string | null;
               };
             }
         >;
@@ -3194,14 +3205,14 @@ export type GetPermissions_PermissionsQuery = {
               createdAt: string;
               user: {
                 id: string;
-                fullName: Maybe<string>;
-                firstName: Maybe<string>;
-                lastName: Maybe<string>;
+                fullName: string | null;
+                firstName: string | null;
+                lastName: string | null;
               };
             }
         >;
       }
-  >;
+    | null;
 };
 
 export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
@@ -3223,9 +3234,9 @@ export type SharePetition_addPetitionPermissionMutation = {
           createdAt: string;
           user: {
             id: string;
-            fullName: Maybe<string>;
-            firstName: Maybe<string>;
-            lastName: Maybe<string>;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
           };
         }
     >;
@@ -3276,9 +3287,9 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
           createdAt: string;
           user: {
             id: string;
-            fullName: Maybe<string>;
-            firstName: Maybe<string>;
-            lastName: Maybe<string>;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
           };
         }
     >;
@@ -3297,8 +3308,8 @@ export type GetTemplates_TemplatesQuery = {
     items: Array<
       | {
           id: string;
-          name: Maybe<string>;
-          description: Maybe<any>;
+          name: string | null;
+          description: any | null;
           locale: PetitionLocale;
           createdAt: string;
         }
@@ -3312,16 +3323,16 @@ export type GetTemplate_TemplateQueryVariables = Exact<{
 }>;
 
 export type GetTemplate_TemplateQuery = {
-  template: Maybe<
+  template:
     | {
         id: string;
-        name: Maybe<string>;
-        description: Maybe<any>;
+        name: string | null;
+        description: any | null;
         locale: PetitionLocale;
         createdAt: string;
       }
     | {}
-  >;
+    | null;
 };
 
 export type DeleteTemplate_deletePetitionsMutationVariables = Exact<{
@@ -3343,9 +3354,9 @@ export type GetContacts_ContactsQuery = {
     items: Array<{
       id: string;
       email: string;
-      fullName: Maybe<string>;
-      firstName: Maybe<string>;
-      lastName: Maybe<string>;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
       createdAt: string;
       updatedAt: string;
     }>;
@@ -3360,9 +3371,9 @@ export type CreateContact_ContactMutation = {
   createContact: {
     id: string;
     email: string;
-    fullName: Maybe<string>;
-    firstName: Maybe<string>;
-    lastName: Maybe<string>;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
     createdAt: string;
     updatedAt: string;
   };
@@ -3373,15 +3384,15 @@ export type GetContact_ContactQueryVariables = Exact<{
 }>;
 
 export type GetContact_ContactQuery = {
-  contact: Maybe<{
+  contact: {
     id: string;
     email: string;
-    fullName: Maybe<string>;
-    firstName: Maybe<string>;
-    lastName: Maybe<string>;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
     createdAt: string;
     updatedAt: string;
-  }>;
+  } | null;
 };
 
 export type GetOrganizationUsers_UsersQueryVariables = Exact<{
@@ -3397,11 +3408,35 @@ export type GetOrganizationUsers_UsersQuery = {
         totalCount: number;
         items: Array<{
           id: string;
-          fullName: Maybe<string>;
-          firstName: Maybe<string>;
-          lastName: Maybe<string>;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
         }>;
       };
     };
   };
 };
+
+export type OrgIntegration_GetSubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrgIntegration_GetSubscriptionsQuery = {
+  me: {
+    organization: {
+      integrations: Array<{ id: string; settings: { [key: string]: any }; isEnabled: boolean }>;
+    };
+  };
+};
+
+export type OrgIntegration_CreateSubscriptionMutationVariables = Exact<{
+  eventsUrl: Scalars["String"];
+}>;
+
+export type OrgIntegration_CreateSubscriptionMutation = {
+  createOrgIntegration: { id: string; settings: { [key: string]: any }; isEnabled: boolean };
+};
+
+export type OrgIntegration_DeleteSubscriptionMutationVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type OrgIntegration_DeleteSubscriptionMutation = { deleteOrgIntegration: Result };

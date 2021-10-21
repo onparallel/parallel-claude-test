@@ -650,6 +650,11 @@ type Mutation {
   deleteContacts(ids: [GID!]!): Result!
 
   """
+  Deletes an integration
+  """
+  deleteOrgIntegration(id: GID!, type: IntegrationType!): Result!
+
+  """
   Soft-deletes any given petition on the database.
   """
   deletePetition(
