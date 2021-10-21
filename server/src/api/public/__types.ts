@@ -230,7 +230,7 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
 };
 
 /** The types of integrations available. */
-export type IntegrationType = "SIGNATURE";
+export type IntegrationType = "EVENT_SUBSCRIPTION" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 /** A public template on landing page */
 export type LandingTemplate = {
@@ -332,6 +332,8 @@ export type Mutation = {
   createContact: Contact;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
+  /** Creates an integration on the user's organization */
+  createOrgIntegration: OrgIntegration;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -477,6 +479,8 @@ export type Mutation = {
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
+  /** Updates an existing integration on the user's org */
+  updateOrgIntegration: OrgIntegration;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
@@ -605,6 +609,12 @@ export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationcreateOrgIntegrationArgs = {
+  provider: Scalars["String"];
+  settings: Scalars["JSONObject"];
+  type: IntegrationType;
 };
 
 export type MutationcreateOrganizationArgs = {
@@ -1027,6 +1037,12 @@ export type MutationupdateOnboardingStatusArgs = {
   status: OnboardingStatus;
 };
 
+export type MutationupdateOrgIntegrationArgs = {
+  data: UpdateOrgIntegrationInput;
+  id: Scalars["GID"];
+  type: IntegrationType;
+};
+
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
 };
@@ -1175,10 +1191,14 @@ export type OnboardingKey =
 export type OnboardingStatus = "FINISHED" | "SKIPPED";
 
 export type OrgIntegration = {
+  id: Scalars["GID"];
+  isEnabled: Scalars["Boolean"];
   /** The name of the integration. */
   name: Scalars["String"];
   /** The provider used for this integration. */
   provider: Scalars["String"];
+  /** The settings of the integration. */
+  settings: Scalars["JSONObject"];
   /** The type of the integration. */
   type: IntegrationType;
 };
@@ -1540,6 +1560,8 @@ export type PetitionField = {
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
   description: Maybe<Scalars["String"]>;
+  /** The field GID used from which this field was cloned */
+  fromPetitionFieldId: Maybe<Scalars["GID"]>;
   /** The ID of the petition field. */
   id: Scalars["GID"];
   /** Determines if the field can be moved or deleted. */
@@ -2598,6 +2620,11 @@ export type UpdateContactInput = {
   lastName?: Maybe<Scalars["String"]>;
 };
 
+export type UpdateOrgIntegrationInput = {
+  isEnabled?: Maybe<Scalars["Boolean"]>;
+  settings?: Maybe<Scalars["JSONObject"]>;
+};
+
 export type UpdatePetitionFieldInput = {
   description?: Maybe<Scalars["String"]>;
   multiple?: Maybe<Scalars["Boolean"]>;
@@ -2884,6 +2911,13 @@ export type PermissionFragment =
   | Permission_PetitionUserGroupPermission_Fragment
   | Permission_PetitionUserPermission_Fragment;
 
+export type PetitionFieldFragment = {
+  id: string;
+  title: Maybe<string>;
+  type: PetitionFieldType;
+  fromPetitionFieldId: Maybe<string>;
+};
+
 export type PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
@@ -3086,9 +3120,9 @@ export type PetitionReplies_RepliesQuery = {
     | {
         fields: Array<{
           id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
           title: Maybe<string>;
+          type: PetitionFieldType;
+          fromPetitionFieldId: Maybe<string>;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3100,9 +3134,9 @@ export type PetitionReplies_RepliesQuery = {
     | {
         fields: Array<{
           id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
           title: Maybe<string>;
+          type: PetitionFieldType;
+          fromPetitionFieldId: Maybe<string>;
           replies: Array<{
             id: string;
             content: { [key: string]: any };

@@ -363,96 +363,123 @@ const _Permission = {
   ],
 } as const;
 
-const _PetitionFieldReply = {
-  title: "PetitionFieldReply",
+const _PetitionFieldWithReply = {
+  title: "PetitionFieldWithReply",
   type: "object",
   additionalProperties: false,
-  required: ["id", "type", "content", "fieldId", "updatedAt", "createdAt"],
+  required: ["id", "title", "type", "replies"],
   properties: {
     id: {
       type: "string",
-      description: "The ID of the reply",
-      example: toGlobalId("PetitionFieldReply", 100),
-    },
-    type: {
-      type: "string",
-      enum: ["TEXT", "SHORT_TEXT", "FILE_UPLOAD", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"],
-      description: "The type of the field this reply originated from",
-      example: "TEXT",
+      description: "The ID of the petition field",
+      example: toGlobalId("PetitionField", 100),
     },
     title: {
       type: ["string", "null"],
-      description: "Title of the field linked to the reply",
+      description: "Title of the field",
       example: "Please, tell us your name",
     },
-    content: {
-      oneOf: [
-        {
-          title: "Text reply",
-          type: "string",
-          description: "The text content of the reply",
-          example: "Robert Baratheon",
-        },
-        {
-          title: "File reply",
-          type: "object",
-          required: ["filename", "size", "contentType"],
-          additionalProperties: false,
-          properties: {
-            filename: {
-              type: "string",
-              description: "The name of the submitted file",
-              example: "Photo_ID.jpeg",
-            },
-            size: {
-              type: "integer",
-              description: "The size of the file in bytes",
-              example: 1928824,
-            },
-            contentType: {
-              type: "string",
-              description: "The content-type of the file",
-              example: "image/jpeg",
-            },
-          },
-        },
-        {
-          title: "Dynamic select reply",
-          description:
-            "An array of tuples where the first element is the name of the field and the second element is the reply",
-          type: "array",
-          minItems: 2,
-          items: {
-            type: "array",
-            items: [{ type: "string" }, { type: "string" }],
-          },
-        },
-        {
-          title: "Checkbox reply",
-          description: "An array with the selected choices.",
-          type: "array",
-          items: {
-            type: "string",
-          },
-        },
+    type: {
+      type: "string",
+      enum: [
+        "HEADING",
+        "TEXT",
+        "SHORT_TEXT",
+        "FILE_UPLOAD",
+        "SELECT",
+        "DYNAMIC_SELECT",
+        "CHECKBOX",
       ],
+      description: "The type of the field",
+      example: "TEXT",
     },
-    fieldId: {
-      type: "string",
-      description: "The ID of the field this reply belongs to",
-      example: toGlobalId("PetitionField", 2),
+    fromPetitionFieldId: {
+      type: ["string", "null"],
+      description: "The field GID from where this field was cloned",
+      example: toGlobalId("PetitionField", 30),
     },
-    createdAt: {
-      type: "string",
-      format: "date-time",
-      description: "Creation date of the reply",
-      example: new Date(2020, 2, 15).toISOString(),
-    },
-    updatedAt: {
-      type: "string",
-      format: "date-time",
-      description: "Last time update of the reply",
-      example: new Date(2020, 2, 20).toISOString(),
+    replies: {
+      type: "array",
+      items: {
+        type: "object",
+        required: ["id", "content", "createdAt", "updatedAt"],
+        properties: {
+          id: {
+            type: "string",
+            description: "The ID of the petition field reply",
+            example: toGlobalId("PetitionFieldReply", 100),
+          },
+          content: {
+            oneOf: [
+              {
+                title: "Text reply",
+                type: "string",
+                description: "The text content of the reply",
+                example: "Robert Baratheon",
+              },
+              {
+                title: "File reply",
+                type: "object",
+                required: ["filename", "size", "contentType"],
+                additionalProperties: false,
+                properties: {
+                  filename: {
+                    type: "string",
+                    description: "The name of the submitted file",
+                    example: "Photo_ID.jpeg",
+                  },
+                  size: {
+                    type: "integer",
+                    description: "The size of the file in bytes",
+                    example: 1928824,
+                  },
+                  contentType: {
+                    type: "string",
+                    description: "The content-type of the file",
+                    example: "image/jpeg",
+                  },
+                },
+              },
+              {
+                title: "Dynamic select reply",
+                description:
+                  "An array of tuples where the first element is the name of the field and the second element is the reply",
+                type: "array",
+                minItems: 2,
+                items: {
+                  type: "array",
+                  items: [{ type: "string" }, { type: "string" }],
+                },
+                example: [
+                  ["Comunidad autónoma", "Andalucía"],
+                  ["Provincia", "Cádiz"],
+                ],
+              },
+              {
+                title: "Checkbox reply",
+                description: "An array with the selected choices.",
+                type: "array",
+                items: {
+                  type: "string",
+                },
+                example: ["Option 1", "Option 3"],
+              },
+            ],
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            description: "Creation date of the reply",
+            example: new Date(2020, 2, 15).toISOString(),
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            description: "Last time update of the reply",
+            example: new Date(2020, 2, 20).toISOString(),
+          },
+        },
+      },
     },
   },
 } as const;
@@ -639,7 +666,7 @@ export const SharePetition = schema({
 
 export const ListOfPermissions = ListOf(_Permission);
 
-export const ListOfReplies = ListOf(_PetitionFieldReply);
+export const ListOfPetitionFieldsWithReplies = ListOf(_PetitionFieldWithReply);
 
 export const FieldReplyDownloadContent = schema({
   type: "string",

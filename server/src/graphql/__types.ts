@@ -1112,6 +1112,7 @@ export interface NexusGenFieldTypes {
     attachments: NexusGenRootTypes["PetitionFieldAttachment"][]; // [PetitionFieldAttachment!]!
     comments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     description: string | null; // String
+    fromPetitionFieldId: NexusGenScalars["GID"] | null; // GID
     id: NexusGenScalars["GID"]; // GID!
     isFixed: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
@@ -2264,6 +2265,7 @@ export interface NexusGenFieldTypeNames {
     attachments: "PetitionFieldAttachment";
     comments: "PetitionFieldComment";
     description: "String";
+    fromPetitionFieldId: "GID";
     id: "GID";
     isFixed: "Boolean";
     isReadOnly: "Boolean";

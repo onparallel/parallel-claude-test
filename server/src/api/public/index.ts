@@ -21,6 +21,7 @@ import {
   ContactFragment,
   PermissionFragment,
   PetitionAccessFragment,
+  PetitionFieldFragment,
   PetitionFragment,
   PetitionReplyFragment,
   TemplateFragment,
@@ -33,7 +34,7 @@ import {
   CreatePetition,
   ListOfPermissions,
   ListOfPetitionAccesses,
-  ListOfReplies,
+  ListOfPetitionFieldsWithReplies,
   PaginatedContacts,
   PaginatedPetitions,
   PaginatedTemplates,
@@ -81,7 +82,6 @@ import {
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
-  PetitionFieldType,
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
@@ -599,16 +599,16 @@ api
     }
   );
 
-api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
+api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
   {
-    operationId: "PetitionReplies",
+    operationId: "PetitionFields",
     summary: "List petition replies",
     description: outdent`
-      Returns a list of the submitted replies to the specified petition.
+      Returns a list of the petition fields with their submitted replies.
     `,
     tags: ["Petitions"],
     responses: {
-      200: SuccessResponse(ListOfReplies),
+      200: SuccessResponse(ListOfPetitionFieldsWithReplies),
     },
   },
   async ({ client, params }) => {
@@ -620,28 +620,26 @@ api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
         query PetitionReplies_Replies($petitionId: GID!) {
           petition(id: $petitionId) {
             fields {
-              id
-              type
-              options
-              title
+              ...PetitionField
               replies {
                 ...PetitionFieldReply
               }
             }
           }
         }
+        ${PetitionFieldFragment}
         ${PetitionReplyFragment}
       `,
       {
         petitionId: params.petitionId,
       }
     );
+
     return Ok(
-      response.petition!.fields.flatMap((field) =>
-        field.replies.map((reply) => ({
-          id: reply.id,
-          type: field.type as Exclude<PetitionFieldType, "HEADING">,
-          title: field.title,
+      response.petition!.fields.map((field) => ({
+        ...field,
+        replies: field.replies.map((reply) => ({
+          ...reply,
           content:
             field.type === "FILE_UPLOAD"
               ? (reply.content as {
@@ -654,11 +652,8 @@ api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
               : field.type === "CHECKBOX"
               ? (reply.content.choices as string[])
               : (reply.content.text as string),
-          fieldId: field.id,
-          updatedAt: reply.updatedAt,
-          createdAt: reply.createdAt,
-        }))
-      )
+        })),
+      }))
     );
   }
 );

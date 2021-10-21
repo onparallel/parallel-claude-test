@@ -89,6 +89,15 @@ export const PermissionFragment = gql`
   ${UserGroupFragment}
 `;
 
+export const PetitionFieldFragment = gql`
+  fragment PetitionField on PetitionField {
+    id
+    title
+    type
+    fromPetitionFieldId
+  }
+`;
+
 export const PetitionReplyFragment = gql`
   fragment PetitionFieldReply on PetitionFieldReply {
     id

@@ -424,6 +424,10 @@ export const PetitionField = objectType({
         return await ctx.petitions.loadFieldAttachmentsByFieldId(o.id);
       },
     });
+    t.nullable.globalId("fromPetitionFieldId", {
+      description: "The field GID used from which this field was cloned",
+      resolve: (root) => root.from_petition_field_id,
+    });
   },
   sourceType: "db.PetitionField",
 });

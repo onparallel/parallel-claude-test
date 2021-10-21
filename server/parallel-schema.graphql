@@ -1979,6 +1979,11 @@ type PetitionField {
   description: String
 
   """
+  The field GID used from which this field was cloned
+  """
+  fromPetitionFieldId: GID
+
+  """
   The ID of the petition field.
   """
   id: GID!
