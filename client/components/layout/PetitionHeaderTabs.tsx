@@ -1,13 +1,16 @@
-import { Stack, StackProps } from "@chakra-ui/layout";
+import { List } from "@chakra-ui/layout";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 
-interface PetitionHeaderTabsProps extends StackProps {}
-
-export const PetitionHeaderTabs = ({ children, ...props }: PetitionHeaderTabsProps) => {
+export const PetitionHeaderTabs = chakraForwardRef<"ul">(function PetitionHeaderTabs(
+  { children, ...props },
+  ref
+) {
   return (
-    <Stack
-      alignItems="center"
+    <List
+      ref={ref}
+      display="flex"
+      alignItems="stretch"
       justifyContent="center"
-      direction="row"
       position={{ base: "relative", md: "absolute" }}
       height={{ base: "40px", md: "64px" }}
       transform={{ base: "none", md: "translate(-50%)" }}
@@ -17,6 +20,6 @@ export const PetitionHeaderTabs = ({ children, ...props }: PetitionHeaderTabsPro
       {...props}
     >
       {children}
-    </Stack>
+    </List>
   );
-};
+});

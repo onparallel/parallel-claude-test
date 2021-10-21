@@ -1,4 +1,4 @@
-import { Box, BoxProps, Button } from "@chakra-ui/react";
+import { Box, BoxProps, Center, ListItem } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { motion } from "framer-motion";
 import { ReactNode, Ref } from "react";
@@ -20,32 +20,37 @@ export const PetitionHeaderTab = chakraForwardRef<
   ref: Ref<any>
 ) {
   const link = (
-    <Button
-      as="a"
-      ref={ref}
-      textTransform="uppercase"
-      isDisabled={isDisabled}
-      rightIcon={rightIcon}
-      variant="ghost"
-      fontWeight="normal"
-      color={isActive ? "blue.600" : undefined}
-      _hover={{ color: isDisabled ? undefined : "blue.600" }}
-      sx={{ WebkitTextStrokeWidth: isActive ? "0.04em" : undefined }}
-      {...(isActive ? { "aria-current": "page" } : {})}
-      {...(props as any)}
-    >
-      {children}
+    <ListItem position="relative" display="flex" alignItems="stretch">
+      <Center
+        ref={ref}
+        as="a"
+        paddingX={5}
+        aria-current={isActive ? "page" : undefined}
+        aria-disabled={isDisabled ? true : undefined}
+        textTransform="uppercase"
+        isDisabled={isDisabled}
+        rightIcon={rightIcon}
+        variant="ghost"
+        fontWeight="normal"
+        _hover={{ color: "blue.600", backgroundColor: "white" }}
+        _activeLink={{ color: "blue.600", WebkitTextStrokeWidth: "0.04em" }}
+        _disabled={{ color: "gray.500", cursor: "not-allowed" }}
+        {...(props as any)}
+      >
+        {children}
+      </Center>
       {isActive && (
         <MotionBox
           width="100%"
-          height="3px"
+          height="4px"
           position="absolute"
-          bottom={{ base: "-11px", md: "-13px" }}
+          bottom="-2px"
           backgroundColor="blue.600"
-          layoutId="underline"
+          transition={{ duration: 0.15 }}
+          layoutId="petition-header-tab-active-indicator"
         />
       )}
-    </Button>
+    </ListItem>
   );
   if (isDisabled) {
     return (
