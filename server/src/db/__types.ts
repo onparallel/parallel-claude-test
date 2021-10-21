@@ -432,11 +432,24 @@ export interface OrgIntegration {
   provider: string; // varchar
   settings: Maybe<any>; // jsonb
   is_enabled: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
 }
 
 export type CreateOrgIntegration = PartialProps<
   Omit<OrgIntegration, "id">,
-  "settings" | "is_enabled"
+  | "settings"
+  | "is_enabled"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface Petition {

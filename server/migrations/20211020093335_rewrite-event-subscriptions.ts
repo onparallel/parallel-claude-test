@@ -5,9 +5,24 @@ import { timestamps } from "./helpers/timestamps";
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.dropTable("petition_event_subscription");
   await addIntegrationType(knex, "EVENT_SUBSCRIPTION");
+
+  await knex.schema.alterTable("org_integration", (t) => {
+    timestamps(t);
+  });
 }
 
 export async function down(knex: Knex): Promise<void> {
+  await knex.schema.alterTable("org_integration", (t) => {
+    t.dropColumns(
+      "created_at",
+      "created_by",
+      "updated_at",
+      "updated_by",
+      "deleted_at",
+      "deleted_by"
+    );
+  });
+
   await knex.schema.createTable("petition_event_subscription", (t) => {
     t.increments("id");
     t.integer("user_id").notNullable().references("user.id");

@@ -24,13 +24,16 @@ export const createOrgIntegration = mutationField("createOrgIntegration", {
   ),
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.integrations.createOrgIntegration({
-        type: args.type,
-        is_enabled: true,
-        org_id: ctx.user!.org_id,
-        provider: args.provider.toUpperCase(),
-        settings: args.settings,
-      });
+      return await ctx.integrations.createOrgIntegration(
+        {
+          type: args.type,
+          is_enabled: true,
+          org_id: ctx.user!.org_id,
+          provider: args.provider.toUpperCase(),
+          settings: args.settings,
+        },
+        `User:${ctx.user!.id}`
+      );
     } catch (error: any) {
       if (error.constraint === "org_integration__org_id__type__provider") {
         const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
@@ -85,7 +88,11 @@ export const updateOrgIntegration = mutationField("updateOrgIntegration", {
     if (isDefined(args.data.isEnabled)) {
       data.is_enabled = args.data.isEnabled;
     }
-    const [integration] = await ctx.integrations.updateOrgIntegration(args.id, data);
+    const [integration] = await ctx.integrations.updateOrgIntegration(
+      args.id,
+      data,
+      `User:${ctx.user!.id}`
+    );
     return integration;
   },
 });

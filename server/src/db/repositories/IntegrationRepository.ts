@@ -32,7 +32,9 @@ export class IntegrationRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadIntegration = this.buildLoadBy("org_integration", "id");
+  readonly loadIntegration = this.buildLoadBy("org_integration", "id", (q) =>
+    q.whereNull("deleted_at")
+  );
 
   async loadIntegrationsByOrgId<IType extends IntegrationType>(
     orgId: number,
@@ -42,6 +44,7 @@ export class IntegrationRepository extends BaseRepository {
     return await this.from("org_integration")
       .where({
         org_id: orgId,
+        deleted_at: null,
       })
       .mmodify((q) => {
         if (type) {
@@ -59,7 +62,8 @@ export class IntegrationRepository extends BaseRepository {
       /* sql */ `
       select * from org_integration
       where ((settings ->> 'AUTH_KEY') = ?) 
-      and "type" = 'USER_PROVISIONING' 
+      and "type" = 'USER_PROVISIONING'
+      and deleted_at is null
       and is_enabled is true;
     `,
       [key]
@@ -74,6 +78,7 @@ export class IntegrationRepository extends BaseRepository {
         select * from org_integration
         where settings#>'{EMAIL_DOMAINS}' \\?| array[?]
         and type = 'SSO'
+        and deleted_at is null
         and is_enabled is true;
       `,
       [domain]
@@ -82,25 +87,44 @@ export class IntegrationRepository extends BaseRepository {
     return integration;
   }
 
-  async createOrgIntegration(data: Partial<OrgIntegration>) {
-    const [integration] = await this.from("org_integration").insert(data, "*");
+  async createOrgIntegration(data: Partial<OrgIntegration>, createdBy: string) {
+    const [integration] = await this.from("org_integration").insert(
+      {
+        ...data,
+        created_by: createdBy,
+      },
+      "*"
+    );
     return integration;
   }
 
   async updateOrgIntegration<K extends IntegrationType>(
     integrationId: number,
-    data: Partial<Replace<OrgIntegration, { settings: IntegrationSettings<K> }>>
+    data: Partial<Replace<OrgIntegration, { settings: IntegrationSettings<K> }>>,
+    updatedBy: string
   ) {
-    return await this.from("org_integration").where("id", integrationId).update(data, "*");
+    return await this.from("org_integration")
+      .where({ id: integrationId, deleted_at: null })
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
   }
 
-  async removeSignaturitBrandingIds(orgId: number) {
+  async removeSignaturitBrandingIds(orgId: number, updatedBy: string) {
     await this.knex.raw(
       /* sql */ `
       update org_integration 
-      set settings = settings - 'EN_FORMAL_BRANDING_ID' - 'ES_FORMAL_BRANDING_ID' - 'EN_INFORMAL_BRANDING_ID' - 'ES_INFORMAL_BRANDING_ID'
-      where org_id = ? and provider = 'SIGNATURIT'`,
-      [orgId]
+      set 
+        settings = settings - 'EN_FORMAL_BRANDING_ID' - 'ES_FORMAL_BRANDING_ID' - 'EN_INFORMAL_BRANDING_ID' - 'ES_INFORMAL_BRANDING_ID',
+        updated_by = ?,
+        updated_at = NOW()
+      where org_id = ? and provider = 'SIGNATURIT' and deleted_at is null`,
+      [updatedBy, orgId]
     );
   }
 }

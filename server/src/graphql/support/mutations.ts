@@ -177,7 +177,7 @@ export const resetSignaturitOrganizationBranding = mutationField(
             message: `Can't find organization with id ${orgId}`,
           };
         }
-        await ctx.integrations.removeSignaturitBrandingIds(orgId);
+        await ctx.integrations.removeSignaturitBrandingIds(orgId, `User:${ctx.user!.id}`);
         return {
           result: RESULT.SUCCESS,
           message: `Brandings resetted successfully`,
