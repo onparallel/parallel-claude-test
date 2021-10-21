@@ -108,7 +108,6 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
       <ModalContent overflow="hidden">
         <ModalCloseButton
           top={4}
-          right={3}
           aria-label={intl.formatMessage({
             id: "generic.close",
             defaultMessage: "Close",
@@ -133,7 +132,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
         >
           {page > 0 ? (
             <Button variant="outline" onClick={() => paginate(-1)}>
-              <FormattedMessage id="generic.go-back-short" defaultMessage="Go back" />
+              <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
             </Button>
           ) : null}
           {page < 2 ? (

@@ -3635,11 +3635,6 @@
     "context": "Go back"
   },
   {
-    "term": "generic.go-back-short",
-    "definition": "Go back",
-    "context": "Go back"
-  },
-  {
     "term": "generic.go-to-page",
     "definition": "Go to page {page}",
     "context": "Go to page {page}"
@@ -7466,8 +7461,8 @@
   },
   {
     "term": "recipient-view.first-time.finalize-whenever-body",
-    "definition": "From the previous email or by copying this link, you can return and finalizing the petition some other time.",
-    "context": "From the previous email or by copying this link, you can return and finalizing the petition some other time."
+    "definition": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the petition.",
+    "context": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the petition."
   },
   {
     "term": "recipient-view.first-time.finalize-whenever-title",
@@ -7481,8 +7476,8 @@
   },
   {
     "term": "recipient-view.first-time.replies-saved-body",
-    "definition": "The information will be automatically saved and synchronized with the sender as you add it.",
-    "context": "The information will be automatically saved and synchronized with the sender as you add it."
+    "definition": "The information you enter will be saved automatically and synchronized with the sender.",
+    "context": "The information you enter will be saved automatically and synchronized with the sender."
   },
   {
     "term": "recipient-view.first-time.replies-saved-title",
@@ -7491,8 +7486,8 @@
   },
   {
     "term": "recipient-view.first-time.send-doubts-body",
-    "definition": "You can add your doubts and questions in the corresponding field and your sender will respond them.",
-    "context": "You can add your doubts and questions in the corresponding field and your sender will respond them."
+    "definition": "You can add any doubts and questions you have on the corresponding field and your sender will respond them.",
+    "context": "You can add any doubts and questions you have on the corresponding field and your sender will respond them."
   },
   {
     "term": "recipient-view.first-time.send-doubts-title",
