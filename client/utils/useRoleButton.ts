@@ -1,10 +1,4 @@
-import {
-  KeyboardEvent,
-  KeyboardEventHandler,
-  MouseEvent,
-  MouseEventHandler,
-  useCallback,
-} from "react";
+import { KeyboardEvent, KeyboardEventHandler, MouseEventHandler, useCallback } from "react";
 import { normalizeEventKey } from "./keys";
 
 /**
