@@ -180,7 +180,7 @@ export function EventSubscriptionCard({
               defaultMessage="We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. Your URL must be configured to accept POST requests from us. <a>Click here</a> to learn more about our events."
               values={{
                 a: (chunks: any[]) => (
-                  <NormalLink target="_blank" href="/developers/api#operation/CreateSubscription">
+                  <NormalLink target="_blank" href="/developers/api#tag/Petition-Event">
                     {chunks}
                   </NormalLink>
                 ),

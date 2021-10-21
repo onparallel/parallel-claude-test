@@ -744,7 +744,7 @@ function ListOf<T extends JsonSchema>(item: T) {
   } as const);
 }
 
-export const PetitionEvent = schema({
+export const _PetitionEvent = {
   type: "object",
   oneOf: Object.entries({
     ACCESS_ACTIVATED: {
@@ -1318,4 +1318,6 @@ export const PetitionEvent = schema({
         },
       } as JsonSchema)
   ),
-} as any);
+} as any;
+
+export const PetitionEvent = schema(_PetitionEvent);

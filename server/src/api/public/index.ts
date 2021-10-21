@@ -48,6 +48,7 @@ import {
   Subscription,
   Template,
   UpdatePetition,
+  _PetitionEvent,
 } from "./schemas";
 import {
   CreateContact_ContactMutation,
@@ -143,12 +144,16 @@ export const api = new RestApi({
         scheme: "bearer",
       },
     },
+    schemas: {
+      PetitionEvent: _PetitionEvent,
+    },
   },
   "x-tagGroups": [
     {
       name: "Endpoints",
       tags: ["Petitions", "Petition Sharing", "Templates", "Contacts", "Users", "Subscriptions"],
     },
+    { name: "Events", tags: ["Petition Event"] },
   ],
   tags: [
     {
@@ -175,6 +180,10 @@ export const api = new RestApi({
     {
       name: "Subscriptions",
       description: "Subscribe to our events to get real time updates on your petitions",
+    },
+    {
+      name: "Petition Event",
+      description: '<SchemaDefinition schemaRef="#/components/schemas/PetitionEvent" />',
     },
   ],
   context: ({ req }) => {
