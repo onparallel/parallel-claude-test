@@ -181,8 +181,13 @@
   },
   {
     "term": "invitation.details",
-    "definition": "Para empezar, accede con tu usuario y contraseña temporal:",
-    "context": "To get started, log in with your username and temporary password:"
+    "definition": "Para empezar, accede con tu dirección de correo y contraseña temporal:",
+    "context": "To get started, log in with your email address and temporary password:"
+  },
+  {
+    "term": "invitation.email",
+    "definition": "Correo electrónico: {email}",
+    "context": "Email: {email}"
   },
   {
     "term": "invitation.email",
