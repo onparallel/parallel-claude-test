@@ -87,12 +87,12 @@ export default function Accounting() {
       src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/tecnotramit_black.png`,
       maxWidth: "155px",
     },
-    {
-      alt: "Prontopiso",
-      href: "https://prontopiso.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/prontopiso_black.png`,
-      maxWidth: "180px",
-    },
+    // {
+    //   alt: "Prontopiso",
+    //   href: "https://prontopiso.com/",
+    //   src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/prontopiso_black.png`,
+    //   maxWidth: "180px",
+    // },
     // {
     //   alt: "Gestoría Pons",
     //   href: "https://www.gestoriapons.com/",

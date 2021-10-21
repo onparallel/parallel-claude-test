@@ -95,6 +95,12 @@ export default function LawFirms() {
       src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/andersen_black.png`,
       maxWidth: "157px",
     },
+    {
+      alt: "Akiton",
+      href: "https://es.andersen.com/",
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/aktion_black.png`,
+      maxWidth: "157px",
+    },
     // {
     //   alt: "Gestoría Pons",
     //   href: "https://www.gestoriapons.com/",

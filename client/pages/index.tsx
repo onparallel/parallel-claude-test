@@ -1,4 +1,5 @@
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicClientsReviews } from "@parallel/components/public/PublicClientsReviews";
 import { PublicDataProtection } from "@parallel/components/public/PublicDataProtection";
 import { PublicDemoCta } from "@parallel/components/public/PublicDemoCta";
 import { PublicFigures } from "@parallel/components/public/PublicFigures";
@@ -44,11 +45,12 @@ export default function Home() {
       })}
     >
       <PublicHero {...hero} />
+      <PublicTrust />
       <PublicHeroPopularUseCases />
       <PublicFigures />
       <PublicHowItWorksHero />
       <PublicDataProtection />
-      <PublicTrust />
+      <PublicClientsReviews />
       <PublicDemoCta>
         <FormattedMessage
           id="public.home.work-in-parallel"

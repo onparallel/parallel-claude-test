@@ -5815,6 +5815,11 @@
     "context": "Without Parallel"
   },
   {
+    "term": "public.clients-reviews.title",
+    "definition": "Qué dicen nuestros clientes",
+    "context": "What our customers say"
+  },
+  {
     "term": "public.consultancy",
     "definition": "Asesorías",
     "context": "Consultancy"
@@ -7323,11 +7328,6 @@
     "term": "public.try-for-free-button",
     "definition": "Pruébalo gratis",
     "context": "Try for free"
-  },
-  {
-    "term": "public.who-trust-us.feedback",
-    "definition": "y esto es lo que dicen...",
-    "context": "and this is what they say..."
   },
   {
     "term": "public.who-trust-us.feedback-1",
