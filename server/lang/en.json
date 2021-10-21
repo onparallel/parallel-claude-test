@@ -71,8 +71,8 @@
   },
   {
     "term": "component.why-we-use-parallel.autosave-body",
-    "definition": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later.",
-    "context": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later."
+    "definition": "Every <b>response is saved automatically and synchronised</b> with your sender, allowing you to exit at any time and resume later.",
+    "context": "Every <b>response is saved automatically and synchronised</b> with your sender, allowing you to exit at any time and resume later."
   },
   {
     "term": "component.why-we-use-parallel.autosave-title",
@@ -81,8 +81,8 @@
   },
   {
     "term": "component.why-we-use-parallel.invite-body",
-    "definition": "Users can only access the link with permission, once inside, they can <b>invite the collaborators</b> they need to complete the information collaboratively.",
-    "context": "Users can only access the link with permission, once inside, they can <b>invite the collaborators</b> they need to complete the information collaboratively."
+    "definition": "Only allowed users will be able to access the link. Once inside, they can <b>invite the collaborators</b> they need to help complete the information.",
+    "context": "Only allowed users will be able to access the link. Once inside, they can <b>invite the collaborators</b> they need to help complete the information."
   },
   {
     "term": "component.why-we-use-parallel.invite-title",
@@ -101,8 +101,8 @@
   },
   {
     "term": "component.why-we-use-parallel.title",
-    "definition": "Why we use Parallel?",
-    "context": "Why we use Parallel?"
+    "definition": "Why we use Parallel",
+    "context": "Why we use Parallel"
   },
   {
     "term": "developer.webhook-error-email.subject",

@@ -72,7 +72,7 @@
   {
     "term": "component.why-we-use-parallel.autosave-body",
     "definition": "{tone, select, INFORMAL{Tus <b>respuestas se autoguardan y sincronizan</b> con el remitente para que puedas cerrar y volver a completarlo cuando quieras.} other{Cada <b>respuesta se autoguarda y sincroniza</b> con el remitente para permitirle cerrar en cualquier momento y terminar de completarlo más adelante.}}",
-    "context": "Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later."
+    "context": "Every <b>response is saved automatically and synchronised</b> with your sender, allowing you to exit at any time and resume later."
   },
   {
     "term": "component.why-we-use-parallel.autosave-title",
@@ -82,7 +82,7 @@
   {
     "term": "component.why-we-use-parallel.invite-body",
     "definition": "{tone, select, INFORMAL{Solo podrán entrar al enlace usuarios con acceso. Si lo necesitas, puedes <b>invitar colaboradores</b> para que te ayuden a completar la información.} other{Solo usuarios con permiso podrán acceder al enlace. Si lo necesita, puede <b>invitar colaboradores</b> para completar la información colaborativamente.}}",
-    "context": "Users can only access the link with permission, once inside, they can <b>invite the collaborators</b> they need to complete the information collaboratively."
+    "context": "Only allowed users will be able to access the link. Once inside, they can <b>invite the collaborators</b> they need to help complete the information."
   },
   {
     "term": "component.why-we-use-parallel.invite-title",
@@ -101,8 +101,8 @@
   },
   {
     "term": "component.why-we-use-parallel.title",
-    "definition": "¿Por qué usamos Parallel?",
-    "context": "Why we use Parallel?"
+    "definition": "Porqué usamos Parallel",
+    "context": "Why we use Parallel"
   },
   {
     "term": "developer.webhook-error-email.subject",

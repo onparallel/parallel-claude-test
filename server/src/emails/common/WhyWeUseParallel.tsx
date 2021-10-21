@@ -14,7 +14,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
         <MjmlText fontSize="20px" fontWeight={600}>
           <FormattedMessage
             id="component.why-we-use-parallel.title"
-            defaultMessage="Why we use Parallel?"
+            defaultMessage="Why we use Parallel"
           />
         </MjmlText>
       </MjmlSection>
@@ -65,7 +65,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
             <MjmlText fontSize="14px" paddingLeft="16px">
               <FormattedMessage
                 id="component.why-we-use-parallel.autosave-body"
-                defaultMessage="Each <b>response is auto-saved and synchronised</b> with your sender to allow to exit at any time and completing later."
+                defaultMessage="Every <b>response is saved automatically and synchronised</b> with your sender, allowing you to exit at any time and resume later."
                 values={{ tone }}
               />
             </MjmlText>
@@ -92,7 +92,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
             <MjmlText fontSize="14px" paddingLeft="16px">
               <FormattedMessage
                 id="component.why-we-use-parallel.invite-body"
-                defaultMessage="Users can only access the link with permission, once inside, they can <b>invite the collaborators</b> they need to complete the information collaboratively."
+                defaultMessage="Only allowed users will be able to access the link. Once inside, they can <b>invite the collaborators</b> they need to help complete the information."
                 values={{ tone }}
               />
             </MjmlText>
