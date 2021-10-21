@@ -7,7 +7,6 @@ import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { FileRepository } from "./db/repositories/FileRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
-import { PetitionEventSubscriptionRepository } from "./db/repositories/PetitionEventSubscriptionRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ReportingRepository } from "./db/repositories/ReportingRepository";
 import { SystemRepository } from "./db/repositories/SystemRepository";
@@ -55,7 +54,6 @@ export class ApiContext {
     public readonly petitions: PetitionRepository,
     public readonly userAuthentication: UserAuthenticationRepository,
     public readonly userGroups: UserGroupRepository,
-    public readonly subscriptions: PetitionEventSubscriptionRepository,
     public readonly tags: TagRepository,
     public readonly system: SystemRepository
   ) {}
@@ -83,7 +81,6 @@ export class WorkerContext {
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,
     public readonly reporting: ReportingRepository,
-    public readonly subscriptions: PetitionEventSubscriptionRepository,
     public readonly system: SystemRepository,
     public readonly userGroups: UserGroupRepository
   ) {}

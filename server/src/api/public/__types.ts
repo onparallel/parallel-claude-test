@@ -344,8 +344,6 @@ export type Mutation = {
   createPetitionFieldAttachmentUploadLink: CreateFileUploadFieldAttachment;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionField;
-  /** Creates a new subscription on a petition */
-  createPetitionSubscription: Subscription;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PetitionTemplate;
   /** Creates a reply to a text or select field. */
@@ -368,7 +366,6 @@ export type Mutation = {
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: Result;
-  deletePetitionSubscription: Result;
   /** Delete petitions. */
   deletePetitions: Result;
   /** Removes the tag from every petition and soft-deletes it */
@@ -624,7 +621,6 @@ export type MutationcreateOrganizationUserArgs = {
 };
 
 export type MutationcreatePetitionArgs = {
-  eventsUrl?: Maybe<Scalars["String"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   petitionId?: Maybe<Scalars["GID"]>;
@@ -647,11 +643,6 @@ export type MutationcreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   isInternal?: Maybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-};
-
-export type MutationcreatePetitionSubscriptionArgs = {
-  endpoint: Scalars["String"];
   petitionId: Scalars["GID"];
 };
 
@@ -718,10 +709,6 @@ export type MutationdeletePetitionFieldCommentArgs = {
 export type MutationdeletePetitionReplyArgs = {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
-};
-
-export type MutationdeletePetitionSubscriptionArgs = {
-  subscriptionId: Scalars["GID"];
 };
 
 export type MutationdeletePetitionsArgs = {
@@ -1357,8 +1344,6 @@ export type Petition = PetitionBase & {
   skipForwardSecurity: Scalars["Boolean"];
   /** The status of the petition. */
   status: PetitionStatus;
-  /** The subscriptions linked to the petition. */
-  subscriptions: Array<Subscription>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
@@ -2571,16 +2556,6 @@ export type SignatureStartedEvent = PetitionEvent & {
   id: Scalars["GID"];
 };
 
-export type Subscription = Timestamps & {
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  endpoint: Scalars["String"];
-  id: Scalars["GID"];
-  petition: Petition;
-  /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-};
-
 /** Return type for all support methods */
 export type SupportMethodResponse = {
   message: Maybe<Scalars["String"]>;
@@ -2893,8 +2868,6 @@ export type PetitionAccessFragment = {
   }>;
 };
 
-export type SubscriptionFragment = { id: string; endpoint: string; createdAt: string };
-
 export type Permission_PetitionUserGroupPermission_Fragment = {
   permissionType: PetitionPermissionType;
   createdAt: string;
@@ -2946,7 +2919,6 @@ export type GetPetitions_PetitionsQuery = {
 export type CreatePetition_PetitionMutationVariables = Exact<{
   name?: Maybe<Scalars["String"]>;
   templateId?: Maybe<Scalars["GID"]>;
-  eventsUrl?: Maybe<Scalars["String"]>;
 }>;
 
 export type CreatePetition_PetitionMutation = {
@@ -3277,33 +3249,6 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
         }
     >;
   }>;
-};
-
-export type GetSubscriptions_SubscriptionQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type GetSubscriptions_SubscriptionQuery = {
-  petition: Maybe<
-    { subscriptions: Array<{ id: string; endpoint: string; createdAt: string }> } | {}
-  >;
-};
-
-export type CreateSubscription_createPetitionSubscriptionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  endpoint: Scalars["String"];
-}>;
-
-export type CreateSubscription_createPetitionSubscriptionMutation = {
-  createPetitionSubscription: { id: string; endpoint: string; createdAt: string };
-};
-
-export type DeleteSubscription_deletePetitionSubscriptionMutationVariables = Exact<{
-  subscriptionId: Scalars["GID"];
-}>;
-
-export type DeleteSubscription_deletePetitionSubscriptionMutation = {
-  deletePetitionSubscription: Result;
 };
 
 export type GetTemplates_TemplatesQueryVariables = Exact<{

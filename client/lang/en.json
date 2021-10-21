@@ -7715,19 +7715,9 @@
     "context": "Save changes"
   },
   {
-    "term": "settings.api-tokens",
-    "definition": "API Tokens",
-    "context": "API Tokens"
-  },
-  {
     "term": "settings.api-tokens.confirm-delete-tokens-dialog.warning",
     "definition": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>.",
     "context": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>."
-  },
-  {
-    "term": "settings.api-tokens.explainer",
-    "definition": "Personal Access Tokens can be used to access the <a>Parallel API</a>.",
-    "context": "Personal Access Tokens can be used to access the <a>Parallel API</a>."
   },
   {
     "term": "settings.api-tokens.generate-new-token",
@@ -7735,9 +7725,69 @@
     "context": "Create token"
   },
   {
-    "term": "settings.api-tokens.header.token-name",
+    "term": "settings.developers",
+    "definition": "Developers",
+    "context": "Developers"
+  },
+  {
+    "term": "settings.developers.api-tokens.explainer",
+    "definition": "Personal Access Tokens can be used to access the <a>Parallel API</a>.",
+    "context": "Personal Access Tokens can be used to access the <a>Parallel API</a>."
+  },
+  {
+    "term": "settings.developers.api-tokens.generate-new-token",
+    "definition": "Create token",
+    "context": "Create token"
+  },
+  {
+    "term": "settings.developers.api-tokens.header.token-name",
     "definition": "Name",
     "context": "Name"
+  },
+  {
+    "term": "settings.developers.api-tokens.title",
+    "definition": "API Tokens",
+    "context": "API Tokens"
+  },
+  {
+    "term": "settings.developers.subscriptions.card-body-explainer",
+    "definition": "You can subscribe to be notified of events in any of the petitions your organization sends (for example, when a contact writes a comment or submits a reply) at a URL you choose.",
+    "context": "You can subscribe to be notified of events in any of the petitions your organization sends (for example, when a contact writes a comment or submits a reply) at a URL you choose."
+  },
+  {
+    "term": "settings.developers.subscriptions.card-header",
+    "definition": "Events subscriptions",
+    "context": "Events subscriptions"
+  },
+  {
+    "term": "settings.developers.subscriptions.input-error.failed-challenge",
+    "definition": "Your URL does not seem to accept POST requests.",
+    "context": "Your URL does not seem to accept POST requests."
+  },
+  {
+    "term": "settings.developers.subscriptions.input-error.invalid-url",
+    "definition": "The provided URL is invalid.",
+    "context": "The provided URL is invalid."
+  },
+  {
+    "term": "settings.developers.subscriptions.input-explainer",
+    "definition": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. Your URL must be configured to accept POST requests from us. <a>Click here</a> to learn more about our events.",
+    "context": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. Your URL must be configured to accept POST requests from us. <a>Click here</a> to learn more about our events."
+  },
+  {
+    "term": "settings.developers.subscriptions.input-saved",
+    "definition": "Saved!",
+    "context": "Saved!"
+  },
+  {
+    "term": "settings.developers.subscriptions.input-title",
+    "definition": "Request URL",
+    "context": "Request URL"
+  },
+  {
+    "term": "settings.developers.subscriptions.title",
+    "definition": "Subscriptions",
+    "context": "Subscriptions"
   },
   {
     "term": "settings.security",

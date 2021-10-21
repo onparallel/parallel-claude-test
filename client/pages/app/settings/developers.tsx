@@ -18,9 +18,12 @@ import { useGenerateNewTokenDialog } from "@parallel/components/settings/Generat
 import {
   DevelopersQuery,
   Developers_UserAuthenticationTokenFragment,
+  EventSubscriptionCard_OrgIntegrationFragment,
   useDevelopersQuery,
+  useDevelopers_CreateOrgIntegrationMutation,
+  useDevelopers_RevokeUserAuthTokenMutation,
+  useDevelopers_UpdateOrgIntegrationMutation,
   UserAuthenticationTokens_OrderBy,
-  useRevokeUserAuthTokenMutation,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -70,6 +73,8 @@ function Developers() {
   const sections = useSettingsSections(me);
   const authTokens = me.authenticationTokens;
 
+  const eventSubscriptionIntegration = me.organization.integrations[0];
+
   const [selected, setSelected] = useState<string[]>([]);
 
   const [search, setSearch] = useState(state.search);
@@ -101,7 +106,7 @@ function Developers() {
   };
 
   const showRevokeAccessToken = useDeleteAccessTokenDialog();
-  const [revokeTokens] = useRevokeUserAuthTokenMutation();
+  const [revokeTokens] = useDevelopers_RevokeUserAuthTokenMutation();
   const handleRevokeTokens = async (tokenIds: string[]) => {
     try {
       await showRevokeAccessToken({ selectedCount: tokenIds.length });
@@ -117,10 +122,34 @@ function Developers() {
 
   const columns = useAuthTokensTableColumns();
 
-  const [subscription, setSubscription] = useState<{
-    isEnabled: boolean;
-    eventsUrl: string | null;
-  }>({ isEnabled: false, eventsUrl: null });
+  const [createOrgSubscription] = useDevelopers_CreateOrgIntegrationMutation();
+  const [updateOrgSubscription] = useDevelopers_UpdateOrgIntegrationMutation();
+  async function handleUpdateOrgSubscription(
+    subscription: EventSubscriptionCard_OrgIntegrationFragment | null,
+    data: { isEnabled: boolean; eventsUrl: string }
+  ) {
+    try {
+      if (subscription) {
+        await updateOrgSubscription({
+          variables: {
+            id: subscription.id,
+            data: {
+              isEnabled: data.isEnabled,
+              settings: { EVENTS_URL: data.eventsUrl },
+            },
+          },
+        });
+      } else {
+        await createOrgSubscription({
+          variables: {
+            settings: {
+              EVENTS_URL: data.eventsUrl,
+            },
+          },
+        });
+      }
+    } catch {}
+  }
 
   return (
     <SettingsLayout
@@ -224,8 +253,8 @@ function Developers() {
             />
           </Heading>
           <EventSubscriptionCard
-            subscription={subscription}
-            onUpdateSubscription={setSubscription}
+            subscription={eventSubscriptionIntegration ?? null}
+            onUpdateSubscription={handleUpdateOrgSubscription}
           />
         </Stack>
       </Stack>
@@ -313,9 +342,25 @@ Developers.fragments = {
 
 Developers.mutations = [
   gql`
-    mutation RevokeUserAuthToken($authTokenIds: [GID!]!) {
+    mutation Developers_RevokeUserAuthToken($authTokenIds: [GID!]!) {
       revokeUserAuthToken(authTokenIds: $authTokenIds)
     }
+  `,
+  gql`
+    mutation Developers_CreateOrgIntegration($settings: JSONObject!) {
+      createOrgIntegration(type: EVENT_SUBSCRIPTION, provider: "PARALLEL", settings: $settings) {
+        ...EventSubscriptionCard_OrgIntegration
+      }
+    }
+    ${EventSubscriptionCard.fragments.OrgIntegration}
+  `,
+  gql`
+    mutation Developers_UpdateOrgIntegration($id: GID!, $data: UpdateOrgIntegrationInput!) {
+      updateOrgIntegration(id: $id, type: EVENT_SUBSCRIPTION, data: $data) {
+        ...EventSubscriptionCard_OrgIntegration
+      }
+    }
+    ${EventSubscriptionCard.fragments.OrgIntegration}
   `,
 ];
 
@@ -338,6 +383,11 @@ Developers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataCo
               ...Developers_UserAuthenticationToken
             }
           }
+          organization {
+            integrations(type: EVENT_SUBSCRIPTION) {
+              ...EventSubscriptionCard_OrgIntegration
+            }
+          }
           ...SettingsLayout_User
           ...useSettingsSections_User
         }
@@ -345,6 +395,7 @@ Developers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataCo
       ${Developers.fragments.UserAuthenticationToken}
       ${SettingsLayout.fragments.User}
       ${useSettingsSections.fragments.User}
+      ${EventSubscriptionCard.fragments.OrgIntegration}
     `,
     {
       variables: {

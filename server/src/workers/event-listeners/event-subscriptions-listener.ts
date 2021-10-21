@@ -8,12 +8,17 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   event: PetitionEvent,
   ctx: WorkerContext
 ) => {
-  const subscriptions = await ctx.subscriptions.loadSubscriptionsByPetitionId(event.petition_id);
+  const petition = await ctx.petitions.loadPetition(event.petition_id);
+  if (!petition) return;
+  const subscriptions = await ctx.integrations.loadIntegrationsByOrgId(
+    petition.org_id,
+    "EVENT_SUBSCRIPTION"
+  );
 
   for (const subscription of subscriptions) {
     const mappedEvent = mapEvent(event);
     try {
-      await fetch(subscription.endpoint, {
+      await fetch(subscription.settings.EVENTS_URL, {
         method: "POST",
         body: JSON.stringify(mappedEvent),
         headers: { "Content-Type": "application/json" },
@@ -21,6 +26,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
     } catch (e: any) {
       await ctx.emails.sendDeveloperWebhookFailedEmail(
         subscription.id,
+        petition.id,
         e.message ?? "",
         mappedEvent
       );

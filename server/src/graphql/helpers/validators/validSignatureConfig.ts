@@ -18,7 +18,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
         signatureConfig;
       const [hasFeatureFlag, integrations] = await Promise.all([
         ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, "PETITION_SIGNATURE"),
-        ctx.integrations.loadEnabledIntegrationsForOrgId(ctx.user!.org_id),
+        ctx.integrations.loadIntegrationsByOrgId(ctx.user!.org_id, "SIGNATURE"),
       ]);
       if (!hasFeatureFlag) {
         throw new ArgValidationError(
@@ -27,11 +27,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           `Petition signature is not available for this user.`
         );
       }
-      if (
-        !integrations.some(
-          (integration) => integration.type === "SIGNATURE" && integration.provider === provider
-        )
-      ) {
+      if (!integrations.some((integration) => integration.provider === provider)) {
         throw new ArgValidationError(info, `${argName}.provider`, `Invalid signature provider.`);
       }
 

@@ -56,8 +56,8 @@ export const User = objectType({
     });
     t.boolean("canCreateUsers", {
       resolve: async (o, _, ctx) => {
-        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(o.org_id);
-        const hasSsoProvider = integrations.some((i) => i.type === "SSO");
+        const ssoIntegrations = await ctx.integrations.loadIntegrationsByOrgId(o.org_id, "SSO");
+        const hasSsoProvider = ssoIntegrations.length > 0;
         return ["OWNER", "ADMIN"].includes(o.organization_role) && !hasSsoProvider;
       },
     });

@@ -7,7 +7,6 @@ import { FeatureFlagRepository } from "./repositories/FeatureFlagRepository";
 import { FileRepository } from "./repositories/FileRepository";
 import { IntegrationRepository } from "./repositories/IntegrationRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
-import { PetitionEventSubscriptionRepository } from "./repositories/PetitionEventSubscriptionRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { ReportingRepository } from "./repositories/ReportingRepository";
 import { SystemRepository } from "./repositories/SystemRepository";
@@ -31,7 +30,6 @@ export const dbModule = new ContainerModule((bind) => {
   bind<ReportingRepository>(ReportingRepository).toSelf();
   bind<UserAuthenticationRepository>(UserAuthenticationRepository).toSelf();
   bind<UserGroupRepository>(UserGroupRepository).toSelf();
-  bind<PetitionEventSubscriptionRepository>(PetitionEventSubscriptionRepository).toSelf();
   bind<TagRepository>(TagRepository).toSelf();
   bind<SystemRepository>(SystemRepository).toSelf();
 });

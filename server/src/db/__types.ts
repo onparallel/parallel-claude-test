@@ -16,7 +16,7 @@ export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
-export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+export type IntegrationType = "EVENT_SUBSCRIPTION" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV" | "ROOT";
 
@@ -134,7 +134,6 @@ export interface TableTypes {
   petition_access: PetitionAccess;
   petition_contact_notification: PetitionContactNotification;
   petition_event: PetitionEvent;
-  petition_event_subscription: PetitionEventSubscription;
   petition_field: PetitionField;
   petition_field_attachment: PetitionFieldAttachment;
   petition_field_comment: PetitionFieldComment;
@@ -174,7 +173,6 @@ export interface TableCreateTypes {
   petition_access: CreatePetitionAccess;
   petition_contact_notification: CreatePetitionContactNotification;
   petition_event: CreatePetitionEvent;
-  petition_event_subscription: CreatePetitionEventSubscription;
   petition_field: CreatePetitionField;
   petition_field_attachment: CreatePetitionFieldAttachment;
   petition_field_comment: CreatePetitionFieldComment;
@@ -214,7 +212,6 @@ export interface TablePrimaryKeys {
   petition_access: "id";
   petition_contact_notification: "id";
   petition_event: "id";
-  petition_event_subscription: "id";
   petition_field: "id";
   petition_field_attachment: "id";
   petition_field_comment: "id";
@@ -560,24 +557,6 @@ export interface PetitionEvent {
 }
 
 export type CreatePetitionEvent = PartialProps<Omit<PetitionEvent, "id">, "data" | "created_at">;
-
-export interface PetitionEventSubscription {
-  id: number; // int4
-  user_id: number; // int4
-  petition_id: number; // int4
-  endpoint: string; // varchar
-  created_at: Date; // timestamptz
-  created_by: Maybe<string>; // varchar
-  updated_at: Date; // timestamptz
-  updated_by: Maybe<string>; // varchar
-  deleted_at: Maybe<Date>; // timestamptz
-  deleted_by: Maybe<string>; // varchar
-}
-
-export type CreatePetitionEventSubscription = PartialProps<
-  Omit<PetitionEventSubscription, "id">,
-  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
->;
 
 export interface PetitionField {
   id: number; // int4

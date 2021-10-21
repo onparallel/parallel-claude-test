@@ -70,14 +70,6 @@ export const PetitionAccessFragment = gql`
   ${UserFragment}
 `;
 
-export const SubscriptionFragment = gql`
-  fragment Subscription on Subscription {
-    id
-    endpoint
-    createdAt
-  }
-`;
-
 export const PermissionFragment = gql`
   fragment Permission on PetitionPermission {
     permissionType

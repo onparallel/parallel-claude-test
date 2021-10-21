@@ -111,8 +111,8 @@
   },
   {
     "term": "developer.webhook-error-email.text",
-    "definition": "We found an error regarding your event subscription {subscriptionId}.",
-    "context": "We found an error regarding your event subscription {subscriptionId}."
+    "definition": "We found an error regarding your event subscription.",
+    "context": "We found an error regarding your event subscription."
   },
   {
     "term": "developer.webhook-error-email.tip",

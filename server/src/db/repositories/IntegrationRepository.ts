@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { Replace } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { IntegrationType, OrgIntegration } from "../__types";
@@ -20,6 +21,9 @@ export type IntegrationSettings<K extends IntegrationType> = {
   USER_PROVISIONING: {
     AUTH_KEY: string;
   };
+  EVENT_SUBSCRIPTION: {
+    EVENTS_URL: string;
+  };
 }[K];
 
 @injectable()
@@ -28,11 +32,27 @@ export class IntegrationRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadEnabledIntegrationsForOrgId = this.buildLoadMultipleBy(
-    "org_integration",
-    "org_id",
-    (q) => q.where("is_enabled", true)
-  );
+  readonly loadIntegration = this.buildLoadBy("org_integration", "id");
+
+  async loadIntegrationsByOrgId<IType extends IntegrationType>(
+    orgId: number,
+    type?: IType,
+    includeDisabled?: boolean
+  ): Promise<Replace<OrgIntegration, { settings: IntegrationSettings<IType> }>[]> {
+    return await this.from("org_integration")
+      .where({
+        org_id: orgId,
+      })
+      .mmodify((q) => {
+        if (type) {
+          q.where("type", type);
+        }
+        if (!includeDisabled) {
+          q.where("is_enabled", true);
+        }
+      })
+      .select("*");
+  }
 
   async loadProvisioningIntegrationByAuthKey(key: string) {
     const [integration] = await this.raw<OrgIntegration | undefined>(
@@ -62,11 +82,16 @@ export class IntegrationRepository extends BaseRepository {
     return integration;
   }
 
-  async updateOrgIntegrationSettings<K extends IntegrationType>(
+  async createOrgIntegration(data: Partial<OrgIntegration>) {
+    const [integration] = await this.from("org_integration").insert(data, "*");
+    return integration;
+  }
+
+  async updateOrgIntegration<K extends IntegrationType>(
     integrationId: number,
-    settings: IntegrationSettings<K>
+    data: Partial<Replace<OrgIntegration, { settings: IntegrationSettings<K> }>>
   ) {
-    return await this.from("org_integration").where("id", integrationId).update({ settings });
+    return await this.from("org_integration").where("id", integrationId).update(data, "*");
   }
 
   async removeSignaturitBrandingIds(orgId: number) {

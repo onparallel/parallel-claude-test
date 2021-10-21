@@ -23,7 +23,6 @@ import {
   PetitionAccessFragment,
   PetitionFragment,
   PetitionReplyFragment,
-  SubscriptionFragment,
   TemplateFragment,
   UserFragment,
 } from "./fragments";
@@ -32,20 +31,16 @@ import {
   Contact,
   CreateContact,
   CreatePetition,
-  CreateSubscription,
   ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfReplies,
-  ListOfSubscriptions,
   PaginatedContacts,
   PaginatedPetitions,
   PaginatedTemplates,
   PaginatedUsers,
   Petition,
-  PetitionEvent,
   SendPetition,
   SharePetition,
-  Subscription,
   Template,
   UpdatePetition,
 } from "./schemas";
@@ -62,12 +57,8 @@ import {
   CreatePetitionRecipients_updateContactMutationVariables,
   CreatePetition_PetitionMutation,
   CreatePetition_PetitionMutationVariables,
-  CreateSubscription_createPetitionSubscriptionMutation,
-  CreateSubscription_createPetitionSubscriptionMutationVariables,
   DeletePetition_deletePetitionsMutation,
   DeletePetition_deletePetitionsMutationVariables,
-  DeleteSubscription_deletePetitionSubscriptionMutation,
-  DeleteSubscription_deletePetitionSubscriptionMutationVariables,
   DeleteTemplate_deletePetitionsMutation,
   DeleteTemplate_deletePetitionsMutationVariables,
   DownloadFileReply_fileUploadReplyDownloadLinkMutation,
@@ -86,15 +77,12 @@ import {
   GetPetitions_PetitionsQueryVariables,
   GetPetition_PetitionQuery,
   GetPetition_PetitionQueryVariables,
-  GetSubscriptions_SubscriptionQuery,
-  GetSubscriptions_SubscriptionQueryVariables,
   GetTemplates_TemplatesQuery,
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
   PetitionFieldType,
   PetitionFragment as PetitionFragmentType,
-  SubscriptionFragment as SubscriptionFragmentType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
   RemoveUserGroupPermission_removePetitionPermissionMutation,
@@ -105,11 +93,11 @@ import {
   SharePetition_addPetitionPermissionMutationVariables,
   StopSharing_removePetitionPermissionMutation,
   StopSharing_removePetitionPermissionMutationVariables,
+  TemplateFragment as TemplateFragmentType,
   TransferPetition_transferPetitionOwnershipMutation,
   TransferPetition_transferPetitionOwnershipMutationVariables,
   UpdatePetition_PetitionMutation,
   UpdatePetition_PetitionMutationVariables,
-  TemplateFragment as TemplateFragmentType,
 } from "./__types";
 
 function assert(condition: any): asserts condition {}
@@ -150,24 +138,13 @@ export const api = new RestApi({
   "x-tagGroups": [
     {
       name: "Endpoints",
-      tags: [
-        "Petitions",
-        "Petition Subscription",
-        "Petition Sharing",
-        "Templates",
-        "Contacts",
-        "Users",
-      ],
+      tags: ["Petitions", "Petition Sharing", "Templates", "Contacts", "Users"],
     },
   ],
   tags: [
     {
       name: "Petitions",
       description: "Petitions are the main entities in Parallel",
-    },
-    {
-      name: "Petition Subscription",
-      description: "Subscribe to your petition to receive real-time event updates",
     },
     {
       name: "Petition Sharing",
@@ -272,12 +249,7 @@ api
     {
       operationId: "CreatePetition",
       summary: "Create petition",
-      description: outdent`
-        Create a new petition based on a template.
-        
-        You can optionally pass an \`eventsUrl\` parameter to subscribe to the
-        events in this petition. See more about petition events [here](#operation/CreateSubscription).
-      `,
+      description: outdent`Create a new petition based on a template.`,
       body: JsonBody(CreatePetition),
       responses: { 201: SuccessResponse(Petition) },
       tags: ["Petitions"],
@@ -288,8 +260,8 @@ api
         CreatePetition_PetitionMutationVariables
       >(
         gql`
-          mutation CreatePetition_Petition($name: String, $templateId: GID, $eventsUrl: String) {
-            createPetition(name: $name, petitionId: $templateId, eventsUrl: $eventsUrl) {
+          mutation CreatePetition_Petition($name: String, $templateId: GID) {
+            createPetition(name: $name, petitionId: $templateId) {
               ...Petition
             }
           }
@@ -989,153 +961,6 @@ api
       );
 
       return Ok(response.transferPetitionOwnership[0].permissions);
-    }
-  );
-
-api
-  .path("/petitions/:petitionId/subscriptions", {
-    params: { petitionId },
-  })
-  .get(
-    {
-      operationId: "GetSubscriptions",
-      summary: "Get petition subscriptions",
-      description: outdent`
-        Returns the list of subscribed endpoints to the specified petition.
-      `,
-      responses: { 200: SuccessResponse(ListOfSubscriptions) },
-      tags: ["Petition Subscription"],
-    },
-    async ({ client, params }) => {
-      const result = await client.request<
-        GetSubscriptions_SubscriptionQuery,
-        GetSubscriptions_SubscriptionQueryVariables
-      >(
-        gql`
-          query GetSubscriptions_Subscription($petitionId: GID!) {
-            petition(id: $petitionId) {
-              ... on Petition {
-                subscriptions {
-                  ...Subscription
-                }
-              }
-            }
-          }
-          ${SubscriptionFragment}
-        `,
-        { petitionId: params.petitionId }
-      );
-      assert("subscriptions" in result.petition!);
-      return Ok(result.petition!.subscriptions);
-    }
-  )
-  .post(
-    {
-      operationId: "CreateSubscription",
-      summary: "Subscribe to petition events",
-      description: outdent`
-        Create a subscription to the specified petition in order to receive
-        real-time event updates on the given URL.  
-
-        You **must be the owner** of the petition in order to create a subscription.
-    `,
-      body: JsonBody(CreateSubscription),
-      responses: {
-        201: SuccessResponse(Subscription),
-      },
-      tags: ["Petition Subscription"],
-      callbacks: {
-        PetitionEvent: {
-          "{endpoint}": {
-            post: {
-              summary: "Petition event",
-              description: outdent`
-                This subscription endpoint will be triggered every time there is
-                a petition event.
-              `,
-              requestBody: {
-                content: {
-                  "application/json": { schema: PetitionEvent },
-                },
-              },
-              responses: {
-                "2XX": {
-                  description: "Petition event processed correctly",
-                },
-                "4XX": {
-                  description: "Request failed, the petition owner will be notified via email",
-                },
-                "5XX": {
-                  description: "Request failed, the petition owner will be notified via email",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    async ({ client, params, body }) => {
-      const result = await client.request<
-        CreateSubscription_createPetitionSubscriptionMutation,
-        CreateSubscription_createPetitionSubscriptionMutationVariables
-      >(
-        gql`
-          mutation CreateSubscription_createPetitionSubscription(
-            $petitionId: GID!
-            $endpoint: String!
-          ) {
-            createPetitionSubscription(petitionId: $petitionId, endpoint: $endpoint) {
-              ...Subscription
-            }
-          }
-          ${SubscriptionFragment}
-        `,
-        {
-          petitionId: params.petitionId,
-          endpoint: body.endpoint,
-        }
-      );
-
-      return Created(result.createPetitionSubscription as SubscriptionFragmentType);
-    }
-  );
-
-api
-  .path("/petitions/:petitionId/subscriptions/:subscriptionId", {
-    params: {
-      petitionId,
-      subscriptionId: idParam({
-        type: "Subscription",
-        description: "The ID of the subscription",
-      }),
-    },
-  })
-  .delete(
-    {
-      operationId: "DeleteSubscription",
-      summary: "Stop petition subscription",
-      description: outdent`
-        You can remove a subscription on a petition to stop receiving real-time event
-        updates.  
-        
-        You **must be the owner** of the petition in order to delete a subscription.
-    `,
-      responses: { 204: SuccessResponse() },
-      tags: ["Petition Subscription"],
-    },
-    async ({ client, params }) => {
-      await client.request<
-        DeleteSubscription_deletePetitionSubscriptionMutation,
-        DeleteSubscription_deletePetitionSubscriptionMutationVariables
-      >(
-        gql`
-          mutation DeleteSubscription_deletePetitionSubscription($subscriptionId: GID!) {
-            deletePetitionSubscription(subscriptionId: $subscriptionId)
-          }
-        `,
-        { subscriptionId: params.subscriptionId }
-      );
-      return NoContent();
     }
   );
 

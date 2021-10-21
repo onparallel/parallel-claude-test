@@ -43,3 +43,5 @@ export * from "./notifications/types";
 export * from "./notifications/mutations";
 
 export * from "./landing/queries";
+
+export * from "./integration/mutations";

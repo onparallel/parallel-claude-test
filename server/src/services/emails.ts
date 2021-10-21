@@ -205,13 +205,15 @@ export class EmailsService implements IEmailsService {
   }
 
   async sendDeveloperWebhookFailedEmail(
-    subscriptionId: number,
+    orgIntegrationId: number,
+    petitionId: number,
     errorMessage: string,
     postBody: any
   ) {
     return await this.enqueueEmail("developer-webhook-failed", {
-      id: this.buildQueueId("DeveloperWebhookFailed", subscriptionId),
-      petition_subscription_id: subscriptionId,
+      id: this.buildQueueId("DeveloperWebhookFailed", orgIntegrationId),
+      org_integration_id: orgIntegrationId,
+      petition_id: petitionId,
       error_message: errorMessage,
       post_body: postBody,
     });

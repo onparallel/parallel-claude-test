@@ -118,11 +118,8 @@ export const createPetition = mutationField("createPetition", {
       description: "Type of petition to create",
       default: "PETITION",
     }),
-    eventsUrl: stringArg({
-      description: "URL to receive real-time events of this petition.",
-    }),
   },
-  resolve: async (_, { name, locale, petitionId, type, eventsUrl }, ctx) => {
+  resolve: async (_, { name, locale, petitionId, type }, ctx) => {
     const isTemplate = type === "TEMPLATE";
     let petition: Petition;
     if (petitionId) {
@@ -167,9 +164,6 @@ export const createPetition = mutationField("createPetition", {
       );
     }
 
-    if (eventsUrl) {
-      await ctx.subscriptions.createSubscription(petition.id, eventsUrl, ctx.user!);
-    }
     await ctx.petitions.createEvent({
       type: "PETITION_CREATED",
       petition_id: petition.id,

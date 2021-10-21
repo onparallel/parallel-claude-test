@@ -11,7 +11,6 @@
       "args": {
         "userName": "Santi",
         "errorMessage": "request to https://example.site/abcd failed, reason: getaddrinfo ENOTFOUND example.site",
-        "subscriptionId": "ABCDEFG",
         "postBody": {
           "id": "12313123",
           "petitionId": "1234567890",
@@ -27,7 +26,6 @@
       "argsTypes": {
         "userName": { "control": { "type": "text" } },
         "errorMessage": { "control": { "type": "text" } },
-        "subscriptionId": { "control": { "type": "text" } },
         "postBody": { "control": { "type": "object" } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },

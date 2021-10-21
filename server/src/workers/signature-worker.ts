@@ -213,10 +213,10 @@ createQueueWorker("signature-worker", async (data: SignatureWorkerPayload, ctx) 
 });
 
 async function fetchOrgSignatureIntegration(orgId: number, provider: string, ctx: WorkerContext) {
-  const orgIntegrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(orgId);
+  const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(orgId, "SIGNATURE");
 
-  const orgSignatureIntegration = orgIntegrations.find(
-    (i) => i.type === "SIGNATURE" && i.provider === provider.toUpperCase()
+  const orgSignatureIntegration = signatureIntegrations.find(
+    (i) => i.provider === provider.toUpperCase()
   );
 
   if (!orgSignatureIntegration) {

@@ -3,55 +3,43 @@ import { buildEmail } from "../../emails/buildEmail";
 import DeveloperWebhookFailedEmail from "../../emails/components/DeveloperWebhookFailedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { toGlobalId } from "../../util/globalId";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function developerWebhookFailed(
   payload: {
-    petition_subscription_id: number;
+    org_integration_id: number;
+    petition_id: number;
     error_message: string;
     post_body: any;
   },
   context: WorkerContext
 ) {
-  const subscription = await context.subscriptions.loadSubscription(
-    payload.petition_subscription_id
-  );
-  if (!subscription) {
-    return;
-  }
-
-  const petition = await context.petitions.loadPetition(subscription.petition_id);
-
+  const petition = await context.petitions.loadPetition(payload.petition_id);
   if (!petition) {
-    throw new Error(`Petition not found for subscription.petition_id ${subscription.petition_id}`);
+    throw new Error(`Petition not found for payload.petition_id ${payload.petition_id}`);
+  }
+  const orgOwner = await context.organizations.getOrganizationOwner(petition.org_id);
+  if (!orgOwner) {
+    throw new Error(`Owner not found for Organization:${petition.org_id}`);
   }
 
-  const user = await context.users.loadUser(subscription.user_id);
-  if (!user) {
-    throw new Error(`User not found for subscription.user_id ${subscription.user_id}`);
-  }
-
-  const { emailFrom, ...layoutProps } = await getLayoutProps(user.org_id, context);
-
+  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,
     {
-      userName: fullName(user.first_name, user.last_name)!,
+      userName: fullName(orgOwner.first_name, orgOwner.last_name)!,
       errorMessage: payload.error_message,
-      subscriptionId: toGlobalId("Subscription", subscription.id),
       postBody: payload.post_body,
       ...layoutProps,
     },
     { locale: petition.locale }
   );
-
   return await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),
-    to: user.email,
+    to: orgOwner.email,
     subject,
     text,
     html,
-    created_from: `Subscription:${subscription.id}`,
+    created_from: `OrgIntegration:${payload.org_integration_id}`,
   });
 }

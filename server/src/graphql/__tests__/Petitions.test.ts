@@ -1060,41 +1060,6 @@ describe("GraphQL/Petitions", () => {
       });
     });
 
-    it("creates a petition and subscribes to its events with a given URL", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID, $eventsUrl: String) {
-            createPetition(petitionId: $petitionId, eventsUrl: $eventsUrl) {
-              id
-              owner {
-                id
-              }
-              __typename
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", publicTemplate.id),
-          eventsUrl: "https://example.url.com",
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(omit(data!.createPetition, ["id"])).toEqual({
-        owner: { id: toGlobalId("User", sessionUser.id) },
-        __typename: "Petition",
-      });
-
-      const { rows: subscriptions } = await mocks.knex.raw(
-        /* sql */ `
-        select endpoint from petition_event_subscription
-        where petition_id = ? and deleted_at is null`,
-        [fromGlobalId(data!.createPetition.id, "Petition").id]
-      );
-
-      expect(subscriptions).toEqual([{ endpoint: "https://example.url.com" }]);
-    });
-
     it("ignores name and locale parameters when creating a petition from a valid petitionId", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

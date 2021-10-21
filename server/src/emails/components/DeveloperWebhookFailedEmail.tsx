@@ -10,7 +10,6 @@ import { closing, greetingUser } from "../common/texts";
 export type DeveloperWebhookFailedEmailProps = {
   userName: string | null;
   errorMessage: string;
-  subscriptionId: string;
   postBody: any;
 } & LayoutProps;
 
@@ -27,22 +26,14 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
       defaultMessage: "Error: Event hook",
     });
   },
-  text(
-    { userName, subscriptionId, errorMessage, postBody }: DeveloperWebhookFailedEmailProps,
-    intl: IntlShape
-  ) {
+  text({ userName, errorMessage, postBody }: DeveloperWebhookFailedEmailProps, intl: IntlShape) {
     return outdent`
     ${greetingUser({ name: userName }, intl)}
 
-    ${intl.formatMessage(
-      {
-        id: "developer.webhook-error-email.text",
-        defaultMessage: "We found an error regarding your event subscription {subscriptionId}.",
-      },
-      {
-        subscriptionId,
-      }
-    )}
+    ${intl.formatMessage({
+      id: "developer.webhook-error-email.text",
+      defaultMessage: "We found an error regarding your event subscription.",
+    })}
 
     ${errorMessage}
     
@@ -59,7 +50,6 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
   },
   html({
     userName,
-    subscriptionId,
     errorMessage,
     postBody,
     parallelUrl,
@@ -75,8 +65,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
             <MjmlText>
               <FormattedMessage
                 id="developer.webhook-error-email.text"
-                defaultMessage="We found an error regarding your event subscription {subscriptionId}."
-                values={{ subscriptionId }}
+                defaultMessage="We found an error regarding your event subscription."
               />
             </MjmlText>
           </MjmlColumn>

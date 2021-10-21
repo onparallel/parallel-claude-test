@@ -289,7 +289,10 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
 The types of integrations available.
 """
 enum IntegrationType {
+  EVENT_SUBSCRIPTION
   SIGNATURE
+  SSO
+  USER_PROVISIONING
 }
 
 """
@@ -497,6 +500,15 @@ type Mutation {
   createFileUploadReply(fieldId: GID!, file: Upload!, petitionId: GID!): PetitionFieldReply!
 
   """
+  Creates an integration on the user's organization
+  """
+  createOrgIntegration(
+    provider: String!
+    settings: JSONObject!
+    type: IntegrationType!
+  ): OrgIntegration!
+
+  """
   Creates a new organization.
   """
   createOrganization(
@@ -522,10 +534,6 @@ type Mutation {
   Create petition.
   """
   createPetition(
-    """
-    URL to receive real-time events of this petition.
-    """
-    eventsUrl: String
     locale: PetitionLocale
     name: String
 
@@ -567,17 +575,6 @@ type Mutation {
     petitionFieldId: GID!
     petitionId: GID!
   ): PetitionField!
-
-  """
-  Creates a new subscription on a petition
-  """
-  createPetitionSubscription(
-    """
-    URL to receive POST requests with the petition events data
-    """
-    endpoint: String!
-    petitionId: GID!
-  ): Subscription!
 
   """
   Creates a public link from a user's template
@@ -680,7 +677,6 @@ type Mutation {
   Deletes a reply to a petition field.
   """
   deletePetitionReply(petitionId: GID!, replyId: GID!): Result!
-  deletePetitionSubscription(subscriptionId: GID!): Result!
 
   """
   Delete petitions.
@@ -1121,6 +1117,15 @@ type Mutation {
   updateOnboardingStatus(key: OnboardingKey!, status: OnboardingStatus!): User!
 
   """
+  Updates an existing integration on the user's org
+  """
+  updateOrgIntegration(
+    data: UpdateOrgIntegrationInput!
+    id: GID!
+    type: IntegrationType!
+  ): OrgIntegration!
+
+  """
   Updates the logo of an organization
   """
   updateOrganizationLogo(file: Upload!): Organization!
@@ -1310,6 +1315,9 @@ enum OnboardingStatus {
 }
 
 type OrgIntegration {
+  id: GID!
+  isEnabled: Boolean!
+
   """
   The name of the integration.
   """
@@ -1319,6 +1327,11 @@ type OrgIntegration {
   The provider used for this integration.
   """
   provider: String!
+
+  """
+  The settings of the integration.
+  """
+  settings: JSONObject!
 
   """
   The type of the integration.
@@ -1645,11 +1658,6 @@ type Petition implements PetitionBase {
   The status of the petition.
   """
   status: PetitionStatus!
-
-  """
-  The subscriptions linked to the petition.
-  """
-  subscriptions: [Subscription!]!
 
   """
   The tags linked to the petition
@@ -3694,21 +3702,6 @@ type SignatureStartedEvent implements PetitionEvent {
   id: GID!
 }
 
-type Subscription implements Timestamps {
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
-  endpoint: String!
-  id: GID!
-  petition: Petition!
-
-  """
-  Time when the resource was last updated.
-  """
-  updatedAt: DateTime!
-}
-
 """
 Return type for all support methods
 """
@@ -3771,6 +3764,11 @@ enum Tone {
 input UpdateContactInput {
   firstName: String
   lastName: String
+}
+
+input UpdateOrgIntegrationInput {
+  isEnabled: Boolean
+  settings: JSONObject
 }
 
 input UpdatePetitionFieldInput {

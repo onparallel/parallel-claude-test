@@ -80,7 +80,6 @@ const result: PossibleTypesResultData = {
       "PublicPetitionFieldReply",
       "PublicPetitionLinkUserGroupPermission",
       "PublicPetitionLinkUserPermission",
-      "Subscription",
       "User",
       "UserGroup",
     ],

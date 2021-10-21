@@ -1,4 +1,4 @@
-import { arg, booleanArg, enumType, list, nonNull, objectType } from "nexus";
+import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
 import { titleize } from "../../util/strings";
 import { userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -24,13 +24,14 @@ export const Tone = enumType({
 });
 export const IntegrationType = enumType({
   name: "IntegrationType",
-  members: ["SIGNATURE"],
+  members: ["EVENT_SUBSCRIPTION", "SIGNATURE", "SSO", "USER_PROVISIONING"],
   description: "The types of integrations available.",
 });
 
 export const OrgIntegration = objectType({
   name: "OrgIntegration",
   definition(t) {
+    t.globalId("id");
     t.string("name", {
       description: "The name of the integration.",
       resolve: (o) => titleize(o.provider),
@@ -41,6 +42,21 @@ export const OrgIntegration = objectType({
     });
     t.string("provider", {
       description: "The provider used for this integration.",
+    });
+    t.jsonObject("settings", {
+      description: "The settings of the integration.",
+      resolve: (o) => {
+        // here we have to be careful not to expose secret APIKEYS to the client. so we will only expose what we need.
+        switch (o.type) {
+          case "EVENT_SUBSCRIPTION":
+            return { EVENTS_URL: o.settings.EVENTS_URL };
+          default:
+            return {};
+        }
+      },
+    });
+    t.boolean("isEnabled", {
+      resolve: (o) => o.is_enabled,
     });
   },
 });
@@ -79,8 +95,8 @@ export const Organization = objectType({
     t.boolean("hasSsoProvider", {
       description: "Whether the organization has an SSO provider configured.",
       resolve: async (o, _, ctx) => {
-        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(o.id);
-        return integrations.some((i) => i.type === "SSO");
+        const ssoIntegrations = await ctx.integrations.loadIntegrationsByOrgId(o.id, "SSO");
+        return ssoIntegrations.length > 0;
       },
     });
     t.int("userCount", {
@@ -123,15 +139,16 @@ export const Organization = objectType({
     t.list.nonNull.field("integrations", {
       type: "OrgIntegration",
       args: {
-        type: arg({
-          type: "IntegrationType",
-          description: "Filter by integration type.",
-        }),
+        type: nullable(
+          arg({
+            type: "IntegrationType",
+            description: "Filter by integration type.",
+          })
+        ),
       },
       authorize: isOwnOrgOrSuperAdmin(),
       resolve: async (root, { type }, ctx) => {
-        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(root.id);
-        return type ? integrations.filter((i) => i.type === type) : integrations;
+        return await ctx.integrations.loadIntegrationsByOrgId(root.id, type ?? undefined, true);
       },
     });
     t.nonNull.field("usageLimits", {

@@ -255,7 +255,7 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
 }
 
 /** The types of integrations available. */
-export type IntegrationType = "SIGNATURE";
+export type IntegrationType = "EVENT_SUBSCRIPTION" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 /** A public template on landing page */
 export interface LandingTemplate {
@@ -366,6 +366,8 @@ export interface Mutation {
   createContact: Contact;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
+  /** Creates an integration on the user's organization */
+  createOrgIntegration: OrgIntegration;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -378,8 +380,6 @@ export interface Mutation {
   createPetitionFieldAttachmentUploadLink: CreateFileUploadFieldAttachment;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionField;
-  /** Creates a new subscription on a petition */
-  createPetitionSubscription: Subscription;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PetitionTemplate;
   /** Creates a reply to a text or select field. */
@@ -402,7 +402,6 @@ export interface Mutation {
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: Result;
-  deletePetitionSubscription: Result;
   /** Delete petitions. */
   deletePetitions: Result;
   /** Removes the tag from every petition and soft-deletes it */
@@ -514,6 +513,8 @@ export interface Mutation {
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
+  /** Updates an existing integration on the user's org */
+  updateOrgIntegration: OrgIntegration;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
@@ -644,6 +645,12 @@ export interface MutationcreateFileUploadReplyArgs {
   petitionId: Scalars["GID"];
 }
 
+export interface MutationcreateOrgIntegrationArgs {
+  provider: Scalars["String"];
+  settings: Scalars["JSONObject"];
+  type: IntegrationType;
+}
+
 export interface MutationcreateOrganizationArgs {
   name: Scalars["String"];
   status: OrganizationStatus;
@@ -658,7 +665,6 @@ export interface MutationcreateOrganizationUserArgs {
 }
 
 export interface MutationcreatePetitionArgs {
-  eventsUrl?: Maybe<Scalars["String"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   petitionId?: Maybe<Scalars["GID"]>;
@@ -681,11 +687,6 @@ export interface MutationcreatePetitionFieldCommentArgs {
   content: Scalars["String"];
   isInternal?: Maybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-}
-
-export interface MutationcreatePetitionSubscriptionArgs {
-  endpoint: Scalars["String"];
   petitionId: Scalars["GID"];
 }
 
@@ -752,10 +753,6 @@ export interface MutationdeletePetitionFieldCommentArgs {
 export interface MutationdeletePetitionReplyArgs {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
-}
-
-export interface MutationdeletePetitionSubscriptionArgs {
-  subscriptionId: Scalars["GID"];
 }
 
 export interface MutationdeletePetitionsArgs {
@@ -1074,6 +1071,12 @@ export interface MutationupdateOnboardingStatusArgs {
   status: OnboardingStatus;
 }
 
+export interface MutationupdateOrgIntegrationArgs {
+  data: UpdateOrgIntegrationInput;
+  id: Scalars["GID"];
+  type: IntegrationType;
+}
+
 export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
 }
@@ -1223,10 +1226,14 @@ export type OnboardingStatus = "FINISHED" | "SKIPPED";
 
 export interface OrgIntegration {
   __typename?: "OrgIntegration";
+  id: Scalars["GID"];
+  isEnabled: Scalars["Boolean"];
   /** The name of the integration. */
   name: Scalars["String"];
   /** The provider used for this integration. */
   provider: Scalars["String"];
+  /** The settings of the integration. */
+  settings: Scalars["JSONObject"];
   /** The type of the integration. */
   type: IntegrationType;
 }
@@ -1399,8 +1406,6 @@ export interface Petition extends PetitionBase {
   skipForwardSecurity: Scalars["Boolean"];
   /** The status of the petition. */
   status: PetitionStatus;
-  /** The subscriptions linked to the petition. */
-  subscriptions: Array<Subscription>;
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
@@ -2676,17 +2681,6 @@ export interface SignatureStartedEvent extends PetitionEvent {
   id: Scalars["GID"];
 }
 
-export interface Subscription extends Timestamps {
-  __typename?: "Subscription";
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  endpoint: Scalars["String"];
-  id: Scalars["GID"];
-  petition: Petition;
-  /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-}
-
 /** Return type for all support methods */
 export interface SupportMethodResponse {
   __typename?: "SupportMethodResponse";
@@ -2731,6 +2725,11 @@ export type Tone = "FORMAL" | "INFORMAL";
 export interface UpdateContactInput {
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
+}
+
+export interface UpdateOrgIntegrationInput {
+  isEnabled?: Maybe<Scalars["Boolean"]>;
+  settings?: Maybe<Scalars["JSONObject"]>;
 }
 
 export interface UpdatePetitionFieldInput {
@@ -8128,6 +8127,14 @@ export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetit
   status: PetitionStatus;
 };
 
+export type EventSubscriptionCard_OrgIntegrationFragment = {
+  __typename?: "OrgIntegration";
+  id: string;
+  type: IntegrationType;
+  settings: { [key: string]: any };
+  isEnabled: boolean;
+};
+
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
   tokenName: Scalars["String"];
 }>;
@@ -9118,35 +9125,6 @@ export type OrganizationSettingsQuery = {
     role: OrganizationRole;
     avatarUrl?: Maybe<string>;
     initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
-    };
-  };
-};
-
-export type SubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
-
-export type SubscriptionsQuery = {
-  me: {
-    __typename?: "User";
-    isSsoUser: boolean;
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasApiTokens: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -13628,11 +13606,40 @@ export type Developers_UserAuthenticationTokenFragment = {
   lastUsedAt?: Maybe<string>;
 };
 
-export type RevokeUserAuthTokenMutationVariables = Exact<{
+export type Developers_RevokeUserAuthTokenMutationVariables = Exact<{
   authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type RevokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
+export type Developers_RevokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
+
+export type Developers_CreateOrgIntegrationMutationVariables = Exact<{
+  settings: Scalars["JSONObject"];
+}>;
+
+export type Developers_CreateOrgIntegrationMutation = {
+  createOrgIntegration: {
+    __typename?: "OrgIntegration";
+    id: string;
+    type: IntegrationType;
+    settings: { [key: string]: any };
+    isEnabled: boolean;
+  };
+};
+
+export type Developers_UpdateOrgIntegrationMutationVariables = Exact<{
+  id: Scalars["GID"];
+  data: UpdateOrgIntegrationInput;
+}>;
+
+export type Developers_UpdateOrgIntegrationMutation = {
+  updateOrgIntegration: {
+    __typename?: "OrgIntegration";
+    id: string;
+    type: IntegrationType;
+    settings: { [key: string]: any };
+    isEnabled: boolean;
+  };
+};
 
 export type DevelopersQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -13670,6 +13677,13 @@ export type DevelopersQuery = {
     organization: {
       __typename?: "Organization";
       id: string;
+      integrations: Array<{
+        __typename?: "OrgIntegration";
+        id: string;
+        type: IntegrationType;
+        settings: { [key: string]: any };
+        isEnabled: boolean;
+      }>;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -15443,6 +15457,14 @@ export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetiti
 export const RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragmentDoc = gql`
   fragment RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetition on PublicPetition {
     status
+  }
+`;
+export const EventSubscriptionCard_OrgIntegrationFragmentDoc = gql`
+  fragment EventSubscriptionCard_OrgIntegration on OrgIntegration {
+    id
+    type
+    settings
+    isEnabled
   }
 `;
 export const UserMenu_UserFragmentDoc = gql`
@@ -20431,37 +20453,6 @@ export type OrganizationSettingsQueryHookResult = ReturnType<typeof useOrganizat
 export type OrganizationSettingsLazyQueryHookResult = ReturnType<
   typeof useOrganizationSettingsLazyQuery
 >;
-export const SubscriptionsDocument = gql`
-  query Subscriptions {
-    me {
-      isSsoUser
-      ...SettingsLayout_User
-      ...useSettingsSections_User
-    }
-  }
-  ${SettingsLayout_UserFragmentDoc}
-  ${useSettingsSections_UserFragmentDoc}
-`;
-export function useSubscriptionsQuery(
-  baseOptions?: Apollo.QueryHookOptions<SubscriptionsQuery, SubscriptionsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<SubscriptionsQuery, SubscriptionsQueryVariables>(
-    SubscriptionsDocument,
-    options
-  );
-}
-export function useSubscriptionsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<SubscriptionsQuery, SubscriptionsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<SubscriptionsQuery, SubscriptionsQueryVariables>(
-    SubscriptionsDocument,
-    options
-  );
-}
-export type SubscriptionsQueryHookResult = ReturnType<typeof useSubscriptionsQuery>;
-export type SubscriptionsLazyQueryHookResult = ReturnType<typeof useSubscriptionsLazyQuery>;
 export const OrganizationUsageDocument = gql`
   query OrganizationUsage {
     me {
@@ -21843,25 +21834,71 @@ export function useAccountLazyQuery(
 }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
 export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
-export const RevokeUserAuthTokenDocument = gql`
-  mutation RevokeUserAuthToken($authTokenIds: [GID!]!) {
+export const Developers_RevokeUserAuthTokenDocument = gql`
+  mutation Developers_RevokeUserAuthToken($authTokenIds: [GID!]!) {
     revokeUserAuthToken(authTokenIds: $authTokenIds)
   }
 `;
-export function useRevokeUserAuthTokenMutation(
+export function useDevelopers_RevokeUserAuthTokenMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    RevokeUserAuthTokenMutation,
-    RevokeUserAuthTokenMutationVariables
+    Developers_RevokeUserAuthTokenMutation,
+    Developers_RevokeUserAuthTokenMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<RevokeUserAuthTokenMutation, RevokeUserAuthTokenMutationVariables>(
-    RevokeUserAuthTokenDocument,
-    options
-  );
+  return Apollo.useMutation<
+    Developers_RevokeUserAuthTokenMutation,
+    Developers_RevokeUserAuthTokenMutationVariables
+  >(Developers_RevokeUserAuthTokenDocument, options);
 }
-export type RevokeUserAuthTokenMutationHookResult = ReturnType<
-  typeof useRevokeUserAuthTokenMutation
+export type Developers_RevokeUserAuthTokenMutationHookResult = ReturnType<
+  typeof useDevelopers_RevokeUserAuthTokenMutation
+>;
+export const Developers_CreateOrgIntegrationDocument = gql`
+  mutation Developers_CreateOrgIntegration($settings: JSONObject!) {
+    createOrgIntegration(type: EVENT_SUBSCRIPTION, provider: "PARALLEL", settings: $settings) {
+      ...EventSubscriptionCard_OrgIntegration
+    }
+  }
+  ${EventSubscriptionCard_OrgIntegrationFragmentDoc}
+`;
+export function useDevelopers_CreateOrgIntegrationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    Developers_CreateOrgIntegrationMutation,
+    Developers_CreateOrgIntegrationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    Developers_CreateOrgIntegrationMutation,
+    Developers_CreateOrgIntegrationMutationVariables
+  >(Developers_CreateOrgIntegrationDocument, options);
+}
+export type Developers_CreateOrgIntegrationMutationHookResult = ReturnType<
+  typeof useDevelopers_CreateOrgIntegrationMutation
+>;
+export const Developers_UpdateOrgIntegrationDocument = gql`
+  mutation Developers_UpdateOrgIntegration($id: GID!, $data: UpdateOrgIntegrationInput!) {
+    updateOrgIntegration(id: $id, type: EVENT_SUBSCRIPTION, data: $data) {
+      ...EventSubscriptionCard_OrgIntegration
+    }
+  }
+  ${EventSubscriptionCard_OrgIntegrationFragmentDoc}
+`;
+export function useDevelopers_UpdateOrgIntegrationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    Developers_UpdateOrgIntegrationMutation,
+    Developers_UpdateOrgIntegrationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    Developers_UpdateOrgIntegrationMutation,
+    Developers_UpdateOrgIntegrationMutationVariables
+  >(Developers_UpdateOrgIntegrationDocument, options);
+}
+export type Developers_UpdateOrgIntegrationMutationHookResult = ReturnType<
+  typeof useDevelopers_UpdateOrgIntegrationMutation
 >;
 export const DevelopersDocument = gql`
   query Developers(
@@ -21878,11 +21915,17 @@ export const DevelopersDocument = gql`
           ...Developers_UserAuthenticationToken
         }
       }
+      organization {
+        integrations(type: EVENT_SUBSCRIPTION) {
+          ...EventSubscriptionCard_OrgIntegration
+        }
+      }
       ...SettingsLayout_User
       ...useSettingsSections_User
     }
   }
   ${Developers_UserAuthenticationTokenFragmentDoc}
+  ${EventSubscriptionCard_OrgIntegrationFragmentDoc}
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
 `;

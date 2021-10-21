@@ -245,13 +245,6 @@ export const Petition = objectType({
         });
       },
     });
-    t.list.field("subscriptions", {
-      type: "Subscription",
-      description: "The subscriptions linked to the petition.",
-      resolve: async (root, _, ctx) => {
-        return await ctx.subscriptions.loadSubscriptionsByPetitionId(root.id);
-      },
-    });
     t.nullable.globalId("fromTemplateId", {
       description: "The template GID used for this petition",
       resolve: (root) => root.from_template_id,

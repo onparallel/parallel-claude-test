@@ -94,9 +94,9 @@ scim
       res.json(toScimUser(user));
     } else {
       const orgId = req.context.organization!.id;
-      const integrations = await req.context.integrations.loadEnabledIntegrationsForOrgId(orgId);
+      const ssoIntegrations = await req.context.integrations.loadIntegrationsByOrgId(orgId, "SSO");
       const email = emails.find((e) => e.type === "work")?.value;
-      if (integrations.some((i) => i.type === "SSO") && email) {
+      if (ssoIntegrations.length > 0 && email) {
         const user = await req.context.users.createUser(
           {
             // fake unique cognitoId, should update when user logs in

@@ -113,10 +113,7 @@ export class SignatureService {
           default:
             break;
         }
-        this.integrationRepository.updateOrgIntegrationSettings<"SIGNATURE">(
-          integration.id,
-          settings
-        );
+        this.integrationRepository.updateOrgIntegration<"SIGNATURE">(integration.id, { settings });
       }
     );
     return client;

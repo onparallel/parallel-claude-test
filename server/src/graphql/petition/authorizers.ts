@@ -54,23 +54,6 @@ export function userHasAccessToSignatureRequest<
   };
 }
 
-export function userHasAccessToSubscriptions<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const subscriptionIds = unMaybeArray(args[argName] as MaybeArray<number>);
-      if (subscriptionIds.length === 0) {
-        return true;
-      }
-      return await ctx.subscriptions.userHasAccessToSubscriptions(ctx.user!.id, subscriptionIds);
-    } catch {}
-    return false;
-  };
-}
-
 export function userHasAccessToPetitionFieldComments<
   TypeName extends string,
   FieldName extends string,
@@ -362,8 +345,8 @@ export function userHasEnabledIntegration<TypeName extends string, FieldName ext
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(ctx.user!.org_id);
-      return integrations.some((i) => i.type === type);
+      const integrations = await ctx.integrations.loadIntegrationsByOrgId(ctx.user!.org_id, type);
+      return integrations.length > 0;
     } catch {}
     return false;
   };

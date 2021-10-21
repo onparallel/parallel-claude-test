@@ -44,16 +44,10 @@ curl -s -XPOST \\
   -H 'Content-Type: application/json' \\
   -d '{
   "templateId": "<your template ID>",
-  "name": "<an optional name>",
-  "eventsUrl": "<your webhook endpoint to receive events>"
+  "name": "<an optional name>"
 }' \\
 'https://www.onparallel.com/api/v1/petitions'
 ~~~
-
-When creating the petition, you can pass an optional argument \`eventsUrl\` to
-subscribe to events in the petition. Parallel will send real-time events
-happening on the petition via a POST request to the provided URL. You can read
-more about the different events on the [Subscriptions documentation](#operation/CreateSubscription)  
 
 If everything goes well, you should have received the created petition. Write
 down the ID because we will need it in the next step.

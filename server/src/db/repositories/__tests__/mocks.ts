@@ -23,7 +23,6 @@ import {
   OrganizationUsageLimitName,
   Petition,
   PetitionAccess,
-  PetitionEventSubscription,
   PetitionField,
   PetitionFieldAttachment,
   PetitionFieldComment,
@@ -344,18 +343,6 @@ export class Mocks {
     return await this.knex<UserAuthenticationToken>("user_authentication_token").delete();
   }
 
-  async createSubscriptions(petitionIds: number[], endpoint: string, userId: number) {
-    return await this.knex<PetitionEventSubscription>("petition_event_subscription")
-      .insert(
-        petitionIds.map((petitionId) => ({
-          petition_id: petitionId,
-          user_id: userId,
-          endpoint,
-        }))
-      )
-      .returning("*");
-  }
-
   async createUserGroups(
     amount: number,
     orgId: number,
@@ -402,10 +389,6 @@ export class Mocks {
         type: "WRITE",
       }))
     );
-  }
-
-  async clearSubscriptions() {
-    await this.knex("petition_event_subscription").delete();
   }
 
   async createContactAuthentication(contactId: number) {

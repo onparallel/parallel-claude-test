@@ -144,11 +144,12 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
     throw new Error(`petition with id ${petitionId} not found.`);
   }
 
-  const orgIntegration = await ctx.integrations.loadEnabledIntegrationsForOrgId(petition.org_id);
-
-  const signaturitIntegration = orgIntegration.find(
-    (i) => i.type === "SIGNATURE" && i.provider === "SIGNATURIT"
+  const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
+    petition.org_id,
+    "SIGNATURE"
   );
+
+  const signaturitIntegration = signatureIntegrations.find((i) => i.provider === "SIGNATURIT");
 
   if (!signaturitIntegration) {
     throw new Error(`Can't load SignaturIt integration for org with id ${petition.org_id}`);
@@ -215,11 +216,12 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
     throw new Error(`petition with id ${petitionId} not found.`);
   }
 
-  const orgIntegration = await ctx.integrations.loadEnabledIntegrationsForOrgId(petition.org_id);
-
-  const signaturitIntegration = orgIntegration.find(
-    (i) => i.type === "SIGNATURE" && i.provider === "SIGNATURIT"
+  const orgIntegration = await ctx.integrations.loadIntegrationsByOrgId(
+    petition.org_id,
+    "SIGNATURE"
   );
+
+  const signaturitIntegration = orgIntegration.find((i) => i.provider === "SIGNATURIT");
 
   if (!signaturitIntegration) {
     throw new Error(`Can't load SignaturIt integration for org with id ${petition.org_id}`);

@@ -312,31 +312,6 @@ const _MessageBody = {
   },
 } as const;
 
-const _Subscription = {
-  title: "Subscription",
-  type: "object",
-  additionalProperties: false,
-  required: ["id", "endpoint", "createdAt"],
-  properties: {
-    id: {
-      description: "The ID of the subscription",
-      type: "string",
-      example: toGlobalId("Subscription", 42),
-    },
-    endpoint: {
-      description: "The URL on which to receive POST requests with the petition events.",
-      type: "string",
-      example: "https://my.endpoint.com/parallel",
-    },
-    createdAt: {
-      description: "Creation date of the subscription",
-      type: "string",
-      format: "date-time",
-      example: new Date(2020, 2, 15).toISOString(),
-    },
-  },
-} as const;
-
 const _CommonPermission = {
   permissionType: {
     description: outdent`
@@ -524,11 +499,6 @@ export const CreatePetition = schema({
       type: ["string", "null"],
       example: "My petition",
     },
-    eventsUrl: {
-      description: "URL to receive real-time events of this petition",
-      type: ["string", "null"],
-      example: "https://my.endpoint.com/parallel",
-    },
   },
 } as const);
 export const PaginatedPetitions = PaginatedListOf(_Petition);
@@ -636,23 +606,6 @@ export const SendPetition = schema({
     },
   },
 } as const);
-
-export const CreateSubscription = schema({
-  title: "CreateSubscription",
-  type: "object",
-  additionalProperties: false,
-  required: ["endpoint"],
-  properties: {
-    endpoint: {
-      description: "The URL on which to receive the petition events.",
-      type: "string",
-      format: "uri",
-      example: "https://my.endpoint.com/parallel",
-    },
-  },
-} as const);
-export const Subscription = schema(_Subscription);
-export const ListOfSubscriptions = ListOf(_Subscription);
 
 export const SharePetition = schema({
   title: "SharePetition",
