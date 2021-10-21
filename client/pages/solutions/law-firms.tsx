@@ -97,7 +97,7 @@ export default function LawFirms() {
     },
     {
       alt: "Akiton",
-      href: "https://es.andersen.com/",
+      href: "https://www.aktionlegal.com/",
       src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/aktion_black.png`,
       maxWidth: "157px",
     },

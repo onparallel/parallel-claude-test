@@ -254,10 +254,14 @@ function Step({
   return (
     <Card
       padding={5}
-      backgroundColor={{ base: "white", md: isActive ? "gray.100" : "white" }}
+      backgroundColor={{ base: "white", md: isActive ? "gray.75" : "white" }}
       cursor={{ base: "default", md: "pointer" }}
       role="button"
       textAlign="left"
+      boxShadow={isActive ? "long" : "short"}
+      transition="0.3s ease all"
+      borderColor={isActive ? "gray.300" : "gray.200"}
+      _hover={{ backgroundColor: isActive ? "gray.75" : "gray.50" }}
       {...props}
     >
       <Heading as="h4" size="sm">

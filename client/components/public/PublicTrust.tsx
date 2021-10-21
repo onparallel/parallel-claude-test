@@ -8,11 +8,10 @@ export function PublicTrust(props: BoxProps) {
     <PublicContainer
       wrapper={{
         marginY: { base: 8, md: 12, lg: 20 },
-
         ...props,
       }}
     >
-      <Heading as="h2" size="xl" fontWeight="bold" marginBottom={8} textAlign="center">
+      <Heading as="h2" size="xl" fontWeight="bold" marginY={8} textAlign="center">
         <FormattedMessage id="public.who-trust-us.title" defaultMessage="Already trust us" />
       </Heading>
       <Grid
@@ -46,9 +45,9 @@ export function PublicTrust(props: BoxProps) {
           </NormalLink>
         </Center>
         <Center>
-          <NormalLink href="https://prontopiso.com/" isExternal paddingY="13px">
+          <NormalLink href="https://www.aktionlegal.com/" isExternal paddingY="13px">
             <Image
-              alt="Action"
+              alt="Aktion"
               width="200px"
               loading="lazy"
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/aktion_black.png`}
@@ -56,7 +55,7 @@ export function PublicTrust(props: BoxProps) {
           </NormalLink>
         </Center>
         <Center>
-          <NormalLink href="https://prontopiso.com/" isExternal paddingY="13px">
+          <NormalLink href="https://web.tecnotramit.com/" isExternal paddingY="13px">
             <Image
               alt="Tecnotramit"
               width="200px"
@@ -66,9 +65,13 @@ export function PublicTrust(props: BoxProps) {
           </NormalLink>
         </Center>
         <Center>
-          <NormalLink href="https://prontopiso.com/" isExternal paddingY="13px">
+          <NormalLink
+            href="https://www.expglobalspain.com/Home?lan=es-ES"
+            isExternal
+            paddingY="13px"
+          >
             <Image
-              alt="Exp"
+              alt="Exp España"
               width="200px"
               loading="lazy"
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/exp_black.png`}
@@ -76,7 +79,7 @@ export function PublicTrust(props: BoxProps) {
           </NormalLink>
         </Center>
         <Center>
-          <NormalLink href="https://prontopiso.com/" isExternal paddingY="13px">
+          <NormalLink href="https://www.sequra.es/" isExternal paddingY="13px">
             <Image
               alt="Sequra"
               width="200px"
