@@ -33,16 +33,16 @@ export function PublicPricingTable(props: CardProps) {
               paddingX: 4,
               paddingY: 2,
             },
-            "table tbody tr:nth-child(2n) td": {
+            "table tbody tr:nth-of-type(2n) td": {
               backgroundColor: "white",
             },
-            "table tbody tr:nth-child(2n+1) td": {
+            "table tbody tr:nth-of-type(2n+1) td": {
               backgroundColor: "gray.75",
             },
-            "table tbody:first-of-type tr:nth-child(2n) td": {
+            "table tbody:first-of-type tr:nth-of-type(2n) td": {
               backgroundColor: "gray.75",
             },
-            "table tbody:first-of-type tr:nth-child(2n+1) td": {
+            "table tbody:first-of-type tr:nth-of-type(2n+1) td": {
               backgroundColor: "white",
             },
             "table thead:not(:first-of-type) th": {
