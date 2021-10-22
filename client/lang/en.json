@@ -2090,11 +2090,6 @@
     "context": "Create your free account now and automate your workflow agilely and safely."
   },
   {
-    "term": "component.public-signup-form.email-placeholder",
-    "definition": "example@company.com",
-    "context": "example@company.com"
-  },
-  {
     "term": "component.public-signup-form.experience.industry-label",
     "definition": "What industry do you work at?",
     "context": "What industry do you work at?"
@@ -3475,6 +3470,11 @@
     "context": "E.g. {example}"
   },
   {
+    "term": "generic.forms.company-email-placeholder",
+    "definition": "example@company.com",
+    "context": "example@company.com"
+  },
+  {
     "term": "generic.forms.confirm-password-label",
     "definition": "Confirm password",
     "context": "Confirm password"
@@ -3623,11 +3623,6 @@
     "term": "generic.forms.valid-password-error",
     "definition": "Please, enter a valid password",
     "context": "Please, enter a valid password"
-  },
-  {
-    "term": "generic.forms.verification-code-label",
-    "definition": "Verification code",
-    "context": "Verification code"
   },
   {
     "term": "generic.go-back",
@@ -6025,6 +6020,16 @@
     "context": "Legal industry"
   },
   {
+    "term": "public.forgot-password.change-your-password",
+    "definition": "Change your password",
+    "context": "Change your password"
+  },
+  {
+    "term": "public.forgot-password.enter-verification-code",
+    "definition": "Enter the verification code",
+    "context": "Enter the verification code"
+  },
+  {
     "term": "public.forgot-password.explanation",
     "definition": "We will send you a message to reset your password.",
     "context": "We will send you a message to reset your password."
@@ -6375,11 +6380,6 @@
     "context": "Go back to login"
   },
   {
-    "term": "public.login.explanation-with-password",
-    "definition": "Login using your email and password",
-    "context": "Login using your email and password"
-  },
-  {
     "term": "public.login.explanation-with-sso",
     "definition": "Login using Single sign-on",
     "context": "Login using Single sign-on"
@@ -6433,6 +6433,11 @@
     "term": "public.login.password-update-header",
     "definition": "Update your password",
     "context": "Update your password"
+  },
+  {
+    "term": "public.login.register-for-free",
+    "definition": "Don't have an account? <a>Register for free</a>",
+    "context": "Don't have an account? <a>Register for free</a>"
   },
   {
     "term": "public.login.signup",

@@ -4,14 +4,13 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
   Input,
   Text,
 } from "@chakra-ui/react";
 import { Link } from "@parallel/components/common/Link";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export interface ForgotPasswordData {
   email: string;
@@ -26,6 +25,8 @@ export function ForgotPasswordForm({
   isSubmitting,
   isExternalUserError,
 }: ForgotPasswordFormProps) {
+  const intl = useIntl();
+
   const {
     handleSubmit,
     register,
@@ -33,10 +34,10 @@ export function ForgotPasswordForm({
   } = useForm<ForgotPasswordData>();
   return (
     <>
-      <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} size="md">
+      <Box marginBottom={10}>
+        <Text as="h1" fontSize="2xl" fontWeight="bold" marginBottom={4}>
           <FormattedMessage id="public.forgot-password.header" defaultMessage="Forgot password" />
-        </Heading>
+        </Text>
         <Text>
           <FormattedMessage
             id="public.forgot-password.explanation"
@@ -54,6 +55,10 @@ export function ForgotPasswordForm({
             {...register("email", {
               required: true,
               pattern: EMAIL_REGEX,
+            })}
+            placeholder={intl.formatMessage({
+              id: "generic.forms.company-email-placeholder",
+              defaultMessage: "example@company.com",
             })}
           />
           <FormErrorMessage>

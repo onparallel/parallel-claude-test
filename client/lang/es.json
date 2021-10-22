@@ -2090,11 +2090,6 @@
     "context": "Create your free account now and automate your workflow agilely and safely."
   },
   {
-    "term": "component.public-signup-form.email-placeholder",
-    "definition": "ejemplo@companía.com",
-    "context": "example@company.com"
-  },
-  {
     "term": "component.public-signup-form.experience.industry-label",
     "definition": "¿En qué sector trabajas?",
     "context": "What industry do you work at?"
@@ -3475,6 +3470,11 @@
     "context": "E.g. {example}"
   },
   {
+    "term": "generic.forms.company-email-placeholder",
+    "definition": "ejemplo@companía.com",
+    "context": "example@company.com"
+  },
+  {
     "term": "generic.forms.confirm-password-label",
     "definition": "Confirmar contraseña",
     "context": "Confirm password"
@@ -3623,11 +3623,6 @@
     "term": "generic.forms.valid-password-error",
     "definition": "Por favor, introduce una contraseña válida",
     "context": "Please, enter a valid password"
-  },
-  {
-    "term": "generic.forms.verification-code-label",
-    "definition": "Código de verificación",
-    "context": "Verification code"
   },
   {
     "term": "generic.go-back",
@@ -6025,6 +6020,16 @@
     "context": "Legal industry"
   },
   {
+    "term": "public.forgot-password.change-your-password",
+    "definition": "Cambia tu contraseña",
+    "context": "Change your password"
+  },
+  {
+    "term": "public.forgot-password.enter-verification-code",
+    "definition": "Introduzca el código de verificación",
+    "context": "Enter the verification code"
+  },
+  {
     "term": "public.forgot-password.explanation",
     "definition": "Le enviaremos un mensaje para restablecer su contraseña",
     "context": "We will send you a message to reset your password."
@@ -6375,11 +6380,6 @@
     "context": "Go back to login"
   },
   {
-    "term": "public.login.explanation-with-password",
-    "definition": "Accede mediante tu correo electrónico y contraseña",
-    "context": "Login using your email and password"
-  },
-  {
     "term": "public.login.explanation-with-sso",
     "definition": "Accede mediante SSO",
     "context": "Login using Single sign-on"
@@ -6391,7 +6391,7 @@
   },
   {
     "term": "public.login.header",
-    "definition": "Entrar en Parallel",
+    "definition": "Inicia sesión en Parallel",
     "context": "Enter Parallel"
   },
   {
@@ -6433,6 +6433,11 @@
     "term": "public.login.password-update-header",
     "definition": "Cambie su contraseña",
     "context": "Update your password"
+  },
+  {
+    "term": "public.login.register-for-free",
+    "definition": "¿No tienes cuenta?  <a>Regístrate gratís</a>",
+    "context": "Don't have an account? <a>Register for free</a>"
   },
   {
     "term": "public.login.signup",

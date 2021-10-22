@@ -3,8 +3,11 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
+  Box,
   Button,
+  Center,
   Flex,
+  Image,
   Stack,
   Text,
   useToast,
@@ -17,11 +20,13 @@ import {
 } from "@parallel/components/auth/PasswordChangeForm";
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
-import { NormalLink } from "@parallel/components/common/Link";
+import { NakedLink, NormalLink } from "@parallel/components/common/Link";
+import { Logo } from "@parallel/components/common/Logo";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
+import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
 import {
   useCurrentUserQuery,
   useLogin_resendVerificationCodeMutation,
@@ -213,99 +218,159 @@ function Login() {
         id: "public.login.meta-description",
         defaultMessage: "Login to your Parallel account",
       })}
+      hideHeader
+      hideFooter
     >
-      <CloseableAlert
-        isOpen={isVerificationRequired}
-        onClose={() => setIsVerificationRequired(false)}
-        status="error"
-        variant="subtle"
-        zIndex={2}
-      >
-        <Flex
-          maxWidth="container.lg"
-          alignItems="center"
-          justifyContent="flex-start"
-          marginX="auto"
-          width="100%"
-          paddingLeft={4}
-          paddingRight={12}
-        >
-          <AlertIcon />
-          <Stack spacing={1}>
-            <AlertTitle>
-              <FormattedMessage
-                id="public.login.activation-pending-title"
-                defaultMessage="Activation pending"
-              />
-            </AlertTitle>
-            <AlertDescription>
-              <Text>
-                <FormattedMessage
-                  id="public.login.activation-pending-body"
-                  defaultMessage="Please activate your account through the activation link that was sent to your email."
+      <Flex minHeight="100vh">
+        <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
+          <Box paddingTop={5} marginLeft={-1}>
+            <NakedLink href="/">
+              <Box
+                as="a"
+                color="gray.700"
+                _hover={{ color: "gray.800" }}
+                _focus={{ color: "gray.800" }}
+                _active={{ color: "gray.900" }}
+              >
+                <Logo width="152px" />
+              </Box>
+            </NakedLink>
+          </Box>
+
+          <Center
+            flex="1"
+            maxWidth="md"
+            width="100%"
+            paddingY={10}
+            marginX="auto"
+            sx={{
+              "@media only screen and (min-width: 62em)": {
+                marginX: 0,
+              },
+              "@media only screen and (min-width: 96em)": {
+                margin: "auto",
+              },
+            }}
+          >
+            <PublicUserFormContainer>
+              <CloseableAlert
+                isOpen={isVerificationRequired}
+                onClose={() => setIsVerificationRequired(false)}
+                status="error"
+                variant="subtle"
+                rounded="md"
+                zIndex={2}
+                marginBottom={10}
+              >
+                <Flex
+                  alignItems="center"
+                  justifyContent="flex-start"
+                  marginX="auto"
+                  width="100%"
+                  paddingLeft={4}
+                  paddingRight={12}
+                >
+                  <AlertIcon />
+                  <Stack spacing={1}>
+                    <AlertTitle>
+                      <FormattedMessage
+                        id="public.login.activation-pending-title"
+                        defaultMessage="Activation pending"
+                      />
+                    </AlertTitle>
+                    <AlertDescription>
+                      <Text>
+                        <FormattedMessage
+                          id="public.login.activation-pending-body"
+                          defaultMessage="Please activate your account through the activation link that was sent to your email."
+                        />
+                      </Text>
+                      <Text>
+                        <FormattedMessage
+                          id="public.login.activation-pending-resend"
+                          defaultMessage="Can't find it? <a>Resend email.</a>"
+                          values={{
+                            a: (chunks: any) => (
+                              <Button
+                                isDisabled={isVerificationEmailSent}
+                                variant="link"
+                                fontWeight="bold"
+                                onClick={handleResendVerificationEmail}
+                              >
+                                {chunks}
+                              </Button>
+                            ),
+                          }}
+                        />
+                      </Text>
+                    </AlertDescription>
+                  </Stack>
+                </Flex>
+              </CloseableAlert>
+              {showContinueAs ? (
+                <AlreadyLoggedIn
+                  me={data!.me}
+                  onRelogin={() => setShowContinueAs(false)}
+                  onContinueAs={() => redirectToApp(data!.me.preferredLocale ?? undefined)}
                 />
-              </Text>
-              <Text>
-                <FormattedMessage
-                  id="public.login.activation-pending-resend"
-                  defaultMessage="Can't find it? <a>Resend email.</a>"
-                  values={{
-                    a: (chunks: any) => (
-                      <Button
-                        isDisabled={isVerificationEmailSent}
-                        variant="link"
-                        fontWeight="bold"
-                        onClick={handleResendVerificationEmail}
-                      >
-                        {chunks}
-                      </Button>
-                    ),
-                  }}
+              ) : passwordChange?.type === "CHANGE" ? (
+                <PasswordChangeForm
+                  onSubmit={handlePasswordChangeSubmit}
+                  backLink={
+                    <NormalLink role="button" onClick={() => setPasswordChange(null)}>
+                      <FormattedMessage
+                        id="public.login.back-to-login-link"
+                        defaultMessage="Go back to login"
+                      />
+                    </NormalLink>
+                  }
+                  isSubmitting={isSubmitting}
                 />
-              </Text>
-            </AlertDescription>
-          </Stack>
+              ) : passwordChange?.type === "RESET" ? (
+                <PasswordResetForm
+                  onSubmit={handlePasswordResetSubmit}
+                  backLink={
+                    <NormalLink role="button" onClick={() => setPasswordChange(null)}>
+                      <FormattedMessage
+                        id="public.login.back-to-login-link"
+                        defaultMessage="Go back to login"
+                      />
+                    </NormalLink>
+                  }
+                  hasVerificationCodeError={verificationCodeStatus.hasVerificationCodeError}
+                  isInvalidPassword={verificationCodeStatus.isInvalidPassword}
+                  isSubmitting={isSubmitting}
+                />
+              ) : (
+                <LoginForm onSubmit={handleLoginSubmit} isSubmitting={isSubmitting} />
+              )}
+            </PublicUserFormContainer>
+          </Center>
         </Flex>
-      </CloseableAlert>
-      <PublicUserFormContainer>
-        {showContinueAs ? (
-          <AlreadyLoggedIn
-            me={data!.me}
-            onRelogin={() => setShowContinueAs(false)}
-            onContinueAs={() => redirectToApp(data!.me.preferredLocale ?? undefined)}
-          />
-        ) : passwordChange?.type === "CHANGE" ? (
-          <PasswordChangeForm
-            onSubmit={handlePasswordChangeSubmit}
-            backLink={
-              <NormalLink role="button" onClick={() => setPasswordChange(null)}>
-                <FormattedMessage
-                  id="public.login.back-to-login-link"
-                  defaultMessage="Go back to login"
-                />
-              </NormalLink>
-            }
-            isSubmitting={isSubmitting}
-          />
-        ) : passwordChange?.type === "RESET" ? (
-          <PasswordResetForm
-            onSubmit={handlePasswordResetSubmit}
-            backLink={
-              <NormalLink role="button" onClick={() => setPasswordChange(null)}>
-                <FormattedMessage
-                  id="public.login.back-to-login-link"
-                  defaultMessage="Go back to login"
-                />
-              </NormalLink>
-            }
-            hasVerificationCodeError={verificationCodeStatus.hasVerificationCodeError}
-            isInvalidPassword={verificationCodeStatus.isInvalidPassword}
-            isSubmitting={isSubmitting}
-          />
-        ) : (
-          <LoginForm onSubmit={handleLoginSubmit} isSubmitting={isSubmitting} />
-        )}
-      </PublicUserFormContainer>
+        <Box
+          display={{ base: "none", lg: "block" }}
+          paddingLeft={8}
+          maxWidth="container.md"
+          flex="1"
+        >
+          <Flex
+            direction="column"
+            backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/signup-bg.svg`}
+            backgroundPosition="center"
+            backgroundRepeat="no-repeat"
+            backgroundSize="cover"
+            height="100%"
+            padding={16}
+          >
+            <PublicSignupRightHeading display="block" />
+            <Center height="100%">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/login/illustration.svg`}
+              />
+            </Center>
+          </Flex>
+        </Box>
+      </Flex>
     </PublicLayout>
   );
 }

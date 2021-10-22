@@ -1,12 +1,14 @@
-import { useToast } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, useToast } from "@chakra-ui/react";
 import {
   ForgotPasswordData,
   ForgotPasswordForm,
 } from "@parallel/components/auth/ForgotPasswordForm";
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
-import { NormalLink } from "@parallel/components/common/Link";
+import { NakedLink, NormalLink } from "@parallel/components/common/Link";
+import { Logo } from "@parallel/components/common/Logo";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
+import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
 import { postJSON } from "@parallel/utils/rest";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -98,31 +100,89 @@ export default function Forgot() {
         id: "public.forgot.title",
         defaultMessage: "Forgot password",
       })}
+      hideHeader
+      hideFooter
     >
-      <PublicUserFormContainer>
-        {verification.sent ? (
-          <PasswordResetForm
-            onSubmit={handlePasswordResetSubmit}
-            backLink={
-              <NormalLink role="button" onClick={() => setVerification({ sent: false })}>
-                <FormattedMessage
-                  id="public.login.back-to-forgot-link"
-                  defaultMessage="Go back to forgot password"
+      <Flex minHeight="100vh">
+        <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
+          <Box paddingTop={5} marginLeft={-1}>
+            <NakedLink href="/">
+              <Box
+                as="a"
+                color="gray.700"
+                _hover={{ color: "gray.800" }}
+                _focus={{ color: "gray.800" }}
+                _active={{ color: "gray.900" }}
+              >
+                <Logo width="152px" />
+              </Box>
+            </NakedLink>
+          </Box>
+          <Center
+            flex="1"
+            maxWidth="md"
+            width="100%"
+            paddingY={10}
+            marginX="auto"
+            sx={{
+              "@media only screen and (min-width: 62em)": {
+                marginX: 0,
+              },
+              "@media only screen and (min-width: 96em)": {
+                margin: "auto",
+              },
+            }}
+          >
+            <PublicUserFormContainer>
+              {verification.sent ? (
+                <PasswordResetForm
+                  onSubmit={handlePasswordResetSubmit}
+                  backLink={
+                    <NormalLink role="button" onClick={() => setVerification({ sent: false })}>
+                      <FormattedMessage
+                        id="public.login.back-to-forgot-link"
+                        defaultMessage="Go back to forgot password"
+                      />
+                    </NormalLink>
+                  }
+                  isInvalidPassword={verification.isInvalidPassword}
+                  hasVerificationCodeError={verification.hasVerificationCodeError}
+                  isSubmitting={isSubmitting}
                 />
-              </NormalLink>
-            }
-            isInvalidPassword={verification.isInvalidPassword}
-            hasVerificationCodeError={verification.hasVerificationCodeError}
-            isSubmitting={isSubmitting}
-          />
-        ) : (
-          <ForgotPasswordForm
-            isExternalUserError={verification.isExternalUserError}
-            onSubmit={handleForgotPasswordSubmit}
-            isSubmitting={isSubmitting}
-          />
-        )}
-      </PublicUserFormContainer>
+              ) : (
+                <ForgotPasswordForm
+                  isExternalUserError={verification.isExternalUserError}
+                  onSubmit={handleForgotPasswordSubmit}
+                  isSubmitting={isSubmitting}
+                />
+              )}
+            </PublicUserFormContainer>
+          </Center>
+        </Flex>
+        <Box
+          display={{ base: "none", lg: "block" }}
+          paddingLeft={8}
+          maxWidth="container.md"
+          flex="1"
+        >
+          <Flex
+            direction="column"
+            backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/signup-bg.svg`}
+            backgroundPosition="center"
+            backgroundRepeat="no-repeat"
+            backgroundSize="cover"
+            height="100%"
+            padding={16}
+          >
+            <PublicSignupRightHeading display="block" />
+            <Center height="100%">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/login/illustration.svg`}
+              />
+            </Center>
+          </Flex>
+        </Box>
+      </Flex>
     </PublicLayout>
   );
 }

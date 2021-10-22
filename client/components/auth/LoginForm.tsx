@@ -6,12 +6,12 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
   Input,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import { LockClosedIcon } from "@parallel/chakra/icons";
-import { Link } from "@parallel/components/common/Link";
+import { Link, NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { postJSON } from "@parallel/utils/rest";
@@ -19,7 +19,7 @@ import { EMAIL_REGEX } from "@parallel/utils/validation";
 import router, { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export interface LoginData {
   email: string;
@@ -30,6 +30,7 @@ interface LoginFormProps {
   isSubmitting: boolean;
 }
 export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
+  const intl = useIntl();
   const {
     handleSubmit,
     register,
@@ -62,22 +63,17 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
   }, [email, locale]);
   return (
     <>
-      <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} size="md">
+      <Box marginBottom={10}>
+        <Text as="h1" fontSize="2xl" fontWeight="bold" marginBottom={4}>
           <FormattedMessage id="public.login.header" defaultMessage="Enter Parallel" />
-        </Heading>
+        </Text>
         <Text>
           {ssoUrl && !forcePassword ? (
             <FormattedMessage
               id="public.login.explanation-with-sso"
               defaultMessage="Login using Single sign-on"
             />
-          ) : (
-            <FormattedMessage
-              id="public.login.explanation-with-password"
-              defaultMessage="Login using your email and password"
-            />
-          )}
+          ) : null}
         </Text>
       </Box>
       <form
@@ -99,6 +95,10 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             {...register("email", {
               required: true,
               pattern: EMAIL_REGEX,
+            })}
+            placeholder={intl.formatMessage({
+              id: "generic.forms.company-email-placeholder",
+              defaultMessage: "example@company.com",
             })}
           />
           <FormErrorMessage>
@@ -176,12 +176,29 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
                 />
               </Button>
             ) : null}
-            <Link href="/forgot">
-              <FormattedMessage
-                id="public.login.forgot-password-link"
-                defaultMessage="I forgot my password"
-              />
-            </Link>
+            <Stack spacing={10} textAlign="center">
+              <Text>
+                <Link href="/forgot">
+                  <FormattedMessage
+                    id="public.login.forgot-password-link"
+                    defaultMessage="I forgot my password"
+                  />
+                </Link>
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="public.login.register-for-free"
+                  defaultMessage="Don't have an account? <a>Register for free</a>"
+                  values={{
+                    a: (chunks: any) => (
+                      <NormalLink role="a" href="signup">
+                        {chunks}
+                      </NormalLink>
+                    ),
+                  }}
+                />
+              </Text>
+            </Stack>
           </>
         )}
       </Flex>

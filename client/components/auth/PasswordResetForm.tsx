@@ -1,11 +1,12 @@
 import {
   Box,
   Button,
+  Center,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
-  Input,
+  PinInput,
+  PinInputField,
   Text,
 } from "@chakra-ui/react";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
@@ -42,6 +43,7 @@ export function PasswordResetForm({
     formState: { errors },
     getValues,
     setError,
+    setValue,
     watch,
     clearErrors,
   } = useForm<PasswordResetData>({ mode: "onBlur" });
@@ -55,15 +57,22 @@ export function PasswordResetForm({
       clearErrors("verificationCode");
     }
   }, [hasVerificationCodeError]);
+
   return (
     <>
-      <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} size="md">
+      <Box marginBottom={6}>
+        <Text as="h1" fontSize="2xl" fontWeight="bold" marginBottom={8}>
           <FormattedMessage
             id="public.forgot-password.reset-header"
             defaultMessage="Password reset"
           />
-        </Heading>
+        </Text>
+        <Text as="h2" fontSize="xl" fontWeight="bold" marginBottom={2}>
+          <FormattedMessage
+            id="public.forgot-password.enter-verification-code"
+            defaultMessage="Enter the verification code"
+          />
+        </Text>
         <Text>
           <FormattedMessage
             id="public.forgot-password.reset-explanation"
@@ -73,13 +82,21 @@ export function PasswordResetForm({
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <FormControl id="verification-code" isInvalid={!!errors.verificationCode}>
-          <FormLabel>
-            <FormattedMessage
-              id="generic.forms.verification-code-label"
-              defaultMessage="Verification code"
-            />
-          </FormLabel>
-          <Input {...register("verificationCode", { required: true })} />
+          <Center marginBottom={6} gridGap={3}>
+            <PinInput
+              onChange={(e) => {
+                setValue("verificationCode", e);
+              }}
+              autoFocus
+            >
+              <PinInputField />
+              <PinInputField />
+              <PinInputField />
+              <PinInputField />
+              <PinInputField />
+              <PinInputField />
+            </PinInput>
+          </Center>
           <FormErrorMessage>
             {errors.verificationCode?.type === "validate" && (
               <FormattedMessage
@@ -95,6 +112,12 @@ export function PasswordResetForm({
             )}
           </FormErrorMessage>
         </FormControl>
+        <Text as="h1" fontSize="2xl" fontWeight="bold" marginBottom={4}>
+          <FormattedMessage
+            id="public.forgot-password.change-your-password"
+            defaultMessage="Change your password"
+          />
+        </Text>
         <FormControl id="password" isInvalid={!!errors.password || isInvalidPassword}>
           <FormLabel>
             <FormattedMessage id="generic.forms.new-password-label" defaultMessage="New password" />

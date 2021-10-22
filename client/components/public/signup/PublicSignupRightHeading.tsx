@@ -1,11 +1,9 @@
 import { Box, BoxProps, Heading, Image } from "@chakra-ui/react";
-import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 export function PublicSignupRightHeading(props: BoxProps) {
-  const [show, setShow] = useState(false);
   return (
-    <Box marginBottom={6} {...props} opacity={show ? "1" : "0"} transition="opacity .32s ease">
+    <Box marginBottom={6} {...props}>
       <Heading as="h2" size="xl" color="white" marginBottom={4}>
         <FormattedMessage
           id="component.public-signup-right-heading.heading"
@@ -14,7 +12,6 @@ export function PublicSignupRightHeading(props: BoxProps) {
       </Heading>
       <Image
         alt="Parallel"
-        onLoad={() => setShow(true)}
         maxWidth="180px"
         src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-logo-white.svg`}
       />

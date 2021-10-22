@@ -117,7 +117,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
               })}
               autoComplete="email"
               placeholder={intl.formatMessage({
-                id: "component.public-signup-form.email-placeholder",
+                id: "generic.forms.company-email-placeholder",
                 defaultMessage: "example@company.com",
               })}
             />
