@@ -107,13 +107,7 @@ export default function Forgot() {
         <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
           <Box paddingTop={5} marginLeft={-1}>
             <NakedLink href="/">
-              <Box
-                as="a"
-                color="gray.700"
-                _hover={{ color: "gray.800" }}
-                _focus={{ color: "gray.800" }}
-                _active={{ color: "gray.900" }}
-              >
+              <Box as="a">
                 <Logo width="152px" />
               </Box>
             </NakedLink>

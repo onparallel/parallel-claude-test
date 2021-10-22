@@ -19,13 +19,7 @@ export function ErrorPage({
     <Flex minHeight="100vh" flexDirection="column">
       <PublicContainer minHeight={20} display="flex" alignItems="center">
         <NextLink href="/" passHref>
-          <Box
-            as="a"
-            color="gray.700"
-            _hover={{ color: "gray.800" }}
-            _focus={{ color: "gray.800" }}
-            _active={{ color: "gray.900" }}
-          >
+          <Box as="a">
             <Logo width="152px" />
           </Box>
         </NextLink>

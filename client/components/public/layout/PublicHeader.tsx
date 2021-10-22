@@ -59,13 +59,7 @@ export function PublicHeader(props: BoxProps) {
           transition="min-height 300ms"
         >
           <NakedLink href="/">
-            <Box
-              as="a"
-              color="gray.700"
-              _hover={{ color: "gray.800" }}
-              _focus={{ color: "gray.800" }}
-              _active={{ color: "gray.900" }}
-            >
+            <Box as="a">
               <Logo width="152px" />
             </Box>
           </NakedLink>
