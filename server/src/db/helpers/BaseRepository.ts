@@ -23,37 +23,40 @@ import {
 } from "../__types";
 
 export interface TableTypes
-  extends Omit<_TableTypes, "PetitionEvent" | "SystemEvent" | "PetitionUserNotification"> {
-  petition_event: PetitionEvent;
-  petition_user_notification: PetitionUserNotification;
-  system_event: SystemEvent;
-  organization: Replace<Organization, { usage_details: OrganizationUsageDetails }>;
-  petition: Replace<Petition, { signature_config: PetitionSignatureConfig | null }>;
-  petition_signature_request: Replace<
-    PetitionSignatureRequest,
+  extends Replace<
+    _TableTypes,
     {
-      signature_config: Replace<
-        PetitionSignatureConfig,
-        { signersInfo: (PetitionSignatureConfigSigner & { externalId?: string })[] }
+      petition_event: PetitionEvent;
+      petition_user_notification: PetitionUserNotification;
+      system_event: SystemEvent;
+      organization: Replace<Organization, { usage_details: OrganizationUsageDetails }>;
+      petition: Replace<Petition, { signature_config: PetitionSignatureConfig | null }>;
+      petition_signature_request: Replace<
+        PetitionSignatureRequest,
+        {
+          signature_config: Replace<
+            PetitionSignatureConfig,
+            { signersInfo: (PetitionSignatureConfigSigner & { externalId?: string })[] }
+          >;
+        }
       >;
     }
-  >;
-}
+  > {}
 
 export interface TableCreateTypes
-  extends Omit<
+  extends Replace<
     _TableCreateTypes,
-    "CreatePetitionEvent" | "CreateSystemEvent" | "CreatePetitionUserNotification"
-  > {
-  petition_event: CreatePetitionEvent;
-  system_event: CreateSystemEvent;
-  petition_user_notification: CreatePetitionUserNotification;
-  petition: Replace<CreatePetition, { signature_config?: PetitionSignatureConfig | null }>;
-  petition_signature_request: Replace<
-    CreatePetitionSignatureRequest,
-    { signature_config: PetitionSignatureConfig }
-  >;
-}
+    {
+      petition_event: CreatePetitionEvent;
+      system_event: CreateSystemEvent;
+      petition_user_notification: CreatePetitionUserNotification;
+      petition: Replace<CreatePetition, { signature_config?: PetitionSignatureConfig | null }>;
+      petition_signature_request: Replace<
+        CreatePetitionSignatureRequest,
+        { signature_config: PetitionSignatureConfig }
+      >;
+    }
+  > {}
 export interface PageOpts {
   offset?: number | null;
   limit?: number | null;
