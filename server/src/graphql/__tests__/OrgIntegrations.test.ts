@@ -146,7 +146,7 @@ describe("GraphQL/OrgIntegrations", () => {
   });
 
   describe("updateEventSubscriptionIntegration", () => {
-    it("updates an subscription on the user's organization", async () => {
+    it("disables a subscription on the user's organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($id: GID!, $data: UpdateOrgIntegrationInput!) {
@@ -168,10 +168,38 @@ describe("GraphQL/OrgIntegrations", () => {
       expect(errors).toBeUndefined();
       expect(data?.updateEventSubscriptionIntegration).toEqual({
         id: subscriptionId,
-        settings: {
-          EVENTS_URL: "https://www.example.com/api",
-        },
+        settings: { EVENTS_URL: "https://www.example.com/api" },
         isEnabled: false,
+      });
+    });
+
+    it("updates the settings of a subscription on the user's organization", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($id: GID!, $data: UpdateOrgIntegrationInput!) {
+            updateEventSubscriptionIntegration(id: $id, data: $data) {
+              id
+              settings
+              isEnabled
+            }
+          }
+        `,
+        variables: {
+          id: subscriptionId,
+          data: {
+            settings: { EVENTS_URL: "https://www.example.com/new-api" },
+            isEnabled: true,
+          },
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateEventSubscriptionIntegration).toEqual({
+        id: subscriptionId,
+        settings: {
+          EVENTS_URL: "https://www.example.com/new-api",
+        },
+        isEnabled: true,
       });
     });
 
