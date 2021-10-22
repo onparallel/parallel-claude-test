@@ -1,4 +1,4 @@
-import { BoxProps, Center, Grid, Heading, Image } from "@chakra-ui/react";
+import { BoxProps, Center, Grid, Heading, Image, List, ListItem } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { NormalLink } from "../common/Link";
 import { PublicContainer } from "./layout/PublicContainer";
@@ -15,6 +15,7 @@ export function PublicTrust(props: BoxProps) {
         <FormattedMessage id="public.who-trust-us.title" defaultMessage="Already trust us" />
       </Heading>
       <Grid
+        as={List}
         alignItems="center"
         justifyContent="space-evenly"
         templateColumns={{
@@ -24,17 +25,17 @@ export function PublicTrust(props: BoxProps) {
         }}
         gridGap={10}
       >
-        <Center>
+        <Center as={ListItem}>
           <NormalLink href="https://www.cuatrecasas.com" isExternal>
             <Image
-              alt="Cuatrecasas Acelera"
+              alt="Cuatrecasas"
               width="220px"
               loading="lazy"
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/cuatrecasas_black.png`}
             />
           </NormalLink>
         </Center>
-        <Center>
+        <Center as={ListItem}>
           <NormalLink href="https://es.andersen.com/" isExternal marginBottom={{ md: "8px" }}>
             <Image
               alt="Andersen"
@@ -44,7 +45,7 @@ export function PublicTrust(props: BoxProps) {
             />
           </NormalLink>
         </Center>
-        <Center>
+        <Center as={ListItem}>
           <NormalLink href="https://www.aktionlegal.com/" isExternal paddingY="13px">
             <Image
               alt="Aktion"
@@ -54,7 +55,7 @@ export function PublicTrust(props: BoxProps) {
             />
           </NormalLink>
         </Center>
-        <Center>
+        <Center as={ListItem}>
           <NormalLink href="https://web.tecnotramit.com/" isExternal paddingY="13px">
             <Image
               alt="Tecnotramit"
@@ -64,7 +65,7 @@ export function PublicTrust(props: BoxProps) {
             />
           </NormalLink>
         </Center>
-        <Center>
+        <Center as={ListItem}>
           <NormalLink
             href="https://www.expglobalspain.com/Home?lan=es-ES"
             isExternal
@@ -78,7 +79,7 @@ export function PublicTrust(props: BoxProps) {
             />
           </NormalLink>
         </Center>
-        <Center>
+        <Center as={ListItem}>
           <NormalLink href="https://www.sequra.es/" isExternal paddingY="13px">
             <Image
               alt="Sequra"
