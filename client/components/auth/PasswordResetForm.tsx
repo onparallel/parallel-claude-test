@@ -12,7 +12,7 @@ import {
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PASSWORD_REGEX } from "@parallel/utils/validation";
 import { ReactElement, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PasswordStrengthIndicator } from "../common/PasswordStrengthIndicator";
 
@@ -43,7 +43,7 @@ export function PasswordResetForm({
     formState: { errors },
     getValues,
     setError,
-    setValue,
+    control,
     watch,
     clearErrors,
   } = useForm<PasswordResetData>({ mode: "onBlur" });
@@ -83,19 +83,20 @@ export function PasswordResetForm({
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <FormControl id="verification-code" isInvalid={!!errors.verificationCode}>
           <Center marginBottom={6} gridGap={3}>
-            <PinInput
-              onChange={(e) => {
-                setValue("verificationCode", e);
-              }}
-              autoFocus
-            >
-              <PinInputField />
-              <PinInputField />
-              <PinInputField />
-              <PinInputField />
-              <PinInputField />
-              <PinInputField />
-            </PinInput>
+            <Controller
+              name="verificationCode"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <PinInput onChange={onChange} value={value} autoFocus>
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                  <PinInputField />
+                </PinInput>
+              )}
+            />
           </Center>
           <FormErrorMessage>
             {errors.verificationCode?.type === "validate" && (
@@ -112,7 +113,7 @@ export function PasswordResetForm({
             )}
           </FormErrorMessage>
         </FormControl>
-        <Text as="h1" fontSize="2xl" fontWeight="bold" marginBottom={4}>
+        <Text as="h2" fontSize="xl" fontWeight="bold" marginBottom={4}>
           <FormattedMessage
             id="public.forgot-password.change-your-password"
             defaultMessage="Change your password"
