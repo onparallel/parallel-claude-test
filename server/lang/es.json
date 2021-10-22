@@ -86,7 +86,7 @@
   },
   {
     "term": "component.why-we-use-parallel.invite-title",
-    "definition": "{tone, select, INFORMAL{Invite colaboradores} other{Invita los colaboradores que necesites}}",
+    "definition": "{tone, select, INFORMAL{Invita los colaboradores que necesites} other{Invite colaboradores}}",
     "context": "Invite collaborators"
   },
   {
