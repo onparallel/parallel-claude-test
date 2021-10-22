@@ -395,7 +395,7 @@ const _PetitionFieldWithReply = {
     },
     fromPetitionFieldId: {
       type: ["string", "null"],
-      description: "The field GID from where this field was cloned",
+      description: "The field ID from where this field was cloned",
       example: toGlobalId("PetitionField", 30),
     },
     replies: {
@@ -744,7 +744,7 @@ function ListOf<T extends JsonSchema>(item: T) {
   } as const);
 }
 
-export const _PetitionEvent = {
+export const AnyPetitionEvent = {
   type: "object",
   oneOf: Object.entries({
     ACCESS_ACTIVATED: {
@@ -753,10 +753,12 @@ export const _PetitionEvent = {
         petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
+          example: toGlobalId("PetitionAccess", 2),
         },
         userId: {
           description: "The ID of the user",
           type: "string",
+          example: toGlobalId("User", 1),
         },
       },
     },
@@ -766,10 +768,12 @@ export const _PetitionEvent = {
         petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
+          example: toGlobalId("PetitionAccess", 2),
         },
         userId: {
           description: "The ID of the user",
           type: "string",
+          example: toGlobalId("User", 1),
         },
       },
     },
@@ -780,10 +784,12 @@ export const _PetitionEvent = {
         newPetitionAccessId: {
           description: "The ID of the new access created by the recipient",
           type: "string",
+          example: toGlobalId("PetitionAccess", 21),
         },
         petitionAccessId: {
           description: "The ID of the original access where the delegation happened",
           type: "string",
+          example: toGlobalId("PetitionAccess", 20),
         },
       },
     },
@@ -793,6 +799,7 @@ export const _PetitionEvent = {
         petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
+          example: toGlobalId("PetitionAccess", 2),
         },
       },
     },
@@ -802,19 +809,23 @@ export const _PetitionEvent = {
         petitionFieldCommentId: {
           description: "The ID of the comment",
           type: "string",
+          example: toGlobalId("PetitionFieldComment", 10),
         },
         petitionFieldId: {
           description: "The ID of the field where the comment belongs",
           type: "string",
+          example: toGlobalId("PetitionField", 10),
         },
         petitionAccessId: {
           description:
             "The ID of the access where the comment was deleted. If set, the comment was deleted by the recipient linked to this access",
           type: ["string", "null"],
+          example: toGlobalId("PetitionAccess", 10),
         },
         userId: {
           description: "The ID of the user. If set, the comment was deleted by this user.",
           type: ["string", "null"],
+          example: null,
         },
       },
     },
@@ -824,10 +835,12 @@ export const _PetitionEvent = {
         petitionFieldCommentId: {
           description: "The ID of the comment",
           type: "string",
+          example: toGlobalId("PetitionFieldComment", 10),
         },
         petitionFieldId: {
           description: "The ID of the field where the comment belongs",
           type: "string",
+          example: toGlobalId("PetitionField", 10),
         },
       },
     },
@@ -837,10 +850,12 @@ export const _PetitionEvent = {
         petitionMessageId: {
           description: "The ID of the cancelled message",
           type: "string",
+          example: toGlobalId("PetitionMessage", 10),
         },
         userId: {
-          description: "The ID of the user that cancelled the message",
+          description: "The ID of the user that cancelled the send of the message",
           type: "string",
+          example: toGlobalId("User", 10),
         },
       },
     },
@@ -850,6 +865,7 @@ export const _PetitionEvent = {
         petitionMessageId: {
           description: "The ID of the scheduled message",
           type: "string",
+          example: toGlobalId("PetitionMessage", 10),
         },
       },
     },
@@ -859,6 +875,7 @@ export const _PetitionEvent = {
         petitionMessageId: {
           description: "The ID of the message",
           type: "string",
+          example: toGlobalId("PetitionMessage", 10),
         },
       },
     },
@@ -868,14 +885,17 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user that transferred the petition",
           type: "string",
+          example: toGlobalId("User", 10),
         },
         ownerId: {
           description: "The ID of the new owner of the petition",
           type: "string",
+          example: toGlobalId("User", 1),
         },
         previousOwnerId: {
           description: "The ID of the previous owner of the petition",
           type: ["string", "null"],
+          example: toGlobalId("User", 2),
         },
       },
     },
@@ -885,6 +905,7 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user that closed the petition",
           type: "string",
+          example: toGlobalId("User", 1),
         },
       },
     },
@@ -894,10 +915,12 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user",
           type: "string",
+          example: toGlobalId("User", 1),
         },
         petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
+          example: toGlobalId("PetitionAccess", 1),
         },
       },
     },
@@ -907,6 +930,7 @@ export const _PetitionEvent = {
         petitionAccessId: {
           description: "The ID of the petition access linked to the recipient",
           type: "string",
+          example: toGlobalId("PetitionAccess", 1),
         },
       },
     },
@@ -916,6 +940,7 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user that created the petition",
           type: "string",
+          example: toGlobalId("User", 10),
         },
       },
     },
@@ -925,6 +950,7 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user that reopened the petition",
           type: "string",
+          example: toGlobalId("User", 5),
         },
       },
     },
@@ -934,6 +960,7 @@ export const _PetitionEvent = {
         petitionReminderId: {
           description: "The ID of the reminder",
           type: "string",
+          example: toGlobalId("PetitionReminder", 100),
         },
       },
     },
@@ -944,18 +971,22 @@ export const _PetitionEvent = {
           description:
             "The ID of the access. If set, the reply was submitted by the recipient linked to this access",
           type: ["string", "null"],
+          example: toGlobalId("PetitionAccess", 1),
         },
         userId: {
           description: "The ID of the user. If set, the reply was submitted by this user.",
           type: ["string", "null"],
+          example: null,
         },
         petitionFieldId: {
           description: "The ID of the field replied by the recipient",
           type: "string",
+          example: toGlobalId("PetitionField", 14),
         },
         petitionFieldReplyId: {
           description: "The ID of the new reply",
           type: "string",
+          example: toGlobalId("PetitionFieldReply", 11),
         },
       },
     },
@@ -966,18 +997,22 @@ export const _PetitionEvent = {
           description:
             "The ID of the access. If set, the reply was deleted by the recipient linked to this access",
           type: ["string", "null"],
+          example: toGlobalId("PetitionAccess", 1),
         },
         userId: {
           description: "The ID of the user. If set, the reply was deleted by this user.",
           type: ["string", "null"],
+          example: toGlobalId("User", 1),
         },
         petitionFieldId: {
           description: "The ID of the field where the reply belongs",
           type: "string",
+          example: toGlobalId("PetitionField", 1),
         },
         petitionFieldReplyId: {
           description: "The ID of the deleted reply",
           type: "string",
+          example: toGlobalId("PetitionFieldReply", 1),
         },
       },
     },
@@ -988,18 +1023,22 @@ export const _PetitionEvent = {
           description:
             "The ID of the access. If set, the reply was updated by the recipient linked to this access",
           type: ["string", "null"],
+          example: toGlobalId("PetitionAccess", 1),
         },
         userId: {
           description: "The ID of the user. If set, the reply was updated by this user.",
           type: ["string", "null"],
+          example: null,
         },
         petitionFieldId: {
           description: "The ID of the field where the reply belongs",
           type: "string",
+          example: toGlobalId("PetitionField", 1),
         },
         petitionFieldReplyId: {
           description: "The ID of the updated reply",
           type: "string",
+          example: toGlobalId("PetitionFieldReply", 1),
         },
       },
     },
@@ -1035,7 +1074,7 @@ export const _PetitionEvent = {
                 The ID of the contact that restarted the signature.  
                 Only set if cancelReason is \`REQUEST_RESTARTED\`.
               `,
-              example: toGlobalId("Contact", 2),
+              example: null,
             },
             declineReason: {
               type: ["string", "null"],
@@ -1043,7 +1082,7 @@ export const _PetitionEvent = {
                 Reason of cancellation.  
                 Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
             `,
-              example: "This document is outdated.",
+              example: null,
             },
             canceller: {
               description: outdent`
@@ -1056,6 +1095,15 @@ export const _PetitionEvent = {
                 lastName: { type: "string" },
                 email: { type: "string" },
               },
+              example: null,
+            },
+            error: {
+              description: outdent`
+                The server error that cancelled the signature.
+                Only set of cancelReason is \`REQUEST_ERROR\`.
+              `,
+              type: ["string", "null"],
+              example: null,
             },
           },
         },
@@ -1067,10 +1115,12 @@ export const _PetitionEvent = {
         fileUploadId: {
           description: "The ID of the signed PDF file",
           type: "string",
+          example: toGlobalId("FileUpload", 1),
         },
         petitionSignatureRequestId: {
           description: "The ID of the eSignature request",
           type: "string",
+          example: toGlobalId("PetitionSignatureRequest", 1),
         },
       },
     },
@@ -1080,6 +1130,7 @@ export const _PetitionEvent = {
         petitionSignatureRequestId: {
           description: "The ID of the eSignature request",
           type: "string",
+          example: toGlobalId("PetitionSignatureRequest", 1),
         },
       },
     },
@@ -1090,14 +1141,17 @@ export const _PetitionEvent = {
           description: "The type of permission for the new user",
           type: "string",
           enum: ["READ", "WRITE"],
+          example: "WRITE",
         },
         userId: {
           description: "The ID of the user that shared the petition",
           type: "string",
+          example: toGlobalId("User", 10),
         },
         permissionUserId: {
           description: "The ID of the user linked to the new permission",
           type: "string",
+          example: toGlobalId("User", 100),
         },
       },
     },
@@ -1108,14 +1162,17 @@ export const _PetitionEvent = {
           description: "The new permission for the user",
           type: "string",
           enum: ["READ", "WRITE"],
+          example: "READ",
         },
         userId: {
           description: "The ID of the user that edited the permission",
           type: "string",
+          example: toGlobalId("User", 10),
         },
         permissionUserId: {
           description: "The ID of the user linked to the modified permission",
           type: "string",
+          example: toGlobalId("User", 20),
         },
       },
     },
@@ -1125,10 +1182,12 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user that removed the permission",
           type: "string",
+          example: toGlobalId("User", 10),
         },
         permissionUserId: {
           description: "The ID of the user that lost its permission",
           type: "string",
+          example: toGlobalId("User", 20),
         },
       },
     },
@@ -1139,14 +1198,17 @@ export const _PetitionEvent = {
           description: "The type of permission for the group members",
           type: "string",
           enum: ["READ", "WRITE"],
+          example: "READ",
         },
         userId: {
           description: "The ID of the user that shared the petition",
           type: "string",
+          example: toGlobalId("User", 10),
         },
         userGroupId: {
           description: "The ID of the group linked to the new permission",
           type: "string",
+          example: toGlobalId("UserGroup", 10),
         },
       },
     },
@@ -1157,14 +1219,17 @@ export const _PetitionEvent = {
           description: "The new permission for the group",
           type: "string",
           enum: ["READ", "WRITE"],
+          example: "WRITE",
         },
         userId: {
           description: "The ID of the user that edited the permission",
           type: "string",
+          example: toGlobalId("User", 10),
         },
         userGroupId: {
           description: "The ID of the group linked to the modified permission",
           type: "string",
+          example: toGlobalId("UserGroup", 10),
         },
       },
     },
@@ -1174,19 +1239,32 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user that removed the permission",
           type: "string",
+          example: toGlobalId("User", 10),
         },
         userGroupId: {
           description: "The ID of the group that lost its permission",
           type: "string",
+          example: toGlobalId("UserGroup", 10),
         },
       },
     },
     PETITION_CLONED: {
       description: "The user cloned a petition",
       properties: {
+        newPetitionId: {
+          description: "The ID of the new created petition",
+          type: "string",
+          example: toGlobalId("Petition", 1),
+        },
+        type: {
+          description: "The type of the new created petition",
+          enum: ["PETITION", "TEMPLATE"],
+          example: "PETITION",
+        },
         userId: {
           description: "The ID of the user that cloned the petition",
           type: "string",
+          example: toGlobalId("User", 10),
         },
       },
     },
@@ -1196,6 +1274,12 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user that deleted the petition",
           type: "string",
+          example: toGlobalId("User", 10),
+        },
+        status: {
+          description: "The status of the petition in the moment it was deleted",
+          enum: ["CLOSED", "COMPLETED", "DRAFT", "PENDING"],
+          example: "COMPLETED",
         },
       },
     },
@@ -1205,69 +1289,81 @@ export const _PetitionEvent = {
         userId: {
           description: "The ID of the user that used the template",
           type: "string",
+          example: toGlobalId("User", 10),
+        },
+        newPetitionId: {
+          description: "The ID of the new created petition",
+          type: "string",
+          example: toGlobalId("Petition", 1),
         },
       },
     },
     REMINDERS_OPT_OUT: {
       description: "The contact has opted out from receiving reminders for this petition",
-      required: ["petitionAccessId", "reason"],
       properties: {
         petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
+          example: toGlobalId("PetitionAccess", 10),
         },
         reason: {
-          type: "string",
           description: "Code representing the reason for opting out.",
+          type: "string",
           enum: ["NOT_INTERESTED", "NOT_REQUESTED", "WRONG_PERSON", "NO_REMINDERS", "OTHER"],
+          example: "NOT_INTERESTED",
         },
         other: {
-          type: "string",
           description: "If reason is OTHER, this will be the explanation added by the contact",
+          type: ["string", "null"],
+          example: null,
         },
       },
     },
     ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
       description: "A contact started and sent itself a petition through a public petition link",
-      required: ["petitionAccessId"],
       properties: {
         petitionAccessId: {
           description: "The ID of the petition access",
+          type: "string",
+          example: toGlobalId("PetitionAccess", 10),
         },
       },
     },
     PETITION_MESSAGE_BOUNCED: {
       description: "A message email has bounced",
-      required: ["petitionMessageId"],
       properties: {
         petitionMessageId: {
           description: "The ID of the petition message that caused the bounce",
           type: "string",
+          example: toGlobalId("PetitionMessage", 10),
         },
       },
     },
     PETITION_REMINDER_BOUNCED: {
       description: "A reminder email has bounced",
-      required: ["petitionReminderId"],
       properties: {
         petitionReminderId: {
           description: "The ID of the petition reminder that caused the bounce",
           type: "string",
+          example: toGlobalId("PetitionReminder", 10),
         },
       },
     },
     RECIPIENT_SIGNED: {
       description: "A recipient has signed the document.",
-      required: ["signer", "petitionSignatureRequestId"],
       properties: {
         signer: {
           type: "object",
-          required: ["firstName", "lastName", "email"],
           description: "Information about the signer",
           properties: {
             firstName: { type: "string" },
             lastName: { type: "string" },
             email: { type: "string" },
+          },
+          example: {
+            firstName: "Tywin",
+            lastName: "Lannister",
+            email: "tywin@casterlyrock.com",
           },
         },
         petitionSignatureRequestId: {
@@ -1277,47 +1373,48 @@ export const _PetitionEvent = {
         },
       },
     },
-  } as Record<PetitionEventType, JsonSchema>).map(
-    ([event, data]) =>
-      ({
-        type: "object",
-        title: titleize(event),
-        description: data.description, // should be visible after merging https://github.com/Redocly/redoc/pull/1497
-        additionalProperties: false,
-        required: ["id", "type", "petitionId", "data", "createdAt"],
-        properties: {
-          id: {
-            type: "string",
-            description: "The ID of the petition event",
-            example: toGlobalId("PetitionEvent", 1),
+  } as Record<PetitionEventType, JsonSchema>)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(
+      ([event, data]) =>
+        ({
+          type: "object",
+          title: titleize(event),
+          description: data.description, // should be visible after merging https://github.com/Redocly/redoc/pull/1497
+          additionalProperties: false,
+          properties: {
+            id: {
+              type: "string",
+              description: "The ID of the petition event",
+              example: toGlobalId("PetitionEvent", 1),
+            },
+            type: {
+              type: "string",
+              const: event,
+              description: `\`${event}\``,
+              example: event,
+            },
+            petitionId: {
+              type: "string",
+              description: "The ID of the petition where this event occurred",
+              example: toGlobalId("Petition", 42),
+            },
+            data: {
+              type: "object",
+              description: "The payload of the event",
+              additionalProperties: false,
+              required: data.required ?? Object.keys(data.properties!),
+              properties: data.properties!,
+            },
+            createdAt: {
+              description: "Creation date of the event",
+              type: "string",
+              format: "date-time",
+              example: new Date(2020, 2, 15).toISOString(),
+            },
           },
-          type: {
-            type: "string",
-            const: event,
-            description: `\`${event}\``,
-            example: event,
-          },
-          petitionId: {
-            type: "string",
-            description: "The ID of the petition where this event occurred",
-            example: toGlobalId("Petition", 42),
-          },
-          data: {
-            type: "object",
-            description: "The payload of the event",
-            additionalProperties: false,
-            required: data.required ?? Object.keys(data.properties!),
-            properties: data.properties!,
-          },
-          createdAt: {
-            description: "Creation date of the event",
-            type: "string",
-            format: "date-time",
-            example: new Date(2020, 2, 15).toISOString(),
-          },
-        },
-      } as JsonSchema)
-  ),
+        } as JsonSchema)
+    ),
 } as any;
 
-export const PetitionEvent = schema(_PetitionEvent);
+export const PetitionEvent = schema(AnyPetitionEvent);

@@ -238,16 +238,19 @@ function mapEventPayload(event: PetitionEvent) {
       return {
         userId: toGlobalId("User", event.data.user_id),
         newPetitionId: toGlobalId("Petition", event.data.new_petition_id),
+        type: event.data.type,
       };
     }
     case "PETITION_DELETED": {
       return {
         userId: toGlobalId("User", event.data.user_id),
+        status: event.data.status,
       };
     }
     case "TEMPLATE_USED": {
       return {
         userId: toGlobalId("User", event.data.user_id),
+        newPetitionId: toGlobalId("Petition", event.data.new_petition_id),
       };
     }
     case "REMINDERS_OPT_OUT": {

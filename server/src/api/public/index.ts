@@ -48,7 +48,7 @@ import {
   Subscription,
   Template,
   UpdatePetition,
-  _PetitionEvent,
+  AnyPetitionEvent,
 } from "./schemas";
 import {
   CreateContact_ContactMutation,
@@ -145,7 +145,7 @@ export const api = new RestApi({
       },
     },
     schemas: {
-      PetitionEvent: _PetitionEvent,
+      PetitionEvent: AnyPetitionEvent,
     },
   },
   "x-tagGroups": [
