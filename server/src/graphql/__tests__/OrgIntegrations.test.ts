@@ -4,7 +4,7 @@ import { Knex } from "knex";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, OrgIntegration, User } from "../../db/__types";
+import { OrgIntegration } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -33,10 +33,10 @@ describe("GraphQL/OrgIntegrations", () => {
     integrations = await Promise.all([
       mocks.createOrgIntegration({
         org_id: organization.id,
-        type: "EVENT_SUBSCRIPTION",
-        provider: "PARALLEL",
+        type: "USER_PROVISIONING",
+        provider: "COGNITO",
         settings: {
-          EVENTS_URL: "https://www.example.com",
+          AUTH_KEY: "<AUTH_KEY>",
         },
         created_at: new Date(),
         is_enabled: true,
@@ -49,18 +49,7 @@ describe("GraphQL/OrgIntegrations", () => {
           API_KEY: "<APIKEY>",
         },
         created_at: addDays(new Date(), 1),
-        is_enabled: true,
-      }),
-      mocks.createOrgIntegration({
-        org_id: organization.id,
-        type: "SSO",
-        provider: "AZURE",
-        settings: {
-          EMAIL_DOMAINS: ["onparallel.com"],
-          COGNITO_PROVIDER: "AZURE",
-        },
         is_enabled: false,
-        created_at: addDays(new Date(), 2),
       }),
     ]);
   });
@@ -92,38 +81,32 @@ describe("GraphQL/OrgIntegrations", () => {
     expect(errors).toBeUndefined();
     expect(data?.me.organization.integrations).toEqual([
       {
-        id: toGlobalId("OrgIntegration", integrations[2].id),
-        name: "Azure",
-        type: "SSO",
-        provider: "AZURE",
-        settings: {},
-        isEnabled: false,
-      },
-      {
         id: toGlobalId("OrgIntegration", integrations[1].id),
         name: "Signaturit",
         type: "SIGNATURE",
         provider: "SIGNATURIT",
         settings: {},
-        isEnabled: true,
+        isEnabled: false,
       },
       {
         id: toGlobalId("OrgIntegration", integrations[0].id),
-        name: "Parallel",
-        type: "EVENT_SUBSCRIPTION",
-        provider: "PARALLEL",
-        settings: { EVENTS_URL: "https://www.example.com" },
+        name: "Cognito",
+        type: "USER_PROVISIONING",
+        provider: "COGNITO",
+        settings: {},
         isEnabled: true,
       },
     ]);
   });
 
-  describe("createOrgIntegration", () => {
-    it("creates and returns a new integration on the user's organization", async () => {
+  let subscriptionId: string;
+  describe("createEventSubscriptionIntegration", () => {
+    it("creates and returns a new subscription on the user's organization", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation ($type: IntegrationType!, $provider: String!, $settings: JSONObject!) {
-            createOrgIntegration(type: $type, provider: $provider, settings: $settings) {
+          mutation ($settings: JSONObject!) {
+            createEventSubscriptionIntegration(settings: $settings) {
+              id
               name
               type
               isEnabled
@@ -131,31 +114,28 @@ describe("GraphQL/OrgIntegrations", () => {
           }
         `,
         variables: {
-          type: "USER_PROVISIONING",
-          provider: "COGNITO",
-          settings: { AUTH_KEY: "<AUTH_KEY>" },
+          settings: { EVENTS_URL: "https://www.example.com/api" },
         },
       });
       expect(errors).toBeUndefined();
-      expect(data?.createOrgIntegration).toEqual({
-        name: "Cognito",
-        type: "USER_PROVISIONING",
+      expect(data?.createEventSubscriptionIntegration).toMatchObject({
+        name: "Parallel",
+        type: "EVENT_SUBSCRIPTION",
         isEnabled: true,
       });
+      subscriptionId = data!.createEventSubscriptionIntegration.id;
     });
 
-    it("throws error if trying to create an integration with same type and provider", async () => {
+    it("throws error if trying to create a second subscription integration", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation ($type: IntegrationType!, $provider: String!, $settings: JSONObject!) {
-            createOrgIntegration(type: $type, provider: $provider, settings: $settings) {
+          mutation ($settings: JSONObject!) {
+            createEventSubscriptionIntegration(settings: $settings) {
               id
             }
           }
         `,
         variables: {
-          type: "EVENT_SUBSCRIPTION",
-          provider: "PARALLEL",
           settings: { EVENTS_URL: "https://www.example.com/api" },
         },
       });
@@ -165,12 +145,41 @@ describe("GraphQL/OrgIntegrations", () => {
     });
   });
 
-  describe("updateOrgIntegration", () => {
-    it("updates an integration on the user's organization", async () => {
+  describe("updateEventSubscriptionIntegration", () => {
+    it("updates an subscription on the user's organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!, $type: IntegrationType!, $data: UpdateOrgIntegrationInput!) {
-            updateOrgIntegration(id: $id, type: $type, data: $data) {
+          mutation ($id: GID!, $data: UpdateOrgIntegrationInput!) {
+            updateEventSubscriptionIntegration(id: $id, data: $data) {
+              id
+              settings
+              isEnabled
+            }
+          }
+        `,
+        variables: {
+          id: subscriptionId,
+          data: {
+            isEnabled: false,
+          },
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateEventSubscriptionIntegration).toEqual({
+        id: subscriptionId,
+        settings: {
+          EVENTS_URL: "https://www.example.com/api",
+        },
+        isEnabled: false,
+      });
+    });
+
+    it("throws error if integration is not of type EVENT_SUBSCRIPTION", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($id: GID!, $data: UpdateOrgIntegrationInput!) {
+            updateEventSubscriptionIntegration(id: $id, data: $data) {
               id
               settings
               isEnabled
@@ -179,43 +188,6 @@ describe("GraphQL/OrgIntegrations", () => {
         `,
         variables: {
           id: toGlobalId("OrgIntegration", integrations[1].id),
-          type: integrations[1].type,
-          data: {
-            isEnabled: false,
-            settings: { API_KEY: "<ANOTHER_API_KEY>" },
-          },
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.updateOrgIntegration).toEqual({
-        id: toGlobalId("OrgIntegration", integrations[1].id),
-        settings: {},
-        isEnabled: false,
-      });
-
-      const [signatureIntegration] = await mocks.knex
-        .from<OrgIntegration>("org_integration")
-        .where("id", integrations[1].id)
-        .select("*");
-      // read this directly from DB as we dont expose APIKEYS with graphql
-      expect(signatureIntegration.settings).toEqual({ API_KEY: "<ANOTHER_API_KEY>" });
-    });
-
-    it("throws error if passed type doesn't match", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $type: IntegrationType!, $data: UpdateOrgIntegrationInput!) {
-            updateOrgIntegration(id: $id, type: $type, data: $data) {
-              id
-              settings
-              isEnabled
-            }
-          }
-        `,
-        variables: {
-          id: toGlobalId("OrgIntegration", integrations[2].id),
-          type: "USER_PROVISIONING",
           data: {
             isEnabled: true,
           },
@@ -229,8 +201,8 @@ describe("GraphQL/OrgIntegrations", () => {
     it("throws error if update data is empty", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!, $type: IntegrationType!, $data: UpdateOrgIntegrationInput!) {
-            updateOrgIntegration(id: $id, type: $type, data: $data) {
+          mutation ($id: GID!, $data: UpdateOrgIntegrationInput!) {
+            updateEventSubscriptionIntegration(id: $id, data: $data) {
               id
               settings
               isEnabled
@@ -238,8 +210,7 @@ describe("GraphQL/OrgIntegrations", () => {
           }
         `,
         variables: {
-          id: toGlobalId("OrgIntegration", integrations[2].id),
-          type: integrations[2].type,
+          id: subscriptionId,
           data: {},
         },
       });
@@ -251,8 +222,8 @@ describe("GraphQL/OrgIntegrations", () => {
     it("throws error if trying to update integration with invalid settings", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!, $type: IntegrationType!, $data: UpdateOrgIntegrationInput!) {
-            updateOrgIntegration(id: $id, type: $type, data: $data) {
+          mutation ($id: GID!, $data: UpdateOrgIntegrationInput!) {
+            updateEventSubscriptionIntegration(id: $id, data: $data) {
               id
               settings
               isEnabled
@@ -260,8 +231,7 @@ describe("GraphQL/OrgIntegrations", () => {
           }
         `,
         variables: {
-          id: toGlobalId("OrgIntegration", integrations[0].id),
-          type: integrations[0].type,
+          id: subscriptionId,
           data: { settings: { INVALID_KEY: true } },
         },
       });
@@ -271,78 +241,37 @@ describe("GraphQL/OrgIntegrations", () => {
     });
   });
 
-  describe("deleteOrgIntegration", () => {
+  describe("deleteEventSubscriptionIntegration", () => {
     it("deletes an integration in the user's organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!, $type: IntegrationType!) {
-            deleteOrgIntegration(id: $id, type: $type)
+          mutation ($id: GID!) {
+            deleteEventSubscriptionIntegration(id: $id)
           }
         `,
         variables: {
-          id: toGlobalId("OrgIntegration", integrations[0].id),
-          type: integrations[0].type,
+          id: subscriptionId,
         },
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.deleteOrgIntegration).toEqual("SUCCESS");
+      expect(data?.deleteEventSubscriptionIntegration).toEqual("SUCCESS");
     });
 
-    it("throws error if the integration type doesn't match", async () => {
+    it("throws error if the integration is not of type EVENT_SUBSCRIPTION", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!, $type: IntegrationType!) {
-            deleteOrgIntegration(id: $id, type: $type)
+          mutation ($id: GID!) {
+            deleteEventSubscriptionIntegration(id: $id)
           }
         `,
         variables: {
           id: toGlobalId("OrgIntegration", integrations[1].id),
-          type: "SSO",
         },
       });
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
-    });
-
-    it("allows to create a new integration of same type and provider after deleting it", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $type: IntegrationType!) {
-            deleteOrgIntegration(id: $id, type: $type)
-          }
-        `,
-        variables: {
-          id: toGlobalId("OrgIntegration", integrations[2].id),
-          type: integrations[2].type,
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.deleteOrgIntegration).toEqual("SUCCESS");
-
-      const { errors: createErrors, data: createData } = await testClient.mutate({
-        mutation: gql`
-          mutation ($type: IntegrationType!, $provider: String!, $settings: JSONObject!) {
-            createOrgIntegration(type: $type, provider: $provider, settings: $settings) {
-              type
-              isEnabled
-            }
-          }
-        `,
-        variables: {
-          type: integrations[2].type,
-          provider: integrations[2].provider,
-          settings: integrations[2].settings,
-        },
-      });
-
-      expect(createErrors).toBeUndefined();
-      expect(createData?.createOrgIntegration).toEqual({
-        type: integrations[2].type,
-        isEnabled: true,
-      });
     });
   });
 });

@@ -20,9 +20,9 @@ import {
   Developers_UserAuthenticationTokenFragment,
   EventSubscriptionCard_OrgIntegrationFragment,
   useDevelopersQuery,
-  useDevelopers_CreateOrgIntegrationMutation,
+  useDevelopers_CreateEventSubscriptionMutation,
   useDevelopers_RevokeUserAuthTokenMutation,
-  useDevelopers_UpdateOrgIntegrationMutation,
+  useDevelopers_UpdateEventSubscriptionMutation,
   UserAuthenticationTokens_OrderBy,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
@@ -122,8 +122,8 @@ function Developers() {
 
   const columns = useAuthTokensTableColumns();
 
-  const [createOrgSubscription] = useDevelopers_CreateOrgIntegrationMutation();
-  const [updateOrgSubscription] = useDevelopers_UpdateOrgIntegrationMutation();
+  const [createOrgSubscription] = useDevelopers_CreateEventSubscriptionMutation();
+  const [updateOrgSubscription] = useDevelopers_UpdateEventSubscriptionMutation();
   async function handleUpdateOrgSubscription(
     subscription: EventSubscriptionCard_OrgIntegrationFragment | null,
     data: { isEnabled: boolean; eventsUrl: string }
@@ -347,16 +347,16 @@ Developers.mutations = [
     }
   `,
   gql`
-    mutation Developers_CreateOrgIntegration($settings: JSONObject!) {
-      createOrgIntegration(type: EVENT_SUBSCRIPTION, provider: "PARALLEL", settings: $settings) {
+    mutation Developers_CreateEventSubscription($settings: JSONObject!) {
+      createEventSubscriptionIntegration(settings: $settings) {
         ...EventSubscriptionCard_OrgIntegration
       }
     }
     ${EventSubscriptionCard.fragments.OrgIntegration}
   `,
   gql`
-    mutation Developers_UpdateOrgIntegration($id: GID!, $data: UpdateOrgIntegrationInput!) {
-      updateOrgIntegration(id: $id, type: EVENT_SUBSCRIPTION, data: $data) {
+    mutation Developers_UpdateEventSubscription($id: GID!, $data: UpdateOrgIntegrationInput!) {
+      updateEventSubscriptionIntegration(id: $id, data: $data) {
         ...EventSubscriptionCard_OrgIntegration
       }
     }

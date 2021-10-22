@@ -19,12 +19,11 @@ export function userHasAccessToIntegration<
 export function integrationIsOfType<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
-  IType extends Arg<TypeName, FieldName, IntegrationType>
->(integrationId: TArg, type: IType): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(integrationId: TArg, type: IntegrationType): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const integrationIds = unMaybeArray(args[integrationId] as unknown as MaybeArray<number>);
     const integrations = await ctx.integrations.loadIntegration(integrationIds);
-    return integrations.every((i) => i && i.type === (args[type] as IntegrationType));
+    return integrations.every((i) => i && i.type === type);
   };
 }

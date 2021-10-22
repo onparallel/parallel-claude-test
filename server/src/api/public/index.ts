@@ -1337,11 +1337,7 @@ api
         >(
           gql`
             mutation OrgIntegration_CreateSubscription($eventsUrl: String!) {
-              createOrgIntegration(
-                type: EVENT_SUBSCRIPTION
-                provider: "PARALLEL"
-                settings: { EVENTS_URL: $eventsUrl }
-              ) {
+              createEventSubscriptionIntegration(settings: { EVENTS_URL: $eventsUrl }) {
                 ...Subscription
               }
             }
@@ -1349,7 +1345,7 @@ api
           `,
           body
         );
-        const subscription = result.createOrgIntegration;
+        const subscription = result.createEventSubscriptionIntegration;
         assert("id" in subscription);
         return Created({
           id: subscription.id,
@@ -1386,7 +1382,7 @@ api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delet
     >(
       gql`
         mutation OrgIntegration_DeleteSubscription($id: GID!) {
-          deleteOrgIntegration(id: $id, type: EVENT_SUBSCRIPTION)
+          deleteEventSubscriptionIntegration(id: $id)
         }
       `,
       { id: params.subscriptionId }

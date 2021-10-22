@@ -330,10 +330,10 @@ export type Mutation = {
   cloneUserGroup: Array<UserGroup>;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates an event subscription on the user's organization */
+  createEventSubscriptionIntegration: OrgIntegration;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
-  /** Creates an integration on the user's organization */
-  createOrgIntegration: OrgIntegration;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -360,8 +360,8 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
   deleteContacts: Result;
-  /** Deletes an integration */
-  deleteOrgIntegration: Result;
+  /** Deletes a subscription */
+  deleteEventSubscriptionIntegration: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Deletes a petition field. */
@@ -475,14 +475,14 @@ export type Mutation = {
   untagPetition: PetitionBase;
   /** Updates a contact. */
   updateContact: Contact;
+  /** Updates an existing event subscription integration on the user's org */
+  updateEventSubscriptionIntegration: OrgIntegration;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
-  /** Updates an existing integration on the user's org */
-  updateOrgIntegration: OrgIntegration;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
@@ -607,16 +607,14 @@ export type MutationcreateContactArgs = {
   data: CreateContactInput;
 };
 
+export type MutationcreateEventSubscriptionIntegrationArgs = {
+  settings: Scalars["JSONObject"];
+};
+
 export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
   petitionId: Scalars["GID"];
-};
-
-export type MutationcreateOrgIntegrationArgs = {
-  provider: Scalars["String"];
-  settings: Scalars["JSONObject"];
-  type: IntegrationType;
 };
 
 export type MutationcreateOrganizationArgs = {
@@ -702,9 +700,8 @@ export type MutationdeleteContactsArgs = {
   ids: Array<Scalars["GID"]>;
 };
 
-export type MutationdeleteOrgIntegrationArgs = {
+export type MutationdeleteEventSubscriptionIntegrationArgs = {
   id: Scalars["GID"];
-  type: IntegrationType;
 };
 
 export type MutationdeletePetitionArgs = {
@@ -1025,6 +1022,11 @@ export type MutationupdateContactArgs = {
   id: Scalars["GID"];
 };
 
+export type MutationupdateEventSubscriptionIntegrationArgs = {
+  data: UpdateOrgIntegrationInput;
+  id: Scalars["GID"];
+};
+
 export type MutationupdateFieldPositionsArgs = {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -1042,12 +1044,6 @@ export type MutationupdateLandingTemplateMetadataArgs = {
 export type MutationupdateOnboardingStatusArgs = {
   key: OnboardingKey;
   status: OnboardingStatus;
-};
-
-export type MutationupdateOrgIntegrationArgs = {
-  data: UpdateOrgIntegrationInput;
-  id: Scalars["GID"];
-  type: IntegrationType;
 };
 
 export type MutationupdateOrganizationLogoArgs = {
@@ -3432,11 +3428,17 @@ export type OrgIntegration_CreateSubscriptionMutationVariables = Exact<{
 }>;
 
 export type OrgIntegration_CreateSubscriptionMutation = {
-  createOrgIntegration: { id: string; settings: { [key: string]: any }; isEnabled: boolean };
+  createEventSubscriptionIntegration: {
+    id: string;
+    settings: { [key: string]: any };
+    isEnabled: boolean;
+  };
 };
 
 export type OrgIntegration_DeleteSubscriptionMutationVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type OrgIntegration_DeleteSubscriptionMutation = { deleteOrgIntegration: Result };
+export type OrgIntegration_DeleteSubscriptionMutation = {
+  deleteEventSubscriptionIntegration: Result;
+};

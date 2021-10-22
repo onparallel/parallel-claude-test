@@ -364,10 +364,10 @@ export interface Mutation {
   cloneUserGroup: Array<UserGroup>;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates an event subscription on the user's organization */
+  createEventSubscriptionIntegration: OrgIntegration;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
-  /** Creates an integration on the user's organization */
-  createOrgIntegration: OrgIntegration;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -394,6 +394,8 @@ export interface Mutation {
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
   deleteContacts: Result;
+  /** Deletes a subscription */
+  deleteEventSubscriptionIntegration: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Deletes a petition field. */
@@ -507,14 +509,14 @@ export interface Mutation {
   untagPetition: PetitionBase;
   /** Updates a contact. */
   updateContact: Contact;
+  /** Updates an existing event subscription integration on the user's org */
+  updateEventSubscriptionIntegration: OrgIntegration;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
-  /** Updates an existing integration on the user's org */
-  updateOrgIntegration: OrgIntegration;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
@@ -639,16 +641,14 @@ export interface MutationcreateContactArgs {
   data: CreateContactInput;
 }
 
+export interface MutationcreateEventSubscriptionIntegrationArgs {
+  settings: Scalars["JSONObject"];
+}
+
 export interface MutationcreateFileUploadReplyArgs {
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
   petitionId: Scalars["GID"];
-}
-
-export interface MutationcreateOrgIntegrationArgs {
-  provider: Scalars["String"];
-  settings: Scalars["JSONObject"];
-  type: IntegrationType;
 }
 
 export interface MutationcreateOrganizationArgs {
@@ -732,6 +732,10 @@ export interface MutationdeactivateAccessesArgs {
 
 export interface MutationdeleteContactsArgs {
   ids: Array<Scalars["GID"]>;
+}
+
+export interface MutationdeleteEventSubscriptionIntegrationArgs {
+  id: Scalars["GID"];
 }
 
 export interface MutationdeletePetitionArgs {
@@ -1052,6 +1056,11 @@ export interface MutationupdateContactArgs {
   id: Scalars["GID"];
 }
 
+export interface MutationupdateEventSubscriptionIntegrationArgs {
+  data: UpdateOrgIntegrationInput;
+  id: Scalars["GID"];
+}
+
 export interface MutationupdateFieldPositionsArgs {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -1069,12 +1078,6 @@ export interface MutationupdateLandingTemplateMetadataArgs {
 export interface MutationupdateOnboardingStatusArgs {
   key: OnboardingKey;
   status: OnboardingStatus;
-}
-
-export interface MutationupdateOrgIntegrationArgs {
-  data: UpdateOrgIntegrationInput;
-  id: Scalars["GID"];
-  type: IntegrationType;
 }
 
 export interface MutationupdateOrganizationLogoArgs {
@@ -1616,6 +1619,8 @@ export interface PetitionField {
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
   description?: Maybe<Scalars["String"]>;
+  /** The field GID used from which this field was cloned */
+  fromPetitionFieldId?: Maybe<Scalars["GID"]>;
   /** The ID of the petition field. */
   id: Scalars["GID"];
   /** Determines if the field can be moved or deleted. */
@@ -2957,14 +2962,14 @@ export type ContactListPopover_ContactFragment = {
   __typename?: "Contact";
   id: string;
   email: string;
-  fullName?: Maybe<string>;
+  fullName?: string | null | undefined;
 };
 
 export type ContactListPopover_PublicContactFragment = {
   __typename?: "PublicContact";
   id: string;
   email: string;
-  fullName?: Maybe<string>;
+  fullName?: string | null | undefined;
 };
 
 export type ContactListPopover_PetitionSignerFragment = {
@@ -2976,16 +2981,16 @@ export type ContactListPopover_PetitionSignerFragment = {
 export type ContactReference_ContactFragment = {
   __typename?: "Contact";
   id: string;
-  fullName?: Maybe<string>;
+  fullName?: string | null | undefined;
   email: string;
 };
 
 export type ContactSelect_ContactFragment = {
   __typename?: "Contact";
   id: string;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  fullName?: Maybe<string>;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
+  fullName?: string | null | undefined;
   email: string;
   hasBouncedEmail: boolean;
 };
@@ -2994,18 +2999,18 @@ export type PetitionFieldSelect_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   options: { [key: string]: any };
 };
 
 export type PetitionSignatureCellContent_PetitionFragment = {
   __typename?: "Petition";
   status: PetitionStatus;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
+  currentSignatureRequest?:
+    | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+    | null
+    | undefined;
+  signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null | undefined;
 };
 
 export type PetitionSignatureCellContent_UserFragment = {
@@ -3119,7 +3124,7 @@ export type ShareButton_PetitionBase_Petition_Fragment = {
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: { __typename?: "User"; id: string; fullName?: string | null | undefined };
       }
   >;
 };
@@ -3135,7 +3140,7 @@ export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: { __typename?: "User"; id: string; fullName?: string | null | undefined };
       }
   >;
 };
@@ -3186,17 +3191,17 @@ export type TagEditDialog_updateTagMutation = {
 
 export type UserAvatar_UserFragment = {
   __typename?: "User";
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  fullName?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
 };
 
 export type UserAvatarList_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  fullName?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
 };
 
 export type UserAvatarList_UserGroupFragment = {
@@ -3209,9 +3214,9 @@ export type UserAvatarList_UserGroupFragment = {
 export type UserListPopover_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  fullName?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
 };
 
 export type UserListPopover_UserGroupFragment = {
@@ -3224,7 +3229,7 @@ export type UserListPopover_UserGroupFragment = {
 export type UserSelect_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
+  fullName?: string | null | undefined;
   email: string;
 };
 
@@ -3234,7 +3239,7 @@ export type UserSelect_UserGroupFragment = {
   name: string;
   members: Array<{
     __typename?: "UserGroupMember";
-    user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+    user: { __typename?: "User"; id: string; fullName?: string | null | undefined; email: string };
   }>;
 };
 
@@ -3254,14 +3259,19 @@ export type useSearchUsers_searchUsersQueryVariables = Exact<{
 
 export type useSearchUsers_searchUsersQuery = {
   searchUsers: Array<
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string }
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; email: string }
     | {
         __typename?: "UserGroup";
         id: string;
         name: string;
         members: Array<{
           __typename?: "UserGroupMember";
-          user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+          user: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          };
         }>;
       }
   >;
@@ -3273,14 +3283,19 @@ export type useGetUsersOrGroupsQueryVariables = Exact<{
 
 export type useGetUsersOrGroupsQuery = {
   getUsersOrGroups: Array<
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string }
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; email: string }
     | {
         __typename?: "UserGroup";
         id: string;
         name: string;
         members: Array<{
           __typename?: "UserGroupMember";
-          user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+          user: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          };
         }>;
       }
   >;
@@ -3315,16 +3330,16 @@ export type ImportContactsDialog_bulkCreateContactsMutation = {
 export type AppLayout_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -3341,9 +3356,9 @@ export type AppLayoutNavbar_UserFragment = {
   email: string;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  fullName?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -3356,14 +3371,14 @@ export type AppLayoutNavbar_UserFragment = {
 
 export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   updatedAt: string;
   isReadOnly: boolean;
 };
 
 export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   updatedAt: string;
   isReadOnly: boolean;
 };
@@ -3376,15 +3391,15 @@ export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   locale: PetitionLocale;
-  deadline?: Maybe<string>;
+  deadline?: string | null | undefined;
   status: PetitionStatus;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   updatedAt: string;
   isReadOnly: boolean;
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
+  myEffectivePermission?:
+    | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+    | null
+    | undefined;
 };
 
 export type PetitionHeader_UserFragment = {
@@ -3415,32 +3430,32 @@ export type PetitionHeader_updatePetitionPermissionSubscriptionMutation = {
   updatePetitionPermissionSubscription: {
     __typename?: "Petition";
     id: string;
-    myEffectivePermission?: Maybe<{
-      __typename?: "EffectivePetitionUserPermission";
-      isSubscribed: boolean;
-    }>;
+    myEffectivePermission?:
+      | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+      | null
+      | undefined;
   };
 };
 
 export type PetitionLayout_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   locale: PetitionLocale;
-  deadline?: Maybe<string>;
+  deadline?: string | null | undefined;
   status: PetitionStatus;
   updatedAt: string;
   isReadOnly: boolean;
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
+  myEffectivePermission?:
+    | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+    | null
+    | undefined;
 };
 
 export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   locale: PetitionLocale;
   isPublic: boolean;
   updatedAt: string;
@@ -3454,16 +3469,16 @@ export type PetitionLayout_PetitionBaseFragment =
 export type PetitionLayout_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   hasPetitionPdfExport: boolean;
   organization: {
     __typename?: "Organization";
@@ -3480,7 +3495,7 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
   id: string;
   locale: PetitionLocale;
   isPublic: boolean;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   updatedAt: string;
   isReadOnly: boolean;
 };
@@ -3490,16 +3505,16 @@ export type PetitionTemplateHeader_UserFragment = { __typename?: "User"; id: str
 export type SettingsLayout_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -3515,9 +3530,9 @@ export type UserMenu_UserFragment = {
   isSuperAdmin: boolean;
   role: OrganizationRole;
   email: string;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  fullName?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
 };
 
 export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables = Exact<{
@@ -3536,16 +3551,19 @@ export type NotificationsDrawer_PetitionUserNotification_AccessActivatedFromPubl
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
@@ -3553,27 +3571,36 @@ export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotif
   id: string;
   createdAt: string;
   isRead: boolean;
-  field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
+  field: { __typename?: "PetitionField"; id: string; title?: string | null | undefined };
   comment: {
     __typename?: "PetitionFieldComment";
     id: string;
     isInternal: boolean;
-    author?: Maybe<
+    author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          contact?:
+            | {
+                __typename?: "Contact";
+                id: string;
+                fullName?: string | null | undefined;
+                email: string;
+              }
+            | null
+            | undefined;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null | undefined;
+          status: UserStatus;
+        }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
@@ -3584,16 +3611,19 @@ export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUser
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
@@ -3604,16 +3634,19 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNo
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment = {
@@ -3623,11 +3656,16 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotif
   createdAt: string;
   isRead: boolean;
   petition:
-    | { __typename: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
+    | { __typename: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename: "PetitionTemplate"; id: string; name?: string | null | undefined };
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null | undefined;
+    status: UserStatus;
+  };
   sharedWith:
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
     | { __typename?: "UserGroup"; id: string; name: string };
 };
 
@@ -3639,37 +3677,38 @@ export type NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUse
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment = {
   __typename?: "RemindersOptOutNotification";
   reason: string;
-  other?: Maybe<string>;
+  other?: string | null | undefined;
   id: string;
   createdAt: string;
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
@@ -3679,8 +3718,8 @@ export type NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserN
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
@@ -3690,8 +3729,8 @@ export type NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserN
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsDrawer_PetitionUserNotificationFragment =
@@ -3727,43 +3766,55 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             isRead: boolean;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
             petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
           }
         | {
             __typename?: "CommentCreatedUserNotification";
             id: string;
             createdAt: string;
             isRead: boolean;
-            field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
+            field: { __typename?: "PetitionField"; id: string; title?: string | null | undefined };
             comment: {
               __typename?: "PetitionFieldComment";
               id: string;
               isInternal: boolean;
-              author?: Maybe<
+              author?:
                 | {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   }
-                | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-              >;
+                | {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    status: UserStatus;
+                  }
+                | null
+                | undefined;
             };
             petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
           }
         | {
             __typename?: "MessageEmailBouncedUserNotification";
@@ -3772,16 +3823,19 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             isRead: boolean;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
             petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
           }
         | {
             __typename?: "PetitionCompletedUserNotification";
@@ -3790,16 +3844,19 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             isRead: boolean;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
             petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
           }
         | {
             __typename?: "PetitionSharedUserNotification";
@@ -3808,16 +3865,21 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             createdAt: string;
             isRead: boolean;
             petition:
-              | { __typename: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename: "PetitionTemplate"; id: string; name?: string | null | undefined };
             owner: {
               __typename?: "User";
               id: string;
-              fullName?: Maybe<string>;
+              fullName?: string | null | undefined;
               status: UserStatus;
             };
             sharedWith:
-              | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
+              | {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  status: UserStatus;
+                }
               | { __typename?: "UserGroup"; id: string; name: string };
           }
         | {
@@ -3827,36 +3889,42 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             isRead: boolean;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
             petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
           }
         | {
             __typename?: "RemindersOptOutNotification";
             reason: string;
-            other?: Maybe<string>;
+            other?: string | null | undefined;
             id: string;
             createdAt: string;
             isRead: boolean;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
             petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
           }
         | {
             __typename?: "SignatureCancelledUserNotification";
@@ -3864,8 +3932,8 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             createdAt: string;
             isRead: boolean;
             petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
           }
         | {
             __typename?: "SignatureCompletedUserNotification";
@@ -3873,8 +3941,8 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             createdAt: string;
             isRead: boolean;
             petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+              | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+              | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
           }
       >;
     };
@@ -3889,16 +3957,19 @@ export type NotificationsList_PetitionUserNotification_AccessActivatedFromPublic
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
@@ -3906,27 +3977,36 @@ export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotific
   id: string;
   createdAt: string;
   isRead: boolean;
-  field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
+  field: { __typename?: "PetitionField"; id: string; title?: string | null | undefined };
   comment: {
     __typename?: "PetitionFieldComment";
     id: string;
     isInternal: boolean;
-    author?: Maybe<
+    author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          contact?:
+            | {
+                __typename?: "Contact";
+                id: string;
+                fullName?: string | null | undefined;
+                email: string;
+              }
+            | null
+            | undefined;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null | undefined;
+          status: UserStatus;
+        }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
@@ -3937,16 +4017,19 @@ export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNo
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
@@ -3957,16 +4040,19 @@ export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNoti
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment = {
@@ -3976,11 +4062,16 @@ export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotific
   createdAt: string;
   isRead: boolean;
   petition:
-    | { __typename: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
+    | { __typename: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename: "PetitionTemplate"; id: string; name?: string | null | undefined };
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null | undefined;
+    status: UserStatus;
+  };
   sharedWith:
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
     | { __typename?: "UserGroup"; id: string; name: string };
 };
 
@@ -3992,37 +4083,38 @@ export type NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserN
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment = {
   __typename?: "RemindersOptOutNotification";
   reason: string;
-  other?: Maybe<string>;
+  other?: string | null | undefined;
   id: string;
   createdAt: string;
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
@@ -4032,8 +4124,8 @@ export type NotificationsList_PetitionUserNotification_SignatureCancelledUserNot
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
@@ -4043,8 +4135,8 @@ export type NotificationsList_PetitionUserNotification_SignatureCompletedUserNot
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type NotificationsList_PetitionUserNotificationFragment =
@@ -4066,16 +4158,19 @@ export type AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitio
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragment = {
@@ -4083,27 +4178,36 @@ export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragmen
   id: string;
   createdAt: string;
   isRead: boolean;
-  field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
+  field: { __typename?: "PetitionField"; id: string; title?: string | null | undefined };
   comment: {
     __typename?: "PetitionFieldComment";
     id: string;
     isInternal: boolean;
-    author?: Maybe<
+    author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          contact?:
+            | {
+                __typename?: "Contact";
+                id: string;
+                fullName?: string | null | undefined;
+                email: string;
+              }
+            | null
+            | undefined;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null | undefined;
+          status: UserStatus;
+        }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment = {
@@ -4113,16 +4217,14 @@ export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificat
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment = {
@@ -4132,16 +4234,14 @@ export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationF
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragment = {
@@ -4151,11 +4251,16 @@ export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragmen
   createdAt: string;
   isRead: boolean;
   petition:
-    | { __typename: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
+    | { __typename: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename: "PetitionTemplate"; id: string; name?: string | null | undefined };
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null | undefined;
+    status: UserStatus;
+  };
   sharedWith:
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
     | { __typename?: "UserGroup"; id: string; name: string };
 };
 
@@ -4166,8 +4271,8 @@ export type PetitionUserNotification_PetitionUserNotification_AccessActivatedFro
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
@@ -4177,8 +4282,8 @@ export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUser
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
@@ -4188,8 +4293,8 @@ export type PetitionUserNotification_PetitionUserNotification_MessageEmailBounce
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
@@ -4199,8 +4304,8 @@ export type PetitionUserNotification_PetitionUserNotification_PetitionCompletedU
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
@@ -4210,8 +4315,8 @@ export type PetitionUserNotification_PetitionUserNotification_PetitionSharedUser
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
@@ -4221,8 +4326,8 @@ export type PetitionUserNotification_PetitionUserNotification_ReminderEmailBounc
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment =
@@ -4232,8 +4337,8 @@ export type PetitionUserNotification_PetitionUserNotification_RemindersOptOutNot
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
@@ -4243,8 +4348,8 @@ export type PetitionUserNotification_PetitionUserNotification_SignatureCancelled
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
@@ -4254,8 +4359,8 @@ export type PetitionUserNotification_PetitionUserNotification_SignatureCompleted
     createdAt: string;
     isRead: boolean;
     petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+      | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
   };
 
 export type PetitionUserNotification_PetitionUserNotificationFragment =
@@ -4276,37 +4381,33 @@ export type ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotific
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
   __typename?: "RemindersOptOutNotification";
   reason: string;
-  other?: Maybe<string>;
+  other?: string | null | undefined;
   id: string;
   createdAt: string;
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment = {
@@ -4315,8 +4416,8 @@ export type SignatureCancelledUserNotification_SignatureCancelledUserNotificatio
   createdAt: string;
   isRead: boolean;
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type SignatureCompletedUserNotification_SignatureCompletedUserNotificationFragment = {
@@ -4325,8 +4426,8 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
   createdAt: string;
   isRead: boolean;
   petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+    | { __typename?: "Petition"; id: string; name?: string | null | undefined }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null | undefined };
 };
 
 export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
@@ -4355,19 +4456,25 @@ export type OrganizationUsersListTableHeader_UserFragment = {
 
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-  }>;
-  remindersConfig?: Maybe<{
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  }>;
+  emailSubject?: string | null | undefined;
+  emailBody?: any | null | undefined;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+      }
+    | null
+    | undefined;
+  remindersConfig?:
+    | {
+        __typename?: "RemindersConfig";
+        offset: number;
+        time: string;
+        timezone: string;
+        weekdaysOnly: boolean;
+      }
+    | null
+    | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -4384,23 +4491,25 @@ export type AddPetitionAccessDialog_contactsByEmailQueryVariables = Exact<{
 
 export type AddPetitionAccessDialog_contactsByEmailQuery = {
   contactsByEmail: Array<
-    Maybe<{
-      __typename?: "Contact";
-      id: string;
-      firstName?: Maybe<string>;
-      lastName?: Maybe<string>;
-      fullName?: Maybe<string>;
-      email: string;
-      hasBouncedEmail: boolean;
-    }>
+    | {
+        __typename?: "Contact";
+        id: string;
+        firstName?: string | null | undefined;
+        lastName?: string | null | undefined;
+        fullName?: string | null | undefined;
+        email: string;
+        hasBouncedEmail: boolean;
+      }
+    | null
+    | undefined
   >;
 };
 
 export type MessageEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
-  bouncedAt?: Maybe<string>;
-  deliveredAt?: Maybe<string>;
-  openedAt?: Maybe<string>;
+  bouncedAt?: string | null | undefined;
+  deliveredAt?: string | null | undefined;
+  openedAt?: string | null | undefined;
 };
 
 export type PetitionAccessTable_PetitionFragment = {
@@ -4410,25 +4519,26 @@ export type PetitionAccessTable_PetitionFragment = {
     __typename?: "PetitionAccess";
     id: string;
     status: PetitionAccessStatus;
-    nextReminderAt?: Maybe<string>;
+    nextReminderAt?: string | null | undefined;
     remindersLeft: number;
     reminderCount: number;
     remindersActive: boolean;
     remindersOptOut: boolean;
     createdAt: string;
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-    remindersConfig?: Maybe<{
-      __typename?: "RemindersConfig";
-      offset: number;
-      time: string;
-      timezone: string;
-      weekdaysOnly: boolean;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
+    remindersConfig?:
+      | {
+          __typename?: "RemindersConfig";
+          offset: number;
+          time: string;
+          timezone: string;
+          weekdaysOnly: boolean;
+        }
+      | null
+      | undefined;
   }>;
 };
 
@@ -4444,20 +4554,26 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   __typename?: "PetitionAccess";
   id: string;
   status: PetitionAccessStatus;
-  nextReminderAt?: Maybe<string>;
+  nextReminderAt?: string | null | undefined;
   remindersLeft: number;
   reminderCount: number;
   remindersActive: boolean;
   remindersOptOut: boolean;
   createdAt: string;
-  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
-  remindersConfig?: Maybe<{
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  }>;
+  contact?:
+    | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+    | null
+    | undefined;
+  remindersConfig?:
+    | {
+        __typename?: "RemindersConfig";
+        offset: number;
+        time: string;
+        timezone: string;
+        weekdaysOnly: boolean;
+      }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionFragment = {
@@ -4469,20 +4585,26 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "AccessActivatedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
@@ -4491,32 +4613,41 @@ export type PetitionActivityTimeline_PetitionFragment = {
           createdAt: string;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
           __typename?: "AccessDeactivatedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
@@ -4525,21 +4656,27 @@ export type PetitionActivityTimeline_PetitionFragment = {
           createdAt: string;
           originalAccess: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
           newAccess: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
@@ -4548,66 +4685,99 @@ export type PetitionActivityTimeline_PetitionFragment = {
           createdAt: string;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
           __typename?: "CommentDeletedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          deletedBy?: Maybe<
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          deletedBy?:
             | {
                 __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                contact?:
+                  | {
+                      __typename?: "Contact";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      email: string;
+                    }
+                  | null
+                  | undefined;
               }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "CommentPublishedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          comment?: Maybe<{
-            __typename?: "PetitionFieldComment";
-            isEdited: boolean;
-            content: string;
-            author?: Maybe<
-              | {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                }
-              | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-            >;
-          }>;
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          comment?:
+            | {
+                __typename?: "PetitionFieldComment";
+                isEdited: boolean;
+                content: string;
+                author?:
+                  | {
+                      __typename?: "PetitionAccess";
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
+                    }
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "GroupPermissionAddedEvent";
           id: string;
           permissionType: PetitionPermissionType;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           permissionGroup: { __typename?: "UserGroup"; name: string };
         }
       | {
@@ -4615,24 +4785,30 @@ export type PetitionActivityTimeline_PetitionFragment = {
           id: string;
           permissionType: PetitionPermissionType;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           permissionGroup: { __typename?: "UserGroup"; name: string };
         }
       | {
           __typename?: "GroupPermissionRemovedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           permissionGroup: { __typename?: "UserGroup"; name: string };
         }
       | {
@@ -4642,24 +4818,30 @@ export type PetitionActivityTimeline_PetitionFragment = {
           message: {
             __typename?: "PetitionMessage";
             status: PetitionMessageStatus;
-            scheduledAt?: Maybe<string>;
-            emailSubject?: Maybe<any>;
+            scheduledAt?: string | null | undefined;
+            emailSubject?: any | null | undefined;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "MessageScheduledEvent";
@@ -4669,24 +4851,27 @@ export type PetitionActivityTimeline_PetitionFragment = {
             __typename?: "PetitionMessage";
             id: string;
             status: PetitionMessageStatus;
-            scheduledAt?: Maybe<string>;
-            emailSubject?: Maybe<any>;
-            emailBody?: Maybe<string>;
-            sentAt?: Maybe<string>;
+            scheduledAt?: string | null | undefined;
+            emailSubject?: any | null | undefined;
+            emailBody?: string | null | undefined;
+            sentAt?: string | null | undefined;
             sender: {
               __typename?: "User";
               id: string;
-              fullName?: Maybe<string>;
+              fullName?: string | null | undefined;
               status: UserStatus;
             };
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -4696,27 +4881,30 @@ export type PetitionActivityTimeline_PetitionFragment = {
           createdAt: string;
           message: {
             __typename?: "PetitionMessage";
-            emailSubject?: Maybe<any>;
-            scheduledAt?: Maybe<string>;
-            bouncedAt?: Maybe<string>;
-            deliveredAt?: Maybe<string>;
-            openedAt?: Maybe<string>;
-            emailBody?: Maybe<string>;
-            sentAt?: Maybe<string>;
+            emailSubject?: any | null | undefined;
+            scheduledAt?: string | null | undefined;
+            bouncedAt?: string | null | undefined;
+            deliveredAt?: string | null | undefined;
+            openedAt?: string | null | undefined;
+            emailBody?: string | null | undefined;
+            sentAt?: string | null | undefined;
             sender: {
               __typename?: "User";
               id: string;
-              fullName?: Maybe<string>;
+              fullName?: string | null | undefined;
               status: UserStatus;
             };
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -4724,65 +4912,86 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "OwnershipTransferredEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          owner?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          previousOwner?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          owner?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          previousOwner?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "PetitionClonedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "PetitionClosedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "PetitionClosedNotifiedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
@@ -4791,24 +5000,30 @@ export type PetitionActivityTimeline_PetitionFragment = {
           createdAt: string;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
           __typename?: "PetitionCreatedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | { __typename?: "PetitionDeletedEvent"; id: string }
       | {
@@ -4819,12 +5034,15 @@ export type PetitionActivityTimeline_PetitionFragment = {
             __typename?: "PetitionMessage";
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -4836,12 +5054,15 @@ export type PetitionActivityTimeline_PetitionFragment = {
             __typename?: "PetitionReminder";
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -4849,18 +5070,24 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "PetitionReopenedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "RecipientSignedEvent";
           id: string;
           createdAt: string;
-          signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+          signer?:
+            | { __typename?: "PetitionSigner"; email: string; fullName: string }
+            | null
+            | undefined;
         }
       | {
           __typename?: "ReminderSentEvent";
@@ -4870,21 +5097,27 @@ export type PetitionActivityTimeline_PetitionFragment = {
             __typename?: "PetitionReminder";
             type: PetitionReminderType;
             createdAt: string;
-            emailBody?: Maybe<string>;
-            sender?: Maybe<{
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
-            }>;
+            emailBody?: string | null | undefined;
+            sender?:
+              | {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  status: UserStatus;
+                }
+              | null
+              | undefined;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -4893,84 +5126,129 @@ export type PetitionActivityTimeline_PetitionFragment = {
           id: string;
           createdAt: string;
           reason: string;
-          other?: Maybe<string>;
+          other?: string | null | undefined;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
           __typename?: "ReplyCreatedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          createdBy?: Maybe<
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          createdBy?:
             | {
                 __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                contact?:
+                  | {
+                      __typename?: "Contact";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      email: string;
+                    }
+                  | null
+                  | undefined;
               }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "ReplyDeletedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          deletedBy?: Maybe<
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          deletedBy?:
             | {
                 __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                contact?:
+                  | {
+                      __typename?: "Contact";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      email: string;
+                    }
+                  | null
+                  | undefined;
               }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "ReplyUpdatedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          updatedBy?: Maybe<
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          updatedBy?:
             | {
                 __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                contact?:
+                  | {
+                      __typename?: "Contact";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      email: string;
+                    }
+                  | null
+                  | undefined;
               }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "SignatureCancelledEvent";
           id: string;
           cancelType: PetitionSignatureCancelReason;
-          cancellerReason?: Maybe<string>;
+          cancellerReason?: string | null | undefined;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          canceller?:
+            | { __typename?: "PetitionSigner"; email: string; fullName: string }
+            | null
+            | undefined;
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
       | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
@@ -4980,53 +5258,71 @@ export type PetitionActivityTimeline_PetitionFragment = {
           id: string;
           permissionType: PetitionPermissionType;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          permissionUser?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "UserPermissionEditedEvent";
           id: string;
           permissionType: PetitionPermissionType;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          permissionUser?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "UserPermissionRemovedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          permissionUser?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
     >;
   };
@@ -5036,15 +5332,16 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   __typename?: "AccessActivatedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5055,12 +5352,15 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedFromPublicPeti
     createdAt: string;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 
@@ -5068,15 +5368,16 @@ export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragme
   __typename?: "AccessDeactivatedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5086,21 +5387,17 @@ export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment
   createdAt: string;
   originalAccess: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
   newAccess: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5110,12 +5407,10 @@ export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = 
   createdAt: string;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5123,43 +5418,59 @@ export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment 
   __typename?: "CommentDeletedEvent";
   id: string;
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  deletedBy?: Maybe<
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  deletedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment = {
   __typename?: "CommentPublishedEvent";
   id: string;
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  comment?: Maybe<{
-    __typename?: "PetitionFieldComment";
-    isEdited: boolean;
-    content: string;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-        }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
-  }>;
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  comment?:
+    | {
+        __typename?: "PetitionFieldComment";
+        isEdited: boolean;
+        content: string;
+        author?:
+          | {
+              __typename?: "PetitionAccess";
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
+            }
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null | undefined;
+              status: UserStatus;
+            }
+          | null
+          | undefined;
+      }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment = {
@@ -5167,7 +5478,10 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fra
   id: string;
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   permissionGroup: { __typename?: "UserGroup"; name: string };
 };
 
@@ -5176,7 +5490,10 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fr
   id: string;
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   permissionGroup: { __typename?: "UserGroup"; name: string };
 };
 
@@ -5184,7 +5501,10 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_F
   __typename?: "GroupPermissionRemovedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   permissionGroup: { __typename?: "UserGroup"; name: string };
 };
 
@@ -5195,19 +5515,25 @@ export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragmen
   message: {
     __typename?: "PetitionMessage";
     status: PetitionMessageStatus;
-    scheduledAt?: Maybe<string>;
-    emailSubject?: Maybe<any>;
+    scheduledAt?: string | null | undefined;
+    emailSubject?: any | null | undefined;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment = {
@@ -5218,19 +5544,27 @@ export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragmen
     __typename?: "PetitionMessage";
     id: string;
     status: PetitionMessageStatus;
-    scheduledAt?: Maybe<string>;
-    emailSubject?: Maybe<any>;
-    emailBody?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    sender: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
+    scheduledAt?: string | null | undefined;
+    emailSubject?: any | null | undefined;
+    emailBody?: string | null | undefined;
+    sentAt?: string | null | undefined;
+    sender: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null | undefined;
+      status: UserStatus;
+    };
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5241,22 +5575,30 @@ export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
   createdAt: string;
   message: {
     __typename?: "PetitionMessage";
-    emailSubject?: Maybe<any>;
-    scheduledAt?: Maybe<string>;
-    bouncedAt?: Maybe<string>;
-    deliveredAt?: Maybe<string>;
-    openedAt?: Maybe<string>;
-    emailBody?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    sender: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
+    emailSubject?: any | null | undefined;
+    scheduledAt?: string | null | undefined;
+    bouncedAt?: string | null | undefined;
+    deliveredAt?: string | null | undefined;
+    openedAt?: string | null | undefined;
+    emailBody?: string | null | undefined;
+    sentAt?: string | null | undefined;
+    sender: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null | undefined;
+      status: UserStatus;
+    };
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5265,43 +5607,54 @@ export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fra
   __typename?: "OwnershipTransferredEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  owner?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  previousOwner?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  owner?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  previousOwner?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClonedEvent_Fragment = {
   __typename?: "PetitionClonedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment = {
   __typename?: "PetitionClosedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment = {
   __typename?: "PetitionClosedNotifiedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5311,12 +5664,10 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
   createdAt: string;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5324,7 +5675,10 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   __typename?: "PetitionCreatedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment = {
@@ -5340,12 +5694,15 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_F
     __typename?: "PetitionMessage";
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5358,12 +5715,15 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_
     __typename?: "PetitionReminder";
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5372,14 +5732,17 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragmen
   __typename?: "PetitionReopenedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment = {
   __typename?: "RecipientSignedEvent";
   id: string;
   createdAt: string;
-  signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
@@ -5390,21 +5753,27 @@ export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = 
     __typename?: "PetitionReminder";
     type: PetitionReminderType;
     createdAt: string;
-    emailBody?: Maybe<string>;
-    sender?: Maybe<{
-      __typename?: "User";
-      id: string;
-      fullName?: Maybe<string>;
-      status: UserStatus;
-    }>;
+    emailBody?: string | null | undefined;
+    sender?:
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null | undefined;
+          status: UserStatus;
+        }
+      | null
+      | undefined;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5414,15 +5783,13 @@ export type PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment
   id: string;
   createdAt: string;
   reason: string;
-  other?: Maybe<string>;
+  other?: string | null | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5430,67 +5797,82 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = 
   __typename?: "ReplyCreatedEvent";
   id: string;
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  createdBy?: Maybe<
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  createdBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = {
   __typename?: "ReplyDeletedEvent";
   id: string;
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  deletedBy?: Maybe<
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  deletedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = {
   __typename?: "ReplyUpdatedEvent";
   id: string;
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  updatedBy?: Maybe<
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  updatedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
   __typename?: "SignatureCancelledEvent";
   id: string;
   cancelType: PetitionSignatureCancelReason;
-  cancellerReason?: Maybe<string>;
+  cancellerReason?: string | null | undefined;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment = {
@@ -5515,13 +5897,14 @@ export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Frag
   id: string;
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  permissionUser?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment = {
@@ -5529,26 +5912,28 @@ export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fra
   id: string;
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  permissionUser?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment = {
   __typename?: "UserPermissionRemovedEvent";
   id: string;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  permissionUser?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionActivityTimeline_PetitionEventFragment =
@@ -5591,60 +5976,57 @@ export type PetitionActivityTimeline_PetitionEventFragment =
 
 export type PetitionFieldReference_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  title?: Maybe<string>;
+  title?: string | null | undefined;
 };
 
 export type SentPetitionMessageDialog_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
-  emailBody?: Maybe<string>;
-  emailSubject?: Maybe<any>;
-  sentAt?: Maybe<string>;
-  scheduledAt?: Maybe<string>;
+  emailBody?: string | null | undefined;
+  emailSubject?: any | null | undefined;
+  sentAt?: string | null | undefined;
+  scheduledAt?: string | null | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
 export type SentReminderMessageDialog_PetitionReminderFragment = {
   __typename?: "PetitionReminder";
   createdAt: string;
-  emailBody?: Maybe<string>;
+  emailBody?: string | null | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
 export type UserReference_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
+  fullName?: string | null | undefined;
   status: UserStatus;
 };
 
 export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   __typename?: "AccessActivatedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5654,27 +6036,31 @@ export type TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetiti
     createdAt: string;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 
 export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   __typename?: "AccessDeactivatedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5683,21 +6069,17 @@ export type TimelineAccessDelegatedEvent_AccessDelegatedEventFragment = {
   createdAt: string;
   originalAccess: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
   newAccess: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5706,61 +6088,78 @@ export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
   createdAt: string;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
 export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
   __typename?: "CommentDeletedEvent";
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  deletedBy?: Maybe<
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  deletedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
   __typename?: "CommentPublishedEvent";
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  comment?: Maybe<{
-    __typename?: "PetitionFieldComment";
-    isEdited: boolean;
-    content: string;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-        }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
-  }>;
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  comment?:
+    | {
+        __typename?: "PetitionFieldComment";
+        isEdited: boolean;
+        content: string;
+        author?:
+          | {
+              __typename?: "PetitionAccess";
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
+            }
+          | {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null | undefined;
+              status: UserStatus;
+            }
+          | null
+          | undefined;
+      }
+    | null
+    | undefined;
 };
 
 export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment = {
   __typename?: "GroupPermissionAddedEvent";
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   permissionGroup: { __typename?: "UserGroup"; name: string };
 };
 
@@ -5768,14 +6167,20 @@ export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmen
   __typename?: "GroupPermissionEditedEvent";
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   permissionGroup: { __typename?: "UserGroup"; name: string };
 };
 
 export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment = {
   __typename?: "GroupPermissionRemovedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   permissionGroup: { __typename?: "UserGroup"; name: string };
 };
 
@@ -5785,19 +6190,25 @@ export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
   message: {
     __typename?: "PetitionMessage";
     status: PetitionMessageStatus;
-    scheduledAt?: Maybe<string>;
-    emailSubject?: Maybe<any>;
+    scheduledAt?: string | null | undefined;
+    emailSubject?: any | null | undefined;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
@@ -5806,19 +6217,27 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
   message: {
     __typename?: "PetitionMessage";
     status: PetitionMessageStatus;
-    scheduledAt?: Maybe<string>;
-    emailSubject?: Maybe<any>;
-    emailBody?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    sender: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
+    scheduledAt?: string | null | undefined;
+    emailSubject?: any | null | undefined;
+    emailBody?: string | null | undefined;
+    sentAt?: string | null | undefined;
+    sender: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null | undefined;
+      status: UserStatus;
+    };
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5828,22 +6247,30 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
   createdAt: string;
   message: {
     __typename?: "PetitionMessage";
-    emailSubject?: Maybe<any>;
-    scheduledAt?: Maybe<string>;
-    bouncedAt?: Maybe<string>;
-    deliveredAt?: Maybe<string>;
-    openedAt?: Maybe<string>;
-    emailBody?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    sender: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
+    emailSubject?: any | null | undefined;
+    scheduledAt?: string | null | undefined;
+    bouncedAt?: string | null | undefined;
+    deliveredAt?: string | null | undefined;
+    openedAt?: string | null | undefined;
+    emailBody?: string | null | undefined;
+    sentAt?: string | null | undefined;
+    sender: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null | undefined;
+      status: UserStatus;
+    };
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5851,40 +6278,51 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
 export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment = {
   __typename?: "OwnershipTransferredEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  owner?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  previousOwner?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  owner?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  previousOwner?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelinePetitionClonedEvent_PetitionClonedEventFragment = {
   __typename?: "PetitionClonedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
   __typename?: "PetitionClosedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment = {
   __typename?: "PetitionClosedNotifiedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
@@ -5893,19 +6331,20 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   createdAt: string;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragment = {
@@ -5915,12 +6354,15 @@ export type TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragm
     __typename?: "PetitionMessage";
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5932,12 +6374,15 @@ export type TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFra
     __typename?: "PetitionReminder";
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5945,13 +6390,16 @@ export type TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFra
 export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
   __typename?: "PetitionReopenedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelineRecipientSignedEvent_RecipientSignedEventFragment = {
   __typename?: "RecipientSignedEvent";
   createdAt: string;
-  signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null | undefined;
 };
 
 export type TimelineReminderSentEvent_ReminderSentEventFragment = {
@@ -5961,21 +6409,27 @@ export type TimelineReminderSentEvent_ReminderSentEventFragment = {
     __typename?: "PetitionReminder";
     type: PetitionReminderType;
     createdAt: string;
-    emailBody?: Maybe<string>;
-    sender?: Maybe<{
-      __typename?: "User";
-      id: string;
-      fullName?: Maybe<string>;
-      status: UserStatus;
-    }>;
+    emailBody?: string | null | undefined;
+    sender?:
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null | undefined;
+          status: UserStatus;
+        }
+      | null
+      | undefined;
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?:
+        | {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }
+        | null
+        | undefined;
     };
   };
 };
@@ -5984,79 +6438,92 @@ export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
   __typename?: "RemindersOptOutEvent";
   createdAt: string;
   reason: string;
-  other?: Maybe<string>;
+  other?: string | null | undefined;
   access: {
     __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
   };
 };
 
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
   __typename?: "ReplyCreatedEvent";
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  createdBy?: Maybe<
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  createdBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
   __typename?: "ReplyDeletedEvent";
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  deletedBy?: Maybe<
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  deletedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
   __typename?: "ReplyUpdatedEvent";
   createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  updatedBy?: Maybe<
+  field?: { __typename?: "PetitionField"; title?: string | null | undefined } | null | undefined;
+  updatedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
   cancelType: PetitionSignatureCancelReason;
-  cancellerReason?: Maybe<string>;
+  cancellerReason?: string | null | undefined;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null | undefined;
 };
 
 export type TimelineSignatureCompletedEvent_SignatureCompletedEventFragment = {
@@ -6073,44 +6540,47 @@ export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = 
   __typename?: "UserPermissionAddedEvent";
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  permissionUser?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment = {
   __typename?: "UserPermissionEditedEvent";
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  permissionUser?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment = {
   __typename?: "UserPermissionRemovedEvent";
   createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
+  user?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
+  permissionUser?:
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionContents_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   type: PetitionFieldType;
   options: { [key: string]: any };
   isReadOnly: boolean;
@@ -6134,35 +6604,41 @@ export type PetitionSettings_UserFragment = {
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   status: PetitionStatus;
-  deadline?: Maybe<string>;
+  deadline?: string | null | undefined;
   id: string;
   locale: PetitionLocale;
   hasCommentsEnabled: boolean;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
   isReadOnly: boolean;
-  name?: Maybe<string>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  }>;
-  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
+  name?: string | null | undefined;
+  currentSignatureRequest?:
+    | {
+        __typename?: "PetitionSignatureRequest";
+        id: string;
+        status: PetitionSignatureRequestStatus;
+      }
+    | null
+    | undefined;
+  organization: { __typename?: "Organization"; customHost?: string | null | undefined };
   owner: { __typename?: "User"; id: string };
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        provider: string;
+        title: string;
+        review: boolean;
+        letRecipientsChooseSigners: boolean;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null | undefined;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }>;
+      }
+    | null
+    | undefined;
 };
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
@@ -6174,43 +6650,49 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
   isReadOnly: boolean;
-  name?: Maybe<string>;
-  publicLink?: Maybe<{
-    __typename?: "PublicPetitionLink";
-    id: string;
-    title: string;
-    isActive: boolean;
-    description: string;
-    slug: string;
-    linkPermissions: Array<
-      | {
-          __typename?: "PublicPetitionLinkUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string };
-        }
-      | {
-          __typename?: "PublicPetitionLinkUserPermission";
-          permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string };
-        }
-    >;
-  }>;
-  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
+  name?: string | null | undefined;
+  publicLink?:
+    | {
+        __typename?: "PublicPetitionLink";
+        id: string;
+        title: string;
+        isActive: boolean;
+        description: string;
+        slug: string;
+        linkPermissions: Array<
+          | {
+              __typename?: "PublicPetitionLinkUserGroupPermission";
+              permissionType: PetitionPermissionType;
+              group: { __typename?: "UserGroup"; id: string };
+            }
+          | {
+              __typename?: "PublicPetitionLinkUserPermission";
+              permissionType: PetitionPermissionType;
+              user: { __typename?: "User"; id: string };
+            }
+        >;
+      }
+    | null
+    | undefined;
+  organization: { __typename?: "Organization"; customHost?: string | null | undefined };
   owner: { __typename?: "User"; id: string };
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        provider: string;
+        title: string;
+        review: boolean;
+        letRecipientsChooseSigners: boolean;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null | undefined;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }>;
+      }
+    | null
+    | undefined;
 };
 
 export type PetitionSettings_PetitionBaseFragment =
@@ -6256,23 +6738,26 @@ export type PetitionSettings_createPublicPetitionLinkMutation = {
   createPublicPetitionLink: {
     __typename?: "PetitionTemplate";
     id: string;
-    publicLink?: Maybe<{
-      __typename?: "PublicPetitionLink";
-      id: string;
-      title: string;
-      description: string;
-      slug: string;
-      linkPermissions: Array<
-        | {
-            __typename?: "PublicPetitionLinkUserGroupPermission";
-            permissionType: PetitionPermissionType;
-          }
-        | {
-            __typename?: "PublicPetitionLinkUserPermission";
-            permissionType: PetitionPermissionType;
-          }
-      >;
-    }>;
+    publicLink?:
+      | {
+          __typename?: "PublicPetitionLink";
+          id: string;
+          title: string;
+          description: string;
+          slug: string;
+          linkPermissions: Array<
+            | {
+                __typename?: "PublicPetitionLinkUserGroupPermission";
+                permissionType: PetitionPermissionType;
+              }
+            | {
+                __typename?: "PublicPetitionLinkUserPermission";
+                permissionType: PetitionPermissionType;
+              }
+          >;
+        }
+      | null
+      | undefined;
   };
 };
 
@@ -6309,7 +6794,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutation = {
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -6325,9 +6810,9 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
               __typename?: "User";
               id: string;
               email: string;
-              fullName?: Maybe<string>;
-              avatarUrl?: Maybe<string>;
-              initials?: Maybe<string>;
+              fullName?: string | null | undefined;
+              avatarUrl?: string | null | undefined;
+              initials?: string | null | undefined;
             };
           }>;
         };
@@ -6339,9 +6824,9 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
           __typename?: "User";
           id: string;
           email: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+          fullName?: string | null | undefined;
+          avatarUrl?: string | null | undefined;
+          initials?: string | null | undefined;
         };
       }
   >;
@@ -6350,7 +6835,7 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
 export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -6366,9 +6851,9 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
               __typename?: "User";
               id: string;
               email: string;
-              fullName?: Maybe<string>;
-              avatarUrl?: Maybe<string>;
-              initials?: Maybe<string>;
+              fullName?: string | null | undefined;
+              avatarUrl?: string | null | undefined;
+              initials?: string | null | undefined;
             };
           }>;
         };
@@ -6380,9 +6865,9 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
           __typename?: "User";
           id: string;
           email: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+          fullName?: string | null | undefined;
+          avatarUrl?: string | null | undefined;
+          initials?: string | null | undefined;
         };
       }
   >;
@@ -6399,9 +6884,9 @@ export type PetitionSharingModal_PetitionUserPermissionFragment = {
     __typename?: "User";
     id: string;
     email: string;
-    fullName?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    fullName?: string | null | undefined;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
   };
 };
 
@@ -6419,9 +6904,9 @@ export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
         __typename?: "User";
         id: string;
         email: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
+        fullName?: string | null | undefined;
+        avatarUrl?: string | null | undefined;
+        initials?: string | null | undefined;
       };
     }>;
   };
@@ -6431,9 +6916,9 @@ export type PetitionSharingModal_UserFragment = {
   __typename?: "User";
   id: string;
   email: string;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  fullName?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
 };
 
 export type PetitionSharingModal_UserGroupFragment = {
@@ -6447,9 +6932,9 @@ export type PetitionSharingModal_UserGroupFragment = {
       __typename?: "User";
       id: string;
       email: string;
-      fullName?: Maybe<string>;
-      avatarUrl?: Maybe<string>;
-      initials?: Maybe<string>;
+      fullName?: string | null | undefined;
+      avatarUrl?: string | null | undefined;
+      initials?: string | null | undefined;
     };
   }>;
 };
@@ -6468,7 +6953,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
   addPetitionPermission: Array<{
     __typename?: "Petition";
     id: string;
-    name?: Maybe<string>;
+    name?: string | null | undefined;
     permissions: Array<
       | {
           __typename?: "PetitionUserGroupPermission";
@@ -6484,9 +6969,9 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
                 __typename?: "User";
                 id: string;
                 email: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
+                fullName?: string | null | undefined;
+                avatarUrl?: string | null | undefined;
+                initials?: string | null | undefined;
               };
             }>;
           };
@@ -6498,9 +6983,9 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
             __typename?: "User";
             id: string;
             email: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
+            fullName?: string | null | undefined;
+            avatarUrl?: string | null | undefined;
+            initials?: string | null | undefined;
           };
         }
     >;
@@ -6517,7 +7002,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
   removePetitionPermission: Array<{
     __typename?: "Petition";
     id: string;
-    name?: Maybe<string>;
+    name?: string | null | undefined;
     permissions: Array<
       | {
           __typename?: "PetitionUserGroupPermission";
@@ -6533,9 +7018,9 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
                 __typename?: "User";
                 id: string;
                 email: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
+                fullName?: string | null | undefined;
+                avatarUrl?: string | null | undefined;
+                initials?: string | null | undefined;
               };
             }>;
           };
@@ -6547,9 +7032,9 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
             __typename?: "User";
             id: string;
             email: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
+            fullName?: string | null | undefined;
+            avatarUrl?: string | null | undefined;
+            initials?: string | null | undefined;
           };
         }
     >;
@@ -6565,7 +7050,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
   transferPetitionOwnership: Array<{
     __typename?: "Petition";
     id: string;
-    name?: Maybe<string>;
+    name?: string | null | undefined;
     permissions: Array<
       | {
           __typename?: "PetitionUserGroupPermission";
@@ -6581,9 +7066,9 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
                 __typename?: "User";
                 id: string;
                 email: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
+                fullName?: string | null | undefined;
+                avatarUrl?: string | null | undefined;
+                initials?: string | null | undefined;
               };
             }>;
           };
@@ -6595,9 +7080,9 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
             __typename?: "User";
             id: string;
             email: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
+            fullName?: string | null | undefined;
+            avatarUrl?: string | null | undefined;
+            initials?: string | null | undefined;
           };
         }
     >;
@@ -6610,88 +7095,88 @@ export type PetitionSharingModal_PetitionsQueryVariables = Exact<{
 
 export type PetitionSharingModal_PetitionsQuery = {
   petitionsById: Array<
-    Maybe<
-      | {
-          __typename?: "Petition";
-          id: string;
-          name?: Maybe<string>;
-          permissions: Array<
-            | {
-                __typename?: "PetitionUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: {
-                  __typename?: "UserGroup";
-                  id: string;
-                  name: string;
-                  initials: string;
-                  members: Array<{
-                    __typename?: "UserGroupMember";
-                    user: {
-                      __typename?: "User";
-                      id: string;
-                      email: string;
-                      fullName?: Maybe<string>;
-                      avatarUrl?: Maybe<string>;
-                      initials?: Maybe<string>;
-                    };
-                  }>;
-                };
-              }
-            | {
-                __typename?: "PetitionUserPermission";
-                permissionType: PetitionPermissionType;
-                user: {
-                  __typename?: "User";
-                  id: string;
-                  email: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
-                };
-              }
-          >;
-        }
-      | {
-          __typename?: "PetitionTemplate";
-          id: string;
-          name?: Maybe<string>;
-          permissions: Array<
-            | {
-                __typename?: "PetitionUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: {
-                  __typename?: "UserGroup";
-                  id: string;
-                  name: string;
-                  initials: string;
-                  members: Array<{
-                    __typename?: "UserGroupMember";
-                    user: {
-                      __typename?: "User";
-                      id: string;
-                      email: string;
-                      fullName?: Maybe<string>;
-                      avatarUrl?: Maybe<string>;
-                      initials?: Maybe<string>;
-                    };
-                  }>;
-                };
-              }
-            | {
-                __typename?: "PetitionUserPermission";
-                permissionType: PetitionPermissionType;
-                user: {
-                  __typename?: "User";
-                  id: string;
-                  email: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
-                };
-              }
-          >;
-        }
-    >
+    | {
+        __typename?: "Petition";
+        id: string;
+        name?: string | null | undefined;
+        permissions: Array<
+          | {
+              __typename?: "PetitionUserGroupPermission";
+              permissionType: PetitionPermissionType;
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                name: string;
+                initials: string;
+                members: Array<{
+                  __typename?: "UserGroupMember";
+                  user: {
+                    __typename?: "User";
+                    id: string;
+                    email: string;
+                    fullName?: string | null | undefined;
+                    avatarUrl?: string | null | undefined;
+                    initials?: string | null | undefined;
+                  };
+                }>;
+              };
+            }
+          | {
+              __typename?: "PetitionUserPermission";
+              permissionType: PetitionPermissionType;
+              user: {
+                __typename?: "User";
+                id: string;
+                email: string;
+                fullName?: string | null | undefined;
+                avatarUrl?: string | null | undefined;
+                initials?: string | null | undefined;
+              };
+            }
+        >;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        name?: string | null | undefined;
+        permissions: Array<
+          | {
+              __typename?: "PetitionUserGroupPermission";
+              permissionType: PetitionPermissionType;
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                name: string;
+                initials: string;
+                members: Array<{
+                  __typename?: "UserGroupMember";
+                  user: {
+                    __typename?: "User";
+                    id: string;
+                    email: string;
+                    fullName?: string | null | undefined;
+                    avatarUrl?: string | null | undefined;
+                    initials?: string | null | undefined;
+                  };
+                }>;
+              };
+            }
+          | {
+              __typename?: "PetitionUserPermission";
+              permissionType: PetitionPermissionType;
+              user: {
+                __typename?: "User";
+                id: string;
+                email: string;
+                fullName?: string | null | undefined;
+                avatarUrl?: string | null | undefined;
+                initials?: string | null | undefined;
+              };
+            }
+        >;
+      }
+    | null
+    | undefined
   >;
 };
 
@@ -6735,40 +7220,46 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
 export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   status: PetitionStatus;
-  name?: Maybe<string>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
+  name?: string | null | undefined;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        provider: string;
+        title: string;
+        review: boolean;
+        letRecipientsChooseSigners: boolean;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null | undefined;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }>;
+      }
+    | null
+    | undefined;
 };
 
 export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  name?: Maybe<string>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
+  name?: string | null | undefined;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        provider: string;
+        title: string;
+        review: boolean;
+        letRecipientsChooseSigners: boolean;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null | undefined;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }>;
+      }
+    | null
+    | undefined;
 };
 
 export type SignatureConfigDialog_PetitionBaseFragment =
@@ -6784,33 +7275,31 @@ export type SignatureConfigDialog_OrgIntegrationFragment = {
 export type TemplateDetailsModal_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  descriptionHtml?: Maybe<string>;
-  name?: Maybe<string>;
+  descriptionHtml?: string | null | undefined;
+  name?: string | null | undefined;
   locale: PetitionLocale;
   updatedAt: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
     type: PetitionFieldType;
     options: { [key: string]: any };
   }>;
   owner: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
+    fullName?: string | null | undefined;
     organization: { __typename?: "Organization"; id: string; name: string };
   };
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-  }>;
-  publicLink?: Maybe<{
-    __typename?: "PublicPetitionLink";
-    id: string;
-    isActive: boolean;
-    slug: string;
-  }>;
+  myEffectivePermission?:
+    | { __typename?: "EffectivePetitionUserPermission"; permissionType: PetitionPermissionType }
+    | null
+    | undefined;
+  publicLink?:
+    | { __typename?: "PublicPetitionLink"; id: string; isActive: boolean; slug: string }
+    | null
+    | undefined;
 };
 
 export type CopySignatureConfigDialog_PetitionSignerFragment = {
@@ -6842,7 +7331,7 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
   dynamicSelectFieldFileDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
@@ -6850,13 +7339,13 @@ export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
+  title?: string | null | undefined;
+  description?: string | null | undefined;
   optional: boolean;
   multiple: boolean;
   isFixed: boolean;
   isReadOnly: boolean;
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   options: { [key: string]: any };
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
@@ -6950,7 +7439,7 @@ export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVari
 export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation = {
   petitionFieldAttachmentDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
@@ -6988,12 +7477,12 @@ export type PetitionComposeFieldList_PetitionFragment = {
     isFixed: boolean;
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
-    description?: Maybe<string>;
+    title?: string | null | undefined;
+    description?: string | null | undefined;
     optional: boolean;
     multiple: boolean;
     isReadOnly: boolean;
-    visibility?: Maybe<{ [key: string]: any }>;
+    visibility?: { [key: string]: any } | null | undefined;
     options: { [key: string]: any };
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -7019,7 +7508,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   isReadOnly: boolean;
   isFixed: boolean;
   position: number;
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
 };
 
 export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
@@ -7037,22 +7526,22 @@ export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   multiple: boolean;
   options: { [key: string]: any };
   isReadOnly: boolean;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
 };
 
 export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  description?: Maybe<any>;
+  emailSubject?: string | null | undefined;
+  emailBody?: any | null | undefined;
+  description?: any | null | undefined;
   isReadOnly: boolean;
 };
 
 export type ReferencedFieldDialogDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   type: PetitionFieldType;
 };
 
@@ -7077,32 +7566,38 @@ export type PetitionListTagFilter_tagsQuery = {
 export type NewPetitionTemplatesList_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  name?: Maybe<string>;
-  descriptionExcerpt?: Maybe<string>;
+  name?: string | null | undefined;
+  descriptionExcerpt?: string | null | undefined;
   locale: PetitionLocale;
   owner: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    fullName?: string | null | undefined;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
   };
-  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
+  publicLink?:
+    | { __typename?: "PublicPetitionLink"; id: string; isActive: boolean }
+    | null
+    | undefined;
 };
 
 export type TemplateCard_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-  name?: Maybe<string>;
-  descriptionExcerpt?: Maybe<string>;
+  name?: string | null | undefined;
+  descriptionExcerpt?: string | null | undefined;
   locale: PetitionLocale;
   owner: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    fullName?: string | null | undefined;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
   };
-  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
+  publicLink?:
+    | { __typename?: "PublicPetitionLink"; id: string; isActive: boolean }
+    | null
+    | undefined;
 };
 
 export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
@@ -7125,7 +7620,7 @@ export type ExportRepliesDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
 };
 
@@ -7136,7 +7631,7 @@ export type ExportRepliesProgressDialog_PetitionFragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -7144,14 +7639,17 @@ export type ExportRepliesProgressDialog_PetitionFragment = {
       content: { [key: string]: any };
     }>;
   }>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-    signedDocumentFilename?: Maybe<string>;
-    auditTrailFilename?: Maybe<string>;
-    metadata: { [key: string]: any };
-  }>;
+  currentSignatureRequest?:
+    | {
+        __typename?: "PetitionSignatureRequest";
+        id: string;
+        status: PetitionSignatureRequestStatus;
+        signedDocumentFilename?: string | null | undefined;
+        auditTrailFilename?: string | null | undefined;
+        metadata: { [key: string]: any };
+      }
+    | null
+    | undefined;
 };
 
 export type ExportRepliesProgressDialog_PetitionRepliesQueryVariables = Exact<{
@@ -7159,7 +7657,7 @@ export type ExportRepliesProgressDialog_PetitionRepliesQueryVariables = Exact<{
 }>;
 
 export type ExportRepliesProgressDialog_PetitionRepliesQuery = {
-  petition?: Maybe<
+  petition?:
     | {
         __typename?: "Petition";
         id: string;
@@ -7167,7 +7665,7 @@ export type ExportRepliesProgressDialog_PetitionRepliesQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
+          title?: string | null | undefined;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -7175,17 +7673,21 @@ export type ExportRepliesProgressDialog_PetitionRepliesQuery = {
             content: { [key: string]: any };
           }>;
         }>;
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          signedDocumentFilename?: Maybe<string>;
-          auditTrailFilename?: Maybe<string>;
-          metadata: { [key: string]: any };
-        }>;
+        currentSignatureRequest?:
+          | {
+              __typename?: "PetitionSignatureRequest";
+              id: string;
+              status: PetitionSignatureRequestStatus;
+              signedDocumentFilename?: string | null | undefined;
+              auditTrailFilename?: string | null | undefined;
+              metadata: { [key: string]: any };
+            }
+          | null
+          | undefined;
       }
     | { __typename?: "PetitionTemplate" }
-  >;
+    | null
+    | undefined;
 };
 
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables = Exact<{
@@ -7197,7 +7699,7 @@ export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
@@ -7210,7 +7712,7 @@ export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
   signedPetitionDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
@@ -7244,15 +7746,18 @@ export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation =
 export type NewSignatureRequestRow_PetitionFragment = {
   __typename?: "Petition";
   status: PetitionStatus;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    letRecipientsChooseSigners: boolean;
-    provider: string;
-    review: boolean;
-    timezone: string;
-    title: string;
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-  }>;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        letRecipientsChooseSigners: boolean;
+        provider: string;
+        review: boolean;
+        timezone: string;
+        title: string;
+        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+      }
+    | null
+    | undefined;
 };
 
 export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
@@ -7269,8 +7774,8 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
+  title?: string | null | undefined;
+  description?: string | null | undefined;
   optional: boolean;
   validated: boolean;
   replies: Array<{
@@ -7280,7 +7785,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     createdAt: string;
     metadata: { [key: string]: any };
-    field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
+    field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null | undefined;
   }>;
   comments: Array<{
     __typename?: "PetitionFieldComment";
@@ -7308,7 +7813,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   createdAt: string;
   metadata: { [key: string]: any };
-  field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
+  field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null | undefined;
 };
 
 export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
@@ -7320,7 +7825,7 @@ export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVari
 export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation = {
   petitionFieldAttachmentDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
@@ -7345,7 +7850,7 @@ export type PetitionRepliesFieldComments_UserFragment = {
 export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   type: PetitionFieldType;
   comments: Array<{
     __typename?: "PetitionFieldComment";
@@ -7354,19 +7859,28 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
     createdAt: string;
     isUnread: boolean;
     isEdited: boolean;
-    isInternal?: Maybe<boolean>;
-    author?: Maybe<
+    isInternal?: boolean;
+    author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          contact?:
+            | {
+                __typename?: "Contact";
+                id: string;
+                fullName?: string | null | undefined;
+                email: string;
+              }
+            | null
+            | undefined;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null | undefined;
+          status: UserStatus;
+        }
+      | null
+      | undefined;
   }>;
   replies: Array<{
     __typename?: "PetitionFieldReply";
@@ -7388,19 +7902,23 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   createdAt: string;
   isUnread: boolean;
   isEdited: boolean;
-  isInternal?: Maybe<boolean>;
-  author?: Maybe<
+  isInternal?: boolean;
+  author?:
     | {
         __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
+        contact?:
+          | {
+              __typename?: "Contact";
+              id: string;
+              fullName?: string | null | undefined;
+              email: string;
+            }
+          | null
+          | undefined;
       }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
+    | { __typename?: "User"; id: string; fullName?: string | null | undefined; status: UserStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
@@ -7410,7 +7928,7 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   createdAt: string;
   metadata: { [key: string]: any };
-  field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
+  field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null | undefined;
 };
 
 export type PetitionSignaturesCard_UserFragment = {
@@ -7425,39 +7943,43 @@ export type PetitionSignaturesCard_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   status: PetitionStatus;
-  name?: Maybe<string>;
-  signatureRequests?: Maybe<
-    Array<{
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      signerStatus: Array<{
-        __typename?: "PetitionSignatureRequestSignerStatus";
-        status: string;
-        signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-      }>;
-      signatureConfig: {
+  name?: string | null | undefined;
+  signatureRequests?:
+    | Array<{
+        __typename?: "PetitionSignatureRequest";
+        id: string;
+        status: PetitionSignatureRequestStatus;
+        signerStatus: Array<{
+          __typename?: "PetitionSignatureRequestSignerStatus";
+          status: string;
+          signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+        }>;
+        signatureConfig: {
+          __typename?: "SignatureConfig";
+          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+        };
+      }>
+    | null
+    | undefined;
+  signatureConfig?:
+    | {
         __typename?: "SignatureConfig";
-        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-      };
-    }>
-  >;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    timezone: string;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-      fullName: string;
-    }>;
-  }>;
+        provider: string;
+        title: string;
+        review: boolean;
+        letRecipientsChooseSigners: boolean;
+        timezone: string;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null | undefined;
+          firstName: string;
+          lastName: string;
+          email: string;
+          fullName: string;
+        }>;
+      }
+    | null
+    | undefined;
 };
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables = Exact<{
@@ -7471,39 +7993,43 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         __typename?: "Petition";
         id: string;
         status: PetitionStatus;
-        name?: Maybe<string>;
-        signatureRequests?: Maybe<
-          Array<{
-            __typename?: "PetitionSignatureRequest";
-            id: string;
-            status: PetitionSignatureRequestStatus;
-            signerStatus: Array<{
-              __typename?: "PetitionSignatureRequestSignerStatus";
-              status: string;
-              signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-            }>;
-            signatureConfig: {
+        name?: string | null | undefined;
+        signatureRequests?:
+          | Array<{
+              __typename?: "PetitionSignatureRequest";
+              id: string;
+              status: PetitionSignatureRequestStatus;
+              signerStatus: Array<{
+                __typename?: "PetitionSignatureRequestSignerStatus";
+                status: string;
+                signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+              }>;
+              signatureConfig: {
+                __typename?: "SignatureConfig";
+                signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+              };
+            }>
+          | null
+          | undefined;
+        signatureConfig?:
+          | {
               __typename?: "SignatureConfig";
-              signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-            };
-          }>
-        >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          timezone: string;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-            fullName: string;
-          }>;
-        }>;
+              provider: string;
+              title: string;
+              review: boolean;
+              letRecipientsChooseSigners: boolean;
+              timezone: string;
+              signers: Array<{
+                __typename?: "PetitionSigner";
+                contactId?: string | null | undefined;
+                firstName: string;
+                lastName: string;
+                email: string;
+                fullName: string;
+              }>;
+            }
+          | null
+          | undefined;
       }
     | { __typename?: "PetitionTemplate" };
 };
@@ -7541,7 +8067,7 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   signedPetitionDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
@@ -7563,10 +8089,10 @@ export type PublicTemplateCard_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
   id: string;
   locale: PetitionLocale;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   slug: string;
-  imageUrl?: Maybe<string>;
-  backgroundColor?: Maybe<string>;
+  imageUrl?: string | null | undefined;
+  backgroundColor?: string | null | undefined;
   ownerFullName: string;
   organizationName: string;
 };
@@ -7581,14 +8107,14 @@ export type useCompleteSignerInfoDialog_PetitionSignerFragment = {
 
 export type useCompleteSignerInfoDialog_PublicContactFragment = {
   __typename?: "PublicContact";
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
 };
 
 export type RecipientViewContentsCard_PublicUserFragment = {
   __typename?: "PublicUser";
-  firstName?: Maybe<string>;
+  firstName?: string | null | undefined;
 };
 
 export type RecipientViewContentsCard_PublicPetitionFragment = {
@@ -7598,14 +8124,14 @@ export type RecipientViewContentsCard_PublicPetitionFragment = {
     __typename?: "PublicPetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
     options: { [key: string]: any };
     optional: boolean;
     validated: boolean;
     isReadOnly: boolean;
     commentCount: number;
     unreadCommentCount: number;
-    visibility?: Maybe<{ [key: string]: any }>;
+    visibility?: { [key: string]: any } | null | undefined;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
       id: string;
@@ -7619,14 +8145,14 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   options: { [key: string]: any };
   optional: boolean;
   validated: boolean;
   isReadOnly: boolean;
   commentCount: number;
   unreadCommentCount: number;
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -7638,18 +8164,22 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
 export type RecipientViewHeader_PublicContactFragment = {
   __typename?: "PublicContact";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
   email: string;
 };
 
 export type RecipientViewHeader_PublicUserFragment = {
   __typename?: "PublicUser";
   id: string;
-  firstName?: Maybe<string>;
-  fullName?: Maybe<string>;
+  firstName?: string | null | undefined;
+  fullName?: string | null | undefined;
   email: string;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
+  organization: {
+    __typename?: "PublicOrganization";
+    name: string;
+    logoUrl?: string | null | undefined;
+  };
 };
 
 export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables = Exact<{
@@ -7663,16 +8193,19 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables =
 export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
   publicDelegateAccessToContact: {
     __typename?: "PublicPetitionAccess";
-    petition?: Maybe<{
-      __typename?: "PublicPetition";
-      id: string;
-      recipients: Array<{
-        __typename?: "PublicContact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    }>;
+    petition?:
+      | {
+          __typename?: "PublicPetition";
+          id: string;
+          recipients: Array<{
+            __typename?: "PublicContact";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          }>;
+        }
+      | null
+      | undefined;
   };
 };
 
@@ -7687,14 +8220,14 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
     validated: boolean;
     isReadOnly: boolean;
     options: { [key: string]: any };
-    visibility?: Maybe<{ [key: string]: any }>;
+    visibility?: { [key: string]: any } | null | undefined;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
       id: string;
       content: { [key: string]: any };
     }>;
   }>;
-  signatureConfig?: Maybe<{ __typename?: "PublicSignatureConfig"; review: boolean }>;
+  signatureConfig?: { __typename?: "PublicSignatureConfig"; review: boolean } | null | undefined;
 };
 
 export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
@@ -7705,7 +8238,7 @@ export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   validated: boolean;
   isReadOnly: boolean;
   options: { [key: string]: any };
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -7727,16 +8260,16 @@ export type RecipientViewFieldAttachment_PetitionFieldAttachmentFragment = {
 
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
-  contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
+  granter?: { __typename?: "PublicUser"; fullName?: string | null | undefined } | null | undefined;
+  contact?: { __typename?: "PublicContact"; id: string } | null | undefined;
 };
 
 export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
+  title?: string | null | undefined;
+  description?: string | null | undefined;
   options: { [key: string]: any };
   optional: boolean;
   multiple: boolean;
@@ -7774,22 +8307,22 @@ export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink
 export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation = {
   publicPetitionFieldAttachmentDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
 export type RecipientViewPetitionFieldCard_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
-  contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
+  granter?: { __typename?: "PublicUser"; fullName?: string | null | undefined } | null | undefined;
+  contact?: { __typename?: "PublicContact"; id: string } | null | undefined;
 };
 
 export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
+  title?: string | null | undefined;
+  description?: string | null | undefined;
   options: { [key: string]: any };
   optional: boolean;
   multiple: boolean;
@@ -7828,14 +8361,14 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment = {
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
-  contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
+  granter?: { __typename?: "PublicUser"; fullName?: string | null | undefined } | null | undefined;
+  contact?: { __typename?: "PublicContact"; id: string } | null | undefined;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment = {
@@ -7844,10 +8377,11 @@ export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentF
   content: string;
   createdAt: string;
   isUnread: boolean;
-  author?: Maybe<
-    | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-    | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-  >;
+  author?:
+    | { __typename?: "PublicContact"; id: string; fullName?: string | null | undefined }
+    | { __typename?: "PublicUser"; id: string; fullName?: string | null | undefined }
+    | null
+    | undefined;
 };
 
 export type RecipientViewPetitionFieldCommentsQueryVariables = Exact<{
@@ -7862,10 +8396,11 @@ export type RecipientViewPetitionFieldCommentsQuery = {
     content: string;
     createdAt: string;
     isUnread: boolean;
-    author?: Maybe<
-      | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-      | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-    >;
+    author?:
+      | { __typename?: "PublicContact"; id: string; fullName?: string | null | undefined }
+      | { __typename?: "PublicUser"; id: string; fullName?: string | null | undefined }
+      | null
+      | undefined;
   }>;
 };
 
@@ -7897,10 +8432,11 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
     content: string;
     createdAt: string;
     isUnread: boolean;
-    author?: Maybe<
-      | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-      | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-    >;
+    author?:
+      | { __typename?: "PublicContact"; id: string; fullName?: string | null | undefined }
+      | { __typename?: "PublicUser"; id: string; fullName?: string | null | undefined }
+      | null
+      | undefined;
   };
 };
 
@@ -7919,10 +8455,11 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
     content: string;
     createdAt: string;
     isUnread: boolean;
-    author?: Maybe<
-      | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-      | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-    >;
+    author?:
+      | { __typename?: "PublicContact"; id: string; fullName?: string | null | undefined }
+      | { __typename?: "PublicUser"; id: string; fullName?: string | null | undefined }
+      | null
+      | undefined;
   };
 };
 
@@ -7954,7 +8491,7 @@ export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLi
   publicFileUploadReplyDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
@@ -8148,7 +8685,7 @@ export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
       id: string;
       tokenName: string;
       createdAt: string;
-      lastUsedAt?: Maybe<string>;
+      lastUsedAt?: string | null | undefined;
     };
   };
 };
@@ -8156,16 +8693,16 @@ export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
 export type Admin_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8182,16 +8719,16 @@ export type AdminQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8221,16 +8758,16 @@ export type AdminOrganizations_OrganizationFragment = {
 export type AdminOrganizations_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8276,16 +8813,16 @@ export type AdminOrganizationsUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8300,16 +8837,16 @@ export type AdminOrganizationsUserQuery = {
 export type AdminSupportMethods_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8326,16 +8863,16 @@ export type AdminSupportMethodsUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8351,19 +8888,79 @@ export type Contact_ContactFragment = {
   __typename?: "Contact";
   id: string;
   email: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   accesses: {
     __typename?: "PetitionAccessPagination";
     items: Array<{
       __typename?: "PetitionAccess";
       id: string;
-      petition?: Maybe<{
+      petition?:
+        | {
+            __typename?: "Petition";
+            id: string;
+            name?: string | null | undefined;
+            sentAt?: string | null | undefined;
+            status: PetitionStatus;
+            permissions: Array<
+              | {
+                  __typename?: "PetitionUserGroupPermission";
+                  permissionType: PetitionPermissionType;
+                  group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+                }
+              | {
+                  __typename?: "PetitionUserPermission";
+                  permissionType: PetitionPermissionType;
+                  user: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    avatarUrl?: string | null | undefined;
+                    initials?: string | null | undefined;
+                  };
+                }
+            >;
+            progress: {
+              __typename?: "PetitionProgress";
+              validated: number;
+              replied: number;
+              optional: number;
+              total: number;
+            };
+            currentSignatureRequest?:
+              | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+              | null
+              | undefined;
+            signatureConfig?:
+              | { __typename?: "SignatureConfig"; review: boolean }
+              | null
+              | undefined;
+          }
+        | null
+        | undefined;
+    }>;
+  };
+};
+
+export type Contact_Contact_ProfileFragment = {
+  __typename?: "Contact";
+  id: string;
+  email: string;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
+};
+
+export type Contact_PetitionAccessFragment = {
+  __typename?: "PetitionAccess";
+  id: string;
+  petition?:
+    | {
         __typename?: "Petition";
         id: string;
-        name?: Maybe<string>;
-        sentAt?: Maybe<string>;
+        name?: string | null | undefined;
+        sentAt?: string | null | undefined;
         status: PetitionStatus;
         permissions: Array<
           | {
@@ -8377,9 +8974,9 @@ export type Contact_ContactFragment = {
               user: {
                 __typename?: "User";
                 id: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
+                fullName?: string | null | undefined;
+                avatarUrl?: string | null | undefined;
+                initials?: string | null | undefined;
               };
             }
         >;
@@ -8390,72 +8987,21 @@ export type Contact_ContactFragment = {
           optional: number;
           total: number;
         };
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
-        }>;
-        signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-      }>;
-    }>;
-  };
-};
-
-export type Contact_Contact_ProfileFragment = {
-  __typename?: "Contact";
-  id: string;
-  email: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-};
-
-export type Contact_PetitionAccessFragment = {
-  __typename?: "PetitionAccess";
-  id: string;
-  petition?: Maybe<{
-    __typename?: "Petition";
-    id: string;
-    name?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    status: PetitionStatus;
-    permissions: Array<
-      | {
-          __typename?: "PetitionUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-        }
-      | {
-          __typename?: "PetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          user: {
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
-          };
-        }
-    >;
-    progress: {
-      __typename?: "PetitionProgress";
-      validated: number;
-      replied: number;
-      optional: number;
-      total: number;
-    };
-    currentSignatureRequest?: Maybe<{
-      __typename?: "PetitionSignatureRequest";
-      status: PetitionSignatureRequestStatus;
-    }>;
-    signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-  }>;
+        currentSignatureRequest?:
+          | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+          | null
+          | undefined;
+        signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null | undefined;
+      }
+    | null
+    | undefined;
 };
 
 export type Contact_PetitionFragment = {
   __typename?: "Petition";
   id: string;
-  name?: Maybe<string>;
-  sentAt?: Maybe<string>;
+  name?: string | null | undefined;
+  sentAt?: string | null | undefined;
   status: PetitionStatus;
   permissions: Array<
     | {
@@ -8469,9 +9015,9 @@ export type Contact_PetitionFragment = {
         user: {
           __typename?: "User";
           id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+          fullName?: string | null | undefined;
+          avatarUrl?: string | null | undefined;
+          initials?: string | null | undefined;
         };
       }
   >;
@@ -8482,26 +9028,26 @@ export type Contact_PetitionFragment = {
     optional: number;
     total: number;
   };
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
+  currentSignatureRequest?:
+    | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+    | null
+    | undefined;
+  signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null | undefined;
 };
 
 export type Contact_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   hasPetitionSignature: boolean;
   organization: {
     __typename?: "Organization";
@@ -8523,9 +9069,9 @@ export type Contact_updateContactMutation = {
     __typename?: "Contact";
     id: string;
     email: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
   };
 };
 
@@ -8535,16 +9081,16 @@ export type ContactUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasPetitionSignature: boolean;
     organization: {
       __typename?: "Organization";
@@ -8563,58 +9109,75 @@ export type ContactQueryVariables = Exact<{
 }>;
 
 export type ContactQuery = {
-  contact?: Maybe<{
-    __typename?: "Contact";
-    id: string;
-    email: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    accesses: {
-      __typename?: "PetitionAccessPagination";
-      items: Array<{
-        __typename?: "PetitionAccess";
+  contact?:
+    | {
+        __typename?: "Contact";
         id: string;
-        petition?: Maybe<{
-          __typename?: "Petition";
-          id: string;
-          name?: Maybe<string>;
-          sentAt?: Maybe<string>;
-          status: PetitionStatus;
-          permissions: Array<
-            | {
-                __typename?: "PetitionUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-              }
-            | {
-                __typename?: "PetitionUserPermission";
-                permissionType: PetitionPermissionType;
-                user: {
-                  __typename?: "User";
+        email: string;
+        fullName?: string | null | undefined;
+        firstName?: string | null | undefined;
+        lastName?: string | null | undefined;
+        accesses: {
+          __typename?: "PetitionAccessPagination";
+          items: Array<{
+            __typename?: "PetitionAccess";
+            id: string;
+            petition?:
+              | {
+                  __typename?: "Petition";
                   id: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
-                };
-              }
-          >;
-          progress: {
-            __typename?: "PetitionProgress";
-            validated: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-          currentSignatureRequest?: Maybe<{
-            __typename?: "PetitionSignatureRequest";
-            status: PetitionSignatureRequestStatus;
+                  name?: string | null | undefined;
+                  sentAt?: string | null | undefined;
+                  status: PetitionStatus;
+                  permissions: Array<
+                    | {
+                        __typename?: "PetitionUserGroupPermission";
+                        permissionType: PetitionPermissionType;
+                        group: {
+                          __typename?: "UserGroup";
+                          id: string;
+                          name: string;
+                          initials: string;
+                        };
+                      }
+                    | {
+                        __typename?: "PetitionUserPermission";
+                        permissionType: PetitionPermissionType;
+                        user: {
+                          __typename?: "User";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          avatarUrl?: string | null | undefined;
+                          initials?: string | null | undefined;
+                        };
+                      }
+                  >;
+                  progress: {
+                    __typename?: "PetitionProgress";
+                    validated: number;
+                    replied: number;
+                    optional: number;
+                    total: number;
+                  };
+                  currentSignatureRequest?:
+                    | {
+                        __typename?: "PetitionSignatureRequest";
+                        status: PetitionSignatureRequestStatus;
+                      }
+                    | null
+                    | undefined;
+                  signatureConfig?:
+                    | { __typename?: "SignatureConfig"; review: boolean }
+                    | null
+                    | undefined;
+                }
+              | null
+              | undefined;
           }>;
-          signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-        }>;
-      }>;
-    };
-  }>;
+        };
+      }
+    | null
+    | undefined;
 };
 
 export type Contacts_ContactsListFragment = {
@@ -8623,9 +9186,9 @@ export type Contacts_ContactsListFragment = {
   items: Array<{
     __typename?: "Contact";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
   }>;
@@ -8634,16 +9197,16 @@ export type Contacts_ContactsListFragment = {
 export type Contacts_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8674,9 +9237,9 @@ export type ContactsQuery = {
     items: Array<{
       __typename?: "Contact";
       id: string;
-      fullName?: Maybe<string>;
-      firstName?: Maybe<string>;
-      lastName?: Maybe<string>;
+      fullName?: string | null | undefined;
+      firstName?: string | null | undefined;
+      lastName?: string | null | undefined;
       email: string;
       createdAt: string;
     }>;
@@ -8689,16 +9252,16 @@ export type ContactsUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8721,7 +9284,11 @@ export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
 }>;
 
 export type OrganizationBranding_updateOrgLogoMutation = {
-  updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: Maybe<string> };
+  updateOrganizationLogo: {
+    __typename?: "Organization";
+    id: string;
+    logoUrl?: string | null | undefined;
+  };
 };
 
 export type OrganizationBranding_updateOrganizationPreferredToneMutationVariables = Exact<{
@@ -8737,21 +9304,21 @@ export type OrganizationBrandingQueryVariables = Exact<{ [key: string]: never }>
 export type OrganizationBrandingQuery = {
   me: {
     __typename?: "User";
-    fullName?: Maybe<string>;
+    fullName?: string | null | undefined;
     id: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
-      logoUrl?: Maybe<string>;
+      logoUrl?: string | null | undefined;
       name: string;
       preferredTone: Tone;
       usageLimits: {
@@ -8771,7 +9338,7 @@ export type OrganizationGroup_UserGroupFragment = {
     __typename?: "UserGroupMember";
     id: string;
     addedAt: string;
-    user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+    user: { __typename?: "User"; id: string; fullName?: string | null | undefined; email: string };
   }>;
 };
 
@@ -8779,22 +9346,22 @@ export type OrganizationGroup_UserGroupMemberFragment = {
   __typename?: "UserGroupMember";
   id: string;
   addedAt: string;
-  user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+  user: { __typename?: "User"; id: string; fullName?: string | null | undefined; email: string };
 };
 
 export type OrganizationGroup_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8820,7 +9387,12 @@ export type OrganizationGroup_updateUserGroupMutation = {
       __typename?: "UserGroupMember";
       id: string;
       addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null | undefined;
+        email: string;
+      };
     }>;
   };
 };
@@ -8840,7 +9412,12 @@ export type OrganizationGroup_addUsersToUserGroupMutation = {
       __typename?: "UserGroupMember";
       id: string;
       addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null | undefined;
+        email: string;
+      };
     }>;
   };
 };
@@ -8860,7 +9437,12 @@ export type OrganizationGroup_removeUsersFromGroupMutation = {
       __typename?: "UserGroupMember";
       id: string;
       addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null | undefined;
+        email: string;
+      };
     }>;
   };
 };
@@ -8886,7 +9468,12 @@ export type OrganizationGroup_cloneUserGroupMutation = {
       __typename?: "UserGroupMember";
       id: string;
       addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null | undefined;
+        email: string;
+      };
     }>;
   }>;
 };
@@ -8896,18 +9483,26 @@ export type OrganizationGroupQueryVariables = Exact<{
 }>;
 
 export type OrganizationGroupQuery = {
-  userGroup?: Maybe<{
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      id: string;
-      addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-    }>;
-  }>;
+  userGroup?:
+    | {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        createdAt: string;
+        members: Array<{
+          __typename?: "UserGroupMember";
+          id: string;
+          addedAt: string;
+          user: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null | undefined;
+            email: string;
+          };
+        }>;
+      }
+    | null
+    | undefined;
 };
 
 export type OrganizationGroupUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -8917,15 +9512,15 @@ export type OrganizationGroupUserQuery = {
     __typename?: "User";
     id: string;
     role: OrganizationRole;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -8950,9 +9545,9 @@ export type OrganizationGroups_UserGroupPaginationFragment = {
       user: {
         __typename?: "User";
         id: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
+        fullName?: string | null | undefined;
+        avatarUrl?: string | null | undefined;
+        initials?: string | null | undefined;
       };
     }>;
   }>;
@@ -8968,9 +9563,9 @@ export type OrganizationGroups_UserGroupFragment = {
     user: {
       __typename?: "User";
       id: string;
-      fullName?: Maybe<string>;
-      avatarUrl?: Maybe<string>;
-      initials?: Maybe<string>;
+      fullName?: string | null | undefined;
+      avatarUrl?: string | null | undefined;
+      initials?: string | null | undefined;
     };
   }>;
 };
@@ -8978,16 +9573,16 @@ export type OrganizationGroups_UserGroupFragment = {
 export type OrganizationGroups_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -9014,9 +9609,9 @@ export type OrganizationGroups_createUserGroupMutation = {
       user: {
         __typename?: "User";
         id: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
+        fullName?: string | null | undefined;
+        avatarUrl?: string | null | undefined;
+        initials?: string | null | undefined;
       };
     }>;
   };
@@ -9044,9 +9639,9 @@ export type OrganizationGroups_cloneUserGroupMutation = {
       user: {
         __typename?: "User";
         id: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
+        fullName?: string | null | undefined;
+        avatarUrl?: string | null | undefined;
+        initials?: string | null | undefined;
       };
     }>;
   }>;
@@ -9073,9 +9668,9 @@ export type OrganizationGroupsQuery = {
         user: {
           __typename?: "User";
           id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+          fullName?: string | null | undefined;
+          avatarUrl?: string | null | undefined;
+          initials?: string | null | undefined;
         };
       }>;
     }>;
@@ -9089,15 +9684,15 @@ export type OrganizationGroupsUserQuery = {
     __typename?: "User";
     id: string;
     role: OrganizationRole;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -9115,16 +9710,16 @@ export type OrganizationSettingsQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -9142,16 +9737,16 @@ export type OrganizationUsageQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -9168,13 +9763,13 @@ export type OrganizationUsageQuery = {
 export type OrganizationUsers_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   role: OrganizationRole;
   createdAt: string;
-  lastActiveAt?: Maybe<string>;
+  lastActiveAt?: string | null | undefined;
   status: UserStatus;
   isSsoUser: boolean;
 };
@@ -9191,13 +9786,13 @@ export type OrganizationUsers_createOrganizationUserMutation = {
   createOrganizationUser: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     role: OrganizationRole;
     createdAt: string;
-    lastActiveAt?: Maybe<string>;
+    lastActiveAt?: string | null | undefined;
     status: UserStatus;
     isSsoUser: boolean;
   };
@@ -9212,13 +9807,13 @@ export type OrganizationUsers_updateOrganizationUserMutation = {
   updateOrganizationUser: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     role: OrganizationRole;
     createdAt: string;
-    lastActiveAt?: Maybe<string>;
+    lastActiveAt?: string | null | undefined;
     status: UserStatus;
     isSsoUser: boolean;
   };
@@ -9246,15 +9841,15 @@ export type OrganizationUsersQuery = {
     __typename?: "User";
     id: string;
     role: OrganizationRole;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -9265,13 +9860,13 @@ export type OrganizationUsersQuery = {
         items: Array<{
           __typename?: "User";
           id: string;
-          fullName?: Maybe<string>;
-          firstName?: Maybe<string>;
-          lastName?: Maybe<string>;
+          fullName?: string | null | undefined;
+          firstName?: string | null | undefined;
+          lastName?: string | null | undefined;
           email: string;
           role: OrganizationRole;
           createdAt: string;
-          lastActiveAt?: Maybe<string>;
+          lastActiveAt?: string | null | undefined;
           status: UserStatus;
           isSsoUser: boolean;
         }>;
@@ -9288,37 +9883,38 @@ export type OrganizationUsersQuery = {
 export type PetitionActivity_PetitionFragment = {
   __typename?: "Petition";
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   status: PetitionStatus;
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
+  emailSubject?: string | null | undefined;
+  emailBody?: any | null | undefined;
   locale: PetitionLocale;
-  deadline?: Maybe<string>;
+  deadline?: string | null | undefined;
   updatedAt: string;
   isReadOnly: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
     status: PetitionAccessStatus;
-    nextReminderAt?: Maybe<string>;
+    nextReminderAt?: string | null | undefined;
     remindersLeft: number;
     reminderCount: number;
     remindersActive: boolean;
     remindersOptOut: boolean;
     createdAt: string;
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-    remindersConfig?: Maybe<{
-      __typename?: "RemindersConfig";
-      offset: number;
-      time: string;
-      timezone: string;
-      weekdaysOnly: boolean;
-    }>;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
+    remindersConfig?:
+      | {
+          __typename?: "RemindersConfig";
+          offset: number;
+          time: string;
+          timezone: string;
+          weekdaysOnly: boolean;
+        }
+      | null
+      | undefined;
   }>;
   events: {
     __typename?: "PetitionEventPagination";
@@ -9327,20 +9923,26 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "AccessActivatedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
@@ -9349,32 +9951,41 @@ export type PetitionActivity_PetitionFragment = {
           createdAt: string;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
           __typename?: "AccessDeactivatedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
@@ -9383,21 +9994,27 @@ export type PetitionActivity_PetitionFragment = {
           createdAt: string;
           originalAccess: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
           newAccess: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
@@ -9406,66 +10023,99 @@ export type PetitionActivity_PetitionFragment = {
           createdAt: string;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
           __typename?: "CommentDeletedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          deletedBy?: Maybe<
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          deletedBy?:
             | {
                 __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                contact?:
+                  | {
+                      __typename?: "Contact";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      email: string;
+                    }
+                  | null
+                  | undefined;
               }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "CommentPublishedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          comment?: Maybe<{
-            __typename?: "PetitionFieldComment";
-            isEdited: boolean;
-            content: string;
-            author?: Maybe<
-              | {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                }
-              | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-            >;
-          }>;
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          comment?:
+            | {
+                __typename?: "PetitionFieldComment";
+                isEdited: boolean;
+                content: string;
+                author?:
+                  | {
+                      __typename?: "PetitionAccess";
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
+                    }
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "GroupPermissionAddedEvent";
           id: string;
           permissionType: PetitionPermissionType;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           permissionGroup: { __typename?: "UserGroup"; name: string };
         }
       | {
@@ -9473,24 +10123,30 @@ export type PetitionActivity_PetitionFragment = {
           id: string;
           permissionType: PetitionPermissionType;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           permissionGroup: { __typename?: "UserGroup"; name: string };
         }
       | {
           __typename?: "GroupPermissionRemovedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           permissionGroup: { __typename?: "UserGroup"; name: string };
         }
       | {
@@ -9500,24 +10156,30 @@ export type PetitionActivity_PetitionFragment = {
           message: {
             __typename?: "PetitionMessage";
             status: PetitionMessageStatus;
-            scheduledAt?: Maybe<string>;
-            emailSubject?: Maybe<any>;
+            scheduledAt?: string | null | undefined;
+            emailSubject?: any | null | undefined;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "MessageScheduledEvent";
@@ -9527,24 +10189,27 @@ export type PetitionActivity_PetitionFragment = {
             __typename?: "PetitionMessage";
             id: string;
             status: PetitionMessageStatus;
-            scheduledAt?: Maybe<string>;
-            emailSubject?: Maybe<any>;
-            emailBody?: Maybe<string>;
-            sentAt?: Maybe<string>;
+            scheduledAt?: string | null | undefined;
+            emailSubject?: any | null | undefined;
+            emailBody?: string | null | undefined;
+            sentAt?: string | null | undefined;
             sender: {
               __typename?: "User";
               id: string;
-              fullName?: Maybe<string>;
+              fullName?: string | null | undefined;
               status: UserStatus;
             };
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -9554,27 +10219,30 @@ export type PetitionActivity_PetitionFragment = {
           createdAt: string;
           message: {
             __typename?: "PetitionMessage";
-            emailSubject?: Maybe<any>;
-            scheduledAt?: Maybe<string>;
-            bouncedAt?: Maybe<string>;
-            deliveredAt?: Maybe<string>;
-            openedAt?: Maybe<string>;
-            emailBody?: Maybe<string>;
-            sentAt?: Maybe<string>;
+            emailSubject?: any | null | undefined;
+            scheduledAt?: string | null | undefined;
+            bouncedAt?: string | null | undefined;
+            deliveredAt?: string | null | undefined;
+            openedAt?: string | null | undefined;
+            emailBody?: string | null | undefined;
+            sentAt?: string | null | undefined;
             sender: {
               __typename?: "User";
               id: string;
-              fullName?: Maybe<string>;
+              fullName?: string | null | undefined;
               status: UserStatus;
             };
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -9582,65 +10250,86 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "OwnershipTransferredEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          owner?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          previousOwner?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          owner?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          previousOwner?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "PetitionClonedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "PetitionClosedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "PetitionClosedNotifiedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
@@ -9649,24 +10338,30 @@ export type PetitionActivity_PetitionFragment = {
           createdAt: string;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
           __typename?: "PetitionCreatedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | { __typename?: "PetitionDeletedEvent"; id: string }
       | {
@@ -9677,12 +10372,15 @@ export type PetitionActivity_PetitionFragment = {
             __typename?: "PetitionMessage";
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -9694,12 +10392,15 @@ export type PetitionActivity_PetitionFragment = {
             __typename?: "PetitionReminder";
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -9707,18 +10408,24 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "PetitionReopenedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "RecipientSignedEvent";
           id: string;
           createdAt: string;
-          signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+          signer?:
+            | { __typename?: "PetitionSigner"; email: string; fullName: string }
+            | null
+            | undefined;
         }
       | {
           __typename?: "ReminderSentEvent";
@@ -9728,21 +10435,27 @@ export type PetitionActivity_PetitionFragment = {
             __typename?: "PetitionReminder";
             type: PetitionReminderType;
             createdAt: string;
-            emailBody?: Maybe<string>;
-            sender?: Maybe<{
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
-            }>;
+            emailBody?: string | null | undefined;
+            sender?:
+              | {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  status: UserStatus;
+                }
+              | null
+              | undefined;
             access: {
               __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+              contact?:
+                | {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null | undefined;
+                    email: string;
+                  }
+                | null
+                | undefined;
             };
           };
         }
@@ -9751,84 +10464,129 @@ export type PetitionActivity_PetitionFragment = {
           id: string;
           createdAt: string;
           reason: string;
-          other?: Maybe<string>;
+          other?: string | null | undefined;
           access: {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           };
         }
       | {
           __typename?: "ReplyCreatedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          createdBy?: Maybe<
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          createdBy?:
             | {
                 __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                contact?:
+                  | {
+                      __typename?: "Contact";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      email: string;
+                    }
+                  | null
+                  | undefined;
               }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "ReplyDeletedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          deletedBy?: Maybe<
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          deletedBy?:
             | {
                 __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                contact?:
+                  | {
+                      __typename?: "Contact";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      email: string;
+                    }
+                  | null
+                  | undefined;
               }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "ReplyUpdatedEvent";
           id: string;
           createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          updatedBy?: Maybe<
+          field?:
+            | { __typename?: "PetitionField"; title?: string | null | undefined }
+            | null
+            | undefined;
+          updatedBy?:
             | {
                 __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
+                contact?:
+                  | {
+                      __typename?: "Contact";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      email: string;
+                    }
+                  | null
+                  | undefined;
               }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "SignatureCancelledEvent";
           id: string;
           cancelType: PetitionSignatureCancelReason;
-          cancellerReason?: Maybe<string>;
+          cancellerReason?: string | null | undefined;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          canceller?:
+            | { __typename?: "PetitionSigner"; email: string; fullName: string }
+            | null
+            | undefined;
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
       | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
@@ -9838,53 +10596,71 @@ export type PetitionActivity_PetitionFragment = {
           id: string;
           permissionType: PetitionPermissionType;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          permissionUser?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "UserPermissionEditedEvent";
           id: string;
           permissionType: PetitionPermissionType;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          permissionUser?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
       | {
           __typename?: "UserPermissionRemovedEvent";
           id: string;
           createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
+          user?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
+          permissionUser?:
+            | {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null | undefined;
+                status: UserStatus;
+              }
+            | null
+            | undefined;
         }
     >;
   };
@@ -9897,20 +10673,26 @@ export type PetitionActivity_PetitionFragment = {
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: { __typename?: "User"; id: string; fullName?: string | null | undefined };
       }
   >;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-  }>;
-  remindersConfig?: Maybe<{
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  }>;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+      }
+    | null
+    | undefined;
+  remindersConfig?:
+    | {
+        __typename?: "RemindersConfig";
+        offset: number;
+        time: string;
+        timezone: string;
+        weekdaysOnly: boolean;
+      }
+    | null
+    | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -9919,26 +10701,26 @@ export type PetitionActivity_PetitionFragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
+  myEffectivePermission?:
+    | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+    | null
+    | undefined;
 };
 
 export type PetitionActivity_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   hasPetitionPdfExport: boolean;
   organization: {
     __typename?: "Organization";
@@ -9960,37 +10742,43 @@ export type PetitionActivity_updatePetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         status: PetitionStatus;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
+        emailSubject?: string | null | undefined;
+        emailBody?: any | null | undefined;
         locale: PetitionLocale;
-        deadline?: Maybe<string>;
+        deadline?: string | null | undefined;
         updatedAt: string;
         isReadOnly: boolean;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
-          nextReminderAt?: Maybe<string>;
+          nextReminderAt?: string | null | undefined;
           remindersLeft: number;
           reminderCount: number;
           remindersActive: boolean;
           remindersOptOut: boolean;
           createdAt: string;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-          remindersConfig?: Maybe<{
-            __typename?: "RemindersConfig";
-            offset: number;
-            time: string;
-            timezone: string;
-            weekdaysOnly: boolean;
-          }>;
+          contact?:
+            | {
+                __typename?: "Contact";
+                id: string;
+                fullName?: string | null | undefined;
+                email: string;
+              }
+            | null
+            | undefined;
+          remindersConfig?:
+            | {
+                __typename?: "RemindersConfig";
+                offset: number;
+                time: string;
+                timezone: string;
+                weekdaysOnly: boolean;
+              }
+            | null
+            | undefined;
         }>;
         events: {
           __typename?: "PetitionEventPagination";
@@ -9999,20 +10787,26 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "AccessActivatedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
@@ -10021,32 +10815,41 @@ export type PetitionActivity_updatePetitionMutation = {
                 createdAt: string;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
                 __typename?: "AccessDeactivatedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
@@ -10055,21 +10858,27 @@ export type PetitionActivity_updatePetitionMutation = {
                 createdAt: string;
                 originalAccess: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
                 newAccess: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
@@ -10078,76 +10887,99 @@ export type PetitionActivity_updatePetitionMutation = {
                 createdAt: string;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
                 __typename?: "CommentDeletedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                deletedBy?: Maybe<
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                deletedBy?:
                   | {
                       __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
                     }
                   | {
                       __typename?: "User";
                       id: string;
-                      fullName?: Maybe<string>;
+                      fullName?: string | null | undefined;
                       status: UserStatus;
                     }
-                >;
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "CommentPublishedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                comment?: Maybe<{
-                  __typename?: "PetitionFieldComment";
-                  isEdited: boolean;
-                  content: string;
-                  author?: Maybe<
-                    | {
-                        __typename?: "PetitionAccess";
-                        contact?: Maybe<{
-                          __typename?: "Contact";
-                          id: string;
-                          fullName?: Maybe<string>;
-                          email: string;
-                        }>;
-                      }
-                    | {
-                        __typename?: "User";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        status: UserStatus;
-                      }
-                  >;
-                }>;
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                comment?:
+                  | {
+                      __typename?: "PetitionFieldComment";
+                      isEdited: boolean;
+                      content: string;
+                      author?:
+                        | {
+                            __typename?: "PetitionAccess";
+                            contact?:
+                              | {
+                                  __typename?: "Contact";
+                                  id: string;
+                                  fullName?: string | null | undefined;
+                                  email: string;
+                                }
+                              | null
+                              | undefined;
+                          }
+                        | {
+                            __typename?: "User";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            status: UserStatus;
+                          }
+                        | null
+                        | undefined;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "GroupPermissionAddedEvent";
                 id: string;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 permissionGroup: { __typename?: "UserGroup"; name: string };
               }
             | {
@@ -10155,24 +10987,30 @@ export type PetitionActivity_updatePetitionMutation = {
                 id: string;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 permissionGroup: { __typename?: "UserGroup"; name: string };
               }
             | {
                 __typename?: "GroupPermissionRemovedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 permissionGroup: { __typename?: "UserGroup"; name: string };
               }
             | {
@@ -10182,24 +11020,30 @@ export type PetitionActivity_updatePetitionMutation = {
                 message: {
                   __typename?: "PetitionMessage";
                   status: PetitionMessageStatus;
-                  scheduledAt?: Maybe<string>;
-                  emailSubject?: Maybe<any>;
+                  scheduledAt?: string | null | undefined;
+                  emailSubject?: any | null | undefined;
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "MessageScheduledEvent";
@@ -10209,24 +11053,27 @@ export type PetitionActivity_updatePetitionMutation = {
                   __typename?: "PetitionMessage";
                   id: string;
                   status: PetitionMessageStatus;
-                  scheduledAt?: Maybe<string>;
-                  emailSubject?: Maybe<any>;
-                  emailBody?: Maybe<string>;
-                  sentAt?: Maybe<string>;
+                  scheduledAt?: string | null | undefined;
+                  emailSubject?: any | null | undefined;
+                  emailBody?: string | null | undefined;
+                  sentAt?: string | null | undefined;
                   sender: {
                     __typename?: "User";
                     id: string;
-                    fullName?: Maybe<string>;
+                    fullName?: string | null | undefined;
                     status: UserStatus;
                   };
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -10236,27 +11083,30 @@ export type PetitionActivity_updatePetitionMutation = {
                 createdAt: string;
                 message: {
                   __typename?: "PetitionMessage";
-                  emailSubject?: Maybe<any>;
-                  scheduledAt?: Maybe<string>;
-                  bouncedAt?: Maybe<string>;
-                  deliveredAt?: Maybe<string>;
-                  openedAt?: Maybe<string>;
-                  emailBody?: Maybe<string>;
-                  sentAt?: Maybe<string>;
+                  emailSubject?: any | null | undefined;
+                  scheduledAt?: string | null | undefined;
+                  bouncedAt?: string | null | undefined;
+                  deliveredAt?: string | null | undefined;
+                  openedAt?: string | null | undefined;
+                  emailBody?: string | null | undefined;
+                  sentAt?: string | null | undefined;
                   sender: {
                     __typename?: "User";
                     id: string;
-                    fullName?: Maybe<string>;
+                    fullName?: string | null | undefined;
                     status: UserStatus;
                   };
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -10264,65 +11114,86 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "OwnershipTransferredEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                owner?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                previousOwner?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                owner?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                previousOwner?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "PetitionClonedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "PetitionClosedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "PetitionClosedNotifiedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
@@ -10331,24 +11202,30 @@ export type PetitionActivity_updatePetitionMutation = {
                 createdAt: string;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
                 __typename?: "PetitionCreatedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | { __typename?: "PetitionDeletedEvent"; id: string }
             | {
@@ -10359,12 +11236,15 @@ export type PetitionActivity_updatePetitionMutation = {
                   __typename?: "PetitionMessage";
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -10376,12 +11256,15 @@ export type PetitionActivity_updatePetitionMutation = {
                   __typename?: "PetitionReminder";
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -10389,18 +11272,24 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "PetitionReopenedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "RecipientSignedEvent";
                 id: string;
                 createdAt: string;
-                signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+                signer?:
+                  | { __typename?: "PetitionSigner"; email: string; fullName: string }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "ReminderSentEvent";
@@ -10410,21 +11299,27 @@ export type PetitionActivity_updatePetitionMutation = {
                   __typename?: "PetitionReminder";
                   type: PetitionReminderType;
                   createdAt: string;
-                  emailBody?: Maybe<string>;
-                  sender?: Maybe<{
-                    __typename?: "User";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    status: UserStatus;
-                  }>;
+                  emailBody?: string | null | undefined;
+                  sender?:
+                    | {
+                        __typename?: "User";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        status: UserStatus;
+                      }
+                    | null
+                    | undefined;
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -10433,103 +11328,129 @@ export type PetitionActivity_updatePetitionMutation = {
                 id: string;
                 createdAt: string;
                 reason: string;
-                other?: Maybe<string>;
+                other?: string | null | undefined;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
                 __typename?: "ReplyCreatedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                createdBy?: Maybe<
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                createdBy?:
                   | {
                       __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
                     }
                   | {
                       __typename?: "User";
                       id: string;
-                      fullName?: Maybe<string>;
+                      fullName?: string | null | undefined;
                       status: UserStatus;
                     }
-                >;
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "ReplyDeletedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                deletedBy?: Maybe<
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                deletedBy?:
                   | {
                       __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
                     }
                   | {
                       __typename?: "User";
                       id: string;
-                      fullName?: Maybe<string>;
+                      fullName?: string | null | undefined;
                       status: UserStatus;
                     }
-                >;
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "ReplyUpdatedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                updatedBy?: Maybe<
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                updatedBy?:
                   | {
                       __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
                     }
                   | {
                       __typename?: "User";
                       id: string;
-                      fullName?: Maybe<string>;
+                      fullName?: string | null | undefined;
                       status: UserStatus;
                     }
-                >;
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
                 cancelType: PetitionSignatureCancelReason;
-                cancellerReason?: Maybe<string>;
+                cancellerReason?: string | null | undefined;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                canceller?: Maybe<{
-                  __typename?: "PetitionSigner";
-                  email: string;
-                  fullName: string;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                canceller?:
+                  | { __typename?: "PetitionSigner"; email: string; fullName: string }
+                  | null
+                  | undefined;
               }
             | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
             | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
@@ -10539,53 +11460,71 @@ export type PetitionActivity_updatePetitionMutation = {
                 id: string;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                permissionUser?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "UserPermissionEditedEvent";
                 id: string;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                permissionUser?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "UserPermissionRemovedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                permissionUser?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
           >;
         };
@@ -10598,20 +11537,26 @@ export type PetitionActivity_updatePetitionMutation = {
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+              user: { __typename?: "User"; id: string; fullName?: string | null | undefined };
             }
         >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-        }>;
-        remindersConfig?: Maybe<{
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        }>;
+        signatureConfig?:
+          | {
+              __typename?: "SignatureConfig";
+              signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+            }
+          | null
+          | undefined;
+        remindersConfig?:
+          | {
+              __typename?: "RemindersConfig";
+              offset: number;
+              time: string;
+              timezone: string;
+              weekdaysOnly: boolean;
+            }
+          | null
+          | undefined;
         organization: {
           __typename?: "Organization";
           id: string;
@@ -10624,10 +11569,10 @@ export type PetitionActivity_updatePetitionMutation = {
             };
           };
         };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
+        myEffectivePermission?:
+          | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+          | null
+          | undefined;
       }
     | { __typename?: "PetitionTemplate" };
 };
@@ -10672,11 +11617,10 @@ export type PetitionActivity_cancelScheduledMessageMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_cancelScheduledMessageMutation = {
-  cancelScheduledMessage?: Maybe<{
-    __typename?: "PetitionMessage";
-    id: string;
-    status: PetitionMessageStatus;
-  }>;
+  cancelScheduledMessage?:
+    | { __typename?: "PetitionMessage"; id: string; status: PetitionMessageStatus }
+    | null
+    | undefined;
 };
 
 export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
@@ -10708,41 +11652,47 @@ export type PetitionActivityQueryVariables = Exact<{
 }>;
 
 export type PetitionActivityQuery = {
-  petition?: Maybe<
+  petition?:
     | {
         __typename?: "Petition";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         status: PetitionStatus;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
+        emailSubject?: string | null | undefined;
+        emailBody?: any | null | undefined;
         locale: PetitionLocale;
-        deadline?: Maybe<string>;
+        deadline?: string | null | undefined;
         updatedAt: string;
         isReadOnly: boolean;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
-          nextReminderAt?: Maybe<string>;
+          nextReminderAt?: string | null | undefined;
           remindersLeft: number;
           reminderCount: number;
           remindersActive: boolean;
           remindersOptOut: boolean;
           createdAt: string;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-          remindersConfig?: Maybe<{
-            __typename?: "RemindersConfig";
-            offset: number;
-            time: string;
-            timezone: string;
-            weekdaysOnly: boolean;
-          }>;
+          contact?:
+            | {
+                __typename?: "Contact";
+                id: string;
+                fullName?: string | null | undefined;
+                email: string;
+              }
+            | null
+            | undefined;
+          remindersConfig?:
+            | {
+                __typename?: "RemindersConfig";
+                offset: number;
+                time: string;
+                timezone: string;
+                weekdaysOnly: boolean;
+              }
+            | null
+            | undefined;
         }>;
         events: {
           __typename?: "PetitionEventPagination";
@@ -10751,20 +11701,26 @@ export type PetitionActivityQuery = {
                 __typename?: "AccessActivatedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
@@ -10773,32 +11729,41 @@ export type PetitionActivityQuery = {
                 createdAt: string;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
                 __typename?: "AccessDeactivatedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
@@ -10807,21 +11772,27 @@ export type PetitionActivityQuery = {
                 createdAt: string;
                 originalAccess: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
                 newAccess: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
@@ -10830,76 +11801,99 @@ export type PetitionActivityQuery = {
                 createdAt: string;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
                 __typename?: "CommentDeletedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                deletedBy?: Maybe<
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                deletedBy?:
                   | {
                       __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
                     }
                   | {
                       __typename?: "User";
                       id: string;
-                      fullName?: Maybe<string>;
+                      fullName?: string | null | undefined;
                       status: UserStatus;
                     }
-                >;
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "CommentPublishedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                comment?: Maybe<{
-                  __typename?: "PetitionFieldComment";
-                  isEdited: boolean;
-                  content: string;
-                  author?: Maybe<
-                    | {
-                        __typename?: "PetitionAccess";
-                        contact?: Maybe<{
-                          __typename?: "Contact";
-                          id: string;
-                          fullName?: Maybe<string>;
-                          email: string;
-                        }>;
-                      }
-                    | {
-                        __typename?: "User";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        status: UserStatus;
-                      }
-                  >;
-                }>;
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                comment?:
+                  | {
+                      __typename?: "PetitionFieldComment";
+                      isEdited: boolean;
+                      content: string;
+                      author?:
+                        | {
+                            __typename?: "PetitionAccess";
+                            contact?:
+                              | {
+                                  __typename?: "Contact";
+                                  id: string;
+                                  fullName?: string | null | undefined;
+                                  email: string;
+                                }
+                              | null
+                              | undefined;
+                          }
+                        | {
+                            __typename?: "User";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            status: UserStatus;
+                          }
+                        | null
+                        | undefined;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "GroupPermissionAddedEvent";
                 id: string;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 permissionGroup: { __typename?: "UserGroup"; name: string };
               }
             | {
@@ -10907,24 +11901,30 @@ export type PetitionActivityQuery = {
                 id: string;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 permissionGroup: { __typename?: "UserGroup"; name: string };
               }
             | {
                 __typename?: "GroupPermissionRemovedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 permissionGroup: { __typename?: "UserGroup"; name: string };
               }
             | {
@@ -10934,24 +11934,30 @@ export type PetitionActivityQuery = {
                 message: {
                   __typename?: "PetitionMessage";
                   status: PetitionMessageStatus;
-                  scheduledAt?: Maybe<string>;
-                  emailSubject?: Maybe<any>;
+                  scheduledAt?: string | null | undefined;
+                  emailSubject?: any | null | undefined;
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "MessageScheduledEvent";
@@ -10961,24 +11967,27 @@ export type PetitionActivityQuery = {
                   __typename?: "PetitionMessage";
                   id: string;
                   status: PetitionMessageStatus;
-                  scheduledAt?: Maybe<string>;
-                  emailSubject?: Maybe<any>;
-                  emailBody?: Maybe<string>;
-                  sentAt?: Maybe<string>;
+                  scheduledAt?: string | null | undefined;
+                  emailSubject?: any | null | undefined;
+                  emailBody?: string | null | undefined;
+                  sentAt?: string | null | undefined;
                   sender: {
                     __typename?: "User";
                     id: string;
-                    fullName?: Maybe<string>;
+                    fullName?: string | null | undefined;
                     status: UserStatus;
                   };
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -10988,27 +11997,30 @@ export type PetitionActivityQuery = {
                 createdAt: string;
                 message: {
                   __typename?: "PetitionMessage";
-                  emailSubject?: Maybe<any>;
-                  scheduledAt?: Maybe<string>;
-                  bouncedAt?: Maybe<string>;
-                  deliveredAt?: Maybe<string>;
-                  openedAt?: Maybe<string>;
-                  emailBody?: Maybe<string>;
-                  sentAt?: Maybe<string>;
+                  emailSubject?: any | null | undefined;
+                  scheduledAt?: string | null | undefined;
+                  bouncedAt?: string | null | undefined;
+                  deliveredAt?: string | null | undefined;
+                  openedAt?: string | null | undefined;
+                  emailBody?: string | null | undefined;
+                  sentAt?: string | null | undefined;
                   sender: {
                     __typename?: "User";
                     id: string;
-                    fullName?: Maybe<string>;
+                    fullName?: string | null | undefined;
                     status: UserStatus;
                   };
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -11016,65 +12028,86 @@ export type PetitionActivityQuery = {
                 __typename?: "OwnershipTransferredEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                owner?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                previousOwner?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                owner?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                previousOwner?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "PetitionClonedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "PetitionClosedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "PetitionClosedNotifiedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
@@ -11083,24 +12116,30 @@ export type PetitionActivityQuery = {
                 createdAt: string;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
                 __typename?: "PetitionCreatedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | { __typename?: "PetitionDeletedEvent"; id: string }
             | {
@@ -11111,12 +12150,15 @@ export type PetitionActivityQuery = {
                   __typename?: "PetitionMessage";
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -11128,12 +12170,15 @@ export type PetitionActivityQuery = {
                   __typename?: "PetitionReminder";
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -11141,18 +12186,24 @@ export type PetitionActivityQuery = {
                 __typename?: "PetitionReopenedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "RecipientSignedEvent";
                 id: string;
                 createdAt: string;
-                signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+                signer?:
+                  | { __typename?: "PetitionSigner"; email: string; fullName: string }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "ReminderSentEvent";
@@ -11162,21 +12213,27 @@ export type PetitionActivityQuery = {
                   __typename?: "PetitionReminder";
                   type: PetitionReminderType;
                   createdAt: string;
-                  emailBody?: Maybe<string>;
-                  sender?: Maybe<{
-                    __typename?: "User";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    status: UserStatus;
-                  }>;
+                  emailBody?: string | null | undefined;
+                  sender?:
+                    | {
+                        __typename?: "User";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        status: UserStatus;
+                      }
+                    | null
+                    | undefined;
                   access: {
                     __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
+                    contact?:
+                      | {
+                          __typename?: "Contact";
+                          id: string;
+                          fullName?: string | null | undefined;
+                          email: string;
+                        }
+                      | null
+                      | undefined;
                   };
                 };
               }
@@ -11185,103 +12242,129 @@ export type PetitionActivityQuery = {
                 id: string;
                 createdAt: string;
                 reason: string;
-                other?: Maybe<string>;
+                other?: string | null | undefined;
                 access: {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 };
               }
             | {
                 __typename?: "ReplyCreatedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                createdBy?: Maybe<
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                createdBy?:
                   | {
                       __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
                     }
                   | {
                       __typename?: "User";
                       id: string;
-                      fullName?: Maybe<string>;
+                      fullName?: string | null | undefined;
                       status: UserStatus;
                     }
-                >;
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "ReplyDeletedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                deletedBy?: Maybe<
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                deletedBy?:
                   | {
                       __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
                     }
                   | {
                       __typename?: "User";
                       id: string;
-                      fullName?: Maybe<string>;
+                      fullName?: string | null | undefined;
                       status: UserStatus;
                     }
-                >;
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "ReplyUpdatedEvent";
                 id: string;
                 createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                updatedBy?: Maybe<
+                field?:
+                  | { __typename?: "PetitionField"; title?: string | null | undefined }
+                  | null
+                  | undefined;
+                updatedBy?:
                   | {
                       __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
+                      contact?:
+                        | {
+                            __typename?: "Contact";
+                            id: string;
+                            fullName?: string | null | undefined;
+                            email: string;
+                          }
+                        | null
+                        | undefined;
                     }
                   | {
                       __typename?: "User";
                       id: string;
-                      fullName?: Maybe<string>;
+                      fullName?: string | null | undefined;
                       status: UserStatus;
                     }
-                >;
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
                 cancelType: PetitionSignatureCancelReason;
-                cancellerReason?: Maybe<string>;
+                cancellerReason?: string | null | undefined;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                canceller?: Maybe<{
-                  __typename?: "PetitionSigner";
-                  email: string;
-                  fullName: string;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                canceller?:
+                  | { __typename?: "PetitionSigner"; email: string; fullName: string }
+                  | null
+                  | undefined;
               }
             | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
             | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
@@ -11291,53 +12374,71 @@ export type PetitionActivityQuery = {
                 id: string;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                permissionUser?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "UserPermissionEditedEvent";
                 id: string;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                permissionUser?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
             | {
                 __typename?: "UserPermissionRemovedEvent";
                 id: string;
                 createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
+                user?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
+                permissionUser?:
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null | undefined;
+                      status: UserStatus;
+                    }
+                  | null
+                  | undefined;
               }
           >;
         };
@@ -11350,20 +12451,26 @@ export type PetitionActivityQuery = {
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+              user: { __typename?: "User"; id: string; fullName?: string | null | undefined };
             }
         >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-        }>;
-        remindersConfig?: Maybe<{
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        }>;
+        signatureConfig?:
+          | {
+              __typename?: "SignatureConfig";
+              signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+            }
+          | null
+          | undefined;
+        remindersConfig?:
+          | {
+              __typename?: "RemindersConfig";
+              offset: number;
+              time: string;
+              timezone: string;
+              weekdaysOnly: boolean;
+            }
+          | null
+          | undefined;
         organization: {
           __typename?: "Organization";
           id: string;
@@ -11376,13 +12483,14 @@ export type PetitionActivityQuery = {
             };
           };
         };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
+        myEffectivePermission?:
+          | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+          | null
+          | undefined;
       }
     | { __typename?: "PetitionTemplate" }
-  >;
+    | null
+    | undefined;
 };
 
 export type PetitionActivityUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -11392,16 +12500,16 @@ export type PetitionActivityUserQuery = {
     __typename?: "User";
     id: string;
     unreadNotificationIds: Array<string>;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasPetitionPdfExport: boolean;
     organization: {
       __typename?: "Organization";
@@ -11419,10 +12527,10 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   status: PetitionStatus;
   id: string;
   tone: Tone;
-  name?: Maybe<string>;
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  deadline?: Maybe<string>;
+  name?: string | null | undefined;
+  emailSubject?: string | null | undefined;
+  emailBody?: any | null | undefined;
+  deadline?: string | null | undefined;
   locale: PetitionLocale;
   hasCommentsEnabled: boolean;
   skipForwardSecurity: boolean;
@@ -11433,13 +12541,13 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
-    description?: Maybe<string>;
+    title?: string | null | undefined;
+    description?: string | null | undefined;
     optional: boolean;
     multiple: boolean;
     isFixed: boolean;
     isReadOnly: boolean;
-    visibility?: Maybe<{ [key: string]: any }>;
+    visibility?: { [key: string]: any } | null | undefined;
     options: { [key: string]: any };
     position: number;
     validated: boolean;
@@ -11457,47 +12565,56 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
     replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
   }>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-      fullName: string;
-    }>;
-  }>;
-  remindersConfig?: Maybe<{
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  }>;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        provider: string;
+        title: string;
+        review: boolean;
+        letRecipientsChooseSigners: boolean;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null | undefined;
+          firstName: string;
+          lastName: string;
+          email: string;
+          fullName: string;
+        }>;
+      }
+    | null
+    | undefined;
+  remindersConfig?:
+    | {
+        __typename?: "RemindersConfig";
+        offset: number;
+        time: string;
+        timezone: string;
+        weekdaysOnly: boolean;
+      }
+    | null
+    | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
-    customHost?: Maybe<string>;
+    customHost?: string | null | undefined;
     usageLimits: {
       __typename?: "OrganizationUsageLimit";
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  }>;
+  currentSignatureRequest?:
+    | {
+        __typename?: "PetitionSignatureRequest";
+        id: string;
+        status: PetitionSignatureRequestStatus;
+      }
+    | null
+    | undefined;
   owner: { __typename?: "User"; id: string };
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
+  myEffectivePermission?:
+    | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+    | null
+    | undefined;
 };
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
@@ -11505,10 +12622,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   id: string;
   tone: Tone;
-  name?: Maybe<string>;
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  description?: Maybe<any>;
+  name?: string | null | undefined;
+  emailSubject?: string | null | undefined;
+  emailBody?: any | null | undefined;
+  description?: any | null | undefined;
   isReadOnly: boolean;
   locale: PetitionLocale;
   hasCommentsEnabled: boolean;
@@ -11519,13 +12636,13 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
-    description?: Maybe<string>;
+    title?: string | null | undefined;
+    description?: string | null | undefined;
     optional: boolean;
     multiple: boolean;
     isFixed: boolean;
     isReadOnly: boolean;
-    visibility?: Maybe<{ [key: string]: any }>;
+    visibility?: { [key: string]: any } | null | undefined;
     options: { [key: string]: any };
     position: number;
     validated: boolean;
@@ -11543,42 +12660,48 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
     replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
   }>;
-  publicLink?: Maybe<{
-    __typename?: "PublicPetitionLink";
-    id: string;
-    title: string;
-    isActive: boolean;
-    description: string;
-    slug: string;
-    linkPermissions: Array<
-      | {
-          __typename?: "PublicPetitionLinkUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string };
-        }
-      | {
-          __typename?: "PublicPetitionLinkUserPermission";
-          permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string };
-        }
-    >;
-  }>;
-  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
+  publicLink?:
+    | {
+        __typename?: "PublicPetitionLink";
+        id: string;
+        title: string;
+        isActive: boolean;
+        description: string;
+        slug: string;
+        linkPermissions: Array<
+          | {
+              __typename?: "PublicPetitionLinkUserGroupPermission";
+              permissionType: PetitionPermissionType;
+              group: { __typename?: "UserGroup"; id: string };
+            }
+          | {
+              __typename?: "PublicPetitionLinkUserPermission";
+              permissionType: PetitionPermissionType;
+              user: { __typename?: "User"; id: string };
+            }
+        >;
+      }
+    | null
+    | undefined;
+  organization: { __typename?: "Organization"; customHost?: string | null | undefined };
   owner: { __typename?: "User"; id: string };
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
+  signatureConfig?:
+    | {
+        __typename?: "SignatureConfig";
+        provider: string;
+        title: string;
+        review: boolean;
+        letRecipientsChooseSigners: boolean;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null | undefined;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }>;
+      }
+    | null
+    | undefined;
 };
 
 export type PetitionCompose_PetitionBaseFragment =
@@ -11589,13 +12712,13 @@ export type PetitionCompose_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
+  title?: string | null | undefined;
+  description?: string | null | undefined;
   optional: boolean;
   multiple: boolean;
   isFixed: boolean;
   isReadOnly: boolean;
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   options: { [key: string]: any };
   position: number;
   validated: boolean;
@@ -11618,16 +12741,16 @@ export type PetitionCompose_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   hasPetitionSignature: boolean;
   hasSkipForwardSecurity: boolean;
   hasHideRecipientViewContents: boolean;
@@ -11662,25 +12785,28 @@ export type PetitionCompose_updatePetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         status: PetitionStatus;
-        deadline?: Maybe<string>;
+        deadline?: string | null | undefined;
         locale: PetitionLocale;
         hasCommentsEnabled: boolean;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
         isReadOnly: boolean;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
+        emailSubject?: string | null | undefined;
+        emailBody?: any | null | undefined;
         updatedAt: string;
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-        }>;
+        currentSignatureRequest?:
+          | {
+              __typename?: "PetitionSignatureRequest";
+              id: string;
+              status: PetitionSignatureRequestStatus;
+            }
+          | null
+          | undefined;
         organization: {
           __typename?: "Organization";
-          customHost?: Maybe<string>;
+          customHost?: string | null | undefined;
           id: string;
           usageLimits: {
             __typename?: "OrganizationUsageLimit";
@@ -11692,83 +12818,95 @@ export type PetitionCompose_updatePetitionMutation = {
           };
         };
         owner: { __typename?: "User"; id: string };
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-            fullName: string;
-          }>;
-        }>;
-        remindersConfig?: Maybe<{
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        }>;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
+        signatureConfig?:
+          | {
+              __typename?: "SignatureConfig";
+              provider: string;
+              title: string;
+              review: boolean;
+              letRecipientsChooseSigners: boolean;
+              signers: Array<{
+                __typename?: "PetitionSigner";
+                contactId?: string | null | undefined;
+                firstName: string;
+                lastName: string;
+                email: string;
+                fullName: string;
+              }>;
+            }
+          | null
+          | undefined;
+        remindersConfig?:
+          | {
+              __typename?: "RemindersConfig";
+              offset: number;
+              time: string;
+              timezone: string;
+              weekdaysOnly: boolean;
+            }
+          | null
+          | undefined;
+        myEffectivePermission?:
+          | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+          | null
+          | undefined;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         isPublic: boolean;
         locale: PetitionLocale;
         hasCommentsEnabled: boolean;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
         isReadOnly: boolean;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        description?: Maybe<any>;
+        emailSubject?: string | null | undefined;
+        emailBody?: any | null | undefined;
+        description?: any | null | undefined;
         updatedAt: string;
-        publicLink?: Maybe<{
-          __typename?: "PublicPetitionLink";
-          id: string;
-          title: string;
-          isActive: boolean;
-          description: string;
-          slug: string;
-          linkPermissions: Array<
-            | {
-                __typename?: "PublicPetitionLinkUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string };
-              }
-            | {
-                __typename?: "PublicPetitionLinkUserPermission";
-                permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string };
-              }
-          >;
-        }>;
-        organization: { __typename?: "Organization"; customHost?: Maybe<string> };
+        publicLink?:
+          | {
+              __typename?: "PublicPetitionLink";
+              id: string;
+              title: string;
+              isActive: boolean;
+              description: string;
+              slug: string;
+              linkPermissions: Array<
+                | {
+                    __typename?: "PublicPetitionLinkUserGroupPermission";
+                    permissionType: PetitionPermissionType;
+                    group: { __typename?: "UserGroup"; id: string };
+                  }
+                | {
+                    __typename?: "PublicPetitionLinkUserPermission";
+                    permissionType: PetitionPermissionType;
+                    user: { __typename?: "User"; id: string };
+                  }
+              >;
+            }
+          | null
+          | undefined;
+        organization: { __typename?: "Organization"; customHost?: string | null | undefined };
         owner: { __typename?: "User"; id: string };
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-          }>;
-        }>;
+        signatureConfig?:
+          | {
+              __typename?: "SignatureConfig";
+              provider: string;
+              title: string;
+              review: boolean;
+              letRecipientsChooseSigners: boolean;
+              signers: Array<{
+                __typename?: "PetitionSigner";
+                contactId?: string | null | undefined;
+                firstName: string;
+                lastName: string;
+                email: string;
+              }>;
+            }
+          | null
+          | undefined;
       };
 };
 
@@ -11782,22 +12920,22 @@ export type PetitionCompose_updateFieldPositionsMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         locale: PetitionLocale;
-        deadline?: Maybe<string>;
+        deadline?: string | null | undefined;
         status: PetitionStatus;
         updatedAt: string;
         isReadOnly: boolean;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
+        myEffectivePermission?:
+          | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+          | null
+          | undefined;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         locale: PetitionLocale;
         isPublic: boolean;
         updatedAt: string;
@@ -11820,13 +12958,13 @@ export type PetitionCompose_createPetitionFieldMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -11847,17 +12985,17 @@ export type PetitionCompose_createPetitionFieldMutation = {
         petition: {
           __typename?: "Petition";
           id: string;
-          name?: Maybe<string>;
+          name?: string | null | undefined;
           locale: PetitionLocale;
-          deadline?: Maybe<string>;
+          deadline?: string | null | undefined;
           status: PetitionStatus;
           updatedAt: string;
           isReadOnly: boolean;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
-          myEffectivePermission?: Maybe<{
-            __typename?: "EffectivePetitionUserPermission";
-            isSubscribed: boolean;
-          }>;
+          myEffectivePermission?:
+            | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+            | null
+            | undefined;
         };
       }
     | {
@@ -11866,13 +13004,13 @@ export type PetitionCompose_createPetitionFieldMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -11893,7 +13031,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
         petition: {
           __typename?: "PetitionTemplate";
           id: string;
-          name?: Maybe<string>;
+          name?: string | null | undefined;
           locale: PetitionLocale;
           isPublic: boolean;
           updatedAt: string;
@@ -11916,13 +13054,13 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -11943,17 +13081,17 @@ export type PetitionCompose_clonePetitionFieldMutation = {
         petition: {
           __typename?: "Petition";
           id: string;
-          name?: Maybe<string>;
+          name?: string | null | undefined;
           locale: PetitionLocale;
-          deadline?: Maybe<string>;
+          deadline?: string | null | undefined;
           status: PetitionStatus;
           updatedAt: string;
           isReadOnly: boolean;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
-          myEffectivePermission?: Maybe<{
-            __typename?: "EffectivePetitionUserPermission";
-            isSubscribed: boolean;
-          }>;
+          myEffectivePermission?:
+            | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+            | null
+            | undefined;
         };
       }
     | {
@@ -11962,13 +13100,13 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -11989,7 +13127,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
         petition: {
           __typename?: "PetitionTemplate";
           id: string;
-          name?: Maybe<string>;
+          name?: string | null | undefined;
           locale: PetitionLocale;
           isPublic: boolean;
           updatedAt: string;
@@ -12010,22 +13148,22 @@ export type PetitionCompose_deletePetitionFieldMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         locale: PetitionLocale;
-        deadline?: Maybe<string>;
+        deadline?: string | null | undefined;
         status: PetitionStatus;
         updatedAt: string;
         isReadOnly: boolean;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
+        myEffectivePermission?:
+          | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+          | null
+          | undefined;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         locale: PetitionLocale;
         isPublic: boolean;
         updatedAt: string;
@@ -12048,13 +13186,13 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -12085,13 +13223,13 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -12128,13 +13266,13 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -12165,13 +13303,13 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -12210,7 +13348,7 @@ export type PetitionCompose_batchSendPetitionMutation = {
   batchSendPetition: Array<{
     __typename?: "SendPetitionResult";
     result: Result;
-    petition?: Maybe<{ __typename?: "Petition"; id: string; status: PetitionStatus }>;
+    petition?: { __typename?: "Petition"; id: string; status: PetitionStatus } | null | undefined;
   }>;
 };
 
@@ -12221,16 +13359,16 @@ export type PetitionComposeUserQuery = {
     __typename?: "User";
     id: string;
     unreadNotificationIds: Array<string>;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasPetitionSignature: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
@@ -12253,16 +13391,16 @@ export type PetitionComposeQueryVariables = Exact<{
 }>;
 
 export type PetitionComposeQuery = {
-  petition?: Maybe<
+  petition?:
     | {
         __typename?: "Petition";
         status: PetitionStatus;
         id: string;
         tone: Tone;
-        name?: Maybe<string>;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        deadline?: Maybe<string>;
+        name?: string | null | undefined;
+        emailSubject?: string | null | undefined;
+        emailBody?: any | null | undefined;
+        deadline?: string | null | undefined;
         locale: PetitionLocale;
         hasCommentsEnabled: boolean;
         skipForwardSecurity: boolean;
@@ -12273,13 +13411,13 @@ export type PetitionComposeQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -12297,32 +13435,38 @@ export type PetitionComposeQuery = {
           comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         }>;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-            fullName: string;
-          }>;
-        }>;
-        remindersConfig?: Maybe<{
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        }>;
+        signatureConfig?:
+          | {
+              __typename?: "SignatureConfig";
+              provider: string;
+              title: string;
+              review: boolean;
+              letRecipientsChooseSigners: boolean;
+              signers: Array<{
+                __typename?: "PetitionSigner";
+                contactId?: string | null | undefined;
+                firstName: string;
+                lastName: string;
+                email: string;
+                fullName: string;
+              }>;
+            }
+          | null
+          | undefined;
+        remindersConfig?:
+          | {
+              __typename?: "RemindersConfig";
+              offset: number;
+              time: string;
+              timezone: string;
+              weekdaysOnly: boolean;
+            }
+          | null
+          | undefined;
         organization: {
           __typename?: "Organization";
           id: string;
-          customHost?: Maybe<string>;
+          customHost?: string | null | undefined;
           usageLimits: {
             __typename?: "OrganizationUsageLimit";
             petitions: {
@@ -12332,26 +13476,29 @@ export type PetitionComposeQuery = {
             };
           };
         };
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-        }>;
+        currentSignatureRequest?:
+          | {
+              __typename?: "PetitionSignatureRequest";
+              id: string;
+              status: PetitionSignatureRequestStatus;
+            }
+          | null
+          | undefined;
         owner: { __typename?: "User"; id: string };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
+        myEffectivePermission?:
+          | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+          | null
+          | undefined;
       }
     | {
         __typename?: "PetitionTemplate";
         isPublic: boolean;
         id: string;
         tone: Tone;
-        name?: Maybe<string>;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        description?: Maybe<any>;
+        name?: string | null | undefined;
+        emailSubject?: string | null | undefined;
+        emailBody?: any | null | undefined;
+        description?: any | null | undefined;
         isReadOnly: boolean;
         locale: PetitionLocale;
         hasCommentsEnabled: boolean;
@@ -12362,13 +13509,13 @@ export type PetitionComposeQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
           isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           options: { [key: string]: any };
           position: number;
           validated: boolean;
@@ -12386,44 +13533,51 @@ export type PetitionComposeQuery = {
           comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         }>;
-        publicLink?: Maybe<{
-          __typename?: "PublicPetitionLink";
-          id: string;
-          title: string;
-          isActive: boolean;
-          description: string;
-          slug: string;
-          linkPermissions: Array<
-            | {
-                __typename?: "PublicPetitionLinkUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string };
-              }
-            | {
-                __typename?: "PublicPetitionLinkUserPermission";
-                permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string };
-              }
-          >;
-        }>;
-        organization: { __typename?: "Organization"; customHost?: Maybe<string> };
+        publicLink?:
+          | {
+              __typename?: "PublicPetitionLink";
+              id: string;
+              title: string;
+              isActive: boolean;
+              description: string;
+              slug: string;
+              linkPermissions: Array<
+                | {
+                    __typename?: "PublicPetitionLinkUserGroupPermission";
+                    permissionType: PetitionPermissionType;
+                    group: { __typename?: "UserGroup"; id: string };
+                  }
+                | {
+                    __typename?: "PublicPetitionLinkUserPermission";
+                    permissionType: PetitionPermissionType;
+                    user: { __typename?: "User"; id: string };
+                  }
+              >;
+            }
+          | null
+          | undefined;
+        organization: { __typename?: "Organization"; customHost?: string | null | undefined };
         owner: { __typename?: "User"; id: string };
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-          }>;
-        }>;
+        signatureConfig?:
+          | {
+              __typename?: "SignatureConfig";
+              provider: string;
+              title: string;
+              review: boolean;
+              letRecipientsChooseSigners: boolean;
+              signers: Array<{
+                __typename?: "PetitionSigner";
+                contactId?: string | null | undefined;
+                firstName: string;
+                lastName: string;
+                email: string;
+              }>;
+            }
+          | null
+          | undefined;
       }
-  >;
+    | null
+    | undefined;
 };
 
 export type PetitionQueryVariables = Exact<{
@@ -12431,20 +13585,21 @@ export type PetitionQueryVariables = Exact<{
 }>;
 
 export type PetitionQuery = {
-  petition?: Maybe<
+  petition?:
     | { __typename?: "Petition"; status: PetitionStatus; id: string }
     | { __typename?: "PetitionTemplate"; id: string }
-  >;
+    | null
+    | undefined;
 };
 
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   hasCommentsEnabled: boolean;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   status: PetitionStatus;
   locale: PetitionLocale;
-  deadline?: Maybe<string>;
+  deadline?: string | null | undefined;
   updatedAt: string;
   isReadOnly: boolean;
   fields: Array<{
@@ -12452,12 +13607,12 @@ export type PetitionReplies_PetitionFragment = {
     isReadOnly: boolean;
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
-    description?: Maybe<string>;
+    title?: string | null | undefined;
+    description?: string | null | undefined;
     optional: boolean;
     validated: boolean;
     options: { [key: string]: any };
-    visibility?: Maybe<{ [key: string]: any }>;
+    visibility?: { [key: string]: any } | null | undefined;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -12465,7 +13620,7 @@ export type PetitionReplies_PetitionFragment = {
       status: PetitionFieldReplyStatus;
       createdAt: string;
       metadata: { [key: string]: any };
-      field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
+      field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null | undefined;
     }>;
     comments: Array<{
       __typename?: "PetitionFieldComment";
@@ -12474,19 +13629,28 @@ export type PetitionReplies_PetitionFragment = {
       createdAt: string;
       content: string;
       isEdited: boolean;
-      isInternal?: Maybe<boolean>;
-      author?: Maybe<
+      isInternal?: boolean;
+      author?:
         | {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           }
-        | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-      >;
+        | {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null | undefined;
+            status: UserStatus;
+          }
+        | null
+        | undefined;
     }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -12500,11 +13664,14 @@ export type PetitionReplies_PetitionFragment = {
       };
     }>;
   }>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  }>;
+  currentSignatureRequest?:
+    | {
+        __typename?: "PetitionSignatureRequest";
+        id: string;
+        status: PetitionSignatureRequestStatus;
+      }
+    | null
+    | undefined;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -12514,45 +13681,49 @@ export type PetitionReplies_PetitionFragment = {
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+        user: { __typename?: "User"; id: string; fullName?: string | null | undefined };
       }
   >;
-  signatureRequests?: Maybe<
-    Array<{
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      signerStatus: Array<{
-        __typename?: "PetitionSignatureRequestSignerStatus";
-        status: string;
-        signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-      }>;
-      signatureConfig: {
+  signatureRequests?:
+    | Array<{
+        __typename?: "PetitionSignatureRequest";
+        id: string;
+        status: PetitionSignatureRequestStatus;
+        signerStatus: Array<{
+          __typename?: "PetitionSignatureRequestSignerStatus";
+          status: string;
+          signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+        }>;
+        signatureConfig: {
+          __typename?: "SignatureConfig";
+          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+        };
+      }>
+    | null
+    | undefined;
+  signatureConfig?:
+    | {
         __typename?: "SignatureConfig";
-        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-      };
-    }>
-  >;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    review: boolean;
-    provider: string;
-    title: string;
-    letRecipientsChooseSigners: boolean;
-    timezone: string;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-      fullName: string;
-    }>;
-  }>;
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
+        review: boolean;
+        provider: string;
+        title: string;
+        letRecipientsChooseSigners: boolean;
+        timezone: string;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null | undefined;
+          firstName: string;
+          lastName: string;
+          email: string;
+          fullName: string;
+        }>;
+      }
+    | null
+    | undefined;
+  myEffectivePermission?:
+    | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+    | null
+    | undefined;
 };
 
 export type PetitionReplies_PetitionFieldFragment = {
@@ -12560,12 +13731,12 @@ export type PetitionReplies_PetitionFieldFragment = {
   isReadOnly: boolean;
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
+  title?: string | null | undefined;
+  description?: string | null | undefined;
   optional: boolean;
   validated: boolean;
   options: { [key: string]: any };
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -12573,7 +13744,7 @@ export type PetitionReplies_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     createdAt: string;
     metadata: { [key: string]: any };
-    field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
+    field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null | undefined;
   }>;
   comments: Array<{
     __typename?: "PetitionFieldComment";
@@ -12582,19 +13753,28 @@ export type PetitionReplies_PetitionFieldFragment = {
     createdAt: string;
     content: string;
     isEdited: boolean;
-    isInternal?: Maybe<boolean>;
-    author?: Maybe<
+    isInternal?: boolean;
+    author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          contact?:
+            | {
+                __typename?: "Contact";
+                id: string;
+                fullName?: string | null | undefined;
+                email: string;
+              }
+            | null
+            | undefined;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
+      | {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null | undefined;
+          status: UserStatus;
+        }
+      | null
+      | undefined;
   }>;
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
@@ -12613,16 +13793,16 @@ export type PetitionReplies_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   hasPetitionSignature: boolean;
   hasPetitionPdfExport: boolean;
   hasInternalComments: boolean;
@@ -12648,21 +13828,21 @@ export type PetitionReplies_updatePetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         locale: PetitionLocale;
-        deadline?: Maybe<string>;
+        deadline?: string | null | undefined;
         status: PetitionStatus;
         updatedAt: string;
         isReadOnly: boolean;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
+        myEffectivePermission?:
+          | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+          | null
+          | undefined;
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         locale: PetitionLocale;
         isPublic: boolean;
         updatedAt: string;
@@ -12704,7 +13884,7 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
-    url?: Maybe<string>;
+    url?: string | null | undefined;
   };
 };
 
@@ -12720,7 +13900,7 @@ export type PetitionReplies_createPetitionFieldCommentMutation = {
   createPetitionFieldComment: {
     __typename?: "PetitionField";
     id: string;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
     type: PetitionFieldType;
     comments: Array<{
       __typename?: "PetitionFieldComment";
@@ -12729,19 +13909,28 @@ export type PetitionReplies_createPetitionFieldCommentMutation = {
       createdAt: string;
       isUnread: boolean;
       isEdited: boolean;
-      isInternal?: Maybe<boolean>;
-      author?: Maybe<
+      isInternal?: boolean;
+      author?:
         | {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           }
-        | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-      >;
+        | {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null | undefined;
+            status: UserStatus;
+          }
+        | null
+        | undefined;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -12763,7 +13952,7 @@ export type PetitionReplies_updatePetitionFieldCommentMutation = {
   updatePetitionFieldComment: {
     __typename?: "PetitionField";
     id: string;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
     type: PetitionFieldType;
     comments: Array<{
       __typename?: "PetitionFieldComment";
@@ -12772,19 +13961,28 @@ export type PetitionReplies_updatePetitionFieldCommentMutation = {
       createdAt: string;
       isUnread: boolean;
       isEdited: boolean;
-      isInternal?: Maybe<boolean>;
-      author?: Maybe<
+      isInternal?: boolean;
+      author?:
         | {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           }
-        | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-      >;
+        | {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null | undefined;
+            status: UserStatus;
+          }
+        | null
+        | undefined;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -12805,7 +14003,7 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
   deletePetitionFieldComment: {
     __typename?: "PetitionField";
     id: string;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
     type: PetitionFieldType;
     comments: Array<{
       __typename?: "PetitionFieldComment";
@@ -12814,19 +14012,28 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
       createdAt: string;
       isUnread: boolean;
       isEdited: boolean;
-      isInternal?: Maybe<boolean>;
-      author?: Maybe<
+      isInternal?: boolean;
+      author?:
         | {
             __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
           }
-        | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-      >;
+        | {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null | undefined;
+            status: UserStatus;
+          }
+        | null
+        | undefined;
     }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -12875,16 +14082,16 @@ export type PetitionRepliesUserQuery = {
     __typename?: "User";
     id: string;
     unreadNotificationIds: Array<string>;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasPetitionSignature: boolean;
     hasPetitionPdfExport: boolean;
     hasInternalComments: boolean;
@@ -12908,15 +14115,15 @@ export type PetitionRepliesQueryVariables = Exact<{
 }>;
 
 export type PetitionRepliesQuery = {
-  petition?: Maybe<
+  petition?:
     | {
         __typename?: "Petition";
         id: string;
         hasCommentsEnabled: boolean;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         status: PetitionStatus;
         locale: PetitionLocale;
-        deadline?: Maybe<string>;
+        deadline?: string | null | undefined;
         updatedAt: string;
         isReadOnly: boolean;
         fields: Array<{
@@ -12924,12 +14131,12 @@ export type PetitionRepliesQuery = {
           isReadOnly: boolean;
           id: string;
           type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
+          title?: string | null | undefined;
+          description?: string | null | undefined;
           optional: boolean;
           validated: boolean;
           options: { [key: string]: any };
-          visibility?: Maybe<{ [key: string]: any }>;
+          visibility?: { [key: string]: any } | null | undefined;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -12937,7 +14144,7 @@ export type PetitionRepliesQuery = {
             status: PetitionFieldReplyStatus;
             createdAt: string;
             metadata: { [key: string]: any };
-            field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
+            field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null | undefined;
           }>;
           comments: Array<{
             __typename?: "PetitionFieldComment";
@@ -12946,19 +14153,28 @@ export type PetitionRepliesQuery = {
             createdAt: string;
             content: string;
             isEdited: boolean;
-            isInternal?: Maybe<boolean>;
-            author?: Maybe<
+            isInternal?: boolean;
+            author?:
               | {
                   __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+                  contact?:
+                    | {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null | undefined;
+                        email: string;
+                      }
+                    | null
+                    | undefined;
                 }
-              | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-            >;
+              | {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  status: UserStatus;
+                }
+              | null
+              | undefined;
           }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -12972,11 +14188,14 @@ export type PetitionRepliesQuery = {
             };
           }>;
         }>;
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-        }>;
+        currentSignatureRequest?:
+          | {
+              __typename?: "PetitionSignatureRequest";
+              id: string;
+              status: PetitionSignatureRequestStatus;
+            }
+          | null
+          | undefined;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -12986,48 +14205,53 @@ export type PetitionRepliesQuery = {
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+              user: { __typename?: "User"; id: string; fullName?: string | null | undefined };
             }
         >;
-        signatureRequests?: Maybe<
-          Array<{
-            __typename?: "PetitionSignatureRequest";
-            id: string;
-            status: PetitionSignatureRequestStatus;
-            signerStatus: Array<{
-              __typename?: "PetitionSignatureRequestSignerStatus";
-              status: string;
-              signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-            }>;
-            signatureConfig: {
+        signatureRequests?:
+          | Array<{
+              __typename?: "PetitionSignatureRequest";
+              id: string;
+              status: PetitionSignatureRequestStatus;
+              signerStatus: Array<{
+                __typename?: "PetitionSignatureRequestSignerStatus";
+                status: string;
+                signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+              }>;
+              signatureConfig: {
+                __typename?: "SignatureConfig";
+                signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+              };
+            }>
+          | null
+          | undefined;
+        signatureConfig?:
+          | {
               __typename?: "SignatureConfig";
-              signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-            };
-          }>
-        >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          review: boolean;
-          provider: string;
-          title: string;
-          letRecipientsChooseSigners: boolean;
-          timezone: string;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-            fullName: string;
-          }>;
-        }>;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
+              review: boolean;
+              provider: string;
+              title: string;
+              letRecipientsChooseSigners: boolean;
+              timezone: string;
+              signers: Array<{
+                __typename?: "PetitionSigner";
+                contactId?: string | null | undefined;
+                firstName: string;
+                lastName: string;
+                email: string;
+                fullName: string;
+              }>;
+            }
+          | null
+          | undefined;
+        myEffectivePermission?:
+          | { __typename?: "EffectivePetitionUserPermission"; isSubscribed: boolean }
+          | null
+          | undefined;
       }
     | { __typename?: "PetitionTemplate" }
-  >;
+    | null
+    | undefined;
 };
 
 export type Petitions_PetitionBasePaginationFragment = {
@@ -13036,22 +14260,25 @@ export type Petitions_PetitionBasePaginationFragment = {
   items: Array<
     | {
         __typename?: "Petition";
-        sentAt?: Maybe<string>;
+        sentAt?: string | null | undefined;
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         createdAt: string;
         status: PetitionStatus;
         isReadOnly: boolean;
         accesses: Array<{
           __typename?: "PetitionAccess";
           status: PetitionAccessStatus;
-          nextReminderAt?: Maybe<string>;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          nextReminderAt?: string | null | undefined;
+          contact?:
+            | {
+                __typename?: "Contact";
+                id: string;
+                fullName?: string | null | undefined;
+                email: string;
+              }
+            | null
+            | undefined;
           reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
         }>;
         permissions: Array<
@@ -13066,9 +14293,9 @@ export type Petitions_PetitionBasePaginationFragment = {
               user: {
                 __typename?: "User";
                 id: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
+                fullName?: string | null | undefined;
+                avatarUrl?: string | null | undefined;
+                initials?: string | null | undefined;
               };
             }
         >;
@@ -13080,18 +14307,18 @@ export type Petitions_PetitionBasePaginationFragment = {
           total: number;
         };
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
-        }>;
-        signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
+        currentSignatureRequest?:
+          | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+          | null
+          | undefined;
+        signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null | undefined;
       }
     | {
         __typename?: "PetitionTemplate";
         isPublic: boolean;
-        descriptionExcerpt?: Maybe<string>;
+        descriptionExcerpt?: string | null | undefined;
         id: string;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         createdAt: string;
         isReadOnly: boolean;
         permissions: Array<
@@ -13106,9 +14333,9 @@ export type Petitions_PetitionBasePaginationFragment = {
               user: {
                 __typename?: "User";
                 id: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
+                fullName?: string | null | undefined;
+                avatarUrl?: string | null | undefined;
+                initials?: string | null | undefined;
               };
             }
         >;
@@ -13119,22 +14346,20 @@ export type Petitions_PetitionBasePaginationFragment = {
 
 export type Petitions_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  sentAt?: Maybe<string>;
+  sentAt?: string | null | undefined;
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   createdAt: string;
   status: PetitionStatus;
   isReadOnly: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
-    nextReminderAt?: Maybe<string>;
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    nextReminderAt?: string | null | undefined;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
     reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
   }>;
   permissions: Array<
@@ -13149,9 +14374,9 @@ export type Petitions_PetitionBase_Petition_Fragment = {
         user: {
           __typename?: "User";
           id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+          fullName?: string | null | undefined;
+          avatarUrl?: string | null | undefined;
+          initials?: string | null | undefined;
         };
       }
   >;
@@ -13163,19 +14388,19 @@ export type Petitions_PetitionBase_Petition_Fragment = {
     total: number;
   };
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
+  currentSignatureRequest?:
+    | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+    | null
+    | undefined;
+  signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null | undefined;
 };
 
 export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
-  descriptionExcerpt?: Maybe<string>;
+  descriptionExcerpt?: string | null | undefined;
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   createdAt: string;
   isReadOnly: boolean;
   permissions: Array<
@@ -13190,9 +14415,9 @@ export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
         user: {
           __typename?: "User";
           id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+          fullName?: string | null | undefined;
+          avatarUrl?: string | null | undefined;
+          initials?: string | null | undefined;
         };
       }
   >;
@@ -13206,16 +14431,16 @@ export type Petitions_PetitionBaseFragment =
 export type Petitions_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   hasPetitionSignature: boolean;
   organization: {
     __typename?: "Organization";
@@ -13233,16 +14458,16 @@ export type PetitionsUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasPetitionSignature: boolean;
     organization: {
       __typename?: "Organization";
@@ -13271,22 +14496,25 @@ export type PetitionsQuery = {
     items: Array<
       | {
           __typename?: "Petition";
-          sentAt?: Maybe<string>;
+          sentAt?: string | null | undefined;
           id: string;
-          name?: Maybe<string>;
+          name?: string | null | undefined;
           createdAt: string;
           status: PetitionStatus;
           isReadOnly: boolean;
           accesses: Array<{
             __typename?: "PetitionAccess";
             status: PetitionAccessStatus;
-            nextReminderAt?: Maybe<string>;
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+            nextReminderAt?: string | null | undefined;
+            contact?:
+              | {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null | undefined;
+                  email: string;
+                }
+              | null
+              | undefined;
             reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
           }>;
           permissions: Array<
@@ -13301,9 +14529,9 @@ export type PetitionsQuery = {
                 user: {
                   __typename?: "User";
                   id: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
+                  fullName?: string | null | undefined;
+                  avatarUrl?: string | null | undefined;
+                  initials?: string | null | undefined;
                 };
               }
           >;
@@ -13315,18 +14543,18 @@ export type PetitionsQuery = {
             total: number;
           };
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-          currentSignatureRequest?: Maybe<{
-            __typename?: "PetitionSignatureRequest";
-            status: PetitionSignatureRequestStatus;
-          }>;
-          signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
+          currentSignatureRequest?:
+            | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+            | null
+            | undefined;
+          signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null | undefined;
         }
       | {
           __typename?: "PetitionTemplate";
           isPublic: boolean;
-          descriptionExcerpt?: Maybe<string>;
+          descriptionExcerpt?: string | null | undefined;
           id: string;
-          name?: Maybe<string>;
+          name?: string | null | undefined;
           createdAt: string;
           isReadOnly: boolean;
           permissions: Array<
@@ -13341,9 +14569,9 @@ export type PetitionsQuery = {
                 user: {
                   __typename?: "User";
                   id: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
+                  fullName?: string | null | undefined;
+                  avatarUrl?: string | null | undefined;
+                  initials?: string | null | undefined;
                 };
               }
           >;
@@ -13356,32 +14584,35 @@ export type PetitionsQuery = {
 export type NewPetition_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  name?: Maybe<string>;
-  descriptionExcerpt?: Maybe<string>;
+  name?: string | null | undefined;
+  descriptionExcerpt?: string | null | undefined;
   locale: PetitionLocale;
   owner: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    fullName?: string | null | undefined;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
   };
-  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
+  publicLink?:
+    | { __typename?: "PublicPetitionLink"; id: string; isActive: boolean }
+    | null
+    | undefined;
 };
 
 export type NewPetition_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -13409,17 +14640,20 @@ export type NewPetitionTemplatesQuery = {
     items: Array<{
       __typename?: "PetitionTemplate";
       id: string;
-      name?: Maybe<string>;
-      descriptionExcerpt?: Maybe<string>;
+      name?: string | null | undefined;
+      descriptionExcerpt?: string | null | undefined;
       locale: PetitionLocale;
       owner: {
         __typename?: "User";
         id: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
+        fullName?: string | null | undefined;
+        avatarUrl?: string | null | undefined;
+        initials?: string | null | undefined;
       };
-      publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
+      publicLink?:
+        | { __typename?: "PublicPetitionLink"; id: string; isActive: boolean }
+        | null
+        | undefined;
     }>;
   };
 };
@@ -13431,16 +14665,16 @@ export type NewPetitionUserQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -13458,57 +14692,59 @@ export type NewPetitionUserTemplateQueryVariables = Exact<{
 }>;
 
 export type NewPetitionUserTemplateQuery = {
-  petition?: Maybe<
+  petition?:
     | { __typename?: "Petition" }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        descriptionHtml?: Maybe<string>;
-        name?: Maybe<string>;
+        descriptionHtml?: string | null | undefined;
+        name?: string | null | undefined;
         locale: PetitionLocale;
         updatedAt: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
-          title?: Maybe<string>;
+          title?: string | null | undefined;
           type: PetitionFieldType;
           options: { [key: string]: any };
         }>;
         owner: {
           __typename?: "User";
           id: string;
-          fullName?: Maybe<string>;
+          fullName?: string | null | undefined;
           organization: { __typename?: "Organization"; id: string; name: string };
         };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        }>;
-        publicLink?: Maybe<{
-          __typename?: "PublicPetitionLink";
-          id: string;
-          isActive: boolean;
-          slug: string;
-        }>;
+        myEffectivePermission?:
+          | {
+              __typename?: "EffectivePetitionUserPermission";
+              permissionType: PetitionPermissionType;
+            }
+          | null
+          | undefined;
+        publicLink?:
+          | { __typename?: "PublicPetitionLink"; id: string; isActive: boolean; slug: string }
+          | null
+          | undefined;
       }
-  >;
+    | null
+    | undefined;
 };
 
 export type Account_UserFragment = {
   __typename?: "User";
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   isSsoUser: boolean;
   email: string;
-  preferredLocale?: Maybe<string>;
+  preferredLocale?: string | null | undefined;
   id: string;
-  fullName?: Maybe<string>;
+  fullName?: string | null | undefined;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   hasApiTokens: boolean;
   organization: {
     __typename?: "Organization";
@@ -13529,10 +14765,10 @@ export type Account_updateAccountMutation = {
   updateUser: {
     __typename?: "User";
     id: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    fullName?: Maybe<string>;
-    initials?: Maybe<string>;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
+    fullName?: string | null | undefined;
+    initials?: string | null | undefined;
   };
 };
 
@@ -13544,18 +14780,18 @@ export type Account_setUserPreferredLocaleMutation = {
   setUserPreferredLocale: {
     __typename?: "User";
     id: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     isSsoUser: boolean;
     email: string;
-    preferredLocale?: Maybe<string>;
-    fullName?: Maybe<string>;
+    preferredLocale?: string | null | undefined;
+    fullName?: string | null | undefined;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasApiTokens: boolean;
     organization: {
       __typename?: "Organization";
@@ -13574,18 +14810,18 @@ export type AccountQuery = {
   me: {
     __typename?: "User";
     id: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     isSsoUser: boolean;
     email: string;
-    preferredLocale?: Maybe<string>;
-    fullName?: Maybe<string>;
+    preferredLocale?: string | null | undefined;
+    fullName?: string | null | undefined;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasApiTokens: boolean;
     organization: {
       __typename?: "Organization";
@@ -13603,7 +14839,7 @@ export type Developers_UserAuthenticationTokenFragment = {
   id: string;
   tokenName: string;
   createdAt: string;
-  lastUsedAt?: Maybe<string>;
+  lastUsedAt?: string | null | undefined;
 };
 
 export type Developers_RevokeUserAuthTokenMutationVariables = Exact<{
@@ -13612,12 +14848,12 @@ export type Developers_RevokeUserAuthTokenMutationVariables = Exact<{
 
 export type Developers_RevokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
 
-export type Developers_CreateOrgIntegrationMutationVariables = Exact<{
+export type Developers_CreateEventSubscriptionMutationVariables = Exact<{
   settings: Scalars["JSONObject"];
 }>;
 
-export type Developers_CreateOrgIntegrationMutation = {
-  createOrgIntegration: {
+export type Developers_CreateEventSubscriptionMutation = {
+  createEventSubscriptionIntegration: {
     __typename?: "OrgIntegration";
     id: string;
     type: IntegrationType;
@@ -13626,13 +14862,13 @@ export type Developers_CreateOrgIntegrationMutation = {
   };
 };
 
-export type Developers_UpdateOrgIntegrationMutationVariables = Exact<{
+export type Developers_UpdateEventSubscriptionMutationVariables = Exact<{
   id: Scalars["GID"];
   data: UpdateOrgIntegrationInput;
 }>;
 
-export type Developers_UpdateOrgIntegrationMutation = {
-  updateOrgIntegration: {
+export type Developers_UpdateEventSubscriptionMutation = {
+  updateEventSubscriptionIntegration: {
     __typename?: "OrgIntegration";
     id: string;
     type: IntegrationType;
@@ -13652,16 +14888,16 @@ export type DevelopersQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasApiTokens: boolean;
     authenticationTokens: {
       __typename?: "UserAuthenticationTokenPagination";
@@ -13671,7 +14907,7 @@ export type DevelopersQuery = {
         id: string;
         tokenName: string;
         createdAt: string;
-        lastUsedAt?: Maybe<string>;
+        lastUsedAt?: string | null | undefined;
       }>;
     };
     organization: {
@@ -13695,16 +14931,16 @@ export type DevelopersQuery = {
 export type Settings_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
+  fullName?: string | null | undefined;
+  firstName?: string | null | undefined;
+  lastName?: string | null | undefined;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
   role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
   hasApiTokens: boolean;
   organization: {
     __typename?: "Organization";
@@ -13722,16 +14958,16 @@ export type SettingsQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasApiTokens: boolean;
     organization: {
       __typename?: "Organization";
@@ -13758,16 +14994,16 @@ export type SecurityQuery = {
     __typename?: "User";
     isSsoUser: boolean;
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
     role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
     hasApiTokens: boolean;
     organization: {
       __typename?: "Organization";
@@ -13794,10 +15030,10 @@ export type CurrentUserQuery = {
     __typename?: "User";
     id: string;
     email: string;
-    fullName?: Maybe<string>;
-    preferredLocale?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+    fullName?: string | null | undefined;
+    preferredLocale?: string | null | undefined;
+    avatarUrl?: string | null | undefined;
+    initials?: string | null | undefined;
   };
 };
 
@@ -13805,131 +15041,150 @@ export type Login_UserFragment = {
   __typename?: "User";
   id: string;
   email: string;
-  fullName?: Maybe<string>;
-  preferredLocale?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
+  fullName?: string | null | undefined;
+  preferredLocale?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
+  initials?: string | null | undefined;
 };
 
 export type RecipientView_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  petition?: Maybe<{
-    __typename?: "PublicPetition";
-    id: string;
-    status: PetitionStatus;
-    deadline?: Maybe<string>;
-    hasCommentsEnabled: boolean;
-    isRecipientViewContentsHidden: boolean;
-    tone: Tone;
-    signatureStatus?: Maybe<PublicSignatureStatus>;
-    fields: Array<{
-      __typename?: "PublicPetitionField";
-      id: string;
-      type: PetitionFieldType;
-      title?: Maybe<string>;
-      options: { [key: string]: any };
-      optional: boolean;
-      validated: boolean;
-      isReadOnly: boolean;
-      commentCount: number;
-      unreadCommentCount: number;
-      visibility?: Maybe<{ [key: string]: any }>;
-      description?: Maybe<string>;
-      multiple: boolean;
-      replies: Array<{
-        __typename?: "PublicPetitionFieldReply";
+  petition?:
+    | {
+        __typename?: "PublicPetition";
         id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-        createdAt: string;
-        updatedAt: string;
-      }>;
-      attachments: Array<{
-        __typename?: "PetitionFieldAttachment";
+        status: PetitionStatus;
+        deadline?: string | null | undefined;
+        hasCommentsEnabled: boolean;
+        isRecipientViewContentsHidden: boolean;
+        tone: Tone;
+        signatureStatus?: PublicSignatureStatus | null | undefined;
+        fields: Array<{
+          __typename?: "PublicPetitionField";
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null | undefined;
+          options: { [key: string]: any };
+          optional: boolean;
+          validated: boolean;
+          isReadOnly: boolean;
+          commentCount: number;
+          unreadCommentCount: number;
+          visibility?: { [key: string]: any } | null | undefined;
+          description?: string | null | undefined;
+          multiple: boolean;
+          replies: Array<{
+            __typename?: "PublicPetitionFieldReply";
+            id: string;
+            status: PetitionFieldReplyStatus;
+            content: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+          attachments: Array<{
+            __typename?: "PetitionFieldAttachment";
+            id: string;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              contentType: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+        }>;
+        signatureConfig?:
+          | {
+              __typename?: "PublicSignatureConfig";
+              review: boolean;
+              letRecipientsChooseSigners: boolean;
+              signers: Array<{
+                __typename?: "PetitionSigner";
+                fullName: string;
+                firstName: string;
+                lastName: string;
+                email: string;
+              }>;
+              additionalSigners: Array<{
+                __typename?: "PetitionSigner";
+                firstName: string;
+                lastName: string;
+                fullName: string;
+                email: string;
+              }>;
+            }
+          | null
+          | undefined;
+        recipients: Array<{
+          __typename?: "PublicContact";
+          id: string;
+          fullName?: string | null | undefined;
+          firstName?: string | null | undefined;
+          email: string;
+        }>;
+      }
+    | null
+    | undefined;
+  granter?:
+    | {
+        __typename?: "PublicUser";
+        fullName?: string | null | undefined;
         id: string;
-        file: {
-          __typename?: "FileUpload";
-          filename: string;
-          contentType: string;
-          size: number;
-          isComplete: boolean;
+        firstName?: string | null | undefined;
+        email: string;
+        organization: {
+          __typename?: "PublicOrganization";
+          name: string;
+          logoUrl?: string | null | undefined;
         };
-      }>;
-    }>;
-    signatureConfig?: Maybe<{
-      __typename?: "PublicSignatureConfig";
-      review: boolean;
-      letRecipientsChooseSigners: boolean;
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        fullName: string;
-        firstName: string;
-        lastName: string;
+      }
+    | null
+    | undefined;
+  contact?:
+    | {
+        __typename?: "PublicContact";
+        id: string;
+        fullName?: string | null | undefined;
+        firstName?: string | null | undefined;
         email: string;
-      }>;
-      additionalSigners: Array<{
-        __typename?: "PetitionSigner";
-        firstName: string;
-        lastName: string;
-        fullName: string;
-        email: string;
-      }>;
-    }>;
-    recipients: Array<{
-      __typename?: "PublicContact";
-      id: string;
-      fullName?: Maybe<string>;
-      firstName?: Maybe<string>;
-      email: string;
-    }>;
-  }>;
-  granter?: Maybe<{
-    __typename?: "PublicUser";
-    fullName?: Maybe<string>;
-    id: string;
-    firstName?: Maybe<string>;
-    email: string;
-    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-  }>;
-  contact?: Maybe<{
-    __typename?: "PublicContact";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    email: string;
-    lastName?: Maybe<string>;
-  }>;
-  message?: Maybe<{ __typename?: "PublicPetitionMessage"; id: string; subject?: Maybe<string> }>;
+        lastName?: string | null | undefined;
+      }
+    | null
+    | undefined;
+  message?:
+    | { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null | undefined }
+    | null
+    | undefined;
 };
 
 export type RecipientView_PublicPetitionMessageFragment = {
   __typename?: "PublicPetitionMessage";
   id: string;
-  subject?: Maybe<string>;
+  subject?: string | null | undefined;
 };
 
 export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   id: string;
   status: PetitionStatus;
-  deadline?: Maybe<string>;
+  deadline?: string | null | undefined;
   hasCommentsEnabled: boolean;
   isRecipientViewContentsHidden: boolean;
   tone: Tone;
-  signatureStatus?: Maybe<PublicSignatureStatus>;
+  signatureStatus?: PublicSignatureStatus | null | undefined;
   fields: Array<{
     __typename?: "PublicPetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
     options: { [key: string]: any };
     optional: boolean;
     validated: boolean;
     isReadOnly: boolean;
     commentCount: number;
     unreadCommentCount: number;
-    visibility?: Maybe<{ [key: string]: any }>;
-    description?: Maybe<string>;
+    visibility?: { [key: string]: any } | null | undefined;
+    description?: string | null | undefined;
     multiple: boolean;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
@@ -13951,30 +15206,33 @@ export type RecipientView_PublicPetitionFragment = {
       };
     }>;
   }>;
-  signatureConfig?: Maybe<{
-    __typename?: "PublicSignatureConfig";
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      fullName: string;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-    additionalSigners: Array<{
-      __typename?: "PetitionSigner";
-      firstName: string;
-      lastName: string;
-      fullName: string;
-      email: string;
-    }>;
-  }>;
+  signatureConfig?:
+    | {
+        __typename?: "PublicSignatureConfig";
+        review: boolean;
+        letRecipientsChooseSigners: boolean;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          fullName: string;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }>;
+        additionalSigners: Array<{
+          __typename?: "PetitionSigner";
+          firstName: string;
+          lastName: string;
+          fullName: string;
+          email: string;
+        }>;
+      }
+    | null
+    | undefined;
   recipients: Array<{
     __typename?: "PublicContact";
     id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
+    fullName?: string | null | undefined;
+    firstName?: string | null | undefined;
     email: string;
   }>;
 };
@@ -13983,16 +15241,16 @@ export type RecipientView_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   options: { [key: string]: any };
   optional: boolean;
   validated: boolean;
   isReadOnly: boolean;
   commentCount: number;
   unreadCommentCount: number;
-  description?: Maybe<string>;
+  description?: string | null | undefined;
   multiple: boolean;
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -14017,10 +15275,14 @@ export type RecipientView_PublicPetitionFieldFragment = {
 export type RecipientView_PublicUserFragment = {
   __typename?: "PublicUser";
   id: string;
-  firstName?: Maybe<string>;
-  fullName?: Maybe<string>;
+  firstName?: string | null | undefined;
+  fullName?: string | null | undefined;
   email: string;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
+  organization: {
+    __typename?: "PublicOrganization";
+    name: string;
+    logoUrl?: string | null | undefined;
+  };
 };
 
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
@@ -14034,24 +15296,24 @@ export type RecipientView_publicCompletePetitionMutation = {
     __typename?: "PublicPetition";
     id: string;
     status: PetitionStatus;
-    deadline?: Maybe<string>;
+    deadline?: string | null | undefined;
     hasCommentsEnabled: boolean;
     isRecipientViewContentsHidden: boolean;
     tone: Tone;
-    signatureStatus?: Maybe<PublicSignatureStatus>;
+    signatureStatus?: PublicSignatureStatus | null | undefined;
     fields: Array<{
       __typename?: "PublicPetitionField";
       id: string;
       type: PetitionFieldType;
-      title?: Maybe<string>;
+      title?: string | null | undefined;
       options: { [key: string]: any };
       optional: boolean;
       validated: boolean;
       isReadOnly: boolean;
       commentCount: number;
       unreadCommentCount: number;
-      visibility?: Maybe<{ [key: string]: any }>;
-      description?: Maybe<string>;
+      visibility?: { [key: string]: any } | null | undefined;
+      description?: string | null | undefined;
       multiple: boolean;
       replies: Array<{
         __typename?: "PublicPetitionFieldReply";
@@ -14073,30 +15335,33 @@ export type RecipientView_publicCompletePetitionMutation = {
         };
       }>;
     }>;
-    signatureConfig?: Maybe<{
-      __typename?: "PublicSignatureConfig";
-      review: boolean;
-      letRecipientsChooseSigners: boolean;
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        fullName: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-      }>;
-      additionalSigners: Array<{
-        __typename?: "PetitionSigner";
-        firstName: string;
-        lastName: string;
-        fullName: string;
-        email: string;
-      }>;
-    }>;
+    signatureConfig?:
+      | {
+          __typename?: "PublicSignatureConfig";
+          review: boolean;
+          letRecipientsChooseSigners: boolean;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            fullName: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+          }>;
+          additionalSigners: Array<{
+            __typename?: "PetitionSigner";
+            firstName: string;
+            lastName: string;
+            fullName: string;
+            email: string;
+          }>;
+        }
+      | null
+      | undefined;
     recipients: Array<{
       __typename?: "PublicContact";
       id: string;
-      fullName?: Maybe<string>;
-      firstName?: Maybe<string>;
+      fullName?: string | null | undefined;
+      firstName?: string | null | undefined;
       email: string;
     }>;
   };
@@ -14107,96 +15372,122 @@ export type PublicPetitionQueryVariables = Exact<{
 }>;
 
 export type PublicPetitionQuery = {
-  access?: Maybe<{
-    __typename?: "PublicPetitionAccess";
-    petition?: Maybe<{
-      __typename?: "PublicPetition";
-      id: string;
-      status: PetitionStatus;
-      deadline?: Maybe<string>;
-      hasCommentsEnabled: boolean;
-      isRecipientViewContentsHidden: boolean;
-      tone: Tone;
-      signatureStatus?: Maybe<PublicSignatureStatus>;
-      fields: Array<{
-        __typename?: "PublicPetitionField";
-        id: string;
-        type: PetitionFieldType;
-        title?: Maybe<string>;
-        options: { [key: string]: any };
-        optional: boolean;
-        validated: boolean;
-        isReadOnly: boolean;
-        commentCount: number;
-        unreadCommentCount: number;
-        visibility?: Maybe<{ [key: string]: any }>;
-        description?: Maybe<string>;
-        multiple: boolean;
-        replies: Array<{
-          __typename?: "PublicPetitionFieldReply";
-          id: string;
-          status: PetitionFieldReplyStatus;
-          content: { [key: string]: any };
-          createdAt: string;
-          updatedAt: string;
-        }>;
-        attachments: Array<{
-          __typename?: "PetitionFieldAttachment";
-          id: string;
-          file: {
-            __typename?: "FileUpload";
-            filename: string;
-            contentType: string;
-            size: number;
-            isComplete: boolean;
-          };
-        }>;
-      }>;
-      signatureConfig?: Maybe<{
-        __typename?: "PublicSignatureConfig";
-        review: boolean;
-        letRecipientsChooseSigners: boolean;
-        signers: Array<{
-          __typename?: "PetitionSigner";
-          fullName: string;
-          firstName: string;
-          lastName: string;
-          email: string;
-        }>;
-        additionalSigners: Array<{
-          __typename?: "PetitionSigner";
-          firstName: string;
-          lastName: string;
-          fullName: string;
-          email: string;
-        }>;
-      }>;
-      recipients: Array<{
-        __typename?: "PublicContact";
-        id: string;
-        fullName?: Maybe<string>;
-        firstName?: Maybe<string>;
-        email: string;
-      }>;
-    }>;
-    granter?: Maybe<{
-      __typename?: "PublicUser";
-      fullName?: Maybe<string>;
-      id: string;
-      firstName?: Maybe<string>;
-      email: string;
-      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-    }>;
-    contact?: Maybe<{
-      __typename?: "PublicContact";
-      id: string;
-      fullName?: Maybe<string>;
-      firstName?: Maybe<string>;
-      email: string;
-      lastName?: Maybe<string>;
-    }>;
-    message?: Maybe<{ __typename?: "PublicPetitionMessage"; id: string; subject?: Maybe<string> }>;
-  }>;
+  access?:
+    | {
+        __typename?: "PublicPetitionAccess";
+        petition?:
+          | {
+              __typename?: "PublicPetition";
+              id: string;
+              status: PetitionStatus;
+              deadline?: string | null | undefined;
+              hasCommentsEnabled: boolean;
+              isRecipientViewContentsHidden: boolean;
+              tone: Tone;
+              signatureStatus?: PublicSignatureStatus | null | undefined;
+              fields: Array<{
+                __typename?: "PublicPetitionField";
+                id: string;
+                type: PetitionFieldType;
+                title?: string | null | undefined;
+                options: { [key: string]: any };
+                optional: boolean;
+                validated: boolean;
+                isReadOnly: boolean;
+                commentCount: number;
+                unreadCommentCount: number;
+                visibility?: { [key: string]: any } | null | undefined;
+                description?: string | null | undefined;
+                multiple: boolean;
+                replies: Array<{
+                  __typename?: "PublicPetitionFieldReply";
+                  id: string;
+                  status: PetitionFieldReplyStatus;
+                  content: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+                attachments: Array<{
+                  __typename?: "PetitionFieldAttachment";
+                  id: string;
+                  file: {
+                    __typename?: "FileUpload";
+                    filename: string;
+                    contentType: string;
+                    size: number;
+                    isComplete: boolean;
+                  };
+                }>;
+              }>;
+              signatureConfig?:
+                | {
+                    __typename?: "PublicSignatureConfig";
+                    review: boolean;
+                    letRecipientsChooseSigners: boolean;
+                    signers: Array<{
+                      __typename?: "PetitionSigner";
+                      fullName: string;
+                      firstName: string;
+                      lastName: string;
+                      email: string;
+                    }>;
+                    additionalSigners: Array<{
+                      __typename?: "PetitionSigner";
+                      firstName: string;
+                      lastName: string;
+                      fullName: string;
+                      email: string;
+                    }>;
+                  }
+                | null
+                | undefined;
+              recipients: Array<{
+                __typename?: "PublicContact";
+                id: string;
+                fullName?: string | null | undefined;
+                firstName?: string | null | undefined;
+                email: string;
+              }>;
+            }
+          | null
+          | undefined;
+        granter?:
+          | {
+              __typename?: "PublicUser";
+              fullName?: string | null | undefined;
+              id: string;
+              firstName?: string | null | undefined;
+              email: string;
+              organization: {
+                __typename?: "PublicOrganization";
+                name: string;
+                logoUrl?: string | null | undefined;
+              };
+            }
+          | null
+          | undefined;
+        contact?:
+          | {
+              __typename?: "PublicContact";
+              id: string;
+              fullName?: string | null | undefined;
+              firstName?: string | null | undefined;
+              email: string;
+              lastName?: string | null | undefined;
+            }
+          | null
+          | undefined;
+        message?:
+          | {
+              __typename?: "PublicPetitionMessage";
+              id: string;
+              subject?: string | null | undefined;
+            }
+          | null
+          | undefined;
+      }
+    | null
+    | undefined;
 };
 
 export type RecipientView_verifyPublicAccessMutationVariables = Exact<{
@@ -14210,12 +15501,12 @@ export type RecipientView_verifyPublicAccessMutation = {
   verifyPublicAccess: {
     __typename?: "PublicAccessVerification";
     isAllowed: boolean;
-    cookieName?: Maybe<string>;
-    cookieValue?: Maybe<string>;
-    email?: Maybe<string>;
-    orgName?: Maybe<string>;
-    orgLogoUrl?: Maybe<string>;
-    tone?: Maybe<Tone>;
+    cookieName?: string | null | undefined;
+    cookieValue?: string | null | undefined;
+    email?: string | null | undefined;
+    orgName?: string | null | undefined;
+    orgLogoUrl?: string | null | undefined;
+    tone?: Tone | null | undefined;
   };
 };
 
@@ -14242,7 +15533,7 @@ export type publicCheckVerificationCodeMutation = {
   publicCheckVerificationCode: {
     __typename?: "VerificationCodeCheck";
     result: Result;
-    remainingAttempts?: Maybe<number>;
+    remainingAttempts?: number | null | undefined;
   };
 };
 
@@ -14256,23 +15547,34 @@ export type OptOut_publicOptOutRemindersMutationVariables = Exact<{
 export type OptOut_publicOptOutRemindersMutation = {
   publicOptOutReminders: {
     __typename?: "PublicPetitionAccess";
-    petition?: Maybe<{ __typename?: "PublicPetition"; id: string }>;
+    petition?: { __typename?: "PublicPetition"; id: string } | null | undefined;
   };
 };
 
 export type OptOut_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: Maybe<{
-    __typename?: "PublicUser";
-    id: string;
-    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-  }>;
+  granter?:
+    | {
+        __typename?: "PublicUser";
+        id: string;
+        organization: {
+          __typename?: "PublicOrganization";
+          name: string;
+          logoUrl?: string | null | undefined;
+        };
+      }
+    | null
+    | undefined;
 };
 
 export type OptOut_PublicUserFragment = {
   __typename?: "PublicUser";
   id: string;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
+  organization: {
+    __typename?: "PublicOrganization";
+    name: string;
+    logoUrl?: string | null | undefined;
+  };
 };
 
 export type PublicOptOutQueryVariables = Exact<{
@@ -14280,14 +15582,24 @@ export type PublicOptOutQueryVariables = Exact<{
 }>;
 
 export type PublicOptOutQuery = {
-  access?: Maybe<{
-    __typename?: "PublicPetitionAccess";
-    granter?: Maybe<{
-      __typename?: "PublicUser";
-      id: string;
-      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-    }>;
-  }>;
+  access?:
+    | {
+        __typename?: "PublicPetitionAccess";
+        granter?:
+          | {
+              __typename?: "PublicUser";
+              id: string;
+              organization: {
+                __typename?: "PublicOrganization";
+                name: string;
+                logoUrl?: string | null | undefined;
+              };
+            }
+          | null
+          | undefined;
+      }
+    | null
+    | undefined;
 };
 
 export type PublicPetitionLink_PublicPetitionLinkFragment = {
@@ -14298,7 +15610,7 @@ export type PublicPetitionLink_PublicPetitionLinkFragment = {
   organization: {
     __typename?: "PublicPetitionLinkOwnerOrganization";
     name: string;
-    logoUrl?: Maybe<string>;
+    logoUrl?: string | null | undefined;
   };
 };
 
@@ -14326,59 +15638,65 @@ export type PublicTemplateLink_publicPetitionLinkBySlugQueryVariables = Exact<{
 }>;
 
 export type PublicTemplateLink_publicPetitionLinkBySlugQuery = {
-  publicPetitionLinkBySlug?: Maybe<{
-    __typename?: "PublicPetitionLink";
-    id: string;
-    title: string;
-    description: string;
-    organization: {
-      __typename?: "PublicPetitionLinkOwnerOrganization";
-      name: string;
-      logoUrl?: Maybe<string>;
-    };
-  }>;
+  publicPetitionLinkBySlug?:
+    | {
+        __typename?: "PublicPetitionLink";
+        id: string;
+        title: string;
+        description: string;
+        organization: {
+          __typename?: "PublicPetitionLinkOwnerOrganization";
+          name: string;
+          logoUrl?: string | null | undefined;
+        };
+      }
+    | null
+    | undefined;
 };
 
 export type PetitionPdf_PetitionFragment = {
   __typename?: "Petition";
   id: string;
-  name?: Maybe<string>;
-  fromTemplateId?: Maybe<string>;
+  name?: string | null | undefined;
+  fromTemplateId?: string | null | undefined;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
     options: { [key: string]: any };
-    description?: Maybe<string>;
+    description?: string | null | undefined;
     validated: boolean;
-    visibility?: Maybe<{ [key: string]: any }>;
+    visibility?: { [key: string]: any } | null | undefined;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
     }>;
   }>;
-  organization: { __typename?: "Organization"; name: string; logoUrl?: Maybe<string> };
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      timezone: string;
-      signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
-    };
-  }>;
+  organization: { __typename?: "Organization"; name: string; logoUrl?: string | null | undefined };
+  currentSignatureRequest?:
+    | {
+        __typename?: "PetitionSignatureRequest";
+        signatureConfig: {
+          __typename?: "SignatureConfig";
+          timezone: string;
+          signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+        };
+      }
+    | null
+    | undefined;
 };
 
 export type PetitionPdf_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   options: { [key: string]: any };
-  description?: Maybe<string>;
+  description?: string | null | undefined;
   validated: boolean;
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -14391,36 +15709,46 @@ export type PdfViewPetitionQueryVariables = Exact<{
 }>;
 
 export type PdfViewPetitionQuery = {
-  petitionAuthToken?: Maybe<{
-    __typename?: "Petition";
-    id: string;
-    name?: Maybe<string>;
-    fromTemplateId?: Maybe<string>;
-    fields: Array<{
-      __typename?: "PetitionField";
-      id: string;
-      type: PetitionFieldType;
-      title?: Maybe<string>;
-      options: { [key: string]: any };
-      description?: Maybe<string>;
-      validated: boolean;
-      visibility?: Maybe<{ [key: string]: any }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
+  petitionAuthToken?:
+    | {
+        __typename?: "Petition";
         id: string;
-        content: { [key: string]: any };
-      }>;
-    }>;
-    organization: { __typename?: "Organization"; name: string; logoUrl?: Maybe<string> };
-    currentSignatureRequest?: Maybe<{
-      __typename?: "PetitionSignatureRequest";
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        timezone: string;
-        signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
-      };
-    }>;
-  }>;
+        name?: string | null | undefined;
+        fromTemplateId?: string | null | undefined;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null | undefined;
+          options: { [key: string]: any };
+          description?: string | null | undefined;
+          validated: boolean;
+          visibility?: { [key: string]: any } | null | undefined;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+          }>;
+        }>;
+        organization: {
+          __typename?: "Organization";
+          name: string;
+          logoUrl?: string | null | undefined;
+        };
+        currentSignatureRequest?:
+          | {
+              __typename?: "PetitionSignatureRequest";
+              signatureConfig: {
+                __typename?: "SignatureConfig";
+                timezone: string;
+                signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+              };
+            }
+          | null
+          | undefined;
+      }
+    | null
+    | undefined;
 };
 
 export type Signup_userSignUpMutationVariables = Exact<{
@@ -14441,33 +15769,33 @@ export type Signup_userSignUpMutation = {
     __typename?: "User";
     id: string;
     email: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
   };
 };
 
 export type LandingTemplateDetails_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   slug: string;
   locale: PetitionLocale;
-  imageUrl?: Maybe<string>;
-  backgroundColor?: Maybe<string>;
-  categories?: Maybe<Array<string>>;
+  imageUrl?: string | null | undefined;
+  backgroundColor?: string | null | undefined;
+  categories?: Array<string> | null | undefined;
   ownerFullName: string;
-  ownerAvatarUrl?: Maybe<string>;
+  ownerAvatarUrl?: string | null | undefined;
   organizationName: string;
   fieldCount: number;
   hasConditionals: boolean;
-  descriptionHtml?: Maybe<string>;
-  shortDescription?: Maybe<string>;
+  descriptionHtml?: string | null | undefined;
+  shortDescription?: string | null | undefined;
   updatedAt: string;
   fields: Array<{
     __typename?: "LandingTemplateField";
     id: string;
     type: PetitionFieldType;
-    title?: Maybe<string>;
+    title?: string | null | undefined;
   }>;
 };
 
@@ -14476,30 +15804,33 @@ export type LandingTemplateDetails_landingTemplateBySlugQueryVariables = Exact<{
 }>;
 
 export type LandingTemplateDetails_landingTemplateBySlugQuery = {
-  landingTemplateBySlug?: Maybe<{
-    __typename?: "LandingTemplate";
-    id: string;
-    name?: Maybe<string>;
-    slug: string;
-    locale: PetitionLocale;
-    imageUrl?: Maybe<string>;
-    backgroundColor?: Maybe<string>;
-    categories?: Maybe<Array<string>>;
-    ownerFullName: string;
-    ownerAvatarUrl?: Maybe<string>;
-    organizationName: string;
-    fieldCount: number;
-    hasConditionals: boolean;
-    descriptionHtml?: Maybe<string>;
-    shortDescription?: Maybe<string>;
-    updatedAt: string;
-    fields: Array<{
-      __typename?: "LandingTemplateField";
-      id: string;
-      type: PetitionFieldType;
-      title?: Maybe<string>;
-    }>;
-  }>;
+  landingTemplateBySlug?:
+    | {
+        __typename?: "LandingTemplate";
+        id: string;
+        name?: string | null | undefined;
+        slug: string;
+        locale: PetitionLocale;
+        imageUrl?: string | null | undefined;
+        backgroundColor?: string | null | undefined;
+        categories?: Array<string> | null | undefined;
+        ownerFullName: string;
+        ownerAvatarUrl?: string | null | undefined;
+        organizationName: string;
+        fieldCount: number;
+        hasConditionals: boolean;
+        descriptionHtml?: string | null | undefined;
+        shortDescription?: string | null | undefined;
+        updatedAt: string;
+        fields: Array<{
+          __typename?: "LandingTemplateField";
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null | undefined;
+        }>;
+      }
+    | null
+    | undefined;
 };
 
 export type LandingTemplateDetails_landingTemplatesQueryVariables = Exact<{
@@ -14517,10 +15848,10 @@ export type LandingTemplateDetails_landingTemplatesQuery = {
       __typename?: "LandingTemplate";
       id: string;
       locale: PetitionLocale;
-      name?: Maybe<string>;
+      name?: string | null | undefined;
       slug: string;
-      imageUrl?: Maybe<string>;
-      backgroundColor?: Maybe<string>;
+      imageUrl?: string | null | undefined;
+      backgroundColor?: string | null | undefined;
       ownerFullName: string;
       organizationName: string;
     }>;
@@ -14554,10 +15885,10 @@ export type LandingTemplatesCategory_landingTemplatesQuery = {
       __typename?: "LandingTemplate";
       id: string;
       locale: PetitionLocale;
-      name?: Maybe<string>;
+      name?: string | null | undefined;
       slug: string;
-      imageUrl?: Maybe<string>;
-      backgroundColor?: Maybe<string>;
+      imageUrl?: string | null | undefined;
+      backgroundColor?: string | null | undefined;
       ownerFullName: string;
       organizationName: string;
     }>;
@@ -14581,10 +15912,10 @@ export type LandingTemplates_landingTemplatesSamplesQuery = {
         __typename?: "LandingTemplate";
         id: string;
         locale: PetitionLocale;
-        name?: Maybe<string>;
+        name?: string | null | undefined;
         slug: string;
-        imageUrl?: Maybe<string>;
-        backgroundColor?: Maybe<string>;
+        imageUrl?: string | null | undefined;
+        backgroundColor?: string | null | undefined;
         ownerFullName: string;
         organizationName: string;
       }>;
@@ -14596,7 +15927,7 @@ export type Thanks_PetitionLogoQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type Thanks_PetitionLogoQuery = { publicOrgLogoUrl?: Maybe<string> };
+export type Thanks_PetitionLogoQuery = { publicOrgLogoUrl?: string | null | undefined };
 
 export type GetMyIdQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -14607,7 +15938,7 @@ export type useFieldVisibility_PublicPetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   options: { [key: string]: any };
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -14620,7 +15951,7 @@ export type useFieldVisibility_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   options: { [key: string]: any };
-  visibility?: Maybe<{ [key: string]: any }>;
+  visibility?: { [key: string]: any } | null | undefined;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -14656,9 +15987,9 @@ export type useCreateContact_createContactMutation = {
     __typename?: "Contact";
     id: string;
     email: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    fullName?: Maybe<string>;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
+    fullName?: string | null | undefined;
     hasBouncedEmail: boolean;
   };
 };
@@ -14685,13 +16016,13 @@ export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Resu
 export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
 };
 
 export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
 };
 
 export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
@@ -14751,7 +16082,7 @@ export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
 };
 
 export type useFilenamePlaceholdersRename_PetitionFieldReplyFragment = {
@@ -14762,31 +16093,29 @@ export type useFilenamePlaceholdersRename_PetitionFieldReplyFragment = {
 export type usePetitionCurrentSignatureStatus_PetitionFragment = {
   __typename?: "Petition";
   status: PetitionStatus;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
+  currentSignatureRequest?:
+    | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+    | null
+    | undefined;
+  signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null | undefined;
 };
 
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  sentAt?: Maybe<string>;
+  sentAt?: string | null | undefined;
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   createdAt: string;
   status: PetitionStatus;
   isReadOnly: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
-    nextReminderAt?: Maybe<string>;
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+    nextReminderAt?: string | null | undefined;
+    contact?:
+      | { __typename?: "Contact"; id: string; fullName?: string | null | undefined; email: string }
+      | null
+      | undefined;
     reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
   }>;
   permissions: Array<
@@ -14801,9 +16130,9 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
         user: {
           __typename?: "User";
           id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+          fullName?: string | null | undefined;
+          avatarUrl?: string | null | undefined;
+          initials?: string | null | undefined;
         };
       }
   >;
@@ -14815,18 +16144,18 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     total: number;
   };
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
+  currentSignatureRequest?:
+    | { __typename?: "PetitionSignatureRequest"; status: PetitionSignatureRequestStatus }
+    | null
+    | undefined;
+  signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null | undefined;
 };
 
 export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  descriptionExcerpt?: Maybe<string>;
+  descriptionExcerpt?: string | null | undefined;
   id: string;
-  name?: Maybe<string>;
+  name?: string | null | undefined;
   createdAt: string;
   isReadOnly: boolean;
   permissions: Array<
@@ -14841,9 +16170,9 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
         user: {
           __typename?: "User";
           id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+          fullName?: string | null | undefined;
+          avatarUrl?: string | null | undefined;
+          initials?: string | null | undefined;
         };
       }
   >;
@@ -14870,9 +16199,9 @@ export type PetitionComposeSearchContactsQuery = {
     items: Array<{
       __typename?: "Contact";
       id: string;
-      firstName?: Maybe<string>;
-      lastName?: Maybe<string>;
-      fullName?: Maybe<string>;
+      firstName?: string | null | undefined;
+      lastName?: string | null | undefined;
+      fullName?: string | null | undefined;
       email: string;
       hasBouncedEmail: boolean;
     }>;
@@ -14884,7 +16213,7 @@ export type useSettingsSections_UserFragment = { __typename?: "User"; hasApiToke
 export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
-  title?: Maybe<string>;
+  title?: string | null | undefined;
   type: PetitionFieldType;
   options: { [key: string]: any };
 };
@@ -21854,51 +23183,51 @@ export function useDevelopers_RevokeUserAuthTokenMutation(
 export type Developers_RevokeUserAuthTokenMutationHookResult = ReturnType<
   typeof useDevelopers_RevokeUserAuthTokenMutation
 >;
-export const Developers_CreateOrgIntegrationDocument = gql`
-  mutation Developers_CreateOrgIntegration($settings: JSONObject!) {
-    createOrgIntegration(type: EVENT_SUBSCRIPTION, provider: "PARALLEL", settings: $settings) {
+export const Developers_CreateEventSubscriptionDocument = gql`
+  mutation Developers_CreateEventSubscription($settings: JSONObject!) {
+    createEventSubscriptionIntegration(settings: $settings) {
       ...EventSubscriptionCard_OrgIntegration
     }
   }
   ${EventSubscriptionCard_OrgIntegrationFragmentDoc}
 `;
-export function useDevelopers_CreateOrgIntegrationMutation(
+export function useDevelopers_CreateEventSubscriptionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    Developers_CreateOrgIntegrationMutation,
-    Developers_CreateOrgIntegrationMutationVariables
+    Developers_CreateEventSubscriptionMutation,
+    Developers_CreateEventSubscriptionMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    Developers_CreateOrgIntegrationMutation,
-    Developers_CreateOrgIntegrationMutationVariables
-  >(Developers_CreateOrgIntegrationDocument, options);
+    Developers_CreateEventSubscriptionMutation,
+    Developers_CreateEventSubscriptionMutationVariables
+  >(Developers_CreateEventSubscriptionDocument, options);
 }
-export type Developers_CreateOrgIntegrationMutationHookResult = ReturnType<
-  typeof useDevelopers_CreateOrgIntegrationMutation
+export type Developers_CreateEventSubscriptionMutationHookResult = ReturnType<
+  typeof useDevelopers_CreateEventSubscriptionMutation
 >;
-export const Developers_UpdateOrgIntegrationDocument = gql`
-  mutation Developers_UpdateOrgIntegration($id: GID!, $data: UpdateOrgIntegrationInput!) {
-    updateOrgIntegration(id: $id, type: EVENT_SUBSCRIPTION, data: $data) {
+export const Developers_UpdateEventSubscriptionDocument = gql`
+  mutation Developers_UpdateEventSubscription($id: GID!, $data: UpdateOrgIntegrationInput!) {
+    updateEventSubscriptionIntegration(id: $id, data: $data) {
       ...EventSubscriptionCard_OrgIntegration
     }
   }
   ${EventSubscriptionCard_OrgIntegrationFragmentDoc}
 `;
-export function useDevelopers_UpdateOrgIntegrationMutation(
+export function useDevelopers_UpdateEventSubscriptionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    Developers_UpdateOrgIntegrationMutation,
-    Developers_UpdateOrgIntegrationMutationVariables
+    Developers_UpdateEventSubscriptionMutation,
+    Developers_UpdateEventSubscriptionMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    Developers_UpdateOrgIntegrationMutation,
-    Developers_UpdateOrgIntegrationMutationVariables
-  >(Developers_UpdateOrgIntegrationDocument, options);
+    Developers_UpdateEventSubscriptionMutation,
+    Developers_UpdateEventSubscriptionMutationVariables
+  >(Developers_UpdateEventSubscriptionDocument, options);
 }
-export type Developers_UpdateOrgIntegrationMutationHookResult = ReturnType<
-  typeof useDevelopers_UpdateOrgIntegrationMutation
+export type Developers_UpdateEventSubscriptionMutationHookResult = ReturnType<
+  typeof useDevelopers_UpdateEventSubscriptionMutation
 >;
 export const DevelopersDocument = gql`
   query Developers(

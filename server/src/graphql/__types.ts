@@ -836,8 +836,8 @@ export interface NexusGenFieldTypes {
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     cloneUserGroup: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
+    createEventSubscriptionIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createFileUploadReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
-    createOrgIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -851,7 +851,7 @@ export interface NexusGenFieldTypes {
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
-    deleteOrgIntegration: NexusGenEnums["Result"]; // Result!
+    deleteEventSubscriptionIntegration: NexusGenEnums["Result"]; // Result!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -909,10 +909,10 @@ export interface NexusGenFieldTypes {
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
+    updateEventSubscriptionIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
-    updateOrgIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
@@ -1990,8 +1990,8 @@ export interface NexusGenFieldTypeNames {
     clonePetitions: "PetitionBase";
     cloneUserGroup: "UserGroup";
     createContact: "Contact";
+    createEventSubscriptionIntegration: "OrgIntegration";
     createFileUploadReply: "PetitionFieldReply";
-    createOrgIntegration: "OrgIntegration";
     createOrganization: "SupportMethodResponse";
     createOrganizationUser: "User";
     createPetition: "PetitionBase";
@@ -2005,7 +2005,7 @@ export interface NexusGenFieldTypeNames {
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
     deleteContacts: "Result";
-    deleteOrgIntegration: "Result";
+    deleteEventSubscriptionIntegration: "Result";
     deletePetition: "SupportMethodResponse";
     deletePetitionField: "PetitionBase";
     deletePetitionFieldComment: "PetitionField";
@@ -2063,10 +2063,10 @@ export interface NexusGenFieldTypeNames {
     transferPetitionOwnership: "Petition";
     untagPetition: "PetitionBase";
     updateContact: "Contact";
+    updateEventSubscriptionIntegration: "OrgIntegration";
     updateFieldPositions: "PetitionBase";
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOnboardingStatus: "User";
-    updateOrgIntegration: "OrgIntegration";
     updateOrganizationLogo: "Organization";
     updateOrganizationPreferredTone: "Organization";
     updateOrganizationUser: "User";
@@ -3014,17 +3014,15 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
     };
+    createEventSubscriptionIntegration: {
+      // args
+      settings: NexusGenScalars["JSONObject"]; // JSONObject!
+    };
     createFileUploadReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       file: NexusGenScalars["Upload"]; // Upload!
       petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    createOrgIntegration: {
-      // args
-      provider: string; // String!
-      settings: NexusGenScalars["JSONObject"]; // JSONObject!
-      type: NexusGenEnums["IntegrationType"]; // IntegrationType!
     };
     createOrganization: {
       // args
@@ -3109,10 +3107,9 @@ export interface NexusGenArgTypes {
       // args
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };
-    deleteOrgIntegration: {
+    deleteEventSubscriptionIntegration: {
       // args
       id: NexusGenScalars["GID"]; // GID!
-      type: NexusGenEnums["IntegrationType"]; // IntegrationType!
     };
     deletePetition: {
       // args
@@ -3432,6 +3429,11 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
       id: NexusGenScalars["GID"]; // GID!
     };
+    updateEventSubscriptionIntegration: {
+      // args
+      data: NexusGenInputs["UpdateOrgIntegrationInput"]; // UpdateOrgIntegrationInput!
+      id: NexusGenScalars["GID"]; // GID!
+    };
     updateFieldPositions: {
       // args
       fieldIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -3450,12 +3452,6 @@ export interface NexusGenArgTypes {
       // args
       key: NexusGenEnums["OnboardingKey"]; // OnboardingKey!
       status: NexusGenEnums["OnboardingStatus"]; // OnboardingStatus!
-    };
-    updateOrgIntegration: {
-      // args
-      data: NexusGenInputs["UpdateOrgIntegrationInput"]; // UpdateOrgIntegrationInput!
-      id: NexusGenScalars["GID"]; // GID!
-      type: NexusGenEnums["IntegrationType"]; // IntegrationType!
     };
     updateOrganizationLogo: {
       // args

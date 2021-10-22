@@ -495,18 +495,14 @@ type Mutation {
   createContact(data: CreateContactInput!): Contact!
 
   """
+  Creates an event subscription on the user's organization
+  """
+  createEventSubscriptionIntegration(settings: JSONObject!): OrgIntegration!
+
+  """
   Creates a reply to a file upload field.
   """
   createFileUploadReply(fieldId: GID!, file: Upload!, petitionId: GID!): PetitionFieldReply!
-
-  """
-  Creates an integration on the user's organization
-  """
-  createOrgIntegration(
-    provider: String!
-    settings: JSONObject!
-    type: IntegrationType!
-  ): OrgIntegration!
 
   """
   Creates a new organization.
@@ -650,9 +646,9 @@ type Mutation {
   deleteContacts(ids: [GID!]!): Result!
 
   """
-  Deletes an integration
+  Deletes a subscription
   """
-  deleteOrgIntegration(id: GID!, type: IntegrationType!): Result!
+  deleteEventSubscriptionIntegration(id: GID!): Result!
 
   """
   Soft-deletes any given petition on the database.
@@ -1081,6 +1077,11 @@ type Mutation {
   updateContact(data: UpdateContactInput!, id: GID!): Contact!
 
   """
+  Updates an existing event subscription integration on the user's org
+  """
+  updateEventSubscriptionIntegration(data: UpdateOrgIntegrationInput!, id: GID!): OrgIntegration!
+
+  """
   Updates the positions of the petition fields
   """
   updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): PetitionBase!
@@ -1120,15 +1121,6 @@ type Mutation {
   Updates the onboarding status for one of the pages.
   """
   updateOnboardingStatus(key: OnboardingKey!, status: OnboardingStatus!): User!
-
-  """
-  Updates an existing integration on the user's org
-  """
-  updateOrgIntegration(
-    data: UpdateOrgIntegrationInput!
-    id: GID!
-    type: IntegrationType!
-  ): OrgIntegration!
 
   """
   Updates the logo of an organization

@@ -429,18 +429,19 @@ describe("GraphQL custom validators", () => {
   describe("validIntegrationSettings", () => {
     it("validates SIGNATURE integration minimal required settings", () => {
       expect(() =>
-        validIntegrationSettings(
-          () => "SIGNATURE",
-          () => ({ API_KEY: "<API_KEY>" }),
-          "settings"
-        )({}, {}, ctx, {} as any)
+        validIntegrationSettings("SIGNATURE", () => ({ API_KEY: "<API_KEY>" }), "settings")(
+          {},
+          {},
+          ctx,
+          {} as any
+        )
       ).not.toThrowError();
     });
 
     it("throws error if SIGNATURE integration settings has unknown key", () => {
       expect(() =>
         validIntegrationSettings(
-          () => "SIGNATURE",
+          "SIGNATURE",
           () => ({ API_KEY: "<API_KEY>", UNKNOWN: 1 }),
           "settings"
         )({}, {}, ctx, {} as any)
@@ -450,7 +451,7 @@ describe("GraphQL custom validators", () => {
     it("validates SIGNATURE integration full settings", () => {
       expect(() =>
         validIntegrationSettings(
-          () => "SIGNATURE",
+          "SIGNATURE",
           () => ({
             API_KEY: "<API_KEY>",
             ENVIRONMENT: "sandbox",
@@ -466,38 +467,36 @@ describe("GraphQL custom validators", () => {
 
     it("throws error if SIGNATURE settings is missing required property API_KEY", () => {
       expect(() =>
-        validIntegrationSettings(
-          () => "SIGNATURE",
-          () => ({ ENVIRONMENT: "production" }),
-          "settings"
-        )({}, {}, ctx, {} as any)
+        validIntegrationSettings("SIGNATURE", () => ({ ENVIRONMENT: "production" }), "settings")(
+          {},
+          {},
+          ctx,
+          {} as any
+        )
       ).toThrowError();
     });
 
     it("throws error if SIGNATURE settings is empty", () => {
       expect(() =>
-        validIntegrationSettings(
-          () => "SIGNATURE",
-          () => ({}),
-          "settings"
-        )({}, {}, ctx, {} as any)
+        validIntegrationSettings("SIGNATURE", () => ({}), "settings")({}, {}, ctx, {} as any)
       ).toThrowError();
     });
 
     it("throws error if SIGNATURE settings API_KEY is not a string", () => {
       expect(() =>
-        validIntegrationSettings(
-          () => "SIGNATURE",
-          () => ({ API_KEY: 1000 }),
-          "settings"
-        )({}, {}, ctx, {} as any)
+        validIntegrationSettings("SIGNATURE", () => ({ API_KEY: 1000 }), "settings")(
+          {},
+          {},
+          ctx,
+          {} as any
+        )
       ).toThrowError();
     });
 
     it("validates SSO integration minimal required settings", () => {
       expect(() =>
         validIntegrationSettings(
-          () => "SSO",
+          "SSO",
           () => ({ EMAIL_DOMAINS: ["onparallel.com"], COGNITO_PROVIDER: "AZURE" }),
           "settings"
         )({}, {}, ctx, {} as any)
@@ -506,18 +505,14 @@ describe("GraphQL custom validators", () => {
 
     it("throws error if SSO integration settings is empty", () => {
       expect(() =>
-        validIntegrationSettings(
-          () => "SSO",
-          () => ({}),
-          "settings"
-        )({}, {}, ctx, {} as any)
+        validIntegrationSettings("SSO", () => ({}), "settings")({}, {}, ctx, {} as any)
       ).toThrowError();
     });
 
     it("throws error if SSO integration settings has additional unknown keys", () => {
       expect(() =>
         validIntegrationSettings(
-          () => "SSO",
+          "SSO",
           () => ({
             EMAIL_DOMAINS: ["onparallel.com"],
             COGNITO_PROVIDER: "AZURE",
@@ -531,7 +526,7 @@ describe("GraphQL custom validators", () => {
     it("validates USER_PROVISIONING integration minimal required settings", () => {
       expect(() =>
         validIntegrationSettings(
-          () => "USER_PROVISIONING",
+          "USER_PROVISIONING",
           () => ({
             AUTH_KEY: "<AUTH_KEY>",
           }),
@@ -543,7 +538,7 @@ describe("GraphQL custom validators", () => {
     it("validates EVENT_SUBSCRIPTION integration minimal required settings", () => {
       expect(() =>
         validIntegrationSettings(
-          () => "EVENT_SUBSCRIPTION",
+          "EVENT_SUBSCRIPTION",
           () => ({ EVENTS_URL: "https://webhook.site/9f94d662-038f-44f2-a610-a64d6a2f352e" }),
           "settings"
         )({}, {}, ctx, {} as any)
@@ -553,7 +548,7 @@ describe("GraphQL custom validators", () => {
     it("throws error if EVENT_SUBSCRIPTION settings has invalid EVENTS_URL", () => {
       expect(() =>
         validIntegrationSettings(
-          () => "EVENT_SUBSCRIPTION",
+          "EVENT_SUBSCRIPTION",
           () => ({ EVENTS_URL: "this is not a valid URL :(" }),
           "settings"
         )({}, {}, ctx, {} as any)

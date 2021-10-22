@@ -102,15 +102,14 @@ function validateIntegrationSettingsByType<IType extends IntegrationType>(
 }
 
 export function validIntegrationSettings<TypeName extends string, FieldName extends string>(
-  integrationTypeProp: (args: core.ArgsValue<TypeName, FieldName>) => IntegrationType,
+  integrationType: IntegrationType,
   settingsProp: (args: core.ArgsValue<TypeName, FieldName>) => any,
   argName: string
 ) {
   return ((root, args, ctx, info) => {
     try {
-      const type = integrationTypeProp(args);
       const settings = settingsProp(args);
-      validateIntegrationSettingsByType(type, settings);
+      validateIntegrationSettingsByType(integrationType, settings);
     } catch (e: any) {
       throw new ArgValidationError(info, argName, e.message);
     }
