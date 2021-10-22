@@ -65,7 +65,7 @@ export function BrandingPreview({
             <Text>
               <FormattedMessage
                 id="component.branding-preview.grettings"
-                defaultMessage="{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}"
+                defaultMessage="{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
                 values={{ tone }}
               />
             </Text>
@@ -96,7 +96,7 @@ export function BrandingPreview({
             <ListItem>
               <FormattedMessage
                 id="component.branding-preview.pending-fields"
-                defaultMessage="{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}"
+                defaultMessage="{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
                 values={{ tone }}
               />
             </ListItem>

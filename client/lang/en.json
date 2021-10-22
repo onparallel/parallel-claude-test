@@ -86,8 +86,8 @@
   },
   {
     "term": "component.branding-preview.grettings",
-    "definition": "{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}",
-    "context": "{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>,} other{Dear <b>[Recipient Name]</b>,}}"
+    "definition": "{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}",
+    "context": "{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
   },
   {
     "term": "component.branding-preview.label",
@@ -96,8 +96,8 @@
   },
   {
     "term": "component.branding-preview.pending-fields",
-    "definition": "{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}",
-    "context": "{tone, select, INFORMAL{There are currently 12/40 fields pending} other{You have 12/40 fields pending}}"
+    "definition": "{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}",
+    "context": "{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
   },
   {
     "term": "component.burger-button.label-close",

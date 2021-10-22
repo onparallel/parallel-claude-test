@@ -3,18 +3,16 @@ import { PublicContainer } from "@parallel/components/public/layout/PublicContai
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicPricingCards } from "@parallel/components/public/pricing/PublicPricingCards";
 import { PublicPricingTable } from "@parallel/components/public/pricing/PublicPricingTable";
-import { PublicSwitchValues } from "@parallel/components/public/pricing/PublicSwitchPricing";
-import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function Pricing() {
   const intl = useIntl();
 
-  const [billing, setBilling] = useState<PublicSwitchValues>("monthly");
+  // const [billing, setBilling] = useState<PublicSwitchValues>("monthly");
 
-  const handleSwitchBillingTime = (e: PublicSwitchValues) => {
-    setBilling(e);
-  };
+  // const handleSwitchBillingTime = (e: PublicSwitchValues) => {
+  //   setBilling(e);
+  // };
 
   return (
     <PublicLayout
@@ -43,7 +41,7 @@ function Pricing() {
         {/* <Center p={10}>
           <PublicSwitchPricing onChange={handleSwitchBillingTime} />
         </Center> */}
-        <PublicPricingCards marginTop={14} marginBottom={20} billing={billing} />
+        <PublicPricingCards marginTop={14} marginBottom={20} />
         <PublicPricingTable display={{ base: "none", md: "block" }} />
       </PublicContainer>
     </PublicLayout>

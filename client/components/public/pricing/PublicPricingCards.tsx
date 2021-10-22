@@ -100,6 +100,8 @@ export function PublicPricingCards({
     push(`/signup`);
   }
 
+  const showPrices = false;
+
   return (
     <Grid
       {...props}
@@ -121,20 +123,22 @@ export function PublicPricingCards({
               />
             </Text>
           </Stack>
-          {/* <Text fontWeight="bold" fontSize="2xl">
-            <FormattedMessage
-              id="page.pricing.euros-always"
-              defaultMessage="<big>{amount}€/</big>always"
-              values={{
-                amount: plans.free.price[billing],
-                big: (chunks: any) => (
-                  <Text as="span" fontSize="3xl">
-                    {chunks}
-                  </Text>
-                ),
-              }}
-            />
-          </Text> */}
+          {showPrices && (
+            <Text fontWeight="bold" fontSize="2xl">
+              <FormattedMessage
+                id="page.pricing.euros-always"
+                defaultMessage="<big>{amount}€/</big>always"
+                values={{
+                  amount: plans.free.price[billing],
+                  big: (chunks: any) => (
+                    <Text as="span" fontSize="3xl">
+                      {chunks}
+                    </Text>
+                  ),
+                }}
+              />
+            </Text>
+          )}
           <Button onClick={trackCTAClick}>
             <Text as="span" fontWeight="bold">
               <FormattedMessage id="page.pricing.try-it-now" defaultMessage="Try it now" />
@@ -196,20 +200,22 @@ export function PublicPricingCards({
               />
             </Text>
           </Stack>
-          {/* <Text fontWeight="bold" fontSize="2xl">
-            <FormattedMessage
-              id="page.pricing.euros-month"
-              defaultMessage="<big>{amount}€/</big>month"
-              values={{
-                amount: plans.basic.price[billing],
-                big: (chunks: any) => (
-                  <Text as="span" fontSize="3xl">
-                    {chunks}
-                  </Text>
-                ),
-              }}
-            />
-          </Text> */}
+          {showPrices && (
+            <Text fontWeight="bold" fontSize="2xl">
+              <FormattedMessage
+                id="page.pricing.euros-month"
+                defaultMessage="<big>{amount}€/</big>month"
+                values={{
+                  amount: plans.basic.price[billing],
+                  big: (chunks: any) => (
+                    <Text as="span" fontSize="3xl">
+                      {chunks}
+                    </Text>
+                  ),
+                }}
+              />
+            </Text>
+          )}
           <Button colorScheme="purple" onClick={handleBasicPlanClick}>
             <Text as="span" fontWeight="bold">
               <FormattedMessage
@@ -280,20 +286,22 @@ export function PublicPricingCards({
               />
             </Text>
           </Stack>
-          {/* <Text fontWeight="bold" fontSize="2xl">
-            <FormattedMessage
-              id="page.pricing.euros-month"
-              defaultMessage="<big>{amount}€/</big>month"
-              values={{
-                amount: plans.professional.price[billing],
-                big: (chunks: any) => (
-                  <Text as="span" fontSize="3xl">
-                    {chunks}
-                  </Text>
-                ),
-              }}
-            />
-          </Text> */}
+          {showPrices && (
+            <Text fontWeight="bold" fontSize="2xl">
+              <FormattedMessage
+                id="page.pricing.euros-month"
+                defaultMessage="<big>{amount}€/</big>month"
+                values={{
+                  amount: plans.professional.price[billing],
+                  big: (chunks: any) => (
+                    <Text as="span" fontSize="3xl">
+                      {chunks}
+                    </Text>
+                  ),
+                }}
+              />
+            </Text>
+          )}
           <Button colorScheme="purple" onClick={handleProPlanClick}>
             <Text as="span" fontWeight="bold">
               <FormattedMessage
@@ -364,17 +372,22 @@ export function PublicPricingCards({
               />
             </Text>
           </Stack>
-          {/* <Text
-            fontWeight="bold"
-            fontSize="2xl"
-            minHeight="45px"
-            lineHeight="39px"
-            display="flex"
-            alignItems="flex-end"
-            justifyContent="center"
-          >
-            <FormattedMessage id="page.pricing.plan-suit-you" defaultMessage="A plan to suit you" />
-          </Text> */}
+          {showPrices && (
+            <Text
+              fontWeight="bold"
+              fontSize="2xl"
+              minHeight="45px"
+              lineHeight="39px"
+              display="flex"
+              alignItems="flex-end"
+              justifyContent="center"
+            >
+              <FormattedMessage
+                id="page.pricing.plan-suit-you"
+                defaultMessage="A plan to suit you"
+              />
+            </Text>
+          )}
           <Button colorScheme="purple" onClick={handleEnterprisePlanClick}>
             <Text as="span" fontWeight="bold">
               <FormattedMessage
