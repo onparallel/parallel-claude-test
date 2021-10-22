@@ -3,9 +3,7 @@ import { addIntegrationType, removeIntegrationType } from "./helpers/integration
 import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.dropTable("petition_event_subscription");
   await addIntegrationType(knex, "EVENT_SUBSCRIPTION");
-
   await knex.schema.alterTable("org_integration", (t) => {
     timestamps(t);
   });
@@ -16,6 +14,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
+  await knex.raw('drop index "org_integration__org_id__type__provider"');
   await knex.schema.alterTable("org_integration", (t) => {
     t.dropColumns(
       "created_at",
@@ -25,19 +24,7 @@ export async function down(knex: Knex): Promise<void> {
       "deleted_at",
       "deleted_by"
     );
-  }).raw(/* sql */ `
-    alter table org_integration drop constraint "org_integration__org_id__type__provider";
-    create unique index "org_integration__org_id__type__provider" on "org_integration" ("org_id", "type", "provider");
-`);
-
-  await knex.schema.createTable("petition_event_subscription", (t) => {
-    t.increments("id");
-    t.integer("user_id").notNullable().references("user.id");
-    t.integer("petition_id").notNullable().references("petition.id");
-    t.string("endpoint").notNullable();
-    timestamps(t);
-
-    t.index(["petition_id"], "petition_event_subscription__petition_id");
+    t.unique(["org_id", "type", "provider"], "org_integration__org_id__type__provider");
   });
 
   await knex.raw(/* sql */ `
