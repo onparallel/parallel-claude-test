@@ -101,12 +101,11 @@ export class IntegrationRepository extends BaseRepository {
 
   async updateOrgIntegration<K extends IntegrationType>(
     integrationId: number,
-    type: K,
     data: Partial<Replace<OrgIntegration, { settings: IntegrationSettings<K> }>>,
     updatedBy: string
   ) {
     return await this.from("org_integration")
-      .where({ id: integrationId, type, deleted_at: null })
+      .where({ id: integrationId, deleted_at: null })
       .update(
         {
           ...data,

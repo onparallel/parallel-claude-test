@@ -113,9 +113,8 @@ export class SignatureService {
           default:
             break;
         }
-        this.integrationRepository.updateOrgIntegration(
+        this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
           integration.id,
-          "SIGNATURE",
           { settings },
           `OrgIntegration:${integration.id}`
         );

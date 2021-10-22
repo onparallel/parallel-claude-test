@@ -95,7 +95,6 @@ export const updateEventSubscriptionIntegration = mutationField(
       }
       const [integration] = await ctx.integrations.updateOrgIntegration(
         args.id,
-        "EVENT_SUBSCRIPTION",
         data,
         `User:${ctx.user!.id}`
       );
@@ -120,7 +119,6 @@ export const deleteEventSubscriptionIntegration = mutationField(
       try {
         await ctx.integrations.updateOrgIntegration(
           id,
-          "EVENT_SUBSCRIPTION",
           {
             deleted_at: new Date(),
             deleted_by: `User:${ctx.user!.id}`,
