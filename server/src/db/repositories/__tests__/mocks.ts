@@ -9,6 +9,7 @@ import {
   CreateFeatureFlag,
   CreateFileUpload,
   CreateOrganization,
+  CreateOrgIntegration,
   CreatePetition,
   CreatePetitionAccess,
   CreatePetitionField,
@@ -21,6 +22,7 @@ import {
   Organization,
   OrganizationUsageLimit,
   OrganizationUsageLimitName,
+  OrgIntegration,
   Petition,
   PetitionAccess,
   PetitionField,
@@ -511,6 +513,11 @@ export class Mocks {
     const [row] = await this.knex<OrganizationUsageLimit>("organization_usage_limit")
       .insert({ limit, limit_name: limitName, org_id: orgId, period: "1 month" })
       .returning("*");
+    return row;
+  }
+
+  async createOrgIntegration(data: CreateOrgIntegration) {
+    const [row] = await this.knex<OrgIntegration>("org_integration").insert(data, "*");
     return row;
   }
 }

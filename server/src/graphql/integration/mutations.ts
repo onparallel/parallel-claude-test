@@ -7,7 +7,7 @@ import { ArgValidationError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { validIntegrationSettings } from "../helpers/validators/validIntegrationSettings";
-import { userHasAccessToIntegration } from "./authorizers";
+import { integrationIsOfType, userHasAccessToIntegration } from "./authorizers";
 
 export const createOrgIntegration = mutationField("createOrgIntegration", {
   description: "Creates an integration on the user's organization",
@@ -38,8 +38,8 @@ export const createOrgIntegration = mutationField("createOrgIntegration", {
     } catch (error: any) {
       if (error.constraint === "org_integration__org_id__type__provider") {
         throw new WhitelistedError(
-          "You already have a subscription",
-          "EXISTING_SUBSCRIPTION_ERROR"
+          `You already have an integration of type ${args.type} and provider ${args.provider}`,
+          "EXISTING_INTEGRATION_ERROR"
         );
       } else {
         throw error;
@@ -51,7 +51,7 @@ export const createOrgIntegration = mutationField("createOrgIntegration", {
 export const updateOrgIntegration = mutationField("updateOrgIntegration", {
   description: "Updates an existing integration on the user's org",
   type: "OrgIntegration",
-  authorize: authenticateAnd(userHasAccessToIntegration("id")),
+  authorize: authenticateAnd(userHasAccessToIntegration("id"), integrationIsOfType("id", "type")),
   args: {
     id: nonNull(globalIdArg("OrgIntegration")),
     type: nonNull("IntegrationType"),
@@ -101,7 +101,7 @@ export const updateOrgIntegration = mutationField("updateOrgIntegration", {
 export const deleteOrgIntegration = mutationField("deleteOrgIntegration", {
   type: "Result",
   description: "Deletes an integration",
-  authorize: authenticateAnd(userHasAccessToIntegration("id")),
+  authorize: authenticateAnd(userHasAccessToIntegration("id"), integrationIsOfType("id", "type")),
   args: {
     id: nonNull(globalIdArg("OrgIntegration")),
     type: nonNull("IntegrationType"), // type here is to make sure we are deleting the right type of integration

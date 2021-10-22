@@ -1362,7 +1362,7 @@ api
         }
         if (
           error instanceof ClientError &&
-          containsGraphQLError(error, "EXISTING_SUBSCRIPTION_ERROR")
+          containsGraphQLError(error, "EXISTING_INTEGRATION_ERROR")
         ) {
           throw new BadRequestError("You already have a subscription.");
         }

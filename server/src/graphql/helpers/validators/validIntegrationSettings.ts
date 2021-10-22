@@ -59,7 +59,7 @@ const schema = {
   $ref: "#/definitions/root",
 };
 
-export function validateIntegrationSettingsByType<IType extends IntegrationType>(
+function validateIntegrationSettingsByType<IType extends IntegrationType>(
   type: IType,
   settings: any
 ) {
@@ -106,7 +106,7 @@ export function validIntegrationSettings<TypeName extends string, FieldName exte
   settingsProp: (args: core.ArgsValue<TypeName, FieldName>) => any,
   argName: string
 ) {
-  return (async (root, args, ctx, info) => {
+  return ((root, args, ctx, info) => {
     try {
       const type = integrationTypeProp(args);
       const settings = settingsProp(args);

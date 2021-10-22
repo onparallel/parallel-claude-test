@@ -54,6 +54,7 @@ export class IntegrationRepository extends BaseRepository {
           q.where("is_enabled", true);
         }
       })
+      .orderBy("created_at", "desc")
       .select("*");
   }
 
