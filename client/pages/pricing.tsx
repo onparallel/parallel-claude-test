@@ -1,12 +1,9 @@
-import { Center, Heading } from "@chakra-ui/layout";
+import { Heading } from "@chakra-ui/layout";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicPricingCards } from "@parallel/components/public/pricing/PublicPricingCards";
 import { PublicPricingTable } from "@parallel/components/public/pricing/PublicPricingTable";
-import {
-  PublicSwitchPricing,
-  PublicSwitchValues,
-} from "@parallel/components/public/pricing/PublicSwitchPricing";
+import { PublicSwitchValues } from "@parallel/components/public/pricing/PublicSwitchPricing";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -43,11 +40,10 @@ function Pricing() {
             defaultMessage="Find the right plan according to your needs"
           />
         </Heading>
-
-        <Center p={10}>
+        {/* <Center p={10}>
           <PublicSwitchPricing onChange={handleSwitchBillingTime} />
-        </Center>
-        <PublicPricingCards pt={4} pb={20} billing={billing} />
+        </Center> */}
+        <PublicPricingCards marginTop={14} marginBottom={20} billing={billing} />
         <PublicPricingTable display={{ base: "none", md: "block" }} />
       </PublicContainer>
     </PublicLayout>

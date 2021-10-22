@@ -121,7 +121,7 @@ export function PublicPricingCards({
               />
             </Text>
           </Stack>
-          <Text fontWeight="bold" fontSize="2xl">
+          {/* <Text fontWeight="bold" fontSize="2xl">
             <FormattedMessage
               id="page.pricing.euros-always"
               defaultMessage="<big>{amount}€/</big>always"
@@ -134,7 +134,7 @@ export function PublicPricingCards({
                 ),
               }}
             />
-          </Text>
+          </Text> */}
           <Button onClick={trackCTAClick}>
             <Text as="span" fontWeight="bold">
               <FormattedMessage id="page.pricing.try-it-now" defaultMessage="Try it now" />
@@ -196,7 +196,7 @@ export function PublicPricingCards({
               />
             </Text>
           </Stack>
-          <Text fontWeight="bold" fontSize="2xl">
+          {/* <Text fontWeight="bold" fontSize="2xl">
             <FormattedMessage
               id="page.pricing.euros-month"
               defaultMessage="<big>{amount}€/</big>month"
@@ -209,7 +209,7 @@ export function PublicPricingCards({
                 ),
               }}
             />
-          </Text>
+          </Text> */}
           <Button colorScheme="purple" onClick={handleBasicPlanClick}>
             <Text as="span" fontWeight="bold">
               <FormattedMessage
@@ -280,7 +280,7 @@ export function PublicPricingCards({
               />
             </Text>
           </Stack>
-          <Text fontWeight="bold" fontSize="2xl">
+          {/* <Text fontWeight="bold" fontSize="2xl">
             <FormattedMessage
               id="page.pricing.euros-month"
               defaultMessage="<big>{amount}€/</big>month"
@@ -293,7 +293,7 @@ export function PublicPricingCards({
                 ),
               }}
             />
-          </Text>
+          </Text> */}
           <Button colorScheme="purple" onClick={handleProPlanClick}>
             <Text as="span" fontWeight="bold">
               <FormattedMessage
@@ -352,7 +352,7 @@ export function PublicPricingCards({
       {/* End Pro Plan */}
       {/* Start Enterprise Plan*/}
       <PricingCard>
-        <DetailsStack minHeight="246px">
+        <DetailsStack minHeight="186px">
           <Stack>
             <Heading as="h2" fontSize="2xl" color="purple.600">
               <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
@@ -364,7 +364,7 @@ export function PublicPricingCards({
               />
             </Text>
           </Stack>
-          <Text
+          {/* <Text
             fontWeight="bold"
             fontSize="2xl"
             minHeight="45px"
@@ -374,7 +374,7 @@ export function PublicPricingCards({
             justifyContent="center"
           >
             <FormattedMessage id="page.pricing.plan-suit-you" defaultMessage="A plan to suit you" />
-          </Text>
+          </Text> */}
           <Button colorScheme="purple" onClick={handleEnterprisePlanClick}>
             <Text as="span" fontWeight="bold">
               <FormattedMessage
