@@ -3885,6 +3885,11 @@
     "context": "Templates"
   },
   {
+    "term": "generic.test",
+    "definition": "Probar",
+    "context": "Test"
+  },
+  {
     "term": "generic.thanks",
     "definition": "Gracias",
     "context": "Thanks"
@@ -7766,13 +7771,13 @@
   },
   {
     "term": "settings.developers.subscriptions.input-error.invalid-url",
-    "definition": "La URL proporcionada no es válida.",
-    "context": "The provided URL is invalid."
+    "definition": "Por favor, proporciona una URL válida.",
+    "context": "Please, provide a valid URL."
   },
   {
     "term": "settings.developers.subscriptions.input-explainer",
-    "definition": "Enviaremos una solicitud POST a esta URL cuando se produzcan eventos en cualquiera de las peticiones enviadas por tu organización. La URL debe estar cunfigurada para aceptar solicitudes POST de nosotros. <a>Haz click aquí</a> para saber más sobre nuestros eventos.",
-    "context": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. Your URL must be configured to accept POST requests from us. <a>Click here</a> to learn more about our events."
+    "definition": "Enviaremos una solicitud POST a esta URL cuando se produzcan eventos en cualquiera de las peticiones enviadas por tu organización. Tan pronto como hagas click en en botón `Probar`, enviaremos una solicitud POST con un body vacío, y tu endpoint debe responder con un código de estado 200. <a>Haz click aquí</a> para saber más sobre nuestros eventos.",
+    "context": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. As soon as you click the `Test` button, we will send a POST request with an empty body, and your endpoint must respond with a status code 200. <a>Click here</a> to learn more about our events."
   },
   {
     "term": "settings.developers.subscriptions.input-saved",

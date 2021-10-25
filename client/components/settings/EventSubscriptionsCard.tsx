@@ -1,11 +1,14 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  Button,
   Collapse,
   Flex,
+  FormControl,
+  FormErrorMessage,
   Input,
-  InputGroup,
   InputRightElement,
+  InputGroup,
   Spinner,
   Stack,
   Switch,
@@ -14,43 +17,52 @@ import {
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { EventSubscriptionCard_OrgIntegrationFragment } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { Maybe } from "@parallel/utils/types";
 import { nextTick } from "process";
-import { useRef, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
 import { NormalLink } from "../common/Link";
 
 interface EventSubscriptionCardProps {
-  subscription: EventSubscriptionCard_OrgIntegrationFragment | null;
-  onUpdateSubscription?: (
-    subscription: EventSubscriptionCard_OrgIntegrationFragment | null,
-    data: { isEnabled: boolean; eventsUrl: string }
-  ) => Promise<void>;
+  subscription?: EventSubscriptionCard_OrgIntegrationFragment;
+  onSwitchClicked: (isEnabled: boolean) => void;
+  onUpdateEventsUrl: (url: string) => void;
 }
 
 export function EventSubscriptionCard({
   subscription,
-  onUpdateSubscription,
+  onUpdateEventsUrl,
+  onSwitchClicked,
 }: EventSubscriptionCardProps) {
-  const [showConfig, setShowConfig] = useState(subscription?.isEnabled ?? false);
-  const [endpointURL, setEndpointURL] = useState(subscription?.settings.EVENTS_URL ?? "");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isValidEndpoint, setIsValidEndpoint] = useState<boolean | null>(
-    subscription ? isValidUrl(subscription.settings.EVENTS_URL) : null
-  );
-  const [isEndpointChallengePassed, setIsEndpointChallengePassed] = useState(!!subscription);
+  const { formState, handleSubmit, register } = useForm<{
+    eventsUrl: Maybe<string>;
+  }>({
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
+    defaultValues: {
+      eventsUrl: subscription?.settings.EVENTS_URL ?? null,
+    },
+  });
 
-  const errors = {
-    invalidInput:
-      !!endpointURL && !isLoading && (isValidEndpoint === false || !isEndpointChallengePassed),
-    invalidEndpoint: !!endpointURL && !isLoading && !isValidEndpoint,
-    challengeFailed: !!endpointURL && !isLoading && !isEndpointChallengePassed,
-  };
+  const [showConfig, setShowConfig] = useState(subscription?.isEnabled ?? false);
+  function handleSwitchChange(event: ChangeEvent<HTMLInputElement>) {
+    setShowConfig(event.target.checked);
+    onSwitchClicked(event.target.checked);
+    if (event.target.checked) {
+      nextTick(() => inputRef.current?.focus());
+    }
+  }
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const inputRegisterProps = useRegisterWithRef(inputRef, register, "eventsUrl", {
+    required: true,
+    validate: { isValidUrl, challengePassed },
+  });
 
-  function isValidUrl(url: string) {
+  function isValidUrl(url: Maybe<string>) {
     if (!url) return false;
     try {
       new URL(url);
@@ -59,57 +71,24 @@ export function EventSubscriptionCard({
     return false;
   }
 
-  const debouncedEndpointChallenge = useDebouncedCallback(
-    async (eventsUrl: string) => {
-      setIsLoading(true);
-      const isValid = !eventsUrl ? null : isValidUrl(eventsUrl);
-      setIsValidEndpoint(isValid);
-      if (isValid) {
-        const controller = new AbortController();
-        const requestTimeout = setTimeout(() => {
-          controller.abort();
-        }, 5000); // POST challenge is aborted after 5 seconds
-        const [, response] = await withError(
-          fetch(eventsUrl, { method: "POST", signal: controller.signal })
-        );
-        const passed = response?.status === 200 ?? false;
-        setIsEndpointChallengePassed(passed);
-        if (passed) {
-          await onUpdateSubscription?.(subscription, { isEnabled: true, eventsUrl });
-        }
-        clearTimeout(requestTimeout);
-      }
-      setIsLoading(false);
-    },
-    300,
-    [setEndpointURL, setIsLoading, setIsEndpointChallengePassed]
-  );
-
-  async function handleInputChange(url: string) {
-    setEndpointURL(url);
-    await debouncedEndpointChallenge(url);
-  }
-
-  async function handleConfigSwitch(isEnabled: boolean) {
-    setShowConfig(isEnabled);
-    if (subscription) {
-      await onUpdateSubscription?.(subscription, {
-        isEnabled,
-        eventsUrl: subscription.settings.EVENTS_URL,
-      });
-    }
-    if (isEnabled) {
-      nextTick(() => inputRef.current?.focus());
-    }
+  async function challengePassed(url: Maybe<string>) {
+    if (!url) return false;
+    const controller = new AbortController();
+    const requestTimeout = setTimeout(() => {
+      controller.abort();
+    }, 5000); // POST challenge is aborted after 5 seconds
+    const [, response] = await withError(
+      fetch(url, { method: "POST", signal: controller.signal, body: JSON.stringify({}) })
+    );
+    clearTimeout(requestTimeout);
+    return response?.status === 200 ?? false;
   }
 
   return (
-    <Card>
+    <Card as="form" onSubmit={handleSubmit(({ eventsUrl }) => onUpdateEventsUrl(eventsUrl!))}>
       <GenericCardHeader
         omitDivider
-        rightAction={
-          <Switch isChecked={showConfig} onChange={(e) => handleConfigSwitch(e.target.checked)} />
-        }
+        rightAction={<Switch isChecked={showConfig} onChange={handleSwitchChange} />}
       >
         <FormattedMessage
           id="settings.developers.subscriptions.card-header"
@@ -130,7 +109,7 @@ export function EventSubscriptionCard({
               defaultMessage="Request URL"
             />
 
-            {!!subscription && (
+            {!formState.isSubmitting && formState.isSubmitSuccessful && (
               <Text marginLeft={1} color="green.500">
                 <FormattedMessage
                   id="settings.developers.subscriptions.input-saved"
@@ -139,45 +118,47 @@ export function EventSubscriptionCard({
               </Text>
             )}
           </Flex>
-          <InputGroup>
-            <Input
-              ref={inputRef}
-              isInvalid={errors.invalidInput}
-              value={endpointURL}
-              onChange={(e) => handleInputChange(e.target.value.trim())}
-              placeholder="https://www.example.com/parallel/events"
-            />
-            <InputRightElement>
-              {!!endpointURL ? (
-                isLoading ? (
-                  <Spinner color="gray.500" />
-                ) : Object.values(errors).every((e) => !e) ? (
-                  <CheckIcon color="green.500" />
-                ) : (
-                  <CloseIcon fontSize="sm" color="red.500" />
-                )
+          <FormControl id="eventsUrl" isInvalid={!!formState.errors.eventsUrl}>
+            <Flex>
+              <InputGroup>
+                <Input
+                  {...inputRegisterProps}
+                  placeholder="https://www.example.com/parallel/events"
+                />
+                <InputRightElement>
+                  {formState.isSubmitting ? (
+                    <Spinner color="gray.500" />
+                  ) : !formState.errors.eventsUrl ? (
+                    <CheckIcon color="green.500" />
+                  ) : (
+                    <CloseIcon fontSize="sm" color="red.500" />
+                  )}
+                </InputRightElement>
+              </InputGroup>
+              <Button type="submit" marginLeft={2}>
+                <FormattedMessage id="generic.test" defaultMessage="Test" />
+              </Button>
+            </Flex>
+            <FormErrorMessage>
+              {formState.errors.eventsUrl?.type === "isValidUrl" ||
+              formState.errors.eventsUrl?.type === "required" ? (
+                <FormattedMessage
+                  id="settings.developers.subscriptions.input-error.invalid-url"
+                  defaultMessage="Please, provide a valid URL."
+                />
+              ) : formState.errors.eventsUrl?.type === "challengePassed" ? (
+                <FormattedMessage
+                  id="settings.developers.subscriptions.input-error.failed-challenge"
+                  defaultMessage="Your URL does not seem to accept POST requests."
+                />
               ) : null}
-            </InputRightElement>
-          </InputGroup>
-          {errors.invalidEndpoint ? (
-            <Text color="red.500">
-              <FormattedMessage
-                id="settings.developers.subscriptions.input-error.invalid-url"
-                defaultMessage="The provided URL is invalid."
-              />
-            </Text>
-          ) : errors.challengeFailed ? (
-            <Text color="red.500">
-              <FormattedMessage
-                id="settings.developers.subscriptions.input-error.failed-challenge"
-                defaultMessage="Your URL does not seem to accept POST requests."
-              />
-            </Text>
-          ) : null}
+            </FormErrorMessage>
+          </FormControl>
+
           <Text fontSize={12} color="gray.500">
             <FormattedMessage
               id="settings.developers.subscriptions.input-explainer"
-              defaultMessage="We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. Your URL must be configured to accept POST requests from us. <a>Click here</a> to learn more about our events."
+              defaultMessage="We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. As soon as you click the `Test` button, we will send a POST request with an empty body, and your endpoint must respond with a status code 200. <a>Click here</a> to learn more about our events."
               values={{
                 a: (chunks: any[]) => (
                   <NormalLink target="_blank" href="/developers/api#tag/Petition-Event">

@@ -3885,6 +3885,11 @@
     "context": "Templates"
   },
   {
+    "term": "generic.test",
+    "definition": "Test",
+    "context": "Test"
+  },
+  {
     "term": "generic.thanks",
     "definition": "Thanks",
     "context": "Thanks"
@@ -7766,13 +7771,13 @@
   },
   {
     "term": "settings.developers.subscriptions.input-error.invalid-url",
-    "definition": "The provided URL is invalid.",
-    "context": "The provided URL is invalid."
+    "definition": "Please, provide a valid URL.",
+    "context": "Please, provide a valid URL."
   },
   {
     "term": "settings.developers.subscriptions.input-explainer",
-    "definition": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. Your URL must be configured to accept POST requests from us. <a>Click here</a> to learn more about our events.",
-    "context": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. Your URL must be configured to accept POST requests from us. <a>Click here</a> to learn more about our events."
+    "definition": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. As soon as you click the `Test` button, we will send a POST request with an empty body, and your endpoint must respond with a status code 200. <a>Click here</a> to learn more about our events.",
+    "context": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. As soon as you click the `Test` button, we will send a POST request with an empty body, and your endpoint must respond with a status code 200. <a>Click here</a> to learn more about our events."
   },
   {
     "term": "settings.developers.subscriptions.input-saved",

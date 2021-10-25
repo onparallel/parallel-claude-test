@@ -18,7 +18,6 @@ import { useGenerateNewTokenDialog } from "@parallel/components/settings/Generat
 import {
   DevelopersQuery,
   Developers_UserAuthenticationTokenFragment,
-  EventSubscriptionCard_OrgIntegrationFragment,
   useDevelopersQuery,
   useDevelopers_CreateEventSubscriptionMutation,
   useDevelopers_RevokeUserAuthTokenMutation,
@@ -73,6 +72,7 @@ function Developers() {
   const sections = useSettingsSections(me);
   const authTokens = me.authenticationTokens;
 
+  // for now we will only configure a single EVENT_SUBSCRIPTION integration
   const eventSubscriptionIntegration = me.organization.integrations[0];
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -124,31 +124,25 @@ function Developers() {
 
   const [createOrgSubscription] = useDevelopers_CreateEventSubscriptionMutation();
   const [updateOrgSubscription] = useDevelopers_UpdateEventSubscriptionMutation();
-  async function handleUpdateOrgSubscription(
-    subscription: EventSubscriptionCard_OrgIntegrationFragment | null,
-    data: { isEnabled: boolean; eventsUrl: string }
-  ) {
-    try {
-      if (subscription) {
-        await updateOrgSubscription({
-          variables: {
-            id: subscription.id,
-            data: {
-              isEnabled: data.isEnabled,
-              settings: { EVENTS_URL: data.eventsUrl },
-            },
-          },
-        });
-      } else {
-        await createOrgSubscription({
-          variables: {
-            settings: {
-              EVENTS_URL: data.eventsUrl,
-            },
-          },
-        });
-      }
-    } catch {}
+  async function handleEventSubscriptionSwitchClicked(isEnabled: boolean) {
+    if (eventSubscriptionIntegration) {
+      await updateOrgSubscription({
+        variables: { id: eventSubscriptionIntegration.id, data: { isEnabled } },
+      });
+    }
+  }
+  async function handleUpdateEventsUrl(url: string) {
+    if (eventSubscriptionIntegration) {
+      await updateOrgSubscription({
+        variables: {
+          id: eventSubscriptionIntegration.id,
+          data: { isEnabled: true, settings: { EVENTS_URL: url } },
+        },
+      });
+    } else {
+      await createOrgSubscription({ variables: { settings: { EVENTS_URL: url } } });
+      await refetch();
+    }
   }
 
   return (
@@ -253,8 +247,9 @@ function Developers() {
             />
           </Heading>
           <EventSubscriptionCard
-            subscription={eventSubscriptionIntegration ?? null}
-            onUpdateSubscription={handleUpdateOrgSubscription}
+            subscription={eventSubscriptionIntegration}
+            onSwitchClicked={handleEventSubscriptionSwitchClicked}
+            onUpdateEventsUrl={handleUpdateEventsUrl}
           />
         </Stack>
       </Stack>
