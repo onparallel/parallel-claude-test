@@ -29,7 +29,6 @@ export const PetitionHeaderTab = chakraForwardRef<
         aria-disabled={isDisabled ? true : undefined}
         textTransform="uppercase"
         isDisabled={isDisabled}
-        rightIcon={rightIcon}
         variant="ghost"
         fontWeight="normal"
         _hover={{ color: "blue.600", backgroundColor: "white" }}
@@ -38,6 +37,7 @@ export const PetitionHeaderTab = chakraForwardRef<
         {...(props as any)}
       >
         {children}
+        {rightIcon ? <Center marginLeft={1}>{rightIcon}</Center> : null}
       </Center>
       {isActive && (
         <MotionBox
