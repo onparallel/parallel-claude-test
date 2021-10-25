@@ -1288,7 +1288,7 @@ api
   .get(
     {
       operationId: "GetSubscriptions",
-      summary: "Get your subscriptions info",
+      summary: "Get your subscription info",
       description: "Return a list with all your event subscriptions",
       responses: { 200: SuccessResponse(ListOfSubscriptions) },
       tags: ["Subscriptions"],
@@ -1297,22 +1297,26 @@ api
       const result = await client.request<OrgIntegration_GetSubscriptionsQuery>(gql`
         query OrgIntegration_GetSubscriptions {
           me {
-            organization {
-              integrations(type: EVENT_SUBSCRIPTION) {
-                ...Subscription
-              }
+            eventSubscription {
+              ...Subscription
             }
           }
         }
         ${SubscriptionFragment}
       `);
 
+      const subscription = result.me.eventSubscription;
+
       return Ok(
-        result.me.organization.integrations.map((subscription) => ({
-          id: subscription.id,
-          eventsUrl: subscription.settings.EVENTS_URL,
-          isEnabled: subscription.isEnabled,
-        }))
+        subscription
+          ? [
+              {
+                id: subscription.id,
+                eventsUrl: subscription.settings.EVENTS_URL,
+                isEnabled: subscription.isEnabled,
+              },
+            ]
+          : []
       );
     }
   )

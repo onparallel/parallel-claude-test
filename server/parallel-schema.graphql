@@ -495,7 +495,7 @@ type Mutation {
   createContact(data: CreateContactInput!): Contact!
 
   """
-  Creates an event subscription on the user's organization
+  Creates an event subscription for the user's petitions
   """
   createEventSubscriptionIntegration(settings: JSONObject!): OrgIntegration!
 
@@ -1077,7 +1077,7 @@ type Mutation {
   updateContact(data: UpdateContactInput!, id: GID!): Contact!
 
   """
-  Updates an existing event subscription integration on the user's org
+  Updates an existing event subscription for the user's petitions
   """
   updateEventSubscriptionIntegration(data: UpdateOrgIntegrationInput!, id: GID!): OrgIntegration!
 
@@ -3861,6 +3861,7 @@ type User implements Timestamps {
   The email of the user.
   """
   email: String!
+  eventSubscription: OrgIntegration
 
   """
   The first name of the user.

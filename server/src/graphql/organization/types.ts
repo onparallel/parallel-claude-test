@@ -148,7 +148,12 @@ export const Organization = objectType({
       },
       authorize: isOwnOrgOrSuperAdmin(),
       resolve: async (root, { type }, ctx) => {
-        return await ctx.integrations.loadIntegrationsByOrgId(root.id, type ?? undefined, true);
+        const orgIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
+          root.id,
+          type ?? undefined
+        );
+        // temporal filter so subscriptions don't show as an org integration
+        return orgIntegrations.filter((i) => i.type !== "EVENT_SUBSCRIPTION");
       },
     });
     t.nonNull.field("usageLimits", {

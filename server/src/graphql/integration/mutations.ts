@@ -7,12 +7,12 @@ import { ArgValidationError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { validIntegrationSettings } from "../helpers/validators/validIntegrationSettings";
-import { integrationIsOfType, userHasAccessToIntegration } from "./authorizers";
+import { userHasAccessToEventSubscription } from "./authorizers";
 
 export const createEventSubscriptionIntegration = mutationField(
   "createEventSubscriptionIntegration",
   {
-    description: "Creates an event subscription on the user's organization",
+    description: "Creates an event subscription for the user's petitions",
     type: "OrgIntegration",
     authorize: authenticate(),
     args: {
@@ -24,27 +24,28 @@ export const createEventSubscriptionIntegration = mutationField(
       "settings"
     ),
     resolve: async (_, args, ctx) => {
-      try {
-        return await ctx.integrations.createOrgIntegration(
-          {
-            type: "EVENT_SUBSCRIPTION",
-            is_enabled: true,
-            org_id: ctx.user!.org_id,
-            provider: "PARALLEL",
-            settings: args.settings,
-          },
-          `User:${ctx.user!.id}`
-        );
-      } catch (error: any) {
-        if (error.constraint === "org_integration__org_id__type__provider") {
-          throw new WhitelistedError(
-            `You already have a subscription`,
-            "EXISTING_INTEGRATION_ERROR"
-          );
-        } else {
-          throw error;
-        }
+      const eventSubscriptionUserIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
+        ctx.user!.org_id,
+        "EVENT_SUBSCRIPTION",
+        true
+      );
+      if (eventSubscriptionUserIntegrations.some((i) => i.settings.USER_ID === ctx.user!.id)) {
+        throw new WhitelistedError(`You already have a subscription`, "EXISTING_INTEGRATION_ERROR");
       }
+
+      return await ctx.integrations.createOrgIntegration(
+        {
+          type: "EVENT_SUBSCRIPTION",
+          is_enabled: true,
+          org_id: ctx.user!.org_id,
+          provider: "PARALLEL",
+          settings: {
+            ...args.settings,
+            USER_ID: ctx.user!.id,
+          },
+        },
+        `User:${ctx.user!.id}`
+      );
     },
   }
 );
@@ -52,12 +53,9 @@ export const createEventSubscriptionIntegration = mutationField(
 export const updateEventSubscriptionIntegration = mutationField(
   "updateEventSubscriptionIntegration",
   {
-    description: "Updates an existing event subscription integration on the user's org",
+    description: "Updates an existing event subscription for the user's petitions",
     type: "OrgIntegration",
-    authorize: authenticateAnd(
-      userHasAccessToIntegration("id"),
-      integrationIsOfType("id", "EVENT_SUBSCRIPTION")
-    ),
+    authorize: authenticateAnd(userHasAccessToEventSubscription("id")),
     args: {
       id: nonNull(globalIdArg("OrgIntegration")),
       data: nonNull(
@@ -88,7 +86,7 @@ export const updateEventSubscriptionIntegration = mutationField(
     resolve: async (_, args, ctx) => {
       const data: Partial<OrgIntegration> = {};
       if (args.data.settings) {
-        data.settings = args.data.settings;
+        data.settings = { ...args.data.settings, USER_ID: ctx.user!.id };
       }
       if (isDefined(args.data.isEnabled)) {
         data.is_enabled = args.data.isEnabled;
@@ -108,10 +106,7 @@ export const deleteEventSubscriptionIntegration = mutationField(
   {
     type: "Result",
     description: "Deletes a subscription",
-    authorize: authenticateAnd(
-      userHasAccessToIntegration("id"),
-      integrationIsOfType("id", "EVENT_SUBSCRIPTION")
-    ),
+    authorize: authenticateAnd(userHasAccessToEventSubscription("id")),
     args: {
       id: nonNull(globalIdArg("OrgIntegration")),
     },

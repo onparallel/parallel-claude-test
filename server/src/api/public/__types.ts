@@ -330,7 +330,7 @@ export type Mutation = {
   cloneUserGroup: Array<UserGroup>;
   /** Create a contact. */
   createContact: Contact;
-  /** Creates an event subscription on the user's organization */
+  /** Creates an event subscription for the user's petitions */
   createEventSubscriptionIntegration: OrgIntegration;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
@@ -475,7 +475,7 @@ export type Mutation = {
   untagPetition: PetitionBase;
   /** Updates a contact. */
   updateContact: Contact;
-  /** Updates an existing event subscription integration on the user's org */
+  /** Updates an existing event subscription for the user's petitions */
   updateEventSubscriptionIntegration: OrgIntegration;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
@@ -2678,6 +2678,7 @@ export type User = Timestamps & {
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
   email: Scalars["String"];
+  eventSubscription: Maybe<OrgIntegration>;
   /** The first name of the user. */
   firstName: Maybe<Scalars["String"]>;
   /** The full name of the user. */
@@ -3419,9 +3420,7 @@ export type OrgIntegration_GetSubscriptionsQueryVariables = Exact<{ [key: string
 
 export type OrgIntegration_GetSubscriptionsQuery = {
   me: {
-    organization: {
-      integrations: Array<{ id: string; settings: { [key: string]: any }; isEnabled: boolean }>;
-    };
+    eventSubscription: Maybe<{ id: string; settings: { [key: string]: any }; isEnabled: boolean }>;
   };
 };
 

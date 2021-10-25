@@ -9,12 +9,10 @@ export async function up(knex: Knex): Promise<void> {
   });
   await knex.raw(/* sql */ `
     alter table org_integration drop constraint "org_integration__org_id__type__provider";
-    create unique index "org_integration__org_id__type__provider" on "org_integration" ("org_id", "type", "provider") where deleted_at is null;
   `);
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.raw('drop index "org_integration__org_id__type__provider"');
   await knex.schema.alterTable("org_integration", (t) => {
     t.dropColumns(
       "created_at",

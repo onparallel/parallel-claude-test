@@ -1610,6 +1610,7 @@ export interface NexusGenFieldTypes {
     canCreateUsers: boolean; // Boolean!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     email: string; // String!
+    eventSubscription: NexusGenRootTypes["OrgIntegration"] | null; // OrgIntegration
     firstName: string | null; // String
     fullName: string | null; // String
     hasFeatureFlag: boolean; // Boolean!
@@ -2764,6 +2765,7 @@ export interface NexusGenFieldTypeNames {
     canCreateUsers: "Boolean";
     createdAt: "DateTime";
     email: "String";
+    eventSubscription: "OrgIntegration";
     firstName: "String";
     fullName: "String";
     hasFeatureFlag: "Boolean";

@@ -72,8 +72,7 @@ function Developers() {
   const sections = useSettingsSections(me);
   const authTokens = me.authenticationTokens;
 
-  // for now we will only configure a single EVENT_SUBSCRIPTION integration
-  const eventSubscriptionIntegration = me.organization.integrations[0];
+  const eventSubscriptionIntegration = me.eventSubscription ?? undefined;
 
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -378,10 +377,8 @@ Developers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataCo
               ...Developers_UserAuthenticationToken
             }
           }
-          organization {
-            integrations(type: EVENT_SUBSCRIPTION) {
-              ...EventSubscriptionCard_OrgIntegration
-            }
+          eventSubscription {
+            ...EventSubscriptionCard_OrgIntegration
           }
           ...SettingsLayout_User
           ...useSettingsSections_User

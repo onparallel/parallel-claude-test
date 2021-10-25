@@ -364,7 +364,7 @@ export interface Mutation {
   cloneUserGroup: Array<UserGroup>;
   /** Create a contact. */
   createContact: Contact;
-  /** Creates an event subscription on the user's organization */
+  /** Creates an event subscription for the user's petitions */
   createEventSubscriptionIntegration: OrgIntegration;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
@@ -509,7 +509,7 @@ export interface Mutation {
   untagPetition: PetitionBase;
   /** Updates a contact. */
   updateContact: Contact;
-  /** Updates an existing event subscription integration on the user's org */
+  /** Updates an existing event subscription for the user's petitions */
   updateEventSubscriptionIntegration: OrgIntegration;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
@@ -2788,6 +2788,7 @@ export interface User extends Timestamps {
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
   email: Scalars["String"];
+  eventSubscription?: Maybe<OrgIntegration>;
   /** The first name of the user. */
   firstName?: Maybe<Scalars["String"]>;
   /** The full name of the user. */
@@ -13679,16 +13680,16 @@ export type DevelopersQuery = {
         lastUsedAt?: Maybe<string>;
       }>;
     };
+    eventSubscription?: Maybe<{
+      __typename?: "OrgIntegration";
+      id: string;
+      type: IntegrationType;
+      settings: { [key: string]: any };
+      isEnabled: boolean;
+    }>;
     organization: {
       __typename?: "Organization";
       id: string;
-      integrations: Array<{
-        __typename?: "OrgIntegration";
-        id: string;
-        type: IntegrationType;
-        settings: { [key: string]: any };
-        isEnabled: boolean;
-      }>;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -21920,10 +21921,8 @@ export const DevelopersDocument = gql`
           ...Developers_UserAuthenticationToken
         }
       }
-      organization {
-        integrations(type: EVENT_SUBSCRIPTION) {
-          ...EventSubscriptionCard_OrgIntegration
-        }
+      eventSubscription {
+        ...EventSubscriptionCard_OrgIntegration
       }
       ...SettingsLayout_User
       ...useSettingsSections_User
