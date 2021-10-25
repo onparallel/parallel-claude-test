@@ -21,6 +21,7 @@ import {
 import {
   CopyIcon,
   DeleteIcon,
+  DownloadIcon,
   EditIcon,
   LockClosedIcon,
   MoreVerticalIcon,
@@ -200,6 +201,10 @@ export function PetitionHeader({
     } catch {}
   }, [petition.id]);
 
+  const handleExportPetitionPDF = async () => {
+    window.open(`/api/downloads/petition/${petition.id}/pdf`, "_blank");
+  };
+
   return (
     <Box
       backgroundColor="white"
@@ -323,6 +328,17 @@ export function PetitionHeader({
                       defaultMessage="Reopen petition"
                     />
                   </MenuItem>
+                  {user.hasPetitionPdfExport ? (
+                    <MenuItem
+                      onClick={handleExportPetitionPDF}
+                      icon={<DownloadIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.export-pdf"
+                        defaultMessage="Export to PDF"
+                      />
+                    </MenuItem>
+                  ) : null}
                   <MenuDivider />
                   <MenuOptionGroup
                     type="radio"
