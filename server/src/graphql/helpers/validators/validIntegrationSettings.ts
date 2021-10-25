@@ -59,10 +59,7 @@ const schema = {
   $ref: "#/definitions/root",
 };
 
-function validateIntegrationSettingsByType<IType extends IntegrationType>(
-  type: IType,
-  settings: any
-) {
+function validateIntegrationSettingsByType(type: IntegrationType, settings: any) {
   const validator = new Ajv();
   validator.addKeyword({
     keyword: "checkValidURL",

@@ -81,15 +81,15 @@ If everything went correctly, you should have received an email with your first
 petition. Congrats! Now fill it out and complete it as a recipient would do.  
 
 ### Step 3: Get the replies
-Finally, use the [GET /petitions/{petitionId}/replies](#operation/PetitionReplies)
+Finally, use the [GET /petitions/{petitionId}/fields](#operation/PetitionFields)
 endpoint in order to get the different replies. For \`TEXT\` replies you will get
-them right there on the same call under the \`content\` field but for \`FILE\`
+them right there on the same call under the \`content\` field but for \`FILE_UPLOAD\`
 replies you will need to call another endpoint.
 
 ~~~bash
 curl -s -XGET \\
   -H 'Authorization: Bearer <your API token>' \\
-  'https://www.onparallel.com/api/v1/petitions/{petitionId}/replies' 
+  'https://www.onparallel.com/api/v1/petitions/{petitionId}/fields' 
 ~~~
 
 ### Step 4: Download files
