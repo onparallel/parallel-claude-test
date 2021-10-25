@@ -22,6 +22,7 @@ export interface BaseParameterOptions<
   deprecated?: boolean;
   required?: TRequired;
   array?: TArray;
+  example?: any;
 }
 
 interface ArrayParameterOptions {
@@ -97,7 +98,7 @@ export function buildDefinition<
   options: ParameterOptions<T, TRequired, TArray, TDefaultValue>,
   schema: JsonSchema
 ): OpenAPIV3.ParameterBaseObject {
-  const { required = true, array = false, deprecated, description } = options;
+  const { required = true, array = false, deprecated, description, example } = options;
   return {
     description,
     deprecated,
@@ -111,6 +112,7 @@ export function buildDefinition<
           } as any,
         }
       : { schema: schema as any }),
+    example,
   };
 }
 

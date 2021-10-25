@@ -18,24 +18,28 @@ export function paginationParams() {
       defaultValue: 0,
       required: false,
       minimum: 0,
+      example: 5,
     }),
     limit: intParam({
       description: "How many items to return at most",
       required: true,
       minimum: 0,
+      example: 10,
     }),
   };
 }
 
-export function sortByParam<T extends string>(values: T[]) {
+type SortByDirection = "ASC" | "DESC";
+
+export function sortByParam<T extends string>(fields: T[]) {
+  const values = fields.flatMap((f) => [`${f}_ASC`, `${f}_DESC`]) as `${T}_${SortByDirection}`[];
   return {
     sortBy: enumParam({
       description: "Sort this resource list by one of the available options",
-      values: values.flatMap((option) => [`${option}_ASC`, `${option}_DESC`]) as `${T}_${
-        | "ASC"
-        | "DESC"}`[],
+      values,
       required: false,
       array: true,
+      example: values[0],
     }),
   };
 }
