@@ -82,6 +82,11 @@ const config = {
         ]
       : [];
   },
+  redirects() {
+    return [
+      { source: "/app/settings/tokens", destination: "/app/settings/developers", permanent: true },
+    ];
+  },
   productionBrowserSourceMaps: true,
 };
 
