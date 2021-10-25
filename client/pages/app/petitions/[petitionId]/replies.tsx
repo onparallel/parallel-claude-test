@@ -1,7 +1,18 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Stack,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import {
   CheckIcon,
+  ChevronDownIcon,
   CommentIcon,
   DownloadIcon,
   ListIcon,
@@ -17,6 +28,7 @@ import {
   withDialogs,
 } from "@parallel/components/common/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
+import { FilePdfIcon, FileZipIcon } from "@parallel/components/common/FileIcon";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -294,6 +306,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0
   );
 
+  const handleExportPetitionPDF = async () => {
+    window.open(`/api/downloads/petition/${petition.id}/pdf`, "_blank");
+  };
+
   const [createPetitionFieldComment] = usePetitionReplies_createPetitionFieldCommentMutation();
   async function handleAddComment(content: string, isInternal?: boolean) {
     await createPetitionFieldComment({
@@ -534,17 +550,38 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           />
         </Button>
         {showDownloadAll ? (
-          <Button
-            colorScheme="purple"
-            leftIcon={<DownloadIcon fontSize="lg" display="block" />}
-            onClick={handleDownloadAllClick}
-            id="download-all"
-          >
-            <FormattedMessage
-              id="petition-replies.export-replies"
-              defaultMessage="Export replies"
-            />
-          </Button>
+          <Menu>
+            <MenuButton
+              as={Button}
+              colorScheme="purple"
+              leftIcon={<DownloadIcon fontSize="lg" display="block" />}
+              rightIcon={<ChevronDownIcon fontSize="lg" />}
+              id="download-all"
+            >
+              <FormattedMessage
+                id="petition-replies.export-replies"
+                defaultMessage="Export replies"
+              />
+            </MenuButton>
+            <MenuList>
+              <MenuItem icon={<FileZipIcon boxSize={5} />} onClick={handleDownloadAllClick}>
+                <FormattedMessage
+                  id="page.petition-replies.export-all-to-zip"
+                  defaultMessage="Export all to ZIP"
+                />
+              </MenuItem>
+              <MenuItem
+                icon={<FilePdfIcon boxSize={5} />}
+                isdisabled={!me.hasPetitionPdfExport}
+                onClick={handleExportPetitionPDF}
+              >
+                <FormattedMessage
+                  id="page.petition-replies.export-pdf"
+                  defaultMessage="Export to PDF"
+                />
+              </MenuItem>
+            </MenuList>
+          </Menu>
         ) : null}
       </Stack>
       <Divider />

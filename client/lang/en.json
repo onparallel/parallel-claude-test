@@ -1300,11 +1300,6 @@
     "context": "Delete petition"
   },
   {
-    "term": "component.petition-header.export-pdf",
-    "definition": "Export to PDF",
-    "context": "Export to PDF"
-  },
-  {
     "term": "component.petition-header.not-subscribed-description",
     "definition": "Don't get notifications about this petition.",
     "context": "Don't get notifications about this petition."
@@ -2820,6 +2815,11 @@
     "context": "Save preferences"
   },
   {
+    "term": "component.upgrade-plan-popover.text",
+    "definition": "This feature is not available on your current plan. <a>Upgrade your plan</a> to enable it.",
+    "context": "This feature is not available on your current plan. <a>Upgrade your plan</a> to enable it."
+  },
+  {
     "term": "component.user-menu.log-out",
     "definition": "Log out",
     "context": "Log out"
@@ -4283,6 +4283,16 @@
     "term": "organizations.header.user-count",
     "definition": "Users",
     "context": "Users"
+  },
+  {
+    "term": "page.petition-replies.export-all-to-zip",
+    "definition": "Export all to ZIP",
+    "context": "Export all to ZIP"
+  },
+  {
+    "term": "page.petition-replies.export-pdf",
+    "definition": "Export to PDF",
+    "context": "Export to PDF"
   },
   {
     "term": "page.pricing.activity-log",

@@ -155,7 +155,7 @@ const FileSpreadsheetIcon = createIcon({
   ),
 });
 
-const FilePdfIcon = createIcon({
+export const FilePdfIcon = createIcon({
   displayName: "FilePdfIcon",
   viewBox: "0 0 24 24",
   path: (
@@ -178,7 +178,7 @@ const FilePdfIcon = createIcon({
   ),
 });
 
-const FileZipIcon = createIcon({
+export const FileZipIcon = createIcon({
   displayName: "FileZipIcon",
   viewBox: "0 0 24 24",
   path: (
