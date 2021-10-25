@@ -179,10 +179,25 @@ export function RecipientViewHeader({
               >
                 <HStack>
                   <CloudOkIcon fontSize="18px" color="green.600" />
-                  <Text fontStyle="italic" color="green.600">
+                  <Text
+                    fontStyle="italic"
+                    color="green.600"
+                    display={{ base: "none", md: "block" }}
+                  >
                     <FormattedMessage
                       id="recipient-view.last-saved-time"
                       defaultMessage="Last saved {time}"
+                      values={{ time: intl.formatDate(lastSaved, FORMATS.HHmm) }}
+                    />
+                  </Text>
+                  <Text
+                    fontStyle="italic"
+                    color="green.600"
+                    display={{ base: "block", md: "none" }}
+                  >
+                    <FormattedMessage
+                      id="recipient-view.last-saved-time-short"
+                      defaultMessage="Saved {time}"
                       values={{ time: intl.formatDate(lastSaved, FORMATS.HHmm) }}
                     />
                   </Text>

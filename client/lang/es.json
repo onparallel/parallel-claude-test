@@ -7545,6 +7545,11 @@
     "context": "Last saved {time}"
   },
   {
+    "term": "recipient-view.last-saved-time-short",
+    "definition": "Guardado {time}",
+    "context": "Saved {time}"
+  },
+  {
     "term": "recipient-view.need-help",
     "definition": "Ayuda",
     "context": "Help"
