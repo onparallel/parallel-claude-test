@@ -18,16 +18,22 @@ export async function developerWebhookFailed(
   if (!petition) {
     throw new Error(`Petition not found for payload.petition_id ${payload.petition_id}`);
   }
-  const orgOwner = await context.organizations.getOrganizationOwner(petition.org_id);
-  if (!orgOwner) {
-    throw new Error(`Owner not found for Organization:${petition.org_id}`);
+  const integration = await context.integrations.loadIntegration(payload.org_integration_id);
+  if (!integration) {
+    throw new Error(
+      `OrgIntegration not found for payload.org_integration_id ${payload.org_integration_id}`
+    );
+  }
+  const integrationUser = await context.users.loadUser(integration.settings.USER_ID);
+  if (!integrationUser) {
+    throw new Error(`User not found for OrgIntegration:${payload.org_integration_id}`);
   }
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,
     {
-      userName: fullName(orgOwner.first_name, orgOwner.last_name)!,
+      userName: fullName(integrationUser.first_name, integrationUser.last_name)!,
       errorMessage: payload.error_message,
       postBody: payload.post_body,
       ...layoutProps,
@@ -36,7 +42,7 @@ export async function developerWebhookFailed(
   );
   return await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),
-    to: orgOwner.email,
+    to: integrationUser.email,
     subject,
     text,
     html,

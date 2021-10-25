@@ -22,6 +22,7 @@ export type IntegrationSettings<K extends IntegrationType> = {
     AUTH_KEY: string;
   };
   EVENT_SUBSCRIPTION: {
+    USER_ID: number;
     EVENTS_URL: string;
   };
 }[K];
