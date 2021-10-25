@@ -3960,6 +3960,11 @@
     "context": "Untitled template"
   },
   {
+    "term": "generic.upgrade-to-enable",
+    "definition": "Actualiza tu plan para activar esta funcionalidad.",
+    "context": "Upgrade to enable this feature."
+  },
+  {
     "term": "generic.you",
     "definition": "Tú",
     "context": "You"

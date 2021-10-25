@@ -39,6 +39,7 @@ import { usePetitionSharingDialog } from "@parallel/components/petition-common/P
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 import {
+  ExportParams,
   ExportRepliesDialog,
   useExportRepliesDialog,
 } from "@parallel/components/petition-replies/ExportRepliesDialog";
@@ -272,15 +273,25 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const showExportRepliesDialog = useExportRepliesDialog();
   const showExportRepliesProgressDialog = useExportRepliesProgressDialog();
   const handleDownloadAllClick = useCallback(async () => {
-    const hasFiles =
-      petition.fields.some((field) => field.type === "FILE_UPLOAD" && field.replies.length > 0) ||
-      petition.currentSignatureRequest?.status === "COMPLETED";
+    const hasFiles = petition.fields.some(
+      (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
+    );
+
     try {
-      if (hasFiles) {
-        const res = await showExportRepliesDialog({
-          user: me,
-          fields: petition.fields,
-        });
+      if (hasFiles || petition.currentSignatureRequest?.status === "COMPLETED") {
+        let res = {
+          type: "DOWNLOAD_ZIP",
+          pattern: "#field-title#",
+          externalClientId: "",
+        } as ExportParams;
+
+        if (hasFiles || me.hasExportCuatrecasas) {
+          res = await showExportRepliesDialog({
+            user: me,
+            fields: petition.fields,
+          });
+        }
+
         if (res.type === "DOWNLOAD_ZIP") {
           window.open(
             `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
@@ -572,13 +583,24 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               </MenuItem>
               <MenuItem
                 icon={<FilePdfIcon boxSize={5} />}
-                isdisabled={!me.hasPetitionPdfExport}
+                isDisabled={!me.hasPetitionPdfExport}
                 onClick={handleExportPetitionPDF}
+                maxWidth={"260px"}
               >
-                <FormattedMessage
-                  id="page.petition-replies.export-pdf"
-                  defaultMessage="Export to PDF"
-                />
+                <Text>
+                  <FormattedMessage
+                    id="page.petition-replies.export-pdf"
+                    defaultMessage="Export to PDF"
+                  />
+                </Text>
+                {me.hasPetitionPdfExport ? null : (
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="generic.upgrade-to-enable"
+                      defaultMessage="Upgrade to enable this feature."
+                    />
+                  </Text>
+                )}
               </MenuItem>
             </MenuList>
           </Menu>

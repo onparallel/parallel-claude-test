@@ -3960,6 +3960,11 @@
     "context": "Untitled template"
   },
   {
+    "term": "generic.upgrade-to-enable",
+    "definition": "Upgrade to enable this feature.",
+    "context": "Upgrade to enable this feature."
+  },
+  {
     "term": "generic.you",
     "definition": "You",
     "context": "You"
