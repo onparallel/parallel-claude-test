@@ -108,9 +108,9 @@ export const PetitionReplyFragment = gql`
 `;
 
 export const SubscriptionFragment = gql`
-  fragment Subscription on OrgIntegration {
+  fragment Subscription on PetitionEventSubscription {
     id
-    settings
+    eventsUrl
     isEnabled
   }
 `;

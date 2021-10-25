@@ -15,7 +15,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
-import { EventSubscriptionCard_OrgIntegrationFragment } from "@parallel/graphql/__types";
+import { EventSubscriptionCard_PetitionEventSubscriptionFragment } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
@@ -27,7 +27,7 @@ import { Card, GenericCardHeader } from "../common/Card";
 import { NormalLink } from "../common/Link";
 
 interface EventSubscriptionCardProps {
-  subscription?: EventSubscriptionCard_OrgIntegrationFragment;
+  subscription?: EventSubscriptionCard_PetitionEventSubscriptionFragment;
   onSwitchClicked: (isEnabled: boolean) => void;
   onUpdateEventsUrl: (url: string) => void;
 }
@@ -43,7 +43,7 @@ export function EventSubscriptionCard({
     mode: "onSubmit",
     reValidateMode: "onSubmit",
     defaultValues: {
-      eventsUrl: subscription?.settings.EVENTS_URL ?? null,
+      eventsUrl: subscription?.eventsUrl ?? null,
     },
   });
 
@@ -175,11 +175,10 @@ export function EventSubscriptionCard({
 }
 
 EventSubscriptionCard.fragments = {
-  OrgIntegration: gql`
-    fragment EventSubscriptionCard_OrgIntegration on OrgIntegration {
+  PetitionEventSubscription: gql`
+    fragment EventSubscriptionCard_PetitionEventSubscription on PetitionEventSubscription {
       id
-      type
-      settings
+      eventsUrl
       isEnabled
     }
   `,

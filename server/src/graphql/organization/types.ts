@@ -55,9 +55,6 @@ export const OrgIntegration = objectType({
         }
       },
     });
-    t.boolean("isEnabled", {
-      resolve: (o) => o.is_enabled,
-    });
   },
 });
 

@@ -497,7 +497,7 @@ type Mutation {
   """
   Creates an event subscription for the user's petitions
   """
-  createEventSubscriptionIntegration(settings: JSONObject!): OrgIntegration!
+  createEventSubscription(eventsUrl: String!): PetitionEventSubscription!
 
   """
   Creates a reply to a file upload field.
@@ -648,7 +648,7 @@ type Mutation {
   """
   Deletes a subscription
   """
-  deleteEventSubscriptionIntegration(id: GID!): Result!
+  deleteEventSubscription(id: GID!): Result!
 
   """
   Soft-deletes any given petition on the database.
@@ -1079,7 +1079,7 @@ type Mutation {
   """
   Updates an existing event subscription for the user's petitions
   """
-  updateEventSubscriptionIntegration(data: UpdateOrgIntegrationInput!, id: GID!): OrgIntegration!
+  updateEventSubscription(data: UpdateEventSubscriptionInput!, id: GID!): PetitionEventSubscription!
 
   """
   Updates the positions of the petition fields
@@ -1313,7 +1313,6 @@ enum OnboardingStatus {
 
 type OrgIntegration {
   id: GID!
-  isEnabled: Boolean!
 
   """
   The name of the integration.
@@ -1954,6 +1953,12 @@ type PetitionEventPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type PetitionEventSubscription {
+  eventsUrl: String!
+  id: GID!
+  isEnabled: Boolean!
 }
 
 """
@@ -3347,6 +3352,7 @@ type Query {
     includeInactive: Boolean
     search: String!
   ): [UserOrUserGroup!]!
+  subscriptions: [PetitionEventSubscription!]!
 
   """
   Paginated list of tags in the organization
@@ -3768,9 +3774,9 @@ input UpdateContactInput {
   lastName: String
 }
 
-input UpdateOrgIntegrationInput {
+input UpdateEventSubscriptionInput {
+  eventsUrl: String
   isEnabled: Boolean
-  settings: JSONObject
 }
 
 input UpdatePetitionFieldInput {
@@ -3861,7 +3867,6 @@ type User implements Timestamps {
   The email of the user.
   """
   email: String!
-  eventSubscription: OrgIntegration
 
   """
   The first name of the user.

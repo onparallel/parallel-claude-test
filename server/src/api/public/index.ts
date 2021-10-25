@@ -87,11 +87,11 @@ import {
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
-  OrgIntegration_CreateSubscriptionMutation,
-  OrgIntegration_CreateSubscriptionMutationVariables,
-  OrgIntegration_DeleteSubscriptionMutation,
-  OrgIntegration_DeleteSubscriptionMutationVariables,
-  OrgIntegration_GetSubscriptionsQuery,
+  EventSubscriptions_CreateSubscriptionMutation,
+  EventSubscriptions_CreateSubscriptionMutationVariables,
+  EventSubscriptions_DeleteSubscriptionMutation,
+  EventSubscriptions_DeleteSubscriptionMutationVariables,
+  EventSubscriptions_GetSubscriptionsQuery,
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
@@ -1279,7 +1279,7 @@ api.path("/users").get(
 );
 
 const subscriptionId = idParam({
-  type: "OrgIntegration",
+  type: "PetitionEventSubscription",
   description: "The ID of the subscription",
 });
 
@@ -1294,30 +1294,16 @@ api
       tags: ["Subscriptions"],
     },
     async ({ client }) => {
-      const result = await client.request<OrgIntegration_GetSubscriptionsQuery>(gql`
-        query OrgIntegration_GetSubscriptions {
-          me {
-            eventSubscription {
-              ...Subscription
-            }
+      const result = await client.request<EventSubscriptions_GetSubscriptionsQuery>(gql`
+        query EventSubscriptions_GetSubscriptions {
+          subscriptions {
+            ...Subscription
           }
         }
         ${SubscriptionFragment}
       `);
 
-      const subscription = result.me.eventSubscription;
-
-      return Ok(
-        subscription
-          ? [
-              {
-                id: subscription.id,
-                eventsUrl: subscription.settings.EVENTS_URL,
-                isEnabled: subscription.isEnabled,
-              },
-            ]
-          : []
-      );
+      return Ok(result.subscriptions);
     }
   )
   .post(
@@ -1336,12 +1322,12 @@ api
     async ({ client, body }) => {
       try {
         const result = await client.request<
-          OrgIntegration_CreateSubscriptionMutation,
-          OrgIntegration_CreateSubscriptionMutationVariables
+          EventSubscriptions_CreateSubscriptionMutation,
+          EventSubscriptions_CreateSubscriptionMutationVariables
         >(
           gql`
-            mutation OrgIntegration_CreateSubscription($eventsUrl: String!) {
-              createEventSubscriptionIntegration(settings: { EVENTS_URL: $eventsUrl }) {
+            mutation EventSubscriptions_CreateSubscription($eventsUrl: String!) {
+              createEventSubscription(eventsUrl: $eventsUrl) {
                 ...Subscription
               }
             }
@@ -1349,20 +1335,16 @@ api
           `,
           body
         );
-        const subscription = result.createEventSubscriptionIntegration;
-        assert("id" in subscription);
-        return Created({
-          id: subscription.id,
-          isEnabled: subscription.isEnabled,
-          eventsUrl: subscription.settings.EVENTS_URL,
-        });
+
+        assert("id" in result.createEventSubscription);
+        return Created(result.createEventSubscription);
       } catch (error: any) {
         if (error instanceof ClientError && containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
           throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
         }
         if (
           error instanceof ClientError &&
-          containsGraphQLError(error, "EXISTING_INTEGRATION_ERROR")
+          containsGraphQLError(error, "EXISTING_SUBSCRIPTION_ERROR")
         ) {
           throw new BadRequestError("You already have a subscription.");
         }
@@ -1381,12 +1363,12 @@ api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delet
   },
   async ({ client, params }) => {
     await client.request<
-      OrgIntegration_DeleteSubscriptionMutation,
-      OrgIntegration_DeleteSubscriptionMutationVariables
+      EventSubscriptions_DeleteSubscriptionMutation,
+      EventSubscriptions_DeleteSubscriptionMutationVariables
     >(
       gql`
-        mutation OrgIntegration_DeleteSubscription($id: GID!) {
-          deleteEventSubscriptionIntegration(id: $id)
+        mutation EventSubscriptions_DeleteSubscription($id: GID!) {
+          deleteEventSubscription(id: $id)
         }
       `,
       { id: params.subscriptionId }

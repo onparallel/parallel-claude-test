@@ -56,7 +56,7 @@ function Developers() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
 
   const {
-    data: { me },
+    data: { me, subscriptions },
     loading,
     refetch,
   } = useAssertQueryOrPreviousData(
@@ -69,10 +69,9 @@ function Developers() {
       },
     })
   );
+  const eventSubscriptions = subscriptions[0];
   const sections = useSettingsSections(me);
   const authTokens = me.authenticationTokens;
-
-  const eventSubscriptionIntegration = me.eventSubscription ?? undefined;
 
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -124,22 +123,22 @@ function Developers() {
   const [createOrgSubscription] = useDevelopers_CreateEventSubscriptionMutation();
   const [updateOrgSubscription] = useDevelopers_UpdateEventSubscriptionMutation();
   async function handleEventSubscriptionSwitchClicked(isEnabled: boolean) {
-    if (eventSubscriptionIntegration) {
+    if (eventSubscriptions) {
       await updateOrgSubscription({
-        variables: { id: eventSubscriptionIntegration.id, data: { isEnabled } },
+        variables: { id: eventSubscriptions.id, data: { isEnabled } },
       });
     }
   }
-  async function handleUpdateEventsUrl(url: string) {
-    if (eventSubscriptionIntegration) {
+  async function handleUpdateEventsUrl(eventsUrl: string) {
+    if (eventSubscriptions) {
       await updateOrgSubscription({
         variables: {
-          id: eventSubscriptionIntegration.id,
-          data: { isEnabled: true, settings: { EVENTS_URL: url } },
+          id: eventSubscriptions.id,
+          data: { isEnabled: true, eventsUrl },
         },
       });
     } else {
-      await createOrgSubscription({ variables: { settings: { EVENTS_URL: url } } });
+      await createOrgSubscription({ variables: { eventsUrl } });
       await refetch();
     }
   }
@@ -246,7 +245,7 @@ function Developers() {
             />
           </Heading>
           <EventSubscriptionCard
-            subscription={eventSubscriptionIntegration}
+            subscription={eventSubscriptions}
             onSwitchClicked={handleEventSubscriptionSwitchClicked}
             onUpdateEventsUrl={handleUpdateEventsUrl}
           />
@@ -341,20 +340,20 @@ Developers.mutations = [
     }
   `,
   gql`
-    mutation Developers_CreateEventSubscription($settings: JSONObject!) {
-      createEventSubscriptionIntegration(settings: $settings) {
-        ...EventSubscriptionCard_OrgIntegration
+    mutation Developers_CreateEventSubscription($eventsUrl: String!) {
+      createEventSubscription(eventsUrl: $eventsUrl) {
+        ...EventSubscriptionCard_PetitionEventSubscription
       }
     }
-    ${EventSubscriptionCard.fragments.OrgIntegration}
+    ${EventSubscriptionCard.fragments.PetitionEventSubscription}
   `,
   gql`
-    mutation Developers_UpdateEventSubscription($id: GID!, $data: UpdateOrgIntegrationInput!) {
-      updateEventSubscriptionIntegration(id: $id, data: $data) {
-        ...EventSubscriptionCard_OrgIntegration
+    mutation Developers_UpdateEventSubscription($id: GID!, $data: UpdateEventSubscriptionInput!) {
+      updateEventSubscription(id: $id, data: $data) {
+        ...EventSubscriptionCard_PetitionEventSubscription
       }
     }
-    ${EventSubscriptionCard.fragments.OrgIntegration}
+    ${EventSubscriptionCard.fragments.PetitionEventSubscription}
   `,
 ];
 
@@ -377,17 +376,17 @@ Developers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataCo
               ...Developers_UserAuthenticationToken
             }
           }
-          eventSubscription {
-            ...EventSubscriptionCard_OrgIntegration
-          }
           ...SettingsLayout_User
           ...useSettingsSections_User
+        }
+        subscriptions {
+          ...EventSubscriptionCard_PetitionEventSubscription
         }
       }
       ${Developers.fragments.UserAuthenticationToken}
       ${SettingsLayout.fragments.User}
       ${useSettingsSections.fragments.User}
-      ${EventSubscriptionCard.fragments.OrgIntegration}
+      ${EventSubscriptionCard.fragments.PetitionEventSubscription}
     `,
     {
       variables: {

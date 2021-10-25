@@ -180,19 +180,6 @@ export const User = objectType({
     t.nullable.string("preferredLocale", {
       resolve: (root) => root.details?.preferredLocale ?? null,
     });
-    t.nullable.field("eventSubscription", {
-      type: "OrgIntegration",
-      authorize: rootIsContextUser(),
-      resolve: async (root, _, ctx) => {
-        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
-          ctx.user!.org_id,
-          "EVENT_SUBSCRIPTION",
-          true
-        );
-
-        return integrations.find((i) => i.settings.USER_ID === ctx.user!.id) ?? null;
-      },
-    });
   },
 });
 

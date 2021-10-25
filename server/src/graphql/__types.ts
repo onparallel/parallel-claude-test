@@ -140,10 +140,10 @@ export interface NexusGenInputs {
     firstName?: string | null; // String
     lastName?: string | null; // String
   };
-  UpdateOrgIntegrationInput: {
+  UpdateEventSubscriptionInput: {
     // input type
+    eventsUrl?: string | null; // String
     isEnabled?: boolean | null; // Boolean
-    settings?: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   UpdatePetitionFieldInput: {
     // input type
@@ -405,6 +405,13 @@ export interface NexusGenObjects {
     // root type
     items: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
     totalCount: number; // Int!
+  };
+  PetitionEventSubscription: {
+    id: number;
+    is_enabled: boolean;
+    settings: {
+      EVENTS_URL: string;
+    };
   };
   PetitionField: db.PetitionField;
   PetitionFieldAttachment: db.PetitionFieldAttachment;
@@ -836,7 +843,7 @@ export interface NexusGenFieldTypes {
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     cloneUserGroup: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
-    createEventSubscriptionIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
+    createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createFileUploadReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
@@ -851,7 +858,7 @@ export interface NexusGenFieldTypes {
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
-    deleteEventSubscriptionIntegration: NexusGenEnums["Result"]; // Result!
+    deleteEventSubscription: NexusGenEnums["Result"]; // Result!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -909,7 +916,7 @@ export interface NexusGenFieldTypes {
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
-    updateEventSubscriptionIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
+    updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
@@ -939,7 +946,6 @@ export interface NexusGenFieldTypes {
   OrgIntegration: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
-    isEnabled: boolean; // Boolean!
     name: string; // String!
     provider: string; // String!
     settings: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -1107,6 +1113,12 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
     totalCount: number; // Int!
+  };
+  PetitionEventSubscription: {
+    // field return type
+    eventsUrl: string; // String!
+    id: NexusGenScalars["GID"]; // GID!
+    isEnabled: boolean; // Boolean!
   };
   PetitionField: {
     // field return type
@@ -1460,6 +1472,7 @@ export interface NexusGenFieldTypes {
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
     publicTemplateCategories: string[]; // [String!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
+    subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
     templates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
@@ -1610,7 +1623,6 @@ export interface NexusGenFieldTypes {
     canCreateUsers: boolean; // Boolean!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     email: string; // String!
-    eventSubscription: NexusGenRootTypes["OrgIntegration"] | null; // OrgIntegration
     firstName: string | null; // String
     fullName: string | null; // String
     hasFeatureFlag: boolean; // Boolean!
@@ -1991,7 +2003,7 @@ export interface NexusGenFieldTypeNames {
     clonePetitions: "PetitionBase";
     cloneUserGroup: "UserGroup";
     createContact: "Contact";
-    createEventSubscriptionIntegration: "OrgIntegration";
+    createEventSubscription: "PetitionEventSubscription";
     createFileUploadReply: "PetitionFieldReply";
     createOrganization: "SupportMethodResponse";
     createOrganizationUser: "User";
@@ -2006,7 +2018,7 @@ export interface NexusGenFieldTypeNames {
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
     deleteContacts: "Result";
-    deleteEventSubscriptionIntegration: "Result";
+    deleteEventSubscription: "Result";
     deletePetition: "SupportMethodResponse";
     deletePetitionField: "PetitionBase";
     deletePetitionFieldComment: "PetitionField";
@@ -2064,7 +2076,7 @@ export interface NexusGenFieldTypeNames {
     transferPetitionOwnership: "Petition";
     untagPetition: "PetitionBase";
     updateContact: "Contact";
-    updateEventSubscriptionIntegration: "OrgIntegration";
+    updateEventSubscription: "PetitionEventSubscription";
     updateFieldPositions: "PetitionBase";
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOnboardingStatus: "User";
@@ -2094,7 +2106,6 @@ export interface NexusGenFieldTypeNames {
   OrgIntegration: {
     // field return type name
     id: "GID";
-    isEnabled: "Boolean";
     name: "String";
     provider: "String";
     settings: "JSONObject";
@@ -2262,6 +2273,12 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "PetitionEvent";
     totalCount: "Int";
+  };
+  PetitionEventSubscription: {
+    // field return type name
+    eventsUrl: "String";
+    id: "GID";
+    isEnabled: "Boolean";
   };
   PetitionField: {
     // field return type name
@@ -2615,6 +2632,7 @@ export interface NexusGenFieldTypeNames {
     publicPetitionLinkBySlug: "PublicPetitionLink";
     publicTemplateCategories: "String";
     searchUsers: "UserOrUserGroup";
+    subscriptions: "PetitionEventSubscription";
     tags: "TagPagination";
     templates: "PetitionTemplatePagination";
     userGroup: "UserGroup";
@@ -2765,7 +2783,6 @@ export interface NexusGenFieldTypeNames {
     canCreateUsers: "Boolean";
     createdAt: "DateTime";
     email: "String";
-    eventSubscription: "OrgIntegration";
     firstName: "String";
     fullName: "String";
     hasFeatureFlag: "Boolean";
@@ -3016,9 +3033,9 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
     };
-    createEventSubscriptionIntegration: {
+    createEventSubscription: {
       // args
-      settings: NexusGenScalars["JSONObject"]; // JSONObject!
+      eventsUrl: string; // String!
     };
     createFileUploadReply: {
       // args
@@ -3109,7 +3126,7 @@ export interface NexusGenArgTypes {
       // args
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };
-    deleteEventSubscriptionIntegration: {
+    deleteEventSubscription: {
       // args
       id: NexusGenScalars["GID"]; // GID!
     };
@@ -3431,9 +3448,9 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
       id: NexusGenScalars["GID"]; // GID!
     };
-    updateEventSubscriptionIntegration: {
+    updateEventSubscription: {
       // args
-      data: NexusGenInputs["UpdateOrgIntegrationInput"]; // UpdateOrgIntegrationInput!
+      data: NexusGenInputs["UpdateEventSubscriptionInput"]; // UpdateEventSubscriptionInput!
       id: NexusGenScalars["GID"]; // GID!
     };
     updateFieldPositions: {

@@ -331,7 +331,7 @@ export type Mutation = {
   /** Create a contact. */
   createContact: Contact;
   /** Creates an event subscription for the user's petitions */
-  createEventSubscriptionIntegration: OrgIntegration;
+  createEventSubscription: PetitionEventSubscription;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
   /** Creates a new organization. */
@@ -361,7 +361,7 @@ export type Mutation = {
   /** Delete contacts. */
   deleteContacts: Result;
   /** Deletes a subscription */
-  deleteEventSubscriptionIntegration: Result;
+  deleteEventSubscription: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Deletes a petition field. */
@@ -476,7 +476,7 @@ export type Mutation = {
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates an existing event subscription for the user's petitions */
-  updateEventSubscriptionIntegration: OrgIntegration;
+  updateEventSubscription: PetitionEventSubscription;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the metadata of a public landing template. */
@@ -607,8 +607,8 @@ export type MutationcreateContactArgs = {
   data: CreateContactInput;
 };
 
-export type MutationcreateEventSubscriptionIntegrationArgs = {
-  settings: Scalars["JSONObject"];
+export type MutationcreateEventSubscriptionArgs = {
+  eventsUrl: Scalars["String"];
 };
 
 export type MutationcreateFileUploadReplyArgs = {
@@ -700,7 +700,7 @@ export type MutationdeleteContactsArgs = {
   ids: Array<Scalars["GID"]>;
 };
 
-export type MutationdeleteEventSubscriptionIntegrationArgs = {
+export type MutationdeleteEventSubscriptionArgs = {
   id: Scalars["GID"];
 };
 
@@ -1022,8 +1022,8 @@ export type MutationupdateContactArgs = {
   id: Scalars["GID"];
 };
 
-export type MutationupdateEventSubscriptionIntegrationArgs = {
-  data: UpdateOrgIntegrationInput;
+export type MutationupdateEventSubscriptionArgs = {
+  data: UpdateEventSubscriptionInput;
   id: Scalars["GID"];
 };
 
@@ -1195,7 +1195,6 @@ export type OnboardingStatus = "FINISHED" | "SKIPPED";
 
 export type OrgIntegration = {
   id: Scalars["GID"];
-  isEnabled: Scalars["Boolean"];
   /** The name of the integration. */
   name: Scalars["String"];
   /** The provider used for this integration. */
@@ -1553,6 +1552,12 @@ export type PetitionEventPagination = {
   items: Array<PetitionEvent>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+};
+
+export type PetitionEventSubscription = {
+  eventsUrl: Scalars["String"];
+  id: Scalars["GID"];
+  isEnabled: Scalars["Boolean"];
 };
 
 /** A field within a petition. */
@@ -2236,6 +2241,7 @@ export type Query = {
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
+  subscriptions: Array<PetitionEventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
   /** The available templates */
@@ -2623,9 +2629,9 @@ export type UpdateContactInput = {
   lastName?: Maybe<Scalars["String"]>;
 };
 
-export type UpdateOrgIntegrationInput = {
+export type UpdateEventSubscriptionInput = {
+  eventsUrl?: Maybe<Scalars["String"]>;
   isEnabled?: Maybe<Scalars["Boolean"]>;
-  settings?: Maybe<Scalars["JSONObject"]>;
 };
 
 export type UpdatePetitionFieldInput = {
@@ -2678,7 +2684,6 @@ export type User = Timestamps & {
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
   email: Scalars["String"];
-  eventSubscription: Maybe<OrgIntegration>;
   /** The first name of the user. */
   firstName: Maybe<Scalars["String"]>;
   /** The full name of the user. */
@@ -2929,11 +2934,7 @@ export type PetitionFieldReplyFragment = {
   updatedAt: string;
 };
 
-export type SubscriptionFragment = {
-  id: string;
-  settings: { [key: string]: any };
-  isEnabled: boolean;
-};
+export type SubscriptionFragment = { id: string; eventsUrl: string; isEnabled: boolean };
 
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -3416,30 +3417,22 @@ export type GetOrganizationUsers_UsersQuery = {
   };
 };
 
-export type OrgIntegration_GetSubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
+export type EventSubscriptions_GetSubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type OrgIntegration_GetSubscriptionsQuery = {
-  me: {
-    eventSubscription: Maybe<{ id: string; settings: { [key: string]: any }; isEnabled: boolean }>;
-  };
+export type EventSubscriptions_GetSubscriptionsQuery = {
+  subscriptions: Array<{ id: string; eventsUrl: string; isEnabled: boolean }>;
 };
 
-export type OrgIntegration_CreateSubscriptionMutationVariables = Exact<{
+export type EventSubscriptions_CreateSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"];
 }>;
 
-export type OrgIntegration_CreateSubscriptionMutation = {
-  createEventSubscriptionIntegration: {
-    id: string;
-    settings: { [key: string]: any };
-    isEnabled: boolean;
-  };
+export type EventSubscriptions_CreateSubscriptionMutation = {
+  createEventSubscription: { id: string; eventsUrl: string; isEnabled: boolean };
 };
 
-export type OrgIntegration_DeleteSubscriptionMutationVariables = Exact<{
+export type EventSubscriptions_DeleteSubscriptionMutationVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type OrgIntegration_DeleteSubscriptionMutation = {
-  deleteEventSubscriptionIntegration: Result;
-};
+export type EventSubscriptions_DeleteSubscriptionMutation = { deleteEventSubscription: Result };

@@ -365,7 +365,7 @@ export interface Mutation {
   /** Create a contact. */
   createContact: Contact;
   /** Creates an event subscription for the user's petitions */
-  createEventSubscriptionIntegration: OrgIntegration;
+  createEventSubscription: PetitionEventSubscription;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
   /** Creates a new organization. */
@@ -395,7 +395,7 @@ export interface Mutation {
   /** Delete contacts. */
   deleteContacts: Result;
   /** Deletes a subscription */
-  deleteEventSubscriptionIntegration: Result;
+  deleteEventSubscription: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Deletes a petition field. */
@@ -510,7 +510,7 @@ export interface Mutation {
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates an existing event subscription for the user's petitions */
-  updateEventSubscriptionIntegration: OrgIntegration;
+  updateEventSubscription: PetitionEventSubscription;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the metadata of a public landing template. */
@@ -641,8 +641,8 @@ export interface MutationcreateContactArgs {
   data: CreateContactInput;
 }
 
-export interface MutationcreateEventSubscriptionIntegrationArgs {
-  settings: Scalars["JSONObject"];
+export interface MutationcreateEventSubscriptionArgs {
+  eventsUrl: Scalars["String"];
 }
 
 export interface MutationcreateFileUploadReplyArgs {
@@ -734,7 +734,7 @@ export interface MutationdeleteContactsArgs {
   ids: Array<Scalars["GID"]>;
 }
 
-export interface MutationdeleteEventSubscriptionIntegrationArgs {
+export interface MutationdeleteEventSubscriptionArgs {
   id: Scalars["GID"];
 }
 
@@ -1056,8 +1056,8 @@ export interface MutationupdateContactArgs {
   id: Scalars["GID"];
 }
 
-export interface MutationupdateEventSubscriptionIntegrationArgs {
-  data: UpdateOrgIntegrationInput;
+export interface MutationupdateEventSubscriptionArgs {
+  data: UpdateEventSubscriptionInput;
   id: Scalars["GID"];
 }
 
@@ -1608,6 +1608,13 @@ export interface PetitionEventPagination {
   items: Array<PetitionEvent>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+}
+
+export interface PetitionEventSubscription {
+  __typename?: "PetitionEventSubscription";
+  eventsUrl: Scalars["String"];
+  id: Scalars["GID"];
+  isEnabled: Scalars["Boolean"];
 }
 
 /** A field within a petition. */
@@ -2325,6 +2332,7 @@ export interface Query {
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
+  subscriptions: Array<PetitionEventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
   /** The available templates */
@@ -2732,9 +2740,9 @@ export interface UpdateContactInput {
   lastName?: Maybe<Scalars["String"]>;
 }
 
-export interface UpdateOrgIntegrationInput {
+export interface UpdateEventSubscriptionInput {
+  eventsUrl?: Maybe<Scalars["String"]>;
   isEnabled?: Maybe<Scalars["Boolean"]>;
-  settings?: Maybe<Scalars["JSONObject"]>;
 }
 
 export interface UpdatePetitionFieldInput {
@@ -2788,7 +2796,6 @@ export interface User extends Timestamps {
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
   email: Scalars["String"];
-  eventSubscription?: Maybe<OrgIntegration>;
   /** The first name of the user. */
   firstName?: Maybe<Scalars["String"]>;
   /** The full name of the user. */
@@ -8133,11 +8140,10 @@ export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetit
   status: PetitionStatus;
 };
 
-export type EventSubscriptionCard_OrgIntegrationFragment = {
-  __typename?: "OrgIntegration";
+export type EventSubscriptionCard_PetitionEventSubscriptionFragment = {
+  __typename?: "PetitionEventSubscription";
   id: string;
-  type: IntegrationType;
-  settings: { [key: string]: any };
+  eventsUrl: string;
   isEnabled: boolean;
 };
 
@@ -13619,30 +13625,28 @@ export type Developers_RevokeUserAuthTokenMutationVariables = Exact<{
 export type Developers_RevokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
 
 export type Developers_CreateEventSubscriptionMutationVariables = Exact<{
-  settings: Scalars["JSONObject"];
+  eventsUrl: Scalars["String"];
 }>;
 
 export type Developers_CreateEventSubscriptionMutation = {
-  createEventSubscriptionIntegration: {
-    __typename?: "OrgIntegration";
+  createEventSubscription: {
+    __typename?: "PetitionEventSubscription";
     id: string;
-    type: IntegrationType;
-    settings: { [key: string]: any };
+    eventsUrl: string;
     isEnabled: boolean;
   };
 };
 
 export type Developers_UpdateEventSubscriptionMutationVariables = Exact<{
   id: Scalars["GID"];
-  data: UpdateOrgIntegrationInput;
+  data: UpdateEventSubscriptionInput;
 }>;
 
 export type Developers_UpdateEventSubscriptionMutation = {
-  updateEventSubscriptionIntegration: {
-    __typename?: "OrgIntegration";
+  updateEventSubscription: {
+    __typename?: "PetitionEventSubscription";
     id: string;
-    type: IntegrationType;
-    settings: { [key: string]: any };
+    eventsUrl: string;
     isEnabled: boolean;
   };
 };
@@ -13680,13 +13684,6 @@ export type DevelopersQuery = {
         lastUsedAt?: Maybe<string>;
       }>;
     };
-    eventSubscription?: Maybe<{
-      __typename?: "OrgIntegration";
-      id: string;
-      type: IntegrationType;
-      settings: { [key: string]: any };
-      isEnabled: boolean;
-    }>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -13696,6 +13693,12 @@ export type DevelopersQuery = {
       };
     };
   };
+  subscriptions: Array<{
+    __typename?: "PetitionEventSubscription";
+    id: string;
+    eventsUrl: string;
+    isEnabled: boolean;
+  }>;
 };
 
 export type Settings_UserFragment = {
@@ -15465,11 +15468,10 @@ export const RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPeti
     status
   }
 `;
-export const EventSubscriptionCard_OrgIntegrationFragmentDoc = gql`
-  fragment EventSubscriptionCard_OrgIntegration on OrgIntegration {
+export const EventSubscriptionCard_PetitionEventSubscriptionFragmentDoc = gql`
+  fragment EventSubscriptionCard_PetitionEventSubscription on PetitionEventSubscription {
     id
-    type
-    settings
+    eventsUrl
     isEnabled
   }
 `;
@@ -21861,12 +21863,12 @@ export type Developers_RevokeUserAuthTokenMutationHookResult = ReturnType<
   typeof useDevelopers_RevokeUserAuthTokenMutation
 >;
 export const Developers_CreateEventSubscriptionDocument = gql`
-  mutation Developers_CreateEventSubscription($settings: JSONObject!) {
-    createEventSubscriptionIntegration(settings: $settings) {
-      ...EventSubscriptionCard_OrgIntegration
+  mutation Developers_CreateEventSubscription($eventsUrl: String!) {
+    createEventSubscription(eventsUrl: $eventsUrl) {
+      ...EventSubscriptionCard_PetitionEventSubscription
     }
   }
-  ${EventSubscriptionCard_OrgIntegrationFragmentDoc}
+  ${EventSubscriptionCard_PetitionEventSubscriptionFragmentDoc}
 `;
 export function useDevelopers_CreateEventSubscriptionMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -21884,12 +21886,12 @@ export type Developers_CreateEventSubscriptionMutationHookResult = ReturnType<
   typeof useDevelopers_CreateEventSubscriptionMutation
 >;
 export const Developers_UpdateEventSubscriptionDocument = gql`
-  mutation Developers_UpdateEventSubscription($id: GID!, $data: UpdateOrgIntegrationInput!) {
-    updateEventSubscriptionIntegration(id: $id, data: $data) {
-      ...EventSubscriptionCard_OrgIntegration
+  mutation Developers_UpdateEventSubscription($id: GID!, $data: UpdateEventSubscriptionInput!) {
+    updateEventSubscription(id: $id, data: $data) {
+      ...EventSubscriptionCard_PetitionEventSubscription
     }
   }
-  ${EventSubscriptionCard_OrgIntegrationFragmentDoc}
+  ${EventSubscriptionCard_PetitionEventSubscriptionFragmentDoc}
 `;
 export function useDevelopers_UpdateEventSubscriptionMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -21921,17 +21923,17 @@ export const DevelopersDocument = gql`
           ...Developers_UserAuthenticationToken
         }
       }
-      eventSubscription {
-        ...EventSubscriptionCard_OrgIntegration
-      }
       ...SettingsLayout_User
       ...useSettingsSections_User
     }
+    subscriptions {
+      ...EventSubscriptionCard_PetitionEventSubscription
+    }
   }
   ${Developers_UserAuthenticationTokenFragmentDoc}
-  ${EventSubscriptionCard_OrgIntegrationFragmentDoc}
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
+  ${EventSubscriptionCard_PetitionEventSubscriptionFragmentDoc}
 `;
 export function useDevelopersQuery(
   baseOptions: Apollo.QueryHookOptions<DevelopersQuery, DevelopersQueryVariables>
