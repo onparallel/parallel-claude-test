@@ -3045,6 +3045,11 @@
     "context": "Please, review your file and make sure it matches the format on the loading model."
   },
   {
+    "term": "contacts.import-from-excel.import-error.details",
+    "definition": "We have detected an error in the following file rows:",
+    "context": "We have detected an error in the following file rows:"
+  },
+  {
     "term": "contacts.no-contacts",
     "definition": "You have no contacts yet. Start by creating one now!",
     "context": "You have no contacts yet. Start by creating one now!"

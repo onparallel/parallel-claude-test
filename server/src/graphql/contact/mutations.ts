@@ -120,10 +120,8 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
     if (importError) {
       throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
     }
-    const [parseError, parsedContacts] = await withError(() => parseContactList(importResult!));
-    if (parseError) {
-      throw new WhitelistedError(parseError.message, "INVALID_FORMAT_ERROR");
-    }
+
+    const parsedContacts = parseContactList(importResult!);
 
     if (!parsedContacts || parsedContacts.length === 0) {
       throw new WhitelistedError("No contacts found on file", "NO_CONTACTS_FOUND_ERROR");

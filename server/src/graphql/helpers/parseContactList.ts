@@ -1,3 +1,4 @@
+import { ExcelParsingError, WhitelistedError } from "./errors";
 import { EMAIL_REGEX } from "./validators/validEmail";
 
 type ParsedContact = {
@@ -7,20 +8,31 @@ type ParsedContact = {
 };
 
 export function parseContactList(data: string[][]): ParsedContact[] {
-  return data
-    .slice(1) // first row is column headers
-    .filter((row) => row.some((c) => !!c))
-    .map((row) => {
-      const firstName = row[0]?.trim();
-      if (!firstName) {
-        throw new Error("First name is required");
-      }
-      const lastName = row[1]?.trim();
-      const email = row[2]?.trim().toLowerCase();
-      if (!EMAIL_REGEX.test(email)) {
-        throw new Error(`${email} is not a valid email`);
-      }
+  const errors = [] as ExcelParsingError[];
 
-      return { firstName, lastName, email };
+  // first row is column headers
+  const parsedContacts = data.slice(1).reduce((acc, row, index) => {
+    if (!row.some((c) => !!c)) return acc;
+
+    const firstName = row[0]?.trim();
+    if (!firstName) {
+      errors.push(new ExcelParsingError("First name is required", index + 2));
+    }
+    const lastName = row[1]?.trim();
+    const email = row[2]?.trim().toLowerCase();
+    if (!EMAIL_REGEX.test(email)) {
+      errors.push(new ExcelParsingError(`${email} is not a valid email`, index + 2));
+    }
+
+    return [...acc, { firstName, lastName, email }];
+  }, [] as ParsedContact[]);
+
+  if (errors.length) {
+    const rows = errors.flatMap((e) => e.row);
+    throw new WhitelistedError(errors[0].message, "INVALID_FORMAT_ERROR", {
+      rows,
     });
+  }
+
+  return parsedContacts;
 }

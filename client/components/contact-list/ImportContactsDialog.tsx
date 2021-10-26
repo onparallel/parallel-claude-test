@@ -14,7 +14,7 @@ import { useImportContactsDialog_bulkCreateContactsMutation } from "@parallel/gr
 import { withError } from "@parallel/utils/promises/withError";
 import { useState } from "react";
 import { FileRejection } from "react-dropzone";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog } from "../common/BaseDialog";
 import { DialogProps } from "../common/DialogProvider";
 import { Dropzone } from "../common/Dropzone";
@@ -38,27 +38,41 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
       setFileDropError(rejected[0].errors[0].code);
     } else {
       setIsUploading(true);
-      const [error, result] = await withError(
-        bulkCreateContacts({
+      try {
+        const result = await bulkCreateContacts({
           variables: { file },
-        })
-      );
-      setIsUploading(false);
-      if (error) {
+        });
+        props.onResolve({ count: result!.data!.bulkCreateContacts.length });
+      } catch (error: any) {
+        const rows = error.graphQLErrors[0]?.extensions?.rows;
         await withError(
           showErrorDialog({
             header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
             message: (
-              <FormattedMessage
-                id="contacts.import-from-excel.import-error.body"
-                defaultMessage="Please, review your file and make sure it matches the format on the loading model."
-              />
+              <>
+                {rows && rows.length ? (
+                  <Text marginBottom={2}>
+                    <FormattedMessage
+                      id="contacts.import-from-excel.import-error.details"
+                      defaultMessage="We have detected an error in the following file rows:"
+                    />
+                    <Text as="b" marginLeft={1.5}>
+                      <FormattedList value={rows} />
+                    </Text>
+                  </Text>
+                ) : null}
+                <Text>
+                  <FormattedMessage
+                    id="contacts.import-from-excel.import-error.body"
+                    defaultMessage="Please, review your file and make sure it matches the format on the loading model."
+                  />
+                </Text>
+              </>
             ),
           })
         );
-      } else {
-        props.onResolve({ count: result!.data!.bulkCreateContacts.length });
       }
+      setIsUploading(false);
     }
   }
 
