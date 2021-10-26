@@ -12,6 +12,7 @@ import { ReportingRepository } from "./repositories/ReportingRepository";
 import { SubscriptionRepository } from "./repositories/SubscriptionRepository";
 import { SystemRepository } from "./repositories/SystemRepository";
 import { TagRepository } from "./repositories/TagRepository";
+import { TaskRepository } from "./repositories/TaskRepository";
 import { UserAuthenticationRepository } from "./repositories/UserAuthenticationRepository";
 import { UserGroupRepository } from "./repositories/UserGroupRepository";
 import { UserRepository } from "./repositories/UserRepository";
@@ -34,4 +35,5 @@ export const dbModule = new ContainerModule((bind) => {
   bind<TagRepository>(TagRepository).toSelf();
   bind<SystemRepository>(SystemRepository).toSelf();
   bind<SubscriptionRepository>(SubscriptionRepository).toSelf();
+  bind<TaskRepository>(TaskRepository).toSelf();
 });

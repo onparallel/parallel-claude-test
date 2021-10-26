@@ -386,6 +386,8 @@ export interface Mutation {
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
   createTag: Tag;
+  /** Creates a task and sends it to the queue to process it */
+  createTask: Task;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
@@ -708,6 +710,11 @@ export interface MutationcreateSimpleReplyArgs {
 export interface MutationcreateTagArgs {
   color: Scalars["String"];
   name: Scalars["String"];
+}
+
+export interface MutationcreateTaskArgs {
+  input: Scalars["JSONObject"];
+  name: TaskName;
 }
 
 export interface MutationcreateUserArgs {
@@ -2333,6 +2340,7 @@ export interface Query {
   subscriptions: Array<PetitionEventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
+  task?: Maybe<Task>;
   /** The available templates */
   templates: PetitionTemplatePagination;
   userGroup?: Maybe<UserGroup>;
@@ -2453,6 +2461,10 @@ export interface QuerytagsArgs {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
+}
+
+export interface QuerytaskArgs {
+  id: Scalars["GID"];
 }
 
 export interface QuerytemplatesArgs {
@@ -2716,6 +2728,19 @@ export interface TagPagination {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 }
+
+export interface Task {
+  __typename?: "Task";
+  id: Scalars["GID"];
+  name: TaskName;
+  output: Scalars["JSONObject"];
+  progress?: Maybe<Scalars["Int"]>;
+  status: TaskStatus;
+}
+
+export type TaskName = "EXPORT_REPLIES" | "PRINT_PDF";
+
+export type TaskStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
 
 export interface TemplateUsedEvent extends PetitionEvent {
   __typename?: "TemplateUsedEvent";

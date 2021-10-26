@@ -47,3 +47,7 @@ export * from "./landing/queries";
 export * from "./subscriptions/types";
 export * from "./subscriptions/queries";
 export * from "./subscriptions/mutations";
+
+export * from "./task/types";
+export * from "./task/queries";
+export * from "./task/mutations";

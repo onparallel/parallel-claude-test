@@ -594,6 +594,11 @@ type Mutation {
   createTag(color: String!, name: String!): Tag!
 
   """
+  Creates a task and sends it to the queue to process it
+  """
+  createTask(input: JSONObject!, name: TaskName!): Task!
+
+  """
   Creates a new user in the specified organization.
   """
   createUser(
@@ -3367,6 +3372,7 @@ type Query {
     """
     search: String
   ): TagPagination!
+  task(id: GID!): Task
 
   """
   The available templates
@@ -3736,6 +3742,26 @@ type TagPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type Task {
+  id: GID!
+  name: TaskName!
+  output: JSONObject!
+  progress: Int
+  status: TaskStatus!
+}
+
+enum TaskName {
+  EXPORT_REPLIES
+  PRINT_PDF
+}
+
+enum TaskStatus {
+  CANCELLED
+  COMPLETED
+  ENQUEUED
+  PROCESSING
 }
 
 type TemplateUsedEvent implements PetitionEvent {

@@ -259,6 +259,8 @@ export interface NexusGenEnums {
     | "sentAt_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
+  TaskName: db.TaskName;
+  TaskStatus: db.TaskStatus;
   Tone: db.Tone;
   UserAuthenticationTokens_OrderBy:
     | "createdAt_ASC"
@@ -538,6 +540,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["Tag"][]; // [Tag!]!
     totalCount: number; // Int!
   };
+  Task: db.Task;
   TemplateUsedEvent: events.TemplateUsedEvent;
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
@@ -848,6 +851,7 @@ export interface NexusGenFieldTypes {
     createPublicPetitionLink: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
+    createTask: NexusGenRootTypes["Task"]; // Task!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -1467,6 +1471,7 @@ export interface NexusGenFieldTypes {
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
+    task: NexusGenRootTypes["Task"] | null; // Task
     templates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
@@ -1603,6 +1608,14 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["Tag"][]; // [Tag!]!
     totalCount: number; // Int!
+  };
+  Task: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    name: NexusGenEnums["TaskName"]; // TaskName!
+    output: NexusGenScalars["JSONObject"]; // JSONObject!
+    progress: number | null; // Int
+    status: NexusGenEnums["TaskStatus"]; // TaskStatus!
   };
   TemplateUsedEvent: {
     // field return type
@@ -2007,6 +2020,7 @@ export interface NexusGenFieldTypeNames {
     createPublicPetitionLink: "PetitionTemplate";
     createSimpleReply: "PetitionFieldReply";
     createTag: "Tag";
+    createTask: "Task";
     createUser: "SupportMethodResponse";
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
@@ -2626,6 +2640,7 @@ export interface NexusGenFieldTypeNames {
     searchUsers: "UserOrUserGroup";
     subscriptions: "PetitionEventSubscription";
     tags: "TagPagination";
+    task: "Task";
     templates: "PetitionTemplatePagination";
     userGroup: "UserGroup";
     userGroups: "UserGroupPagination";
@@ -2762,6 +2777,14 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "Tag";
     totalCount: "Int";
+  };
+  Task: {
+    // field return type name
+    id: "GID";
+    name: "TaskName";
+    output: "JSONObject";
+    progress: "Int";
+    status: "TaskStatus";
   };
   TemplateUsedEvent: {
     // field return type name
@@ -3093,6 +3116,11 @@ export interface NexusGenArgTypes {
       // args
       color: string; // String!
       name: string; // String!
+    };
+    createTask: {
+      // args
+      input: NexusGenScalars["JSONObject"]; // JSONObject!
+      name: NexusGenEnums["TaskName"]; // TaskName!
     };
     createUser: {
       // args
@@ -3744,6 +3772,10 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
+    };
+    task: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
     };
     templates: {
       // args
