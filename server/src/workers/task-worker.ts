@@ -22,7 +22,7 @@ function taskUpdateHandler<TName extends TaskName>(
       task.id,
       {
         progress,
-        status: progress === 100 ? "COMPLETED" : error ? "CANCELLED" : "PROCESSING",
+        status: error ? "CANCELLED" : progress === 100 ? "COMPLETED" : "PROCESSING",
         cancel_data: error,
         output,
       },
@@ -52,17 +52,7 @@ async function runPrintPdfTask(
     const buffer = await ctx.printer.pdf(
       `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
         token,
-      })}`,
-      {
-        height: "297mm",
-        width: "210mm",
-        margin: {
-          top: "10mm",
-          bottom: "10mm",
-          left: "10mm",
-          right: "10mm",
-        },
-      }
+      })}`
     );
 
     onUpdate(50);

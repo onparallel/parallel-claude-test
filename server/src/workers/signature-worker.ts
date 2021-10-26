@@ -61,17 +61,7 @@ async function startSignatureProcess(
       `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
         token,
       })}`,
-      {
-        path: tmpPdfPath,
-        height: "297mm",
-        width: "210mm",
-        margin: {
-          top: "10mm",
-          bottom: "10mm",
-          left: "10mm",
-          right: "10mm",
-        },
-      }
+      tmpPdfPath
     );
 
     const signatureBoxPositions = await calculateSignatureBoxPositions(buffer, recipients);

@@ -71,17 +71,7 @@ export const downloads = Router()
       const buffer = await ctx.printer.pdf(
         `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
           token,
-        })}`,
-        {
-          height: "297mm",
-          width: "210mm",
-          margin: {
-            top: "10mm",
-            bottom: "10mm",
-            left: "10mm",
-            right: "10mm",
-          },
-        }
+        })}`
       );
 
       res

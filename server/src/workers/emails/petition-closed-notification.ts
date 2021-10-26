@@ -73,17 +73,7 @@ export async function petitionClosedNotification(
       const buffer = await context.printer.pdf(
         `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
           token,
-        })}`,
-        {
-          height: "297mm",
-          width: "210mm",
-          margin: {
-            top: "10mm",
-            bottom: "10mm",
-            left: "10mm",
-            right: "10mm",
-          },
-        }
+        })}`
       );
 
       const path = random(16);
