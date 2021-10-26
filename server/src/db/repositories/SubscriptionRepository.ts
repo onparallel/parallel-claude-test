@@ -17,7 +17,7 @@ export class SubscriptionRepository extends BaseRepository {
   readonly loadSubscriptionsByUserId = this.buildLoadMultipleBy(
     "petition_event_subscription",
     "user_id",
-    (q) => q.whereNull("deleted_at")
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
   );
 
   async createSubscription(data: CreatePetitionEventSubscription, createdBy: string) {

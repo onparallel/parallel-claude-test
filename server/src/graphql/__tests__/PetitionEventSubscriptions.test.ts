@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { USER_COGNITO_ID } from "../../../test/mocks";
@@ -13,7 +14,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
   let sessionUser: User;
   let otherUser: User;
 
-  let otherUserSubscription: PetitionEventSubscription;
+  let subscriptions: PetitionEventSubscription[];
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -32,13 +33,57 @@ describe("GraphQL/PetitionEventSubscription", () => {
       org_id: organization.id,
     }));
 
-    [otherUserSubscription] = await mocks.createEventSubscription([
-      { user_id: otherUser.id, endpoint: "https://www.other-endpoint.com" },
+    subscriptions = await mocks.createEventSubscription([
+      { user_id: otherUser.id, endpoint: "https://www.endpoint-1.com" },
+      { user_id: sessionUser.id, endpoint: "https://www.endpoint-2.com", created_at: new Date() },
+      {
+        user_id: sessionUser.id,
+        endpoint: "https://www.endpoint-3.com",
+        is_enabled: false,
+        created_at: addDays(new Date(), 1),
+      },
     ]);
   });
 
   afterAll(async () => {
     await testClient.stop();
+  });
+
+  describe("Queries", () => {
+    afterAll(async () => {
+      // delete session user's subscriptions so we will able to create new ones in the next tests
+      await mocks.knex
+        .from("petition_event_subscription")
+        .where({ user_id: sessionUser.id })
+        .update({ deleted_at: new Date() });
+    });
+    it("fetches user's subscriptions ordered by creation date", async () => {
+      const { data, errors } = await testClient.query({
+        query: gql`
+          query {
+            subscriptions {
+              id
+              eventsUrl
+              isEnabled
+            }
+          }
+        `,
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.subscriptions).toEqual([
+        {
+          id: toGlobalId("PetitionEventSubscription", subscriptions[2].id),
+          eventsUrl: "https://www.endpoint-3.com",
+          isEnabled: false,
+        },
+        {
+          id: toGlobalId("PetitionEventSubscription", subscriptions[1].id),
+          eventsUrl: "https://www.endpoint-2.com",
+          isEnabled: true,
+        },
+      ]);
+    });
   });
 
   let subscriptionId: string;
@@ -151,7 +196,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
           }
         `,
         variables: {
-          id: toGlobalId("PetitionEventSubscription", otherUserSubscription.id),
+          id: toGlobalId("PetitionEventSubscription", subscriptions[0].id),
           data: {
             isEnabled: true,
           },
@@ -226,7 +271,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
           }
         `,
         variables: {
-          id: toGlobalId("PetitionEventSubscription", otherUserSubscription.id),
+          id: toGlobalId("PetitionEventSubscription", subscriptions[0].id),
         },
       });
 
