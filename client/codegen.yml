@@ -23,7 +23,7 @@ generates:
         Upload: File
         GID: string
       namingConvention: keep
-      preResolveTypes: true
+      preResolveTypes: false
       declarationKind: "interface"
       skipTypeNameForRoot: true
       exportFragmentSpreadSubTypes: true

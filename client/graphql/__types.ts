@@ -1230,7 +1230,6 @@ export type OnboardingStatus = "FINISHED" | "SKIPPED";
 export interface OrgIntegration {
   __typename?: "OrgIntegration";
   id: Scalars["GID"];
-  isEnabled: Scalars["Boolean"];
   /** The name of the integration. */
   name: Scalars["String"];
   /** The provider used for this integration. */
@@ -2966,98 +2965,76 @@ export interface VerificationCodeRequest {
   token: Scalars["ID"];
 }
 
-export type ContactListPopover_ContactFragment = {
-  __typename?: "Contact";
-  id: string;
-  email: string;
-  fullName?: Maybe<string>;
-};
+export type ContactListPopover_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "email" | "fullName"
+>;
 
-export type ContactListPopover_PublicContactFragment = {
-  __typename?: "PublicContact";
-  id: string;
-  email: string;
-  fullName?: Maybe<string>;
-};
+export type ContactListPopover_PublicContactFragment = { __typename?: "PublicContact" } & Pick<
+  PublicContact,
+  "id" | "email" | "fullName"
+>;
 
-export type ContactListPopover_PetitionSignerFragment = {
-  __typename?: "PetitionSigner";
-  email: string;
-  fullName: string;
-};
+export type ContactListPopover_PetitionSignerFragment = { __typename?: "PetitionSigner" } & Pick<
+  PetitionSigner,
+  "email" | "fullName"
+>;
 
-export type ContactReference_ContactFragment = {
-  __typename?: "Contact";
-  id: string;
-  fullName?: Maybe<string>;
-  email: string;
-};
+export type ContactReference_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "fullName" | "email"
+>;
 
-export type ContactSelect_ContactFragment = {
-  __typename?: "Contact";
-  id: string;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  fullName?: Maybe<string>;
-  email: string;
-  hasBouncedEmail: boolean;
-};
+export type ContactSelect_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "firstName" | "lastName" | "fullName" | "email" | "hasBouncedEmail"
+>;
 
-export type PetitionFieldSelect_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  options: { [key: string]: any };
-};
+export type PetitionFieldSelect_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "type" | "title" | "options"
+>;
 
-export type PetitionSignatureCellContent_PetitionFragment = {
-  __typename?: "Petition";
-  status: PetitionStatus;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-};
-
-export type PetitionSignatureCellContent_UserFragment = {
-  __typename?: "User";
-  hasPetitionSignature: boolean;
-};
-
-export type PetitionStatusCellContent_PetitionFragment = {
-  __typename?: "Petition";
-  status: PetitionStatus;
-  progress: {
-    __typename?: "PetitionProgress";
-    validated: number;
-    replied: number;
-    optional: number;
-    total: number;
+export type PetitionSignatureCellContent_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "status"
+> & {
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+    >;
+    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
   };
+
+export type PetitionSignatureCellContent_UserFragment = { __typename?: "User" } & {
+  hasPetitionSignature: User["hasFeatureFlag"];
 };
 
-export type PetitionTagListCellContent_TagFragment = {
-  __typename?: "Tag";
-  id: string;
-  name: string;
-  color: string;
-};
+export type PetitionStatusCellContent_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "status"
+> & {
+    progress: { __typename?: "PetitionProgress" } & Pick<
+      PetitionProgress,
+      "validated" | "replied" | "optional" | "total"
+    >;
+  };
+
+export type PetitionTagListCellContent_TagFragment = { __typename?: "Tag" } & Pick<
+  Tag,
+  "id" | "name" | "color"
+>;
 
 export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  id: string;
-  isReadOnly: boolean;
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-};
+} & Pick<Petition, "id" | "isReadOnly"> & {
+    tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+  };
 
 export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  isReadOnly: boolean;
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-};
+} & Pick<PetitionTemplate, "id" | "isReadOnly"> & {
+    tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+  };
 
 export type PetitionTagListCellContent_PetitionBaseFragment =
   | PetitionTagListCellContent_PetitionBase_Petition_Fragment
@@ -3068,9 +3045,8 @@ export type PetitionTagListCellContent_tagsQueryVariables = Exact<{
 }>;
 
 export type PetitionTagListCellContent_tagsQuery = {
-  tags: {
-    __typename?: "TagPagination";
-    items: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+  tags: { __typename?: "TagPagination" } & {
+    items: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
   };
 };
 
@@ -3081,16 +3057,12 @@ export type PetitionTagListCellContent_tagPetitionMutationVariables = Exact<{
 
 export type PetitionTagListCellContent_tagPetitionMutation = {
   tagPetition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-      };
+    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
+          tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
+          tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+        });
 };
 
 export type PetitionTagListCellContent_untagPetitionMutationVariables = Exact<{
@@ -3100,16 +3072,12 @@ export type PetitionTagListCellContent_untagPetitionMutationVariables = Exact<{
 
 export type PetitionTagListCellContent_untagPetitionMutation = {
   untagPetition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-      };
+    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
+          tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
+          tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+        });
 };
 
 export type PetitionTagListCellContent_createTagMutationVariables = Exact<{
@@ -3118,38 +3086,34 @@ export type PetitionTagListCellContent_createTagMutationVariables = Exact<{
 }>;
 
 export type PetitionTagListCellContent_createTagMutation = {
-  createTag: { __typename?: "Tag"; id: string; name: string; color: string };
+  createTag: { __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">;
 };
 
-export type ShareButton_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
+export type ShareButton_PetitionBase_Petition_Fragment = { __typename?: "Petition" } & {
   permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-      }
+    | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+        PetitionUserGroupPermission,
+        "permissionType"
+      > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> })
+    | ({ __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
   >;
 };
 
 export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+} & {
   permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-      }
+    | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+        PetitionUserGroupPermission,
+        "permissionType"
+      > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> })
+    | ({ __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
   >;
 };
 
@@ -3157,34 +3121,23 @@ export type ShareButton_PetitionBaseFragment =
   | ShareButton_PetitionBase_Petition_Fragment
   | ShareButton_PetitionBase_PetitionTemplate_Fragment;
 
-export type SignerReference_PetitionSignerFragment = {
-  __typename?: "PetitionSigner";
-  email: string;
-  fullName: string;
-};
+export type SignerReference_PetitionSignerFragment = { __typename?: "PetitionSigner" } & Pick<
+  PetitionSigner,
+  "email" | "fullName"
+>;
 
-export type Tag_TagFragment = { __typename?: "Tag"; name: string; color: string };
+export type Tag_TagFragment = { __typename?: "Tag" } & Pick<Tag, "name" | "color">;
 
-export type TagEditDialog_TagFragment = {
-  __typename?: "Tag";
-  id: string;
-  createdAt: string;
-  name: string;
-  color: string;
-};
+export type TagEditDialog_TagFragment = { __typename?: "Tag" } & Pick<
+  Tag,
+  "id" | "createdAt" | "name" | "color"
+>;
 
 export type TagEditDialog_tagsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type TagEditDialog_tagsQuery = {
-  tags: {
-    __typename?: "TagPagination";
-    items: Array<{
-      __typename?: "Tag";
-      id: string;
-      createdAt: string;
-      name: string;
-      color: string;
-    }>;
+  tags: { __typename?: "TagPagination" } & {
+    items: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "createdAt" | "name" | "color">>;
   };
 };
 
@@ -3194,67 +3147,54 @@ export type TagEditDialog_updateTagMutationVariables = Exact<{
 }>;
 
 export type TagEditDialog_updateTagMutation = {
-  updateTag: { __typename?: "Tag"; id: string; createdAt: string; name: string; color: string };
+  updateTag: { __typename?: "Tag" } & Pick<Tag, "id" | "createdAt" | "name" | "color">;
 };
 
-export type UserAvatar_UserFragment = {
-  __typename?: "User";
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-};
+export type UserAvatar_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "fullName" | "avatarUrl" | "initials"
+>;
 
-export type UserAvatarList_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-};
+export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "fullName" | "avatarUrl" | "initials"
+>;
 
-export type UserAvatarList_UserGroupFragment = {
-  __typename?: "UserGroup";
-  id: string;
-  name: string;
-  initials: string;
-};
+export type UserAvatarList_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
+  UserGroup,
+  "id" | "name" | "initials"
+>;
 
-export type UserListPopover_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-};
+export type UserListPopover_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "fullName" | "avatarUrl" | "initials"
+>;
 
-export type UserListPopover_UserGroupFragment = {
-  __typename?: "UserGroup";
-  id: string;
-  name: string;
-  initials: string;
-};
+export type UserListPopover_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
+  UserGroup,
+  "id" | "name" | "initials"
+>;
 
-export type UserSelect_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  email: string;
-};
+export type UserSelect_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "fullName" | "email"
+>;
 
-export type UserSelect_UserGroupFragment = {
-  __typename?: "UserGroup";
-  id: string;
-  name: string;
-  members: Array<{
-    __typename?: "UserGroupMember";
-    user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-  }>;
-};
+export type UserSelect_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
+  UserGroup,
+  "id" | "name"
+> & {
+    members: Array<
+      { __typename?: "UserGroupMember" } & {
+        user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+      }
+    >;
+  };
 
 export type UserSelect_canCreateUsersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserSelect_canCreateUsersQuery = {
-  me: { __typename?: "User"; canCreateUsers: boolean };
+  me: { __typename?: "User" } & Pick<User, "canCreateUsers">;
 };
 
 export type useSearchUsers_searchUsersQueryVariables = Exact<{
@@ -3267,16 +3207,14 @@ export type useSearchUsers_searchUsersQueryVariables = Exact<{
 
 export type useSearchUsers_searchUsersQuery = {
   searchUsers: Array<
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string }
-    | {
-        __typename?: "UserGroup";
-        id: string;
-        name: string;
-        members: Array<{
-          __typename?: "UserGroupMember";
-          user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-        }>;
-      }
+    | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "email">)
+    | ({ __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+          members: Array<
+            { __typename?: "UserGroupMember" } & {
+              user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+            }
+          >;
+        })
   >;
 };
 
@@ -3286,137 +3224,116 @@ export type useGetUsersOrGroupsQueryVariables = Exact<{
 
 export type useGetUsersOrGroupsQuery = {
   getUsersOrGroups: Array<
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string }
-    | {
-        __typename?: "UserGroup";
-        id: string;
-        name: string;
-        members: Array<{
-          __typename?: "UserGroupMember";
-          user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-        }>;
-      }
+    | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "email">)
+    | ({ __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+          members: Array<
+            { __typename?: "UserGroupMember" } & {
+              user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+            }
+          >;
+        })
   >;
 };
 
 export type WithAdminOrganizationRoleQueryVariables = Exact<{ [key: string]: never }>;
 
-export type WithAdminOrganizationRoleQuery = {
-  me: { __typename?: "User"; role: OrganizationRole };
-};
+export type WithAdminOrganizationRoleQuery = { me: { __typename?: "User" } & Pick<User, "role"> };
 
 export type HasFeatureFlagQueryVariables = Exact<{
   featureFlag: FeatureFlag;
 }>;
 
 export type HasFeatureFlagQuery = {
-  me: { __typename?: "User"; id: string; hasFeatureFlag: boolean };
+  me: { __typename?: "User" } & Pick<User, "id"> & { hasFeatureFlag: User["hasFeatureFlag"] };
 };
 
 export type WithSuperAdminAccessQueryVariables = Exact<{ [key: string]: never }>;
 
-export type WithSuperAdminAccessQuery = { me: { __typename?: "User"; isSuperAdmin: boolean } };
+export type WithSuperAdminAccessQuery = {
+  me: { __typename?: "User" } & Pick<User, "isSuperAdmin">;
+};
 
 export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
   file: Scalars["Upload"];
 }>;
 
 export type ImportContactsDialog_bulkCreateContactsMutation = {
-  bulkCreateContacts: Array<{ __typename?: "Contact"; id: string }>;
+  bulkCreateContacts: Array<{ __typename?: "Contact" } & Pick<Contact, "id">>;
 };
 
-export type AppLayout_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type AppLayout_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
-export type AppLayoutNavbar_UserFragment = {
-  __typename?: "User";
-  id: string;
-  email: string;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type AppLayoutNavbar_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "email" | "isSuperAdmin" | "role" | "fullName" | "avatarUrl" | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
-export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-  name?: Maybe<string>;
-  updatedAt: string;
-  isReadOnly: boolean;
-};
+export type HeaderNameEditable_PetitionBase_Petition_Fragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "name" | "updatedAt" | "isReadOnly"
+>;
 
 export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  name?: Maybe<string>;
-  updatedAt: string;
-  isReadOnly: boolean;
-};
+} & Pick<PetitionTemplate, "name" | "updatedAt" | "isReadOnly">;
 
 export type HeaderNameEditable_PetitionBaseFragment =
   | HeaderNameEditable_PetitionBase_Petition_Fragment
   | HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionHeader_PetitionFragment = {
-  __typename?: "Petition";
-  id: string;
-  locale: PetitionLocale;
-  deadline?: Maybe<string>;
-  status: PetitionStatus;
-  name?: Maybe<string>;
-  updatedAt: string;
-  isReadOnly: boolean;
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
-};
+export type PetitionHeader_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "locale" | "deadline" | "status" | "name" | "updatedAt" | "isReadOnly"
+> & {
+    myEffectivePermission?: Maybe<
+      { __typename?: "EffectivePetitionUserPermission" } & Pick<
+        EffectivePetitionUserPermission,
+        "isSubscribed"
+      >
+    >;
+  };
 
-export type PetitionHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  hasPetitionPdfExport: boolean;
-};
+export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<User, "id"> & {
+    hasPetitionPdfExport: User["hasFeatureFlag"];
+  };
 
 export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
 export type PetitionHeader_reopenPetitionMutation = {
-  reopenPetition: {
-    __typename?: "Petition";
-    id: string;
-    status: PetitionStatus;
-    updatedAt: string;
-  };
+  reopenPetition: { __typename?: "Petition" } & Pick<Petition, "id" | "status" | "updatedAt">;
 };
 
 export type PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables = Exact<{
@@ -3425,287 +3342,219 @@ export type PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables
 }>;
 
 export type PetitionHeader_updatePetitionPermissionSubscriptionMutation = {
-  updatePetitionPermissionSubscription: {
-    __typename?: "Petition";
-    id: string;
-    myEffectivePermission?: Maybe<{
-      __typename?: "EffectivePetitionUserPermission";
-      isSubscribed: boolean;
-    }>;
-  };
+  updatePetitionPermissionSubscription: { __typename?: "Petition" } & Pick<Petition, "id"> & {
+      myEffectivePermission?: Maybe<
+        { __typename?: "EffectivePetitionUserPermission" } & Pick<
+          EffectivePetitionUserPermission,
+          "isSubscribed"
+        >
+      >;
+    };
 };
 
-export type PetitionLayout_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-  id: string;
-  name?: Maybe<string>;
-  locale: PetitionLocale;
-  deadline?: Maybe<string>;
-  status: PetitionStatus;
-  updatedAt: string;
-  isReadOnly: boolean;
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
-};
+export type PetitionLayout_PetitionBase_Petition_Fragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "name" | "locale" | "deadline" | "status" | "updatedAt" | "isReadOnly"
+> & {
+    myEffectivePermission?: Maybe<
+      { __typename?: "EffectivePetitionUserPermission" } & Pick<
+        EffectivePetitionUserPermission,
+        "isSubscribed"
+      >
+    >;
+  };
 
 export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  name?: Maybe<string>;
-  locale: PetitionLocale;
-  isPublic: boolean;
-  updatedAt: string;
-  isReadOnly: boolean;
-};
+} & Pick<PetitionTemplate, "id" | "name" | "locale" | "isPublic" | "updatedAt" | "isReadOnly">;
 
 export type PetitionLayout_PetitionBaseFragment =
   | PetitionLayout_PetitionBase_Petition_Fragment
   | PetitionLayout_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionLayout_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  hasPetitionPdfExport: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type PetitionLayout_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & { hasPetitionPdfExport: User["hasFeatureFlag"] } & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
 export type PetitionTemplateHeader_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  locale: PetitionLocale;
-  isPublic: boolean;
-  name?: Maybe<string>;
-  updatedAt: string;
-  isReadOnly: boolean;
-};
+} & Pick<PetitionTemplate, "id" | "locale" | "isPublic" | "name" | "updatedAt" | "isReadOnly">;
 
-export type PetitionTemplateHeader_UserFragment = { __typename?: "User"; id: string };
+export type PetitionTemplateHeader_UserFragment = { __typename?: "User" } & Pick<User, "id">;
 
-export type SettingsLayout_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type SettingsLayout_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
-export type UserMenu_UserFragment = {
-  __typename?: "User";
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  email: string;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-};
+export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "isSuperAdmin" | "role" | "email" | "fullName" | "avatarUrl" | "initials"
+>;
 
 export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
 export type Notifications_UnreadPetitionUserNotificationIdsQuery = {
-  me: { __typename?: "User"; id: string; unreadNotificationIds: Array<string> };
+  me: { __typename?: "User" } & Pick<User, "id" | "unreadNotificationIds">;
 };
 
 export type NotificationsDrawer_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment =
-  {
-    __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification" } & Pick<
+    AccessActivatedFromPublicPetitionLinkUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
   __typename?: "CommentCreatedUserNotification";
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
-  comment: {
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isInternal: boolean;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-        }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
+} & Pick<CommentCreatedUserNotification, "id" | "createdAt" | "isRead"> & {
+    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "title">;
+    comment: { __typename?: "PetitionFieldComment" } & Pick<
+      PetitionFieldComment,
+      "id" | "isInternal"
+    > & {
+        author?: Maybe<
+          | ({ __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            })
+          | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+        >;
+      };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
-  {
-    __typename?: "MessageEmailBouncedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "MessageEmailBouncedUserNotification" } & Pick<
+    MessageEmailBouncedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
-  {
-    __typename?: "PetitionCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "PetitionCompletedUserNotification" } & Pick<
+    PetitionCompletedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment = {
   __typename?: "PetitionSharedUserNotification";
-  permissionType: PetitionPermissionTypeRW;
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  petition:
-    | { __typename: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
-  sharedWith:
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    | { __typename?: "UserGroup"; id: string; name: string };
-};
+} & Pick<PetitionSharedUserNotification, "permissionType" | "id" | "createdAt" | "isRead"> & {
+    petition:
+      | ({ __typename: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+    sharedWith:
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+      | ({ __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name">);
+  };
 
 export type NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
-  {
-    __typename?: "ReminderEmailBouncedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "ReminderEmailBouncedUserNotification" } & Pick<
+    ReminderEmailBouncedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment = {
   __typename?: "RemindersOptOutNotification";
-  reason: string;
-  other?: Maybe<string>;
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<RemindersOptOutNotification, "reason" | "other" | "id" | "createdAt" | "isRead"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
-  {
-    __typename?: "SignatureCancelledUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "SignatureCancelledUserNotification" } & Pick<
+    SignatureCancelledUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
-  {
-    __typename?: "SignatureCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "SignatureCompletedUserNotification" } & Pick<
+    SignatureCompletedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type NotificationsDrawer_PetitionUserNotificationFragment =
   | NotificationsDrawer_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment
@@ -3725,340 +3574,251 @@ export type NotificationsDrawer_PetitionUserNotificationsQueryVariables = Exact<
 }>;
 
 export type NotificationsDrawer_PetitionUserNotificationsQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    unreadNotificationIds: Array<string>;
-    notifications: {
-      __typename?: "UserNotifications_Pagination";
-      hasMore: boolean;
-      items: Array<
-        | {
-            __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-            petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-          }
-        | {
-            __typename?: "CommentCreatedUserNotification";
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
-            comment: {
-              __typename?: "PetitionFieldComment";
-              id: string;
-              isInternal: boolean;
-              author?: Maybe<
-                | {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  }
-                | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-              >;
-            };
-            petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-          }
-        | {
-            __typename?: "MessageEmailBouncedUserNotification";
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-            petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-          }
-        | {
-            __typename?: "PetitionCompletedUserNotification";
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-            petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-          }
-        | {
-            __typename?: "PetitionSharedUserNotification";
-            permissionType: PetitionPermissionTypeRW;
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            petition:
-              | { __typename: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename: "PetitionTemplate"; id: string; name?: Maybe<string> };
-            owner: {
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
-            };
-            sharedWith:
-              | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-              | { __typename?: "UserGroup"; id: string; name: string };
-          }
-        | {
-            __typename?: "ReminderEmailBouncedUserNotification";
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-            petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-          }
-        | {
-            __typename?: "RemindersOptOutNotification";
-            reason: string;
-            other?: Maybe<string>;
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-            petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-          }
-        | {
-            __typename?: "SignatureCancelledUserNotification";
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-          }
-        | {
-            __typename?: "SignatureCompletedUserNotification";
-            id: string;
-            createdAt: string;
-            isRead: boolean;
-            petition:
-              | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-              | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-          }
-      >;
+  me: { __typename?: "User" } & Pick<User, "id" | "unreadNotificationIds"> & {
+      notifications: { __typename?: "UserNotifications_Pagination" } & Pick<
+        UserNotifications_Pagination,
+        "hasMore"
+      > & {
+          items: Array<
+            | ({ __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification" } & Pick<
+                AccessActivatedFromPublicPetitionLinkUserNotification,
+                "id" | "createdAt" | "isRead"
+              > & {
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                  petition:
+                    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                })
+            | ({ __typename?: "CommentCreatedUserNotification" } & Pick<
+                CommentCreatedUserNotification,
+                "id" | "createdAt" | "isRead"
+              > & {
+                  field: { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "title">;
+                  comment: { __typename?: "PetitionFieldComment" } & Pick<
+                    PetitionFieldComment,
+                    "id" | "isInternal"
+                  > & {
+                      author?: Maybe<
+                        | ({ __typename?: "PetitionAccess" } & {
+                            contact?: Maybe<
+                              { __typename?: "Contact" } & Pick<
+                                Contact,
+                                "id" | "fullName" | "email"
+                              >
+                            >;
+                          })
+                        | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                      >;
+                    };
+                  petition:
+                    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                })
+            | ({ __typename?: "MessageEmailBouncedUserNotification" } & Pick<
+                MessageEmailBouncedUserNotification,
+                "id" | "createdAt" | "isRead"
+              > & {
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                  petition:
+                    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                })
+            | ({ __typename?: "PetitionCompletedUserNotification" } & Pick<
+                PetitionCompletedUserNotification,
+                "id" | "createdAt" | "isRead"
+              > & {
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                  petition:
+                    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                })
+            | ({ __typename?: "PetitionSharedUserNotification" } & Pick<
+                PetitionSharedUserNotification,
+                "permissionType" | "id" | "createdAt" | "isRead"
+              > & {
+                  petition:
+                    | ({ __typename: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                  owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                  sharedWith:
+                    | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    | ({ __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name">);
+                })
+            | ({ __typename?: "ReminderEmailBouncedUserNotification" } & Pick<
+                ReminderEmailBouncedUserNotification,
+                "id" | "createdAt" | "isRead"
+              > & {
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                  petition:
+                    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                })
+            | ({ __typename?: "RemindersOptOutNotification" } & Pick<
+                RemindersOptOutNotification,
+                "reason" | "other" | "id" | "createdAt" | "isRead"
+              > & {
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                  petition:
+                    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                })
+            | ({ __typename?: "SignatureCancelledUserNotification" } & Pick<
+                SignatureCancelledUserNotification,
+                "id" | "createdAt" | "isRead"
+              > & {
+                  petition:
+                    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                })
+            | ({ __typename?: "SignatureCompletedUserNotification" } & Pick<
+                SignatureCompletedUserNotification,
+                "id" | "createdAt" | "isRead"
+              > & {
+                  petition:
+                    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+                    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+                })
+          >;
+        };
     };
-  };
 };
 
 export type NotificationsList_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment =
-  {
-    __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification" } & Pick<
+    AccessActivatedFromPublicPetitionLinkUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
   __typename?: "CommentCreatedUserNotification";
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
-  comment: {
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isInternal: boolean;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-        }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
+} & Pick<CommentCreatedUserNotification, "id" | "createdAt" | "isRead"> & {
+    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "title">;
+    comment: { __typename?: "PetitionFieldComment" } & Pick<
+      PetitionFieldComment,
+      "id" | "isInternal"
+    > & {
+        author?: Maybe<
+          | ({ __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            })
+          | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+        >;
+      };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
-  {
-    __typename?: "MessageEmailBouncedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "MessageEmailBouncedUserNotification" } & Pick<
+    MessageEmailBouncedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
-  {
-    __typename?: "PetitionCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "PetitionCompletedUserNotification" } & Pick<
+    PetitionCompletedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment = {
   __typename?: "PetitionSharedUserNotification";
-  permissionType: PetitionPermissionTypeRW;
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  petition:
-    | { __typename: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
-  sharedWith:
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    | { __typename?: "UserGroup"; id: string; name: string };
-};
+} & Pick<PetitionSharedUserNotification, "permissionType" | "id" | "createdAt" | "isRead"> & {
+    petition:
+      | ({ __typename: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+    sharedWith:
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+      | ({ __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name">);
+  };
 
 export type NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
-  {
-    __typename?: "ReminderEmailBouncedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "ReminderEmailBouncedUserNotification" } & Pick<
+    ReminderEmailBouncedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment = {
   __typename?: "RemindersOptOutNotification";
-  reason: string;
-  other?: Maybe<string>;
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<RemindersOptOutNotification, "reason" | "other" | "id" | "createdAt" | "isRead"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
-  {
-    __typename?: "SignatureCancelledUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "SignatureCancelledUserNotification" } & Pick<
+    SignatureCancelledUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
-  {
-    __typename?: "SignatureCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "SignatureCompletedUserNotification" } & Pick<
+    SignatureCompletedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type NotificationsList_PetitionUserNotificationFragment =
   | NotificationsList_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment
@@ -4072,204 +3832,163 @@ export type NotificationsList_PetitionUserNotificationFragment =
   | NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
 export type AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragment =
-  {
-    __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+  { __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification" } & Pick<
+    AccessActivatedFromPublicPetitionLinkUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
     };
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
 
 export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragment = {
   __typename?: "CommentCreatedUserNotification";
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
-  comment: {
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isInternal: boolean;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-        }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    >;
+} & Pick<CommentCreatedUserNotification, "id" | "createdAt" | "isRead"> & {
+    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "title">;
+    comment: { __typename?: "PetitionFieldComment" } & Pick<
+      PetitionFieldComment,
+      "id" | "isInternal"
+    > & {
+        author?: Maybe<
+          | ({ __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            })
+          | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+        >;
+      };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment = {
   __typename?: "MessageEmailBouncedUserNotification";
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<MessageEmailBouncedUserNotification, "id" | "createdAt" | "isRead"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment = {
   __typename?: "PetitionCompletedUserNotification";
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<PetitionCompletedUserNotification, "id" | "createdAt" | "isRead"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragment = {
   __typename?: "PetitionSharedUserNotification";
-  permissionType: PetitionPermissionTypeRW;
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  petition:
-    | { __typename: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
-  sharedWith:
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-    | { __typename?: "UserGroup"; id: string; name: string };
-};
+} & Pick<PetitionSharedUserNotification, "permissionType" | "id" | "createdAt" | "isRead"> & {
+    petition:
+      | ({ __typename: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+    sharedWith:
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+      | ({ __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name">);
+  };
 
 export type PetitionUserNotification_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment =
-  {
-    __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification" } & Pick<
+    AccessActivatedFromPublicPetitionLinkUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
-  {
-    __typename?: "CommentCreatedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "CommentCreatedUserNotification" } & Pick<
+    CommentCreatedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
-  {
-    __typename?: "MessageEmailBouncedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "MessageEmailBouncedUserNotification" } & Pick<
+    MessageEmailBouncedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
-  {
-    __typename?: "PetitionCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "PetitionCompletedUserNotification" } & Pick<
+    PetitionCompletedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
-  {
-    __typename?: "PetitionSharedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "PetitionSharedUserNotification" } & Pick<
+    PetitionSharedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
-  {
-    __typename?: "ReminderEmailBouncedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "ReminderEmailBouncedUserNotification" } & Pick<
+    ReminderEmailBouncedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment =
-  {
-    __typename?: "RemindersOptOutNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "RemindersOptOutNotification" } & Pick<
+    RemindersOptOutNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
-  {
-    __typename?: "SignatureCancelledUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "SignatureCancelledUserNotification" } & Pick<
+    SignatureCancelledUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
-  {
-    __typename?: "SignatureCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
+  { __typename?: "SignatureCompletedUserNotification" } & Pick<
+    SignatureCompletedUserNotification,
+    "id" | "createdAt" | "isRead"
+  > & {
+      petition:
+        | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+        | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+    };
 
 export type PetitionUserNotification_PetitionUserNotificationFragment =
   | PetitionUserNotification_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment
@@ -4284,112 +4003,89 @@ export type PetitionUserNotification_PetitionUserNotificationFragment =
 
 export type ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment = {
   __typename?: "ReminderEmailBouncedUserNotification";
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<ReminderEmailBouncedUserNotification, "id" | "createdAt" | "isRead"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
   __typename?: "RemindersOptOutNotification";
-  reason: string;
-  other?: Maybe<string>;
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<RemindersOptOutNotification, "reason" | "other" | "id" | "createdAt" | "isRead"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
   };
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
 
 export type SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment = {
   __typename?: "SignatureCancelledUserNotification";
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
+} & Pick<SignatureCancelledUserNotification, "id" | "createdAt" | "isRead"> & {
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+  };
 
 export type SignatureCompletedUserNotification_SignatureCompletedUserNotificationFragment = {
   __typename?: "SignatureCompletedUserNotification";
-  id: string;
-  createdAt: string;
-  isRead: boolean;
-  petition:
-    | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-    | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-};
+} & Pick<SignatureCompletedUserNotification, "id" | "createdAt" | "isRead"> & {
+    petition:
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name">)
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">);
+  };
 
 export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
   email: Scalars["String"];
 }>;
 
-export type CreateUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
+export type CreateUserDialog_emailIsAvailableQuery = Pick<Query, "emailIsAvailable">;
 
-export type OrganizationGroupListTableHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-};
+export type OrganizationGroupListTableHeader_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "role"
+>;
 
-export type OrganizationGroupsListTableHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-};
+export type OrganizationGroupsListTableHeader_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "role"
+>;
 
-export type OrganizationUsersListTableHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-};
+export type OrganizationUsersListTableHeader_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "role"
+>;
 
-export type AddPetitionAccessDialog_PetitionFragment = {
-  __typename?: "Petition";
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-  }>;
-  remindersConfig?: Maybe<{
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  }>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type AddPetitionAccessDialog_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "emailSubject" | "emailBody"
+> & {
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & {
+        signers: Array<
+          { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+        >;
+      }
+    >;
+    remindersConfig?: Maybe<
+      { __typename?: "RemindersConfig" } & Pick<
+        RemindersConfig,
+        "offset" | "time" | "timezone" | "weekdaysOnly"
+      >
+    >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
 export type AddPetitionAccessDialog_contactsByEmailQueryVariables = Exact<{
   emails: Array<Scalars["String"]> | Scalars["String"];
@@ -4397,1172 +4093,738 @@ export type AddPetitionAccessDialog_contactsByEmailQueryVariables = Exact<{
 
 export type AddPetitionAccessDialog_contactsByEmailQuery = {
   contactsByEmail: Array<
-    Maybe<{
-      __typename?: "Contact";
-      id: string;
-      firstName?: Maybe<string>;
-      lastName?: Maybe<string>;
-      fullName?: Maybe<string>;
-      email: string;
-      hasBouncedEmail: boolean;
-    }>
+    Maybe<
+      { __typename?: "Contact" } & Pick<
+        Contact,
+        "id" | "firstName" | "lastName" | "fullName" | "email" | "hasBouncedEmail"
+      >
+    >
   >;
 };
 
 export type MessageEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
-  bouncedAt?: Maybe<string>;
-  deliveredAt?: Maybe<string>;
-  openedAt?: Maybe<string>;
-};
+} & Pick<PetitionMessage, "bouncedAt" | "deliveredAt" | "openedAt">;
 
-export type PetitionAccessTable_PetitionFragment = {
-  __typename?: "Petition";
-  status: PetitionStatus;
-  accesses: Array<{
-    __typename?: "PetitionAccess";
-    id: string;
-    status: PetitionAccessStatus;
-    nextReminderAt?: Maybe<string>;
-    remindersLeft: number;
-    reminderCount: number;
-    remindersActive: boolean;
-    remindersOptOut: boolean;
-    createdAt: string;
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-    remindersConfig?: Maybe<{
-      __typename?: "RemindersConfig";
-      offset: number;
-      time: string;
-      timezone: string;
-      weekdaysOnly: boolean;
-    }>;
-  }>;
-};
+export type PetitionAccessTable_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "status"
+> & {
+    accesses: Array<
+      { __typename?: "PetitionAccess" } & Pick<
+        PetitionAccess,
+        | "id"
+        | "status"
+        | "nextReminderAt"
+        | "remindersLeft"
+        | "reminderCount"
+        | "remindersActive"
+        | "remindersOptOut"
+        | "createdAt"
+      > & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+          remindersConfig?: Maybe<
+            { __typename?: "RemindersConfig" } & Pick<
+              RemindersConfig,
+              "offset" | "time" | "timezone" | "weekdaysOnly"
+            >
+          >;
+        }
+    >;
+  };
 
 export type PetitionAccessTable_PetitionAccessRemindersConfigFragment = {
   __typename?: "RemindersConfig";
-  offset: number;
-  time: string;
-  timezone: string;
-  weekdaysOnly: boolean;
-};
+} & Pick<RemindersConfig, "offset" | "time" | "timezone" | "weekdaysOnly">;
 
-export type PetitionAccessTable_PetitionAccessFragment = {
-  __typename?: "PetitionAccess";
-  id: string;
-  status: PetitionAccessStatus;
-  nextReminderAt?: Maybe<string>;
-  remindersLeft: number;
-  reminderCount: number;
-  remindersActive: boolean;
-  remindersOptOut: boolean;
-  createdAt: string;
-  contact?: Maybe<{ __typename?: "Contact"; id: string; fullName?: Maybe<string>; email: string }>;
-  remindersConfig?: Maybe<{
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  }>;
-};
+export type PetitionAccessTable_PetitionAccessFragment = { __typename?: "PetitionAccess" } & Pick<
+  PetitionAccess,
+  | "id"
+  | "status"
+  | "nextReminderAt"
+  | "remindersLeft"
+  | "reminderCount"
+  | "remindersActive"
+  | "remindersOptOut"
+  | "createdAt"
+> & {
+    contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    remindersConfig?: Maybe<
+      { __typename?: "RemindersConfig" } & Pick<
+        RemindersConfig,
+        "offset" | "time" | "timezone" | "weekdaysOnly"
+      >
+    >;
+  };
 
-export type PetitionActivityTimeline_PetitionFragment = {
-  __typename?: "Petition";
-  events: {
-    __typename?: "PetitionEventPagination";
+export type PetitionActivityTimeline_PetitionFragment = { __typename?: "Petition" } & {
+  events: { __typename?: "PetitionEventPagination" } & {
     items: Array<
-      | {
-          __typename?: "AccessActivatedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "AccessDeactivatedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "AccessDelegatedEvent";
-          id: string;
-          createdAt: string;
-          originalAccess: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-          newAccess: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "AccessOpenedEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "CommentDeletedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          deletedBy?: Maybe<
-            | {
-                __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
-              }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
-        }
-      | {
-          __typename?: "CommentPublishedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          comment?: Maybe<{
-            __typename?: "PetitionFieldComment";
-            isEdited: boolean;
-            content: string;
-            author?: Maybe<
-              | {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                }
-              | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
+      | ({ __typename?: "AccessActivatedEvent" } & Pick<
+          AccessActivatedEvent,
+          "id" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            access: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            };
+          })
+      | ({ __typename?: "AccessActivatedFromPublicPetitionLinkEvent" } & Pick<
+          AccessActivatedFromPublicPetitionLinkEvent,
+          "id" | "createdAt"
+        > & {
+            access: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            };
+          })
+      | ({ __typename?: "AccessDeactivatedEvent" } & Pick<
+          AccessDeactivatedEvent,
+          "id" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            access: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            };
+          })
+      | ({ __typename?: "AccessDelegatedEvent" } & Pick<
+          AccessDelegatedEvent,
+          "id" | "createdAt"
+        > & {
+            originalAccess: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            };
+            newAccess: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            };
+          })
+      | ({ __typename?: "AccessOpenedEvent" } & Pick<AccessOpenedEvent, "id" | "createdAt"> & {
+            access: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
+            };
+          })
+      | ({ __typename?: "CommentDeletedEvent" } & Pick<CommentDeletedEvent, "id" | "createdAt"> & {
+            field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+            deletedBy?: Maybe<
+              | ({ __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                })
+              | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
             >;
-          }>;
-        }
-      | {
-          __typename?: "GroupPermissionAddedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
-        }
-      | {
-          __typename?: "GroupPermissionEditedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
-        }
-      | {
-          __typename?: "GroupPermissionRemovedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
-        }
-      | {
-          __typename?: "MessageCancelledEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            status: PetitionMessageStatus;
-            scheduledAt?: Maybe<string>;
-            emailSubject?: Maybe<any>;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+          })
+      | ({ __typename?: "CommentPublishedEvent" } & Pick<
+          CommentPublishedEvent,
+          "id" | "createdAt"
+        > & {
+            field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+            comment?: Maybe<
+              { __typename?: "PetitionFieldComment" } & Pick<
+                PetitionFieldComment,
+                "isEdited" | "content"
+              > & {
+                  author?: Maybe<
+                    | ({ __typename?: "PetitionAccess" } & {
+                        contact?: Maybe<
+                          { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                        >;
+                      })
+                    | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                  >;
+                }
+            >;
+          })
+      | ({ __typename?: "GroupPermissionAddedEvent" } & Pick<
+          GroupPermissionAddedEvent,
+          "id" | "permissionType" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+          })
+      | ({ __typename?: "GroupPermissionEditedEvent" } & Pick<
+          GroupPermissionEditedEvent,
+          "id" | "permissionType" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+          })
+      | ({ __typename?: "GroupPermissionRemovedEvent" } & Pick<
+          GroupPermissionRemovedEvent,
+          "id" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+          })
+      | ({ __typename?: "MessageCancelledEvent" } & Pick<
+          MessageCancelledEvent,
+          "id" | "createdAt"
+        > & {
+            message: { __typename?: "PetitionMessage" } & Pick<
+              PetitionMessage,
+              "status" | "scheduledAt" | "emailSubject"
+            > & {
+                access: { __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                };
+              };
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+          })
+      | ({ __typename?: "MessageScheduledEvent" } & Pick<
+          MessageScheduledEvent,
+          "id" | "createdAt"
+        > & {
+            message: { __typename?: "PetitionMessage" } & Pick<
+              PetitionMessage,
+              "id" | "status" | "scheduledAt" | "emailSubject" | "emailBody" | "sentAt"
+            > & {
+                sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                access: { __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                };
+              };
+          })
+      | ({ __typename?: "MessageSentEvent" } & Pick<MessageSentEvent, "id" | "createdAt"> & {
+            message: { __typename?: "PetitionMessage" } & Pick<
+              PetitionMessage,
+              | "emailSubject"
+              | "scheduledAt"
+              | "bouncedAt"
+              | "deliveredAt"
+              | "openedAt"
+              | "emailBody"
+              | "sentAt"
+            > & {
+                sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                access: { __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                };
+              };
+          })
+      | ({ __typename?: "OwnershipTransferredEvent" } & Pick<
+          OwnershipTransferredEvent,
+          "id" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            owner?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            previousOwner?: Maybe<
+              { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+            >;
+          })
+      | ({ __typename?: "PetitionClonedEvent" } & Pick<PetitionClonedEvent, "id" | "createdAt"> & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+          })
+      | ({ __typename?: "PetitionClosedEvent" } & Pick<PetitionClosedEvent, "id" | "createdAt"> & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+          })
+      | ({ __typename?: "PetitionClosedNotifiedEvent" } & Pick<
+          PetitionClosedNotifiedEvent,
+          "id" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            access: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
             };
-          };
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "MessageScheduledEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            id: string;
-            status: PetitionMessageStatus;
-            scheduledAt?: Maybe<string>;
-            emailSubject?: Maybe<any>;
-            emailBody?: Maybe<string>;
-            sentAt?: Maybe<string>;
-            sender: {
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
+          })
+      | ({ __typename?: "PetitionCompletedEvent" } & Pick<
+          PetitionCompletedEvent,
+          "id" | "createdAt"
+        > & {
+            access: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
             };
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+          })
+      | ({ __typename?: "PetitionCreatedEvent" } & Pick<
+          PetitionCreatedEvent,
+          "id" | "createdAt"
+        > & { user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">> })
+      | ({ __typename?: "PetitionDeletedEvent" } & Pick<PetitionDeletedEvent, "id">)
+      | ({ __typename?: "PetitionMessageBouncedEvent" } & Pick<
+          PetitionMessageBouncedEvent,
+          "id" | "createdAt"
+        > & {
+            message: { __typename?: "PetitionMessage" } & {
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
             };
-          };
-        }
-      | {
-          __typename?: "MessageSentEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            emailSubject?: Maybe<any>;
-            scheduledAt?: Maybe<string>;
-            bouncedAt?: Maybe<string>;
-            deliveredAt?: Maybe<string>;
-            openedAt?: Maybe<string>;
-            emailBody?: Maybe<string>;
-            sentAt?: Maybe<string>;
-            sender: {
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
+          })
+      | ({ __typename?: "PetitionReminderBouncedEvent" } & Pick<
+          PetitionReminderBouncedEvent,
+          "id" | "createdAt"
+        > & {
+            reminder: { __typename?: "PetitionReminder" } & {
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
             };
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
+          })
+      | ({ __typename?: "PetitionReopenedEvent" } & Pick<
+          PetitionReopenedEvent,
+          "id" | "createdAt"
+        > & { user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">> })
+      | ({ __typename?: "RecipientSignedEvent" } & Pick<
+          RecipientSignedEvent,
+          "id" | "createdAt"
+        > & {
+            signer?: Maybe<
+              { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+            >;
+          })
+      | ({ __typename?: "ReminderSentEvent" } & Pick<ReminderSentEvent, "id" | "createdAt"> & {
+            reminder: { __typename?: "PetitionReminder" } & Pick<
+              PetitionReminder,
+              "type" | "createdAt" | "emailBody"
+            > & {
+                sender?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+                access: { __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                };
+              };
+          })
+      | ({ __typename?: "RemindersOptOutEvent" } & Pick<
+          RemindersOptOutEvent,
+          "id" | "createdAt" | "reason" | "other"
+        > & {
+            access: { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+              >;
             };
-          };
-        }
-      | {
-          __typename?: "OwnershipTransferredEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          owner?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          previousOwner?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "PetitionClonedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "PetitionClosedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "PetitionClosedNotifiedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "PetitionCompletedEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "PetitionCreatedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | { __typename?: "PetitionDeletedEvent"; id: string }
-      | {
-          __typename?: "PetitionMessageBouncedEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-        }
-      | {
-          __typename?: "PetitionReminderBouncedEvent";
-          id: string;
-          createdAt: string;
-          reminder: {
-            __typename?: "PetitionReminder";
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-        }
-      | {
-          __typename?: "PetitionReopenedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "RecipientSignedEvent";
-          id: string;
-          createdAt: string;
-          signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-        }
-      | {
-          __typename?: "ReminderSentEvent";
-          id: string;
-          createdAt: string;
-          reminder: {
-            __typename?: "PetitionReminder";
-            type: PetitionReminderType;
-            createdAt: string;
-            emailBody?: Maybe<string>;
-            sender?: Maybe<{
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
-            }>;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-        }
-      | {
-          __typename?: "RemindersOptOutEvent";
-          id: string;
-          createdAt: string;
-          reason: string;
-          other?: Maybe<string>;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "ReplyCreatedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          createdBy?: Maybe<
-            | {
-                __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
-              }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
-        }
-      | {
-          __typename?: "ReplyDeletedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          deletedBy?: Maybe<
-            | {
-                __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
-              }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
-        }
-      | {
-          __typename?: "ReplyUpdatedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          updatedBy?: Maybe<
-            | {
-                __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
-              }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
-        }
-      | {
-          __typename?: "SignatureCancelledEvent";
-          id: string;
-          cancelType: PetitionSignatureCancelReason;
-          cancellerReason?: Maybe<string>;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-        }
-      | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
-      | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
-      | { __typename?: "TemplateUsedEvent"; id: string }
-      | {
-          __typename?: "UserPermissionAddedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "UserPermissionEditedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "UserPermissionRemovedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
+          })
+      | ({ __typename?: "ReplyCreatedEvent" } & Pick<ReplyCreatedEvent, "id" | "createdAt"> & {
+            field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+            createdBy?: Maybe<
+              | ({ __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                })
+              | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+            >;
+          })
+      | ({ __typename?: "ReplyDeletedEvent" } & Pick<ReplyDeletedEvent, "id" | "createdAt"> & {
+            field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+            deletedBy?: Maybe<
+              | ({ __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                })
+              | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+            >;
+          })
+      | ({ __typename?: "ReplyUpdatedEvent" } & Pick<ReplyUpdatedEvent, "id" | "createdAt"> & {
+            field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+            updatedBy?: Maybe<
+              | ({ __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                })
+              | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+            >;
+          })
+      | ({ __typename?: "SignatureCancelledEvent" } & Pick<
+          SignatureCancelledEvent,
+          "id" | "cancelType" | "cancellerReason" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            canceller?: Maybe<
+              { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+            >;
+          })
+      | ({ __typename?: "SignatureCompletedEvent" } & Pick<
+          SignatureCompletedEvent,
+          "id" | "createdAt"
+        >)
+      | ({ __typename?: "SignatureStartedEvent" } & Pick<SignatureStartedEvent, "id" | "createdAt">)
+      | ({ __typename?: "TemplateUsedEvent" } & Pick<TemplateUsedEvent, "id">)
+      | ({ __typename?: "UserPermissionAddedEvent" } & Pick<
+          UserPermissionAddedEvent,
+          "id" | "permissionType" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            permissionUser?: Maybe<
+              { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+            >;
+          })
+      | ({ __typename?: "UserPermissionEditedEvent" } & Pick<
+          UserPermissionEditedEvent,
+          "id" | "permissionType" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            permissionUser?: Maybe<
+              { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+            >;
+          })
+      | ({ __typename?: "UserPermissionRemovedEvent" } & Pick<
+          UserPermissionRemovedEvent,
+          "id" | "createdAt"
+        > & {
+            user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            permissionUser?: Maybe<
+              { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+            >;
+          })
     >;
   };
 };
 
 export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment = {
   __typename?: "AccessActivatedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-  };
-};
-
-export type PetitionActivityTimeline_PetitionEvent_AccessActivatedFromPublicPetitionLinkEvent_Fragment =
-  {
-    __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-    id: string;
-    createdAt: string;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+} & Pick<AccessActivatedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
     };
   };
+
+export type PetitionActivityTimeline_PetitionEvent_AccessActivatedFromPublicPetitionLinkEvent_Fragment =
+  { __typename?: "AccessActivatedFromPublicPetitionLinkEvent" } & Pick<
+    AccessActivatedFromPublicPetitionLinkEvent,
+    "id" | "createdAt"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+    };
 
 export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment = {
   __typename?: "AccessDeactivatedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<AccessDeactivatedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment = {
   __typename?: "AccessDelegatedEvent";
-  id: string;
-  createdAt: string;
-  originalAccess: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<AccessDelegatedEvent, "id" | "createdAt"> & {
+    originalAccess: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
+    newAccess: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-  newAccess: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-  };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = {
   __typename?: "AccessOpenedEvent";
-  id: string;
-  createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<AccessOpenedEvent, "id" | "createdAt"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment = {
   __typename?: "CommentDeletedEvent";
-  id: string;
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  deletedBy?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & Pick<CommentDeletedEvent, "id" | "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    deletedBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment = {
   __typename?: "CommentPublishedEvent";
-  id: string;
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  comment?: Maybe<{
-    __typename?: "PetitionFieldComment";
-    isEdited: boolean;
-    content: string;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+} & Pick<CommentPublishedEvent, "id" | "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    comment?: Maybe<
+      { __typename?: "PetitionFieldComment" } & Pick<
+        PetitionFieldComment,
+        "isEdited" | "content"
+      > & {
+          author?: Maybe<
+            | ({ __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              })
+            | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+          >;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
     >;
-  }>;
-};
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment = {
   __typename?: "GroupPermissionAddedEvent";
-  id: string;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
-};
+} & Pick<GroupPermissionAddedEvent, "id" | "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment = {
   __typename?: "GroupPermissionEditedEvent";
-  id: string;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
-};
+} & Pick<GroupPermissionEditedEvent, "id" | "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment = {
   __typename?: "GroupPermissionRemovedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
-};
+} & Pick<GroupPermissionRemovedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
   __typename?: "MessageCancelledEvent";
-  id: string;
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    status: PetitionMessageStatus;
-    scheduledAt?: Maybe<string>;
-    emailSubject?: Maybe<any>;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    };
+} & Pick<MessageCancelledEvent, "id" | "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      "status" | "scheduledAt" | "emailSubject"
+    > & {
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        };
+      };
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
   };
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
 
 export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment = {
   __typename?: "MessageScheduledEvent";
-  id: string;
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    id: string;
-    status: PetitionMessageStatus;
-    scheduledAt?: Maybe<string>;
-    emailSubject?: Maybe<any>;
-    emailBody?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    sender: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    };
+} & Pick<MessageScheduledEvent, "id" | "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      "id" | "status" | "scheduledAt" | "emailSubject" | "emailBody" | "sentAt"
+    > & {
+        sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        };
+      };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
   __typename?: "MessageSentEvent";
-  id: string;
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    emailSubject?: Maybe<any>;
-    scheduledAt?: Maybe<string>;
-    bouncedAt?: Maybe<string>;
-    deliveredAt?: Maybe<string>;
-    openedAt?: Maybe<string>;
-    emailBody?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    sender: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    };
+} & Pick<MessageSentEvent, "id" | "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      | "emailSubject"
+      | "scheduledAt"
+      | "bouncedAt"
+      | "deliveredAt"
+      | "openedAt"
+      | "emailBody"
+      | "sentAt"
+    > & {
+        sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        };
+      };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment = {
   __typename?: "OwnershipTransferredEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  owner?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  previousOwner?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
-};
+} & Pick<OwnershipTransferredEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    owner?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    previousOwner?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClonedEvent_Fragment = {
   __typename?: "PetitionClonedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
+} & Pick<PetitionClonedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment = {
   __typename?: "PetitionClosedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
+} & Pick<PetitionClosedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment = {
   __typename?: "PetitionClosedNotifiedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<PetitionClosedNotifiedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment = {
   __typename?: "PetitionCompletedEvent";
-  id: string;
-  createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<PetitionCompletedEvent, "id" | "createdAt"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
   __typename?: "PetitionCreatedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
+} & Pick<PetitionCreatedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment = {
   __typename?: "PetitionDeletedEvent";
-  id: string;
-};
+} & Pick<PetitionDeletedEvent, "id">;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_Fragment = {
   __typename?: "PetitionMessageBouncedEvent";
-  id: string;
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+} & Pick<PetitionMessageBouncedEvent, "id" | "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
     };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_Fragment = {
   __typename?: "PetitionReminderBouncedEvent";
-  id: string;
-  createdAt: string;
-  reminder: {
-    __typename?: "PetitionReminder";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+} & Pick<PetitionReminderBouncedEvent, "id" | "createdAt"> & {
+    reminder: { __typename?: "PetitionReminder" } & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
     };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment = {
   __typename?: "PetitionReopenedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
+} & Pick<PetitionReopenedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment = {
   __typename?: "RecipientSignedEvent";
-  id: string;
-  createdAt: string;
-  signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-};
+} & Pick<RecipientSignedEvent, "id" | "createdAt"> & {
+    signer?: Maybe<{ __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
   __typename?: "ReminderSentEvent";
-  id: string;
-  createdAt: string;
-  reminder: {
-    __typename?: "PetitionReminder";
-    type: PetitionReminderType;
-    createdAt: string;
-    emailBody?: Maybe<string>;
-    sender?: Maybe<{
-      __typename?: "User";
-      id: string;
-      fullName?: Maybe<string>;
-      status: UserStatus;
-    }>;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    };
+} & Pick<ReminderSentEvent, "id" | "createdAt"> & {
+    reminder: { __typename?: "PetitionReminder" } & Pick<
+      PetitionReminder,
+      "type" | "createdAt" | "emailBody"
+    > & {
+        sender?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        };
+      };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment = {
   __typename?: "RemindersOptOutEvent";
-  id: string;
-  createdAt: string;
-  reason: string;
-  other?: Maybe<string>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<RemindersOptOutEvent, "id" | "createdAt" | "reason" | "other"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = {
   __typename?: "ReplyCreatedEvent";
-  id: string;
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  createdBy?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & Pick<ReplyCreatedEvent, "id" | "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    createdBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = {
   __typename?: "ReplyDeletedEvent";
-  id: string;
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  deletedBy?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & Pick<ReplyDeletedEvent, "id" | "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    deletedBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = {
   __typename?: "ReplyUpdatedEvent";
-  id: string;
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  updatedBy?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & Pick<ReplyUpdatedEvent, "id" | "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    updatedBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
   __typename?: "SignatureCancelledEvent";
-  id: string;
-  cancelType: PetitionSignatureCancelReason;
-  cancellerReason?: Maybe<string>;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-};
+} & Pick<SignatureCancelledEvent, "id" | "cancelType" | "cancellerReason" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    canceller?: Maybe<
+      { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+    >;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment = {
   __typename?: "SignatureCompletedEvent";
-  id: string;
-  createdAt: string;
-};
+} & Pick<SignatureCompletedEvent, "id" | "createdAt">;
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment = {
   __typename?: "SignatureStartedEvent";
-  id: string;
-  createdAt: string;
-};
+} & Pick<SignatureStartedEvent, "id" | "createdAt">;
 
 export type PetitionActivityTimeline_PetitionEvent_TemplateUsedEvent_Fragment = {
   __typename?: "TemplateUsedEvent";
-  id: string;
-};
+} & Pick<TemplateUsedEvent, "id">;
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment = {
   __typename?: "UserPermissionAddedEvent";
-  id: string;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
-};
+} & Pick<UserPermissionAddedEvent, "id" | "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionUser?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment = {
   __typename?: "UserPermissionEditedEvent";
-  id: string;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
-};
+} & Pick<UserPermissionEditedEvent, "id" | "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionUser?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment = {
   __typename?: "UserPermissionRemovedEvent";
-  id: string;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
-};
+} & Pick<UserPermissionRemovedEvent, "id" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionUser?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
@@ -5602,629 +4864,453 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment;
 
-export type PetitionFieldReference_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  title?: Maybe<string>;
-};
+export type PetitionFieldReference_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "title"
+>;
 
 export type SentPetitionMessageDialog_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
-  emailBody?: Maybe<string>;
-  emailSubject?: Maybe<any>;
-  sentAt?: Maybe<string>;
-  scheduledAt?: Maybe<string>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<PetitionMessage, "emailBody" | "emailSubject" | "sentAt" | "scheduledAt"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type SentReminderMessageDialog_PetitionReminderFragment = {
   __typename?: "PetitionReminder";
-  createdAt: string;
-  emailBody?: Maybe<string>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<PetitionReminder, "createdAt" | "emailBody"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
-export type UserReference_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  status: UserStatus;
-};
+export type UserReference_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "fullName" | "status"
+>;
 
 export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   __typename?: "AccessActivatedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-  };
-};
-
-export type TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragment =
-  {
-    __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-    createdAt: string;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+} & Pick<AccessActivatedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
     };
   };
+
+export type TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragment =
+  { __typename?: "AccessActivatedFromPublicPetitionLinkEvent" } & Pick<
+    AccessActivatedFromPublicPetitionLinkEvent,
+    "createdAt"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
+    };
 
 export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   __typename?: "AccessDeactivatedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<AccessDeactivatedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type TimelineAccessDelegatedEvent_AccessDelegatedEventFragment = {
   __typename?: "AccessDelegatedEvent";
-  createdAt: string;
-  originalAccess: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<AccessDelegatedEvent, "createdAt"> & {
+    originalAccess: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
+    newAccess: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-  newAccess: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-  };
-};
 
 export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
   __typename?: "AccessOpenedEvent";
-  createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<AccessOpenedEvent, "createdAt"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
   __typename?: "CommentDeletedEvent";
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  deletedBy?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & Pick<CommentDeletedEvent, "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    deletedBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
   __typename?: "CommentPublishedEvent";
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  comment?: Maybe<{
-    __typename?: "PetitionFieldComment";
-    isEdited: boolean;
-    content: string;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+} & Pick<CommentPublishedEvent, "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    comment?: Maybe<
+      { __typename?: "PetitionFieldComment" } & Pick<
+        PetitionFieldComment,
+        "isEdited" | "content"
+      > & {
+          author?: Maybe<
+            | ({ __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              })
+            | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+          >;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
     >;
-  }>;
-};
+  };
 
 export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment = {
   __typename?: "GroupPermissionAddedEvent";
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
-};
+} & Pick<GroupPermissionAddedEvent, "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+  };
 
 export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment = {
   __typename?: "GroupPermissionEditedEvent";
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
-};
+} & Pick<GroupPermissionEditedEvent, "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+  };
 
 export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment = {
   __typename?: "GroupPermissionRemovedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
-};
+} & Pick<GroupPermissionRemovedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+  };
 
 export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
   __typename?: "MessageCancelledEvent";
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    status: PetitionMessageStatus;
-    scheduledAt?: Maybe<string>;
-    emailSubject?: Maybe<any>;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    };
+} & Pick<MessageCancelledEvent, "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      "status" | "scheduledAt" | "emailSubject"
+    > & {
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        };
+      };
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
   };
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
 
 export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
   __typename?: "MessageScheduledEvent";
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    status: PetitionMessageStatus;
-    scheduledAt?: Maybe<string>;
-    emailSubject?: Maybe<any>;
-    emailBody?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    sender: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    };
+} & Pick<MessageScheduledEvent, "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      "status" | "scheduledAt" | "emailSubject" | "emailBody" | "sentAt"
+    > & {
+        sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        };
+      };
   };
-};
 
 export type TimelineMessageSentEvent_MessageSentEventFragment = {
   __typename?: "MessageSentEvent";
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    emailSubject?: Maybe<any>;
-    scheduledAt?: Maybe<string>;
-    bouncedAt?: Maybe<string>;
-    deliveredAt?: Maybe<string>;
-    openedAt?: Maybe<string>;
-    emailBody?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    sender: { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus };
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    };
+} & Pick<MessageSentEvent, "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      | "emailSubject"
+      | "scheduledAt"
+      | "bouncedAt"
+      | "deliveredAt"
+      | "openedAt"
+      | "emailBody"
+      | "sentAt"
+    > & {
+        sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        };
+      };
   };
-};
 
 export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment = {
   __typename?: "OwnershipTransferredEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  owner?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  previousOwner?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
-};
+} & Pick<OwnershipTransferredEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    owner?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    previousOwner?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type TimelinePetitionClonedEvent_PetitionClonedEventFragment = {
   __typename?: "PetitionClonedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
+} & Pick<PetitionClonedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
   __typename?: "PetitionClosedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
+} & Pick<PetitionClosedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment = {
   __typename?: "PetitionClosedNotifiedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<PetitionClosedNotifiedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   __typename?: "PetitionCompletedEvent";
-  createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<PetitionCompletedEvent, "createdAt"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
+} & Pick<PetitionCreatedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragment = {
   __typename?: "PetitionMessageBouncedEvent";
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+} & Pick<PetitionMessageBouncedEvent, "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
     };
   };
-};
 
 export type TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragment = {
   __typename?: "PetitionReminderBouncedEvent";
-  createdAt: string;
-  reminder: {
-    __typename?: "PetitionReminder";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+} & Pick<PetitionReminderBouncedEvent, "createdAt"> & {
+    reminder: { __typename?: "PetitionReminder" } & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+      };
     };
   };
-};
 
 export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
   __typename?: "PetitionReopenedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-};
+} & Pick<PetitionReopenedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type TimelineRecipientSignedEvent_RecipientSignedEventFragment = {
   __typename?: "RecipientSignedEvent";
-  createdAt: string;
-  signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-};
+} & Pick<RecipientSignedEvent, "createdAt"> & {
+    signer?: Maybe<{ __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">>;
+  };
 
 export type TimelineReminderSentEvent_ReminderSentEventFragment = {
   __typename?: "ReminderSentEvent";
-  createdAt: string;
-  reminder: {
-    __typename?: "PetitionReminder";
-    type: PetitionReminderType;
-    createdAt: string;
-    emailBody?: Maybe<string>;
-    sender?: Maybe<{
-      __typename?: "User";
-      id: string;
-      fullName?: Maybe<string>;
-      status: UserStatus;
-    }>;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    };
+} & Pick<ReminderSentEvent, "createdAt"> & {
+    reminder: { __typename?: "PetitionReminder" } & Pick<
+      PetitionReminder,
+      "type" | "createdAt" | "emailBody"
+    > & {
+        sender?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        };
+      };
   };
-};
 
 export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
   __typename?: "RemindersOptOutEvent";
-  createdAt: string;
-  reason: string;
-  other?: Maybe<string>;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
+} & Pick<RemindersOptOutEvent, "createdAt" | "reason" | "other"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+    };
   };
-};
 
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
   __typename?: "ReplyCreatedEvent";
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  createdBy?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & Pick<ReplyCreatedEvent, "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    createdBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
   __typename?: "ReplyDeletedEvent";
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  deletedBy?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & Pick<ReplyDeletedEvent, "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    deletedBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
   __typename?: "ReplyUpdatedEvent";
-  createdAt: string;
-  field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-  updatedBy?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & Pick<ReplyUpdatedEvent, "createdAt"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+    updatedBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
-  cancelType: PetitionSignatureCancelReason;
-  cancellerReason?: Maybe<string>;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-};
+} & Pick<SignatureCancelledEvent, "cancelType" | "cancellerReason" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    canceller?: Maybe<
+      { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+    >;
+  };
 
 export type TimelineSignatureCompletedEvent_SignatureCompletedEventFragment = {
   __typename?: "SignatureCompletedEvent";
-  createdAt: string;
-};
+} & Pick<SignatureCompletedEvent, "createdAt">;
 
 export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
   __typename?: "SignatureStartedEvent";
-  createdAt: string;
-};
+} & Pick<SignatureStartedEvent, "createdAt">;
 
 export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = {
   __typename?: "UserPermissionAddedEvent";
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
-};
+} & Pick<UserPermissionAddedEvent, "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionUser?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment = {
   __typename?: "UserPermissionEditedEvent";
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
-};
+} & Pick<UserPermissionEditedEvent, "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionUser?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+  };
 
 export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment = {
   __typename?: "UserPermissionRemovedEvent";
-  createdAt: string;
-  user?: Maybe<{ __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }>;
-  permissionUser?: Maybe<{
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    status: UserStatus;
-  }>;
-};
-
-export type PetitionContents_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  title?: Maybe<string>;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  isReadOnly: boolean;
-  validated: boolean;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-};
-
-export type PetitionSettings_UserFragment = {
-  __typename?: "User";
-  hasPetitionSignature: boolean;
-  hasSkipForwardSecurity: boolean;
-  hasHideRecipientViewContents: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    signatureIntegrations: Array<{ __typename?: "OrgIntegration"; label: string; value: string }>;
+} & Pick<UserPermissionRemovedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+    permissionUser?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
   };
+
+export type PetitionContents_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "title" | "type" | "options" | "isReadOnly" | "validated"
+> & {
+    comments: Array<{ __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">>;
+    replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+  };
+
+export type PetitionSettings_UserFragment = { __typename?: "User" } & {
+  hasPetitionSignature: User["hasFeatureFlag"];
+  hasSkipForwardSecurity: User["hasFeatureFlag"];
+  hasHideRecipientViewContents: User["hasFeatureFlag"];
+} & {
+  organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+      signatureIntegrations: Array<
+        { __typename?: "OrgIntegration" } & {
+          label: OrgIntegration["name"];
+          value: OrgIntegration["provider"];
+        }
+      >;
+    };
 };
 
-export type PetitionSettings_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-  status: PetitionStatus;
-  deadline?: Maybe<string>;
-  id: string;
-  locale: PetitionLocale;
-  hasCommentsEnabled: boolean;
-  skipForwardSecurity: boolean;
-  isRecipientViewContentsHidden: boolean;
-  isReadOnly: boolean;
-  name?: Maybe<string>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  }>;
-  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
-  owner: { __typename?: "User"; id: string };
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
-};
+export type PetitionSettings_PetitionBase_Petition_Fragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  | "status"
+  | "deadline"
+  | "id"
+  | "locale"
+  | "hasCommentsEnabled"
+  | "skipForwardSecurity"
+  | "isRecipientViewContentsHidden"
+  | "isReadOnly"
+  | "name"
+> & {
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "id" | "status">
+    >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
+    owner: { __typename?: "User" } & Pick<User, "id">;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "provider" | "title" | "review" | "letRecipientsChooseSigners"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email"
+            >
+          >;
+        }
+    >;
+  };
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  isPublic: boolean;
-  id: string;
-  locale: PetitionLocale;
-  hasCommentsEnabled: boolean;
-  skipForwardSecurity: boolean;
-  isRecipientViewContentsHidden: boolean;
-  isReadOnly: boolean;
-  name?: Maybe<string>;
-  publicLink?: Maybe<{
-    __typename?: "PublicPetitionLink";
-    id: string;
-    title: string;
-    isActive: boolean;
-    description: string;
-    slug: string;
-    linkPermissions: Array<
-      | {
-          __typename?: "PublicPetitionLinkUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string };
-        }
-      | {
-          __typename?: "PublicPetitionLinkUserPermission";
-          permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string };
+} & Pick<
+  PetitionTemplate,
+  | "isPublic"
+  | "id"
+  | "locale"
+  | "hasCommentsEnabled"
+  | "skipForwardSecurity"
+  | "isRecipientViewContentsHidden"
+  | "isReadOnly"
+  | "name"
+> & {
+    publicLink?: Maybe<
+      { __typename?: "PublicPetitionLink" } & Pick<
+        PublicPetitionLink,
+        "id" | "title" | "isActive" | "description" | "slug"
+      > & {
+          linkPermissions: Array<
+            | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
+                PublicPetitionLinkUserGroupPermission,
+                "permissionType"
+              > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+            | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
+                PublicPetitionLinkUserPermission,
+                "permissionType"
+              > & { user: { __typename?: "User" } & Pick<User, "id"> })
+          >;
         }
     >;
-  }>;
-  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
-  owner: { __typename?: "User"; id: string };
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
-};
+    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
+    owner: { __typename?: "User" } & Pick<User, "id">;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "provider" | "title" | "review" | "letRecipientsChooseSigners"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email"
+            >
+          >;
+        }
+    >;
+  };
 
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
@@ -6235,11 +5321,10 @@ export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables = E
 }>;
 
 export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
-  cancelSignatureRequest: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  };
+  cancelSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "status"
+  >;
 };
 
 export type PetitionSettings_startPetitionSignatureRequestMutationVariables = Exact<{
@@ -6247,11 +5332,10 @@ export type PetitionSettings_startPetitionSignatureRequestMutationVariables = Ex
 }>;
 
 export type PetitionSettings_startPetitionSignatureRequestMutation = {
-  startSignatureRequest: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  };
+  startSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "status"
+  >;
 };
 
 export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
@@ -6266,27 +5350,25 @@ export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
 }>;
 
 export type PetitionSettings_createPublicPetitionLinkMutation = {
-  createPublicPetitionLink: {
-    __typename?: "PetitionTemplate";
-    id: string;
-    publicLink?: Maybe<{
-      __typename?: "PublicPetitionLink";
-      id: string;
-      title: string;
-      description: string;
-      slug: string;
-      linkPermissions: Array<
-        | {
-            __typename?: "PublicPetitionLinkUserGroupPermission";
-            permissionType: PetitionPermissionType;
-          }
-        | {
-            __typename?: "PublicPetitionLinkUserPermission";
-            permissionType: PetitionPermissionType;
+  createPublicPetitionLink: { __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
+      publicLink?: Maybe<
+        { __typename?: "PublicPetitionLink" } & Pick<
+          PublicPetitionLink,
+          "id" | "title" | "description" | "slug"
+        > & {
+            linkPermissions: Array<
+              | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
+                  PublicPetitionLinkUserGroupPermission,
+                  "permissionType"
+                >)
+              | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
+                  PublicPetitionLinkUserPermission,
+                  "permissionType"
+                >)
+            >;
           }
       >;
-    }>;
-  };
+    };
 };
 
 export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
@@ -6302,104 +5384,85 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
 }>;
 
 export type PetitionSettings_updatePublicPetitionLinkMutation = {
-  updatePublicPetitionLink: {
-    __typename?: "PublicPetitionLink";
-    id: string;
-    title: string;
-    description: string;
-    slug: string;
-    isActive: boolean;
-    linkPermissions: Array<
-      | {
-          __typename?: "PublicPetitionLinkUserGroupPermission";
-          permissionType: PetitionPermissionType;
-        }
-      | { __typename?: "PublicPetitionLinkUserPermission"; permissionType: PetitionPermissionType }
-    >;
-  };
+  updatePublicPetitionLink: { __typename?: "PublicPetitionLink" } & Pick<
+    PublicPetitionLink,
+    "id" | "title" | "description" | "slug" | "isActive"
+  > & {
+      linkPermissions: Array<
+        | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
+            PublicPetitionLinkUserGroupPermission,
+            "permissionType"
+          >)
+        | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
+            PublicPetitionLinkUserPermission,
+            "permissionType"
+          >)
+      >;
+    };
 };
 
-export type PetitionSharingModal_Petition_Petition_Fragment = {
-  __typename?: "Petition";
-  id: string;
-  name?: Maybe<string>;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          name: string;
-          initials: string;
-          members: Array<{
-            __typename?: "UserGroupMember";
-            user: {
-              __typename?: "User";
-              id: string;
-              email: string;
-              fullName?: Maybe<string>;
-              avatarUrl?: Maybe<string>;
-              initials?: Maybe<string>;
-            };
-          }>;
-        };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          email: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
-        };
-      }
-  >;
-};
+export type PetitionSharingModal_Petition_Petition_Fragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "name"
+> & {
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & {
+            group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials"> & {
+                members: Array<
+                  { __typename?: "UserGroupMember" } & {
+                    user: { __typename?: "User" } & Pick<
+                      User,
+                      "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                    >;
+                  }
+                >;
+              };
+          })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "email" | "fullName" | "avatarUrl" | "initials"
+            >;
+          })
+    >;
+  };
 
 export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  name?: Maybe<string>;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          name: string;
-          initials: string;
-          members: Array<{
-            __typename?: "UserGroupMember";
-            user: {
-              __typename?: "User";
-              id: string;
-              email: string;
-              fullName?: Maybe<string>;
-              avatarUrl?: Maybe<string>;
-              initials?: Maybe<string>;
-            };
-          }>;
-        };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          email: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
-        };
-      }
-  >;
-};
+} & Pick<PetitionTemplate, "id" | "name"> & {
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & {
+            group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials"> & {
+                members: Array<
+                  { __typename?: "UserGroupMember" } & {
+                    user: { __typename?: "User" } & Pick<
+                      User,
+                      "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                    >;
+                  }
+                >;
+              };
+          })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "email" | "fullName" | "avatarUrl" | "initials"
+            >;
+          })
+    >;
+  };
 
 export type PetitionSharingModal_PetitionFragment =
   | PetitionSharingModal_Petition_Petition_Fragment
@@ -6407,65 +5470,46 @@ export type PetitionSharingModal_PetitionFragment =
 
 export type PetitionSharingModal_PetitionUserPermissionFragment = {
   __typename?: "PetitionUserPermission";
-  permissionType: PetitionPermissionType;
-  user: {
-    __typename?: "User";
-    id: string;
-    email: string;
-    fullName?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+} & Pick<PetitionUserPermission, "permissionType"> & {
+    user: { __typename?: "User" } & Pick<
+      User,
+      "id" | "email" | "fullName" | "avatarUrl" | "initials"
+    >;
   };
-};
 
 export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
   __typename?: "PetitionUserGroupPermission";
-  permissionType: PetitionPermissionType;
-  group: {
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    initials: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      user: {
-        __typename?: "User";
-        id: string;
-        email: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
+} & Pick<PetitionUserGroupPermission, "permissionType"> & {
+    group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials"> & {
+        members: Array<
+          { __typename?: "UserGroupMember" } & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "email" | "fullName" | "avatarUrl" | "initials"
+            >;
+          }
+        >;
       };
-    }>;
   };
-};
 
-export type PetitionSharingModal_UserFragment = {
-  __typename?: "User";
-  id: string;
-  email: string;
-  fullName?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-};
+export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "email" | "fullName" | "avatarUrl" | "initials"
+>;
 
-export type PetitionSharingModal_UserGroupFragment = {
-  __typename?: "UserGroup";
-  id: string;
-  name: string;
-  initials: string;
-  members: Array<{
-    __typename?: "UserGroupMember";
-    user: {
-      __typename?: "User";
-      id: string;
-      email: string;
-      fullName?: Maybe<string>;
-      avatarUrl?: Maybe<string>;
-      initials?: Maybe<string>;
-    };
-  }>;
-};
+export type PetitionSharingModal_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
+  UserGroup,
+  "id" | "name" | "initials"
+> & {
+    members: Array<
+      { __typename?: "UserGroupMember" } & {
+        user: { __typename?: "User" } & Pick<
+          User,
+          "id" | "email" | "fullName" | "avatarUrl" | "initials"
+        >;
+      }
+    >;
+  };
 
 export type PetitionSharingModal_addPetitionPermissionMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
@@ -6478,46 +5522,39 @@ export type PetitionSharingModal_addPetitionPermissionMutationVariables = Exact<
 }>;
 
 export type PetitionSharingModal_addPetitionPermissionMutation = {
-  addPetitionPermission: Array<{
-    __typename?: "Petition";
-    id: string;
-    name?: Maybe<string>;
-    permissions: Array<
-      | {
-          __typename?: "PetitionUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: {
-            __typename?: "UserGroup";
-            id: string;
-            name: string;
-            initials: string;
-            members: Array<{
-              __typename?: "UserGroupMember";
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
-              };
-            }>;
-          };
-        }
-      | {
-          __typename?: "PetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          user: {
-            __typename?: "User";
-            id: string;
-            email: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
-          };
-        }
-    >;
-  }>;
+  addPetitionPermission: Array<
+    { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+        permissions: Array<
+          | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+              PetitionUserGroupPermission,
+              "permissionType"
+            > & {
+                group: { __typename?: "UserGroup" } & Pick<
+                  UserGroup,
+                  "id" | "name" | "initials"
+                > & {
+                    members: Array<
+                      { __typename?: "UserGroupMember" } & {
+                        user: { __typename?: "User" } & Pick<
+                          User,
+                          "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                        >;
+                      }
+                    >;
+                  };
+              })
+          | ({ __typename?: "PetitionUserPermission" } & Pick<
+              PetitionUserPermission,
+              "permissionType"
+            > & {
+                user: { __typename?: "User" } & Pick<
+                  User,
+                  "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                >;
+              })
+        >;
+      }
+  >;
 };
 
 export type PetitionSharingModal_removePetitionPermissionMutationVariables = Exact<{
@@ -6527,46 +5564,39 @@ export type PetitionSharingModal_removePetitionPermissionMutationVariables = Exa
 }>;
 
 export type PetitionSharingModal_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{
-    __typename?: "Petition";
-    id: string;
-    name?: Maybe<string>;
-    permissions: Array<
-      | {
-          __typename?: "PetitionUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: {
-            __typename?: "UserGroup";
-            id: string;
-            name: string;
-            initials: string;
-            members: Array<{
-              __typename?: "UserGroupMember";
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
-              };
-            }>;
-          };
-        }
-      | {
-          __typename?: "PetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          user: {
-            __typename?: "User";
-            id: string;
-            email: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
-          };
-        }
-    >;
-  }>;
+  removePetitionPermission: Array<
+    { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+        permissions: Array<
+          | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+              PetitionUserGroupPermission,
+              "permissionType"
+            > & {
+                group: { __typename?: "UserGroup" } & Pick<
+                  UserGroup,
+                  "id" | "name" | "initials"
+                > & {
+                    members: Array<
+                      { __typename?: "UserGroupMember" } & {
+                        user: { __typename?: "User" } & Pick<
+                          User,
+                          "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                        >;
+                      }
+                    >;
+                  };
+              })
+          | ({ __typename?: "PetitionUserPermission" } & Pick<
+              PetitionUserPermission,
+              "permissionType"
+            > & {
+                user: { __typename?: "User" } & Pick<
+                  User,
+                  "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                >;
+              })
+        >;
+      }
+  >;
 };
 
 export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Exact<{
@@ -6575,46 +5605,39 @@ export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Ex
 }>;
 
 export type PetitionSharingModal_transferPetitionOwnershipMutation = {
-  transferPetitionOwnership: Array<{
-    __typename?: "Petition";
-    id: string;
-    name?: Maybe<string>;
-    permissions: Array<
-      | {
-          __typename?: "PetitionUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: {
-            __typename?: "UserGroup";
-            id: string;
-            name: string;
-            initials: string;
-            members: Array<{
-              __typename?: "UserGroupMember";
-              user: {
-                __typename?: "User";
-                id: string;
-                email: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
-              };
-            }>;
-          };
-        }
-      | {
-          __typename?: "PetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          user: {
-            __typename?: "User";
-            id: string;
-            email: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
-          };
-        }
-    >;
-  }>;
+  transferPetitionOwnership: Array<
+    { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+        permissions: Array<
+          | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+              PetitionUserGroupPermission,
+              "permissionType"
+            > & {
+                group: { __typename?: "UserGroup" } & Pick<
+                  UserGroup,
+                  "id" | "name" | "initials"
+                > & {
+                    members: Array<
+                      { __typename?: "UserGroupMember" } & {
+                        user: { __typename?: "User" } & Pick<
+                          User,
+                          "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                        >;
+                      }
+                    >;
+                  };
+              })
+          | ({ __typename?: "PetitionUserPermission" } & Pick<
+              PetitionUserPermission,
+              "permissionType"
+            > & {
+                user: { __typename?: "User" } & Pick<
+                  User,
+                  "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                >;
+              })
+        >;
+      }
+  >;
 };
 
 export type PetitionSharingModal_PetitionsQueryVariables = Exact<{
@@ -6624,86 +5647,68 @@ export type PetitionSharingModal_PetitionsQueryVariables = Exact<{
 export type PetitionSharingModal_PetitionsQuery = {
   petitionsById: Array<
     Maybe<
-      | {
-          __typename?: "Petition";
-          id: string;
-          name?: Maybe<string>;
-          permissions: Array<
-            | {
-                __typename?: "PetitionUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: {
-                  __typename?: "UserGroup";
-                  id: string;
-                  name: string;
-                  initials: string;
-                  members: Array<{
-                    __typename?: "UserGroupMember";
-                    user: {
-                      __typename?: "User";
-                      id: string;
-                      email: string;
-                      fullName?: Maybe<string>;
-                      avatarUrl?: Maybe<string>;
-                      initials?: Maybe<string>;
-                    };
-                  }>;
-                };
-              }
-            | {
-                __typename?: "PetitionUserPermission";
-                permissionType: PetitionPermissionType;
-                user: {
-                  __typename?: "User";
-                  id: string;
-                  email: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
-                };
-              }
-          >;
-        }
-      | {
-          __typename?: "PetitionTemplate";
-          id: string;
-          name?: Maybe<string>;
-          permissions: Array<
-            | {
-                __typename?: "PetitionUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: {
-                  __typename?: "UserGroup";
-                  id: string;
-                  name: string;
-                  initials: string;
-                  members: Array<{
-                    __typename?: "UserGroupMember";
-                    user: {
-                      __typename?: "User";
-                      id: string;
-                      email: string;
-                      fullName?: Maybe<string>;
-                      avatarUrl?: Maybe<string>;
-                      initials?: Maybe<string>;
-                    };
-                  }>;
-                };
-              }
-            | {
-                __typename?: "PetitionUserPermission";
-                permissionType: PetitionPermissionType;
-                user: {
-                  __typename?: "User";
-                  id: string;
-                  email: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
-                };
-              }
-          >;
-        }
+      | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+            permissions: Array<
+              | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                  PetitionUserGroupPermission,
+                  "permissionType"
+                > & {
+                    group: { __typename?: "UserGroup" } & Pick<
+                      UserGroup,
+                      "id" | "name" | "initials"
+                    > & {
+                        members: Array<
+                          { __typename?: "UserGroupMember" } & {
+                            user: { __typename?: "User" } & Pick<
+                              User,
+                              "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                            >;
+                          }
+                        >;
+                      };
+                  })
+              | ({ __typename?: "PetitionUserPermission" } & Pick<
+                  PetitionUserPermission,
+                  "permissionType"
+                > & {
+                    user: { __typename?: "User" } & Pick<
+                      User,
+                      "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                    >;
+                  })
+            >;
+          })
+      | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name"> & {
+            permissions: Array<
+              | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                  PetitionUserGroupPermission,
+                  "permissionType"
+                > & {
+                    group: { __typename?: "UserGroup" } & Pick<
+                      UserGroup,
+                      "id" | "name" | "initials"
+                    > & {
+                        members: Array<
+                          { __typename?: "UserGroupMember" } & {
+                            user: { __typename?: "User" } & Pick<
+                              User,
+                              "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                            >;
+                          }
+                        >;
+                      };
+                  })
+              | ({ __typename?: "PetitionUserPermission" } & Pick<
+                  PetitionUserPermission,
+                  "permissionType"
+                > & {
+                    user: { __typename?: "User" } & Pick<
+                      User,
+                      "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                    >;
+                  })
+            >;
+          })
     >
   >;
 };
@@ -6712,125 +5717,103 @@ export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables 
   petitionName?: Maybe<Scalars["String"]>;
 }>;
 
-export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery = {
-  getSlugForPublicPetitionLink: string;
-};
+export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery = Pick<
+  Query,
+  "getSlugForPublicPetitionLink"
+>;
 
 export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables = Exact<{
   slug: Scalars["String"];
 }>;
 
-export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery = {
-  isValidPublicPetitionLinkSlug: boolean;
-};
+export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery = Pick<
+  Query,
+  "isValidPublicPetitionLinkSlug"
+>;
 
 export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   __typename?: "PublicPetitionLink";
-  id: string;
-  title: string;
-  isActive: boolean;
-  description: string;
-  slug: string;
-  linkPermissions: Array<
-    | {
-        __typename?: "PublicPetitionLinkUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string };
-      }
-    | {
-        __typename?: "PublicPetitionLinkUserPermission";
-        permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string };
-      }
-  >;
-};
+} & Pick<PublicPetitionLink, "id" | "title" | "isActive" | "description" | "slug"> & {
+    linkPermissions: Array<
+      | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
+          PublicPetitionLinkUserGroupPermission,
+          "permissionType"
+        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+      | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
+          PublicPetitionLinkUserPermission,
+          "permissionType"
+        > & { user: { __typename?: "User" } & Pick<User, "id"> })
+    >;
+  };
 
 export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  status: PetitionStatus;
-  name?: Maybe<string>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
-};
+} & Pick<Petition, "status" | "name"> & {
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "provider" | "title" | "review" | "letRecipientsChooseSigners"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email"
+            >
+          >;
+        }
+    >;
+  };
 
 export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  name?: Maybe<string>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
-};
+} & Pick<PetitionTemplate, "name"> & {
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "provider" | "title" | "review" | "letRecipientsChooseSigners"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email"
+            >
+          >;
+        }
+    >;
+  };
 
 export type SignatureConfigDialog_PetitionBaseFragment =
   | SignatureConfigDialog_PetitionBase_Petition_Fragment
   | SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment;
 
-export type SignatureConfigDialog_OrgIntegrationFragment = {
-  __typename?: "OrgIntegration";
-  label: string;
-  value: string;
+export type SignatureConfigDialog_OrgIntegrationFragment = { __typename?: "OrgIntegration" } & {
+  label: OrgIntegration["name"];
+  value: OrgIntegration["provider"];
 };
 
 export type TemplateDetailsModal_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  descriptionHtml?: Maybe<string>;
-  name?: Maybe<string>;
-  locale: PetitionLocale;
-  updatedAt: string;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    title?: Maybe<string>;
-    type: PetitionFieldType;
-    options: { [key: string]: any };
-  }>;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    organization: { __typename?: "Organization"; id: string; name: string };
+} & Pick<PetitionTemplate, "id" | "descriptionHtml" | "name" | "locale" | "updatedAt"> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "title" | "type" | "options">
+    >;
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
+        organization: { __typename?: "Organization" } & Pick<Organization, "id" | "name">;
+      };
+    myEffectivePermission?: Maybe<
+      { __typename?: "EffectivePetitionUserPermission" } & Pick<
+        EffectivePetitionUserPermission,
+        "permissionType"
+      >
+    >;
+    publicLink?: Maybe<
+      { __typename?: "PublicPetitionLink" } & Pick<PublicPetitionLink, "id" | "isActive" | "slug">
+    >;
   };
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-  }>;
-  publicLink?: Maybe<{
-    __typename?: "PublicPetitionLink";
-    id: string;
-    isActive: boolean;
-    slug: string;
-  }>;
-};
 
 export type CopySignatureConfigDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
-  email: string;
-  fullName: string;
-};
+} & Pick<PetitionSigner, "email" | "fullName">;
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -6839,11 +5822,10 @@ export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables 
 }>;
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
-  uploadDynamicSelectFieldFile: {
-    __typename?: "PetitionField";
-    id: string;
-    options: { [key: string]: any };
-  };
+  uploadDynamicSelectFieldFile: { __typename?: "PetitionField" } & Pick<
+    PetitionField,
+    "id" | "options"
+  >;
 };
 
 export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables = Exact<{
@@ -6852,49 +5834,43 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVari
 }>;
 
 export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
-  dynamicSelectFieldFileDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: Maybe<string>;
-  };
+  dynamicSelectFieldFileDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
 };
 
-export type PetitionComposeField_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
-  optional: boolean;
-  multiple: boolean;
-  isFixed: boolean;
-  isReadOnly: boolean;
-  visibility?: Maybe<{ [key: string]: any }>;
-  options: { [key: string]: any };
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
-};
+export type PetitionComposeField_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  | "id"
+  | "type"
+  | "title"
+  | "description"
+  | "optional"
+  | "multiple"
+  | "isFixed"
+  | "isReadOnly"
+  | "visibility"
+  | "options"
+> & {
+    attachments: Array<
+      { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+          file: { __typename?: "FileUpload" } & Pick<
+            FileUpload,
+            "filename" | "contentType" | "size" | "isComplete"
+          >;
+        }
+    >;
+  };
 
 export type PetitionComposeField_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
+} & Pick<PetitionFieldAttachment, "id"> & {
+    file: { __typename?: "FileUpload" } & Pick<
+      FileUpload,
+      "filename" | "contentType" | "size" | "isComplete"
+    >;
   };
-};
 
 export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -6903,24 +5879,17 @@ export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation
 }>;
 
 export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation = {
-  createPetitionFieldAttachmentUploadLink: {
-    __typename?: "CreateFileUploadFieldAttachment";
-    presignedPostData: {
-      __typename?: "AWSPresignedPostData";
-      url: string;
-      fields: { [key: string]: any };
-    };
-    attachment: {
-      __typename?: "PetitionFieldAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
+  createPetitionFieldAttachmentUploadLink: { __typename?: "CreateFileUploadFieldAttachment" } & {
+    presignedPostData: { __typename?: "AWSPresignedPostData" } & Pick<
+      AWSPresignedPostData,
+      "url" | "fields"
+    >;
+    attachment: { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+        file: { __typename?: "FileUpload" } & Pick<
+          FileUpload,
+          "filename" | "contentType" | "size" | "isComplete"
+        >;
       };
-    };
   };
 };
 
@@ -6931,17 +5900,15 @@ export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutationVa
 }>;
 
 export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation = {
-  petitionFieldAttachmentUploadComplete: {
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
+  petitionFieldAttachmentUploadComplete: { __typename?: "PetitionFieldAttachment" } & Pick<
+    PetitionFieldAttachment,
+    "id"
+  > & {
+      file: { __typename?: "FileUpload" } & Pick<
+        FileUpload,
+        "filename" | "contentType" | "size" | "isComplete"
+      >;
     };
-  };
 };
 
 export type PetitionComposeField_removePetitionFieldAttachmentMutationVariables = Exact<{
@@ -6950,9 +5917,10 @@ export type PetitionComposeField_removePetitionFieldAttachmentMutationVariables 
   attachmentId: Scalars["GID"];
 }>;
 
-export type PetitionComposeField_removePetitionFieldAttachmentMutation = {
-  removePetitionFieldAttachment: Result;
-};
+export type PetitionComposeField_removePetitionFieldAttachmentMutation = Pick<
+  Mutation,
+  "removePetitionFieldAttachment"
+>;
 
 export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -6961,211 +5929,167 @@ export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVari
 }>;
 
 export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation = {
-  petitionFieldAttachmentDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    url?: Maybe<string>;
-  };
+  petitionFieldAttachmentDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "url"
+  >;
 };
 
 export type PetitionComposeField_updateFieldAttachments_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
+} & {
+  attachments: Array<
+    { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+        file: { __typename?: "FileUpload" } & Pick<
+          FileUpload,
+          "filename" | "contentType" | "size" | "isComplete"
+        >;
+      }
+  >;
 };
 
 export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
+} & Pick<PetitionFieldAttachment, "id"> & {
+    file: { __typename?: "FileUpload" } & Pick<
+      FileUpload,
+      "filename" | "contentType" | "size" | "isComplete"
+    >;
   };
-};
 
-export type PetitionComposeFieldList_PetitionFragment = {
-  __typename?: "Petition";
-  fields: Array<{
-    __typename?: "PetitionField";
-    isFixed: boolean;
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-    description?: Maybe<string>;
-    optional: boolean;
-    multiple: boolean;
-    isReadOnly: boolean;
-    visibility?: Maybe<{ [key: string]: any }>;
-    options: { [key: string]: any };
-    attachments: Array<{
-      __typename?: "PetitionFieldAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
-  }>;
+export type PetitionComposeFieldList_PetitionFragment = { __typename?: "Petition" } & {
+  fields: Array<
+    { __typename?: "PetitionField" } & Pick<
+      PetitionField,
+      | "isFixed"
+      | "id"
+      | "type"
+      | "title"
+      | "description"
+      | "optional"
+      | "multiple"
+      | "isReadOnly"
+      | "visibility"
+      | "options"
+    > & {
+        attachments: Array<
+          { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+              file: { __typename?: "FileUpload" } & Pick<
+                FileUpload,
+                "filename" | "contentType" | "size" | "isComplete"
+              >;
+            }
+        >;
+      }
+  >;
 };
 
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  optional: boolean;
-  multiple: boolean;
-  options: { [key: string]: any };
-  isReadOnly: boolean;
-  isFixed: boolean;
-  position: number;
-  visibility?: Maybe<{ [key: string]: any }>;
-};
+} & Pick<
+  PetitionField,
+  | "id"
+  | "type"
+  | "optional"
+  | "multiple"
+  | "options"
+  | "isReadOnly"
+  | "isFixed"
+  | "position"
+  | "visibility"
+>;
 
 export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  optional: boolean;
-  options: { [key: string]: any };
-};
+} & Pick<PetitionField, "id" | "type" | "optional" | "options">;
 
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  multiple: boolean;
-  options: { [key: string]: any };
-  isReadOnly: boolean;
-  title?: Maybe<string>;
-};
+} & Pick<PetitionField, "id" | "type" | "multiple" | "options" | "isReadOnly" | "title">;
 
 export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  description?: Maybe<any>;
-  isReadOnly: boolean;
-};
+} & Pick<PetitionTemplate, "id" | "emailSubject" | "emailBody" | "description" | "isReadOnly">;
 
 export type ReferencedFieldDialogDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  id: string;
-  title?: Maybe<string>;
-  type: PetitionFieldType;
-};
+} & Pick<PetitionField, "id" | "title" | "type">;
 
-export type PetitionListTagFilter_TagFragment = {
-  __typename?: "Tag";
-  id: string;
-  name: string;
-  color: string;
-};
+export type PetitionListTagFilter_TagFragment = { __typename?: "Tag" } & Pick<
+  Tag,
+  "id" | "name" | "color"
+>;
 
 export type PetitionListTagFilter_tagsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
 }>;
 
 export type PetitionListTagFilter_tagsQuery = {
-  tags: {
-    __typename?: "TagPagination";
-    items: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+  tags: { __typename?: "TagPagination" } & {
+    items: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
   };
 };
 
 export type NewPetitionTemplatesList_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  name?: Maybe<string>;
-  descriptionExcerpt?: Maybe<string>;
-  locale: PetitionLocale;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+} & Pick<PetitionTemplate, "id" | "name" | "descriptionExcerpt" | "locale"> & {
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "avatarUrl" | "initials">;
+    publicLink?: Maybe<
+      { __typename?: "PublicPetitionLink" } & Pick<PublicPetitionLink, "id" | "isActive">
+    >;
   };
-  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
-};
 
-export type TemplateCard_PetitionTemplateFragment = {
-  __typename?: "PetitionTemplate";
-  name?: Maybe<string>;
-  descriptionExcerpt?: Maybe<string>;
-  locale: PetitionLocale;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+export type TemplateCard_PetitionTemplateFragment = { __typename?: "PetitionTemplate" } & Pick<
+  PetitionTemplate,
+  "name" | "descriptionExcerpt" | "locale"
+> & {
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "avatarUrl" | "initials">;
+    publicLink?: Maybe<
+      { __typename?: "PublicPetitionLink" } & Pick<PublicPetitionLink, "id" | "isActive">
+    >;
   };
-  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
-};
 
 export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
-  id: string;
-  status: PetitionSignatureRequestStatus;
-  signerStatus: Array<{
-    __typename?: "PetitionSignatureRequestSignerStatus";
-    status: string;
-    signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-  }>;
+} & Pick<PetitionSignatureRequest, "id" | "status"> & {
+    signerStatus: Array<
+      { __typename?: "PetitionSignatureRequestSignerStatus" } & Pick<
+        PetitionSignatureRequestSignerStatus,
+        "status"
+      > & { signer: { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName"> }
+    >;
+  };
+
+export type ExportRepliesDialog_UserFragment = { __typename?: "User" } & {
+  hasExportCuatrecasas: User["hasFeatureFlag"];
 };
 
-export type ExportRepliesDialog_UserFragment = {
-  __typename?: "User";
-  hasExportCuatrecasas: boolean;
-};
+export type ExportRepliesDialog_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "type" | "title"
+> & { replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "content">> };
 
-export type ExportRepliesDialog_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  replies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
-};
-
-export type ExportRepliesProgressDialog_PetitionFragment = {
-  __typename?: "Petition";
-  id: string;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      metadata: { [key: string]: any };
-      content: { [key: string]: any };
-    }>;
-  }>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-    signedDocumentFilename?: Maybe<string>;
-    auditTrailFilename?: Maybe<string>;
-    metadata: { [key: string]: any };
-  }>;
-};
+export type ExportRepliesProgressDialog_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id"
+> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "type" | "title"> & {
+          replies: Array<
+            { __typename?: "PetitionFieldReply" } & Pick<
+              PetitionFieldReply,
+              "id" | "metadata" | "content"
+            >
+          >;
+        }
+    >;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "id" | "status" | "signedDocumentFilename" | "auditTrailFilename" | "metadata"
+      >
+    >;
+  };
 
 export type ExportRepliesProgressDialog_PetitionRepliesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -7173,30 +6097,24 @@ export type ExportRepliesProgressDialog_PetitionRepliesQueryVariables = Exact<{
 
 export type ExportRepliesProgressDialog_PetitionRepliesQuery = {
   petition?: Maybe<
-    | {
-        __typename?: "Petition";
-        id: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          replies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            metadata: { [key: string]: any };
-            content: { [key: string]: any };
-          }>;
-        }>;
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          signedDocumentFilename?: Maybe<string>;
-          auditTrailFilename?: Maybe<string>;
-          metadata: { [key: string]: any };
-        }>;
-      }
+    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
+          fields: Array<
+            { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "type" | "title"> & {
+                replies: Array<
+                  { __typename?: "PetitionFieldReply" } & Pick<
+                    PetitionFieldReply,
+                    "id" | "metadata" | "content"
+                  >
+                >;
+              }
+          >;
+          currentSignatureRequest?: Maybe<
+            { __typename?: "PetitionSignatureRequest" } & Pick<
+              PetitionSignatureRequest,
+              "id" | "status" | "signedDocumentFilename" | "auditTrailFilename" | "metadata"
+            >
+          >;
+        })
     | { __typename?: "PetitionTemplate" }
   >;
 };
@@ -7207,11 +6125,10 @@ export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVaria
 }>;
 
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
-  fileUploadReplyDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: Maybe<string>;
-  };
+  fileUploadReplyDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
 };
 
 export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables = Exact<{
@@ -7220,11 +6137,10 @@ export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariab
 }>;
 
 export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
-  signedPetitionDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: Maybe<string>;
-  };
+  signedPetitionDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
 };
 
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables = Exact<{
@@ -7234,11 +6150,10 @@ export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation
 }>;
 
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation = {
-  updatePetitionFieldReplyMetadata: {
-    __typename?: "PetitionFieldReply";
-    id: string;
-    metadata: { [key: string]: any };
-  };
+  updatePetitionFieldReplyMetadata: { __typename?: "PetitionFieldReply" } & Pick<
+    PetitionFieldReply,
+    "id" | "metadata"
+  >;
 };
 
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables = Exact<{
@@ -7247,82 +6162,69 @@ export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVa
 }>;
 
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation = {
-  updateSignatureRequestMetadata: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    metadata: { [key: string]: any };
-  };
+  updateSignatureRequestMetadata: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "metadata"
+  >;
 };
 
-export type NewSignatureRequestRow_PetitionFragment = {
-  __typename?: "Petition";
-  status: PetitionStatus;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    letRecipientsChooseSigners: boolean;
-    provider: string;
-    review: boolean;
-    timezone: string;
-    title: string;
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-  }>;
-};
+export type NewSignatureRequestRow_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "status"
+> & {
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "letRecipientsChooseSigners" | "provider" | "review" | "timezone" | "title"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+          >;
+        }
+    >;
+  };
 
 export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
-  id: string;
-  status: PetitionSignatureRequestStatus;
-  signatureConfig: {
-    __typename?: "SignatureConfig";
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-  };
-};
-
-export type PetitionRepliesField_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
-  optional: boolean;
-  validated: boolean;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    createdAt: string;
-    metadata: { [key: string]: any };
-    field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
-  }>;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isUnread: boolean;
-    createdAt: string;
-  }>;
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
+} & Pick<PetitionSignatureRequest, "id" | "status"> & {
+    signatureConfig: { __typename?: "SignatureConfig" } & {
+      signers: Array<
+        { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+      >;
     };
-  }>;
-};
+  };
+
+export type PetitionRepliesField_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "type" | "title" | "description" | "optional" | "validated"
+> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<
+        PetitionFieldReply,
+        "id" | "content" | "status" | "createdAt" | "metadata"
+      > & { field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "type">> }
+    >;
+    comments: Array<
+      { __typename?: "PetitionFieldComment" } & Pick<
+        PetitionFieldComment,
+        "id" | "isUnread" | "createdAt"
+      >
+    >;
+    attachments: Array<
+      { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+          file: { __typename?: "FileUpload" } & Pick<
+            FileUpload,
+            "filename" | "contentType" | "size" | "isComplete"
+          >;
+        }
+    >;
+  };
 
 export type PetitionRepliesField_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-  id: string;
-  content: { [key: string]: any };
-  status: PetitionFieldReplyStatus;
-  createdAt: string;
-  metadata: { [key: string]: any };
-  field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
-};
+} & Pick<PetitionFieldReply, "id" | "content" | "status" | "createdAt" | "metadata"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "type">>;
+  };
 
 export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -7331,147 +6233,133 @@ export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVari
 }>;
 
 export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation = {
-  petitionFieldAttachmentDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    url?: Maybe<string>;
-  };
+  petitionFieldAttachmentDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "url"
+  >;
 };
 
 export type PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
+} & Pick<PetitionFieldAttachment, "id"> & {
+    file: { __typename?: "FileUpload" } & Pick<
+      FileUpload,
+      "filename" | "contentType" | "size" | "isComplete"
+    >;
   };
-};
 
-export type PetitionRepliesFieldComments_UserFragment = {
-  __typename?: "User";
-  id: string;
-  hasInternalComments: boolean;
-};
+export type PetitionRepliesFieldComments_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id"
+> & { hasInternalComments: User["hasFeatureFlag"] };
 
 export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  id: string;
-  title?: Maybe<string>;
-  type: PetitionFieldType;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    content: string;
-    createdAt: string;
-    isUnread: boolean;
-    isEdited: boolean;
-    isInternal?: Maybe<boolean>;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+} & Pick<PetitionField, "id" | "title" | "type"> & {
+    comments: Array<
+      { __typename?: "PetitionFieldComment" } & MakeOptional<
+        Pick<
+          PetitionFieldComment,
+          "id" | "content" | "createdAt" | "isUnread" | "isEdited" | "isInternal"
+        >,
+        "isInternal"
+      > & {
+          author?: Maybe<
+            | ({ __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              })
+            | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+          >;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
     >;
-  }>;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-  }>;
-};
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+    >;
+  };
 
 export type PetitionRepliesFieldComments_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-  id: string;
-  content: { [key: string]: any };
-};
+} & Pick<PetitionFieldReply, "id" | "content">;
 
 export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
-  id: string;
-  content: string;
-  createdAt: string;
-  isUnread: boolean;
-  isEdited: boolean;
-  isInternal?: Maybe<boolean>;
-  author?: Maybe<
-    | {
-        __typename?: "PetitionAccess";
-        contact?: Maybe<{
-          __typename?: "Contact";
-          id: string;
-          fullName?: Maybe<string>;
-          email: string;
-        }>;
-      }
-    | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-  >;
-};
+} & MakeOptional<
+  Pick<
+    PetitionFieldComment,
+    "id" | "content" | "createdAt" | "isUnread" | "isEdited" | "isInternal"
+  >,
+  "isInternal"
+> & {
+    author?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+        })
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+    >;
+  };
 
 export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-  id: string;
-  content: { [key: string]: any };
-  status: PetitionFieldReplyStatus;
-  createdAt: string;
-  metadata: { [key: string]: any };
-  field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
-};
+} & Pick<PetitionFieldReply, "id" | "content" | "status" | "createdAt" | "metadata"> & {
+    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "type">>;
+  };
 
-export type PetitionSignaturesCard_UserFragment = {
-  __typename?: "User";
-  organization: {
-    __typename?: "Organization";
-    signatureIntegrations: Array<{ __typename?: "OrgIntegration"; label: string; value: string }>;
+export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
+  organization: { __typename?: "Organization" } & {
+    signatureIntegrations: Array<
+      { __typename?: "OrgIntegration" } & {
+        label: OrgIntegration["name"];
+        value: OrgIntegration["provider"];
+      }
+    >;
   };
 };
 
-export type PetitionSignaturesCard_PetitionFragment = {
-  __typename?: "Petition";
-  id: string;
-  status: PetitionStatus;
-  name?: Maybe<string>;
-  signatureRequests?: Maybe<
-    Array<{
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      signerStatus: Array<{
-        __typename?: "PetitionSignatureRequestSignerStatus";
-        status: string;
-        signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-      }>;
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-      };
-    }>
-  >;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    timezone: string;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-      fullName: string;
-    }>;
-  }>;
-};
+export type PetitionSignaturesCard_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "status" | "name"
+> & {
+    signatureRequests?: Maybe<
+      Array<
+        { __typename?: "PetitionSignatureRequest" } & Pick<
+          PetitionSignatureRequest,
+          "id" | "status"
+        > & {
+            signerStatus: Array<
+              { __typename?: "PetitionSignatureRequestSignerStatus" } & Pick<
+                PetitionSignatureRequestSignerStatus,
+                "status"
+              > & {
+                  signer: { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "email" | "fullName"
+                  >;
+                }
+            >;
+            signatureConfig: { __typename?: "SignatureConfig" } & {
+              signers: Array<
+                { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+              >;
+            };
+          }
+      >
+    >;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "provider" | "title" | "review" | "letRecipientsChooseSigners" | "timezone"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email" | "fullName"
+            >
+          >;
+        }
+    >;
+  };
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -7480,44 +6368,46 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariable
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
   updatePetition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        status: PetitionStatus;
-        name?: Maybe<string>;
-        signatureRequests?: Maybe<
-          Array<{
-            __typename?: "PetitionSignatureRequest";
-            id: string;
-            status: PetitionSignatureRequestStatus;
-            signerStatus: Array<{
-              __typename?: "PetitionSignatureRequestSignerStatus";
-              status: string;
-              signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-            }>;
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-            };
-          }>
-        >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          timezone: string;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-            fullName: string;
-          }>;
-        }>;
-      }
+    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "status" | "name"> & {
+          signatureRequests?: Maybe<
+            Array<
+              { __typename?: "PetitionSignatureRequest" } & Pick<
+                PetitionSignatureRequest,
+                "id" | "status"
+              > & {
+                  signerStatus: Array<
+                    { __typename?: "PetitionSignatureRequestSignerStatus" } & Pick<
+                      PetitionSignatureRequestSignerStatus,
+                      "status"
+                    > & {
+                        signer: { __typename?: "PetitionSigner" } & Pick<
+                          PetitionSigner,
+                          "email" | "fullName"
+                        >;
+                      }
+                  >;
+                  signatureConfig: { __typename?: "SignatureConfig" } & {
+                    signers: Array<
+                      { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+                    >;
+                  };
+                }
+            >
+          >;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "provider" | "title" | "review" | "letRecipientsChooseSigners" | "timezone"
+            > & {
+                signers: Array<
+                  { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "contactId" | "firstName" | "lastName" | "email" | "fullName"
+                  >
+                >;
+              }
+          >;
+        })
     | { __typename?: "PetitionTemplate" };
 };
 
@@ -7526,11 +6416,10 @@ export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables = Exa
 }>;
 
 export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
-  cancelSignatureRequest: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  };
+  cancelSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "status"
+  >;
 };
 
 export type PetitionSignaturesCard_startSignatureRequestMutationVariables = Exact<{
@@ -7538,11 +6427,10 @@ export type PetitionSignaturesCard_startSignatureRequestMutationVariables = Exac
 }>;
 
 export type PetitionSignaturesCard_startSignatureRequestMutation = {
-  startSignatureRequest: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  };
+  startSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "status"
+  >;
 };
 
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables = Exact<{
@@ -7551,119 +6439,116 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables =
 }>;
 
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
-  signedPetitionDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: Maybe<string>;
-  };
+  signedPetitionDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
 };
 
 export type PetitionSignaturesCard_sendSignatureRequestRemindersMutationVariables = Exact<{
   petitionSignatureRequestId: Scalars["GID"];
 }>;
 
-export type PetitionSignaturesCard_sendSignatureRequestRemindersMutation = {
-  sendSignatureRequestReminders: Result;
-};
+export type PetitionSignaturesCard_sendSignatureRequestRemindersMutation = Pick<
+  Mutation,
+  "sendSignatureRequestReminders"
+>;
 
 export type PublicSignupForm_emailIsAvailableQueryVariables = Exact<{
   email: Scalars["String"];
 }>;
 
-export type PublicSignupForm_emailIsAvailableQuery = { emailIsAvailable: boolean };
+export type PublicSignupForm_emailIsAvailableQuery = Pick<Query, "emailIsAvailable">;
 
-export type PublicTemplateCard_LandingTemplateFragment = {
-  __typename?: "LandingTemplate";
-  id: string;
-  locale: PetitionLocale;
-  name?: Maybe<string>;
-  slug: string;
-  imageUrl?: Maybe<string>;
-  backgroundColor?: Maybe<string>;
-  ownerFullName: string;
-  organizationName: string;
-};
+export type PublicTemplateCard_LandingTemplateFragment = { __typename?: "LandingTemplate" } & Pick<
+  LandingTemplate,
+  | "id"
+  | "locale"
+  | "name"
+  | "slug"
+  | "imageUrl"
+  | "backgroundColor"
+  | "ownerFullName"
+  | "organizationName"
+>;
 
 export type useCompleteSignerInfoDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
-  firstName: string;
-  lastName: string;
-  fullName: string;
-  email: string;
-};
+} & Pick<PetitionSigner, "firstName" | "lastName" | "fullName" | "email">;
 
 export type useCompleteSignerInfoDialog_PublicContactFragment = {
   __typename?: "PublicContact";
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-};
+} & Pick<PublicContact, "firstName" | "lastName" | "email">;
 
-export type RecipientViewContentsCard_PublicUserFragment = {
-  __typename?: "PublicUser";
-  firstName?: Maybe<string>;
-};
+export type RecipientViewContentsCard_PublicUserFragment = { __typename?: "PublicUser" } & Pick<
+  PublicUser,
+  "firstName"
+>;
 
 export type RecipientViewContentsCard_PublicPetitionFragment = {
   __typename?: "PublicPetition";
-  status: PetitionStatus;
-  fields: Array<{
-    __typename?: "PublicPetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-    options: { [key: string]: any };
-    optional: boolean;
-    validated: boolean;
-    isReadOnly: boolean;
-    commentCount: number;
-    unreadCommentCount: number;
-    visibility?: Maybe<{ [key: string]: any }>;
-    replies: Array<{
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
-      content: { [key: string]: any };
-    }>;
-  }>;
-};
+} & Pick<PublicPetition, "status"> & {
+    fields: Array<
+      { __typename?: "PublicPetitionField" } & Pick<
+        PublicPetitionField,
+        | "id"
+        | "type"
+        | "title"
+        | "options"
+        | "optional"
+        | "validated"
+        | "isReadOnly"
+        | "commentCount"
+        | "unreadCommentCount"
+        | "visibility"
+      > & {
+          replies: Array<
+            { __typename?: "PublicPetitionFieldReply" } & Pick<
+              PublicPetitionFieldReply,
+              "id" | "status" | "content"
+            >
+          >;
+        }
+    >;
+  };
 
 export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  options: { [key: string]: any };
-  optional: boolean;
-  validated: boolean;
-  isReadOnly: boolean;
-  commentCount: number;
-  unreadCommentCount: number;
-  visibility?: Maybe<{ [key: string]: any }>;
-  replies: Array<{
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-  }>;
-};
+} & Pick<
+  PublicPetitionField,
+  | "id"
+  | "type"
+  | "title"
+  | "options"
+  | "optional"
+  | "validated"
+  | "isReadOnly"
+  | "commentCount"
+  | "unreadCommentCount"
+  | "visibility"
+> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id" | "status" | "content"
+      >
+    >;
+  };
 
-export type RecipientViewHeader_PublicContactFragment = {
-  __typename?: "PublicContact";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  email: string;
-};
+export type RecipientViewHeader_PublicContactFragment = { __typename?: "PublicContact" } & Pick<
+  PublicContact,
+  "id" | "fullName" | "firstName" | "email"
+>;
 
-export type RecipientViewHeader_PublicUserFragment = {
-  __typename?: "PublicUser";
-  id: string;
-  firstName?: Maybe<string>;
-  fullName?: Maybe<string>;
-  email: string;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-};
+export type RecipientViewHeader_PublicUserFragment = { __typename?: "PublicUser" } & Pick<
+  PublicUser,
+  "id" | "firstName" | "fullName" | "email"
+> & {
+    organization: { __typename?: "PublicOrganization" } & Pick<
+      PublicOrganization,
+      "name" | "logoUrl"
+    >;
+  };
 
 export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables = Exact<{
   keycode: Scalars["ID"];
@@ -7674,108 +6559,95 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables =
 }>;
 
 export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
-  publicDelegateAccessToContact: {
-    __typename?: "PublicPetitionAccess";
-    petition?: Maybe<{
-      __typename?: "PublicPetition";
-      id: string;
-      recipients: Array<{
-        __typename?: "PublicContact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
-    }>;
+  publicDelegateAccessToContact: { __typename?: "PublicPetitionAccess" } & {
+    petition?: Maybe<
+      { __typename?: "PublicPetition" } & Pick<PublicPetition, "id"> & {
+          recipients: Array<
+            { __typename?: "PublicContact" } & Pick<PublicContact, "id" | "fullName" | "email">
+          >;
+        }
+    >;
   };
 };
 
 export type RecipientViewProgressFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
-  status: PetitionStatus;
-  fields: Array<{
-    __typename?: "PublicPetitionField";
-    id: string;
-    type: PetitionFieldType;
-    optional: boolean;
-    validated: boolean;
-    isReadOnly: boolean;
-    options: { [key: string]: any };
-    visibility?: Maybe<{ [key: string]: any }>;
-    replies: Array<{
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "PublicSignatureConfig"; review: boolean }>;
-};
+} & Pick<PublicPetition, "status"> & {
+    fields: Array<
+      { __typename?: "PublicPetitionField" } & Pick<
+        PublicPetitionField,
+        "id" | "type" | "optional" | "validated" | "isReadOnly" | "options" | "visibility"
+      > & {
+          replies: Array<
+            { __typename?: "PublicPetitionFieldReply" } & Pick<
+              PublicPetitionFieldReply,
+              "id" | "content"
+            >
+          >;
+        }
+    >;
+    signatureConfig?: Maybe<
+      { __typename?: "PublicSignatureConfig" } & Pick<PublicSignatureConfig, "review">
+    >;
+  };
 
 export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-  id: string;
-  type: PetitionFieldType;
-  optional: boolean;
-  validated: boolean;
-  isReadOnly: boolean;
-  options: { [key: string]: any };
-  visibility?: Maybe<{ [key: string]: any }>;
-  replies: Array<{
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-  }>;
-};
+} & Pick<
+  PublicPetitionField,
+  "id" | "type" | "optional" | "validated" | "isReadOnly" | "options" | "visibility"
+> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<PublicPetitionFieldReply, "id" | "content">
+    >;
+  };
 
 export type RecipientViewFieldAttachment_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
+} & Pick<PetitionFieldAttachment, "id"> & {
+    file: { __typename?: "FileUpload" } & Pick<
+      FileUpload,
+      "filename" | "contentType" | "size" | "isComplete"
+    >;
   };
-};
 
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
-  contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
+} & {
+  granter?: Maybe<{ __typename?: "PublicUser" } & Pick<PublicUser, "fullName">>;
+  contact?: Maybe<{ __typename?: "PublicContact" } & Pick<PublicContact, "id">>;
 };
 
 export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
-  options: { [key: string]: any };
-  optional: boolean;
-  multiple: boolean;
-  validated: boolean;
-  commentCount: number;
-  unreadCommentCount: number;
-  replies: Array<{
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
-};
+} & Pick<
+  PublicPetitionField,
+  | "id"
+  | "type"
+  | "title"
+  | "description"
+  | "options"
+  | "optional"
+  | "multiple"
+  | "validated"
+  | "commentCount"
+  | "unreadCommentCount"
+> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id" | "status" | "content" | "createdAt" | "updatedAt"
+      >
+    >;
+    attachments: Array<
+      { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+          file: { __typename?: "FileUpload" } & Pick<
+            FileUpload,
+            "filename" | "contentType" | "size" | "isComplete"
+          >;
+        }
+    >;
+  };
 
 export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutationVariables =
   Exact<{
@@ -7785,83 +6657,73 @@ export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink
   }>;
 
 export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation = {
-  publicPetitionFieldAttachmentDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    url?: Maybe<string>;
-  };
+  publicPetitionFieldAttachmentDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "url"
+  >;
 };
 
 export type RecipientViewPetitionFieldCard_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
-  contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
+} & {
+  granter?: Maybe<{ __typename?: "PublicUser" } & Pick<PublicUser, "fullName">>;
+  contact?: Maybe<{ __typename?: "PublicContact" } & Pick<PublicContact, "id">>;
 };
 
 export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
-  options: { [key: string]: any };
-  optional: boolean;
-  multiple: boolean;
-  validated: boolean;
-  commentCount: number;
-  unreadCommentCount: number;
-  replies: Array<{
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
-};
+} & Pick<
+  PublicPetitionField,
+  | "id"
+  | "type"
+  | "title"
+  | "description"
+  | "options"
+  | "optional"
+  | "multiple"
+  | "validated"
+  | "commentCount"
+  | "unreadCommentCount"
+> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id" | "status" | "content" | "createdAt" | "updatedAt"
+      >
+    >;
+    attachments: Array<
+      { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+          file: { __typename?: "FileUpload" } & Pick<
+            FileUpload,
+            "filename" | "contentType" | "size" | "isComplete"
+          >;
+        }
+    >;
+  };
 
 export type RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment = {
   __typename?: "PublicPetitionFieldReply";
-  id: string;
-  status: PetitionFieldReplyStatus;
-  content: { [key: string]: any };
-  createdAt: string;
-  updatedAt: string;
-};
+} & Pick<PublicPetitionFieldReply, "id" | "status" | "content" | "createdAt" | "updatedAt">;
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
-  contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
+} & {
+  granter?: Maybe<{ __typename?: "PublicUser" } & Pick<PublicUser, "fullName">>;
+  contact?: Maybe<{ __typename?: "PublicContact" } & Pick<PublicContact, "id">>;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-  id: string;
-  title?: Maybe<string>;
-};
+} & Pick<PublicPetitionField, "id" | "title">;
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment = {
   __typename?: "PublicPetitionFieldComment";
-  id: string;
-  content: string;
-  createdAt: string;
-  isUnread: boolean;
-  author?: Maybe<
-    | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-    | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-  >;
-};
+} & Pick<PublicPetitionFieldComment, "id" | "content" | "createdAt" | "isUnread"> & {
+    author?: Maybe<
+      | ({ __typename?: "PublicContact" } & Pick<PublicContact, "id" | "fullName">)
+      | ({ __typename?: "PublicUser" } & Pick<PublicUser, "id" | "fullName">)
+    >;
+  };
 
 export type RecipientViewPetitionFieldCommentsQueryVariables = Exact<{
   keycode: Scalars["ID"];
@@ -7869,17 +6731,17 @@ export type RecipientViewPetitionFieldCommentsQueryVariables = Exact<{
 }>;
 
 export type RecipientViewPetitionFieldCommentsQuery = {
-  petitionFieldComments: Array<{
-    __typename?: "PublicPetitionFieldComment";
-    id: string;
-    content: string;
-    createdAt: string;
-    isUnread: boolean;
-    author?: Maybe<
-      | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-      | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-    >;
-  }>;
+  petitionFieldComments: Array<
+    { __typename?: "PublicPetitionFieldComment" } & Pick<
+      PublicPetitionFieldComment,
+      "id" | "content" | "createdAt" | "isUnread"
+    > & {
+        author?: Maybe<
+          | ({ __typename?: "PublicContact" } & Pick<PublicContact, "id" | "fullName">)
+          | ({ __typename?: "PublicUser" } & Pick<PublicUser, "id" | "fullName">)
+        >;
+      }
+  >;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationVariables =
@@ -7889,11 +6751,12 @@ export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAs
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation = {
-  publicMarkPetitionFieldCommentsAsRead: Array<{
-    __typename?: "PublicPetitionFieldComment";
-    id: string;
-    isUnread: boolean;
-  }>;
+  publicMarkPetitionFieldCommentsAsRead: Array<
+    { __typename?: "PublicPetitionFieldComment" } & Pick<
+      PublicPetitionFieldComment,
+      "id" | "isUnread"
+    >
+  >;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables =
@@ -7904,17 +6767,15 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation = {
-  publicCreatePetitionFieldComment: {
-    __typename?: "PublicPetitionFieldComment";
-    id: string;
-    content: string;
-    createdAt: string;
-    isUnread: boolean;
-    author?: Maybe<
-      | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-      | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-    >;
-  };
+  publicCreatePetitionFieldComment: { __typename?: "PublicPetitionFieldComment" } & Pick<
+    PublicPetitionFieldComment,
+    "id" | "content" | "createdAt" | "isUnread"
+  > & {
+      author?: Maybe<
+        | ({ __typename?: "PublicContact" } & Pick<PublicContact, "id" | "fullName">)
+        | ({ __typename?: "PublicUser" } & Pick<PublicUser, "id" | "fullName">)
+      >;
+    };
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables =
@@ -7926,17 +6787,15 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation = {
-  publicUpdatePetitionFieldComment: {
-    __typename?: "PublicPetitionFieldComment";
-    id: string;
-    content: string;
-    createdAt: string;
-    isUnread: boolean;
-    author?: Maybe<
-      | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
-      | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
-    >;
-  };
+  publicUpdatePetitionFieldComment: { __typename?: "PublicPetitionFieldComment" } & Pick<
+    PublicPetitionFieldComment,
+    "id" | "content" | "createdAt" | "isUnread"
+  > & {
+      author?: Maybe<
+        | ({ __typename?: "PublicContact" } & Pick<PublicContact, "id" | "fullName">)
+        | ({ __typename?: "PublicUser" } & Pick<PublicUser, "id" | "fullName">)
+      >;
+    };
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables =
@@ -7946,15 +6805,14 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
     petitionFieldCommentId: Scalars["GID"];
   }>;
 
-export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation = {
-  publicDeletePetitionFieldComment: Result;
-};
+export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation = Pick<
+  Mutation,
+  "publicDeletePetitionFieldComment"
+>;
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment = {
   __typename?: "PublicPetitionField";
-  commentCount: number;
-  unreadCommentCount: number;
-};
+} & Pick<PublicPetitionField, "commentCount" | "unreadCommentCount">;
 
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables =
   Exact<{
@@ -7964,11 +6822,10 @@ export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLi
   }>;
 
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation = {
-  publicFileUploadReplyDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: Maybe<string>;
-  };
+  publicFileUploadReplyDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables = Exact<{
@@ -7976,9 +6833,10 @@ export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutatio
   keycode: Scalars["ID"];
 }>;
 
-export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation = {
-  publicDeletePetitionReply: Result;
-};
+export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation = Pick<
+  Mutation,
+  "publicDeletePetitionReply"
+>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
@@ -7987,13 +6845,10 @@ export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationV
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation = {
-  publicUpdateSimpleReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    updatedAt: string;
-  };
+  publicUpdateSimpleReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "content" | "status" | "updatedAt"
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables = Exact<{
@@ -8003,14 +6858,10 @@ export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationV
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation = {
-  publicCreateSimpleReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  };
+  publicCreateSimpleReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "status" | "content" | "createdAt" | "updatedAt"
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables = Exact<{
@@ -8020,14 +6871,10 @@ export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutatio
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation = {
-  publicCreateCheckboxReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  };
+  publicCreateCheckboxReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "status" | "content" | "createdAt" | "updatedAt"
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables = Exact<{
@@ -8037,13 +6884,10 @@ export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutatio
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation = {
-  publicUpdateCheckboxReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    updatedAt: string;
-  };
+  publicUpdateCheckboxReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "content" | "status" | "updatedAt"
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables =
@@ -8057,14 +6901,10 @@ export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMu
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation = {
-  publicCreateDynamicSelectReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  };
+  publicCreateDynamicSelectReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "status" | "content" | "createdAt" | "updatedAt"
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables =
@@ -8078,13 +6918,10 @@ export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMu
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation = {
-  publicUpdateDynamicSelectReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    updatedAt: string;
-  };
+  publicUpdateDynamicSelectReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "content" | "status" | "updatedAt"
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables =
@@ -8095,21 +6932,15 @@ export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutat
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation = {
-  publicCreateFileUploadReply: {
-    __typename?: "CreateFileUploadReply";
-    presignedPostData: {
-      __typename?: "AWSPresignedPostData";
-      url: string;
-      fields: { [key: string]: any };
-    };
-    reply: {
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
-      content: { [key: string]: any };
-      createdAt: string;
-      updatedAt: string;
-    };
+  publicCreateFileUploadReply: { __typename?: "CreateFileUploadReply" } & {
+    presignedPostData: { __typename?: "AWSPresignedPostData" } & Pick<
+      AWSPresignedPostData,
+      "url" | "fields"
+    >;
+    reply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id" | "status" | "content" | "createdAt" | "updatedAt"
+    >;
   };
 };
 
@@ -8120,138 +6951,138 @@ export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMut
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation = {
-  publicFileUploadReplyComplete: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-  };
+  publicFileUploadReplyComplete: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "content"
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-  replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<PublicPetitionFieldReply, "id">
+  >;
 };
 
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
-  { __typename?: "PublicPetitionFieldReply"; content: { [key: string]: any } };
+  { __typename?: "PublicPetitionFieldReply" } & Pick<PublicPetitionFieldReply, "content">;
 
 export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment = {
   __typename?: "PublicPetition";
-  status: PetitionStatus;
-};
+} & Pick<PublicPetition, "status">;
 
 export type EventSubscriptionCard_PetitionEventSubscriptionFragment = {
   __typename?: "PetitionEventSubscription";
-  id: string;
-  eventsUrl: string;
-  isEnabled: boolean;
-};
+} & Pick<PetitionEventSubscription, "id" | "eventsUrl" | "isEnabled">;
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
   tokenName: Scalars["String"];
 }>;
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
-  generateUserAuthToken: {
-    __typename?: "GenerateUserAuthTokenResponse";
-    apiKey: string;
-    userAuthToken: {
-      __typename?: "UserAuthenticationToken";
-      id: string;
-      tokenName: string;
-      createdAt: string;
-      lastUsedAt?: Maybe<string>;
+  generateUserAuthToken: { __typename?: "GenerateUserAuthTokenResponse" } & Pick<
+    GenerateUserAuthTokenResponse,
+    "apiKey"
+  > & {
+      userAuthToken: { __typename?: "UserAuthenticationToken" } & Pick<
+        UserAuthenticationToken,
+        "id" | "tokenName" | "createdAt" | "lastUsedAt"
+      >;
     };
-  };
 };
 
-export type Admin_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type Admin_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
 export type AdminQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AdminQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
+    };
+};
+
+export type AdminOrganizations_OrganizationFragment = { __typename?: "Organization" } & Pick<
+  Organization,
+  "id" | "_id" | "name" | "status" | "userCount" | "createdAt"
+> & {
+    usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+      users: { __typename?: "OrganizationUsageUserLimit" } & Pick<
+        OrganizationUsageUserLimit,
+        "limit"
+      >;
+      petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+        OrganizationUsagePetitionLimit,
+        "used" | "limit"
+      >;
+    };
+  };
+
+export type AdminOrganizations_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
       };
-    };
   };
-};
-
-export type AdminOrganizations_OrganizationFragment = {
-  __typename?: "Organization";
-  id: string;
-  _id: number;
-  name: string;
-  status: OrganizationStatus;
-  userCount: number;
-  createdAt: string;
-  usageLimits: {
-    __typename?: "OrganizationUsageLimit";
-    users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-    petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
-  };
-};
-
-export type AdminOrganizations_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
-};
 
 export type AdminOrganizationsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -8262,268 +7093,253 @@ export type AdminOrganizationsQueryVariables = Exact<{
 }>;
 
 export type AdminOrganizationsQuery = {
-  organizations: {
-    __typename?: "OrganizationPagination";
-    totalCount: number;
-    items: Array<{
-      __typename?: "Organization";
-      id: string;
-      _id: number;
-      name: string;
-      status: OrganizationStatus;
-      userCount: number;
-      createdAt: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
-      };
-    }>;
-  };
+  organizations: { __typename?: "OrganizationPagination" } & Pick<
+    OrganizationPagination,
+    "totalCount"
+  > & {
+      items: Array<
+        { __typename?: "Organization" } & Pick<
+          Organization,
+          "id" | "_id" | "name" | "status" | "userCount" | "createdAt"
+        > & {
+            usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+              users: { __typename?: "OrganizationUsageUserLimit" } & Pick<
+                OrganizationUsageUserLimit,
+                "limit"
+              >;
+              petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+                OrganizationUsagePetitionLimit,
+                "used" | "limit"
+              >;
+            };
+          }
+      >;
+    };
 };
 
 export type AdminOrganizationsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AdminOrganizationsUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
-export type AdminSupportMethods_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type AdminSupportMethods_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
 export type AdminSupportMethodsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AdminSupportMethodsUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
+    };
+};
+
+export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "email" | "fullName" | "firstName" | "lastName"
+> & {
+    accesses: { __typename?: "PetitionAccessPagination" } & {
+      items: Array<
+        { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id"> & {
+            petition?: Maybe<
+              { __typename?: "Petition" } & Pick<Petition, "id" | "name" | "sentAt" | "status"> & {
+                  permissions: Array<
+                    | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                        PetitionUserGroupPermission,
+                        "permissionType"
+                      > & {
+                          group: { __typename?: "UserGroup" } & Pick<
+                            UserGroup,
+                            "id" | "name" | "initials"
+                          >;
+                        })
+                    | ({ __typename?: "PetitionUserPermission" } & Pick<
+                        PetitionUserPermission,
+                        "permissionType"
+                      > & {
+                          user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "fullName" | "avatarUrl" | "initials"
+                          >;
+                        })
+                  >;
+                  progress: { __typename?: "PetitionProgress" } & Pick<
+                    PetitionProgress,
+                    "validated" | "replied" | "optional" | "total"
+                  >;
+                  currentSignatureRequest?: Maybe<
+                    { __typename?: "PetitionSignatureRequest" } & Pick<
+                      PetitionSignatureRequest,
+                      "status"
+                    >
+                  >;
+                  signatureConfig?: Maybe<
+                    { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+                  >;
+                }
+            >;
+          }
+      >;
     };
   };
-};
 
-export type Contact_ContactFragment = {
-  __typename?: "Contact";
-  id: string;
-  email: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  accesses: {
-    __typename?: "PetitionAccessPagination";
-    items: Array<{
-      __typename?: "PetitionAccess";
-      id: string;
-      petition?: Maybe<{
-        __typename?: "Petition";
-        id: string;
-        name?: Maybe<string>;
-        sentAt?: Maybe<string>;
-        status: PetitionStatus;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
-              };
-            }
-        >;
-        progress: {
-          __typename?: "PetitionProgress";
-          validated: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
-        }>;
-        signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-      }>;
-    }>;
-  };
-};
+export type Contact_Contact_ProfileFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "email" | "fullName" | "firstName" | "lastName"
+>;
 
-export type Contact_Contact_ProfileFragment = {
-  __typename?: "Contact";
-  id: string;
-  email: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-};
-
-export type Contact_PetitionAccessFragment = {
-  __typename?: "PetitionAccess";
-  id: string;
-  petition?: Maybe<{
-    __typename?: "Petition";
-    id: string;
-    name?: Maybe<string>;
-    sentAt?: Maybe<string>;
-    status: PetitionStatus;
-    permissions: Array<
-      | {
-          __typename?: "PetitionUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-        }
-      | {
-          __typename?: "PetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          user: {
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            avatarUrl?: Maybe<string>;
-            initials?: Maybe<string>;
-          };
+export type Contact_PetitionAccessFragment = { __typename?: "PetitionAccess" } & Pick<
+  PetitionAccess,
+  "id"
+> & {
+    petition?: Maybe<
+      { __typename?: "Petition" } & Pick<Petition, "id" | "name" | "sentAt" | "status"> & {
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials">;
+                })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & {
+                  user: { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "fullName" | "avatarUrl" | "initials"
+                  >;
+                })
+          >;
+          progress: { __typename?: "PetitionProgress" } & Pick<
+            PetitionProgress,
+            "validated" | "replied" | "optional" | "total"
+          >;
+          currentSignatureRequest?: Maybe<
+            { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+          >;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+          >;
         }
     >;
-    progress: {
-      __typename?: "PetitionProgress";
-      validated: number;
-      replied: number;
-      optional: number;
-      total: number;
-    };
-    currentSignatureRequest?: Maybe<{
-      __typename?: "PetitionSignatureRequest";
-      status: PetitionSignatureRequestStatus;
-    }>;
-    signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-  }>;
-};
+  };
 
-export type Contact_PetitionFragment = {
-  __typename?: "Petition";
-  id: string;
-  name?: Maybe<string>;
-  sentAt?: Maybe<string>;
-  status: PetitionStatus;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
+export type Contact_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "name" | "sentAt" | "status"
+> & {
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials"> })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "fullName" | "avatarUrl" | "initials"
+            >;
+          })
+    >;
+    progress: { __typename?: "PetitionProgress" } & Pick<
+      PetitionProgress,
+      "validated" | "replied" | "optional" | "total"
+    >;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+    >;
+    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
+  };
+
+export type Contact_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & { hasPetitionSignature: User["hasFeatureFlag"] } & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
         };
-      }
-  >;
-  progress: {
-    __typename?: "PetitionProgress";
-    validated: number;
-    replied: number;
-    optional: number;
-    total: number;
+      };
   };
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-};
-
-export type Contact_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  hasPetitionSignature: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
-};
 
 export type Contact_updateContactMutationVariables = Exact<{
   id: Scalars["GID"];
@@ -8531,42 +7347,38 @@ export type Contact_updateContactMutationVariables = Exact<{
 }>;
 
 export type Contact_updateContactMutation = {
-  updateContact: {
-    __typename?: "Contact";
-    id: string;
-    email: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-  };
+  updateContact: { __typename?: "Contact" } & Pick<
+    Contact,
+    "id" | "email" | "fullName" | "firstName" | "lastName"
+  >;
 };
 
 export type ContactUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ContactUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasPetitionSignature: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & { hasPetitionSignature: User["hasFeatureFlag"] } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type ContactQueryVariables = Exact<{
@@ -8575,102 +7387,102 @@ export type ContactQueryVariables = Exact<{
 }>;
 
 export type ContactQuery = {
-  contact?: Maybe<{
-    __typename?: "Contact";
-    id: string;
-    email: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    accesses: {
-      __typename?: "PetitionAccessPagination";
-      items: Array<{
-        __typename?: "PetitionAccess";
-        id: string;
-        petition?: Maybe<{
-          __typename?: "Petition";
-          id: string;
-          name?: Maybe<string>;
-          sentAt?: Maybe<string>;
-          status: PetitionStatus;
-          permissions: Array<
-            | {
-                __typename?: "PetitionUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-              }
-            | {
-                __typename?: "PetitionUserPermission";
-                permissionType: PetitionPermissionType;
-                user: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
-                };
+  contact?: Maybe<
+    { __typename?: "Contact" } & Pick<
+      Contact,
+      "id" | "email" | "fullName" | "firstName" | "lastName"
+    > & {
+        accesses: { __typename?: "PetitionAccessPagination" } & {
+          items: Array<
+            { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id"> & {
+                petition?: Maybe<
+                  { __typename?: "Petition" } & Pick<
+                    Petition,
+                    "id" | "name" | "sentAt" | "status"
+                  > & {
+                      permissions: Array<
+                        | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                            PetitionUserGroupPermission,
+                            "permissionType"
+                          > & {
+                              group: { __typename?: "UserGroup" } & Pick<
+                                UserGroup,
+                                "id" | "name" | "initials"
+                              >;
+                            })
+                        | ({ __typename?: "PetitionUserPermission" } & Pick<
+                            PetitionUserPermission,
+                            "permissionType"
+                          > & {
+                              user: { __typename?: "User" } & Pick<
+                                User,
+                                "id" | "fullName" | "avatarUrl" | "initials"
+                              >;
+                            })
+                      >;
+                      progress: { __typename?: "PetitionProgress" } & Pick<
+                        PetitionProgress,
+                        "validated" | "replied" | "optional" | "total"
+                      >;
+                      currentSignatureRequest?: Maybe<
+                        { __typename?: "PetitionSignatureRequest" } & Pick<
+                          PetitionSignatureRequest,
+                          "status"
+                        >
+                      >;
+                      signatureConfig?: Maybe<
+                        { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+                      >;
+                    }
+                >;
               }
           >;
-          progress: {
-            __typename?: "PetitionProgress";
-            validated: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-          currentSignatureRequest?: Maybe<{
-            __typename?: "PetitionSignatureRequest";
-            status: PetitionSignatureRequestStatus;
-          }>;
-          signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-        }>;
-      }>;
-    };
-  }>;
+        };
+      }
+  >;
 };
 
-export type Contacts_ContactsListFragment = {
-  __typename?: "ContactPagination";
-  totalCount: number;
-  items: Array<{
-    __typename?: "Contact";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-  }>;
-};
-
-export type Contacts_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type Contacts_ContactsListFragment = { __typename?: "ContactPagination" } & Pick<
+  ContactPagination,
+  "totalCount"
+> & {
+    items: Array<
+      { __typename?: "Contact" } & Pick<
+        Contact,
+        "id" | "fullName" | "firstName" | "lastName" | "email" | "createdAt"
+      >
+    >;
   };
-};
+
+export type Contacts_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
+  };
 
 export type Contacts_deleteContactsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type Contacts_deleteContactsMutation = { deleteContacts: Result };
+export type Contacts_deleteContactsMutation = Pick<Mutation, "deleteContacts">;
 
 export type ContactsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -8680,52 +7492,48 @@ export type ContactsQueryVariables = Exact<{
 }>;
 
 export type ContactsQuery = {
-  contacts: {
-    __typename?: "ContactPagination";
-    totalCount: number;
-    items: Array<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      firstName?: Maybe<string>;
-      lastName?: Maybe<string>;
-      email: string;
-      createdAt: string;
-    }>;
-  };
+  contacts: { __typename?: "ContactPagination" } & Pick<ContactPagination, "totalCount"> & {
+      items: Array<
+        { __typename?: "Contact" } & Pick<
+          Contact,
+          "id" | "fullName" | "firstName" | "lastName" | "email" | "createdAt"
+        >
+      >;
+    };
 };
 
 export type ContactsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ContactsUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type AppPetitionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AppPetitionsQuery = {
-  petitions: { __typename?: "PetitionBasePagination"; totalCount: number };
+  petitions: { __typename?: "PetitionBasePagination" } & Pick<PetitionBasePagination, "totalCount">;
 };
 
 export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
@@ -8733,7 +7541,7 @@ export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
 }>;
 
 export type OrganizationBranding_updateOrgLogoMutation = {
-  updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: Maybe<string> };
+  updateOrganizationLogo: { __typename?: "Organization" } & Pick<Organization, "id" | "logoUrl">;
 };
 
 export type OrganizationBranding_updateOrganizationPreferredToneMutationVariables = Exact<{
@@ -8741,81 +7549,82 @@ export type OrganizationBranding_updateOrganizationPreferredToneMutationVariable
 }>;
 
 export type OrganizationBranding_updateOrganizationPreferredToneMutation = {
-  updateOrganizationPreferredTone: { __typename?: "Organization"; id: string; preferredTone: Tone };
+  updateOrganizationPreferredTone: { __typename?: "Organization" } & Pick<
+    Organization,
+    "id" | "preferredTone"
+  >;
 };
 
 export type OrganizationBrandingQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationBrandingQuery = {
-  me: {
-    __typename?: "User";
-    fullName?: Maybe<string>;
-    id: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      logoUrl?: Maybe<string>;
-      name: string;
-      preferredTone: Tone;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "fullName"
+    | "id"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<
+        Organization,
+        "id" | "logoUrl" | "name" | "preferredTone"
+      > & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
+    };
+};
+
+export type OrganizationGroup_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
+  UserGroup,
+  "id" | "name" | "createdAt"
+> & {
+    members: Array<
+      { __typename?: "UserGroupMember" } & Pick<UserGroupMember, "id" | "addedAt"> & {
+          user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+        }
+    >;
+  };
+
+export type OrganizationGroup_UserGroupMemberFragment = { __typename?: "UserGroupMember" } & Pick<
+  UserGroupMember,
+  "id" | "addedAt"
+> & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> };
+
+export type OrganizationGroup_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
       };
-    };
   };
-};
-
-export type OrganizationGroup_UserGroupFragment = {
-  __typename?: "UserGroup";
-  id: string;
-  name: string;
-  createdAt: string;
-  members: Array<{
-    __typename?: "UserGroupMember";
-    id: string;
-    addedAt: string;
-    user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-  }>;
-};
-
-export type OrganizationGroup_UserGroupMemberFragment = {
-  __typename?: "UserGroupMember";
-  id: string;
-  addedAt: string;
-  user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-};
-
-export type OrganizationGroup_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
-};
 
 export type OrganizationGroup_updateUserGroupMutationVariables = Exact<{
   id: Scalars["GID"];
@@ -8823,18 +7632,13 @@ export type OrganizationGroup_updateUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_updateUserGroupMutation = {
-  updateUserGroup: {
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      id: string;
-      addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-    }>;
-  };
+  updateUserGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
+      members: Array<
+        { __typename?: "UserGroupMember" } & Pick<UserGroupMember, "id" | "addedAt"> & {
+            user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+          }
+      >;
+    };
 };
 
 export type OrganizationGroup_addUsersToUserGroupMutationVariables = Exact<{
@@ -8843,18 +7647,16 @@ export type OrganizationGroup_addUsersToUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_addUsersToUserGroupMutation = {
-  addUsersToUserGroup: {
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      id: string;
-      addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-    }>;
-  };
+  addUsersToUserGroup: { __typename?: "UserGroup" } & Pick<
+    UserGroup,
+    "id" | "name" | "createdAt"
+  > & {
+      members: Array<
+        { __typename?: "UserGroupMember" } & Pick<UserGroupMember, "id" | "addedAt"> & {
+            user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+          }
+      >;
+    };
 };
 
 export type OrganizationGroup_removeUsersFromGroupMutationVariables = Exact<{
@@ -8863,25 +7665,23 @@ export type OrganizationGroup_removeUsersFromGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_removeUsersFromGroupMutation = {
-  removeUsersFromGroup: {
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      id: string;
-      addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-    }>;
-  };
+  removeUsersFromGroup: { __typename?: "UserGroup" } & Pick<
+    UserGroup,
+    "id" | "name" | "createdAt"
+  > & {
+      members: Array<
+        { __typename?: "UserGroupMember" } & Pick<UserGroupMember, "id" | "addedAt"> & {
+            user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+          }
+      >;
+    };
 };
 
 export type OrganizationGroup_deleteUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type OrganizationGroup_deleteUserGroupMutation = { deleteUserGroup: Result };
+export type OrganizationGroup_deleteUserGroupMutation = Pick<Mutation, "deleteUserGroup">;
 
 export type OrganizationGroup_cloneUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
@@ -8889,18 +7689,15 @@ export type OrganizationGroup_cloneUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_cloneUserGroupMutation = {
-  cloneUserGroup: Array<{
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      id: string;
-      addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-    }>;
-  }>;
+  cloneUserGroup: Array<
+    { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
+        members: Array<
+          { __typename?: "UserGroupMember" } & Pick<UserGroupMember, "id" | "addedAt"> & {
+              user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+            }
+        >;
+      }
+  >;
 };
 
 export type OrganizationGroupQueryVariables = Exact<{
@@ -8908,107 +7705,96 @@ export type OrganizationGroupQueryVariables = Exact<{
 }>;
 
 export type OrganizationGroupQuery = {
-  userGroup?: Maybe<{
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      id: string;
-      addedAt: string;
-      user: { __typename?: "User"; id: string; fullName?: Maybe<string>; email: string };
-    }>;
-  }>;
+  userGroup?: Maybe<
+    { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
+        members: Array<
+          { __typename?: "UserGroupMember" } & Pick<UserGroupMember, "id" | "addedAt"> & {
+              user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+            }
+        >;
+      }
+  >;
 };
 
 export type OrganizationGroupUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationGroupUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    role: OrganizationRole;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "role"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type OrganizationGroups_UserGroupPaginationFragment = {
   __typename?: "UserGroupPagination";
-  totalCount: number;
-  items: Array<{
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      user: {
-        __typename?: "User";
-        id: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
-      };
-    }>;
-  }>;
-};
-
-export type OrganizationGroups_UserGroupFragment = {
-  __typename?: "UserGroup";
-  id: string;
-  name: string;
-  createdAt: string;
-  members: Array<{
-    __typename?: "UserGroupMember";
-    user: {
-      __typename?: "User";
-      id: string;
-      fullName?: Maybe<string>;
-      avatarUrl?: Maybe<string>;
-      initials?: Maybe<string>;
-    };
-  }>;
-};
-
-export type OrganizationGroups_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+} & Pick<UserGroupPagination, "totalCount"> & {
+    items: Array<
+      { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
+          members: Array<
+            { __typename?: "UserGroupMember" } & {
+              user: { __typename?: "User" } & Pick<
+                User,
+                "id" | "fullName" | "avatarUrl" | "initials"
+              >;
+            }
+          >;
+        }
+    >;
   };
-};
+
+export type OrganizationGroups_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
+  UserGroup,
+  "id" | "name" | "createdAt"
+> & {
+    members: Array<
+      { __typename?: "UserGroupMember" } & {
+        user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "avatarUrl" | "initials">;
+      }
+    >;
+  };
+
+export type OrganizationGroups_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
+  };
 
 export type OrganizationGroups_createUserGroupMutationVariables = Exact<{
   name: Scalars["String"];
@@ -9016,29 +7802,20 @@ export type OrganizationGroups_createUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroups_createUserGroupMutation = {
-  createUserGroup: {
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      user: {
-        __typename?: "User";
-        id: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
-      };
-    }>;
-  };
+  createUserGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
+      members: Array<
+        { __typename?: "UserGroupMember" } & {
+          user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "avatarUrl" | "initials">;
+        }
+      >;
+    };
 };
 
 export type OrganizationGroups_deleteUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type OrganizationGroups_deleteUserGroupMutation = { deleteUserGroup: Result };
+export type OrganizationGroups_deleteUserGroupMutation = Pick<Mutation, "deleteUserGroup">;
 
 export type OrganizationGroups_cloneUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
@@ -9046,22 +7823,18 @@ export type OrganizationGroups_cloneUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroups_cloneUserGroupMutation = {
-  cloneUserGroup: Array<{
-    __typename?: "UserGroup";
-    id: string;
-    name: string;
-    createdAt: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      user: {
-        __typename?: "User";
-        id: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
-      };
-    }>;
-  }>;
+  cloneUserGroup: Array<
+    { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
+        members: Array<
+          { __typename?: "UserGroupMember" } & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "fullName" | "avatarUrl" | "initials"
+            >;
+          }
+        >;
+      }
+  >;
 };
 
 export type OrganizationGroupsQueryVariables = Exact<{
@@ -9072,124 +7845,123 @@ export type OrganizationGroupsQueryVariables = Exact<{
 }>;
 
 export type OrganizationGroupsQuery = {
-  userGroups: {
-    __typename?: "UserGroupPagination";
-    totalCount: number;
-    items: Array<{
-      __typename?: "UserGroup";
-      id: string;
-      name: string;
-      createdAt: string;
-      members: Array<{
-        __typename?: "UserGroupMember";
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
-        };
-      }>;
-    }>;
-  };
+  userGroups: { __typename?: "UserGroupPagination" } & Pick<UserGroupPagination, "totalCount"> & {
+      items: Array<
+        { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
+            members: Array<
+              { __typename?: "UserGroupMember" } & {
+                user: { __typename?: "User" } & Pick<
+                  User,
+                  "id" | "fullName" | "avatarUrl" | "initials"
+                >;
+              }
+            >;
+          }
+      >;
+    };
 };
 
 export type OrganizationGroupsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationGroupsUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    role: OrganizationRole;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "role"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type OrganizationSettingsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationSettingsQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type OrganizationUsageQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationUsageQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      userCount: number;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id" | "userCount"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            users: { __typename?: "OrganizationUsageUserLimit" } & Pick<
+              OrganizationUsageUserLimit,
+              "limit"
+            >;
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "used" | "limit"
+            >;
+          };
+        };
     };
-  };
 };
 
-export type OrganizationUsers_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  role: OrganizationRole;
-  createdAt: string;
-  lastActiveAt?: Maybe<string>;
-  status: UserStatus;
-  isSsoUser: boolean;
-};
+export type OrganizationUsers_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "role"
+  | "createdAt"
+  | "lastActiveAt"
+  | "status"
+  | "isSsoUser"
+>;
 
 export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
   firstName: Scalars["String"];
@@ -9200,19 +7972,19 @@ export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
 }>;
 
 export type OrganizationUsers_createOrganizationUserMutation = {
-  createOrganizationUser: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    role: OrganizationRole;
-    createdAt: string;
-    lastActiveAt?: Maybe<string>;
-    status: UserStatus;
-    isSsoUser: boolean;
-  };
+  createOrganizationUser: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "role"
+    | "createdAt"
+    | "lastActiveAt"
+    | "status"
+    | "isSsoUser"
+  >;
 };
 
 export type OrganizationUsers_updateOrganizationUserMutationVariables = Exact<{
@@ -9221,19 +7993,19 @@ export type OrganizationUsers_updateOrganizationUserMutationVariables = Exact<{
 }>;
 
 export type OrganizationUsers_updateOrganizationUserMutation = {
-  updateOrganizationUser: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    role: OrganizationRole;
-    createdAt: string;
-    lastActiveAt?: Maybe<string>;
-    status: UserStatus;
-    isSsoUser: boolean;
-  };
+  updateOrganizationUser: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "role"
+    | "createdAt"
+    | "lastActiveAt"
+    | "status"
+    | "isSsoUser"
+  >;
 };
 
 export type OrganizationUsers_updateUserStatusMutationVariables = Exact<{
@@ -9243,7 +8015,7 @@ export type OrganizationUsers_updateUserStatusMutationVariables = Exact<{
 }>;
 
 export type OrganizationUsers_updateUserStatusMutation = {
-  updateUserStatus: Array<{ __typename?: "User"; id: string; status: UserStatus }>;
+  updateUserStatus: Array<{ __typename?: "User" } & Pick<User, "id" | "status">>;
 };
 
 export type OrganizationUsersQueryVariables = Exact<{
@@ -9254,713 +8026,499 @@ export type OrganizationUsersQueryVariables = Exact<{
 }>;
 
 export type OrganizationUsersQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    role: OrganizationRole;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      hasSsoProvider: boolean;
-      users: {
-        __typename?: "UserPagination";
-        totalCount: number;
-        items: Array<{
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          firstName?: Maybe<string>;
-          lastName?: Maybe<string>;
-          email: string;
-          role: OrganizationRole;
-          createdAt: string;
-          lastActiveAt?: Maybe<string>;
-          status: UserStatus;
-          isSsoUser: boolean;
-        }>;
-      };
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "role"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<
+        Organization,
+        "id" | "hasSsoProvider"
+      > & {
+          users: { __typename?: "UserPagination" } & Pick<UserPagination, "totalCount"> & {
+              items: Array<
+                { __typename?: "User" } & Pick<
+                  User,
+                  | "id"
+                  | "fullName"
+                  | "firstName"
+                  | "lastName"
+                  | "email"
+                  | "role"
+                  | "createdAt"
+                  | "lastActiveAt"
+                  | "status"
+                  | "isSsoUser"
+                >
+              >;
+            };
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            users: { __typename?: "OrganizationUsageUserLimit" } & Pick<
+              OrganizationUsageUserLimit,
+              "limit"
+            >;
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
-export type PetitionActivity_PetitionFragment = {
-  __typename?: "Petition";
-  id: string;
-  name?: Maybe<string>;
-  status: PetitionStatus;
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  locale: PetitionLocale;
-  deadline?: Maybe<string>;
-  updatedAt: string;
-  isReadOnly: boolean;
-  accesses: Array<{
-    __typename?: "PetitionAccess";
-    id: string;
-    status: PetitionAccessStatus;
-    nextReminderAt?: Maybe<string>;
-    remindersLeft: number;
-    reminderCount: number;
-    remindersActive: boolean;
-    remindersOptOut: boolean;
-    createdAt: string;
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-    remindersConfig?: Maybe<{
-      __typename?: "RemindersConfig";
-      offset: number;
-      time: string;
-      timezone: string;
-      weekdaysOnly: boolean;
-    }>;
-  }>;
-  events: {
-    __typename?: "PetitionEventPagination";
-    items: Array<
-      | {
-          __typename?: "AccessActivatedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "AccessDeactivatedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "AccessDelegatedEvent";
-          id: string;
-          createdAt: string;
-          originalAccess: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-          newAccess: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "AccessOpenedEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "CommentDeletedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          deletedBy?: Maybe<
-            | {
-                __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
-              }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
+export type PetitionActivity_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  | "id"
+  | "name"
+  | "status"
+  | "emailSubject"
+  | "emailBody"
+  | "locale"
+  | "deadline"
+  | "updatedAt"
+  | "isReadOnly"
+> & {
+    accesses: Array<
+      { __typename?: "PetitionAccess" } & Pick<
+        PetitionAccess,
+        | "id"
+        | "status"
+        | "nextReminderAt"
+        | "remindersLeft"
+        | "reminderCount"
+        | "remindersActive"
+        | "remindersOptOut"
+        | "createdAt"
+      > & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+          remindersConfig?: Maybe<
+            { __typename?: "RemindersConfig" } & Pick<
+              RemindersConfig,
+              "offset" | "time" | "timezone" | "weekdaysOnly"
+            >
           >;
-        }
-      | {
-          __typename?: "CommentPublishedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          comment?: Maybe<{
-            __typename?: "PetitionFieldComment";
-            isEdited: boolean;
-            content: string;
-            author?: Maybe<
-              | {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                }
-              | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-            >;
-          }>;
-        }
-      | {
-          __typename?: "GroupPermissionAddedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
-        }
-      | {
-          __typename?: "GroupPermissionEditedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
-        }
-      | {
-          __typename?: "GroupPermissionRemovedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
-        }
-      | {
-          __typename?: "MessageCancelledEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            status: PetitionMessageStatus;
-            scheduledAt?: Maybe<string>;
-            emailSubject?: Maybe<any>;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "MessageScheduledEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            id: string;
-            status: PetitionMessageStatus;
-            scheduledAt?: Maybe<string>;
-            emailSubject?: Maybe<any>;
-            emailBody?: Maybe<string>;
-            sentAt?: Maybe<string>;
-            sender: {
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
-            };
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-        }
-      | {
-          __typename?: "MessageSentEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            emailSubject?: Maybe<any>;
-            scheduledAt?: Maybe<string>;
-            bouncedAt?: Maybe<string>;
-            deliveredAt?: Maybe<string>;
-            openedAt?: Maybe<string>;
-            emailBody?: Maybe<string>;
-            sentAt?: Maybe<string>;
-            sender: {
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
-            };
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-        }
-      | {
-          __typename?: "OwnershipTransferredEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          owner?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          previousOwner?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "PetitionClonedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "PetitionClosedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "PetitionClosedNotifiedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "PetitionCompletedEvent";
-          id: string;
-          createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "PetitionCreatedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | { __typename?: "PetitionDeletedEvent"; id: string }
-      | {
-          __typename?: "PetitionMessageBouncedEvent";
-          id: string;
-          createdAt: string;
-          message: {
-            __typename?: "PetitionMessage";
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-        }
-      | {
-          __typename?: "PetitionReminderBouncedEvent";
-          id: string;
-          createdAt: string;
-          reminder: {
-            __typename?: "PetitionReminder";
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-        }
-      | {
-          __typename?: "PetitionReopenedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "RecipientSignedEvent";
-          id: string;
-          createdAt: string;
-          signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-        }
-      | {
-          __typename?: "ReminderSentEvent";
-          id: string;
-          createdAt: string;
-          reminder: {
-            __typename?: "PetitionReminder";
-            type: PetitionReminderType;
-            createdAt: string;
-            emailBody?: Maybe<string>;
-            sender?: Maybe<{
-              __typename?: "User";
-              id: string;
-              fullName?: Maybe<string>;
-              status: UserStatus;
-            }>;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: Maybe<{
-                __typename?: "Contact";
-                id: string;
-                fullName?: Maybe<string>;
-                email: string;
-              }>;
-            };
-          };
-        }
-      | {
-          __typename?: "RemindersOptOutEvent";
-          id: string;
-          createdAt: string;
-          reason: string;
-          other?: Maybe<string>;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          };
-        }
-      | {
-          __typename?: "ReplyCreatedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          createdBy?: Maybe<
-            | {
-                __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
-              }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
-        }
-      | {
-          __typename?: "ReplyDeletedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          deletedBy?: Maybe<
-            | {
-                __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
-              }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
-        }
-      | {
-          __typename?: "ReplyUpdatedEvent";
-          id: string;
-          createdAt: string;
-          field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-          updatedBy?: Maybe<
-            | {
-                __typename?: "PetitionAccess";
-                contact?: Maybe<{
-                  __typename?: "Contact";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  email: string;
-                }>;
-              }
-            | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-          >;
-        }
-      | {
-          __typename?: "SignatureCancelledEvent";
-          id: string;
-          cancelType: PetitionSignatureCancelReason;
-          cancellerReason?: Maybe<string>;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          canceller?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-        }
-      | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
-      | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
-      | { __typename?: "TemplateUsedEvent"; id: string }
-      | {
-          __typename?: "UserPermissionAddedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "UserPermissionEditedEvent";
-          id: string;
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-        }
-      | {
-          __typename?: "UserPermissionRemovedEvent";
-          id: string;
-          createdAt: string;
-          user?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
-          permissionUser?: Maybe<{
-            __typename?: "User";
-            id: string;
-            fullName?: Maybe<string>;
-            status: UserStatus;
-          }>;
         }
     >;
-  };
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-      }
-  >;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-  }>;
-  remindersConfig?: Maybe<{
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  }>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    events: { __typename?: "PetitionEventPagination" } & {
+      items: Array<
+        | ({ __typename?: "AccessActivatedEvent" } & Pick<
+            AccessActivatedEvent,
+            "id" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+            })
+        | ({ __typename?: "AccessActivatedFromPublicPetitionLinkEvent" } & Pick<
+            AccessActivatedFromPublicPetitionLinkEvent,
+            "id" | "createdAt"
+          > & {
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+            })
+        | ({ __typename?: "AccessDeactivatedEvent" } & Pick<
+            AccessDeactivatedEvent,
+            "id" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+            })
+        | ({ __typename?: "AccessDelegatedEvent" } & Pick<
+            AccessDelegatedEvent,
+            "id" | "createdAt"
+          > & {
+              originalAccess: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+              newAccess: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+            })
+        | ({ __typename?: "AccessOpenedEvent" } & Pick<AccessOpenedEvent, "id" | "createdAt"> & {
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+            })
+        | ({ __typename?: "CommentDeletedEvent" } & Pick<
+            CommentDeletedEvent,
+            "id" | "createdAt"
+          > & {
+              field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+              deletedBy?: Maybe<
+                | ({ __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  })
+                | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+              >;
+            })
+        | ({ __typename?: "CommentPublishedEvent" } & Pick<
+            CommentPublishedEvent,
+            "id" | "createdAt"
+          > & {
+              field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+              comment?: Maybe<
+                { __typename?: "PetitionFieldComment" } & Pick<
+                  PetitionFieldComment,
+                  "isEdited" | "content"
+                > & {
+                    author?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  }
+              >;
+            })
+        | ({ __typename?: "GroupPermissionAddedEvent" } & Pick<
+            GroupPermissionAddedEvent,
+            "id" | "permissionType" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+            })
+        | ({ __typename?: "GroupPermissionEditedEvent" } & Pick<
+            GroupPermissionEditedEvent,
+            "id" | "permissionType" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+            })
+        | ({ __typename?: "GroupPermissionRemovedEvent" } & Pick<
+            GroupPermissionRemovedEvent,
+            "id" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+            })
+        | ({ __typename?: "MessageCancelledEvent" } & Pick<
+            MessageCancelledEvent,
+            "id" | "createdAt"
+          > & {
+              message: { __typename?: "PetitionMessage" } & Pick<
+                PetitionMessage,
+                "status" | "scheduledAt" | "emailSubject"
+              > & {
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                };
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+            })
+        | ({ __typename?: "MessageScheduledEvent" } & Pick<
+            MessageScheduledEvent,
+            "id" | "createdAt"
+          > & {
+              message: { __typename?: "PetitionMessage" } & Pick<
+                PetitionMessage,
+                "id" | "status" | "scheduledAt" | "emailSubject" | "emailBody" | "sentAt"
+              > & {
+                  sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                };
+            })
+        | ({ __typename?: "MessageSentEvent" } & Pick<MessageSentEvent, "id" | "createdAt"> & {
+              message: { __typename?: "PetitionMessage" } & Pick<
+                PetitionMessage,
+                | "emailSubject"
+                | "scheduledAt"
+                | "bouncedAt"
+                | "deliveredAt"
+                | "openedAt"
+                | "emailBody"
+                | "sentAt"
+              > & {
+                  sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                };
+            })
+        | ({ __typename?: "OwnershipTransferredEvent" } & Pick<
+            OwnershipTransferredEvent,
+            "id" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              owner?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              previousOwner?: Maybe<
+                { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+              >;
+            })
+        | ({ __typename?: "PetitionClonedEvent" } & Pick<
+            PetitionClonedEvent,
+            "id" | "createdAt"
+          > & { user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">> })
+        | ({ __typename?: "PetitionClosedEvent" } & Pick<
+            PetitionClosedEvent,
+            "id" | "createdAt"
+          > & { user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">> })
+        | ({ __typename?: "PetitionClosedNotifiedEvent" } & Pick<
+            PetitionClosedNotifiedEvent,
+            "id" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+            })
+        | ({ __typename?: "PetitionCompletedEvent" } & Pick<
+            PetitionCompletedEvent,
+            "id" | "createdAt"
+          > & {
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+            })
+        | ({ __typename?: "PetitionCreatedEvent" } & Pick<
+            PetitionCreatedEvent,
+            "id" | "createdAt"
+          > & { user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">> })
+        | ({ __typename?: "PetitionDeletedEvent" } & Pick<PetitionDeletedEvent, "id">)
+        | ({ __typename?: "PetitionMessageBouncedEvent" } & Pick<
+            PetitionMessageBouncedEvent,
+            "id" | "createdAt"
+          > & {
+              message: { __typename?: "PetitionMessage" } & {
+                access: { __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                };
+              };
+            })
+        | ({ __typename?: "PetitionReminderBouncedEvent" } & Pick<
+            PetitionReminderBouncedEvent,
+            "id" | "createdAt"
+          > & {
+              reminder: { __typename?: "PetitionReminder" } & {
+                access: { __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                };
+              };
+            })
+        | ({ __typename?: "PetitionReopenedEvent" } & Pick<
+            PetitionReopenedEvent,
+            "id" | "createdAt"
+          > & { user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">> })
+        | ({ __typename?: "RecipientSignedEvent" } & Pick<
+            RecipientSignedEvent,
+            "id" | "createdAt"
+          > & {
+              signer?: Maybe<
+                { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+              >;
+            })
+        | ({ __typename?: "ReminderSentEvent" } & Pick<ReminderSentEvent, "id" | "createdAt"> & {
+              reminder: { __typename?: "PetitionReminder" } & Pick<
+                PetitionReminder,
+                "type" | "createdAt" | "emailBody"
+              > & {
+                  sender?: Maybe<
+                    { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                  >;
+                  access: { __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  };
+                };
+            })
+        | ({ __typename?: "RemindersOptOutEvent" } & Pick<
+            RemindersOptOutEvent,
+            "id" | "createdAt" | "reason" | "other"
+          > & {
+              access: { __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              };
+            })
+        | ({ __typename?: "ReplyCreatedEvent" } & Pick<ReplyCreatedEvent, "id" | "createdAt"> & {
+              field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+              createdBy?: Maybe<
+                | ({ __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  })
+                | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+              >;
+            })
+        | ({ __typename?: "ReplyDeletedEvent" } & Pick<ReplyDeletedEvent, "id" | "createdAt"> & {
+              field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+              deletedBy?: Maybe<
+                | ({ __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  })
+                | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+              >;
+            })
+        | ({ __typename?: "ReplyUpdatedEvent" } & Pick<ReplyUpdatedEvent, "id" | "createdAt"> & {
+              field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+              updatedBy?: Maybe<
+                | ({ __typename?: "PetitionAccess" } & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                  })
+                | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+              >;
+            })
+        | ({ __typename?: "SignatureCancelledEvent" } & Pick<
+            SignatureCancelledEvent,
+            "id" | "cancelType" | "cancellerReason" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              canceller?: Maybe<
+                { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+              >;
+            })
+        | ({ __typename?: "SignatureCompletedEvent" } & Pick<
+            SignatureCompletedEvent,
+            "id" | "createdAt"
+          >)
+        | ({ __typename?: "SignatureStartedEvent" } & Pick<
+            SignatureStartedEvent,
+            "id" | "createdAt"
+          >)
+        | ({ __typename?: "TemplateUsedEvent" } & Pick<TemplateUsedEvent, "id">)
+        | ({ __typename?: "UserPermissionAddedEvent" } & Pick<
+            UserPermissionAddedEvent,
+            "id" | "permissionType" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              permissionUser?: Maybe<
+                { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+              >;
+            })
+        | ({ __typename?: "UserPermissionEditedEvent" } & Pick<
+            UserPermissionEditedEvent,
+            "id" | "permissionType" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              permissionUser?: Maybe<
+                { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+              >;
+            })
+        | ({ __typename?: "UserPermissionRemovedEvent" } & Pick<
+            UserPermissionRemovedEvent,
+            "id" | "createdAt"
+          > & {
+              user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">>;
+              permissionUser?: Maybe<
+                { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+              >;
+            })
+      >;
     };
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
+    >;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & {
+        signers: Array<
+          { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+        >;
+      }
+    >;
+    remindersConfig?: Maybe<
+      { __typename?: "RemindersConfig" } & Pick<
+        RemindersConfig,
+        "offset" | "time" | "timezone" | "weekdaysOnly"
+      >
+    >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
+    myEffectivePermission?: Maybe<
+      { __typename?: "EffectivePetitionUserPermission" } & Pick<
+        EffectivePetitionUserPermission,
+        "isSubscribed"
+      >
+    >;
   };
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
-};
 
-export type PetitionActivity_UserFragment = {
-  __typename?: "User";
-  id: string;
-  unreadNotificationIds: Array<string>;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  hasPetitionPdfExport: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type PetitionActivity_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "unreadNotificationIds"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & { hasPetitionPdfExport: User["hasFeatureFlag"] } & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -9969,678 +8527,490 @@ export type PetitionActivity_updatePetitionMutationVariables = Exact<{
 
 export type PetitionActivity_updatePetitionMutation = {
   updatePetition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: Maybe<string>;
-        status: PetitionStatus;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        locale: PetitionLocale;
-        deadline?: Maybe<string>;
-        updatedAt: string;
-        isReadOnly: boolean;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          id: string;
-          status: PetitionAccessStatus;
-          nextReminderAt?: Maybe<string>;
-          remindersLeft: number;
-          reminderCount: number;
-          remindersActive: boolean;
-          remindersOptOut: boolean;
-          createdAt: string;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-          remindersConfig?: Maybe<{
-            __typename?: "RemindersConfig";
-            offset: number;
-            time: string;
-            timezone: string;
-            weekdaysOnly: boolean;
-          }>;
-        }>;
-        events: {
-          __typename?: "PetitionEventPagination";
-          items: Array<
-            | {
-                __typename?: "AccessActivatedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-                id: string;
-                createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "AccessDeactivatedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "AccessDelegatedEvent";
-                id: string;
-                createdAt: string;
-                originalAccess: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-                newAccess: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "AccessOpenedEvent";
-                id: string;
-                createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "CommentDeletedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                deletedBy?: Maybe<
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      status: UserStatus;
-                    }
+    | ({ __typename?: "Petition" } & Pick<
+        Petition,
+        | "id"
+        | "name"
+        | "status"
+        | "emailSubject"
+        | "emailBody"
+        | "locale"
+        | "deadline"
+        | "updatedAt"
+        | "isReadOnly"
+      > & {
+          accesses: Array<
+            { __typename?: "PetitionAccess" } & Pick<
+              PetitionAccess,
+              | "id"
+              | "status"
+              | "nextReminderAt"
+              | "remindersLeft"
+              | "reminderCount"
+              | "remindersActive"
+              | "remindersOptOut"
+              | "createdAt"
+            > & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
                 >;
-              }
-            | {
-                __typename?: "CommentPublishedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                comment?: Maybe<{
-                  __typename?: "PetitionFieldComment";
-                  isEdited: boolean;
-                  content: string;
-                  author?: Maybe<
-                    | {
-                        __typename?: "PetitionAccess";
-                        contact?: Maybe<{
-                          __typename?: "Contact";
-                          id: string;
-                          fullName?: Maybe<string>;
-                          email: string;
-                        }>;
-                      }
-                    | {
-                        __typename?: "User";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        status: UserStatus;
-                      }
-                  >;
-                }>;
-              }
-            | {
-                __typename?: "GroupPermissionAddedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
-              }
-            | {
-                __typename?: "GroupPermissionEditedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
-              }
-            | {
-                __typename?: "GroupPermissionRemovedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
-              }
-            | {
-                __typename?: "MessageCancelledEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  status: PetitionMessageStatus;
-                  scheduledAt?: Maybe<string>;
-                  emailSubject?: Maybe<any>;
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "MessageScheduledEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  id: string;
-                  status: PetitionMessageStatus;
-                  scheduledAt?: Maybe<string>;
-                  emailSubject?: Maybe<any>;
-                  emailBody?: Maybe<string>;
-                  sentAt?: Maybe<string>;
-                  sender: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    status: UserStatus;
-                  };
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "MessageSentEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  emailSubject?: Maybe<any>;
-                  scheduledAt?: Maybe<string>;
-                  bouncedAt?: Maybe<string>;
-                  deliveredAt?: Maybe<string>;
-                  openedAt?: Maybe<string>;
-                  emailBody?: Maybe<string>;
-                  sentAt?: Maybe<string>;
-                  sender: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    status: UserStatus;
-                  };
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "OwnershipTransferredEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                owner?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                previousOwner?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "PetitionClonedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "PetitionClosedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "PetitionClosedNotifiedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "PetitionCompletedEvent";
-                id: string;
-                createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "PetitionCreatedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | { __typename?: "PetitionDeletedEvent"; id: string }
-            | {
-                __typename?: "PetitionMessageBouncedEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "PetitionReminderBouncedEvent";
-                id: string;
-                createdAt: string;
-                reminder: {
-                  __typename?: "PetitionReminder";
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "PetitionReopenedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "RecipientSignedEvent";
-                id: string;
-                createdAt: string;
-                signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-              }
-            | {
-                __typename?: "ReminderSentEvent";
-                id: string;
-                createdAt: string;
-                reminder: {
-                  __typename?: "PetitionReminder";
-                  type: PetitionReminderType;
-                  createdAt: string;
-                  emailBody?: Maybe<string>;
-                  sender?: Maybe<{
-                    __typename?: "User";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    status: UserStatus;
-                  }>;
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "RemindersOptOutEvent";
-                id: string;
-                createdAt: string;
-                reason: string;
-                other?: Maybe<string>;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "ReplyCreatedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                createdBy?: Maybe<
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      status: UserStatus;
-                    }
+                remindersConfig?: Maybe<
+                  { __typename?: "RemindersConfig" } & Pick<
+                    RemindersConfig,
+                    "offset" | "time" | "timezone" | "weekdaysOnly"
+                  >
                 >;
-              }
-            | {
-                __typename?: "ReplyDeletedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                deletedBy?: Maybe<
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      status: UserStatus;
-                    }
-                >;
-              }
-            | {
-                __typename?: "ReplyUpdatedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                updatedBy?: Maybe<
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      status: UserStatus;
-                    }
-                >;
-              }
-            | {
-                __typename?: "SignatureCancelledEvent";
-                id: string;
-                cancelType: PetitionSignatureCancelReason;
-                cancellerReason?: Maybe<string>;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                canceller?: Maybe<{
-                  __typename?: "PetitionSigner";
-                  email: string;
-                  fullName: string;
-                }>;
-              }
-            | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
-            | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
-            | { __typename?: "TemplateUsedEvent"; id: string }
-            | {
-                __typename?: "UserPermissionAddedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "UserPermissionEditedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "UserPermissionRemovedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
               }
           >;
-        };
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-            }
-        >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-        }>;
-        remindersConfig?: Maybe<{
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        }>;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
-            };
+          events: { __typename?: "PetitionEventPagination" } & {
+            items: Array<
+              | ({ __typename?: "AccessActivatedEvent" } & Pick<
+                  AccessActivatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "AccessActivatedFromPublicPetitionLinkEvent" } & Pick<
+                  AccessActivatedFromPublicPetitionLinkEvent,
+                  "id" | "createdAt"
+                > & {
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "AccessDeactivatedEvent" } & Pick<
+                  AccessDeactivatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "AccessDelegatedEvent" } & Pick<
+                  AccessDelegatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    originalAccess: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                    newAccess: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "AccessOpenedEvent" } & Pick<
+                  AccessOpenedEvent,
+                  "id" | "createdAt"
+                > & {
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "CommentDeletedEvent" } & Pick<
+                  CommentDeletedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    deletedBy?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  })
+              | ({ __typename?: "CommentPublishedEvent" } & Pick<
+                  CommentPublishedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    comment?: Maybe<
+                      { __typename?: "PetitionFieldComment" } & Pick<
+                        PetitionFieldComment,
+                        "isEdited" | "content"
+                      > & {
+                          author?: Maybe<
+                            | ({ __typename?: "PetitionAccess" } & {
+                                contact?: Maybe<
+                                  { __typename?: "Contact" } & Pick<
+                                    Contact,
+                                    "id" | "fullName" | "email"
+                                  >
+                                >;
+                              })
+                            | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                          >;
+                        }
+                    >;
+                  })
+              | ({ __typename?: "GroupPermissionAddedEvent" } & Pick<
+                  GroupPermissionAddedEvent,
+                  "id" | "permissionType" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+                  })
+              | ({ __typename?: "GroupPermissionEditedEvent" } & Pick<
+                  GroupPermissionEditedEvent,
+                  "id" | "permissionType" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+                  })
+              | ({ __typename?: "GroupPermissionRemovedEvent" } & Pick<
+                  GroupPermissionRemovedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+                  })
+              | ({ __typename?: "MessageCancelledEvent" } & Pick<
+                  MessageCancelledEvent,
+                  "id" | "createdAt"
+                > & {
+                    message: { __typename?: "PetitionMessage" } & Pick<
+                      PetitionMessage,
+                      "status" | "scheduledAt" | "emailSubject"
+                    > & {
+                        access: { __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        };
+                      };
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "MessageScheduledEvent" } & Pick<
+                  MessageScheduledEvent,
+                  "id" | "createdAt"
+                > & {
+                    message: { __typename?: "PetitionMessage" } & Pick<
+                      PetitionMessage,
+                      "id" | "status" | "scheduledAt" | "emailSubject" | "emailBody" | "sentAt"
+                    > & {
+                        sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                        access: { __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        };
+                      };
+                  })
+              | ({ __typename?: "MessageSentEvent" } & Pick<
+                  MessageSentEvent,
+                  "id" | "createdAt"
+                > & {
+                    message: { __typename?: "PetitionMessage" } & Pick<
+                      PetitionMessage,
+                      | "emailSubject"
+                      | "scheduledAt"
+                      | "bouncedAt"
+                      | "deliveredAt"
+                      | "openedAt"
+                      | "emailBody"
+                      | "sentAt"
+                    > & {
+                        sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                        access: { __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        };
+                      };
+                  })
+              | ({ __typename?: "OwnershipTransferredEvent" } & Pick<
+                  OwnershipTransferredEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    owner?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    previousOwner?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "PetitionClonedEvent" } & Pick<
+                  PetitionClonedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "PetitionClosedEvent" } & Pick<
+                  PetitionClosedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "PetitionClosedNotifiedEvent" } & Pick<
+                  PetitionClosedNotifiedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "PetitionCompletedEvent" } & Pick<
+                  PetitionCompletedEvent,
+                  "id" | "createdAt"
+                > & {
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "PetitionCreatedEvent" } & Pick<
+                  PetitionCreatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "PetitionDeletedEvent" } & Pick<PetitionDeletedEvent, "id">)
+              | ({ __typename?: "PetitionMessageBouncedEvent" } & Pick<
+                  PetitionMessageBouncedEvent,
+                  "id" | "createdAt"
+                > & {
+                    message: { __typename?: "PetitionMessage" } & {
+                      access: { __typename?: "PetitionAccess" } & {
+                        contact?: Maybe<
+                          { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                        >;
+                      };
+                    };
+                  })
+              | ({ __typename?: "PetitionReminderBouncedEvent" } & Pick<
+                  PetitionReminderBouncedEvent,
+                  "id" | "createdAt"
+                > & {
+                    reminder: { __typename?: "PetitionReminder" } & {
+                      access: { __typename?: "PetitionAccess" } & {
+                        contact?: Maybe<
+                          { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                        >;
+                      };
+                    };
+                  })
+              | ({ __typename?: "PetitionReopenedEvent" } & Pick<
+                  PetitionReopenedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "RecipientSignedEvent" } & Pick<
+                  RecipientSignedEvent,
+                  "id" | "createdAt"
+                > & {
+                    signer?: Maybe<
+                      { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+                    >;
+                  })
+              | ({ __typename?: "ReminderSentEvent" } & Pick<
+                  ReminderSentEvent,
+                  "id" | "createdAt"
+                > & {
+                    reminder: { __typename?: "PetitionReminder" } & Pick<
+                      PetitionReminder,
+                      "type" | "createdAt" | "emailBody"
+                    > & {
+                        sender?: Maybe<
+                          { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                        >;
+                        access: { __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        };
+                      };
+                  })
+              | ({ __typename?: "RemindersOptOutEvent" } & Pick<
+                  RemindersOptOutEvent,
+                  "id" | "createdAt" | "reason" | "other"
+                > & {
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "ReplyCreatedEvent" } & Pick<
+                  ReplyCreatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    createdBy?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  })
+              | ({ __typename?: "ReplyDeletedEvent" } & Pick<
+                  ReplyDeletedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    deletedBy?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  })
+              | ({ __typename?: "ReplyUpdatedEvent" } & Pick<
+                  ReplyUpdatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    updatedBy?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  })
+              | ({ __typename?: "SignatureCancelledEvent" } & Pick<
+                  SignatureCancelledEvent,
+                  "id" | "cancelType" | "cancellerReason" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    canceller?: Maybe<
+                      { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+                    >;
+                  })
+              | ({ __typename?: "SignatureCompletedEvent" } & Pick<
+                  SignatureCompletedEvent,
+                  "id" | "createdAt"
+                >)
+              | ({ __typename?: "SignatureStartedEvent" } & Pick<
+                  SignatureStartedEvent,
+                  "id" | "createdAt"
+                >)
+              | ({ __typename?: "TemplateUsedEvent" } & Pick<TemplateUsedEvent, "id">)
+              | ({ __typename?: "UserPermissionAddedEvent" } & Pick<
+                  UserPermissionAddedEvent,
+                  "id" | "permissionType" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionUser?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "UserPermissionEditedEvent" } & Pick<
+                  UserPermissionEditedEvent,
+                  "id" | "permissionType" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionUser?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "UserPermissionRemovedEvent" } & Pick<
+                  UserPermissionRemovedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionUser?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+            >;
           };
-        };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
-      }
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
+          >;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & {
+              signers: Array<
+                { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+              >;
+            }
+          >;
+          remindersConfig?: Maybe<
+            { __typename?: "RemindersConfig" } & Pick<
+              RemindersConfig,
+              "offset" | "time" | "timezone" | "weekdaysOnly"
+            >
+          >;
+          organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+              usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+                petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+                  OrganizationUsagePetitionLimit,
+                  "limit" | "used"
+                >;
+              };
+            };
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "isSubscribed"
+            >
+          >;
+        })
     | { __typename?: "PetitionTemplate" };
 };
 
@@ -10650,7 +9020,7 @@ export type PetitionActivity_sendRemindersMutationVariables = Exact<{
   body?: Maybe<Scalars["JSON"]>;
 }>;
 
-export type PetitionActivity_sendRemindersMutation = { sendReminders: Result };
+export type PetitionActivity_sendRemindersMutation = Pick<Mutation, "sendReminders">;
 
 export type PetitionActivity_deactivateAccessesMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -10658,11 +9028,9 @@ export type PetitionActivity_deactivateAccessesMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_deactivateAccessesMutation = {
-  deactivateAccesses: Array<{
-    __typename?: "PetitionAccess";
-    id: string;
-    status: PetitionAccessStatus;
-  }>;
+  deactivateAccesses: Array<
+    { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id" | "status">
+  >;
 };
 
 export type PetitionActivity_reactivateAccessesMutationVariables = Exact<{
@@ -10671,11 +9039,9 @@ export type PetitionActivity_reactivateAccessesMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_reactivateAccessesMutation = {
-  reactivateAccesses: Array<{
-    __typename?: "PetitionAccess";
-    id: string;
-    status: PetitionAccessStatus;
-  }>;
+  reactivateAccesses: Array<
+    { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id" | "status">
+  >;
 };
 
 export type PetitionActivity_cancelScheduledMessageMutationVariables = Exact<{
@@ -10684,11 +9050,9 @@ export type PetitionActivity_cancelScheduledMessageMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_cancelScheduledMessageMutation = {
-  cancelScheduledMessage?: Maybe<{
-    __typename?: "PetitionMessage";
-    id: string;
-    status: PetitionMessageStatus;
-  }>;
+  cancelScheduledMessage?: Maybe<
+    { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id" | "status">
+  >;
 };
 
 export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
@@ -10701,7 +9065,7 @@ export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionsActivity_sendPetitionMutation = {
-  sendPetition: { __typename?: "SendPetitionResult"; result: Result };
+  sendPetition: { __typename?: "SendPetitionResult" } & Pick<SendPetitionResult, "result">;
 };
 
 export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
@@ -10712,7 +9076,7 @@ export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_switchAutomaticRemindersMutation = {
-  switchAutomaticReminders: Array<{ __typename?: "PetitionAccess"; id: string }>;
+  switchAutomaticReminders: Array<{ __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id">>;
 };
 
 export type PetitionActivityQueryVariables = Exact<{
@@ -10721,678 +9085,490 @@ export type PetitionActivityQueryVariables = Exact<{
 
 export type PetitionActivityQuery = {
   petition?: Maybe<
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: Maybe<string>;
-        status: PetitionStatus;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        locale: PetitionLocale;
-        deadline?: Maybe<string>;
-        updatedAt: string;
-        isReadOnly: boolean;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          id: string;
-          status: PetitionAccessStatus;
-          nextReminderAt?: Maybe<string>;
-          remindersLeft: number;
-          reminderCount: number;
-          remindersActive: boolean;
-          remindersOptOut: boolean;
-          createdAt: string;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-          remindersConfig?: Maybe<{
-            __typename?: "RemindersConfig";
-            offset: number;
-            time: string;
-            timezone: string;
-            weekdaysOnly: boolean;
-          }>;
-        }>;
-        events: {
-          __typename?: "PetitionEventPagination";
-          items: Array<
-            | {
-                __typename?: "AccessActivatedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-                id: string;
-                createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "AccessDeactivatedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "AccessDelegatedEvent";
-                id: string;
-                createdAt: string;
-                originalAccess: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-                newAccess: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "AccessOpenedEvent";
-                id: string;
-                createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "CommentDeletedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                deletedBy?: Maybe<
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      status: UserStatus;
-                    }
+    | ({ __typename?: "Petition" } & Pick<
+        Petition,
+        | "id"
+        | "name"
+        | "status"
+        | "emailSubject"
+        | "emailBody"
+        | "locale"
+        | "deadline"
+        | "updatedAt"
+        | "isReadOnly"
+      > & {
+          accesses: Array<
+            { __typename?: "PetitionAccess" } & Pick<
+              PetitionAccess,
+              | "id"
+              | "status"
+              | "nextReminderAt"
+              | "remindersLeft"
+              | "reminderCount"
+              | "remindersActive"
+              | "remindersOptOut"
+              | "createdAt"
+            > & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
                 >;
-              }
-            | {
-                __typename?: "CommentPublishedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                comment?: Maybe<{
-                  __typename?: "PetitionFieldComment";
-                  isEdited: boolean;
-                  content: string;
-                  author?: Maybe<
-                    | {
-                        __typename?: "PetitionAccess";
-                        contact?: Maybe<{
-                          __typename?: "Contact";
-                          id: string;
-                          fullName?: Maybe<string>;
-                          email: string;
-                        }>;
-                      }
-                    | {
-                        __typename?: "User";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        status: UserStatus;
-                      }
-                  >;
-                }>;
-              }
-            | {
-                __typename?: "GroupPermissionAddedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
-              }
-            | {
-                __typename?: "GroupPermissionEditedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
-              }
-            | {
-                __typename?: "GroupPermissionRemovedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
-              }
-            | {
-                __typename?: "MessageCancelledEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  status: PetitionMessageStatus;
-                  scheduledAt?: Maybe<string>;
-                  emailSubject?: Maybe<any>;
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "MessageScheduledEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  id: string;
-                  status: PetitionMessageStatus;
-                  scheduledAt?: Maybe<string>;
-                  emailSubject?: Maybe<any>;
-                  emailBody?: Maybe<string>;
-                  sentAt?: Maybe<string>;
-                  sender: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    status: UserStatus;
-                  };
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "MessageSentEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  emailSubject?: Maybe<any>;
-                  scheduledAt?: Maybe<string>;
-                  bouncedAt?: Maybe<string>;
-                  deliveredAt?: Maybe<string>;
-                  openedAt?: Maybe<string>;
-                  emailBody?: Maybe<string>;
-                  sentAt?: Maybe<string>;
-                  sender: {
-                    __typename?: "User";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    status: UserStatus;
-                  };
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "OwnershipTransferredEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                owner?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                previousOwner?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "PetitionClonedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "PetitionClosedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "PetitionClosedNotifiedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "PetitionCompletedEvent";
-                id: string;
-                createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "PetitionCreatedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | { __typename?: "PetitionDeletedEvent"; id: string }
-            | {
-                __typename?: "PetitionMessageBouncedEvent";
-                id: string;
-                createdAt: string;
-                message: {
-                  __typename?: "PetitionMessage";
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "PetitionReminderBouncedEvent";
-                id: string;
-                createdAt: string;
-                reminder: {
-                  __typename?: "PetitionReminder";
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "PetitionReopenedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "RecipientSignedEvent";
-                id: string;
-                createdAt: string;
-                signer?: Maybe<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-              }
-            | {
-                __typename?: "ReminderSentEvent";
-                id: string;
-                createdAt: string;
-                reminder: {
-                  __typename?: "PetitionReminder";
-                  type: PetitionReminderType;
-                  createdAt: string;
-                  emailBody?: Maybe<string>;
-                  sender?: Maybe<{
-                    __typename?: "User";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    status: UserStatus;
-                  }>;
-                  access: {
-                    __typename?: "PetitionAccess";
-                    contact?: Maybe<{
-                      __typename?: "Contact";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      email: string;
-                    }>;
-                  };
-                };
-              }
-            | {
-                __typename?: "RemindersOptOutEvent";
-                id: string;
-                createdAt: string;
-                reason: string;
-                other?: Maybe<string>;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
-                };
-              }
-            | {
-                __typename?: "ReplyCreatedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                createdBy?: Maybe<
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      status: UserStatus;
-                    }
+                remindersConfig?: Maybe<
+                  { __typename?: "RemindersConfig" } & Pick<
+                    RemindersConfig,
+                    "offset" | "time" | "timezone" | "weekdaysOnly"
+                  >
                 >;
-              }
-            | {
-                __typename?: "ReplyDeletedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                deletedBy?: Maybe<
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      status: UserStatus;
-                    }
-                >;
-              }
-            | {
-                __typename?: "ReplyUpdatedEvent";
-                id: string;
-                createdAt: string;
-                field?: Maybe<{ __typename?: "PetitionField"; title?: Maybe<string> }>;
-                updatedBy?: Maybe<
-                  | {
-                      __typename?: "PetitionAccess";
-                      contact?: Maybe<{
-                        __typename?: "Contact";
-                        id: string;
-                        fullName?: Maybe<string>;
-                        email: string;
-                      }>;
-                    }
-                  | {
-                      __typename?: "User";
-                      id: string;
-                      fullName?: Maybe<string>;
-                      status: UserStatus;
-                    }
-                >;
-              }
-            | {
-                __typename?: "SignatureCancelledEvent";
-                id: string;
-                cancelType: PetitionSignatureCancelReason;
-                cancellerReason?: Maybe<string>;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                canceller?: Maybe<{
-                  __typename?: "PetitionSigner";
-                  email: string;
-                  fullName: string;
-                }>;
-              }
-            | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
-            | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
-            | { __typename?: "TemplateUsedEvent"; id: string }
-            | {
-                __typename?: "UserPermissionAddedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "UserPermissionEditedEvent";
-                id: string;
-                permissionType: PetitionPermissionType;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-              }
-            | {
-                __typename?: "UserPermissionRemovedEvent";
-                id: string;
-                createdAt: string;
-                user?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
-                permissionUser?: Maybe<{
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  status: UserStatus;
-                }>;
               }
           >;
-        };
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-            }
-        >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-        }>;
-        remindersConfig?: Maybe<{
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        }>;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
-            };
+          events: { __typename?: "PetitionEventPagination" } & {
+            items: Array<
+              | ({ __typename?: "AccessActivatedEvent" } & Pick<
+                  AccessActivatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "AccessActivatedFromPublicPetitionLinkEvent" } & Pick<
+                  AccessActivatedFromPublicPetitionLinkEvent,
+                  "id" | "createdAt"
+                > & {
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "AccessDeactivatedEvent" } & Pick<
+                  AccessDeactivatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "AccessDelegatedEvent" } & Pick<
+                  AccessDelegatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    originalAccess: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                    newAccess: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "AccessOpenedEvent" } & Pick<
+                  AccessOpenedEvent,
+                  "id" | "createdAt"
+                > & {
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "CommentDeletedEvent" } & Pick<
+                  CommentDeletedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    deletedBy?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  })
+              | ({ __typename?: "CommentPublishedEvent" } & Pick<
+                  CommentPublishedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    comment?: Maybe<
+                      { __typename?: "PetitionFieldComment" } & Pick<
+                        PetitionFieldComment,
+                        "isEdited" | "content"
+                      > & {
+                          author?: Maybe<
+                            | ({ __typename?: "PetitionAccess" } & {
+                                contact?: Maybe<
+                                  { __typename?: "Contact" } & Pick<
+                                    Contact,
+                                    "id" | "fullName" | "email"
+                                  >
+                                >;
+                              })
+                            | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                          >;
+                        }
+                    >;
+                  })
+              | ({ __typename?: "GroupPermissionAddedEvent" } & Pick<
+                  GroupPermissionAddedEvent,
+                  "id" | "permissionType" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+                  })
+              | ({ __typename?: "GroupPermissionEditedEvent" } & Pick<
+                  GroupPermissionEditedEvent,
+                  "id" | "permissionType" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+                  })
+              | ({ __typename?: "GroupPermissionRemovedEvent" } & Pick<
+                  GroupPermissionRemovedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+                  })
+              | ({ __typename?: "MessageCancelledEvent" } & Pick<
+                  MessageCancelledEvent,
+                  "id" | "createdAt"
+                > & {
+                    message: { __typename?: "PetitionMessage" } & Pick<
+                      PetitionMessage,
+                      "status" | "scheduledAt" | "emailSubject"
+                    > & {
+                        access: { __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        };
+                      };
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "MessageScheduledEvent" } & Pick<
+                  MessageScheduledEvent,
+                  "id" | "createdAt"
+                > & {
+                    message: { __typename?: "PetitionMessage" } & Pick<
+                      PetitionMessage,
+                      "id" | "status" | "scheduledAt" | "emailSubject" | "emailBody" | "sentAt"
+                    > & {
+                        sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                        access: { __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        };
+                      };
+                  })
+              | ({ __typename?: "MessageSentEvent" } & Pick<
+                  MessageSentEvent,
+                  "id" | "createdAt"
+                > & {
+                    message: { __typename?: "PetitionMessage" } & Pick<
+                      PetitionMessage,
+                      | "emailSubject"
+                      | "scheduledAt"
+                      | "bouncedAt"
+                      | "deliveredAt"
+                      | "openedAt"
+                      | "emailBody"
+                      | "sentAt"
+                    > & {
+                        sender: { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">;
+                        access: { __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        };
+                      };
+                  })
+              | ({ __typename?: "OwnershipTransferredEvent" } & Pick<
+                  OwnershipTransferredEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    owner?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    previousOwner?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "PetitionClonedEvent" } & Pick<
+                  PetitionClonedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "PetitionClosedEvent" } & Pick<
+                  PetitionClosedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "PetitionClosedNotifiedEvent" } & Pick<
+                  PetitionClosedNotifiedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "PetitionCompletedEvent" } & Pick<
+                  PetitionCompletedEvent,
+                  "id" | "createdAt"
+                > & {
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "PetitionCreatedEvent" } & Pick<
+                  PetitionCreatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "PetitionDeletedEvent" } & Pick<PetitionDeletedEvent, "id">)
+              | ({ __typename?: "PetitionMessageBouncedEvent" } & Pick<
+                  PetitionMessageBouncedEvent,
+                  "id" | "createdAt"
+                > & {
+                    message: { __typename?: "PetitionMessage" } & {
+                      access: { __typename?: "PetitionAccess" } & {
+                        contact?: Maybe<
+                          { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                        >;
+                      };
+                    };
+                  })
+              | ({ __typename?: "PetitionReminderBouncedEvent" } & Pick<
+                  PetitionReminderBouncedEvent,
+                  "id" | "createdAt"
+                > & {
+                    reminder: { __typename?: "PetitionReminder" } & {
+                      access: { __typename?: "PetitionAccess" } & {
+                        contact?: Maybe<
+                          { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                        >;
+                      };
+                    };
+                  })
+              | ({ __typename?: "PetitionReopenedEvent" } & Pick<
+                  PetitionReopenedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "RecipientSignedEvent" } & Pick<
+                  RecipientSignedEvent,
+                  "id" | "createdAt"
+                > & {
+                    signer?: Maybe<
+                      { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+                    >;
+                  })
+              | ({ __typename?: "ReminderSentEvent" } & Pick<
+                  ReminderSentEvent,
+                  "id" | "createdAt"
+                > & {
+                    reminder: { __typename?: "PetitionReminder" } & Pick<
+                      PetitionReminder,
+                      "type" | "createdAt" | "emailBody"
+                    > & {
+                        sender?: Maybe<
+                          { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                        >;
+                        access: { __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        };
+                      };
+                  })
+              | ({ __typename?: "RemindersOptOutEvent" } & Pick<
+                  RemindersOptOutEvent,
+                  "id" | "createdAt" | "reason" | "other"
+                > & {
+                    access: { __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    };
+                  })
+              | ({ __typename?: "ReplyCreatedEvent" } & Pick<
+                  ReplyCreatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    createdBy?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  })
+              | ({ __typename?: "ReplyDeletedEvent" } & Pick<
+                  ReplyDeletedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    deletedBy?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  })
+              | ({ __typename?: "ReplyUpdatedEvent" } & Pick<
+                  ReplyUpdatedEvent,
+                  "id" | "createdAt"
+                > & {
+                    field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "title">>;
+                    updatedBy?: Maybe<
+                      | ({ __typename?: "PetitionAccess" } & {
+                          contact?: Maybe<
+                            { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                          >;
+                        })
+                      | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                    >;
+                  })
+              | ({ __typename?: "SignatureCancelledEvent" } & Pick<
+                  SignatureCancelledEvent,
+                  "id" | "cancelType" | "cancellerReason" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    canceller?: Maybe<
+                      { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+                    >;
+                  })
+              | ({ __typename?: "SignatureCompletedEvent" } & Pick<
+                  SignatureCompletedEvent,
+                  "id" | "createdAt"
+                >)
+              | ({ __typename?: "SignatureStartedEvent" } & Pick<
+                  SignatureStartedEvent,
+                  "id" | "createdAt"
+                >)
+              | ({ __typename?: "TemplateUsedEvent" } & Pick<TemplateUsedEvent, "id">)
+              | ({ __typename?: "UserPermissionAddedEvent" } & Pick<
+                  UserPermissionAddedEvent,
+                  "id" | "permissionType" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionUser?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "UserPermissionEditedEvent" } & Pick<
+                  UserPermissionEditedEvent,
+                  "id" | "permissionType" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionUser?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+              | ({ __typename?: "UserPermissionRemovedEvent" } & Pick<
+                  UserPermissionRemovedEvent,
+                  "id" | "createdAt"
+                > & {
+                    user?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                    permissionUser?: Maybe<
+                      { __typename?: "User" } & Pick<User, "id" | "fullName" | "status">
+                    >;
+                  })
+            >;
           };
-        };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
-      }
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
+          >;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & {
+              signers: Array<
+                { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+              >;
+            }
+          >;
+          remindersConfig?: Maybe<
+            { __typename?: "RemindersConfig" } & Pick<
+              RemindersConfig,
+              "offset" | "time" | "timezone" | "weekdaysOnly"
+            >
+          >;
+          organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+              usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+                petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+                  OrganizationUsagePetitionLimit,
+                  "limit" | "used"
+                >;
+              };
+            };
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "isSubscribed"
+            >
+          >;
+        })
     | { __typename?: "PetitionTemplate" }
   >;
 };
@@ -11400,266 +9576,272 @@ export type PetitionActivityQuery = {
 export type PetitionActivityUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionActivityUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    unreadNotificationIds: Array<string>;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasPetitionPdfExport: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "unreadNotificationIds"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & { hasPetitionPdfExport: User["hasFeatureFlag"] } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
-export type PetitionCompose_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-  status: PetitionStatus;
-  id: string;
-  tone: Tone;
-  name?: Maybe<string>;
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  deadline?: Maybe<string>;
-  locale: PetitionLocale;
-  hasCommentsEnabled: boolean;
-  skipForwardSecurity: boolean;
-  isRecipientViewContentsHidden: boolean;
-  isReadOnly: boolean;
-  updatedAt: string;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-    description?: Maybe<string>;
-    optional: boolean;
-    multiple: boolean;
-    isFixed: boolean;
-    isReadOnly: boolean;
-    visibility?: Maybe<{ [key: string]: any }>;
-    options: { [key: string]: any };
-    position: number;
-    validated: boolean;
-    attachments: Array<{
-      __typename?: "PetitionFieldAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
+export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  | "status"
+  | "id"
+  | "tone"
+  | "name"
+  | "emailSubject"
+  | "emailBody"
+  | "deadline"
+  | "locale"
+  | "hasCommentsEnabled"
+  | "skipForwardSecurity"
+  | "isRecipientViewContentsHidden"
+  | "isReadOnly"
+  | "updatedAt"
+> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<
+        PetitionField,
+        | "id"
+        | "type"
+        | "title"
+        | "description"
+        | "optional"
+        | "multiple"
+        | "isFixed"
+        | "isReadOnly"
+        | "visibility"
+        | "options"
+        | "position"
+        | "validated"
+      > & {
+          attachments: Array<
+            { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                file: { __typename?: "FileUpload" } & Pick<
+                  FileUpload,
+                  "filename" | "contentType" | "size" | "isComplete"
+                >;
+              }
+          >;
+          comments: Array<
+            { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+          >;
+          replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+        }
+    >;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "provider" | "title" | "review" | "letRecipientsChooseSigners"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email" | "fullName"
+            >
+          >;
+        }
+    >;
+    remindersConfig?: Maybe<
+      { __typename?: "RemindersConfig" } & Pick<
+        RemindersConfig,
+        "offset" | "time" | "timezone" | "weekdaysOnly"
+      >
+    >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "id" | "customHost"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
       };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-  }>;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-      fullName: string;
-    }>;
-  }>;
-  remindersConfig?: Maybe<{
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  }>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    customHost?: Maybe<string>;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "id" | "status">
+    >;
+    owner: { __typename?: "User" } & Pick<User, "id">;
+    myEffectivePermission?: Maybe<
+      { __typename?: "EffectivePetitionUserPermission" } & Pick<
+        EffectivePetitionUserPermission,
+        "isSubscribed"
+      >
+    >;
   };
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  }>;
-  owner: { __typename?: "User"; id: string };
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
-};
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  isPublic: boolean;
-  id: string;
-  tone: Tone;
-  name?: Maybe<string>;
-  emailSubject?: Maybe<string>;
-  emailBody?: Maybe<any>;
-  description?: Maybe<any>;
-  isReadOnly: boolean;
-  locale: PetitionLocale;
-  hasCommentsEnabled: boolean;
-  skipForwardSecurity: boolean;
-  isRecipientViewContentsHidden: boolean;
-  updatedAt: string;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-    description?: Maybe<string>;
-    optional: boolean;
-    multiple: boolean;
-    isFixed: boolean;
-    isReadOnly: boolean;
-    visibility?: Maybe<{ [key: string]: any }>;
-    options: { [key: string]: any };
-    position: number;
-    validated: boolean;
-    attachments: Array<{
-      __typename?: "PetitionFieldAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-  }>;
-  publicLink?: Maybe<{
-    __typename?: "PublicPetitionLink";
-    id: string;
-    title: string;
-    isActive: boolean;
-    description: string;
-    slug: string;
-    linkPermissions: Array<
-      | {
-          __typename?: "PublicPetitionLinkUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          group: { __typename?: "UserGroup"; id: string };
-        }
-      | {
-          __typename?: "PublicPetitionLinkUserPermission";
-          permissionType: PetitionPermissionType;
-          user: { __typename?: "User"; id: string };
+} & Pick<
+  PetitionTemplate,
+  | "isPublic"
+  | "id"
+  | "tone"
+  | "name"
+  | "emailSubject"
+  | "emailBody"
+  | "description"
+  | "isReadOnly"
+  | "locale"
+  | "hasCommentsEnabled"
+  | "skipForwardSecurity"
+  | "isRecipientViewContentsHidden"
+  | "updatedAt"
+> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<
+        PetitionField,
+        | "id"
+        | "type"
+        | "title"
+        | "description"
+        | "optional"
+        | "multiple"
+        | "isFixed"
+        | "isReadOnly"
+        | "visibility"
+        | "options"
+        | "position"
+        | "validated"
+      > & {
+          attachments: Array<
+            { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                file: { __typename?: "FileUpload" } & Pick<
+                  FileUpload,
+                  "filename" | "contentType" | "size" | "isComplete"
+                >;
+              }
+          >;
+          comments: Array<
+            { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+          >;
+          replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
         }
     >;
-  }>;
-  organization: { __typename?: "Organization"; customHost?: Maybe<string> };
-  owner: { __typename?: "User"; id: string };
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    provider: string;
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-  }>;
-};
+    publicLink?: Maybe<
+      { __typename?: "PublicPetitionLink" } & Pick<
+        PublicPetitionLink,
+        "id" | "title" | "isActive" | "description" | "slug"
+      > & {
+          linkPermissions: Array<
+            | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
+                PublicPetitionLinkUserGroupPermission,
+                "permissionType"
+              > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+            | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
+                PublicPetitionLinkUserPermission,
+                "permissionType"
+              > & { user: { __typename?: "User" } & Pick<User, "id"> })
+          >;
+        }
+    >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
+    owner: { __typename?: "User" } & Pick<User, "id">;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "provider" | "title" | "review" | "letRecipientsChooseSigners"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email"
+            >
+          >;
+        }
+    >;
+  };
 
 export type PetitionCompose_PetitionBaseFragment =
   | PetitionCompose_PetitionBase_Petition_Fragment
   | PetitionCompose_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionCompose_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
-  optional: boolean;
-  multiple: boolean;
-  isFixed: boolean;
-  isReadOnly: boolean;
-  visibility?: Maybe<{ [key: string]: any }>;
-  options: { [key: string]: any };
-  position: number;
-  validated: boolean;
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-};
-
-export type PetitionCompose_UserFragment = {
-  __typename?: "User";
-  id: string;
-  unreadNotificationIds: Array<string>;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  hasPetitionSignature: boolean;
-  hasSkipForwardSecurity: boolean;
-  hasHideRecipientViewContents: boolean;
-  hasPetitionPdfExport: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    signatureIntegrations: Array<{ __typename?: "OrgIntegration"; label: string; value: string }>;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type PetitionCompose_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  | "id"
+  | "type"
+  | "title"
+  | "description"
+  | "optional"
+  | "multiple"
+  | "isFixed"
+  | "isReadOnly"
+  | "visibility"
+  | "options"
+  | "position"
+  | "validated"
+> & {
+    attachments: Array<
+      { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+          file: { __typename?: "FileUpload" } & Pick<
+            FileUpload,
+            "filename" | "contentType" | "size" | "isComplete"
+          >;
+        }
+    >;
+    comments: Array<{ __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">>;
+    replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
   };
-};
 
-export type PetitionCompose_OrganizationFragment = {
-  __typename?: "Organization";
-  usageLimits: {
-    __typename?: "OrganizationUsageLimit";
-    petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+export type PetitionCompose_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "unreadNotificationIds"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    hasPetitionSignature: User["hasFeatureFlag"];
+    hasSkipForwardSecurity: User["hasFeatureFlag"];
+    hasHideRecipientViewContents: User["hasFeatureFlag"];
+    hasPetitionPdfExport: User["hasFeatureFlag"];
+  } & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        signatureIntegrations: Array<
+          { __typename?: "OrgIntegration" } & {
+            label: OrgIntegration["name"];
+            value: OrgIntegration["provider"];
+          }
+        >;
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
+  };
+
+export type PetitionCompose_OrganizationFragment = { __typename?: "Organization" } & {
+  usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+    petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+      OrganizationUsagePetitionLimit,
+      "limit" | "used"
+    >;
   };
 };
 
@@ -11671,117 +9853,113 @@ export type PetitionCompose_updatePetitionMutationVariables = Exact<{
 
 export type PetitionCompose_updatePetitionMutation = {
   updatePetition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: Maybe<string>;
-        status: PetitionStatus;
-        deadline?: Maybe<string>;
-        locale: PetitionLocale;
-        hasCommentsEnabled: boolean;
-        skipForwardSecurity: boolean;
-        isRecipientViewContentsHidden: boolean;
-        isReadOnly: boolean;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        updatedAt: string;
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-        }>;
-        organization: {
-          __typename?: "Organization";
-          customHost?: Maybe<string>;
-          id: string;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
+    | ({ __typename?: "Petition" } & Pick<
+        Petition,
+        | "id"
+        | "name"
+        | "status"
+        | "deadline"
+        | "locale"
+        | "hasCommentsEnabled"
+        | "skipForwardSecurity"
+        | "isRecipientViewContentsHidden"
+        | "isReadOnly"
+        | "emailSubject"
+        | "emailBody"
+        | "updatedAt"
+      > & {
+          currentSignatureRequest?: Maybe<
+            { __typename?: "PetitionSignatureRequest" } & Pick<
+              PetitionSignatureRequest,
+              "id" | "status"
+            >
+          >;
+          organization: { __typename?: "Organization" } & Pick<
+            Organization,
+            "customHost" | "id"
+          > & {
+              usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+                petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+                  OrganizationUsagePetitionLimit,
+                  "limit" | "used"
+                >;
+              };
             };
-          };
-        };
-        owner: { __typename?: "User"; id: string };
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-            fullName: string;
-          }>;
-        }>;
-        remindersConfig?: Maybe<{
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        }>;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: Maybe<string>;
-        isPublic: boolean;
-        locale: PetitionLocale;
-        hasCommentsEnabled: boolean;
-        skipForwardSecurity: boolean;
-        isRecipientViewContentsHidden: boolean;
-        isReadOnly: boolean;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        description?: Maybe<any>;
-        updatedAt: string;
-        publicLink?: Maybe<{
-          __typename?: "PublicPetitionLink";
-          id: string;
-          title: string;
-          isActive: boolean;
-          description: string;
-          slug: string;
-          linkPermissions: Array<
-            | {
-                __typename?: "PublicPetitionLinkUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string };
-              }
-            | {
-                __typename?: "PublicPetitionLinkUserPermission";
-                permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string };
+          owner: { __typename?: "User" } & Pick<User, "id">;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "provider" | "title" | "review" | "letRecipientsChooseSigners"
+            > & {
+                signers: Array<
+                  { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "contactId" | "firstName" | "lastName" | "email" | "fullName"
+                  >
+                >;
               }
           >;
-        }>;
-        organization: { __typename?: "Organization"; customHost?: Maybe<string> };
-        owner: { __typename?: "User"; id: string };
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-          }>;
-        }>;
-      };
+          remindersConfig?: Maybe<
+            { __typename?: "RemindersConfig" } & Pick<
+              RemindersConfig,
+              "offset" | "time" | "timezone" | "weekdaysOnly"
+            >
+          >;
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "isSubscribed"
+            >
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<
+        PetitionTemplate,
+        | "id"
+        | "name"
+        | "isPublic"
+        | "locale"
+        | "hasCommentsEnabled"
+        | "skipForwardSecurity"
+        | "isRecipientViewContentsHidden"
+        | "isReadOnly"
+        | "emailSubject"
+        | "emailBody"
+        | "description"
+        | "updatedAt"
+      > & {
+          publicLink?: Maybe<
+            { __typename?: "PublicPetitionLink" } & Pick<
+              PublicPetitionLink,
+              "id" | "title" | "isActive" | "description" | "slug"
+            > & {
+                linkPermissions: Array<
+                  | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
+                      PublicPetitionLinkUserGroupPermission,
+                      "permissionType"
+                    > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+                  | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
+                      PublicPetitionLinkUserPermission,
+                      "permissionType"
+                    > & { user: { __typename?: "User" } & Pick<User, "id"> })
+                >;
+              }
+          >;
+          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
+          owner: { __typename?: "User" } & Pick<User, "id">;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "provider" | "title" | "review" | "letRecipientsChooseSigners"
+            > & {
+                signers: Array<
+                  { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "contactId" | "firstName" | "lastName" | "email"
+                  >
+                >;
+              }
+          >;
+        });
 };
 
 export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
@@ -11791,31 +9969,22 @@ export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
 
 export type PetitionCompose_updateFieldPositionsMutation = {
   updateFieldPositions:
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: Maybe<string>;
-        locale: PetitionLocale;
-        deadline?: Maybe<string>;
-        status: PetitionStatus;
-        updatedAt: string;
-        isReadOnly: boolean;
-        fields: Array<{ __typename?: "PetitionField"; id: string }>;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: Maybe<string>;
-        locale: PetitionLocale;
-        isPublic: boolean;
-        updatedAt: string;
-        isReadOnly: boolean;
-        fields: Array<{ __typename?: "PetitionField"; id: string }>;
-      };
+    | ({ __typename?: "Petition" } & Pick<
+        Petition,
+        "id" | "name" | "locale" | "deadline" | "status" | "updatedAt" | "isReadOnly"
+      > & {
+          fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "isSubscribed"
+            >
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<
+        PetitionTemplate,
+        "id" | "name" | "locale" | "isPublic" | "updatedAt" | "isReadOnly"
+      > & { fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">> });
 };
 
 export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
@@ -11826,93 +9995,82 @@ export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
 
 export type PetitionCompose_createPetitionFieldMutation = {
   createPetitionField:
-    | {
-        __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
-          __typename?: "Petition";
-          id: string;
-          name?: Maybe<string>;
-          locale: PetitionLocale;
-          deadline?: Maybe<string>;
-          status: PetitionStatus;
-          updatedAt: string;
-          isReadOnly: boolean;
-          fields: Array<{ __typename?: "PetitionField"; id: string }>;
-          myEffectivePermission?: Maybe<{
-            __typename?: "EffectivePetitionUserPermission";
-            isSubscribed: boolean;
-          }>;
-        };
-      }
-    | {
-        __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
-          __typename?: "PetitionTemplate";
-          id: string;
-          name?: Maybe<string>;
-          locale: PetitionLocale;
-          isPublic: boolean;
-          updatedAt: string;
-          isReadOnly: boolean;
-          fields: Array<{ __typename?: "PetitionField"; id: string }>;
-        };
-      };
+    | ({ __typename?: "PetitionAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<
+          PetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "description"
+          | "optional"
+          | "multiple"
+          | "isFixed"
+          | "isReadOnly"
+          | "visibility"
+          | "options"
+          | "position"
+          | "validated"
+        > & {
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+            comments: Array<
+              { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+            >;
+            replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+          };
+        petition: { __typename?: "Petition" } & Pick<
+          Petition,
+          "id" | "name" | "locale" | "deadline" | "status" | "updatedAt" | "isReadOnly"
+        > & {
+            fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
+            myEffectivePermission?: Maybe<
+              { __typename?: "EffectivePetitionUserPermission" } & Pick<
+                EffectivePetitionUserPermission,
+                "isSubscribed"
+              >
+            >;
+          };
+      })
+    | ({ __typename?: "PetitionTemplateAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<
+          PetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "description"
+          | "optional"
+          | "multiple"
+          | "isFixed"
+          | "isReadOnly"
+          | "visibility"
+          | "options"
+          | "position"
+          | "validated"
+        > & {
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+            comments: Array<
+              { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+            >;
+            replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+          };
+        petition: { __typename?: "PetitionTemplate" } & Pick<
+          PetitionTemplate,
+          "id" | "name" | "locale" | "isPublic" | "updatedAt" | "isReadOnly"
+        > & { fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">> };
+      });
 };
 
 export type PetitionCompose_clonePetitionFieldMutationVariables = Exact<{
@@ -11922,93 +10080,82 @@ export type PetitionCompose_clonePetitionFieldMutationVariables = Exact<{
 
 export type PetitionCompose_clonePetitionFieldMutation = {
   clonePetitionField:
-    | {
-        __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
-          __typename?: "Petition";
-          id: string;
-          name?: Maybe<string>;
-          locale: PetitionLocale;
-          deadline?: Maybe<string>;
-          status: PetitionStatus;
-          updatedAt: string;
-          isReadOnly: boolean;
-          fields: Array<{ __typename?: "PetitionField"; id: string }>;
-          myEffectivePermission?: Maybe<{
-            __typename?: "EffectivePetitionUserPermission";
-            isSubscribed: boolean;
-          }>;
-        };
-      }
-    | {
-        __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
-          __typename?: "PetitionTemplate";
-          id: string;
-          name?: Maybe<string>;
-          locale: PetitionLocale;
-          isPublic: boolean;
-          updatedAt: string;
-          isReadOnly: boolean;
-          fields: Array<{ __typename?: "PetitionField"; id: string }>;
-        };
-      };
+    | ({ __typename?: "PetitionAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<
+          PetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "description"
+          | "optional"
+          | "multiple"
+          | "isFixed"
+          | "isReadOnly"
+          | "visibility"
+          | "options"
+          | "position"
+          | "validated"
+        > & {
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+            comments: Array<
+              { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+            >;
+            replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+          };
+        petition: { __typename?: "Petition" } & Pick<
+          Petition,
+          "id" | "name" | "locale" | "deadline" | "status" | "updatedAt" | "isReadOnly"
+        > & {
+            fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
+            myEffectivePermission?: Maybe<
+              { __typename?: "EffectivePetitionUserPermission" } & Pick<
+                EffectivePetitionUserPermission,
+                "isSubscribed"
+              >
+            >;
+          };
+      })
+    | ({ __typename?: "PetitionTemplateAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<
+          PetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "description"
+          | "optional"
+          | "multiple"
+          | "isFixed"
+          | "isReadOnly"
+          | "visibility"
+          | "options"
+          | "position"
+          | "validated"
+        > & {
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+            comments: Array<
+              { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+            >;
+            replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+          };
+        petition: { __typename?: "PetitionTemplate" } & Pick<
+          PetitionTemplate,
+          "id" | "name" | "locale" | "isPublic" | "updatedAt" | "isReadOnly"
+        > & { fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">> };
+      });
 };
 
 export type PetitionCompose_deletePetitionFieldMutationVariables = Exact<{
@@ -12019,31 +10166,22 @@ export type PetitionCompose_deletePetitionFieldMutationVariables = Exact<{
 
 export type PetitionCompose_deletePetitionFieldMutation = {
   deletePetitionField:
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: Maybe<string>;
-        locale: PetitionLocale;
-        deadline?: Maybe<string>;
-        status: PetitionStatus;
-        updatedAt: string;
-        isReadOnly: boolean;
-        fields: Array<{ __typename?: "PetitionField"; id: string }>;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: Maybe<string>;
-        locale: PetitionLocale;
-        isPublic: boolean;
-        updatedAt: string;
-        isReadOnly: boolean;
-        fields: Array<{ __typename?: "PetitionField"; id: string }>;
-      };
+    | ({ __typename?: "Petition" } & Pick<
+        Petition,
+        "id" | "name" | "locale" | "deadline" | "status" | "updatedAt" | "isReadOnly"
+      > & {
+          fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "isSubscribed"
+            >
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<
+        PetitionTemplate,
+        "id" | "name" | "locale" | "isPublic" | "updatedAt" | "isReadOnly"
+      > & { fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">> });
 };
 
 export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
@@ -12054,75 +10192,68 @@ export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
 
 export type PetitionCompose_updatePetitionFieldMutation = {
   updatePetitionField:
-    | {
-        __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
-          __typename?: "Petition";
-          status: PetitionStatus;
-          id: string;
-          updatedAt: string;
-        };
-      }
-    | {
-        __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
-      };
+    | ({ __typename?: "PetitionAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<
+          PetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "description"
+          | "optional"
+          | "multiple"
+          | "isFixed"
+          | "isReadOnly"
+          | "visibility"
+          | "options"
+          | "position"
+          | "validated"
+        > & {
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+            comments: Array<
+              { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+            >;
+            replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+          };
+        petition: { __typename?: "Petition" } & Pick<Petition, "status" | "id" | "updatedAt">;
+      })
+    | ({ __typename?: "PetitionTemplateAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<
+          PetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "description"
+          | "optional"
+          | "multiple"
+          | "isFixed"
+          | "isReadOnly"
+          | "visibility"
+          | "options"
+          | "position"
+          | "validated"
+        > & {
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+            comments: Array<
+              { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+            >;
+            replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+          };
+        petition: { __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "updatedAt">;
+      });
 };
 
 export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
@@ -12134,75 +10265,68 @@ export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
 
 export type PetitionCompose_changePetitionFieldTypeMutation = {
   changePetitionFieldType:
-    | {
-        __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
-          __typename?: "Petition";
-          status: PetitionStatus;
-          id: string;
-          updatedAt: string;
-        };
-      }
-    | {
-        __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
-      };
+    | ({ __typename?: "PetitionAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<
+          PetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "description"
+          | "optional"
+          | "multiple"
+          | "isFixed"
+          | "isReadOnly"
+          | "visibility"
+          | "options"
+          | "position"
+          | "validated"
+        > & {
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+            comments: Array<
+              { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+            >;
+            replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+          };
+        petition: { __typename?: "Petition" } & Pick<Petition, "status" | "id" | "updatedAt">;
+      })
+    | ({ __typename?: "PetitionTemplateAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<
+          PetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "description"
+          | "optional"
+          | "multiple"
+          | "isFixed"
+          | "isReadOnly"
+          | "visibility"
+          | "options"
+          | "position"
+          | "validated"
+        > & {
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+            comments: Array<
+              { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+            >;
+            replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+          };
+        petition: { __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "updatedAt">;
+      });
 };
 
 export type PetitionCompose_batchSendPetitionMutationVariables = Exact<{
@@ -12219,44 +10343,51 @@ export type PetitionCompose_batchSendPetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_batchSendPetitionMutation = {
-  batchSendPetition: Array<{
-    __typename?: "SendPetitionResult";
-    result: Result;
-    petition?: Maybe<{ __typename?: "Petition"; id: string; status: PetitionStatus }>;
-  }>;
+  batchSendPetition: Array<
+    { __typename?: "SendPetitionResult" } & Pick<SendPetitionResult, "result"> & {
+        petition?: Maybe<{ __typename?: "Petition" } & Pick<Petition, "id" | "status">>;
+      }
+  >;
 };
 
 export type PetitionComposeUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionComposeUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    unreadNotificationIds: Array<string>;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasPetitionSignature: boolean;
-    hasSkipForwardSecurity: boolean;
-    hasHideRecipientViewContents: boolean;
-    hasPetitionPdfExport: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      signatureIntegrations: Array<{ __typename?: "OrgIntegration"; label: string; value: string }>;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "unreadNotificationIds"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      hasPetitionSignature: User["hasFeatureFlag"];
+      hasSkipForwardSecurity: User["hasFeatureFlag"];
+      hasHideRecipientViewContents: User["hasFeatureFlag"];
+      hasPetitionPdfExport: User["hasFeatureFlag"];
+    } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          signatureIntegrations: Array<
+            { __typename?: "OrgIntegration" } & {
+              label: OrgIntegration["name"];
+              value: OrgIntegration["provider"];
+            }
+          >;
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type PetitionComposeQueryVariables = Exact<{
@@ -12266,175 +10397,185 @@ export type PetitionComposeQueryVariables = Exact<{
 
 export type PetitionComposeQuery = {
   petition?: Maybe<
-    | {
-        __typename?: "Petition";
-        status: PetitionStatus;
-        id: string;
-        tone: Tone;
-        name?: Maybe<string>;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        deadline?: Maybe<string>;
-        locale: PetitionLocale;
-        hasCommentsEnabled: boolean;
-        skipForwardSecurity: boolean;
-        isRecipientViewContentsHidden: boolean;
-        isReadOnly: boolean;
-        updatedAt: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        }>;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-            fullName: string;
-          }>;
-        }>;
-        remindersConfig?: Maybe<{
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        }>;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          customHost?: Maybe<string>;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
-            };
-          };
-        };
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-        }>;
-        owner: { __typename?: "User"; id: string };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        isPublic: boolean;
-        id: string;
-        tone: Tone;
-        name?: Maybe<string>;
-        emailSubject?: Maybe<string>;
-        emailBody?: Maybe<any>;
-        description?: Maybe<any>;
-        isReadOnly: boolean;
-        locale: PetitionLocale;
-        hasCommentsEnabled: boolean;
-        skipForwardSecurity: boolean;
-        isRecipientViewContentsHidden: boolean;
-        updatedAt: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: Maybe<{ [key: string]: any }>;
-          options: { [key: string]: any };
-          position: number;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        }>;
-        publicLink?: Maybe<{
-          __typename?: "PublicPetitionLink";
-          id: string;
-          title: string;
-          isActive: boolean;
-          description: string;
-          slug: string;
-          linkPermissions: Array<
-            | {
-                __typename?: "PublicPetitionLinkUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string };
-              }
-            | {
-                __typename?: "PublicPetitionLinkUserPermission";
-                permissionType: PetitionPermissionType;
-                user: { __typename?: "User"; id: string };
+    | ({ __typename?: "Petition" } & Pick<
+        Petition,
+        | "status"
+        | "id"
+        | "tone"
+        | "name"
+        | "emailSubject"
+        | "emailBody"
+        | "deadline"
+        | "locale"
+        | "hasCommentsEnabled"
+        | "skipForwardSecurity"
+        | "isRecipientViewContentsHidden"
+        | "isReadOnly"
+        | "updatedAt"
+      > & {
+          fields: Array<
+            { __typename?: "PetitionField" } & Pick<
+              PetitionField,
+              | "id"
+              | "type"
+              | "title"
+              | "description"
+              | "optional"
+              | "multiple"
+              | "isFixed"
+              | "isReadOnly"
+              | "visibility"
+              | "options"
+              | "position"
+              | "validated"
+            > & {
+                attachments: Array<
+                  { __typename?: "PetitionFieldAttachment" } & Pick<
+                    PetitionFieldAttachment,
+                    "id"
+                  > & {
+                      file: { __typename?: "FileUpload" } & Pick<
+                        FileUpload,
+                        "filename" | "contentType" | "size" | "isComplete"
+                      >;
+                    }
+                >;
+                comments: Array<
+                  { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+                >;
+                replies: Array<
+                  { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
+                >;
               }
           >;
-        }>;
-        organization: { __typename?: "Organization"; customHost?: Maybe<string> };
-        owner: { __typename?: "User"; id: string };
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          provider: string;
-          title: string;
-          review: boolean;
-          letRecipientsChooseSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-          }>;
-        }>;
-      }
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "provider" | "title" | "review" | "letRecipientsChooseSigners"
+            > & {
+                signers: Array<
+                  { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "contactId" | "firstName" | "lastName" | "email" | "fullName"
+                  >
+                >;
+              }
+          >;
+          remindersConfig?: Maybe<
+            { __typename?: "RemindersConfig" } & Pick<
+              RemindersConfig,
+              "offset" | "time" | "timezone" | "weekdaysOnly"
+            >
+          >;
+          organization: { __typename?: "Organization" } & Pick<
+            Organization,
+            "id" | "customHost"
+          > & {
+              usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+                petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+                  OrganizationUsagePetitionLimit,
+                  "limit" | "used"
+                >;
+              };
+            };
+          currentSignatureRequest?: Maybe<
+            { __typename?: "PetitionSignatureRequest" } & Pick<
+              PetitionSignatureRequest,
+              "id" | "status"
+            >
+          >;
+          owner: { __typename?: "User" } & Pick<User, "id">;
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "isSubscribed"
+            >
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<
+        PetitionTemplate,
+        | "isPublic"
+        | "id"
+        | "tone"
+        | "name"
+        | "emailSubject"
+        | "emailBody"
+        | "description"
+        | "isReadOnly"
+        | "locale"
+        | "hasCommentsEnabled"
+        | "skipForwardSecurity"
+        | "isRecipientViewContentsHidden"
+        | "updatedAt"
+      > & {
+          fields: Array<
+            { __typename?: "PetitionField" } & Pick<
+              PetitionField,
+              | "id"
+              | "type"
+              | "title"
+              | "description"
+              | "optional"
+              | "multiple"
+              | "isFixed"
+              | "isReadOnly"
+              | "visibility"
+              | "options"
+              | "position"
+              | "validated"
+            > & {
+                attachments: Array<
+                  { __typename?: "PetitionFieldAttachment" } & Pick<
+                    PetitionFieldAttachment,
+                    "id"
+                  > & {
+                      file: { __typename?: "FileUpload" } & Pick<
+                        FileUpload,
+                        "filename" | "contentType" | "size" | "isComplete"
+                      >;
+                    }
+                >;
+                comments: Array<
+                  { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+                >;
+                replies: Array<
+                  { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
+                >;
+              }
+          >;
+          publicLink?: Maybe<
+            { __typename?: "PublicPetitionLink" } & Pick<
+              PublicPetitionLink,
+              "id" | "title" | "isActive" | "description" | "slug"
+            > & {
+                linkPermissions: Array<
+                  | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
+                      PublicPetitionLinkUserGroupPermission,
+                      "permissionType"
+                    > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+                  | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
+                      PublicPetitionLinkUserPermission,
+                      "permissionType"
+                    > & { user: { __typename?: "User" } & Pick<User, "id"> })
+                >;
+              }
+          >;
+          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
+          owner: { __typename?: "User" } & Pick<User, "id">;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "provider" | "title" | "review" | "letRecipientsChooseSigners"
+            > & {
+                signers: Array<
+                  { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "contactId" | "firstName" | "lastName" | "email"
+                  >
+                >;
+              }
+          >;
+        })
   >;
 };
 
@@ -12444,211 +10585,209 @@ export type PetitionQueryVariables = Exact<{
 
 export type PetitionQuery = {
   petition?: Maybe<
-    | { __typename?: "Petition"; status: PetitionStatus; id: string }
-    | { __typename?: "PetitionTemplate"; id: string }
+    | ({ __typename?: "Petition" } & Pick<Petition, "status" | "id">)
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">)
   >;
 };
 
-export type PetitionReplies_PetitionFragment = {
-  __typename?: "Petition";
-  id: string;
-  hasCommentsEnabled: boolean;
-  name?: Maybe<string>;
-  status: PetitionStatus;
-  locale: PetitionLocale;
-  deadline?: Maybe<string>;
-  updatedAt: string;
-  isReadOnly: boolean;
-  fields: Array<{
-    __typename?: "PetitionField";
-    isReadOnly: boolean;
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-    description?: Maybe<string>;
-    optional: boolean;
-    validated: boolean;
-    options: { [key: string]: any };
-    visibility?: Maybe<{ [key: string]: any }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-      status: PetitionFieldReplyStatus;
-      createdAt: string;
-      metadata: { [key: string]: any };
-      field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
-    }>;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
-      id: string;
-      isUnread: boolean;
-      createdAt: string;
-      content: string;
-      isEdited: boolean;
-      isInternal?: Maybe<boolean>;
-      author?: Maybe<
-        | {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-          }
-        | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-      >;
-    }>;
-    attachments: Array<{
-      __typename?: "PetitionFieldAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
-  }>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  }>;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-      }
-  >;
-  signatureRequests?: Maybe<
-    Array<{
-      __typename?: "PetitionSignatureRequest";
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      signerStatus: Array<{
-        __typename?: "PetitionSignatureRequestSignerStatus";
-        status: string;
-        signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-      }>;
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-      };
-    }>
-  >;
-  signatureConfig?: Maybe<{
-    __typename?: "SignatureConfig";
-    review: boolean;
-    provider: string;
-    title: string;
-    letRecipientsChooseSigners: boolean;
-    timezone: string;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: Maybe<string>;
-      firstName: string;
-      lastName: string;
-      email: string;
-      fullName: string;
-    }>;
-  }>;
-  myEffectivePermission?: Maybe<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  }>;
-};
-
-export type PetitionReplies_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  isReadOnly: boolean;
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
-  optional: boolean;
-  validated: boolean;
-  options: { [key: string]: any };
-  visibility?: Maybe<{ [key: string]: any }>;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    createdAt: string;
-    metadata: { [key: string]: any };
-    field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
-  }>;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isUnread: boolean;
-    createdAt: string;
-    content: string;
-    isEdited: boolean;
-    isInternal?: Maybe<boolean>;
-    author?: Maybe<
-      | {
-          __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+export type PetitionReplies_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  | "id"
+  | "hasCommentsEnabled"
+  | "name"
+  | "status"
+  | "locale"
+  | "deadline"
+  | "updatedAt"
+  | "isReadOnly"
+> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<
+        PetitionField,
+        | "isReadOnly"
+        | "id"
+        | "type"
+        | "title"
+        | "description"
+        | "optional"
+        | "validated"
+        | "options"
+        | "visibility"
+      > & {
+          replies: Array<
+            { __typename?: "PetitionFieldReply" } & Pick<
+              PetitionFieldReply,
+              "id" | "content" | "status" | "createdAt" | "metadata"
+            > & { field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "type">> }
+          >;
+          comments: Array<
+            { __typename?: "PetitionFieldComment" } & MakeOptional<
+              Pick<
+                PetitionFieldComment,
+                "id" | "isUnread" | "createdAt" | "content" | "isEdited" | "isInternal"
+              >,
+              "isInternal"
+            > & {
+                author?: Maybe<
+                  | ({ __typename?: "PetitionAccess" } & {
+                      contact?: Maybe<
+                        { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                      >;
+                    })
+                  | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                >;
+              }
+          >;
+          attachments: Array<
+            { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                file: { __typename?: "FileUpload" } & Pick<
+                  FileUpload,
+                  "filename" | "contentType" | "size" | "isComplete"
+                >;
+              }
+          >;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
     >;
-  }>;
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
-};
-
-export type PetitionReplies_UserFragment = {
-  __typename?: "User";
-  id: string;
-  unreadNotificationIds: Array<string>;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  hasPetitionSignature: boolean;
-  hasPetitionPdfExport: boolean;
-  hasInternalComments: boolean;
-  hasExportCuatrecasas: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    signatureIntegrations: Array<{ __typename?: "OrgIntegration"; label: string; value: string }>;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "id" | "status">
+    >;
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
+    >;
+    signatureRequests?: Maybe<
+      Array<
+        { __typename?: "PetitionSignatureRequest" } & Pick<
+          PetitionSignatureRequest,
+          "id" | "status"
+        > & {
+            signerStatus: Array<
+              { __typename?: "PetitionSignatureRequestSignerStatus" } & Pick<
+                PetitionSignatureRequestSignerStatus,
+                "status"
+              > & {
+                  signer: { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "email" | "fullName"
+                  >;
+                }
+            >;
+            signatureConfig: { __typename?: "SignatureConfig" } & {
+              signers: Array<
+                { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+              >;
+            };
+          }
+      >
+    >;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "review" | "provider" | "title" | "letRecipientsChooseSigners" | "timezone"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email" | "fullName"
+            >
+          >;
+        }
+    >;
+    myEffectivePermission?: Maybe<
+      { __typename?: "EffectivePetitionUserPermission" } & Pick<
+        EffectivePetitionUserPermission,
+        "isSubscribed"
+      >
+    >;
   };
-};
+
+export type PetitionReplies_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  | "isReadOnly"
+  | "id"
+  | "type"
+  | "title"
+  | "description"
+  | "optional"
+  | "validated"
+  | "options"
+  | "visibility"
+> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<
+        PetitionFieldReply,
+        "id" | "content" | "status" | "createdAt" | "metadata"
+      > & { field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "type">> }
+    >;
+    comments: Array<
+      { __typename?: "PetitionFieldComment" } & MakeOptional<
+        Pick<
+          PetitionFieldComment,
+          "id" | "isUnread" | "createdAt" | "content" | "isEdited" | "isInternal"
+        >,
+        "isInternal"
+      > & {
+          author?: Maybe<
+            | ({ __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                >;
+              })
+            | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+          >;
+        }
+    >;
+    attachments: Array<
+      { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+          file: { __typename?: "FileUpload" } & Pick<
+            FileUpload,
+            "filename" | "contentType" | "size" | "isComplete"
+          >;
+        }
+    >;
+  };
+
+export type PetitionReplies_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "unreadNotificationIds"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    hasPetitionSignature: User["hasFeatureFlag"];
+    hasPetitionPdfExport: User["hasFeatureFlag"];
+    hasInternalComments: User["hasFeatureFlag"];
+    hasExportCuatrecasas: User["hasFeatureFlag"];
+  } & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        signatureIntegrations: Array<
+          { __typename?: "OrgIntegration" } & {
+            label: OrgIntegration["name"];
+            value: OrgIntegration["provider"];
+          }
+        >;
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
+  };
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -12657,29 +10796,21 @@ export type PetitionReplies_updatePetitionMutationVariables = Exact<{
 
 export type PetitionReplies_updatePetitionMutation = {
   updatePetition:
-    | {
-        __typename?: "Petition";
-        id: string;
-        name?: Maybe<string>;
-        locale: PetitionLocale;
-        deadline?: Maybe<string>;
-        status: PetitionStatus;
-        updatedAt: string;
-        isReadOnly: boolean;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        name?: Maybe<string>;
-        locale: PetitionLocale;
-        isPublic: boolean;
-        updatedAt: string;
-        isReadOnly: boolean;
-      };
+    | ({ __typename?: "Petition" } & Pick<
+        Petition,
+        "id" | "name" | "locale" | "deadline" | "status" | "updatedAt" | "isReadOnly"
+      > & {
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "isSubscribed"
+            >
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<
+        PetitionTemplate,
+        "id" | "name" | "locale" | "isPublic" | "updatedAt" | "isReadOnly"
+      >);
 };
 
 export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
@@ -12690,19 +10821,15 @@ export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
 }>;
 
 export type PetitionReplies_validatePetitionFieldsMutation = {
-  validatePetitionFields: {
-    __typename?: "PetitionAndPartialFields";
-    petition: { __typename?: "Petition"; id: string; status: PetitionStatus };
-    fields: Array<{
-      __typename?: "PetitionField";
-      id: string;
-      validated: boolean;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
-    }>;
+  validatePetitionFields: { __typename?: "PetitionAndPartialFields" } & {
+    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "status">;
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "validated"> & {
+          replies: Array<
+            { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "status">
+          >;
+        }
+    >;
   };
 };
 
@@ -12713,11 +10840,10 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact
 }>;
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
-  fileUploadReplyDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: Maybe<string>;
-  };
+  fileUploadReplyDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
 };
 
 export type PetitionReplies_createPetitionFieldCommentMutationVariables = Exact<{
@@ -12729,38 +10855,32 @@ export type PetitionReplies_createPetitionFieldCommentMutationVariables = Exact<
 }>;
 
 export type PetitionReplies_createPetitionFieldCommentMutation = {
-  createPetitionFieldComment: {
-    __typename?: "PetitionField";
-    id: string;
-    title?: Maybe<string>;
-    type: PetitionFieldType;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
-      id: string;
-      content: string;
-      createdAt: string;
-      isUnread: boolean;
-      isEdited: boolean;
-      isInternal?: Maybe<boolean>;
-      author?: Maybe<
-        | {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+  createPetitionFieldComment: { __typename?: "PetitionField" } & Pick<
+    PetitionField,
+    "id" | "title" | "type"
+  > & {
+      comments: Array<
+        { __typename?: "PetitionFieldComment" } & MakeOptional<
+          Pick<
+            PetitionFieldComment,
+            "id" | "content" | "createdAt" | "isUnread" | "isEdited" | "isInternal"
+          >,
+          "isInternal"
+        > & {
+            author?: Maybe<
+              | ({ __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                })
+              | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+            >;
           }
-        | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
       >;
-    }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
-  };
+      replies: Array<
+        { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+      >;
+    };
 };
 
 export type PetitionReplies_updatePetitionFieldCommentMutationVariables = Exact<{
@@ -12772,38 +10892,32 @@ export type PetitionReplies_updatePetitionFieldCommentMutationVariables = Exact<
 }>;
 
 export type PetitionReplies_updatePetitionFieldCommentMutation = {
-  updatePetitionFieldComment: {
-    __typename?: "PetitionField";
-    id: string;
-    title?: Maybe<string>;
-    type: PetitionFieldType;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
-      id: string;
-      content: string;
-      createdAt: string;
-      isUnread: boolean;
-      isEdited: boolean;
-      isInternal?: Maybe<boolean>;
-      author?: Maybe<
-        | {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+  updatePetitionFieldComment: { __typename?: "PetitionField" } & Pick<
+    PetitionField,
+    "id" | "title" | "type"
+  > & {
+      comments: Array<
+        { __typename?: "PetitionFieldComment" } & MakeOptional<
+          Pick<
+            PetitionFieldComment,
+            "id" | "content" | "createdAt" | "isUnread" | "isEdited" | "isInternal"
+          >,
+          "isInternal"
+        > & {
+            author?: Maybe<
+              | ({ __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                })
+              | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+            >;
           }
-        | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
       >;
-    }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
-  };
+      replies: Array<
+        { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+      >;
+    };
 };
 
 export type PetitionReplies_deletePetitionFieldCommentMutationVariables = Exact<{
@@ -12814,38 +10928,32 @@ export type PetitionReplies_deletePetitionFieldCommentMutationVariables = Exact<
 }>;
 
 export type PetitionReplies_deletePetitionFieldCommentMutation = {
-  deletePetitionFieldComment: {
-    __typename?: "PetitionField";
-    id: string;
-    title?: Maybe<string>;
-    type: PetitionFieldType;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
-      id: string;
-      content: string;
-      createdAt: string;
-      isUnread: boolean;
-      isEdited: boolean;
-      isInternal?: Maybe<boolean>;
-      author?: Maybe<
-        | {
-            __typename?: "PetitionAccess";
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
+  deletePetitionFieldComment: { __typename?: "PetitionField" } & Pick<
+    PetitionField,
+    "id" | "title" | "type"
+  > & {
+      comments: Array<
+        { __typename?: "PetitionFieldComment" } & MakeOptional<
+          Pick<
+            PetitionFieldComment,
+            "id" | "content" | "createdAt" | "isUnread" | "isEdited" | "isInternal"
+          >,
+          "isInternal"
+        > & {
+            author?: Maybe<
+              | ({ __typename?: "PetitionAccess" } & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                })
+              | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+            >;
           }
-        | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
       >;
-    }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
-  };
+      replies: Array<
+        { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+      >;
+    };
 };
 
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
@@ -12856,15 +10964,12 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables = 
 }>;
 
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
-  updatePetitionFieldRepliesStatus: {
-    __typename?: "PetitionWithFieldAndReplies";
-    petition: { __typename?: "Petition"; id: string; status: PetitionStatus };
-    field: { __typename?: "PetitionField"; id: string; validated: boolean };
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
-    }>;
+  updatePetitionFieldRepliesStatus: { __typename?: "PetitionWithFieldAndReplies" } & {
+    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "status">;
+    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "validated">;
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "status">
+    >;
   };
 };
 
@@ -12877,40 +10982,47 @@ export type PetitionReplies_sendPetitionClosedNotificationMutationVariables = Ex
 }>;
 
 export type PetitionReplies_sendPetitionClosedNotificationMutation = {
-  sendPetitionClosedNotification: { __typename?: "Petition"; id: string };
+  sendPetitionClosedNotification: { __typename?: "Petition" } & Pick<Petition, "id">;
 };
 
 export type PetitionRepliesUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionRepliesUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    unreadNotificationIds: Array<string>;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasPetitionSignature: boolean;
-    hasPetitionPdfExport: boolean;
-    hasInternalComments: boolean;
-    hasExportCuatrecasas: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      signatureIntegrations: Array<{ __typename?: "OrgIntegration"; label: string; value: string }>;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "unreadNotificationIds"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      hasPetitionSignature: User["hasFeatureFlag"];
+      hasPetitionPdfExport: User["hasFeatureFlag"];
+      hasInternalComments: User["hasFeatureFlag"];
+      hasExportCuatrecasas: User["hasFeatureFlag"];
+    } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          signatureIntegrations: Array<
+            { __typename?: "OrgIntegration" } & {
+              label: OrgIntegration["name"];
+              value: OrgIntegration["provider"];
+            }
+          >;
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type PetitionRepliesQueryVariables = Exact<{
@@ -12921,350 +11033,335 @@ export type PetitionRepliesQueryVariables = Exact<{
 
 export type PetitionRepliesQuery = {
   petition?: Maybe<
-    | {
-        __typename?: "Petition";
-        id: string;
-        hasCommentsEnabled: boolean;
-        name?: Maybe<string>;
-        status: PetitionStatus;
-        locale: PetitionLocale;
-        deadline?: Maybe<string>;
-        updatedAt: string;
-        isReadOnly: boolean;
-        fields: Array<{
-          __typename?: "PetitionField";
-          isReadOnly: boolean;
-          id: string;
-          type: PetitionFieldType;
-          title?: Maybe<string>;
-          description?: Maybe<string>;
-          optional: boolean;
-          validated: boolean;
-          options: { [key: string]: any };
-          visibility?: Maybe<{ [key: string]: any }>;
-          replies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            content: { [key: string]: any };
-            status: PetitionFieldReplyStatus;
-            createdAt: string;
-            metadata: { [key: string]: any };
-            field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
-          }>;
-          comments: Array<{
-            __typename?: "PetitionFieldComment";
-            id: string;
-            isUnread: boolean;
-            createdAt: string;
-            content: string;
-            isEdited: boolean;
-            isInternal?: Maybe<boolean>;
-            author?: Maybe<
-              | {
-                  __typename?: "PetitionAccess";
-                  contact?: Maybe<{
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: Maybe<string>;
-                    email: string;
-                  }>;
+    | ({ __typename?: "Petition" } & Pick<
+        Petition,
+        | "id"
+        | "hasCommentsEnabled"
+        | "name"
+        | "status"
+        | "locale"
+        | "deadline"
+        | "updatedAt"
+        | "isReadOnly"
+      > & {
+          fields: Array<
+            { __typename?: "PetitionField" } & Pick<
+              PetitionField,
+              | "isReadOnly"
+              | "id"
+              | "type"
+              | "title"
+              | "description"
+              | "optional"
+              | "validated"
+              | "options"
+              | "visibility"
+            > & {
+                replies: Array<
+                  { __typename?: "PetitionFieldReply" } & Pick<
+                    PetitionFieldReply,
+                    "id" | "content" | "status" | "createdAt" | "metadata"
+                  > & {
+                      field?: Maybe<{ __typename?: "PetitionField" } & Pick<PetitionField, "type">>;
+                    }
+                >;
+                comments: Array<
+                  { __typename?: "PetitionFieldComment" } & MakeOptional<
+                    Pick<
+                      PetitionFieldComment,
+                      "id" | "isUnread" | "createdAt" | "content" | "isEdited" | "isInternal"
+                    >,
+                    "isInternal"
+                  > & {
+                      author?: Maybe<
+                        | ({ __typename?: "PetitionAccess" } & {
+                            contact?: Maybe<
+                              { __typename?: "Contact" } & Pick<
+                                Contact,
+                                "id" | "fullName" | "email"
+                              >
+                            >;
+                          })
+                        | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "status">)
+                      >;
+                    }
+                >;
+                attachments: Array<
+                  { __typename?: "PetitionFieldAttachment" } & Pick<
+                    PetitionFieldAttachment,
+                    "id"
+                  > & {
+                      file: { __typename?: "FileUpload" } & Pick<
+                        FileUpload,
+                        "filename" | "contentType" | "size" | "isComplete"
+                      >;
+                    }
+                >;
+              }
+          >;
+          currentSignatureRequest?: Maybe<
+            { __typename?: "PetitionSignatureRequest" } & Pick<
+              PetitionSignatureRequest,
+              "id" | "status"
+            >
+          >;
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
+          >;
+          signatureRequests?: Maybe<
+            Array<
+              { __typename?: "PetitionSignatureRequest" } & Pick<
+                PetitionSignatureRequest,
+                "id" | "status"
+              > & {
+                  signerStatus: Array<
+                    { __typename?: "PetitionSignatureRequestSignerStatus" } & Pick<
+                      PetitionSignatureRequestSignerStatus,
+                      "status"
+                    > & {
+                        signer: { __typename?: "PetitionSigner" } & Pick<
+                          PetitionSigner,
+                          "email" | "fullName"
+                        >;
+                      }
+                  >;
+                  signatureConfig: { __typename?: "SignatureConfig" } & {
+                    signers: Array<
+                      { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
+                    >;
+                  };
                 }
-              | { __typename?: "User"; id: string; fullName?: Maybe<string>; status: UserStatus }
-            >;
-          }>;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-        }>;
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-        }>;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-            }
-        >;
-        signatureRequests?: Maybe<
-          Array<{
-            __typename?: "PetitionSignatureRequest";
-            id: string;
-            status: PetitionSignatureRequestStatus;
-            signerStatus: Array<{
-              __typename?: "PetitionSignatureRequestSignerStatus";
-              status: string;
-              signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
-            }>;
-            signatureConfig: {
-              __typename?: "SignatureConfig";
-              signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
-            };
-          }>
-        >;
-        signatureConfig?: Maybe<{
-          __typename?: "SignatureConfig";
-          review: boolean;
-          provider: string;
-          title: string;
-          letRecipientsChooseSigners: boolean;
-          timezone: string;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: Maybe<string>;
-            firstName: string;
-            lastName: string;
-            email: string;
-            fullName: string;
-          }>;
-        }>;
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        }>;
-      }
+            >
+          >;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "review" | "provider" | "title" | "letRecipientsChooseSigners" | "timezone"
+            > & {
+                signers: Array<
+                  { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "contactId" | "firstName" | "lastName" | "email" | "fullName"
+                  >
+                >;
+              }
+          >;
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "isSubscribed"
+            >
+          >;
+        })
     | { __typename?: "PetitionTemplate" }
   >;
 };
 
 export type Petitions_PetitionBasePaginationFragment = {
   __typename?: "PetitionBasePagination";
-  totalCount: number;
-  items: Array<
-    | {
-        __typename?: "Petition";
-        sentAt?: Maybe<string>;
-        id: string;
-        name?: Maybe<string>;
-        createdAt: string;
-        status: PetitionStatus;
-        isReadOnly: boolean;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          status: PetitionAccessStatus;
-          nextReminderAt?: Maybe<string>;
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
-          reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-        }>;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
-              };
-            }
-        >;
-        progress: {
-          __typename?: "PetitionProgress";
-          validated: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        currentSignatureRequest?: Maybe<{
-          __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
-        }>;
-        signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        isPublic: boolean;
-        descriptionExcerpt?: Maybe<string>;
-        id: string;
-        name?: Maybe<string>;
-        createdAt: string;
-        isReadOnly: boolean;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: Maybe<string>;
-                avatarUrl?: Maybe<string>;
-                initials?: Maybe<string>;
-              };
-            }
-        >;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-      }
-  >;
-};
-
-export type Petitions_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-  sentAt?: Maybe<string>;
-  id: string;
-  name?: Maybe<string>;
-  createdAt: string;
-  status: PetitionStatus;
-  isReadOnly: boolean;
-  accesses: Array<{
-    __typename?: "PetitionAccess";
-    status: PetitionAccessStatus;
-    nextReminderAt?: Maybe<string>;
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-    reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-  }>;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
-        };
-      }
-  >;
-  progress: {
-    __typename?: "PetitionProgress";
-    validated: number;
-    replied: number;
-    optional: number;
-    total: number;
+} & Pick<PetitionBasePagination, "totalCount"> & {
+    items: Array<
+      | ({ __typename?: "Petition" } & Pick<
+          Petition,
+          "sentAt" | "id" | "name" | "createdAt" | "status" | "isReadOnly"
+        > & {
+            accesses: Array<
+              { __typename?: "PetitionAccess" } & Pick<
+                PetitionAccess,
+                "status" | "nextReminderAt"
+              > & {
+                  contact?: Maybe<
+                    { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                  >;
+                  reminders: Array<
+                    { __typename?: "PetitionReminder" } & Pick<PetitionReminder, "createdAt">
+                  >;
+                }
+            >;
+            permissions: Array<
+              | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                  PetitionUserGroupPermission,
+                  "permissionType"
+                > & {
+                    group: { __typename?: "UserGroup" } & Pick<
+                      UserGroup,
+                      "id" | "name" | "initials"
+                    >;
+                  })
+              | ({ __typename?: "PetitionUserPermission" } & Pick<
+                  PetitionUserPermission,
+                  "permissionType"
+                > & {
+                    user: { __typename?: "User" } & Pick<
+                      User,
+                      "id" | "fullName" | "avatarUrl" | "initials"
+                    >;
+                  })
+            >;
+            progress: { __typename?: "PetitionProgress" } & Pick<
+              PetitionProgress,
+              "validated" | "replied" | "optional" | "total"
+            >;
+            tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+            currentSignatureRequest?: Maybe<
+              { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+            >;
+            signatureConfig?: Maybe<
+              { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+            >;
+          })
+      | ({ __typename?: "PetitionTemplate" } & Pick<
+          PetitionTemplate,
+          "isPublic" | "descriptionExcerpt" | "id" | "name" | "createdAt" | "isReadOnly"
+        > & {
+            permissions: Array<
+              | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                  PetitionUserGroupPermission,
+                  "permissionType"
+                > & {
+                    group: { __typename?: "UserGroup" } & Pick<
+                      UserGroup,
+                      "id" | "name" | "initials"
+                    >;
+                  })
+              | ({ __typename?: "PetitionUserPermission" } & Pick<
+                  PetitionUserPermission,
+                  "permissionType"
+                > & {
+                    user: { __typename?: "User" } & Pick<
+                      User,
+                      "id" | "fullName" | "avatarUrl" | "initials"
+                    >;
+                  })
+            >;
+            tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+          })
+    >;
   };
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-};
+
+export type Petitions_PetitionBase_Petition_Fragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "sentAt" | "id" | "name" | "createdAt" | "status" | "isReadOnly"
+> & {
+    accesses: Array<
+      { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "status" | "nextReminderAt"> & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+          reminders: Array<
+            { __typename?: "PetitionReminder" } & Pick<PetitionReminder, "createdAt">
+          >;
+        }
+    >;
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials"> })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "fullName" | "avatarUrl" | "initials"
+            >;
+          })
+    >;
+    progress: { __typename?: "PetitionProgress" } & Pick<
+      PetitionProgress,
+      "validated" | "replied" | "optional" | "total"
+    >;
+    tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+    >;
+    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
+  };
 
 export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  isPublic: boolean;
-  descriptionExcerpt?: Maybe<string>;
-  id: string;
-  name?: Maybe<string>;
-  createdAt: string;
-  isReadOnly: boolean;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
-        };
-      }
-  >;
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-};
+} & Pick<
+  PetitionTemplate,
+  "isPublic" | "descriptionExcerpt" | "id" | "name" | "createdAt" | "isReadOnly"
+> & {
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials"> })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "fullName" | "avatarUrl" | "initials"
+            >;
+          })
+    >;
+    tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+  };
 
 export type Petitions_PetitionBaseFragment =
   | Petitions_PetitionBase_Petition_Fragment
   | Petitions_PetitionBase_PetitionTemplate_Fragment;
 
-export type Petitions_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  hasPetitionSignature: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type Petitions_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & { hasPetitionSignature: User["hasFeatureFlag"] } & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
 export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionsUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasPetitionSignature: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & { hasPetitionSignature: User["hasFeatureFlag"] } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type PetitionsQueryVariables = Exact<{
@@ -13277,132 +11374,126 @@ export type PetitionsQueryVariables = Exact<{
 }>;
 
 export type PetitionsQuery = {
-  petitions: {
-    __typename?: "PetitionBasePagination";
-    totalCount: number;
-    items: Array<
-      | {
-          __typename?: "Petition";
-          sentAt?: Maybe<string>;
-          id: string;
-          name?: Maybe<string>;
-          createdAt: string;
-          status: PetitionStatus;
-          isReadOnly: boolean;
-          accesses: Array<{
-            __typename?: "PetitionAccess";
-            status: PetitionAccessStatus;
-            nextReminderAt?: Maybe<string>;
-            contact?: Maybe<{
-              __typename?: "Contact";
-              id: string;
-              fullName?: Maybe<string>;
-              email: string;
-            }>;
-            reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-          }>;
-          permissions: Array<
-            | {
-                __typename?: "PetitionUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-              }
-            | {
-                __typename?: "PetitionUserPermission";
-                permissionType: PetitionPermissionType;
-                user: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
-                };
-              }
-          >;
-          progress: {
-            __typename?: "PetitionProgress";
-            validated: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-          tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-          currentSignatureRequest?: Maybe<{
-            __typename?: "PetitionSignatureRequest";
-            status: PetitionSignatureRequestStatus;
-          }>;
-          signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-        }
-      | {
-          __typename?: "PetitionTemplate";
-          isPublic: boolean;
-          descriptionExcerpt?: Maybe<string>;
-          id: string;
-          name?: Maybe<string>;
-          createdAt: string;
-          isReadOnly: boolean;
-          permissions: Array<
-            | {
-                __typename?: "PetitionUserGroupPermission";
-                permissionType: PetitionPermissionType;
-                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-              }
-            | {
-                __typename?: "PetitionUserPermission";
-                permissionType: PetitionPermissionType;
-                user: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: Maybe<string>;
-                  avatarUrl?: Maybe<string>;
-                  initials?: Maybe<string>;
-                };
-              }
-          >;
-          tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        }
+  petitions: { __typename?: "PetitionBasePagination" } & Pick<
+    PetitionBasePagination,
+    "totalCount"
+  > & {
+      items: Array<
+        | ({ __typename?: "Petition" } & Pick<
+            Petition,
+            "sentAt" | "id" | "name" | "createdAt" | "status" | "isReadOnly"
+          > & {
+              accesses: Array<
+                { __typename?: "PetitionAccess" } & Pick<
+                  PetitionAccess,
+                  "status" | "nextReminderAt"
+                > & {
+                    contact?: Maybe<
+                      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
+                    >;
+                    reminders: Array<
+                      { __typename?: "PetitionReminder" } & Pick<PetitionReminder, "createdAt">
+                    >;
+                  }
+              >;
+              permissions: Array<
+                | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                    PetitionUserGroupPermission,
+                    "permissionType"
+                  > & {
+                      group: { __typename?: "UserGroup" } & Pick<
+                        UserGroup,
+                        "id" | "name" | "initials"
+                      >;
+                    })
+                | ({ __typename?: "PetitionUserPermission" } & Pick<
+                    PetitionUserPermission,
+                    "permissionType"
+                  > & {
+                      user: { __typename?: "User" } & Pick<
+                        User,
+                        "id" | "fullName" | "avatarUrl" | "initials"
+                      >;
+                    })
+              >;
+              progress: { __typename?: "PetitionProgress" } & Pick<
+                PetitionProgress,
+                "validated" | "replied" | "optional" | "total"
+              >;
+              tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+              currentSignatureRequest?: Maybe<
+                { __typename?: "PetitionSignatureRequest" } & Pick<
+                  PetitionSignatureRequest,
+                  "status"
+                >
+              >;
+              signatureConfig?: Maybe<
+                { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+              >;
+            })
+        | ({ __typename?: "PetitionTemplate" } & Pick<
+            PetitionTemplate,
+            "isPublic" | "descriptionExcerpt" | "id" | "name" | "createdAt" | "isReadOnly"
+          > & {
+              permissions: Array<
+                | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                    PetitionUserGroupPermission,
+                    "permissionType"
+                  > & {
+                      group: { __typename?: "UserGroup" } & Pick<
+                        UserGroup,
+                        "id" | "name" | "initials"
+                      >;
+                    })
+                | ({ __typename?: "PetitionUserPermission" } & Pick<
+                    PetitionUserPermission,
+                    "permissionType"
+                  > & {
+                      user: { __typename?: "User" } & Pick<
+                        User,
+                        "id" | "fullName" | "avatarUrl" | "initials"
+                      >;
+                    })
+              >;
+              tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+            })
+      >;
+    };
+};
+
+export type NewPetition_PetitionTemplateFragment = { __typename?: "PetitionTemplate" } & Pick<
+  PetitionTemplate,
+  "id" | "name" | "descriptionExcerpt" | "locale"
+> & {
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "avatarUrl" | "initials">;
+    publicLink?: Maybe<
+      { __typename?: "PublicPetitionLink" } & Pick<PublicPetitionLink, "id" | "isActive">
     >;
   };
-};
 
-export type NewPetition_PetitionTemplateFragment = {
-  __typename?: "PetitionTemplate";
-  id: string;
-  name?: Maybe<string>;
-  descriptionExcerpt?: Maybe<string>;
-  locale: PetitionLocale;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
+export type NewPetition_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-  publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
-};
-
-export type NewPetition_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
-};
 
 export type NewPetitionTemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -13415,54 +11506,57 @@ export type NewPetitionTemplatesQueryVariables = Exact<{
 }>;
 
 export type NewPetitionTemplatesQuery = {
-  templates: {
-    __typename?: "PetitionTemplatePagination";
-    totalCount: number;
-    items: Array<{
-      __typename?: "PetitionTemplate";
-      id: string;
-      name?: Maybe<string>;
-      descriptionExcerpt?: Maybe<string>;
-      locale: PetitionLocale;
-      owner: {
-        __typename?: "User";
-        id: string;
-        fullName?: Maybe<string>;
-        avatarUrl?: Maybe<string>;
-        initials?: Maybe<string>;
-      };
-      publicLink?: Maybe<{ __typename?: "PublicPetitionLink"; id: string; isActive: boolean }>;
-    }>;
-  };
+  templates: { __typename?: "PetitionTemplatePagination" } & Pick<
+    PetitionTemplatePagination,
+    "totalCount"
+  > & {
+      items: Array<
+        { __typename?: "PetitionTemplate" } & Pick<
+          PetitionTemplate,
+          "id" | "name" | "descriptionExcerpt" | "locale"
+        > & {
+            owner: { __typename?: "User" } & Pick<
+              User,
+              "id" | "fullName" | "avatarUrl" | "initials"
+            >;
+            publicLink?: Maybe<
+              { __typename?: "PublicPetitionLink" } & Pick<PublicPetitionLink, "id" | "isActive">
+            >;
+          }
+      >;
+    };
 };
 
 export type NewPetitionUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type NewPetitionUserQuery = {
-  publicTemplateCategories: Array<string>;
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+export type NewPetitionUserQuery = Pick<Query, "publicTemplateCategories"> & {
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
-  hasTemplates: { __typename?: "PetitionBasePagination"; totalCount: number };
+  hasTemplates: { __typename?: "PetitionBasePagination" } & Pick<
+    PetitionBasePagination,
+    "totalCount"
+  >;
 };
 
 export type NewPetitionUserTemplateQueryVariables = Exact<{
@@ -13472,65 +11566,60 @@ export type NewPetitionUserTemplateQueryVariables = Exact<{
 export type NewPetitionUserTemplateQuery = {
   petition?: Maybe<
     | { __typename?: "Petition" }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        descriptionHtml?: Maybe<string>;
-        name?: Maybe<string>;
-        locale: PetitionLocale;
-        updatedAt: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          title?: Maybe<string>;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-        }>;
-        owner: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          organization: { __typename?: "Organization"; id: string; name: string };
-        };
-        myEffectivePermission?: Maybe<{
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        }>;
-        publicLink?: Maybe<{
-          __typename?: "PublicPetitionLink";
-          id: string;
-          isActive: boolean;
-          slug: string;
-        }>;
-      }
+    | ({ __typename?: "PetitionTemplate" } & Pick<
+        PetitionTemplate,
+        "id" | "descriptionHtml" | "name" | "locale" | "updatedAt"
+      > & {
+          fields: Array<
+            { __typename?: "PetitionField" } & Pick<
+              PetitionField,
+              "id" | "title" | "type" | "options"
+            >
+          >;
+          owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
+              organization: { __typename?: "Organization" } & Pick<Organization, "id" | "name">;
+            };
+          myEffectivePermission?: Maybe<
+            { __typename?: "EffectivePetitionUserPermission" } & Pick<
+              EffectivePetitionUserPermission,
+              "permissionType"
+            >
+          >;
+          publicLink?: Maybe<
+            { __typename?: "PublicPetitionLink" } & Pick<
+              PublicPetitionLink,
+              "id" | "isActive" | "slug"
+            >
+          >;
+        })
   >;
 };
 
-export type Account_UserFragment = {
-  __typename?: "User";
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  isSsoUser: boolean;
-  email: string;
-  preferredLocale?: Maybe<string>;
-  id: string;
-  fullName?: Maybe<string>;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  hasApiTokens: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type Account_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "firstName"
+  | "lastName"
+  | "isSsoUser"
+  | "email"
+  | "preferredLocale"
+  | "id"
+  | "fullName"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & { hasApiTokens: User["hasFeatureFlag"] } & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
 export type Account_updateAccountMutationVariables = Exact<{
   id: Scalars["GID"];
@@ -13538,14 +11627,10 @@ export type Account_updateAccountMutationVariables = Exact<{
 }>;
 
 export type Account_updateAccountMutation = {
-  updateUser: {
-    __typename?: "User";
-    id: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    fullName?: Maybe<string>;
-    initials?: Maybe<string>;
-  };
+  updateUser: { __typename?: "User" } & Pick<
+    User,
+    "id" | "firstName" | "lastName" | "fullName" | "initials"
+  >;
 };
 
 export type Account_setUserPreferredLocaleMutationVariables = Exact<{
@@ -13553,88 +11638,82 @@ export type Account_setUserPreferredLocaleMutationVariables = Exact<{
 }>;
 
 export type Account_setUserPreferredLocaleMutation = {
-  setUserPreferredLocale: {
-    __typename?: "User";
-    id: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    isSsoUser: boolean;
-    email: string;
-    preferredLocale?: Maybe<string>;
-    fullName?: Maybe<string>;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasApiTokens: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  setUserPreferredLocale: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "firstName"
+    | "lastName"
+    | "isSsoUser"
+    | "email"
+    | "preferredLocale"
+    | "fullName"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type AccountQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AccountQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    isSsoUser: boolean;
-    email: string;
-    preferredLocale?: Maybe<string>;
-    fullName?: Maybe<string>;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasApiTokens: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "firstName"
+    | "lastName"
+    | "isSsoUser"
+    | "email"
+    | "preferredLocale"
+    | "fullName"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type Developers_UserAuthenticationTokenFragment = {
   __typename?: "UserAuthenticationToken";
-  id: string;
-  tokenName: string;
-  createdAt: string;
-  lastUsedAt?: Maybe<string>;
-};
+} & Pick<UserAuthenticationToken, "id" | "tokenName" | "createdAt" | "lastUsedAt">;
 
 export type Developers_RevokeUserAuthTokenMutationVariables = Exact<{
   authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type Developers_RevokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
+export type Developers_RevokeUserAuthTokenMutation = Pick<Mutation, "revokeUserAuthToken">;
 
 export type Developers_CreateEventSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"];
 }>;
 
 export type Developers_CreateEventSubscriptionMutation = {
-  createEventSubscription: {
-    __typename?: "PetitionEventSubscription";
-    id: string;
-    eventsUrl: string;
-    isEnabled: boolean;
-  };
+  createEventSubscription: { __typename?: "PetitionEventSubscription" } & Pick<
+    PetitionEventSubscription,
+    "id" | "eventsUrl" | "isEnabled"
+  >;
 };
 
 export type Developers_UpdateEventSubscriptionMutationVariables = Exact<{
@@ -13643,12 +11722,10 @@ export type Developers_UpdateEventSubscriptionMutationVariables = Exact<{
 }>;
 
 export type Developers_UpdateEventSubscriptionMutation = {
-  updateEventSubscription: {
-    __typename?: "PetitionEventSubscription";
-    id: string;
-    eventsUrl: string;
-    isEnabled: boolean;
-  };
+  updateEventSubscription: { __typename?: "PetitionEventSubscription" } & Pick<
+    PetitionEventSubscription,
+    "id" | "eventsUrl" | "isEnabled"
+  >;
 };
 
 export type DevelopersQueryVariables = Exact<{
@@ -13659,98 +11736,98 @@ export type DevelopersQueryVariables = Exact<{
 }>;
 
 export type DevelopersQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasApiTokens: boolean;
-    authenticationTokens: {
-      __typename?: "UserAuthenticationTokenPagination";
-      totalCount: number;
-      items: Array<{
-        __typename?: "UserAuthenticationToken";
-        id: string;
-        tokenName: string;
-        createdAt: string;
-        lastUsedAt?: Maybe<string>;
-      }>;
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+      authenticationTokens: { __typename?: "UserAuthenticationTokenPagination" } & Pick<
+        UserAuthenticationTokenPagination,
+        "totalCount"
+      > & {
+          items: Array<
+            { __typename?: "UserAuthenticationToken" } & Pick<
+              UserAuthenticationToken,
+              "id" | "tokenName" | "createdAt" | "lastUsedAt"
+            >
+          >;
+        };
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
-    };
-  };
-  subscriptions: Array<{
-    __typename?: "PetitionEventSubscription";
-    id: string;
-    eventsUrl: string;
-    isEnabled: boolean;
-  }>;
+  subscriptions: Array<
+    { __typename?: "PetitionEventSubscription" } & Pick<
+      PetitionEventSubscription,
+      "id" | "eventsUrl" | "isEnabled"
+    >
+  >;
 };
 
-export type Settings_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: Maybe<string>;
-  firstName?: Maybe<string>;
-  lastName?: Maybe<string>;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-  hasApiTokens: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+export type Settings_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "createdAt"
+  | "canCreateUsers"
+  | "isSuperAdmin"
+  | "role"
+  | "avatarUrl"
+  | "initials"
+> & { hasApiTokens: User["hasFeatureFlag"] } & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+          petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+            OrganizationUsagePetitionLimit,
+            "limit" | "used"
+          >;
+        };
+      };
   };
-};
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SettingsQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasApiTokens: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type Security_updatePasswordMutationVariables = Exact<{
@@ -13758,35 +11835,35 @@ export type Security_updatePasswordMutationVariables = Exact<{
   newPassword: Scalars["String"];
 }>;
 
-export type Security_updatePasswordMutation = { changePassword: ChangePasswordResult };
+export type Security_updatePasswordMutation = Pick<Mutation, "changePassword">;
 
 export type SecurityQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SecurityQuery = {
-  me: {
-    __typename?: "User";
-    isSsoUser: boolean;
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    hasApiTokens: boolean;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "isSsoUser"
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type Login_resendVerificationCodeMutationVariables = Exact<{
@@ -13794,243 +11871,227 @@ export type Login_resendVerificationCodeMutationVariables = Exact<{
   locale?: Maybe<Scalars["String"]>;
 }>;
 
-export type Login_resendVerificationCodeMutation = { resendVerificationCode: Result };
+export type Login_resendVerificationCodeMutation = Pick<Mutation, "resendVerificationCode">;
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    email: string;
-    fullName?: Maybe<string>;
-    preferredLocale?: Maybe<string>;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-  };
+  me: { __typename?: "User" } & Pick<
+    User,
+    "id" | "email" | "fullName" | "preferredLocale" | "avatarUrl" | "initials"
+  >;
 };
 
-export type Login_UserFragment = {
-  __typename?: "User";
-  id: string;
-  email: string;
-  fullName?: Maybe<string>;
-  preferredLocale?: Maybe<string>;
-  avatarUrl?: Maybe<string>;
-  initials?: Maybe<string>;
-};
+export type Login_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "email" | "fullName" | "preferredLocale" | "avatarUrl" | "initials"
+>;
 
-export type RecipientView_PublicPetitionAccessFragment = {
-  __typename?: "PublicPetitionAccess";
-  petition?: Maybe<{
-    __typename?: "PublicPetition";
-    id: string;
-    status: PetitionStatus;
-    deadline?: Maybe<string>;
-    hasCommentsEnabled: boolean;
-    isRecipientViewContentsHidden: boolean;
-    tone: Tone;
-    signatureStatus?: Maybe<PublicSignatureStatus>;
-    fields: Array<{
-      __typename?: "PublicPetitionField";
-      id: string;
-      type: PetitionFieldType;
-      title?: Maybe<string>;
-      options: { [key: string]: any };
-      optional: boolean;
-      validated: boolean;
-      isReadOnly: boolean;
-      commentCount: number;
-      unreadCommentCount: number;
-      visibility?: Maybe<{ [key: string]: any }>;
-      description?: Maybe<string>;
-      multiple: boolean;
-      replies: Array<{
-        __typename?: "PublicPetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-        createdAt: string;
-        updatedAt: string;
-      }>;
-      attachments: Array<{
-        __typename?: "PetitionFieldAttachment";
-        id: string;
-        file: {
-          __typename?: "FileUpload";
-          filename: string;
-          contentType: string;
-          size: number;
-          isComplete: boolean;
-        };
-      }>;
-    }>;
-    signatureConfig?: Maybe<{
-      __typename?: "PublicSignatureConfig";
-      review: boolean;
-      letRecipientsChooseSigners: boolean;
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        fullName: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-      }>;
-      additionalSigners: Array<{
-        __typename?: "PetitionSigner";
-        firstName: string;
-        lastName: string;
-        fullName: string;
-        email: string;
-      }>;
-    }>;
-    recipients: Array<{
-      __typename?: "PublicContact";
-      id: string;
-      fullName?: Maybe<string>;
-      firstName?: Maybe<string>;
-      email: string;
-    }>;
-  }>;
-  granter?: Maybe<{
-    __typename?: "PublicUser";
-    fullName?: Maybe<string>;
-    id: string;
-    firstName?: Maybe<string>;
-    email: string;
-    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-  }>;
-  contact?: Maybe<{
-    __typename?: "PublicContact";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    email: string;
-    lastName?: Maybe<string>;
-  }>;
-  message?: Maybe<{ __typename?: "PublicPetitionMessage"; id: string; subject?: Maybe<string> }>;
+export type RecipientView_PublicPetitionAccessFragment = { __typename?: "PublicPetitionAccess" } & {
+  petition?: Maybe<
+    { __typename?: "PublicPetition" } & Pick<
+      PublicPetition,
+      | "id"
+      | "status"
+      | "deadline"
+      | "hasCommentsEnabled"
+      | "isRecipientViewContentsHidden"
+      | "tone"
+      | "signatureStatus"
+    > & {
+        fields: Array<
+          { __typename?: "PublicPetitionField" } & Pick<
+            PublicPetitionField,
+            | "id"
+            | "type"
+            | "title"
+            | "options"
+            | "optional"
+            | "validated"
+            | "isReadOnly"
+            | "commentCount"
+            | "unreadCommentCount"
+            | "visibility"
+            | "description"
+            | "multiple"
+          > & {
+              replies: Array<
+                { __typename?: "PublicPetitionFieldReply" } & Pick<
+                  PublicPetitionFieldReply,
+                  "id" | "status" | "content" | "createdAt" | "updatedAt"
+                >
+              >;
+              attachments: Array<
+                { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                    file: { __typename?: "FileUpload" } & Pick<
+                      FileUpload,
+                      "filename" | "contentType" | "size" | "isComplete"
+                    >;
+                  }
+              >;
+            }
+        >;
+        signatureConfig?: Maybe<
+          { __typename?: "PublicSignatureConfig" } & Pick<
+            PublicSignatureConfig,
+            "review" | "letRecipientsChooseSigners"
+          > & {
+              signers: Array<
+                { __typename?: "PetitionSigner" } & Pick<
+                  PetitionSigner,
+                  "fullName" | "firstName" | "lastName" | "email"
+                >
+              >;
+              additionalSigners: Array<
+                { __typename?: "PetitionSigner" } & Pick<
+                  PetitionSigner,
+                  "firstName" | "lastName" | "fullName" | "email"
+                >
+              >;
+            }
+        >;
+        recipients: Array<
+          { __typename?: "PublicContact" } & Pick<
+            PublicContact,
+            "id" | "fullName" | "firstName" | "email"
+          >
+        >;
+      }
+  >;
+  granter?: Maybe<
+    { __typename?: "PublicUser" } & Pick<PublicUser, "fullName" | "id" | "firstName" | "email"> & {
+        organization: { __typename?: "PublicOrganization" } & Pick<
+          PublicOrganization,
+          "name" | "logoUrl"
+        >;
+      }
+  >;
+  contact?: Maybe<
+    { __typename?: "PublicContact" } & Pick<
+      PublicContact,
+      "id" | "fullName" | "firstName" | "email" | "lastName"
+    >
+  >;
+  message?: Maybe<
+    { __typename?: "PublicPetitionMessage" } & Pick<PublicPetitionMessage, "id" | "subject">
+  >;
 };
 
 export type RecipientView_PublicPetitionMessageFragment = {
   __typename?: "PublicPetitionMessage";
-  id: string;
-  subject?: Maybe<string>;
-};
+} & Pick<PublicPetitionMessage, "id" | "subject">;
 
-export type RecipientView_PublicPetitionFragment = {
-  __typename?: "PublicPetition";
-  id: string;
-  status: PetitionStatus;
-  deadline?: Maybe<string>;
-  hasCommentsEnabled: boolean;
-  isRecipientViewContentsHidden: boolean;
-  tone: Tone;
-  signatureStatus?: Maybe<PublicSignatureStatus>;
-  fields: Array<{
-    __typename?: "PublicPetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-    options: { [key: string]: any };
-    optional: boolean;
-    validated: boolean;
-    isReadOnly: boolean;
-    commentCount: number;
-    unreadCommentCount: number;
-    visibility?: Maybe<{ [key: string]: any }>;
-    description?: Maybe<string>;
-    multiple: boolean;
-    replies: Array<{
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
-      content: { [key: string]: any };
-      createdAt: string;
-      updatedAt: string;
-    }>;
-    attachments: Array<{
-      __typename?: "PetitionFieldAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
-  }>;
-  signatureConfig?: Maybe<{
-    __typename?: "PublicSignatureConfig";
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      fullName: string;
-      firstName: string;
-      lastName: string;
-      email: string;
-    }>;
-    additionalSigners: Array<{
-      __typename?: "PetitionSigner";
-      firstName: string;
-      lastName: string;
-      fullName: string;
-      email: string;
-    }>;
-  }>;
-  recipients: Array<{
-    __typename?: "PublicContact";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    email: string;
-  }>;
-};
+export type RecipientView_PublicPetitionFragment = { __typename?: "PublicPetition" } & Pick<
+  PublicPetition,
+  | "id"
+  | "status"
+  | "deadline"
+  | "hasCommentsEnabled"
+  | "isRecipientViewContentsHidden"
+  | "tone"
+  | "signatureStatus"
+> & {
+    fields: Array<
+      { __typename?: "PublicPetitionField" } & Pick<
+        PublicPetitionField,
+        | "id"
+        | "type"
+        | "title"
+        | "options"
+        | "optional"
+        | "validated"
+        | "isReadOnly"
+        | "commentCount"
+        | "unreadCommentCount"
+        | "visibility"
+        | "description"
+        | "multiple"
+      > & {
+          replies: Array<
+            { __typename?: "PublicPetitionFieldReply" } & Pick<
+              PublicPetitionFieldReply,
+              "id" | "status" | "content" | "createdAt" | "updatedAt"
+            >
+          >;
+          attachments: Array<
+            { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                file: { __typename?: "FileUpload" } & Pick<
+                  FileUpload,
+                  "filename" | "contentType" | "size" | "isComplete"
+                >;
+              }
+          >;
+        }
+    >;
+    signatureConfig?: Maybe<
+      { __typename?: "PublicSignatureConfig" } & Pick<
+        PublicSignatureConfig,
+        "review" | "letRecipientsChooseSigners"
+      > & {
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "fullName" | "firstName" | "lastName" | "email"
+            >
+          >;
+          additionalSigners: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "firstName" | "lastName" | "fullName" | "email"
+            >
+          >;
+        }
+    >;
+    recipients: Array<
+      { __typename?: "PublicContact" } & Pick<
+        PublicContact,
+        "id" | "fullName" | "firstName" | "email"
+      >
+    >;
+  };
 
 export type RecipientView_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  options: { [key: string]: any };
-  optional: boolean;
-  validated: boolean;
-  isReadOnly: boolean;
-  commentCount: number;
-  unreadCommentCount: number;
-  description?: Maybe<string>;
-  multiple: boolean;
-  visibility?: Maybe<{ [key: string]: any }>;
-  replies: Array<{
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
-};
+} & Pick<
+  PublicPetitionField,
+  | "id"
+  | "type"
+  | "title"
+  | "options"
+  | "optional"
+  | "validated"
+  | "isReadOnly"
+  | "commentCount"
+  | "unreadCommentCount"
+  | "description"
+  | "multiple"
+  | "visibility"
+> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id" | "status" | "content" | "createdAt" | "updatedAt"
+      >
+    >;
+    attachments: Array<
+      { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+          file: { __typename?: "FileUpload" } & Pick<
+            FileUpload,
+            "filename" | "contentType" | "size" | "isComplete"
+          >;
+        }
+    >;
+  };
 
-export type RecipientView_PublicUserFragment = {
-  __typename?: "PublicUser";
-  id: string;
-  firstName?: Maybe<string>;
-  fullName?: Maybe<string>;
-  email: string;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-};
+export type RecipientView_PublicUserFragment = { __typename?: "PublicUser" } & Pick<
+  PublicUser,
+  "id" | "firstName" | "fullName" | "email"
+> & {
+    organization: { __typename?: "PublicOrganization" } & Pick<
+      PublicOrganization,
+      "name" | "logoUrl"
+    >;
+  };
 
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
   keycode: Scalars["ID"];
@@ -14039,76 +12100,74 @@ export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
 }>;
 
 export type RecipientView_publicCompletePetitionMutation = {
-  publicCompletePetition: {
-    __typename?: "PublicPetition";
-    id: string;
-    status: PetitionStatus;
-    deadline?: Maybe<string>;
-    hasCommentsEnabled: boolean;
-    isRecipientViewContentsHidden: boolean;
-    tone: Tone;
-    signatureStatus?: Maybe<PublicSignatureStatus>;
-    fields: Array<{
-      __typename?: "PublicPetitionField";
-      id: string;
-      type: PetitionFieldType;
-      title?: Maybe<string>;
-      options: { [key: string]: any };
-      optional: boolean;
-      validated: boolean;
-      isReadOnly: boolean;
-      commentCount: number;
-      unreadCommentCount: number;
-      visibility?: Maybe<{ [key: string]: any }>;
-      description?: Maybe<string>;
-      multiple: boolean;
-      replies: Array<{
-        __typename?: "PublicPetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-        createdAt: string;
-        updatedAt: string;
-      }>;
-      attachments: Array<{
-        __typename?: "PetitionFieldAttachment";
-        id: string;
-        file: {
-          __typename?: "FileUpload";
-          filename: string;
-          contentType: string;
-          size: number;
-          isComplete: boolean;
-        };
-      }>;
-    }>;
-    signatureConfig?: Maybe<{
-      __typename?: "PublicSignatureConfig";
-      review: boolean;
-      letRecipientsChooseSigners: boolean;
-      signers: Array<{
-        __typename?: "PetitionSigner";
-        fullName: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-      }>;
-      additionalSigners: Array<{
-        __typename?: "PetitionSigner";
-        firstName: string;
-        lastName: string;
-        fullName: string;
-        email: string;
-      }>;
-    }>;
-    recipients: Array<{
-      __typename?: "PublicContact";
-      id: string;
-      fullName?: Maybe<string>;
-      firstName?: Maybe<string>;
-      email: string;
-    }>;
-  };
+  publicCompletePetition: { __typename?: "PublicPetition" } & Pick<
+    PublicPetition,
+    | "id"
+    | "status"
+    | "deadline"
+    | "hasCommentsEnabled"
+    | "isRecipientViewContentsHidden"
+    | "tone"
+    | "signatureStatus"
+  > & {
+      fields: Array<
+        { __typename?: "PublicPetitionField" } & Pick<
+          PublicPetitionField,
+          | "id"
+          | "type"
+          | "title"
+          | "options"
+          | "optional"
+          | "validated"
+          | "isReadOnly"
+          | "commentCount"
+          | "unreadCommentCount"
+          | "visibility"
+          | "description"
+          | "multiple"
+        > & {
+            replies: Array<
+              { __typename?: "PublicPetitionFieldReply" } & Pick<
+                PublicPetitionFieldReply,
+                "id" | "status" | "content" | "createdAt" | "updatedAt"
+              >
+            >;
+            attachments: Array<
+              { __typename?: "PetitionFieldAttachment" } & Pick<PetitionFieldAttachment, "id"> & {
+                  file: { __typename?: "FileUpload" } & Pick<
+                    FileUpload,
+                    "filename" | "contentType" | "size" | "isComplete"
+                  >;
+                }
+            >;
+          }
+      >;
+      signatureConfig?: Maybe<
+        { __typename?: "PublicSignatureConfig" } & Pick<
+          PublicSignatureConfig,
+          "review" | "letRecipientsChooseSigners"
+        > & {
+            signers: Array<
+              { __typename?: "PetitionSigner" } & Pick<
+                PetitionSigner,
+                "fullName" | "firstName" | "lastName" | "email"
+              >
+            >;
+            additionalSigners: Array<
+              { __typename?: "PetitionSigner" } & Pick<
+                PetitionSigner,
+                "firstName" | "lastName" | "fullName" | "email"
+              >
+            >;
+          }
+      >;
+      recipients: Array<
+        { __typename?: "PublicContact" } & Pick<
+          PublicContact,
+          "id" | "fullName" | "firstName" | "email"
+        >
+      >;
+    };
 };
 
 export type PublicPetitionQueryVariables = Exact<{
@@ -14116,96 +12175,103 @@ export type PublicPetitionQueryVariables = Exact<{
 }>;
 
 export type PublicPetitionQuery = {
-  access?: Maybe<{
-    __typename?: "PublicPetitionAccess";
-    petition?: Maybe<{
-      __typename?: "PublicPetition";
-      id: string;
-      status: PetitionStatus;
-      deadline?: Maybe<string>;
-      hasCommentsEnabled: boolean;
-      isRecipientViewContentsHidden: boolean;
-      tone: Tone;
-      signatureStatus?: Maybe<PublicSignatureStatus>;
-      fields: Array<{
-        __typename?: "PublicPetitionField";
-        id: string;
-        type: PetitionFieldType;
-        title?: Maybe<string>;
-        options: { [key: string]: any };
-        optional: boolean;
-        validated: boolean;
-        isReadOnly: boolean;
-        commentCount: number;
-        unreadCommentCount: number;
-        visibility?: Maybe<{ [key: string]: any }>;
-        description?: Maybe<string>;
-        multiple: boolean;
-        replies: Array<{
-          __typename?: "PublicPetitionFieldReply";
-          id: string;
-          status: PetitionFieldReplyStatus;
-          content: { [key: string]: any };
-          createdAt: string;
-          updatedAt: string;
-        }>;
-        attachments: Array<{
-          __typename?: "PetitionFieldAttachment";
-          id: string;
-          file: {
-            __typename?: "FileUpload";
-            filename: string;
-            contentType: string;
-            size: number;
-            isComplete: boolean;
-          };
-        }>;
-      }>;
-      signatureConfig?: Maybe<{
-        __typename?: "PublicSignatureConfig";
-        review: boolean;
-        letRecipientsChooseSigners: boolean;
-        signers: Array<{
-          __typename?: "PetitionSigner";
-          fullName: string;
-          firstName: string;
-          lastName: string;
-          email: string;
-        }>;
-        additionalSigners: Array<{
-          __typename?: "PetitionSigner";
-          firstName: string;
-          lastName: string;
-          fullName: string;
-          email: string;
-        }>;
-      }>;
-      recipients: Array<{
-        __typename?: "PublicContact";
-        id: string;
-        fullName?: Maybe<string>;
-        firstName?: Maybe<string>;
-        email: string;
-      }>;
-    }>;
-    granter?: Maybe<{
-      __typename?: "PublicUser";
-      fullName?: Maybe<string>;
-      id: string;
-      firstName?: Maybe<string>;
-      email: string;
-      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-    }>;
-    contact?: Maybe<{
-      __typename?: "PublicContact";
-      id: string;
-      fullName?: Maybe<string>;
-      firstName?: Maybe<string>;
-      email: string;
-      lastName?: Maybe<string>;
-    }>;
-    message?: Maybe<{ __typename?: "PublicPetitionMessage"; id: string; subject?: Maybe<string> }>;
-  }>;
+  access?: Maybe<
+    { __typename?: "PublicPetitionAccess" } & {
+      petition?: Maybe<
+        { __typename?: "PublicPetition" } & Pick<
+          PublicPetition,
+          | "id"
+          | "status"
+          | "deadline"
+          | "hasCommentsEnabled"
+          | "isRecipientViewContentsHidden"
+          | "tone"
+          | "signatureStatus"
+        > & {
+            fields: Array<
+              { __typename?: "PublicPetitionField" } & Pick<
+                PublicPetitionField,
+                | "id"
+                | "type"
+                | "title"
+                | "options"
+                | "optional"
+                | "validated"
+                | "isReadOnly"
+                | "commentCount"
+                | "unreadCommentCount"
+                | "visibility"
+                | "description"
+                | "multiple"
+              > & {
+                  replies: Array<
+                    { __typename?: "PublicPetitionFieldReply" } & Pick<
+                      PublicPetitionFieldReply,
+                      "id" | "status" | "content" | "createdAt" | "updatedAt"
+                    >
+                  >;
+                  attachments: Array<
+                    { __typename?: "PetitionFieldAttachment" } & Pick<
+                      PetitionFieldAttachment,
+                      "id"
+                    > & {
+                        file: { __typename?: "FileUpload" } & Pick<
+                          FileUpload,
+                          "filename" | "contentType" | "size" | "isComplete"
+                        >;
+                      }
+                  >;
+                }
+            >;
+            signatureConfig?: Maybe<
+              { __typename?: "PublicSignatureConfig" } & Pick<
+                PublicSignatureConfig,
+                "review" | "letRecipientsChooseSigners"
+              > & {
+                  signers: Array<
+                    { __typename?: "PetitionSigner" } & Pick<
+                      PetitionSigner,
+                      "fullName" | "firstName" | "lastName" | "email"
+                    >
+                  >;
+                  additionalSigners: Array<
+                    { __typename?: "PetitionSigner" } & Pick<
+                      PetitionSigner,
+                      "firstName" | "lastName" | "fullName" | "email"
+                    >
+                  >;
+                }
+            >;
+            recipients: Array<
+              { __typename?: "PublicContact" } & Pick<
+                PublicContact,
+                "id" | "fullName" | "firstName" | "email"
+              >
+            >;
+          }
+      >;
+      granter?: Maybe<
+        { __typename?: "PublicUser" } & Pick<
+          PublicUser,
+          "fullName" | "id" | "firstName" | "email"
+        > & {
+            organization: { __typename?: "PublicOrganization" } & Pick<
+              PublicOrganization,
+              "name" | "logoUrl"
+            >;
+          }
+      >;
+      contact?: Maybe<
+        { __typename?: "PublicContact" } & Pick<
+          PublicContact,
+          "id" | "fullName" | "firstName" | "email" | "lastName"
+        >
+      >;
+      message?: Maybe<
+        { __typename?: "PublicPetitionMessage" } & Pick<PublicPetitionMessage, "id" | "subject">
+      >;
+    }
+  >;
 };
 
 export type RecipientView_verifyPublicAccessMutationVariables = Exact<{
@@ -14216,16 +12282,10 @@ export type RecipientView_verifyPublicAccessMutationVariables = Exact<{
 }>;
 
 export type RecipientView_verifyPublicAccessMutation = {
-  verifyPublicAccess: {
-    __typename?: "PublicAccessVerification";
-    isAllowed: boolean;
-    cookieName?: Maybe<string>;
-    cookieValue?: Maybe<string>;
-    email?: Maybe<string>;
-    orgName?: Maybe<string>;
-    orgLogoUrl?: Maybe<string>;
-    tone?: Maybe<Tone>;
-  };
+  verifyPublicAccess: { __typename?: "PublicAccessVerification" } & Pick<
+    PublicAccessVerification,
+    "isAllowed" | "cookieName" | "cookieValue" | "email" | "orgName" | "orgLogoUrl" | "tone"
+  >;
 };
 
 export type publicSendVerificationCodeMutationVariables = Exact<{
@@ -14233,12 +12293,10 @@ export type publicSendVerificationCodeMutationVariables = Exact<{
 }>;
 
 export type publicSendVerificationCodeMutation = {
-  publicSendVerificationCode: {
-    __typename?: "VerificationCodeRequest";
-    token: string;
-    remainingAttempts: number;
-    expiresAt: string;
-  };
+  publicSendVerificationCode: { __typename?: "VerificationCodeRequest" } & Pick<
+    VerificationCodeRequest,
+    "token" | "remainingAttempts" | "expiresAt"
+  >;
 };
 
 export type publicCheckVerificationCodeMutationVariables = Exact<{
@@ -14248,11 +12306,10 @@ export type publicCheckVerificationCodeMutationVariables = Exact<{
 }>;
 
 export type publicCheckVerificationCodeMutation = {
-  publicCheckVerificationCode: {
-    __typename?: "VerificationCodeCheck";
-    result: Result;
-    remainingAttempts?: Maybe<number>;
-  };
+  publicCheckVerificationCode: { __typename?: "VerificationCodeCheck" } & Pick<
+    VerificationCodeCheck,
+    "result" | "remainingAttempts"
+  >;
 };
 
 export type OptOut_publicOptOutRemindersMutationVariables = Exact<{
@@ -14263,53 +12320,56 @@ export type OptOut_publicOptOutRemindersMutationVariables = Exact<{
 }>;
 
 export type OptOut_publicOptOutRemindersMutation = {
-  publicOptOutReminders: {
-    __typename?: "PublicPetitionAccess";
-    petition?: Maybe<{ __typename?: "PublicPetition"; id: string }>;
+  publicOptOutReminders: { __typename?: "PublicPetitionAccess" } & {
+    petition?: Maybe<{ __typename?: "PublicPetition" } & Pick<PublicPetition, "id">>;
   };
 };
 
-export type OptOut_PublicPetitionAccessFragment = {
-  __typename?: "PublicPetitionAccess";
-  granter?: Maybe<{
-    __typename?: "PublicUser";
-    id: string;
-    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-  }>;
+export type OptOut_PublicPetitionAccessFragment = { __typename?: "PublicPetitionAccess" } & {
+  granter?: Maybe<
+    { __typename?: "PublicUser" } & Pick<PublicUser, "id"> & {
+        organization: { __typename?: "PublicOrganization" } & Pick<
+          PublicOrganization,
+          "name" | "logoUrl"
+        >;
+      }
+  >;
 };
 
-export type OptOut_PublicUserFragment = {
-  __typename?: "PublicUser";
-  id: string;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-};
+export type OptOut_PublicUserFragment = { __typename?: "PublicUser" } & Pick<PublicUser, "id"> & {
+    organization: { __typename?: "PublicOrganization" } & Pick<
+      PublicOrganization,
+      "name" | "logoUrl"
+    >;
+  };
 
 export type PublicOptOutQueryVariables = Exact<{
   keycode: Scalars["ID"];
 }>;
 
 export type PublicOptOutQuery = {
-  access?: Maybe<{
-    __typename?: "PublicPetitionAccess";
-    granter?: Maybe<{
-      __typename?: "PublicUser";
-      id: string;
-      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: Maybe<string> };
-    }>;
-  }>;
+  access?: Maybe<
+    { __typename?: "PublicPetitionAccess" } & {
+      granter?: Maybe<
+        { __typename?: "PublicUser" } & Pick<PublicUser, "id"> & {
+            organization: { __typename?: "PublicOrganization" } & Pick<
+              PublicOrganization,
+              "name" | "logoUrl"
+            >;
+          }
+      >;
+    }
+  >;
 };
 
 export type PublicPetitionLink_PublicPetitionLinkFragment = {
   __typename?: "PublicPetitionLink";
-  id: string;
-  title: string;
-  description: string;
-  organization: {
-    __typename?: "PublicPetitionLinkOwnerOrganization";
-    name: string;
-    logoUrl?: Maybe<string>;
+} & Pick<PublicPetitionLink, "id" | "title" | "description"> & {
+    organization: { __typename?: "PublicPetitionLinkOwnerOrganization" } & Pick<
+      PublicPetitionLinkOwnerOrganization,
+      "name" | "logoUrl"
+    >;
   };
-};
 
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables = Exact<{
   publicPetitionLinkId: Scalars["GID"];
@@ -14319,117 +12379,103 @@ export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation
   force?: Maybe<Scalars["Boolean"]>;
 }>;
 
-export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation = {
-  publicCreateAndSendPetitionFromPublicLink: Result;
-};
+export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation = Pick<
+  Mutation,
+  "publicCreateAndSendPetitionFromPublicLink"
+>;
 
 export type PublicPetitionLink_publicSendReminderMutationVariables = Exact<{
   publicPetitionLinkId: Scalars["GID"];
   contactEmail: Scalars["String"];
 }>;
 
-export type PublicPetitionLink_publicSendReminderMutation = { publicSendReminder: Result };
+export type PublicPetitionLink_publicSendReminderMutation = Pick<Mutation, "publicSendReminder">;
 
 export type PublicTemplateLink_publicPetitionLinkBySlugQueryVariables = Exact<{
   slug: Scalars["String"];
 }>;
 
 export type PublicTemplateLink_publicPetitionLinkBySlugQuery = {
-  publicPetitionLinkBySlug?: Maybe<{
-    __typename?: "PublicPetitionLink";
-    id: string;
-    title: string;
-    description: string;
-    organization: {
-      __typename?: "PublicPetitionLinkOwnerOrganization";
-      name: string;
-      logoUrl?: Maybe<string>;
-    };
-  }>;
+  publicPetitionLinkBySlug?: Maybe<
+    { __typename?: "PublicPetitionLink" } & Pick<
+      PublicPetitionLink,
+      "id" | "title" | "description"
+    > & {
+        organization: { __typename?: "PublicPetitionLinkOwnerOrganization" } & Pick<
+          PublicPetitionLinkOwnerOrganization,
+          "name" | "logoUrl"
+        >;
+      }
+  >;
 };
 
-export type PetitionPdf_PetitionFragment = {
-  __typename?: "Petition";
-  id: string;
-  name?: Maybe<string>;
-  fromTemplateId?: Maybe<string>;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-    options: { [key: string]: any };
-    description?: Maybe<string>;
-    validated: boolean;
-    visibility?: Maybe<{ [key: string]: any }>;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
-  }>;
-  organization: { __typename?: "Organization"; name: string; logoUrl?: Maybe<string> };
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      timezone: string;
-      signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
-    };
-  }>;
-};
+export type PetitionPdf_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "name" | "fromTemplateId"
+> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<
+        PetitionField,
+        "id" | "type" | "title" | "options" | "description" | "validated" | "visibility"
+      > & {
+          replies: Array<
+            { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+          >;
+        }
+    >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "name" | "logoUrl">;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & {
+        signatureConfig: { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "timezone"> & {
+            signers: Array<
+              { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "fullName" | "email">
+            >;
+          };
+      }
+    >;
+  };
 
-export type PetitionPdf_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  options: { [key: string]: any };
-  description?: Maybe<string>;
-  validated: boolean;
-  visibility?: Maybe<{ [key: string]: any }>;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-  }>;
-};
+export type PetitionPdf_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "type" | "title" | "options" | "description" | "validated" | "visibility"
+> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+    >;
+  };
 
 export type PdfViewPetitionQueryVariables = Exact<{
   token: Scalars["String"];
 }>;
 
 export type PdfViewPetitionQuery = {
-  petitionAuthToken?: Maybe<{
-    __typename?: "Petition";
-    id: string;
-    name?: Maybe<string>;
-    fromTemplateId?: Maybe<string>;
-    fields: Array<{
-      __typename?: "PetitionField";
-      id: string;
-      type: PetitionFieldType;
-      title?: Maybe<string>;
-      options: { [key: string]: any };
-      description?: Maybe<string>;
-      validated: boolean;
-      visibility?: Maybe<{ [key: string]: any }>;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-      }>;
-    }>;
-    organization: { __typename?: "Organization"; name: string; logoUrl?: Maybe<string> };
-    currentSignatureRequest?: Maybe<{
-      __typename?: "PetitionSignatureRequest";
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        timezone: string;
-        signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
-      };
-    }>;
-  }>;
+  petitionAuthToken?: Maybe<
+    { __typename?: "Petition" } & Pick<Petition, "id" | "name" | "fromTemplateId"> & {
+        fields: Array<
+          { __typename?: "PetitionField" } & Pick<
+            PetitionField,
+            "id" | "type" | "title" | "options" | "description" | "validated" | "visibility"
+          > & {
+              replies: Array<
+                { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+              >;
+            }
+        >;
+        organization: { __typename?: "Organization" } & Pick<Organization, "name" | "logoUrl">;
+        currentSignatureRequest?: Maybe<
+          { __typename?: "PetitionSignatureRequest" } & {
+            signatureConfig: { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "timezone"
+            > & {
+                signers: Array<
+                  { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "fullName" | "email">
+                >;
+              };
+          }
+        >;
+      }
+  >;
 };
 
 export type Signup_userSignUpMutationVariables = Exact<{
@@ -14446,69 +12492,66 @@ export type Signup_userSignUpMutationVariables = Exact<{
 }>;
 
 export type Signup_userSignUpMutation = {
-  userSignUp: {
-    __typename?: "User";
-    id: string;
-    email: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-  };
+  userSignUp: { __typename?: "User" } & Pick<User, "id" | "email" | "firstName" | "lastName">;
 };
 
 export type LandingTemplateDetails_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
-  id: string;
-  name?: Maybe<string>;
-  slug: string;
-  locale: PetitionLocale;
-  imageUrl?: Maybe<string>;
-  backgroundColor?: Maybe<string>;
-  categories?: Maybe<Array<string>>;
-  ownerFullName: string;
-  ownerAvatarUrl?: Maybe<string>;
-  organizationName: string;
-  fieldCount: number;
-  hasConditionals: boolean;
-  descriptionHtml?: Maybe<string>;
-  shortDescription?: Maybe<string>;
-  updatedAt: string;
-  fields: Array<{
-    __typename?: "LandingTemplateField";
-    id: string;
-    type: PetitionFieldType;
-    title?: Maybe<string>;
-  }>;
-};
+} & Pick<
+  LandingTemplate,
+  | "id"
+  | "name"
+  | "slug"
+  | "locale"
+  | "imageUrl"
+  | "backgroundColor"
+  | "categories"
+  | "ownerFullName"
+  | "ownerAvatarUrl"
+  | "organizationName"
+  | "fieldCount"
+  | "hasConditionals"
+  | "descriptionHtml"
+  | "shortDescription"
+  | "updatedAt"
+> & {
+    fields: Array<
+      { __typename?: "LandingTemplateField" } & Pick<LandingTemplateField, "id" | "type" | "title">
+    >;
+  };
 
 export type LandingTemplateDetails_landingTemplateBySlugQueryVariables = Exact<{
   slug: Scalars["String"];
 }>;
 
 export type LandingTemplateDetails_landingTemplateBySlugQuery = {
-  landingTemplateBySlug?: Maybe<{
-    __typename?: "LandingTemplate";
-    id: string;
-    name?: Maybe<string>;
-    slug: string;
-    locale: PetitionLocale;
-    imageUrl?: Maybe<string>;
-    backgroundColor?: Maybe<string>;
-    categories?: Maybe<Array<string>>;
-    ownerFullName: string;
-    ownerAvatarUrl?: Maybe<string>;
-    organizationName: string;
-    fieldCount: number;
-    hasConditionals: boolean;
-    descriptionHtml?: Maybe<string>;
-    shortDescription?: Maybe<string>;
-    updatedAt: string;
-    fields: Array<{
-      __typename?: "LandingTemplateField";
-      id: string;
-      type: PetitionFieldType;
-      title?: Maybe<string>;
-    }>;
-  }>;
+  landingTemplateBySlug?: Maybe<
+    { __typename?: "LandingTemplate" } & Pick<
+      LandingTemplate,
+      | "id"
+      | "name"
+      | "slug"
+      | "locale"
+      | "imageUrl"
+      | "backgroundColor"
+      | "categories"
+      | "ownerFullName"
+      | "ownerAvatarUrl"
+      | "organizationName"
+      | "fieldCount"
+      | "hasConditionals"
+      | "descriptionHtml"
+      | "shortDescription"
+      | "updatedAt"
+    > & {
+        fields: Array<
+          { __typename?: "LandingTemplateField" } & Pick<
+            LandingTemplateField,
+            "id" | "type" | "title"
+          >
+        >;
+      }
+  >;
 };
 
 export type LandingTemplateDetails_landingTemplatesQueryVariables = Exact<{
@@ -14519,21 +12562,24 @@ export type LandingTemplateDetails_landingTemplatesQueryVariables = Exact<{
 }>;
 
 export type LandingTemplateDetails_landingTemplatesQuery = {
-  landingTemplates: {
-    __typename?: "LandingTemplatePagination";
-    totalCount: number;
-    items: Array<{
-      __typename?: "LandingTemplate";
-      id: string;
-      locale: PetitionLocale;
-      name?: Maybe<string>;
-      slug: string;
-      imageUrl?: Maybe<string>;
-      backgroundColor?: Maybe<string>;
-      ownerFullName: string;
-      organizationName: string;
-    }>;
-  };
+  landingTemplates: { __typename?: "LandingTemplatePagination" } & Pick<
+    LandingTemplatePagination,
+    "totalCount"
+  > & {
+      items: Array<
+        { __typename?: "LandingTemplate" } & Pick<
+          LandingTemplate,
+          | "id"
+          | "locale"
+          | "name"
+          | "slug"
+          | "imageUrl"
+          | "backgroundColor"
+          | "ownerFullName"
+          | "organizationName"
+        >
+      >;
+    };
 };
 
 export type LandingTemplatesCategory_landingTemplatesSamplesQueryVariables = Exact<{
@@ -14541,11 +12587,14 @@ export type LandingTemplatesCategory_landingTemplatesSamplesQueryVariables = Exa
 }>;
 
 export type LandingTemplatesCategory_landingTemplatesSamplesQuery = {
-  landingTemplatesSamples: Array<{
-    __typename?: "LandingTemplateSample";
-    category: string;
-    templates: { __typename?: "LandingTemplatePagination"; totalCount: number };
-  }>;
+  landingTemplatesSamples: Array<
+    { __typename?: "LandingTemplateSample" } & Pick<LandingTemplateSample, "category"> & {
+        templates: { __typename?: "LandingTemplatePagination" } & Pick<
+          LandingTemplatePagination,
+          "totalCount"
+        >;
+      }
+  >;
 };
 
 export type LandingTemplatesCategory_landingTemplatesQueryVariables = Exact<{
@@ -14556,21 +12605,24 @@ export type LandingTemplatesCategory_landingTemplatesQueryVariables = Exact<{
 }>;
 
 export type LandingTemplatesCategory_landingTemplatesQuery = {
-  landingTemplates: {
-    __typename?: "LandingTemplatePagination";
-    totalCount: number;
-    items: Array<{
-      __typename?: "LandingTemplate";
-      id: string;
-      locale: PetitionLocale;
-      name?: Maybe<string>;
-      slug: string;
-      imageUrl?: Maybe<string>;
-      backgroundColor?: Maybe<string>;
-      ownerFullName: string;
-      organizationName: string;
-    }>;
-  };
+  landingTemplates: { __typename?: "LandingTemplatePagination" } & Pick<
+    LandingTemplatePagination,
+    "totalCount"
+  > & {
+      items: Array<
+        { __typename?: "LandingTemplate" } & Pick<
+          LandingTemplate,
+          | "id"
+          | "locale"
+          | "name"
+          | "slug"
+          | "imageUrl"
+          | "backgroundColor"
+          | "ownerFullName"
+          | "organizationName"
+        >
+      >;
+    };
 };
 
 export type LandingTemplates_landingTemplatesSamplesQueryVariables = Exact<{
@@ -14580,71 +12632,64 @@ export type LandingTemplates_landingTemplatesSamplesQueryVariables = Exact<{
 }>;
 
 export type LandingTemplates_landingTemplatesSamplesQuery = {
-  landingTemplatesSamples: Array<{
-    __typename?: "LandingTemplateSample";
-    category: string;
-    templates: {
-      __typename?: "LandingTemplatePagination";
-      totalCount: number;
-      items: Array<{
-        __typename?: "LandingTemplate";
-        id: string;
-        locale: PetitionLocale;
-        name?: Maybe<string>;
-        slug: string;
-        imageUrl?: Maybe<string>;
-        backgroundColor?: Maybe<string>;
-        ownerFullName: string;
-        organizationName: string;
-      }>;
-    };
-  }>;
+  landingTemplatesSamples: Array<
+    { __typename?: "LandingTemplateSample" } & Pick<LandingTemplateSample, "category"> & {
+        templates: { __typename?: "LandingTemplatePagination" } & Pick<
+          LandingTemplatePagination,
+          "totalCount"
+        > & {
+            items: Array<
+              { __typename?: "LandingTemplate" } & Pick<
+                LandingTemplate,
+                | "id"
+                | "locale"
+                | "name"
+                | "slug"
+                | "imageUrl"
+                | "backgroundColor"
+                | "ownerFullName"
+                | "organizationName"
+              >
+            >;
+          };
+      }
+  >;
 };
 
 export type Thanks_PetitionLogoQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type Thanks_PetitionLogoQuery = { publicOrgLogoUrl?: Maybe<string> };
+export type Thanks_PetitionLogoQuery = Pick<Query, "publicOrgLogoUrl">;
 
 export type GetMyIdQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetMyIdQuery = { me: { __typename?: "User"; id: string } };
+export type GetMyIdQuery = { me: { __typename?: "User" } & Pick<User, "id"> };
 
 export type useFieldVisibility_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-  id: string;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  visibility?: Maybe<{ [key: string]: any }>;
-  replies: Array<{
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-  }>;
-};
+} & Pick<PublicPetitionField, "id" | "type" | "options" | "visibility"> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<PublicPetitionFieldReply, "id" | "content">
+    >;
+  };
 
-export type useFieldVisibility_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  visibility?: Maybe<{ [key: string]: any }>;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-  }>;
-};
+export type useFieldVisibility_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "type" | "options" | "visibility"
+> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+    >;
+  };
 
-export type filterPetitionFields_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  isReadOnly: boolean;
-  validated: boolean;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-};
+export type filterPetitionFields_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "isReadOnly" | "validated"
+> & {
+    comments: Array<{ __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">>;
+    replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
+  };
 
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
@@ -14652,7 +12697,8 @@ export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
 
 export type useClonePetitions_clonePetitionsMutation = {
   clonePetitions: Array<
-    { __typename?: "Petition"; id: string } | { __typename?: "PetitionTemplate"; id: string }
+    | ({ __typename?: "Petition" } & Pick<Petition, "id">)
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">)
   >;
 };
 
@@ -14661,15 +12707,10 @@ export type useCreateContact_createContactMutationVariables = Exact<{
 }>;
 
 export type useCreateContact_createContactMutation = {
-  createContact: {
-    __typename?: "Contact";
-    id: string;
-    email: string;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    fullName?: Maybe<string>;
-    hasBouncedEmail: boolean;
-  };
+  createContact: { __typename?: "Contact" } & Pick<
+    Contact,
+    "id" | "email" | "firstName" | "lastName" | "fullName" | "hasBouncedEmail"
+  >;
 };
 
 export type useCreatePetition_createPetitionMutationVariables = Exact<{
@@ -14681,27 +12722,23 @@ export type useCreatePetition_createPetitionMutationVariables = Exact<{
 
 export type useCreatePetition_createPetitionMutation = {
   createPetition:
-    | { __typename?: "Petition"; id: string }
-    | { __typename?: "PetitionTemplate"; id: string };
+    | ({ __typename?: "Petition" } & Pick<Petition, "id">)
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">);
 };
 
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Result };
+export type useDeletePetitions_deletePetitionsMutation = Pick<Mutation, "deletePetitions">;
 
 export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  id: string;
-  name?: Maybe<string>;
-};
+} & Pick<Petition, "id" | "name">;
 
 export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  name?: Maybe<string>;
-};
+} & Pick<PetitionTemplate, "id" | "name">;
 
 export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
   | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
@@ -14717,155 +12754,140 @@ export type useUpdateIsReadNotificationMutationVariables = Exact<{
 
 export type useUpdateIsReadNotificationMutation = {
   updatePetitionUserNotificationReadStatus: Array<
-    | {
-        __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "CommentCreatedUserNotification";
-        id: string;
-        isRead: boolean;
-        comment: { __typename?: "PetitionFieldComment"; id: string };
-      }
-    | { __typename?: "MessageEmailBouncedUserNotification"; id: string; isRead: boolean }
-    | { __typename?: "PetitionCompletedUserNotification"; id: string; isRead: boolean }
-    | { __typename?: "PetitionSharedUserNotification"; id: string; isRead: boolean }
-    | { __typename?: "ReminderEmailBouncedUserNotification"; id: string; isRead: boolean }
-    | { __typename?: "RemindersOptOutNotification"; id: string; isRead: boolean }
-    | { __typename?: "SignatureCancelledUserNotification"; id: string; isRead: boolean }
-    | { __typename?: "SignatureCompletedUserNotification"; id: string; isRead: boolean }
+    | ({ __typename?: "AccessActivatedFromPublicPetitionLinkUserNotification" } & Pick<
+        AccessActivatedFromPublicPetitionLinkUserNotification,
+        "id" | "isRead"
+      >)
+    | ({ __typename?: "CommentCreatedUserNotification" } & Pick<
+        CommentCreatedUserNotification,
+        "id" | "isRead"
+      > & { comment: { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id"> })
+    | ({ __typename?: "MessageEmailBouncedUserNotification" } & Pick<
+        MessageEmailBouncedUserNotification,
+        "id" | "isRead"
+      >)
+    | ({ __typename?: "PetitionCompletedUserNotification" } & Pick<
+        PetitionCompletedUserNotification,
+        "id" | "isRead"
+      >)
+    | ({ __typename?: "PetitionSharedUserNotification" } & Pick<
+        PetitionSharedUserNotification,
+        "id" | "isRead"
+      >)
+    | ({ __typename?: "ReminderEmailBouncedUserNotification" } & Pick<
+        ReminderEmailBouncedUserNotification,
+        "id" | "isRead"
+      >)
+    | ({ __typename?: "RemindersOptOutNotification" } & Pick<
+        RemindersOptOutNotification,
+        "id" | "isRead"
+      >)
+    | ({ __typename?: "SignatureCancelledUserNotification" } & Pick<
+        SignatureCancelledUserNotification,
+        "id" | "isRead"
+      >)
+    | ({ __typename?: "SignatureCompletedUserNotification" } & Pick<
+        SignatureCompletedUserNotification,
+        "id" | "isRead"
+      >)
   >;
 };
 
-export type useUpdateIsReadNotification_UserFragment = {
-  __typename?: "User";
-  id: string;
-  unreadNotificationIds: Array<string>;
-};
+export type useUpdateIsReadNotification_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "unreadNotificationIds"
+>;
 
 export type useUpdateIsReadNotification_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
-  id: string;
-  isUnread: boolean;
-};
+} & Pick<PetitionFieldComment, "id" | "isUnread">;
 
 export type uploadFile_AWSPresignedPostDataFragment = {
   __typename?: "AWSPresignedPostData";
-  url: string;
-  fields: { [key: string]: any };
-};
+} & Pick<AWSPresignedPostData, "url" | "fields">;
 
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-};
+} & Pick<PetitionField, "id" | "type" | "title">;
 
 export type useFilenamePlaceholdersRename_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-  content: { [key: string]: any };
-};
+} & Pick<PetitionFieldReply, "content">;
 
-export type usePetitionCurrentSignatureStatus_PetitionFragment = {
-  __typename?: "Petition";
-  status: PetitionStatus;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-};
+export type usePetitionCurrentSignatureStatus_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "status"
+> & {
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+    >;
+    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
+  };
 
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-  sentAt?: Maybe<string>;
-  id: string;
-  name?: Maybe<string>;
-  createdAt: string;
-  status: PetitionStatus;
-  isReadOnly: boolean;
-  accesses: Array<{
-    __typename?: "PetitionAccess";
-    status: PetitionAccessStatus;
-    nextReminderAt?: Maybe<string>;
-    contact?: Maybe<{
-      __typename?: "Contact";
-      id: string;
-      fullName?: Maybe<string>;
-      email: string;
-    }>;
-    reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-  }>;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
-        };
-      }
-  >;
-  progress: {
-    __typename?: "PetitionProgress";
-    validated: number;
-    replied: number;
-    optional: number;
-    total: number;
+} & Pick<Petition, "sentAt" | "id" | "name" | "createdAt" | "status" | "isReadOnly"> & {
+    accesses: Array<
+      { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "status" | "nextReminderAt"> & {
+          contact?: Maybe<{ __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">>;
+          reminders: Array<
+            { __typename?: "PetitionReminder" } & Pick<PetitionReminder, "createdAt">
+          >;
+        }
+    >;
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials"> })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "fullName" | "avatarUrl" | "initials"
+            >;
+          })
+    >;
+    progress: { __typename?: "PetitionProgress" } & Pick<
+      PetitionProgress,
+      "validated" | "replied" | "optional" | "total"
+    >;
+    tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+    >;
+    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
   };
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-  currentSignatureRequest?: Maybe<{
-    __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
-  }>;
-  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
-};
 
 export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  descriptionExcerpt?: Maybe<string>;
-  id: string;
-  name?: Maybe<string>;
-  createdAt: string;
-  isReadOnly: boolean;
-  permissions: Array<
-    | {
-        __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-      }
-    | {
-        __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: Maybe<string>;
-          avatarUrl?: Maybe<string>;
-          initials?: Maybe<string>;
-        };
-      }
-  >;
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-};
+} & Pick<PetitionTemplate, "descriptionExcerpt" | "id" | "name" | "createdAt" | "isReadOnly"> & {
+    permissions: Array<
+      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+          PetitionUserGroupPermission,
+          "permissionType"
+        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name" | "initials"> })
+      | ({ __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & {
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "fullName" | "avatarUrl" | "initials"
+            >;
+          })
+    >;
+    tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
+  };
 
 export type usePetitionsTableColumns_PetitionBaseFragment =
   | usePetitionsTableColumns_PetitionBase_Petition_Fragment
   | usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
 
-export type usePetitionsTableColumns_UserFragment = {
-  __typename?: "User";
-  hasPetitionSignature: boolean;
+export type usePetitionsTableColumns_UserFragment = { __typename?: "User" } & {
+  hasPetitionSignature: User["hasFeatureFlag"];
 };
 
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
@@ -14874,29 +12896,24 @@ export type PetitionComposeSearchContactsQueryVariables = Exact<{
 }>;
 
 export type PetitionComposeSearchContactsQuery = {
-  contacts: {
-    __typename?: "ContactPagination";
-    items: Array<{
-      __typename?: "Contact";
-      id: string;
-      firstName?: Maybe<string>;
-      lastName?: Maybe<string>;
-      fullName?: Maybe<string>;
-      email: string;
-      hasBouncedEmail: boolean;
-    }>;
+  contacts: { __typename?: "ContactPagination" } & {
+    items: Array<
+      { __typename?: "Contact" } & Pick<
+        Contact,
+        "id" | "firstName" | "lastName" | "fullName" | "email" | "hasBouncedEmail"
+      >
+    >;
   };
 };
 
-export type useSettingsSections_UserFragment = { __typename?: "User"; hasApiTokens: boolean };
-
-export type validatePetitionFields_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  title?: Maybe<string>;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
+export type useSettingsSections_UserFragment = { __typename?: "User" } & {
+  hasApiTokens: User["hasFeatureFlag"];
 };
+
+export type validatePetitionFields_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "title" | "type" | "options"
+>;
 
 export const ContactListPopover_ContactFragmentDoc = gql`
   fragment ContactListPopover_Contact on Contact {
