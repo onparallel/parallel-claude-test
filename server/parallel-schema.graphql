@@ -289,7 +289,6 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
 The types of integrations available.
 """
 enum IntegrationType {
-  EVENT_SUBSCRIPTION
   SIGNATURE
   SSO
   USER_PROVISIONING
@@ -1323,11 +1322,6 @@ type OrgIntegration {
   The provider used for this integration.
   """
   provider: String!
-
-  """
-  The settings of the integration.
-  """
-  settings: JSONObject!
 
   """
   The type of the integration.

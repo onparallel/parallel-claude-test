@@ -128,11 +128,11 @@ export function EventSubscriptionCard({
                 <InputRightElement>
                   {formState.isSubmitting ? (
                     <Spinner color="gray.500" />
-                  ) : !formState.errors.eventsUrl ? (
+                  ) : !formState.errors.eventsUrl && formState.isSubmitSuccessful ? (
                     <CheckIcon color="green.500" />
-                  ) : (
+                  ) : formState.isSubmitted ? (
                     <CloseIcon fontSize="sm" color="red.500" />
-                  )}
+                  ) : null}
                 </InputRightElement>
               </InputGroup>
               <Button type="submit" marginLeft={2}>

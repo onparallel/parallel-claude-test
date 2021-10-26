@@ -24,7 +24,7 @@ export const Tone = enumType({
 });
 export const IntegrationType = enumType({
   name: "IntegrationType",
-  members: ["EVENT_SUBSCRIPTION", "SIGNATURE", "SSO", "USER_PROVISIONING"],
+  members: ["SIGNATURE", "SSO", "USER_PROVISIONING"],
   description: "The types of integrations available.",
 });
 
@@ -42,18 +42,6 @@ export const OrgIntegration = objectType({
     });
     t.string("provider", {
       description: "The provider used for this integration.",
-    });
-    t.jsonObject("settings", {
-      description: "The settings of the integration.",
-      resolve: (o) => {
-        // here we have to be careful not to expose secret APIKEYS to the client. so we will only expose what we need.
-        switch (o.type) {
-          case "EVENT_SUBSCRIPTION":
-            return { EVENTS_URL: o.settings.EVENTS_URL };
-          default:
-            return {};
-        }
-      },
     });
   },
 });
@@ -144,14 +132,8 @@ export const Organization = objectType({
         ),
       },
       authorize: isOwnOrgOrSuperAdmin(),
-      resolve: async (root, { type }, ctx) => {
-        const orgIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
-          root.id,
-          type ?? undefined
-        );
-        // temporal filter so subscriptions don't show as an org integration
-        return orgIntegrations.filter((i) => i.type !== "EVENT_SUBSCRIPTION");
-      },
+      resolve: async (root, { type }, ctx) =>
+        await ctx.integrations.loadIntegrationsByOrgId(root.id, type),
     });
     t.nonNull.field("usageLimits", {
       authorize: isOwnOrgOrSuperAdmin(),

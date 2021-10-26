@@ -1,12 +1,13 @@
 import { inputObjectType, mutationField, nonNull } from "nexus";
 import { isDefined } from "remeda";
 import { RESULT } from "..";
-import { OrgIntegration } from "../../db/__types";
+import { PetitionEventSubscription } from "../../db/__types";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
-import { ArgValidationError, WhitelistedError } from "../helpers/errors";
+import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
-import { validIntegrationSettings } from "../helpers/validators/validIntegrationSettings";
+import { notEmptyObject } from "../helpers/validators/notEmptyObject";
+import { validUrl } from "../helpers/validators/validUrl";
 import { userHasAccessToEventSubscription } from "./authorizers";
 
 export const createEventSubscription = mutationField("createEventSubscription", {
@@ -16,31 +17,18 @@ export const createEventSubscription = mutationField("createEventSubscription", 
   args: {
     eventsUrl: nonNull("String"),
   },
-  validateArgs: validIntegrationSettings(
-    "EVENT_SUBSCRIPTION",
-    (args) => ({ EVENTS_URL: args.eventsUrl }), // TODO change this, no need to use AJV
-    "settings"
-  ),
+  validateArgs: validUrl((args) => args.eventsUrl, "eventsUrl"),
   resolve: async (_, args, ctx) => {
-    const eventSubscriptionUserIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
-      ctx.user!.org_id,
-      "EVENT_SUBSCRIPTION",
-      true
-    );
-    if (eventSubscriptionUserIntegrations.some((i) => i.settings.USER_ID === ctx.user!.id)) {
+    const userSubscriptions = await ctx.subscriptions.loadSubscriptionsByUserId(ctx.user!.id);
+    if (userSubscriptions.length > 0) {
       throw new WhitelistedError(`You already have a subscription`, "EXISTING_SUBSCRIPTION_ERROR");
     }
 
-    return await ctx.integrations.createOrgIntegration(
+    return await ctx.subscriptions.createSubscription(
       {
-        type: "EVENT_SUBSCRIPTION",
+        user_id: ctx.user!.id,
         is_enabled: true,
-        org_id: ctx.user!.org_id,
-        provider: "PARALLEL",
-        settings: {
-          EVENTS_URL: args.eventsUrl,
-          USER_ID: ctx.user!.id,
-        },
+        endpoint: args.eventsUrl,
       },
       `User:${ctx.user!.id}`
     );
@@ -64,34 +52,21 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
     ),
   },
   validateArgs: validateAnd(
-    (_, args, ctx, info) => {
-      if (!isDefined(args.data.isEnabled) && !isDefined(args.data.eventsUrl)) {
-        throw new ArgValidationError(info, "args.data", "Update data can't be empty");
-      }
-    },
+    notEmptyObject((args) => args.data, "data"),
     validateIf(
       (args) => isDefined(args.data.eventsUrl),
-      validIntegrationSettings(
-        "EVENT_SUBSCRIPTION",
-        (args) => ({ EVENTS_URL: args.data.eventsUrl }),
-        "data.eventsUrl"
-      )
+      validUrl((args) => args.data.eventsUrl, "data.eventsUrl")
     )
   ),
   resolve: async (_, args, ctx) => {
-    const data: Partial<OrgIntegration> = {};
-    if (args.data.eventsUrl) {
-      data.settings = { EVENTS_URL: args.data.eventsUrl, USER_ID: ctx.user!.id };
+    const data: Partial<PetitionEventSubscription> = {};
+    if (isDefined(args.data.eventsUrl)) {
+      data.endpoint = args.data.eventsUrl;
     }
     if (isDefined(args.data.isEnabled)) {
       data.is_enabled = args.data.isEnabled;
     }
-    const [integration] = await ctx.integrations.updateOrgIntegration(
-      args.id,
-      data,
-      `User:${ctx.user!.id}`
-    );
-    return integration;
+    return await ctx.subscriptions.updateSubscription(args.id, data, `User:${ctx.user!.id}`);
   },
 });
 
@@ -104,7 +79,7 @@ export const deleteEventSubscription = mutationField("deleteEventSubscription", 
   },
   resolve: async (_, { id }, ctx) => {
     try {
-      await ctx.integrations.updateOrgIntegration(
+      await ctx.subscriptions.updateSubscription(
         id,
         {
           deleted_at: new Date(),

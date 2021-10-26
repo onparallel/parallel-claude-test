@@ -406,13 +406,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
     totalCount: number; // Int!
   };
-  PetitionEventSubscription: {
-    id: number;
-    is_enabled: boolean;
-    settings: {
-      EVENTS_URL: string;
-    };
-  };
+  PetitionEventSubscription: db.PetitionEventSubscription;
   PetitionField: db.PetitionField;
   PetitionFieldAttachment: db.PetitionFieldAttachment;
   PetitionFieldComment: db.PetitionFieldComment;
@@ -948,7 +942,6 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     name: string; // String!
     provider: string; // String!
-    settings: NexusGenScalars["JSONObject"]; // JSONObject!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
   Organization: {
@@ -2108,7 +2101,6 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     name: "String";
     provider: "String";
-    settings: "JSONObject";
     type: "IntegrationType";
   };
   Organization: {

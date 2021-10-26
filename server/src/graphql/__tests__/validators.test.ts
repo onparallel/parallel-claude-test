@@ -534,25 +534,5 @@ describe("GraphQL custom validators", () => {
         )({}, {}, ctx, {} as any)
       ).not.toThrowError();
     });
-
-    it("validates EVENT_SUBSCRIPTION integration minimal required settings", () => {
-      expect(() =>
-        validIntegrationSettings(
-          "EVENT_SUBSCRIPTION",
-          () => ({ EVENTS_URL: "https://webhook.site/9f94d662-038f-44f2-a610-a64d6a2f352e" }),
-          "settings"
-        )({}, {}, ctx, {} as any)
-      ).not.toThrowError();
-    });
-
-    it("throws error if EVENT_SUBSCRIPTION settings has invalid EVENTS_URL", () => {
-      expect(() =>
-        validIntegrationSettings(
-          "EVENT_SUBSCRIPTION",
-          () => ({ EVENTS_URL: "this is not a valid URL :(" }),
-          "settings"
-        )({}, {}, ctx, {} as any)
-      ).toThrowError();
-    });
   });
 });

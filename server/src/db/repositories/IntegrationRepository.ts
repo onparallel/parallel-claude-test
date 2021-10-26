@@ -21,10 +21,6 @@ export type IntegrationSettings<K extends IntegrationType> = {
   USER_PROVISIONING: {
     AUTH_KEY: string;
   };
-  EVENT_SUBSCRIPTION: {
-    USER_ID: number;
-    EVENTS_URL: string;
-  };
 }[K];
 
 @injectable()
@@ -33,26 +29,19 @@ export class IntegrationRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadIntegration = this.buildLoadBy("org_integration", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
-
   async loadIntegrationsByOrgId<IType extends IntegrationType>(
     orgId: number,
-    type?: IType,
-    includeDisabled?: boolean
+    type?: IType | null
   ): Promise<Replace<OrgIntegration, { settings: IntegrationSettings<IType> }>[]> {
     return await this.from("org_integration")
       .where({
         org_id: orgId,
         deleted_at: null,
+        is_enabled: true,
       })
       .mmodify((q) => {
         if (type) {
           q.where("type", type);
-        }
-        if (!includeDisabled) {
-          q.where("is_enabled", true);
         }
       })
       .orderBy("created_at", "desc")
@@ -86,17 +75,6 @@ export class IntegrationRepository extends BaseRepository {
       [domain]
     );
 
-    return integration;
-  }
-
-  async createOrgIntegration(data: Partial<OrgIntegration>, createdBy: string) {
-    const [integration] = await this.from("org_integration").insert(
-      {
-        ...data,
-        created_by: createdBy,
-      },
-      "*"
-    );
     return integration;
   }
 

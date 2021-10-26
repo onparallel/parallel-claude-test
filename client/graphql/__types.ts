@@ -255,7 +255,7 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
 }
 
 /** The types of integrations available. */
-export type IntegrationType = "EVENT_SUBSCRIPTION" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 /** A public template on landing page */
 export interface LandingTemplate {
@@ -1234,8 +1234,6 @@ export interface OrgIntegration {
   name: Scalars["String"];
   /** The provider used for this integration. */
   provider: Scalars["String"];
-  /** The settings of the integration. */
-  settings: Scalars["JSONObject"];
   /** The type of the integration. */
   type: IntegrationType;
 }

@@ -9,10 +9,8 @@ export function userHasAccessToEventSubscription<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const integrationIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-    const integrations = await ctx.integrations.loadIntegration(integrationIds);
-    return integrations.every(
-      (i) => i?.type === "EVENT_SUBSCRIPTION" && (i.settings as any).USER_ID === ctx.user!.id
-    );
+    const subscriptionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+    const subscriptions = await ctx.subscriptions.loadSubscription(subscriptionIds);
+    return subscriptions.every((s) => s?.user_id === ctx.user!.id);
   };
 }

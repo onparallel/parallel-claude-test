@@ -12,34 +12,34 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   if (!petition) {
     return;
   }
-  const subscriptions = await ctx.integrations.loadIntegrationsByOrgId(
-    petition.org_id,
-    "EVENT_SUBSCRIPTION"
-  );
-  if (subscriptions.length === 0) {
-    return;
-  }
-  const users = new Set(
-    (await ctx.petitions.loadEffectivePermissions(petition.id)).map((p) => p.user_id!)
+
+  const userIds = (await ctx.petitions.loadEffectivePermissions(petition.id)).map(
+    (p) => p.user_id!
   );
 
-  for (const subscription of subscriptions) {
-    if (users.has(subscription.settings.USER_ID)) {
-      const mappedEvent = mapEvent(event);
-      try {
-        await fetch(subscription.settings.EVENTS_URL, {
-          method: "POST",
-          body: JSON.stringify(mappedEvent),
-          headers: { "Content-Type": "application/json" },
-        });
-      } catch (e: any) {
-        await ctx.emails.sendDeveloperWebhookFailedEmail(
-          subscription.id,
-          petition.id,
-          e.message ?? "",
-          mappedEvent
-        );
-      }
+  const userSubscriptions = (await ctx.subscriptions.loadSubscriptionsByUserId(userIds))
+    .flat()
+    .filter((s) => s.is_enabled);
+
+  if (userSubscriptions.length === 0) {
+    return;
+  }
+
+  for (const subscription of userSubscriptions) {
+    const mappedEvent = mapEvent(event);
+    try {
+      await fetch(subscription.endpoint, {
+        method: "POST",
+        body: JSON.stringify(mappedEvent),
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (e: any) {
+      await ctx.emails.sendDeveloperWebhookFailedEmail(
+        subscription.id,
+        petition.id,
+        e.message ?? "",
+        mappedEvent
+      );
     }
   }
 };

@@ -58,7 +58,7 @@ describe("GraphQL/OrgIntegrations", () => {
     await testClient.stop();
   });
 
-  it("fetches all user's enabled integrations ordered by created_at DESC", async () => {
+  it("fetches all organization enabled integrations ordered by created_at DESC", async () => {
     const { data, errors } = await testClient.query({
       query: gql`
         query {
@@ -69,7 +69,6 @@ describe("GraphQL/OrgIntegrations", () => {
                 name
                 type
                 provider
-                settings
               }
             }
           }
@@ -84,204 +83,7 @@ describe("GraphQL/OrgIntegrations", () => {
         name: "Cognito",
         type: "USER_PROVISIONING",
         provider: "COGNITO",
-        settings: {},
       },
     ]);
-  });
-
-  let subscriptionId: string;
-  describe("createEventSubscription", () => {
-    it("creates and returns a new subscription for the user's petitions", async () => {
-      const { data, errors } = await testClient.mutate({
-        mutation: gql`
-          mutation ($eventsUrl: String!) {
-            createEventSubscription(eventsUrl: $eventsUrl) {
-              id
-              eventsUrl
-              isEnabled
-            }
-          }
-        `,
-        variables: {
-          eventsUrl: "https://www.example.com/api",
-        },
-      });
-      expect(errors).toBeUndefined();
-      expect(data?.createEventSubscription).toMatchObject({
-        isEnabled: true,
-        eventsUrl: "https://www.example.com/api",
-      });
-      subscriptionId = data!.createEventSubscription.id;
-    });
-
-    it("throws error if trying to create a second subscription", async () => {
-      const { data, errors } = await testClient.mutate({
-        mutation: gql`
-          mutation ($eventsUrl: String!) {
-            createEventSubscription(eventsUrl: $eventsUrl) {
-              id
-            }
-          }
-        `,
-        variables: {
-          eventsUrl: "https://www.example.com/api",
-        },
-      });
-
-      expect(data).toBeNull();
-      expect(errors).toContainGraphQLError("EXISTING_SUBSCRIPTION_ERROR");
-    });
-  });
-
-  describe("updateEventSubscription", () => {
-    it("disables a subscription for the user's petitions", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
-              id
-              eventsUrl
-              isEnabled
-            }
-          }
-        `,
-        variables: {
-          id: subscriptionId,
-          data: {
-            isEnabled: false,
-          },
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.updateEventSubscription).toEqual({
-        id: subscriptionId,
-        eventsUrl: "https://www.example.com/api",
-        isEnabled: false,
-      });
-    });
-
-    it("updates the settings of a subscription ", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
-              id
-              eventsUrl
-              isEnabled
-            }
-          }
-        `,
-        variables: {
-          id: subscriptionId,
-          data: {
-            eventsUrl: "https://www.example.com/new-api",
-            isEnabled: true,
-          },
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.updateEventSubscription).toEqual({
-        id: subscriptionId,
-        eventsUrl: "https://www.example.com/new-api",
-        isEnabled: true,
-      });
-    });
-
-    it.todo("FIX: throws error if subscription is from another user");
-    // , async () => {
-    //   const { errors, data } = await testClient.mutate({
-    //     mutation: gql`
-    //       mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-    //         updateEventSubscription(id: $id, data: $data) {
-    //           id
-    //         }
-    //       }
-    //     `,
-    //     variables: {
-    //       id: toGlobalId("PetitionEventSubscription", integrations[1].id),
-    //       data: {
-    //         isEnabled: true,
-    //       },
-    //     },
-    //   });
-    //
-    //   expect(errors).toContainGraphQLError("FORBIDDEN");
-    //   expect(data).toBeNull();
-    // });
-
-    it("throws error if update data is empty", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
-              id
-            }
-          }
-        `,
-        variables: {
-          id: subscriptionId,
-          data: {},
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("throws error if trying to update subscription with invalid URL", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
-              id
-            }
-          }
-        `,
-        variables: {
-          id: subscriptionId,
-          data: { eventsUrl: "invalid url!" },
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-  });
-
-  describe("deleteEventSubscription", () => {
-    it("deletes an user's subscription", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!) {
-            deleteEventSubscription(id: $id)
-          }
-        `,
-        variables: {
-          id: subscriptionId,
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.deleteEventSubscription).toEqual("SUCCESS");
-    });
-
-    it.todo("FIX: throws error if the trying to delete a subscription of another user");
-    // , async () => {
-    //   const { errors, data } = await testClient.mutate({
-    //     mutation: gql`
-    //       mutation ($id: GID!) {
-    //         deleteEventSubscriptionIntegration(id: $id)
-    //       }
-    //     `,
-    //     variables: {
-    //       id: toGlobalId("OrgIntegration", integrations[1].id),
-    //     },
-    //   });
-
-    //   expect(errors).toContainGraphQLError("FORBIDDEN");
-    //   expect(data).toBeNull();
-    // });
   });
 });

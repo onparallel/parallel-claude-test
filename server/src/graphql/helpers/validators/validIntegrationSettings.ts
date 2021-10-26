@@ -1,6 +1,5 @@
 import Ajv from "ajv";
 import { core } from "nexus";
-import { URL } from "url";
 import { IntegrationSettings } from "../../../db/repositories/IntegrationRepository";
 import { IntegrationType } from "../../../db/__types";
 import { ArgValidationError } from "../errors";
@@ -14,7 +13,6 @@ const schema = {
         { $ref: "#/definitions/signature" },
         { $ref: "#/definitions/sso" },
         { $ref: "#/definitions/userProvisioning" },
-        { $ref: "#/definitions/eventSubscription" },
       ],
     },
     signature: {
@@ -47,32 +45,12 @@ const schema = {
         AUTH_KEY: { type: "string" },
       },
     },
-    eventSubscription: {
-      type: "object",
-      additionalProperties: false,
-      required: ["EVENTS_URL"],
-      properties: {
-        EVENTS_URL: { type: "string", checkValidURL: true },
-      },
-    },
   },
   $ref: "#/definitions/root",
 };
 
 function validateIntegrationSettingsByType(type: IntegrationType, settings: any) {
   const validator = new Ajv();
-  validator.addKeyword({
-    keyword: "checkValidURL",
-    validate: function (runValidation: boolean, url: string) {
-      try {
-        if (runValidation) {
-          new URL(url);
-        }
-        return true;
-      } catch {}
-      return false;
-    },
-  });
 
   let validateFunction;
   if (type === "SIGNATURE") {
@@ -84,10 +62,6 @@ function validateIntegrationSettingsByType(type: IntegrationType, settings: any)
   } else if (type === "USER_PROVISIONING") {
     validateFunction = validator.compile<IntegrationSettings<"USER_PROVISIONING">>(
       schema.definitions.userProvisioning
-    );
-  } else if (type === "EVENT_SUBSCRIPTION") {
-    validateFunction = validator.compile<IntegrationSettings<"EVENT_SUBSCRIPTION">>(
-      schema.definitions.eventSubscription
     );
   } else {
     throw new Error(`Schema not defined for validating integration settings of type ${type}`);

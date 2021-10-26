@@ -7,33 +7,37 @@ import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function developerWebhookFailed(
   payload: {
-    org_integration_id: number;
+    petition_event_subscription_id: number;
     petition_id: number;
     error_message: string;
     post_body: any;
   },
   context: WorkerContext
 ) {
-  const petition = await context.petitions.loadPetition(payload.petition_id);
+  const [petition, subscription] = await Promise.all([
+    context.petitions.loadPetition(payload.petition_id),
+    context.subscriptions.loadSubscription(payload.petition_event_subscription_id),
+  ]);
   if (!petition) {
     throw new Error(`Petition not found for payload.petition_id ${payload.petition_id}`);
   }
-  const integration = await context.integrations.loadIntegration(payload.org_integration_id);
-  if (!integration) {
+  if (!subscription) {
     throw new Error(
-      `OrgIntegration not found for payload.org_integration_id ${payload.org_integration_id}`
+      `PetitionEventSubscription not found for payload.petition_event_subscription_id ${payload.petition_event_subscription_id}`
     );
   }
-  const integrationUser = await context.users.loadUser(integration.settings.USER_ID);
-  if (!integrationUser) {
-    throw new Error(`User not found for OrgIntegration:${payload.org_integration_id}`);
+  const subscribedUser = await context.users.loadUser(subscription.user_id);
+  if (!subscribedUser) {
+    throw new Error(
+      `User not found for PetitionEventSubscription:${payload.petition_event_subscription_id}`
+    );
   }
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,
     {
-      userName: fullName(integrationUser.first_name, integrationUser.last_name)!,
+      userName: fullName(subscribedUser.first_name, subscribedUser.last_name)!,
       errorMessage: payload.error_message,
       postBody: payload.post_body,
       ...layoutProps,
@@ -42,10 +46,10 @@ export async function developerWebhookFailed(
   );
   return await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),
-    to: integrationUser.email,
+    to: subscribedUser.email,
     subject,
     text,
     html,
-    created_from: `OrgIntegration:${payload.org_integration_id}`,
+    created_from: `PetitionEventSubscription:${payload.petition_event_subscription_id}`,
   });
 }

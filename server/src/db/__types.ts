@@ -16,7 +16,7 @@ export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
-export type IntegrationType = "EVENT_SUBSCRIPTION" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV" | "ROOT";
 
@@ -577,7 +577,6 @@ export type CreatePetitionEvent = PartialProps<Omit<PetitionEvent, "id">, "data"
 export interface PetitionEventSubscription {
   id: number; // int4
   user_id: number; // int4
-  petition_id: number; // int4
   endpoint: string; // varchar
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
@@ -585,11 +584,18 @@ export interface PetitionEventSubscription {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  is_enabled: boolean; // bool
 }
 
 export type CreatePetitionEventSubscription = PartialProps<
   Omit<PetitionEventSubscription, "id">,
-  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "is_enabled"
 >;
 
 export interface PetitionField {

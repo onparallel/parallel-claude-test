@@ -1,7 +1,9 @@
 import faker from "faker";
 import { Knex } from "knex";
 import { range } from "remeda";
+import { unMaybeArray } from "../../../util/arrays";
 import { hash, random } from "../../../util/token";
+import { MaybeArray } from "../../../util/types";
 import {
   Contact,
   ContactAuthentication,
@@ -12,6 +14,7 @@ import {
   CreateOrgIntegration,
   CreatePetition,
   CreatePetitionAccess,
+  CreatePetitionEventSubscription,
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreateTag,
@@ -25,6 +28,7 @@ import {
   OrgIntegration,
   Petition,
   PetitionAccess,
+  PetitionEventSubscription,
   PetitionField,
   PetitionFieldAttachment,
   PetitionFieldComment,
@@ -519,6 +523,17 @@ export class Mocks {
   async createOrgIntegration(data: CreateOrgIntegration) {
     const [row] = await this.knex<OrgIntegration>("org_integration").insert(data, "*");
     return row;
+  }
+
+  async createEventSubscription(data: MaybeArray<CreatePetitionEventSubscription>) {
+    const dataArr = unMaybeArray(data);
+    if (dataArr.length === 0) {
+      return [];
+    }
+    return await this.knex<PetitionEventSubscription>("petition_event_subscription").insert(
+      dataArr,
+      "*"
+    );
   }
 }
 
