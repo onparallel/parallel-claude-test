@@ -50,7 +50,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
             header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
             message: (
               <>
-                {rows && rows.length ? (
+                {rows && rows.length && rows.length < 16 ? (
                   <Text marginBottom={2}>
                     <FormattedMessage
                       id="contacts.import-from-excel.import-error.details"
