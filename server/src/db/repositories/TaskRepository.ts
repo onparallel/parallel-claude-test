@@ -12,7 +12,7 @@ export type TaskInput<TName extends TaskName> = {
   PRINT_PDF: { petitionId: string };
 }[TName];
 
-type TaskOutput<TName extends TaskName> = {
+export type TaskOutput<TName extends TaskName> = {
   EXPORT_REPLIES: {};
   PRINT_PDF: { url: string };
 }[TName];
