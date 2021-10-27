@@ -8082,6 +8082,33 @@ export type OrganizationSettingsQuery = {
     };
 };
 
+export type OrganizationIntegrationsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrganizationIntegrationsQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    email: string;
+    createdAt: string;
+    canCreateUsers: boolean;
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    avatarUrl?: Maybe<string>;
+    initials?: Maybe<string>;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+};
+
 export type OrganizationUsageQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationUsageQuery = {
@@ -18887,6 +18914,45 @@ export function useOrganizationSettingsLazyQuery(
 export type OrganizationSettingsQueryHookResult = ReturnType<typeof useOrganizationSettingsQuery>;
 export type OrganizationSettingsLazyQueryHookResult = ReturnType<
   typeof useOrganizationSettingsLazyQuery
+>;
+export const OrganizationIntegrationsDocument = gql`
+  query OrganizationIntegrations {
+    me {
+      id
+      ...SettingsLayout_User
+    }
+  }
+  ${SettingsLayout_UserFragmentDoc}
+`;
+export function useOrganizationIntegrationsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    OrganizationIntegrationsQuery,
+    OrganizationIntegrationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<OrganizationIntegrationsQuery, OrganizationIntegrationsQueryVariables>(
+    OrganizationIntegrationsDocument,
+    options
+  );
+}
+export function useOrganizationIntegrationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OrganizationIntegrationsQuery,
+    OrganizationIntegrationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<OrganizationIntegrationsQuery, OrganizationIntegrationsQueryVariables>(
+    OrganizationIntegrationsDocument,
+    options
+  );
+}
+export type OrganizationIntegrationsQueryHookResult = ReturnType<
+  typeof useOrganizationIntegrationsQuery
+>;
+export type OrganizationIntegrationsLazyQueryHookResult = ReturnType<
+  typeof useOrganizationIntegrationsLazyQuery
 >;
 export const OrganizationUsageDocument = gql`
   query OrganizationUsage {

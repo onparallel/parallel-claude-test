@@ -180,6 +180,7 @@ export const AppLayout = Object.assign(
                     <Button
                       variant="outline"
                       colorScheme="blue"
+                      backgroundColor="white"
                       size="sm"
                       marginX={2}
                       onClick={() => window.location.reload()}

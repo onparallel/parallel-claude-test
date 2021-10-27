@@ -65,6 +65,16 @@
     "context": "Recipients"
   },
   {
+    "term": "component.add-signature-apikey-dialog.apikey-label",
+    "definition": "API Key",
+    "context": "API Key"
+  },
+  {
+    "term": "component.add-signature-apikey-dialog.title",
+    "definition": "Add members to group",
+    "context": "Add members to group"
+  },
+  {
     "term": "component.app-layout.new-version-available",
     "definition": "There's a new release of Parallel available. Please refresh your browser for it to take effect.",
     "context": "There's a new release of Parallel available. Please refresh your browser for it to take effect."
@@ -3355,6 +3365,16 @@
     "context": "Actions"
   },
   {
+    "term": "generic.activate",
+    "definition": "Activate",
+    "context": "Activate"
+  },
+  {
+    "term": "generic.activated",
+    "definition": "Activated",
+    "context": "Activated"
+  },
+  {
     "term": "generic.add",
     "definition": "Add",
     "context": "Add"
@@ -3468,6 +3488,11 @@
     "term": "generic.confirm-delete-button",
     "definition": "Yes, delete",
     "context": "Yes, delete"
+  },
+  {
+    "term": "generic.contact",
+    "definition": "Contact",
+    "context": "Contact"
   },
   {
     "term": "generic.continue",
@@ -3960,6 +3985,11 @@
     "context": "The field is required"
   },
   {
+    "term": "generic.reset",
+    "definition": "Reset",
+    "context": "Reset"
+  },
+  {
     "term": "generic.save",
     "definition": "Save",
     "context": "Save"
@@ -4038,6 +4068,11 @@
     "term": "generic.test",
     "definition": "Test",
     "context": "Test"
+  },
+  {
+    "term": "generic.test-mode",
+    "definition": "Test mode",
+    "context": "Test mode"
   },
   {
     "term": "generic.thanks",
@@ -4380,6 +4415,11 @@
     "context": "Select a user from your organization"
   },
   {
+    "term": "organization.integrations.title",
+    "definition": "Integrations",
+    "context": "Integrations"
+  },
+  {
     "term": "organization.role.admin",
     "definition": "Administrator",
     "context": "Administrator"
@@ -4433,6 +4473,11 @@
     "term": "organizations.header.user-count",
     "definition": "Users",
     "context": "Users"
+  },
+  {
+    "term": "page.integrations.upgrade-plan-alert",
+    "definition": "Upgrade your plan to access integrations. Contact our support team support team for more information.",
+    "context": "Upgrade your plan to access integrations. Contact our support team support team for more information."
   },
   {
     "term": "page.petition-replies.export-pdf",
