@@ -12,10 +12,6 @@ import { webhooks } from "./webhooks";
 export function api(container: Container) {
   const logger = container.get<Logger>(LOGGER);
   return Router()
-    .use(((err, req, res, next) => {
-      logger.error(err?.message, { stack: err?.stack });
-      next(err);
-    }) as ErrorRequestHandler)
     .use((req, res, next) => {
       req.context = container.get<ApiContext>(ApiContext);
       next();
@@ -37,5 +33,9 @@ export function api(container: Container) {
     .use("/webhooks", webhooks)
     .use("/lambda", lambdas)
     .use("/v1", publicApi.handler())
-    .use("/docs", publicApi.spec());
+    .use("/docs", publicApi.spec())
+    .use(((err, req, res, next) => {
+      logger.error(err?.message, { stack: err?.stack });
+      next(err);
+    }) as ErrorRequestHandler);
 }
