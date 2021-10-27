@@ -81,6 +81,7 @@
     "slate-react": "^0.68.1",
     "smooth-scroll-into-view-if-needed": "^1.1.32",
     "styled-components": "^5.3.3",
+    "to-arraybuffer": "^1.0.1",
     "truncate-utf8-bytes": "^1.0.2",
     "ua-parser-js": "^1.0.1",
     "userflow.js": "^2.2.0"
