@@ -28,11 +28,20 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   for (const subscription of userSubscriptions) {
     const mappedEvent = mapEvent(event);
     try {
-      await fetch(subscription.endpoint, {
+      const { status, statusText } = await fetch(subscription.endpoint, {
         method: "POST",
         body: JSON.stringify(mappedEvent),
         headers: { "Content-Type": "application/json" },
       });
+
+      if (status !== 200) {
+        await ctx.emails.sendDeveloperWebhookFailedEmail(
+          subscription.id,
+          petition.id,
+          `Error ${status}: ${statusText} for POST ${subscription.endpoint}`,
+          mappedEvent
+        );
+      }
     } catch (e: any) {
       await ctx.emails.sendDeveloperWebhookFailedEmail(
         subscription.id,
