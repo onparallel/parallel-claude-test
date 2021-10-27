@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -7,8 +7,8 @@ import {
   FormControl,
   FormErrorMessage,
   Input,
-  InputRightElement,
   InputGroup,
+  InputRightElement,
   Spinner,
   Stack,
   Switch,
@@ -16,7 +16,6 @@ import {
 } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { EventSubscriptionCard_PetitionEventSubscriptionFragment } from "@parallel/graphql/__types";
-import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
 import { nextTick } from "process";
@@ -29,7 +28,7 @@ import { NormalLink } from "../common/Link";
 interface EventSubscriptionCardProps {
   subscription?: EventSubscriptionCard_PetitionEventSubscriptionFragment;
   onSwitchClicked: (isEnabled: boolean) => void;
-  onUpdateEventsUrl: (url: string) => void;
+  onUpdateEventsUrl: (url: string) => Promise<void>;
 }
 
 export function EventSubscriptionCard({
@@ -48,6 +47,7 @@ export function EventSubscriptionCard({
   });
 
   const [showConfig, setShowConfig] = useState(subscription?.isEnabled ?? false);
+  const [challengePassed, setChallengePassed] = useState(true);
   function handleSwitchChange(event: ChangeEvent<HTMLInputElement>) {
     setShowConfig(event.target.checked);
     onSwitchClicked(event.target.checked);
@@ -59,7 +59,7 @@ export function EventSubscriptionCard({
   const inputRef = useRef<HTMLInputElement>(null);
   const inputRegisterProps = useRegisterWithRef(inputRef, register, "eventsUrl", {
     required: true,
-    validate: { isValidUrl, challengePassed },
+    validate: { isValidUrl },
   });
 
   function isValidUrl(url: Maybe<string>) {
@@ -71,21 +71,22 @@ export function EventSubscriptionCard({
     return false;
   }
 
-  async function challengePassed(url: Maybe<string>) {
-    if (!url) return false;
-    const controller = new AbortController();
-    const requestTimeout = setTimeout(() => {
-      controller.abort();
-    }, 5000); // POST challenge is aborted after 5 seconds
-    const [, response] = await withError(
-      fetch(url, { method: "POST", signal: controller.signal, body: JSON.stringify({}) })
-    );
-    clearTimeout(requestTimeout);
-    return response?.status === 200 ?? false;
-  }
-
   return (
-    <Card as="form" onSubmit={handleSubmit(({ eventsUrl }) => onUpdateEventsUrl(eventsUrl!))}>
+    <Card
+      as="form"
+      onSubmit={handleSubmit(async ({ eventsUrl }) => {
+        try {
+          await onUpdateEventsUrl(eventsUrl!);
+        } catch (error: any) {
+          if (error instanceof ApolloError) {
+            const code = error.graphQLErrors[0]?.extensions?.code;
+            if (code === "WEBHOOK_CHALLENGE_FAILED") {
+              setChallengePassed(false);
+            }
+          }
+        }
+      })}
+    >
       <GenericCardHeader
         omitDivider
         rightAction={<Switch isChecked={showConfig} onChange={handleSwitchChange} />}
@@ -109,7 +110,7 @@ export function EventSubscriptionCard({
               defaultMessage="Request URL"
             />
 
-            {!formState.isSubmitting && formState.isSubmitSuccessful && (
+            {!formState.isSubmitting && formState.isSubmitSuccessful && challengePassed && (
               <Text marginLeft={1} color="green.500">
                 <FormattedMessage
                   id="settings.developers.subscriptions.input-saved"
@@ -118,7 +119,7 @@ export function EventSubscriptionCard({
               </Text>
             )}
           </Flex>
-          <FormControl id="eventsUrl" isInvalid={!!formState.errors.eventsUrl}>
+          <FormControl id="eventsUrl" isInvalid={!!formState.errors.eventsUrl || !challengePassed}>
             <Flex>
               <InputGroup>
                 <Input
@@ -128,7 +129,9 @@ export function EventSubscriptionCard({
                 <InputRightElement>
                   {formState.isSubmitting ? (
                     <Spinner color="gray.500" />
-                  ) : !formState.errors.eventsUrl && formState.isSubmitSuccessful ? (
+                  ) : !formState.errors.eventsUrl &&
+                    formState.isSubmitSuccessful &&
+                    challengePassed ? (
                     <CheckIcon color="green.500" />
                   ) : formState.isSubmitted ? (
                     <CloseIcon fontSize="sm" color="red.500" />
@@ -146,7 +149,7 @@ export function EventSubscriptionCard({
                   id="settings.developers.subscriptions.input-error.invalid-url"
                   defaultMessage="Please, provide a valid URL."
                 />
-              ) : formState.errors.eventsUrl?.type === "challengePassed" ? (
+              ) : !challengePassed ? (
                 <FormattedMessage
                   id="settings.developers.subscriptions.input-error.failed-challenge"
                   defaultMessage="Your URL does not seem to accept POST requests."

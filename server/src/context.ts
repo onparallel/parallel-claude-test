@@ -20,6 +20,7 @@ import { ANALYTICS, AnalyticsService } from "./services/analytics";
 import { AUTH, Auth } from "./services/auth";
 import { Aws, AWS_SERVICE } from "./services/aws";
 import { EMAILS, EmailsService } from "./services/emails";
+import { FetchService, FETCH_SERVICE } from "./services/fetch";
 import { LOGGER, Logger } from "./services/logger";
 import { PRINTER, Printer } from "./services/printer";
 import { SECURITY, SecurityService } from "./services/security";
@@ -43,6 +44,7 @@ export class ApiContext {
     @inject(SIGNATURE) public readonly signature: SignatureService,
     @inject(PRINTER) public readonly printer: Printer,
     @inject(AWS_SERVICE) public readonly aws: Aws,
+    @inject(FETCH_SERVICE) public readonly nodeFetch: FetchService,
 
     // Repositories
     public readonly contacts: ContactRepository,

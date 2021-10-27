@@ -3,6 +3,7 @@ import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
 import { AUTH, Auth, IAuth } from "./auth";
 import { Aws, AWS_SERVICE, IAws } from "./aws";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
+import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
 import { createLogger, Logger, LOGGER } from "./logger";
 import { IPrinter, Printer, PRINTER } from "./printer";
 import { IRedis, REDIS, Redis } from "./redis";
@@ -25,4 +26,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IStorage>(STORAGE_FACTORY).toFactory(() => {
     return ((...args) => new Storage(...args)) as StorageFactory;
   });
+  bind<IFetchService>(FETCH_SERVICE).to(FetchService);
 });

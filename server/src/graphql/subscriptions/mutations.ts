@@ -2,6 +2,8 @@ import { inputObjectType, mutationField, nonNull } from "nexus";
 import { isDefined } from "remeda";
 import { RESULT } from "..";
 import { PetitionEventSubscription } from "../../db/__types";
+import { FetchService } from "../../services/fetch";
+import { withError } from "../../util/promises/withError";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -9,6 +11,22 @@ import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validUrl } from "../helpers/validators/validUrl";
 import { userHasAccessToEventSubscription } from "./authorizers";
+
+async function challengeWebhookUrl(url: string, nodeFetch: FetchService) {
+  const controller = new AbortController();
+  const requestTimeout = setTimeout(() => {
+    controller.abort();
+  }, 5000); // POST challenge is aborted after 5 seconds
+  const [, response] = await withError(
+    nodeFetch.fetch(url, {
+      method: "POST",
+      signal: controller.signal as any,
+      body: JSON.stringify({}),
+    })
+  );
+  clearTimeout(requestTimeout);
+  return response?.status === 200 ?? false;
+}
 
 export const createEventSubscription = mutationField("createEventSubscription", {
   description: "Creates an event subscription for the user's petitions",
@@ -18,17 +36,25 @@ export const createEventSubscription = mutationField("createEventSubscription", 
     eventsUrl: nonNull("String"),
   },
   validateArgs: validUrl((args) => args.eventsUrl, "eventsUrl"),
-  resolve: async (_, args, ctx) => {
+  resolve: async (_, { eventsUrl }, ctx) => {
     const userSubscriptions = await ctx.subscriptions.loadSubscriptionsByUserId(ctx.user!.id);
     if (userSubscriptions.length > 0) {
       throw new WhitelistedError(`You already have a subscription`, "EXISTING_SUBSCRIPTION_ERROR");
+    }
+
+    const challengePassed = await challengeWebhookUrl(eventsUrl, ctx.nodeFetch);
+    if (!challengePassed) {
+      throw new WhitelistedError(
+        "Your URL does not seem to accept POST requests.",
+        "WEBHOOK_CHALLENGE_FAILED"
+      );
     }
 
     return await ctx.subscriptions.createSubscription(
       {
         user_id: ctx.user!.id,
         is_enabled: true,
-        endpoint: args.eventsUrl,
+        endpoint: eventsUrl,
       },
       `User:${ctx.user!.id}`
     );
@@ -61,7 +87,15 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionEventSubscription> = {};
     if (isDefined(args.data.eventsUrl)) {
-      data.endpoint = args.data.eventsUrl;
+      const challengePassed = await challengeWebhookUrl(args.data.eventsUrl, ctx.nodeFetch);
+      if (challengePassed) {
+        data.endpoint = args.data.eventsUrl;
+      } else {
+        throw new WhitelistedError(
+          "Your URL does not seem to accept POST requests.",
+          "WEBHOOK_CHALLENGE_FAILED"
+        );
+      }
     }
     if (isDefined(args.data.isEnabled)) {
       data.is_enabled = args.data.isEnabled;

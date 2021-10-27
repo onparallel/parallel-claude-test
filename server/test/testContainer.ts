@@ -3,6 +3,7 @@ import { ANALYTICS, IAnalyticsService } from "../src/services/analytics";
 import { AUTH, IAuth } from "../src/services/auth";
 import { AWS_SERVICE, IAws } from "../src/services/aws";
 import { EMAILS, IEmailsService } from "../src/services/emails";
+import { FETCH_SERVICE, IFetchService } from "../src/services/fetch";
 import { IRedis, REDIS } from "../src/services/redis";
 import { IStorage, StorageFactory, STORAGE_FACTORY } from "../src/services/storage";
 import {
@@ -10,6 +11,7 @@ import {
   MockAuth,
   MockAwsService,
   MockEmailsService,
+  MockNodeFetch,
   MockRedis,
   MockStorage,
 } from "./mocks";
@@ -25,5 +27,6 @@ export function createTestContainer() {
   container.rebind<IStorage>(STORAGE_FACTORY).toFactory(() => {
     return (() => new MockStorage()) as StorageFactory;
   });
+  container.rebind<IFetchService>(FETCH_SERVICE).to(MockNodeFetch);
   return container;
 }

@@ -1314,7 +1314,7 @@ api
       body: JsonBody(CreateSubscription),
       responses: {
         201: SuccessResponse(Subscription),
-        400: ErrorResponse({ description: "Invalid request body" }),
+        400: ErrorResponse({ description: "Invalid request" }),
         409: ErrorResponse({ description: "You already have a subscription" }),
       },
       tags: ["Subscriptions"],
@@ -1339,14 +1339,16 @@ api
         assert("id" in result.createEventSubscription);
         return Created(result.createEventSubscription);
       } catch (error: any) {
-        if (error instanceof ClientError && containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-          throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
-        }
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "EXISTING_SUBSCRIPTION_ERROR")
-        ) {
-          throw new BadRequestError("You already have a subscription.");
+        if (error instanceof ClientError) {
+          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
+          }
+          if (containsGraphQLError(error, "WEBHOOK_CHALLENGE_FAILED")) {
+            throw new BadRequestError(`Your URL does not seem to accept POST requests.`);
+          }
+          if (containsGraphQLError(error, "EXISTING_SUBSCRIPTION_ERROR")) {
+            throw new ConflictError("You already have a subscription.");
+          }
         }
         throw error;
       }

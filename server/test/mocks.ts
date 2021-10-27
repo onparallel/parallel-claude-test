@@ -1,10 +1,12 @@
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
+import { RequestInfo, RequestInit, Response } from "node-fetch";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { IAnalyticsService } from "../src/services/analytics";
 import { IAuth } from "../src/services/auth";
 import { IAws } from "../src/services/aws";
 import { IEmailsService } from "../src/services/emails";
+import { IFetchService } from "../src/services/fetch";
 import { IRedis } from "../src/services/redis";
 import { IStorage } from "../src/services/storage";
 
@@ -105,5 +107,12 @@ export class MockStorage implements IStorage {
   }
   async getSignedDownloadEndpoint() {
     return "";
+  }
+}
+
+@injectable()
+export class MockNodeFetch implements IFetchService {
+  fetch(url: RequestInfo, init?: RequestInit | undefined): Promise<Response> {
+    return Promise.resolve(new Response("OK", { status: 200 }));
   }
 }
