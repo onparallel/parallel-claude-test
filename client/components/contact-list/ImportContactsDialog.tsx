@@ -28,16 +28,15 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
   const intl = useIntl();
 
   const [fileDropError, setFileDropError] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
 
   const showErrorDialog = useErrorDialog();
 
-  const [bulkCreateContacts] = useImportContactsDialog_bulkCreateContactsMutation();
+  const [bulkCreateContacts, { loading: isUploading }] =
+    useImportContactsDialog_bulkCreateContactsMutation();
   async function handleFileDrop([file]: File[], rejected: FileRejection[]) {
     if (rejected.length > 0) {
       setFileDropError(rejected[0].errors[0].code);
     } else {
-      setIsUploading(true);
       try {
         const result = await bulkCreateContacts({
           variables: { file },
@@ -72,7 +71,6 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
           })
         );
       }
-      setIsUploading(false);
     }
   }
 
