@@ -28,9 +28,10 @@ export type LayoutProps = {
   logoAlt: string;
   assetsUrl: string;
   contentHeading?: Element | null;
-  optOutUrl?: string;
   useAlternativeSlogan?: boolean;
+  optOutUrl?: string;
   optOutText?: string;
+  omitGdprDisclaimer?: boolean;
   tone?: string;
 };
 
@@ -42,8 +43,9 @@ export const Layout: FC<LayoutProps> = function Layout({
   children,
   contentHeading,
   optOutUrl,
-  useAlternativeSlogan,
   optOutText,
+  useAlternativeSlogan,
+  omitGdprDisclaimer,
   tone,
 }) {
   const { locale } = useIntl();
@@ -162,7 +164,7 @@ export const Layout: FC<LayoutProps> = function Layout({
             <MjmlText align="center">
               <a
                 className="link"
-                href={`https://www.onparallel.com/${locale}/legal/terms?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+                href={`https://www.onparallel.com/${locale}/legal/terms?utm_source=parallel&utm_medium=email`}
               >
                 <FormattedMessage
                   id="layout.terms-and-conditions-link"
@@ -172,7 +174,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               <span> | </span>
               <a
                 className="link"
-                href={`https://www.onparallel.com/${locale}/legal/privacy?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+                href={`https://www.onparallel.com/${locale}/legal/privacy?utm_source=parallel&utm_medium=email`}
               >
                 <FormattedMessage id="layout.privacy-link" defaultMessage="Privacy" />
               </a>
@@ -186,11 +188,13 @@ export const Layout: FC<LayoutProps> = function Layout({
             ) : null}
           </MjmlColumn>
         </MjmlSection>
-        <MjmlSection>
-          <MjmlColumn>
-            <GdprDisclaimer />
-          </MjmlColumn>
-        </MjmlSection>
+        {omitGdprDisclaimer ? null : (
+          <MjmlSection>
+            <MjmlColumn>
+              <GdprDisclaimer />
+            </MjmlColumn>
+          </MjmlSection>
+        )}
       </MjmlBody>
     </Mjml>
   );

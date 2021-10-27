@@ -216,8 +216,8 @@
   },
   {
     "term": "invitation.details",
-    "definition": "To get started, log in with your email address and temporary password:",
-    "context": "To get started, log in with your email address and temporary password:"
+    "definition": "Get started by logging in with your email and temporary password:",
+    "context": "Get started by logging in with your email and temporary password:"
   },
   {
     "term": "invitation.email",
@@ -236,13 +236,13 @@
   },
   {
     "term": "invitation.subject",
-    "definition": "{organizationUser} invited you to join {organizationName} organization in Parallel 🎊",
-    "context": "{organizationUser} invited you to join {organizationName} organization in Parallel 🎊"
+    "definition": "{organizationUser} invited you to join {organizationName} on Parallel 🎊",
+    "context": "{organizationUser} invited you to join {organizationName} on Parallel 🎊"
   },
   {
     "term": "invitation.text",
-    "definition": "{organizationUser} has invited you to join {organizationName} organization in Parallel.",
-    "context": "{organizationUser} has invited you to join {organizationName} organization in Parallel."
+    "definition": "{organizationUser} has invited you to join {organizationName} on Parallel.",
+    "context": "{organizationUser} has invited you to join {organizationName} on Parallel."
   },
   {
     "term": "invitation.waiting-to-collaborate",

@@ -27,8 +27,7 @@ const email: Email<InvitationProps> = {
     return intl.formatMessage(
       {
         id: "invitation.subject",
-        defaultMessage:
-          "{organizationUser} invited you to join {organizationName} organization in Parallel 🎊",
+        defaultMessage: "{organizationUser} invited you to join {organizationName} on Parallel 🎊",
       },
       { organizationUser, organizationName }
     );
@@ -44,14 +43,14 @@ const email: Email<InvitationProps> = {
       {
         id: "invitation.text",
         defaultMessage:
-          "{organizationUser} has invited you to join {organizationName} organization in Parallel.",
+          "{organizationUser} has invited you to join {organizationName} on Parallel.",
       },
       { organizationName, organizationUser }
     )}
 
     ${intl.formatMessage({
       id: "invitation.details",
-      defaultMessage: "To get started, log in with your email address and temporary password:",
+      defaultMessage: "Get started by logging in with your email and temporary password:",
     })}
 
     ${intl.formatMessage(
@@ -90,21 +89,27 @@ const email: Email<InvitationProps> = {
   }: InvitationProps) {
     const { locale } = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        omitGdprDisclaimer
+      >
         <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingNewUser name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="invitation.text"
-                defaultMessage="{organizationUser} has invited you to join {organizationName} organization in Parallel."
+                defaultMessage="{organizationUser} has invited you to join {organizationName} on Parallel."
                 values={{ organizationUser, organizationName }}
               />
             </MjmlText>
             <MjmlText>
               <FormattedMessage
                 id="invitation.details"
-                defaultMessage="To get started, log in with your email address and temporary password:"
+                defaultMessage="Get started by logging in with your email and temporary password:"
               />
             </MjmlText>
             <MjmlSection backgroundColor="#F4F7F9" borderRadius="5px" padding="12px 16px">
