@@ -968,7 +968,7 @@ type Mutation {
   """
   Resets the given user password on AWS Cognito and sends an email with new temporary.
   """
-  resetUserPassword(email: String!): SupportMethodResponse!
+  resetUserPassword(email: String!, locale: PetitionLocale!): SupportMethodResponse!
 
   """
   Soft-deletes a given auth token, making it permanently unusable.

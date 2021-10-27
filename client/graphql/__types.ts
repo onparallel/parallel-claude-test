@@ -977,6 +977,7 @@ export interface MutationresetSignaturitOrganizationBrandingArgs {
 
 export interface MutationresetUserPasswordArgs {
   email: Scalars["String"];
+  locale: PetitionLocale;
 }
 
 export interface MutationrevokeUserAuthTokenArgs {

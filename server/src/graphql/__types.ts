@@ -3362,6 +3362,7 @@ export interface NexusGenArgTypes {
     resetUserPassword: {
       // args
       email: string; // String!
+      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     };
     revokeUserAuthToken: {
       // args

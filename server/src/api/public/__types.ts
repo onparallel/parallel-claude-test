@@ -943,6 +943,7 @@ export type MutationresetSignaturitOrganizationBrandingArgs = {
 
 export type MutationresetUserPasswordArgs = {
   email: Scalars["String"];
+  locale: Scalars["String"];
 };
 
 export type MutationrevokeUserAuthTokenArgs = {
@@ -2842,27 +2843,27 @@ export type VerificationCodeRequest = {
 
 export type PetitionFragment = {
   id: string;
-  name: string | null;
+  name: Maybe<string>;
   status: PetitionStatus;
-  deadline: string | null;
+  deadline: Maybe<string>;
   locale: PetitionLocale;
   createdAt: string;
-  fromTemplateId: string | null;
+  fromTemplateId: Maybe<string>;
 };
 
 export type TemplateFragment = {
   id: string;
-  name: string | null;
-  description: any | null;
+  name: Maybe<string>;
+  description: Maybe<any>;
   locale: PetitionLocale;
   createdAt: string;
 };
 
 export type UserFragment = {
   id: string;
-  fullName: string | null;
-  firstName: string | null;
-  lastName: string | null;
+  fullName: Maybe<string>;
+  firstName: Maybe<string>;
+  lastName: Maybe<string>;
 };
 
 export type UserGroupFragment = { id: string; name: string };
@@ -2870,9 +2871,9 @@ export type UserGroupFragment = { id: string; name: string };
 export type ContactFragment = {
   id: string;
   email: string;
-  fullName: string | null;
-  firstName: string | null;
-  lastName: string | null;
+  fullName: Maybe<string>;
+  firstName: Maybe<string>;
+  lastName: Maybe<string>;
   createdAt: string;
   updatedAt: string;
 };
@@ -2883,23 +2884,23 @@ export type PetitionAccessFragment = {
   reminderCount: number;
   remindersLeft: number;
   remindersActive: boolean;
-  nextReminderAt: string | null;
+  nextReminderAt: Maybe<string>;
   createdAt: string;
-  contact: {
+  contact: Maybe<{
     id: string;
     email: string;
-    fullName: string | null;
-    firstName: string | null;
-    lastName: string | null;
+    fullName: Maybe<string>;
+    firstName: Maybe<string>;
+    lastName: Maybe<string>;
     createdAt: string;
     updatedAt: string;
-  } | null;
-  granter: {
+  }>;
+  granter: Maybe<{
     id: string;
-    fullName: string | null;
-    firstName: string | null;
-    lastName: string | null;
-  } | null;
+    fullName: Maybe<string>;
+    firstName: Maybe<string>;
+    lastName: Maybe<string>;
+  }>;
 };
 
 export type Permission_PetitionUserGroupPermission_Fragment = {
@@ -2911,7 +2912,7 @@ export type Permission_PetitionUserGroupPermission_Fragment = {
 export type Permission_PetitionUserPermission_Fragment = {
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user: { id: string; fullName: string | null; firstName: string | null; lastName: string | null };
+  user: { id: string; fullName: Maybe<string>; firstName: Maybe<string>; lastName: Maybe<string> };
 };
 
 export type PermissionFragment =
@@ -2920,9 +2921,9 @@ export type PermissionFragment =
 
 export type PetitionFieldFragment = {
   id: string;
-  title: string | null;
+  title: Maybe<string>;
   type: PetitionFieldType;
-  fromPetitionFieldId: string | null;
+  fromPetitionFieldId: Maybe<string>;
 };
 
 export type PetitionFieldReplyFragment = {
@@ -2947,12 +2948,12 @@ export type GetPetitions_PetitionsQuery = {
     items: Array<
       | {
           id: string;
-          name: string | null;
+          name: Maybe<string>;
           status: PetitionStatus;
-          deadline: string | null;
+          deadline: Maybe<string>;
           locale: PetitionLocale;
           createdAt: string;
-          fromTemplateId: string | null;
+          fromTemplateId: Maybe<string>;
         }
       | {}
     >;
@@ -2968,12 +2969,12 @@ export type CreatePetition_PetitionMutation = {
   createPetition:
     | {
         id: string;
-        name: string | null;
+        name: Maybe<string>;
         status: PetitionStatus;
-        deadline: string | null;
+        deadline: Maybe<string>;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: string | null;
+        fromTemplateId: Maybe<string>;
       }
     | {};
 };
@@ -2983,18 +2984,18 @@ export type GetPetition_PetitionQueryVariables = Exact<{
 }>;
 
 export type GetPetition_PetitionQuery = {
-  petition:
+  petition: Maybe<
     | {
         id: string;
-        name: string | null;
+        name: Maybe<string>;
         status: PetitionStatus;
-        deadline: string | null;
+        deadline: Maybe<string>;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: string | null;
+        fromTemplateId: Maybe<string>;
       }
     | {}
-    | null;
+  >;
 };
 
 export type UpdatePetition_PetitionMutationVariables = Exact<{
@@ -3006,12 +3007,12 @@ export type UpdatePetition_PetitionMutation = {
   updatePetition:
     | {
         id: string;
-        name: string | null;
+        name: Maybe<string>;
         status: PetitionStatus;
-        deadline: string | null;
+        deadline: Maybe<string>;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: string | null;
+        fromTemplateId: Maybe<string>;
       }
     | {};
 };
@@ -3028,7 +3029,7 @@ export type GetPetitionRecipients_PetitionAccessesQueryVariables = Exact<{
 }>;
 
 export type GetPetitionRecipients_PetitionAccessesQuery = {
-  petition:
+  petition: Maybe<
     | {
         accesses: Array<{
           id: string;
@@ -3036,27 +3037,27 @@ export type GetPetitionRecipients_PetitionAccessesQuery = {
           reminderCount: number;
           remindersLeft: number;
           remindersActive: boolean;
-          nextReminderAt: string | null;
+          nextReminderAt: Maybe<string>;
           createdAt: string;
-          contact: {
+          contact: Maybe<{
             id: string;
             email: string;
-            fullName: string | null;
-            firstName: string | null;
-            lastName: string | null;
+            fullName: Maybe<string>;
+            firstName: Maybe<string>;
+            lastName: Maybe<string>;
             createdAt: string;
             updatedAt: string;
-          } | null;
-          granter: {
+          }>;
+          granter: Maybe<{
             id: string;
-            fullName: string | null;
-            firstName: string | null;
-            lastName: string | null;
-          } | null;
+            fullName: Maybe<string>;
+            firstName: Maybe<string>;
+            lastName: Maybe<string>;
+          }>;
         }>;
       }
     | {}
-    | null;
+  >;
 };
 
 export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
@@ -3064,7 +3065,7 @@ export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
 }>;
 
 export type CreatePetitionRecipients_ContactQuery = {
-  contacts: Array<{ id: string; firstName: string | null; lastName: string | null } | null>;
+  contacts: Array<Maybe<{ id: string; firstName: Maybe<string>; lastName: Maybe<string> }>>;
 };
 
 export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
@@ -3091,30 +3092,32 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
   sendPetition: {
-    accesses: Array<{
-      id: string;
-      status: PetitionAccessStatus;
-      reminderCount: number;
-      remindersLeft: number;
-      remindersActive: boolean;
-      nextReminderAt: string | null;
-      createdAt: string;
-      contact: {
+    accesses: Maybe<
+      Array<{
         id: string;
-        email: string;
-        fullName: string | null;
-        firstName: string | null;
-        lastName: string | null;
+        status: PetitionAccessStatus;
+        reminderCount: number;
+        remindersLeft: number;
+        remindersActive: boolean;
+        nextReminderAt: Maybe<string>;
         createdAt: string;
-        updatedAt: string;
-      } | null;
-      granter: {
-        id: string;
-        fullName: string | null;
-        firstName: string | null;
-        lastName: string | null;
-      } | null;
-    }> | null;
+        contact: Maybe<{
+          id: string;
+          email: string;
+          fullName: Maybe<string>;
+          firstName: Maybe<string>;
+          lastName: Maybe<string>;
+          createdAt: string;
+          updatedAt: string;
+        }>;
+        granter: Maybe<{
+          id: string;
+          fullName: Maybe<string>;
+          firstName: Maybe<string>;
+          lastName: Maybe<string>;
+        }>;
+      }>
+    >;
   };
 };
 
@@ -3123,13 +3126,13 @@ export type PetitionReplies_RepliesQueryVariables = Exact<{
 }>;
 
 export type PetitionReplies_RepliesQuery = {
-  petition:
+  petition: Maybe<
     | {
         fields: Array<{
           id: string;
-          title: string | null;
+          title: Maybe<string>;
           type: PetitionFieldType;
-          fromPetitionFieldId: string | null;
+          fromPetitionFieldId: Maybe<string>;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3141,9 +3144,9 @@ export type PetitionReplies_RepliesQuery = {
     | {
         fields: Array<{
           id: string;
-          title: string | null;
+          title: Maybe<string>;
           type: PetitionFieldType;
-          fromPetitionFieldId: string | null;
+          fromPetitionFieldId: Maybe<string>;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3152,7 +3155,7 @@ export type PetitionReplies_RepliesQuery = {
           }>;
         }>;
       }
-    | null;
+  >;
 };
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exact<{
@@ -3161,7 +3164,7 @@ export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exa
 }>;
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
-  fileUploadReplyDownloadLink: { url: string | null };
+  fileUploadReplyDownloadLink: { url: Maybe<string> };
 };
 
 export type GetPermissions_PermissionsQueryVariables = Exact<{
@@ -3169,7 +3172,7 @@ export type GetPermissions_PermissionsQueryVariables = Exact<{
 }>;
 
 export type GetPermissions_PermissionsQuery = {
-  petition:
+  petition: Maybe<
     | {
         permissions: Array<
           | {
@@ -3182,9 +3185,9 @@ export type GetPermissions_PermissionsQuery = {
               createdAt: string;
               user: {
                 id: string;
-                fullName: string | null;
-                firstName: string | null;
-                lastName: string | null;
+                fullName: Maybe<string>;
+                firstName: Maybe<string>;
+                lastName: Maybe<string>;
               };
             }
         >;
@@ -3201,14 +3204,14 @@ export type GetPermissions_PermissionsQuery = {
               createdAt: string;
               user: {
                 id: string;
-                fullName: string | null;
-                firstName: string | null;
-                lastName: string | null;
+                fullName: Maybe<string>;
+                firstName: Maybe<string>;
+                lastName: Maybe<string>;
               };
             }
         >;
       }
-    | null;
+  >;
 };
 
 export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
@@ -3230,9 +3233,9 @@ export type SharePetition_addPetitionPermissionMutation = {
           createdAt: string;
           user: {
             id: string;
-            fullName: string | null;
-            firstName: string | null;
-            lastName: string | null;
+            fullName: Maybe<string>;
+            firstName: Maybe<string>;
+            lastName: Maybe<string>;
           };
         }
     >;
@@ -3283,9 +3286,9 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
           createdAt: string;
           user: {
             id: string;
-            fullName: string | null;
-            firstName: string | null;
-            lastName: string | null;
+            fullName: Maybe<string>;
+            firstName: Maybe<string>;
+            lastName: Maybe<string>;
           };
         }
     >;
@@ -3304,8 +3307,8 @@ export type GetTemplates_TemplatesQuery = {
     items: Array<
       | {
           id: string;
-          name: string | null;
-          description: any | null;
+          name: Maybe<string>;
+          description: Maybe<any>;
           locale: PetitionLocale;
           createdAt: string;
         }
@@ -3319,16 +3322,16 @@ export type GetTemplate_TemplateQueryVariables = Exact<{
 }>;
 
 export type GetTemplate_TemplateQuery = {
-  template:
+  template: Maybe<
     | {
         id: string;
-        name: string | null;
-        description: any | null;
+        name: Maybe<string>;
+        description: Maybe<any>;
         locale: PetitionLocale;
         createdAt: string;
       }
     | {}
-    | null;
+  >;
 };
 
 export type DeleteTemplate_deletePetitionsMutationVariables = Exact<{
@@ -3350,9 +3353,9 @@ export type GetContacts_ContactsQuery = {
     items: Array<{
       id: string;
       email: string;
-      fullName: string | null;
-      firstName: string | null;
-      lastName: string | null;
+      fullName: Maybe<string>;
+      firstName: Maybe<string>;
+      lastName: Maybe<string>;
       createdAt: string;
       updatedAt: string;
     }>;
@@ -3367,9 +3370,9 @@ export type CreateContact_ContactMutation = {
   createContact: {
     id: string;
     email: string;
-    fullName: string | null;
-    firstName: string | null;
-    lastName: string | null;
+    fullName: Maybe<string>;
+    firstName: Maybe<string>;
+    lastName: Maybe<string>;
     createdAt: string;
     updatedAt: string;
   };
@@ -3380,15 +3383,15 @@ export type GetContact_ContactQueryVariables = Exact<{
 }>;
 
 export type GetContact_ContactQuery = {
-  contact: {
+  contact: Maybe<{
     id: string;
     email: string;
-    fullName: string | null;
-    firstName: string | null;
-    lastName: string | null;
+    fullName: Maybe<string>;
+    firstName: Maybe<string>;
+    lastName: Maybe<string>;
     createdAt: string;
     updatedAt: string;
-  } | null;
+  }>;
 };
 
 export type GetOrganizationUsers_UsersQueryVariables = Exact<{
@@ -3404,9 +3407,9 @@ export type GetOrganizationUsers_UsersQuery = {
         totalCount: number;
         items: Array<{
           id: string;
-          fullName: string | null;
-          firstName: string | null;
-          lastName: string | null;
+          fullName: Maybe<string>;
+          firstName: Maybe<string>;
+          lastName: Maybe<string>;
         }>;
       };
     };

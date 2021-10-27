@@ -195,16 +195,30 @@ export const resetUserPassword = mutationField("resetUserPassword", {
   type: "SupportMethodResponse",
   args: {
     email: nonNull(stringArg()),
+    locale: nonNull("PetitionLocale"),
   },
   authorize: supportMethodAccess(),
   validateArgs: validEmail((args) => args.email, "email"),
-  resolve: async (_, { email }, ctx) => {
+  resolve: async (_, { email, locale }, ctx) => {
     try {
-      await ctx.aws.resetUserPassword(email);
-      return {
-        result: RESULT.SUCCESS,
-        message: "User will receive an email with new temporary password.",
-      };
+      const user = await ctx.users.loadUserByEmail(email);
+      if (user) {
+        const organization = await ctx.organizations.loadOrg(user.org_id);
+        await ctx.aws.resetUserPassword(email, {
+          locale,
+          organizationName: organization!.name,
+          organizationUser: fullName(ctx.user!.first_name, ctx.user!.last_name),
+        });
+        return {
+          result: RESULT.SUCCESS,
+          message: "User will receive an email with new temporary password.",
+        };
+      } else {
+        return {
+          result: RESULT.FAILURE,
+          message: `User with email ${email} not found.`,
+        };
+      }
     } catch (error: any) {
       return {
         result: RESULT.FAILURE,

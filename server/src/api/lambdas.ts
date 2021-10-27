@@ -3,8 +3,8 @@ import { Handler, json, Router } from "express";
 import { Config } from "../config";
 import { buildEmail } from "../emails/buildEmail";
 import AccountVerification from "../emails/components/AccountVerification";
-import Invitation from "../emails/components/Invitation";
 import ForgotPassword from "../emails/components/ForgotPassword";
+import Invitation from "../emails/components/Invitation";
 import { fullName } from "../util/fullName";
 
 interface CustomMessageRequest {
@@ -39,84 +39,99 @@ function authenticateLambdaRequest(): Handler {
 
 function customMessageAccountVerificationResponse(): Handler {
   return async (req, res) => {
-    const {
-      userAttributes: { given_name: firstName, family_name: lastName, email },
-      clientMetadata: { locale },
-      codeParameter,
-    } = req.body;
+    try {
+      const {
+        userAttributes: { given_name: firstName, family_name: lastName, email },
+        clientMetadata: { locale },
+        codeParameter,
+      } = req.body;
 
-    const { subject, html } = await buildEmail(
-      AccountVerification,
-      {
-        userName: fullName(firstName, lastName) || email,
-        activationUrl: `${
-          process.env.PARALLEL_URL
-        }/api/auth/verify-email?email=${encodeURIComponent(
-          email
-        )}&code=${codeParameter}&locale=${locale}`,
-        ...layoutProps(req.context.config.misc),
-      },
-      { locale }
-    );
+      const { subject, html } = await buildEmail(
+        AccountVerification,
+        {
+          userName: fullName(firstName, lastName) || email,
+          activationUrl: `${
+            process.env.PARALLEL_URL
+          }/api/auth/verify-email?email=${encodeURIComponent(
+            email
+          )}&code=${codeParameter}&locale=${locale}`,
+          ...layoutProps(req.context.config.misc),
+        },
+        { locale }
+      );
 
-    res.json({
-      emailSubject: subject,
-      emailMessage: html,
-    });
+      res.json({
+        emailSubject: subject,
+        emailMessage: html,
+      });
+    } catch (error: any) {
+      req.context.logger.error(error?.message, { stack: error?.stack });
+      res.sendStatus(500).end();
+    }
   };
 }
 
 function customMessageUserInviteResponse(): Handler {
   return async (req, res) => {
-    const {
-      userAttributes: { given_name: firstName },
-      clientMetadata: { organizationName, organizationUser, locale },
-      usernameParameter,
-      codeParameter,
-    } = req.body as CustomMessageRequest;
+    try {
+      const {
+        userAttributes: { given_name: firstName },
+        clientMetadata: { organizationName, organizationUser, locale },
+        usernameParameter,
+        codeParameter,
+      } = req.body as CustomMessageRequest;
 
-    const { subject, html } = await buildEmail(
-      Invitation,
-      {
-        email: usernameParameter!,
-        password: codeParameter,
-        userName: firstName!,
-        organizationName: organizationName!,
-        organizationUser: organizationUser!,
-        ...layoutProps(req.context.config.misc),
-      },
-      { locale }
-    );
+      const { subject, html } = await buildEmail(
+        Invitation,
+        {
+          email: usernameParameter!,
+          password: codeParameter,
+          userName: firstName!,
+          organizationName: organizationName!,
+          organizationUser: organizationUser!,
+          ...layoutProps(req.context.config.misc),
+        },
+        { locale }
+      );
 
-    res.json({
-      emailSubject: subject,
-      emailMessage: html,
-    });
+      res.json({
+        emailSubject: subject,
+        emailMessage: html,
+      });
+    } catch (error: any) {
+      req.context.logger.error(error?.message, { stack: error?.stack });
+      res.sendStatus(500).end();
+    }
   };
 }
 
 function customMessageForgotPasswordResponse(): Handler {
   return async (req, res) => {
-    const {
-      userAttributes: { given_name: firstName },
-      clientMetadata: { locale },
-      codeParameter,
-    } = req.body as CustomMessageRequest;
+    try {
+      const {
+        userAttributes: { given_name: firstName },
+        clientMetadata: { locale },
+        codeParameter,
+      } = req.body as CustomMessageRequest;
 
-    const { subject, html } = await buildEmail(
-      ForgotPassword,
-      {
-        name: firstName!,
-        verificationCode: codeParameter,
-        ...layoutProps(req.context.config.misc),
-      },
-      { locale }
-    );
+      const { subject, html } = await buildEmail(
+        ForgotPassword,
+        {
+          name: firstName!,
+          verificationCode: codeParameter,
+          ...layoutProps(req.context.config.misc),
+        },
+        { locale }
+      );
 
-    res.json({
-      emailSubject: subject,
-      emailMessage: html,
-    });
+      res.json({
+        emailSubject: subject,
+        emailMessage: html,
+      });
+    } catch (error: any) {
+      req.context.logger.error(error?.message, { stack: error?.stack });
+      res.sendStatus(500).end();
+    }
   };
 }
 

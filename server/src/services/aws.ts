@@ -30,7 +30,14 @@ export interface IAws {
     },
     sendEmail?: boolean
   ): Promise<string | undefined>;
-  resetUserPassword(email: string): Promise<void>;
+  resetUserPassword(
+    email: string,
+    clientMetadata: {
+      organizationName: string;
+      organizationUser: string;
+      locale: string;
+    }
+  ): Promise<void>;
   signUpUser(
     email: string,
     password: string,
@@ -173,12 +180,16 @@ export class Aws implements IAws {
   }
 
   /** resends the email with temporary password to an already existing user */
-  async resetUserPassword(email: string) {
+  async resetUserPassword(
+    email: string,
+    clientMetadata: { organizationName: string; organizationUser: string; locale: string }
+  ) {
     await this.cognitoIdP
       .adminCreateUser({
         UserPoolId: this.config.cognito.defaultPoolId,
         Username: email,
         MessageAction: "RESEND",
+        ClientMetadata: clientMetadata,
       })
       .promise();
   }
