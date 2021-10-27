@@ -106,6 +106,7 @@ const email: Email<PetitionMessageProps> = {
           id: "layout.stop-receiving-emails",
           defaultMessage: "Stop receiving emails",
         })}
+        utmCampaign="recipients"
         tone={tone}
       >
         <MjmlSection padding="0">

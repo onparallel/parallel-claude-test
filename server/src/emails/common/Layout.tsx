@@ -19,6 +19,7 @@ import {
 } from "mjml-react";
 import { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { URLSearchParams } from "url";
 import { GdprDisclaimer } from "./GdprDisclaimer";
 
 export type LayoutProps = {
@@ -33,6 +34,7 @@ export type LayoutProps = {
   optOutText?: string;
   omitGdprDisclaimer?: boolean;
   tone?: string;
+  utmCampaign?: string;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -46,9 +48,15 @@ export const Layout: FC<LayoutProps> = function Layout({
   optOutText,
   useAlternativeSlogan,
   omitGdprDisclaimer,
+  utmCampaign,
   tone,
 }) {
   const { locale } = useIntl();
+  const utm = new URLSearchParams({
+    utm_source: "parallel",
+    utm_medium: "email",
+    ...(utmCampaign ? { utm_campaign: utmCampaign } : {}),
+  });
   return (
     <Mjml>
       <MjmlHead>
@@ -98,7 +106,7 @@ export const Layout: FC<LayoutProps> = function Layout({
           <MjmlColumn width="100%">
             {useAlternativeSlogan ? (
               <MjmlButton
-                href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+                href={`https://www.onparallel.com/${locale}?${utm}`}
                 innerPadding="6px 25px"
                 backgroundColor="white"
                 color="black"
@@ -121,7 +129,7 @@ export const Layout: FC<LayoutProps> = function Layout({
                   width="120px"
                   alt="Parallel"
                   src={`${assetsUrl}/static/emails/logo.png`}
-                  href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=users`}
+                  href={`https://www.onparallel.com/${locale}?${utm}`}
                 />
               </>
             )}
@@ -162,10 +170,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               C/Almogàvers 165, 59.203, 08018 | Barcelona, Spain
             </MjmlText>
             <MjmlText align="center">
-              <a
-                className="link"
-                href={`https://www.onparallel.com/${locale}/legal/terms?utm_source=parallel&utm_medium=email`}
-              >
+              <a className="link" href={`https://www.onparallel.com/${locale}/legal/terms?${utm}`}>
                 <FormattedMessage
                   id="layout.terms-and-conditions-link"
                   defaultMessage="Terms and conditions"
@@ -174,7 +179,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               <span> | </span>
               <a
                 className="link"
-                href={`https://www.onparallel.com/${locale}/legal/privacy?utm_source=parallel&utm_medium=email`}
+                href={`https://www.onparallel.com/${locale}/legal/privacy?${utm}`}
               >
                 <FormattedMessage id="layout.privacy-link" defaultMessage="Privacy" />
               </a>

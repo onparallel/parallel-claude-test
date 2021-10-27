@@ -71,6 +71,7 @@ const email: Email<SignatureCancelledProps> = {
           id: "signature-cancelled.subject",
           defaultMessage: "Cancelled signature request",
         })}
+        utmCampaign="recipients"
         tone={tone}
       >
         <MjmlSection padding="0">

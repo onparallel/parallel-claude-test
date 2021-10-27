@@ -167,6 +167,7 @@ const email: Email<PetitionReminderProps> = {
           id: "layout.stop-reminders",
           defaultMessage: "Stop receiving reminders",
         })}
+        utmCampaign="recipients"
         tone={tone}
       >
         <MjmlSection padding="0">

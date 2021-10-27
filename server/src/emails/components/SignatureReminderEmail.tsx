@@ -79,6 +79,7 @@ const email: Email<SignatureReminderProps> = {
           id: "signature-reminder.subject",
           defaultMessage: "Signature reminder",
         })}
+        utmCampaign="recipients"
         tone={tone}
       >
         <MjmlSection padding="0">

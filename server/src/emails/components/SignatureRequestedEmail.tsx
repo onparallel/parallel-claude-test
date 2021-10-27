@@ -84,6 +84,7 @@ const email: Email<SignatureRequestedProps> = {
           id: "signature-requested.subject",
           defaultMessage: "Signature requested",
         })}
+        utmCampaign="recipients"
         tone={tone}
       >
         <MjmlSection padding="0">

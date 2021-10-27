@@ -71,6 +71,7 @@ const email: Email<SignatureCompletedProps> = {
           id: "signature-completed.subject",
           defaultMessage: "Signature request completed",
         })}
+        utmCampaign="recipients"
         tone={tone}
       >
         <MjmlSection padding="0">

@@ -121,6 +121,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        utmCampaign="recipients"
         tone={tone}
       >
         <MjmlSection padding="0">
