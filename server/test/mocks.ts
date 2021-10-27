@@ -1,6 +1,6 @@
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
-import { RequestInfo, RequestInit, Response } from "node-fetch";
+import { Response } from "node-fetch";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { IAnalyticsService } from "../src/services/analytics";
 import { IAuth } from "../src/services/auth";
@@ -111,8 +111,11 @@ export class MockStorage implements IStorage {
 }
 
 @injectable()
-export class MockNodeFetch implements IFetchService {
-  fetch(url: RequestInfo, init?: RequestInit | undefined): Promise<Response> {
-    return Promise.resolve(new Response("OK", { status: 200 }));
+export class MockFetchService implements IFetchService {
+  async fetch() {
+    return new Response("OK", { status: 200 });
+  }
+  async fetchWithTimeout() {
+    return new Response("OK", { status: 200 });
   }
 }

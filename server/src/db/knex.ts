@@ -1,14 +1,14 @@
 import { interfaces } from "inversify";
 import { Knex, knex } from "knex";
 import { CONFIG, Config } from "../config";
-import { LOGGER, Logger } from "../services/logger";
+import { LOGGER, ILogger } from "../services/logger";
 import "./helpers/knexExtensions";
 
 export const KNEX = Symbol.for("KNEX");
 
 export function createKnex({ container }: interfaces.Context): Knex {
   const config = container.get<Config>(CONFIG);
-  const logger = container.get<Logger>(LOGGER);
+  const logger = container.get<ILogger>(LOGGER);
   const instance = knex({
     client: "pg",
     connection: config.db,

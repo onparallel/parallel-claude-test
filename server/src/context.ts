@@ -21,7 +21,7 @@ import { AUTH, Auth } from "./services/auth";
 import { Aws, AWS_SERVICE } from "./services/aws";
 import { EMAILS, EmailsService } from "./services/emails";
 import { FetchService, FETCH_SERVICE } from "./services/fetch";
-import { LOGGER, Logger } from "./services/logger";
+import { LOGGER, ILogger } from "./services/logger";
 import { PRINTER, Printer } from "./services/printer";
 import { SECURITY, SecurityService } from "./services/security";
 import { SIGNATURE, SignatureService } from "./services/signature";
@@ -36,7 +36,7 @@ export class ApiContext {
   req!: express.Request;
   constructor(
     @inject(CONFIG) public config: Config,
-    @inject(LOGGER) public logger: Logger,
+    @inject(LOGGER) public logger: ILogger,
     // Services
     @inject(AUTH) public readonly auth: Auth,
     @inject(EMAILS) public readonly emails: EmailsService,
@@ -44,7 +44,7 @@ export class ApiContext {
     @inject(SIGNATURE) public readonly signature: SignatureService,
     @inject(PRINTER) public readonly printer: Printer,
     @inject(AWS_SERVICE) public readonly aws: Aws,
-    @inject(FETCH_SERVICE) public readonly nodeFetch: FetchService,
+    @inject(FETCH_SERVICE) public readonly fetch: FetchService,
 
     // Repositories
     public readonly contacts: ContactRepository,
@@ -67,7 +67,7 @@ export class ApiContext {
 export class WorkerContext {
   constructor(
     @inject(CONFIG) public config: Config,
-    @inject(LOGGER) public logger: Logger,
+    @inject(LOGGER) public logger: ILogger,
     // Services
     @inject(AWS_SERVICE) public readonly aws: Aws,
     public readonly smtp: Smtp,

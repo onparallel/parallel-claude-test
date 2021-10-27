@@ -2,7 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "target": "es2019",
-    "lib": ["es2020"],
+    "lib": ["esnext"],
     "module": "commonjs",
     "jsx": "react-jsxdev",
     "experimentalDecorators": true,

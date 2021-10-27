@@ -14,7 +14,7 @@ import { createContainer } from "./container";
 import { ApiContext } from "./context";
 import { UnknownError } from "./graphql/helpers/errors";
 import { schema } from "./schema";
-import { LOGGER, Logger } from "./services/logger";
+import { LOGGER, ILogger } from "./services/logger";
 import { stopwatchEnd } from "./util/stopwatch";
 
 const app = express();
@@ -88,7 +88,7 @@ server.start().then(() => {
 
   app.listen(port, () => {
     const host = `http://localhost:${port}`;
-    const logger = container.get<Logger>(LOGGER);
+    const logger = container.get<ILogger>(LOGGER);
     logger.info(`Ready on ${host}`);
     if (process.env.NODE_ENV !== "production") {
       logger.info(`GraphQL playground available on ${host}${server.graphqlPath}`);

@@ -1338,7 +1338,7 @@ api
 
         assert("id" in result.createEventSubscription);
         return Created(result.createEventSubscription);
-      } catch (error: any) {
+      } catch (error) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
             throw new BadRequestError("Invalid request body. Please verify your eventsUrl");

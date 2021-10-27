@@ -7,7 +7,7 @@ import { Config, CONFIG } from "../config";
 import { PetitionEvent, SystemEvent } from "../db/events";
 import { unMaybeArray } from "../util/arrays";
 import { MaybeArray } from "../util/types";
-import { LOGGER, Logger } from "./logger";
+import { LOGGER, ILogger } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
 export interface IAws {
@@ -87,7 +87,7 @@ export class Aws implements IAws {
 
   constructor(
     @inject(CONFIG) private config: Config,
-    @inject(LOGGER) private logger: Logger,
+    @inject(LOGGER) private logger: ILogger,
     @inject(STORAGE_FACTORY)
     private storageFactory: interfaces.Factory<IStorage>
   ) {

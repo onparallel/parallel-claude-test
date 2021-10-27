@@ -5,7 +5,7 @@ import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
-import { LOGGER, Logger } from "../../services/logger";
+import { LOGGER, ILogger } from "../../services/logger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 
@@ -55,7 +55,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
       "Start listening to the queue",
       () => {},
       () => {
-        const logger = container.get<Logger>(LOGGER);
+        const logger = container.get<ILogger>(LOGGER);
         const config = container.get<Config>(CONFIG);
         AWS.config.update({
           ...config.aws,

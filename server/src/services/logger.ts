@@ -6,7 +6,19 @@ import stringify from "fast-safe-stringify";
 
 export const LOGGER = Symbol.for("LOGGER");
 
-export function createLogger({ container }: interfaces.Context) {
+export interface LogMethod {
+  (...messages: any[]): void;
+}
+
+export interface ILogger {
+  readonly log: LogMethod;
+  readonly info: LogMethod;
+  readonly warn: LogMethod;
+  readonly error: LogMethod;
+  readonly debug: LogMethod;
+}
+
+export function createLogger({ container }: interfaces.Context): ILogger {
   const config = container.get<Config>(CONFIG);
   const logger = winston.createLogger({
     transports: [
@@ -37,5 +49,3 @@ export function createLogger({ container }: interfaces.Context) {
   });
   return logger;
 }
-
-export type { Logger } from "winston";

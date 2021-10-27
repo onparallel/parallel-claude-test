@@ -12,19 +12,10 @@ import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validUrl } from "../helpers/validators/validUrl";
 import { userHasAccessToEventSubscription } from "./authorizers";
 
-async function challengeWebhookUrl(url: string, nodeFetch: FetchService) {
-  const controller = new AbortController();
-  const requestTimeout = setTimeout(() => {
-    controller.abort();
-  }, 5000); // POST challenge is aborted after 5 seconds
+async function challengeWebhookUrl(url: string, fetch: FetchService) {
   const [, response] = await withError(
-    nodeFetch.fetch(url, {
-      method: "POST",
-      signal: controller.signal as any,
-      body: JSON.stringify({}),
-    })
+    fetch.fetchWithTimeout(url, { method: "POST", body: JSON.stringify({}) }, 5000)
   );
-  clearTimeout(requestTimeout);
   return response?.status === 200 ?? false;
 }
 
@@ -42,7 +33,7 @@ export const createEventSubscription = mutationField("createEventSubscription", 
       throw new WhitelistedError(`You already have a subscription`, "EXISTING_SUBSCRIPTION_ERROR");
     }
 
-    const challengePassed = await challengeWebhookUrl(eventsUrl, ctx.nodeFetch);
+    const challengePassed = await challengeWebhookUrl(eventsUrl, ctx.fetch);
     if (!challengePassed) {
       throw new WhitelistedError(
         "Your URL does not seem to accept POST requests.",
@@ -87,7 +78,7 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionEventSubscription> = {};
     if (isDefined(args.data.eventsUrl)) {
-      const challengePassed = await challengeWebhookUrl(args.data.eventsUrl, ctx.nodeFetch);
+      const challengePassed = await challengeWebhookUrl(args.data.eventsUrl, ctx.fetch);
       if (challengePassed) {
         data.endpoint = args.data.eventsUrl;
       } else {

@@ -4,12 +4,20 @@ import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 export const FETCH_SERVICE = Symbol.for("FETCH_SERVICE");
 
 export interface IFetchService {
-  fetch(...args: Parameters<typeof fetch>): ReturnType<typeof fetch>;
+  fetch(url: RequestInfo, init: RequestInit): Promise<Response>;
+  fetchWithTimeout(url: RequestInfo, init: RequestInit, timeout: number): Promise<Response>;
 }
 
 @injectable()
 export class FetchService implements IFetchService {
-  fetch(url: RequestInfo, init?: RequestInit | undefined): Promise<Response> {
-    return fetch(url, init);
+  readonly fetch = fetch;
+  async fetchWithTimeout(url: RequestInfo, init: RequestInit, timeout: number) {
+    const controller = new AbortController();
+    const cancelTimeout = setTimeout(() => {
+      controller.abort();
+    }, timeout);
+    const result = await fetch(url, { ...init, signal: controller.signal as any });
+    clearTimeout(cancelTimeout);
+    return result;
   }
 }

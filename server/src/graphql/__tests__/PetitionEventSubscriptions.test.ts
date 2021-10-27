@@ -5,6 +5,7 @@ import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { PetitionEventSubscription, User } from "../../db/__types";
+import { FETCH_SERVICE, IFetchService } from "../../services/fetch";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -89,6 +90,8 @@ describe("GraphQL/PetitionEventSubscription", () => {
   let subscriptionId: string;
   describe("createEventSubscription", () => {
     it("creates and returns a new subscription for the user's petitions", async () => {
+      const fetch = testClient.container.get<IFetchService>(FETCH_SERVICE);
+      const spy = jest.spyOn(fetch, "fetchWithTimeout");
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($eventsUrl: String!) {
@@ -109,6 +112,11 @@ describe("GraphQL/PetitionEventSubscription", () => {
         eventsUrl: "https://www.example.com/api",
       });
       subscriptionId = data!.createEventSubscription.id;
+      expect(spy).toHaveBeenCalledWith(
+        "https://www.example.com/api",
+        expect.anything(),
+        expect.anything()
+      );
     });
 
     it("throws error if trying to create a second subscription", async () => {
@@ -159,6 +167,8 @@ describe("GraphQL/PetitionEventSubscription", () => {
     });
 
     it("updates the settings of a subscription ", async () => {
+      const fetch = testClient.container.get<IFetchService>(FETCH_SERVICE);
+      const spy = jest.spyOn(fetch, "fetchWithTimeout");
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
@@ -177,6 +187,11 @@ describe("GraphQL/PetitionEventSubscription", () => {
           },
         },
       });
+      expect(spy).toHaveBeenCalledWith(
+        "https://www.example.com/new-api",
+        expect.anything(),
+        expect.anything()
+      );
 
       expect(errors).toBeUndefined();
       expect(data?.updateEventSubscription).toEqual({

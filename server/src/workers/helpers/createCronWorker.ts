@@ -4,7 +4,7 @@ import { EventEmitter } from "events";
 import { Config, CONFIG } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
-import { LOGGER, Logger } from "../../services/logger";
+import { LOGGER, ILogger } from "../../services/logger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 import yargs from "yargs";
@@ -36,7 +36,7 @@ export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
       "Start the cron job",
       () => {},
       () => {
-        const logger = container.get<Logger>(LOGGER);
+        const logger = container.get<ILogger>(LOGGER);
         let running = false;
         const events = new EventEmitter();
         const job = new CronJob(config.cronWorkers[name].rule, async function () {
