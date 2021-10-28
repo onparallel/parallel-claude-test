@@ -322,9 +322,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const runTask = useTaskRunner();
   const handleExportPetitionPDF = async () => {
-    const [error, output] = await runTask("PRINT_PDF", { petitionId: petition.id });
-    if (!error) {
-      window.open(output!.url, "_blank");
+    const output = await runTask("PRINT_PDF", { petitionId: petition.id });
+    if (output) {
+      window.open(output.url, "_blank");
     }
   };
 

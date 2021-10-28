@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Button, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@chakra-ui/react";
 import { BaseDialog } from "@parallel/components/common/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { ProgressIndicator, ProgressTrack } from "@parallel/components/common/Progress";
 import {
   useTaskRunner_TaskFragment,
@@ -24,8 +25,10 @@ type TaskOutput<TName extends TaskName> = {
 }[TName];
 
 export function useTaskRunner() {
+  const intl = useIntl();
   const [createTask] = useuseTaskRunner_createTaskMutation();
   const showTaskProgressDialog = useDialog(TaskProgressDialog);
+  const showErrorDialog = useErrorDialog();
 
   return async function runTask<TName extends TaskName>(
     name: TName,
@@ -33,9 +36,21 @@ export function useTaskRunner() {
     pollInterval = 1000
   ) {
     const { data } = await createTask({ variables: { name, input } });
-    return await withError<Error, TaskOutput<TName>>(
+    const [error, output] = await withError<Error, TaskOutput<TName>>(
       showTaskProgressDialog({ task: data!.createTask, pollInterval })
     );
+
+    if (error?.message === "SERVER_ERROR") {
+      await showErrorDialog({
+        message: intl.formatMessage({
+          id: "component.task-progress-dialog.server-error",
+          defaultMessage: "An unexpected error happened, please try again.",
+        }),
+      });
+      return null;
+    } else {
+      return output;
+    }
   };
 }
 
@@ -54,6 +69,9 @@ function TaskProgressDialog({
       if (updatedData.task.status === "COMPLETED") {
         clearInterval(interval);
         props.onResolve(updatedData.task.output);
+      } else if (updatedData.task.status === "CANCELLED") {
+        clearInterval(interval);
+        props.onReject("SERVER_ERROR");
       }
     });
   }, pollInterval || 1000);
