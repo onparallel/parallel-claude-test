@@ -2745,6 +2745,11 @@
     "context": "Generating PDF file"
   },
   {
+    "term": "component.task-progress-dialog.server-error",
+    "definition": "Ocurrió un error inesperado, por favor intenta nuevamente.",
+    "context": "An unexpected error happened, please try again."
+  },
+  {
     "term": "component.task-progress-dialog.unknown-task.header",
     "definition": "Por favor, espere...",
     "context": "Please wait..."
