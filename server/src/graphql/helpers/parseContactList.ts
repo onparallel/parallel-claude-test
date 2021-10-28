@@ -11,9 +11,14 @@ export function parseContactList(data: string[][]): ParsedContact[] {
   const errors = [] as ExcelParsingError[];
 
   // first row is column headers
-  const parsedContacts = data.slice(1).reduce((acc, row, index) => {
+  const dataSliced = data.slice(1);
+
+  const parsedContacts = [] as ParsedContact[];
+
+  for (let index = 0; index < dataSliced.length; index++) {
+    const row = dataSliced[index];
     // empty rows are ignored
-    if (!row.some((c) => !!c)) return acc;
+    if (!row.some((c) => !!c)) continue;
 
     // the columns are parsed to ParsedContact and the possible errors are stored with their row and column
     const firstName = row[0]?.trim();
@@ -27,8 +32,8 @@ export function parseContactList(data: string[][]): ParsedContact[] {
     }
 
     // we add the new contact to the cumulative array
-    return [...acc, { firstName, lastName, email }];
-  }, [] as ParsedContact[]);
+    parsedContacts.push({ firstName, lastName, email });
+  }
 
   if (errors.length) {
     throw new AggregateError(errors, errors[0].message);
