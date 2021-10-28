@@ -377,7 +377,7 @@ export function PublicLinkSettingsDialog({
               <Text as="span" marginLeft={0.5}>
                 *
               </Text>
-              <HelpPopover marginLeft={2}>
+              <HelpPopover>
                 <Text fontSize="sm">
                   <FormattedMessage
                     id="component.settings-public-link-dialog.link-popover"

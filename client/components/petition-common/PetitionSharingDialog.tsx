@@ -308,7 +308,7 @@ export function PetitionSharingDialog({
                     id="component.petition-sharing-dialog.subscribe"
                     defaultMessage="Subscribe to notifications"
                   />
-                  <HelpPopover marginLeft={2}>
+                  <HelpPopover>
                     <FormattedMessage
                       id="component.petition-sharing-dialog.subscribe-help"
                       defaultMessage="Users will receive notifications about the activity of this petition."

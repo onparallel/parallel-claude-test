@@ -27,7 +27,7 @@ import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver from "react-resize-observer";
 
 export type PublicPetitionInitialFormInputs = {
@@ -52,6 +52,7 @@ export function PublicPetitionInitialForm({
   isLoading,
 }: PublicPetitionInitialFormProps) {
   const router = useRouter();
+  const intl = useIntl();
 
   const supportUrl =
     {
@@ -259,7 +260,12 @@ export function PublicPetitionInitialForm({
                 </Text>
               </HStack>
             </ModalHeader>
-            <ModalCloseButton marginTop={2} />
+            <ModalCloseButton
+              aria-label={intl.formatMessage({
+                id: "generic.close",
+                defaultMessage: "Close",
+              })}
+            />
             <ModalBody>
               <Stack spacing={4}>
                 <Text>

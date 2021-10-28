@@ -162,7 +162,7 @@ export function ClosePetitionDialog({
                             id="component.close-petition-dialog.attach-pdf-export.title"
                             defaultMessage="PDF export title"
                           />
-                          <HelpPopover marginLeft={2} placement="auto">
+                          <HelpPopover placement="auto">
                             <FormattedMessage
                               id="component.close-petition-dialog.attach-pdf-export.title.help"
                               defaultMessage="This will be the name of the attached PDF file."

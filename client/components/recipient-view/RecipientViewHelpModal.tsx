@@ -107,7 +107,6 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
     <BaseDialog {...props} size="md">
       <ModalContent overflow="hidden">
         <ModalCloseButton
-          top={4}
           aria-label={intl.formatMessage({
             id: "generic.close",
             defaultMessage: "Close",

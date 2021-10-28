@@ -163,7 +163,6 @@ export function AddPetitionAccessDialog({
           {canAddRecipientGroups ? (
             <HelpPopover
               popoverWidth="container.2xs"
-              marginLeft={2}
               color="blue.200"
               _hover={{ color: "blue.300" }}
             >

@@ -213,7 +213,7 @@ export function PetitionRepliesFieldComments({
                       defaultMessage="Internal comment"
                     />
                   </Checkbox>
-                  <HelpPopover marginLeft={2}>
+                  <HelpPopover>
                     <FormattedMessage
                       id="petition-replies.internal-comment-check.help"
                       defaultMessage="By checking this field, the comment will be visible only to users in your organization."

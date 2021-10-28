@@ -82,7 +82,7 @@ export function PublicSignupFormOrganization({
               id="component.public-signup-form-organization.company-name-label"
               defaultMessage="Company name*"
             />
-            <HelpPopover marginLeft={2}>
+            <HelpPopover>
               <Text fontSize="sm">
                 <FormattedMessage
                   id="component.public-signup-form-organization.company-name-description"

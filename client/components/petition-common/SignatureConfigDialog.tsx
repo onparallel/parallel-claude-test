@@ -199,7 +199,7 @@ export function SignatureConfigDialog({
                 id="component.signature-config-dialog.title-label"
                 defaultMessage="Title of the document"
               />
-              <HelpPopover marginLeft={2} color="gray.300">
+              <HelpPopover>
                 <FormattedMessage
                   id="component.signature-config-dialog.title-help"
                   defaultMessage="We will use this as the title of the signing document"
@@ -307,7 +307,7 @@ export function SignatureConfigDialog({
                 defaultMessage="Allow the recipient to choose signers"
               />
             </Checkbox>
-            <HelpPopover marginLeft={2} color="gray.300">
+            <HelpPopover>
               <FormattedMessage
                 id="component.signature-config-dialog.allow-recipient-to-choose.help"
                 defaultMessage="If this option is disabled, only the assigned people will be able to sign."

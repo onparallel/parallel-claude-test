@@ -274,7 +274,7 @@ function _PetitionSettings({
         <FormControl id="petition-deadline">
           <FormLabel display="flex" alignItems="center">
             <FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />
-            <HelpPopover marginLeft={2}>
+            <HelpPopover>
               <Text fontSize="sm">
                 <FormattedMessage
                   id="component.petition-settings.deadline-description"
@@ -587,7 +587,7 @@ function SwitchSetting({
         {icon ? <Flex marginRight={1}>{icon}</Flex> : null}
         {title}
         {help ? (
-          <HelpPopover marginLeft={2}>
+          <HelpPopover>
             <Text fontSize="sm">{help}</Text>
           </HelpPopover>
         ) : null}

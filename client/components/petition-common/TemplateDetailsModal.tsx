@@ -111,7 +111,6 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
             )}
           </ModalHeader>
           <ModalCloseButton
-            right={3}
             aria-label={intl.formatMessage({
               id: "generic.close",
               defaultMessage: "Close",

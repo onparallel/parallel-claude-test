@@ -283,7 +283,7 @@ export function SettingsRow({
     <FormControl display="flex" alignItems="center" id={controlId} {...props}>
       <FormLabel display="flex" alignItems="center" fontWeight="normal" margin={0}>
         {label}
-        <HelpPopover marginLeft={2}>{description}</HelpPopover>
+        <HelpPopover>{description}</HelpPopover>
       </FormLabel>
       <Spacer minWidth={4} />
       {children}

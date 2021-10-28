@@ -169,7 +169,6 @@ export function RecipientViewPetitionFieldCommentsDialog({
       <ModalContent maxHeight="calc(100vh - 7.5rem)">
         <ModalCloseButton
           ref={closeRef}
-          right={3}
           aria-label={intl.formatMessage({
             id: "generic.close",
             defaultMessage: "Close",

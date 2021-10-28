@@ -320,7 +320,7 @@ export function RecipientViewHeader({
                         />
                       </Text>
                     </Button>
-                    <HelpPopover color="gray.300" _hover={{ color: "gray.400" }} marginLeft={2}>
+                    <HelpPopover>
                       <FormattedMessage
                         id="recipient-view.invite-collaborator.help"
                         defaultMessage="Use this option to request someone else to complete the information for you."

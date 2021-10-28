@@ -186,6 +186,14 @@ export const theme = extendTheme({
         colorScheme: "green",
       },
     },
+    Modal: {
+      baseStyle: {
+        closeButton: {
+          top: 4,
+          right: 3,
+        },
+      },
+    },
   },
 });
 
