@@ -2735,6 +2735,21 @@
     "context": "Remove tag \"{tag}\""
   },
   {
+    "term": "component.task-progress-dialog.export-replies.header",
+    "definition": "Exportando respuestas",
+    "context": "Exporting replies"
+  },
+  {
+    "term": "component.task-progress-dialog.print-pdf.header",
+    "definition": "Generando archivo PDF",
+    "context": "Generating PDF file"
+  },
+  {
+    "term": "component.task-progress-dialog.unknown-task.header",
+    "definition": "Por favor, espere...",
+    "context": "Please wait..."
+  },
+  {
     "term": "component.template-card.active-link",
     "definition": "Enlace activado",
     "context": "Enabled link"
@@ -2818,11 +2833,6 @@
     "term": "component.third-party.preferences-save",
     "definition": "Guardar preferencias",
     "context": "Save preferences"
-  },
-  {
-    "term": "component.upgrade-plan-popover.text",
-    "definition": "Esta funcionalidad no está disponible en tu plan actual. <a>Actualiza tu plan</a> para activarla",
-    "context": "This feature is not available on your current plan. <a>Upgrade your plan</a> to enable it."
   },
   {
     "term": "component.user-menu.log-out",
