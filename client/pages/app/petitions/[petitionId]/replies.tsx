@@ -15,6 +15,8 @@ import {
   ChevronDownIcon,
   CommentIcon,
   DownloadIcon,
+  FilePdfIcon,
+  FileZipIcon,
   ListIcon,
   RepeatIcon,
   ThumbUpIcon,
@@ -28,7 +30,7 @@ import {
   withDialogs,
 } from "@parallel/components/common/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
-import { FilePdfIcon, FileZipIcon } from "@parallel/components/common/FileIcon";
+
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
