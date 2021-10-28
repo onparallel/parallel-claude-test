@@ -40,6 +40,7 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
+import { useTaskRunner } from "@parallel/utils/useTaskRunner";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -201,8 +202,12 @@ export function PetitionHeader({
     } catch {}
   }, [petition.id]);
 
+  const runTask = useTaskRunner();
   const handleExportPetitionPDF = async () => {
-    window.open(`/api/downloads/petition/${petition.id}/pdf`, "_blank");
+    const [error, output] = await runTask("PRINT_PDF", { petitionId: petition.id });
+    if (!error) {
+      window.open(output!.url, "_blank");
+    }
   };
 
   return (

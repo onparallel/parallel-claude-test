@@ -100,6 +100,7 @@ import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
+import { useTaskRunner } from "@parallel/utils/useTaskRunner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -319,8 +320,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0
   );
 
+  const runTask = useTaskRunner();
   const handleExportPetitionPDF = async () => {
-    window.open(`/api/downloads/petition/${petition.id}/pdf`, "_blank");
+    const [error, output] = await runTask("PRINT_PDF", { petitionId: petition.id });
+    if (!error) {
+      window.open(output!.url, "_blank");
+    }
   };
 
   const [createPetitionFieldComment] = usePetitionReplies_createPetitionFieldCommentMutation();
