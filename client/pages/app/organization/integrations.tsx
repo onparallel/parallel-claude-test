@@ -12,8 +12,11 @@ import {
   Alert,
   AlertIcon,
 } from "@chakra-ui/react";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { useAddSignaturitAPIKeyDialog } from "@parallel/components/organization/AddSignaturitAPIKeyDialog";
+import { useResetSignaturitTokenDialog } from "@parallel/components/organization/ResetSignaturitTokenDialog";
 import {
   OrganizationIntegrationsQuery,
   useOrganizationIntegrationsQuery,
@@ -31,11 +34,22 @@ function OrganizationIntegrations() {
   } = assertQuery(useOrganizationIntegrationsQuery());
   const sections = useOrganizationSections(me);
 
+  const addSignaturitAPIKey = useAddSignaturitAPIKeyDialog();
+  const resetSignaturit = useResetSignaturitTokenDialog();
+
   const signaturitEnabled = false;
 
-  const handleActivateSignaturit = () => {};
+  const handleActivateSignaturit = async () => {
+    try {
+      await addSignaturitAPIKey({});
+    } catch {}
+  };
 
-  const handleResetSignaturit = () => {};
+  const handleResetSignaturit = async () => {
+    try {
+      await resetSignaturit({});
+    } catch {}
+  };
 
   const integrations = [
     {
@@ -57,9 +71,12 @@ function OrganizationIntegrations() {
         </Badge>
       ),
       title: "Signaturit",
-      body: "Añade firma digital a tus peticiones.",
+      body: intl.formatMessage({
+        id: "organization.integrations.signaturit-description",
+        defaultMessage: "Add digital signature to your requests.",
+      }),
       button: signaturitEnabled ? (
-        <Button variant="outline" olorScheme="gray" onClick={handleResetSignaturit}>
+        <Button variant="outline" onClick={handleResetSignaturit}>
           <FormattedMessage id="generic.reset" defaultMessage="Reset" />
         </Button>
       ) : (
@@ -69,7 +86,7 @@ function OrganizationIntegrations() {
       ),
     },
     {
-      isDisabled: false,
+      isDisabled: true,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
@@ -79,8 +96,38 @@ function OrganizationIntegrations() {
       ),
       badge: null,
       title: "Zapier",
-      body: "Automatiza tus flujos de trabajo utilizando sus +400 servicios.",
+      body: intl.formatMessage({
+        id: "organization.integrations.zapier-description",
+        defaultMessage: "Automate your workflows using its +400 services.",
+      }),
       button: null,
+    },
+    {
+      isDisabled: false,
+      logo: (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
+          alt="Zapier logo"
+          maxWidth="124px"
+        />
+      ),
+      badge: null,
+      title: intl.formatMessage({
+        id: "organization.integrations.parallel-api-title",
+        defaultMessage: "Parallel API",
+      }),
+      body: intl.formatMessage({
+        id: "organization.integrations.parallel-api-description",
+        defaultMessage: "Access our API to automate all your flows.",
+      }),
+      button: (
+        <Button colorScheme="purple">
+          <FormattedMessage
+            id="organization.integrations.parallel-api-button"
+            defaultMessage="API Key"
+          />
+        </Button>
+      ),
     },
   ];
 
@@ -186,4 +233,4 @@ OrganizationIntegrations.getInitialProps = async ({
   `);
 };
 
-export default compose(withApolloData)(OrganizationIntegrations);
+export default compose(withDialogs, withApolloData)(OrganizationIntegrations);

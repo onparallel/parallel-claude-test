@@ -1,5 +1,6 @@
 import { DataProxy, gql } from "@apollo/client";
 import {
+  Badge,
   Box,
   Button,
   Center,
@@ -47,6 +48,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop, pick } from "remeda";
@@ -92,15 +94,28 @@ function _PetitionSettings({
 
   const publicLink = petition.__typename === "PetitionTemplate" ? petition.publicLink : null;
 
+  const [dontShowTestSignature, setDontShowTestSignature] = useUserPreference(
+    "dont-show-test-signature-dialog",
+    false
+  );
+
   const showSignatureConfigDialog = useSignatureConfigDialog();
 
   const showConfirmConfigureOngoingSignature = useDialog(ConfirmConfigureOngoingSignature);
   const showConfirmSignatureConfigChanged = useDialog(ConfirmSignatureConfigChanged);
+  const showTestSignatureDialog = useTestSignatureDialog();
   const [cancelSignatureRequest] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
   const [startSignatureRequest] = usePetitionSettings_startPetitionSignatureRequestMutation();
 
   async function handleConfigureSignatureClick() {
     try {
+      // TODO: comprobar si está en modo TEST
+      if (!dontShowTestSignature) {
+        const { dontShow } = await showTestSignatureDialog({});
+        if (dontShow) {
+          setDontShowTestSignature(true);
+        }
+      }
       if (ongoingSignatureRequest) {
         await showConfirmConfigureOngoingSignature({});
       }

@@ -65,14 +65,24 @@
     "context": "Recipients"
   },
   {
-    "term": "component.add-signature-apikey-dialog.apikey-label",
+    "term": "component.add-signaturit-apikey-dialog.apikey-help",
+    "definition": "This key is provided by Signaturit and is required to perform the integration",
+    "context": "This key is provided by Signaturit and is required to perform the integration"
+  },
+  {
+    "term": "component.add-signaturit-apikey-dialog.apikey-label",
     "definition": "API Key",
     "context": "API Key"
   },
   {
-    "term": "component.add-signature-apikey-dialog.title",
-    "definition": "Add members to group",
-    "context": "Add members to group"
+    "term": "component.add-signaturit-apikey-dialog.help",
+    "definition": "If you need help to find your key you can find more information <a>here</a>.",
+    "context": "If you need help to find your key you can find more information <a>here</a>."
+  },
+  {
+    "term": "component.add-signaturit-apikey-dialog.title",
+    "definition": "Enter your API Key",
+    "context": "Enter your API Key"
   },
   {
     "term": "component.app-layout.new-version-available",
@@ -1695,6 +1705,16 @@
     "context": "Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
   },
   {
+    "term": "component.petition-settings.signature-test-help",
+    "definition": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>",
+    "context": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
+  },
+  {
+    "term": "component.petition-settings.signature-test-label",
+    "definition": "TEST",
+    "context": "TEST"
+  },
+  {
     "term": "component.petition-settings.skip-forward-security",
     "definition": "Disable Forward Security",
     "context": "Disable Forward Security"
@@ -2415,6 +2435,16 @@
     "context": "Mark as unread"
   },
   {
+    "term": "component.reset-signaturit-dialog.body",
+    "definition": "Are you sure you want to reset your token? If continue, the signature will be deactivated and you will return to test mode.",
+    "context": "Are you sure you want to reset your token? If continue, the signature will be deactivated and you will return to test mode."
+  },
+  {
+    "term": "component.reset-signaturit-dialog.title",
+    "definition": "Reset access token",
+    "context": "Reset access token"
+  },
+  {
     "term": "component.rich-text-editor.add-link-header",
     "definition": "Add link",
     "context": "Add link"
@@ -2878,6 +2908,21 @@
     "term": "component.template-header.use-template",
     "definition": "Use this template",
     "context": "Use this template"
+  },
+  {
+    "term": "component.test-signature-dialog.body",
+    "definition": "If you continue, the signature will be sent according to the indicated configuration but it will not have any legal validity.",
+    "context": "If you continue, the signature will be sent according to the indicated configuration but it will not have any legal validity."
+  },
+  {
+    "term": "component.test-signature-dialog.dont-show-again",
+    "definition": "Do not show this message again",
+    "context": "Do not show this message again"
+  },
+  {
+    "term": "component.test-signature-dialog.title",
+    "definition": "Test signature",
+    "context": "Test signature"
   },
   {
     "term": "component.third-party.accept-button",
@@ -4145,6 +4190,11 @@
     "context": "Upgrade to enable this feature."
   },
   {
+    "term": "generic.yes-reset",
+    "definition": "Yest, reset",
+    "context": "Yest, reset"
+  },
+  {
     "term": "generic.you",
     "definition": "You",
     "context": "You"
@@ -4415,9 +4465,34 @@
     "context": "Select a user from your organization"
   },
   {
+    "term": "organization.integrations.parallel-api-button",
+    "definition": "API Key",
+    "context": "API Key"
+  },
+  {
+    "term": "organization.integrations.parallel-api-description",
+    "definition": "Access our API to automate all your flows.",
+    "context": "Access our API to automate all your flows."
+  },
+  {
+    "term": "organization.integrations.parallel-api-title",
+    "definition": "Parallel API",
+    "context": "Parallel API"
+  },
+  {
+    "term": "organization.integrations.signaturit-description",
+    "definition": "Add digital signature to your requests.",
+    "context": "Add digital signature to your requests."
+  },
+  {
     "term": "organization.integrations.title",
     "definition": "Integrations",
     "context": "Integrations"
+  },
+  {
+    "term": "organization.integrations.zapier-description",
+    "definition": "Automate your workflows using its +400 services.",
+    "context": "Automate your workflows using its +400 services."
   },
   {
     "term": "organization.role.admin",
