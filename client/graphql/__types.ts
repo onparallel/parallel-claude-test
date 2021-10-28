@@ -2340,7 +2340,7 @@ export interface Query {
   subscriptions: Array<PetitionEventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
-  task?: Maybe<Task>;
+  task: Task;
   /** The available templates */
   templates: PetitionTemplatePagination;
   userGroup?: Maybe<UserGroup>;
@@ -12934,6 +12934,31 @@ export type useSettingsSections_UserFragment = { __typename?: "User" } & {
   hasApiTokens: User["hasFeatureFlag"];
 };
 
+export type useTaskRunner_TaskFragment = { __typename?: "Task" } & Pick<
+  Task,
+  "id" | "name" | "output" | "status" | "progress"
+>;
+
+export type useTaskRunner_TaskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type useTaskRunner_TaskQuery = {
+  task: { __typename?: "Task" } & Pick<Task, "id" | "name" | "output" | "status" | "progress">;
+};
+
+export type useTaskRunner_createTaskMutationVariables = Exact<{
+  name: TaskName;
+  input: Scalars["JSONObject"];
+}>;
+
+export type useTaskRunner_createTaskMutation = {
+  createTask: { __typename?: "Task" } & Pick<
+    Task,
+    "id" | "name" | "output" | "status" | "progress"
+  >;
+};
+
 export type validatePetitionFields_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
   PetitionField,
   "id" | "title" | "type" | "options"
@@ -15672,6 +15697,15 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
   fragment uploadFile_AWSPresignedPostData on AWSPresignedPostData {
     url
     fields
+  }
+`;
+export const useTaskRunner_TaskFragmentDoc = gql`
+  fragment useTaskRunner_Task on Task {
+    id
+    name
+    output
+    status
+    progress
   }
 `;
 export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
@@ -20912,4 +20946,60 @@ export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
 >;
 export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeSearchContactsLazyQuery
+>;
+export const useTaskRunner_TaskDocument = gql`
+  query useTaskRunner_Task($id: GID!) {
+    task(id: $id) {
+      ...useTaskRunner_Task
+    }
+  }
+  ${useTaskRunner_TaskFragmentDoc}
+`;
+export function useuseTaskRunner_TaskQuery(
+  baseOptions: Apollo.QueryHookOptions<useTaskRunner_TaskQuery, useTaskRunner_TaskQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<useTaskRunner_TaskQuery, useTaskRunner_TaskQueryVariables>(
+    useTaskRunner_TaskDocument,
+    options
+  );
+}
+export function useuseTaskRunner_TaskLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    useTaskRunner_TaskQuery,
+    useTaskRunner_TaskQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<useTaskRunner_TaskQuery, useTaskRunner_TaskQueryVariables>(
+    useTaskRunner_TaskDocument,
+    options
+  );
+}
+export type useTaskRunner_TaskQueryHookResult = ReturnType<typeof useuseTaskRunner_TaskQuery>;
+export type useTaskRunner_TaskLazyQueryHookResult = ReturnType<
+  typeof useuseTaskRunner_TaskLazyQuery
+>;
+export const useTaskRunner_createTaskDocument = gql`
+  mutation useTaskRunner_createTask($name: TaskName!, $input: JSONObject!) {
+    createTask(name: $name, input: $input) {
+      ...useTaskRunner_Task
+    }
+  }
+  ${useTaskRunner_TaskFragmentDoc}
+`;
+export function useuseTaskRunner_createTaskMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    useTaskRunner_createTaskMutation,
+    useTaskRunner_createTaskMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    useTaskRunner_createTaskMutation,
+    useTaskRunner_createTaskMutationVariables
+  >(useTaskRunner_createTaskDocument, options);
+}
+export type useTaskRunner_createTaskMutationHookResult = ReturnType<
+  typeof useuseTaskRunner_createTaskMutation
 >;

@@ -3372,7 +3372,7 @@ type Query {
     """
     search: String
   ): TagPagination!
-  task(id: GID!): Task
+  task(id: GID!): Task!
 
   """
   The available templates

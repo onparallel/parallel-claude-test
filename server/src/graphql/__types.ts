@@ -1471,7 +1471,7 @@ export interface NexusGenFieldTypes {
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
-    task: NexusGenRootTypes["Task"] | null; // Task
+    task: NexusGenRootTypes["Task"]; // Task!
     templates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!

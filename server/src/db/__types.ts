@@ -111,6 +111,10 @@ export type SystemEventType =
   | "USER_CREATED"
   | "USER_LOGGED_IN";
 
+export type TaskName = "EXPORT_REPLIES" | "PRINT_PDF";
+
+export type TaskStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+
 export type Tone = "FORMAL" | "INFORMAL";
 
 export type UserOrganizationRole = "ADMIN" | "NORMAL" | "OWNER";
@@ -150,6 +154,7 @@ export interface TableTypes {
   public_petition_link_user: PublicPetitionLinkUser;
   system_event: SystemEvent;
   tag: Tag;
+  task: Task;
   temporary_file: TemporaryFile;
   user: User;
   user_authentication_token: UserAuthenticationToken;
@@ -190,6 +195,7 @@ export interface TableCreateTypes {
   public_petition_link_user: CreatePublicPetitionLinkUser;
   system_event: CreateSystemEvent;
   tag: CreateTag;
+  task: CreateTask;
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
@@ -230,6 +236,7 @@ export interface TablePrimaryKeys {
   public_petition_link_user: "id";
   system_event: "id";
   tag: "id";
+  task: "id";
   temporary_file: "id";
   user: "id";
   user_authentication_token: "id";
@@ -933,6 +940,34 @@ export interface Tag {
 export type CreateTag = PartialProps<
   Omit<Tag, "id">,
   "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface Task {
+  id: number; // int4
+  user_id: number; // int4
+  name: TaskName; // task_name
+  status: TaskStatus; // task_status
+  progress: Maybe<number>; // int4
+  input: any; // jsonb
+  output: any; // jsonb
+  cancel_data: Maybe<any>; // jsonb
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+}
+
+export type CreateTask = PartialProps<
+  Omit<Task, "id">,
+  | "status"
+  | "progress"
+  | "input"
+  | "output"
+  | "cancel_data"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
 >;
 
 export interface TemporaryFile {
