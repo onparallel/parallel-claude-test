@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { useImportContactsDialog_bulkCreateContactsMutation } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { withError } from "@parallel/utils/promises/withError";
 import { useState } from "react";
 import { FileRejection } from "react-dropzone";
@@ -43,33 +44,39 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
         });
         props.onResolve({ count: result!.data!.bulkCreateContacts.length });
       } catch (error: any) {
-        const rows = error.graphQLErrors[0]?.extensions?.rows;
-        await withError(
-          showErrorDialog({
-            header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
-            message: (
-              <>
-                {rows && rows.length && rows.length < 16 ? (
-                  <Text marginBottom={2}>
-                    <FormattedMessage
-                      id="contacts.import-from-excel.import-error.details"
-                      defaultMessage="We have detected an error in the following file rows:"
-                    />
-                    <Text as="b" marginLeft={1.5}>
-                      <FormattedList value={rows} />
+        if (
+          isApolloError(error) &&
+          (error.graphQLErrors[0]?.extensions?.code === "INVALID_FORMAT_ERROR" ||
+            error.graphQLErrors[0]?.extensions?.code === "NO_CONTACTS_FOUND_ERROR")
+        ) {
+          const rows = error.graphQLErrors[0]?.extensions?.rows;
+          await withError(
+            showErrorDialog({
+              header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
+              message: (
+                <>
+                  {rows && rows.length && rows.length < 16 ? (
+                    <Text marginBottom={2}>
+                      <FormattedMessage
+                        id="contacts.import-from-excel.import-error.details"
+                        defaultMessage="We have detected an error in the following file rows:"
+                      />
+                      <Text as="b" marginLeft={1.5}>
+                        <FormattedList value={rows} />
+                      </Text>
                     </Text>
+                  ) : null}
+                  <Text>
+                    <FormattedMessage
+                      id="contacts.import-from-excel.import-error.body"
+                      defaultMessage="Please, review your file and make sure it matches the format on the loading model."
+                    />
                   </Text>
-                ) : null}
-                <Text>
-                  <FormattedMessage
-                    id="contacts.import-from-excel.import-error.body"
-                    defaultMessage="Please, review your file and make sure it matches the format on the loading model."
-                  />
-                </Text>
-              </>
-            ),
-          })
-        );
+                </>
+              ),
+            })
+          );
+        }
       }
     }
   }

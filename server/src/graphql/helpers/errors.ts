@@ -59,7 +59,7 @@ export class ValidatorOrConditionError extends ApolloError {
 }
 
 export class ExcelParsingError extends Error {
-  constructor(message: string, public readonly row?: number, public readonly column?: number) {
+  constructor(message: string, public readonly row: number, public readonly column: number) {
     super(message);
   }
 }

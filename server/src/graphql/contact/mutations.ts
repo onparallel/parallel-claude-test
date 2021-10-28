@@ -5,7 +5,7 @@ import { chunk, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { withError } from "../../util/promises/withError";
 import { authenticate, chain } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
+import { ExcelParsingError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
@@ -121,7 +121,15 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
       throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
     }
 
-    const parsedContacts = parseContactList(importResult!);
+    const [parsedErrors, parsedContacts] = await withError(() => parseContactList(importResult!));
+
+    if (parsedErrors && parsedErrors instanceof AggregateError) {
+      const rows = parsedErrors.errors.map((e: ExcelParsingError) => e.row);
+
+      throw new WhitelistedError(parsedErrors.message, "INVALID_FORMAT_ERROR", {
+        rows,
+      });
+    }
 
     if (!parsedContacts || parsedContacts.length === 0) {
       throw new WhitelistedError("No contacts found on file", "NO_CONTACTS_FOUND_ERROR");
