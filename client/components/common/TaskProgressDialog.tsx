@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@chakra-ui/react";
-import { BaseDialog } from "@parallel/components/common/BaseDialog";
+import { Button } from "@chakra-ui/react";
 import { DialogProps } from "@parallel/components/common/DialogProvider";
 import { ProgressIndicator, ProgressTrack } from "@parallel/components/common/Progress";
 import {
@@ -11,6 +10,7 @@ import { useInterval } from "@parallel/utils/useInterval";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { generateCssStripe } from "../../utils/css";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export function TaskProgressDialog({
   task,
@@ -45,26 +45,24 @@ export function TaskProgressDialog({
   );
 
   return (
-    <BaseDialog {...props} closeOnOverlayClick={false} closeOnEsc={false}>
-      <ModalContent>
-        <ModalHeader>
-          {dialogHeader ?? (
-            <FormattedMessage
-              id="component.task-progress-dialog.unknown-task.header"
-              defaultMessage="Please wait..."
-            />
-          )}
-        </ModalHeader>
-        <ModalBody>
-          <TaskProgressBar progress={processingTask.progress} />
-        </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="red" onClick={() => props.onReject()}>
-            <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </BaseDialog>
+    <ConfirmDialog
+      {...props}
+      header={
+        dialogHeader ?? (
+          <FormattedMessage
+            id="component.task-progress-dialog.unknown-task.header"
+            defaultMessage="Please wait..."
+          />
+        )
+      }
+      body={<TaskProgressBar progress={processingTask.progress} />}
+      confirm={null}
+      cancel={
+        <Button colorScheme="red" onClick={() => props.onReject()}>
+          <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+        </Button>
+      }
+    />
   );
 }
 
