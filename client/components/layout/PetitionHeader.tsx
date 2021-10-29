@@ -39,8 +39,8 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { useExportPdfTask } from "@parallel/utils/useExportPdfTask";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
-import { useTaskRunner } from "@parallel/utils/useTaskRunner";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -202,13 +202,7 @@ export function PetitionHeader({
     } catch {}
   }, [petition.id]);
 
-  const runTask = useTaskRunner();
-  const handleExportPetitionPDF = async () => {
-    const output = await runTask("PRINT_PDF", { petitionId: petition.id });
-    if (output) {
-      window.open(output.url, "_blank");
-    }
-  };
+  const handleExportPetitionPDF = useExportPdfTask();
 
   return (
     <Box
@@ -335,7 +329,7 @@ export function PetitionHeader({
                   </MenuItem>
                   {user.hasPetitionPdfExport ? (
                     <MenuItem
-                      onClick={handleExportPetitionPDF}
+                      onClick={() => handleExportPetitionPDF(petition.id)}
                       icon={<DownloadIcon display="block" boxSize={4} />}
                     >
                       <FormattedMessage

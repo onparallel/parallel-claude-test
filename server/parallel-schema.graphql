@@ -572,6 +572,11 @@ type Mutation {
   ): PetitionField!
 
   """
+  Creates a task for printing a PDF of the petition and sends it to the queue
+  """
+  createPrintPdfTask(petitionId: GID!): Task!
+
+  """
   Creates a public link from a user's template
   """
   createPublicPetitionLink(
@@ -592,11 +597,6 @@ type Mutation {
   Creates a tag in the user's organization
   """
   createTag(color: String!, name: String!): Tag!
-
-  """
-  Creates a task and sends it to the queue to process it
-  """
-  createTask(input: JSONObject!, name: TaskName!): Task!
 
   """
   Creates a new user in the specified organization.

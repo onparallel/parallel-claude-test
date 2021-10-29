@@ -5,15 +5,15 @@ import { Loader } from "../../util/fromDataLoader";
 import { Replace } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateTask, Task as _Task, TaskName } from "../__types";
+import { Task as _Task, TaskName } from "../__types";
 
 export type TaskInput<TName extends TaskName> = {
-  EXPORT_REPLIES: {};
-  PRINT_PDF: { petitionId: string };
+  EXPORT_REPLIES: { petitionId: number };
+  PRINT_PDF: { petitionId: number };
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {
-  EXPORT_REPLIES: {};
+  EXPORT_REPLIES: { url: string };
   PRINT_PDF: { url: string };
 }[TName];
 
@@ -36,7 +36,7 @@ export class TaskRepository extends BaseRepository {
 
   readonly loadTask: Loader<number, AnyTask | null> = this.buildLoadBy("task", "id");
 
-  async createTask(data: Omit<CreateTask, "user_id">, userId: number) {
+  async createTask<TName extends TaskName>(data: Partial<Task<TName>>, userId: number) {
     const [task] = await this.from("task").insert(
       {
         ...data,

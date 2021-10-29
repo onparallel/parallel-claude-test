@@ -2,7 +2,6 @@ import { URLSearchParams } from "url";
 import { WorkerContext } from "../context";
 import { Task, TaskOutput } from "../db/repositories/TaskRepository";
 import { TaskName } from "../db/__types";
-import { fromGlobalId } from "../util/globalId";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
 import { createQueueWorker } from "./helpers/createQueueWorker";
@@ -37,7 +36,7 @@ async function runPrintPdfTask(
   onUpdate: TaskUpdateHandler<"PRINT_PDF">
 ) {
   try {
-    const { id: petitionId } = fromGlobalId(task.input.petitionId, "Petition");
+    const { petitionId } = task.input;
     const hasAccess = await ctx.petitions.userHasAccessToPetitions(task.user_id, [petitionId]);
     if (!hasAccess) {
       return;
@@ -55,7 +54,7 @@ async function runPrintPdfTask(
       })}`
     );
 
-    onUpdate(50);
+    onUpdate(75);
 
     const path = random(16);
     const res = await ctx.aws.temporaryFiles.uploadFile(path, "application/pdf", buffer);
@@ -68,8 +67,6 @@ async function runPrintPdfTask(
       },
       `TaskWorker:${task.id}`
     );
-
-    onUpdate(75);
 
     const url = await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
       tmpFile.path,

@@ -848,10 +848,10 @@ export interface NexusGenFieldTypes {
     createPetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["CreateFileUploadFieldAttachment"]; // CreateFileUploadFieldAttachment!
     createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
-    createTask: NexusGenRootTypes["Task"]; // Task!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -2017,10 +2017,10 @@ export interface NexusGenFieldTypeNames {
     createPetitionField: "PetitionBaseAndField";
     createPetitionFieldAttachmentUploadLink: "CreateFileUploadFieldAttachment";
     createPetitionFieldComment: "PetitionField";
+    createPrintPdfTask: "Task";
     createPublicPetitionLink: "PetitionTemplate";
     createSimpleReply: "PetitionFieldReply";
     createTag: "Tag";
-    createTask: "Task";
     createUser: "SupportMethodResponse";
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
@@ -3097,6 +3097,10 @@ export interface NexusGenArgTypes {
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    createPrintPdfTask: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     createPublicPetitionLink: {
       // args
       description: string; // String!
@@ -3116,11 +3120,6 @@ export interface NexusGenArgTypes {
       // args
       color: string; // String!
       name: string; // String!
-    };
-    createTask: {
-      // args
-      input: NexusGenScalars["JSONObject"]; // JSONObject!
-      name: NexusGenEnums["TaskName"]; // TaskName!
     };
     createUser: {
       // args

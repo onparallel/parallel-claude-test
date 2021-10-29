@@ -380,14 +380,14 @@ export interface Mutation {
   createPetitionFieldAttachmentUploadLink: CreateFileUploadFieldAttachment;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionField;
+  /** Creates a task for printing a PDF of the petition and sends it to the queue */
+  createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PetitionTemplate;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
   createTag: Tag;
-  /** Creates a task and sends it to the queue to process it */
-  createTask: Task;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
@@ -692,6 +692,10 @@ export interface MutationcreatePetitionFieldCommentArgs {
   petitionId: Scalars["GID"];
 }
 
+export interface MutationcreatePrintPdfTaskArgs {
+  petitionId: Scalars["GID"];
+}
+
 export interface MutationcreatePublicPetitionLinkArgs {
   description: Scalars["String"];
   otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
@@ -710,11 +714,6 @@ export interface MutationcreateSimpleReplyArgs {
 export interface MutationcreateTagArgs {
   color: Scalars["String"];
   name: Scalars["String"];
-}
-
-export interface MutationcreateTaskArgs {
-  input: Scalars["JSONObject"];
-  name: TaskName;
 }
 
 export interface MutationcreateUserArgs {
@@ -3172,6 +3171,19 @@ export type TagEditDialog_updateTagMutationVariables = Exact<{
 
 export type TagEditDialog_updateTagMutation = {
   updateTag: { __typename?: "Tag" } & Pick<Tag, "id" | "createdAt" | "name" | "color">;
+};
+
+export type TaskProgressDialog_TaskFragment = { __typename?: "Task" } & Pick<
+  Task,
+  "id" | "name" | "output" | "status" | "progress"
+>;
+
+export type TaskProgressDialog_TaskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type TaskProgressDialog_TaskQuery = {
+  task: { __typename?: "Task" } & Pick<Task, "id" | "name" | "output" | "status" | "progress">;
 };
 
 export type UserAvatar_UserFragment = { __typename?: "User" } & Pick<
@@ -12830,6 +12842,22 @@ export type uploadFile_AWSPresignedPostDataFragment = {
   __typename?: "AWSPresignedPostData";
 } & Pick<AWSPresignedPostData, "url" | "fields">;
 
+export type useExportPdfTask_TaskFragment = { __typename?: "Task" } & Pick<
+  Task,
+  "id" | "name" | "output" | "status" | "progress"
+>;
+
+export type useExportPdfTask_createPrintPdfTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type useExportPdfTask_createPrintPdfTaskMutation = {
+  createPrintPdfTask: { __typename?: "Task" } & Pick<
+    Task,
+    "id" | "name" | "output" | "status" | "progress"
+  >;
+};
+
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "type" | "title">;
@@ -12934,31 +12962,6 @@ export type useSettingsSections_UserFragment = { __typename?: "User" } & {
   hasApiTokens: User["hasFeatureFlag"];
 };
 
-export type useTaskRunner_TaskFragment = { __typename?: "Task" } & Pick<
-  Task,
-  "id" | "name" | "output" | "status" | "progress"
->;
-
-export type useTaskRunner_TaskQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type useTaskRunner_TaskQuery = {
-  task: { __typename?: "Task" } & Pick<Task, "id" | "name" | "output" | "status" | "progress">;
-};
-
-export type useTaskRunner_createTaskMutationVariables = Exact<{
-  name: TaskName;
-  input: Scalars["JSONObject"];
-}>;
-
-export type useTaskRunner_createTaskMutation = {
-  createTask: { __typename?: "Task" } & Pick<
-    Task,
-    "id" | "name" | "output" | "status" | "progress"
-  >;
-};
-
 export type validatePetitionFields_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
   PetitionField,
   "id" | "title" | "type" | "options"
@@ -13007,6 +13010,15 @@ export const TagEditDialog_TagFragmentDoc = gql`
     createdAt
   }
   ${Tag_TagFragmentDoc}
+`;
+export const TaskProgressDialog_TaskFragmentDoc = gql`
+  fragment TaskProgressDialog_Task on Task {
+    id
+    name
+    output
+    status
+    progress
+  }
 `;
 export const UserListPopover_UserGroupFragmentDoc = gql`
   fragment UserListPopover_UserGroup on UserGroup {
@@ -15699,8 +15711,8 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
     fields
   }
 `;
-export const useTaskRunner_TaskFragmentDoc = gql`
-  fragment useTaskRunner_Task on Task {
+export const useExportPdfTask_TaskFragmentDoc = gql`
+  fragment useExportPdfTask_Task on Task {
     id
     name
     output
@@ -15888,6 +15900,44 @@ export function useTagEditDialog_updateTagMutation(
 }
 export type TagEditDialog_updateTagMutationHookResult = ReturnType<
   typeof useTagEditDialog_updateTagMutation
+>;
+export const TaskProgressDialog_TaskDocument = gql`
+  query TaskProgressDialog_Task($id: GID!) {
+    task(id: $id) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+`;
+export function useTaskProgressDialog_TaskQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    TaskProgressDialog_TaskQuery,
+    TaskProgressDialog_TaskQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<TaskProgressDialog_TaskQuery, TaskProgressDialog_TaskQueryVariables>(
+    TaskProgressDialog_TaskDocument,
+    options
+  );
+}
+export function useTaskProgressDialog_TaskLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    TaskProgressDialog_TaskQuery,
+    TaskProgressDialog_TaskQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<TaskProgressDialog_TaskQuery, TaskProgressDialog_TaskQueryVariables>(
+    TaskProgressDialog_TaskDocument,
+    options
+  );
+}
+export type TaskProgressDialog_TaskQueryHookResult = ReturnType<
+  typeof useTaskProgressDialog_TaskQuery
+>;
+export type TaskProgressDialog_TaskLazyQueryHookResult = ReturnType<
+  typeof useTaskProgressDialog_TaskLazyQuery
 >;
 export const UserSelect_canCreateUsersDocument = gql`
   query UserSelect_canCreateUsers {
@@ -20907,6 +20957,29 @@ export function useuseUpdateIsReadNotificationMutation(
 export type useUpdateIsReadNotificationMutationHookResult = ReturnType<
   typeof useuseUpdateIsReadNotificationMutation
 >;
+export const useExportPdfTask_createPrintPdfTaskDocument = gql`
+  mutation useExportPdfTask_createPrintPdfTask($petitionId: GID!) {
+    createPrintPdfTask(petitionId: $petitionId) {
+      ...useExportPdfTask_Task
+    }
+  }
+  ${useExportPdfTask_TaskFragmentDoc}
+`;
+export function useuseExportPdfTask_createPrintPdfTaskMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    useExportPdfTask_createPrintPdfTaskMutation,
+    useExportPdfTask_createPrintPdfTaskMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    useExportPdfTask_createPrintPdfTaskMutation,
+    useExportPdfTask_createPrintPdfTaskMutationVariables
+  >(useExportPdfTask_createPrintPdfTaskDocument, options);
+}
+export type useExportPdfTask_createPrintPdfTaskMutationHookResult = ReturnType<
+  typeof useuseExportPdfTask_createPrintPdfTaskMutation
+>;
 export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {
     contacts(limit: 10, search: $search, exclude: $exclude) {
@@ -20946,60 +21019,4 @@ export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
 >;
 export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeSearchContactsLazyQuery
->;
-export const useTaskRunner_TaskDocument = gql`
-  query useTaskRunner_Task($id: GID!) {
-    task(id: $id) {
-      ...useTaskRunner_Task
-    }
-  }
-  ${useTaskRunner_TaskFragmentDoc}
-`;
-export function useuseTaskRunner_TaskQuery(
-  baseOptions: Apollo.QueryHookOptions<useTaskRunner_TaskQuery, useTaskRunner_TaskQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<useTaskRunner_TaskQuery, useTaskRunner_TaskQueryVariables>(
-    useTaskRunner_TaskDocument,
-    options
-  );
-}
-export function useuseTaskRunner_TaskLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    useTaskRunner_TaskQuery,
-    useTaskRunner_TaskQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<useTaskRunner_TaskQuery, useTaskRunner_TaskQueryVariables>(
-    useTaskRunner_TaskDocument,
-    options
-  );
-}
-export type useTaskRunner_TaskQueryHookResult = ReturnType<typeof useuseTaskRunner_TaskQuery>;
-export type useTaskRunner_TaskLazyQueryHookResult = ReturnType<
-  typeof useuseTaskRunner_TaskLazyQuery
->;
-export const useTaskRunner_createTaskDocument = gql`
-  mutation useTaskRunner_createTask($name: TaskName!, $input: JSONObject!) {
-    createTask(name: $name, input: $input) {
-      ...useTaskRunner_Task
-    }
-  }
-  ${useTaskRunner_TaskFragmentDoc}
-`;
-export function useuseTaskRunner_createTaskMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    useTaskRunner_createTaskMutation,
-    useTaskRunner_createTaskMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    useTaskRunner_createTaskMutation,
-    useTaskRunner_createTaskMutationVariables
-  >(useTaskRunner_createTaskDocument, options);
-}
-export type useTaskRunner_createTaskMutationHookResult = ReturnType<
-  typeof useuseTaskRunner_createTaskMutation
 >;

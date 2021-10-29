@@ -2,7 +2,6 @@ import contentDisposition from "content-disposition";
 import escapeStringRegexp from "escape-string-regexp";
 import { Router } from "express";
 import { indexBy, isDefined, zip } from "remeda";
-import { URLSearchParams } from "url";
 import { ApiContext } from "../context";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
@@ -36,54 +35,6 @@ export const downloads = Router()
       );
       const zipFile = createZipFile(getPetitionFiles(ctx, petitionId, pattern, petition?.locale));
       zipFile.pipe(res);
-    } catch (error: any) {
-      next(error);
-    }
-  })
-  .get("/petition/:petitionId/pdf", async (req, res, next) => {
-    try {
-      const ctx = req.context;
-      const user = ctx.user!;
-      const { id: petitionId } = fromGlobalId(req.params.petitionId, "Petition");
-
-      const hasAccess = await ctx.petitions.userHasAccessToPetitions(user.id, [petitionId]);
-      if (!hasAccess) {
-        throw new Error("No access");
-      }
-
-      const hasFeatureFlag = await ctx.featureFlags.userHasFeatureFlag(
-        user.id,
-        "PETITION_PDF_EXPORT"
-      );
-      if (!hasFeatureFlag) {
-        throw new Error("FORBIDDEN");
-      }
-
-      const petition = await ctx.petitions.loadPetition(petitionId);
-      if (!petition) {
-        throw new Error(`Petition with id ${petitionId} not found`);
-      }
-
-      const token = ctx.security.generateAuthToken({
-        petitionId,
-      });
-
-      const buffer = await ctx.printer.pdf(
-        `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
-          token,
-        })}`
-      );
-
-      res
-        .header(
-          "content-disposition",
-          contentDisposition(sanitizeFilenameWithSuffix(petition.name ?? "parallel", ".pdf"), {
-            type: "inline",
-          })
-        )
-        .header("content-type", "application/pdf")
-        .send(buffer)
-        .end();
     } catch (error: any) {
       next(error);
     }

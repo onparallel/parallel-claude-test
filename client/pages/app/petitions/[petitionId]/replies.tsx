@@ -30,7 +30,6 @@ import {
   withDialogs,
 } from "@parallel/components/common/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
-
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -96,11 +95,11 @@ import { withError } from "@parallel/utils/promises/withError";
 import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
+import { useExportPdfTask } from "@parallel/utils/useExportPdfTask";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
-import { useTaskRunner } from "@parallel/utils/useTaskRunner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -320,13 +319,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0
   );
 
-  const runTask = useTaskRunner();
-  const handleExportPetitionPDF = async () => {
-    const output = await runTask("PRINT_PDF", { petitionId: petition.id });
-    if (output) {
-      window.open(output.url, "_blank");
-    }
-  };
+  const handleExportPetitionPDF = useExportPdfTask();
 
   const [createPetitionFieldComment] = usePetitionReplies_createPetitionFieldCommentMutation();
   async function handleAddComment(content: string, isInternal?: boolean) {
@@ -591,7 +584,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               <MenuItem
                 icon={<FilePdfIcon boxSize={5} />}
                 isDisabled={!me.hasPetitionPdfExport}
-                onClick={handleExportPetitionPDF}
+                onClick={() => handleExportPetitionPDF(petition.id)}
                 maxWidth={"260px"}
               >
                 <Text>

@@ -2735,11 +2735,6 @@
     "context": "Remove tag \"{tag}\""
   },
   {
-    "term": "component.task-progress-dialog.export-replies.header",
-    "definition": "Exportando respuestas",
-    "context": "Exporting replies"
-  },
-  {
     "term": "component.task-progress-dialog.print-pdf.header",
     "definition": "Generando archivo PDF",
     "context": "Generating PDF file"

@@ -1,20 +1,18 @@
 import { mutationField, nonNull } from "nexus";
-import { authenticate } from "../helpers/authorize";
-import { jsonObjectArg } from "../helpers/json";
-import { validTaskInput } from "./validators";
+import { authenticateAnd } from "../helpers/authorize";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { userHasAccessToPetitions } from "../petition/authorizers";
 
-export const createTask = mutationField("createTask", {
-  description: "Creates a task and sends it to the queue to process it",
+export const createPrintPdfTask = mutationField("createPrintPdfTask", {
+  description: "Creates a task for printing a PDF of the petition and sends it to the queue",
   type: "Task",
-  authorize: authenticate(),
-  validateArgs: validTaskInput(
-    (args) => args.name,
-    (args) => args.input,
-    "input"
-  ),
+  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
   args: {
-    name: nonNull("TaskName"),
-    input: nonNull(jsonObjectArg()),
+    petitionId: nonNull(globalIdArg("Petition")),
   },
-  resolve: async (_, args, ctx) => await ctx.task.createTask(args, ctx.user!.id),
+  resolve: async (_, args, ctx) =>
+    await ctx.task.createTask(
+      { name: "PRINT_PDF", input: { petitionId: args.petitionId } },
+      ctx.user!.id
+    ),
 });
