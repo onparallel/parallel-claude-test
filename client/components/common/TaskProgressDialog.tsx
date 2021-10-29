@@ -7,6 +7,7 @@ import {
   TaskProgressDialog_TaskFragment,
   useTaskProgressDialog_TaskQuery,
 } from "@parallel/graphql/__types";
+import { useInterval } from "@parallel/utils/useInterval";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { generateCssStripe } from "../../utils/css";
@@ -23,19 +24,25 @@ export function TaskProgressDialog({
   const { data, refetch } = useTaskProgressDialog_TaskQuery({ variables: { id: task.id } });
   const processingTask = data?.task ?? task;
 
-  const interval = setInterval(() => {
-    refetch()
-      ?.then(({ data: updatedData }) => {
+  useInterval(
+    async (done) => {
+      try {
+        const { data: updatedData } = await refetch();
         if (updatedData.task.status === "COMPLETED") {
-          clearInterval(interval);
+          done();
           props.onResolve(updatedData.task.output);
-        } else if (updatedData.task.status === "CANCELLED") {
-          clearInterval(interval);
+        } else if (updatedData.task.status === "FAILED") {
+          done();
           props.onReject("SERVER_ERROR");
         }
-      })
-      .catch(() => props.onReject("SERVER_ERROR"));
-  }, pollInterval || 1000);
+      } catch {
+        done();
+        props.onReject("SERVER_ERROR");
+      }
+    },
+    pollInterval || 1000,
+    []
+  );
 
   return (
     <BaseDialog {...props} closeOnOverlayClick={false} closeOnEsc={false}>

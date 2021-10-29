@@ -20,8 +20,8 @@ function taskUpdateHandler<TName extends TaskName>(
       task.id,
       {
         progress,
-        status: error ? "CANCELLED" : progress === 100 ? "COMPLETED" : "PROCESSING",
-        cancel_data: error,
+        status: error ? "FAILED" : progress === 100 ? "COMPLETED" : "PROCESSING",
+        error_data: error,
         output,
       },
       `TaskWorker:${task.id}`

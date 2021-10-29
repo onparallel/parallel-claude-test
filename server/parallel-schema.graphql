@@ -3763,9 +3763,9 @@ enum TaskName {
 }
 
 enum TaskStatus {
-  CANCELLED
   COMPLETED
   ENQUEUED
+  FAILED
   PROCESSING
 }
 

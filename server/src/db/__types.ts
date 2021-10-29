@@ -113,7 +113,7 @@ export type SystemEventType =
 
 export type TaskName = "EXPORT_REPLIES" | "PRINT_PDF";
 
-export type TaskStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
 export type Tone = "FORMAL" | "INFORMAL";
 
@@ -950,7 +950,7 @@ export interface Task {
   progress: Maybe<number>; // int4
   input: any; // jsonb
   output: any; // jsonb
-  cancel_data: Maybe<any>; // jsonb
+  error_data: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -963,7 +963,7 @@ export type CreateTask = PartialProps<
   | "progress"
   | "input"
   | "output"
-  | "cancel_data"
+  | "error_data"
   | "created_at"
   | "created_by"
   | "updated_at"

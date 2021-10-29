@@ -18,5 +18,5 @@ export const TaskName = enumType({
 
 export const TaskStatus = enumType({
   name: "TaskStatus",
-  members: ["ENQUEUED", "PROCESSING", "COMPLETED", "CANCELLED"],
+  members: ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"],
 });

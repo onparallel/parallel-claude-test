@@ -2746,7 +2746,7 @@ export interface Task {
 
 export type TaskName = "EXPORT_REPLIES" | "PRINT_PDF";
 
-export type TaskStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
 export interface TemplateUsedEvent extends PetitionEvent {
   __typename?: "TemplateUsedEvent";
