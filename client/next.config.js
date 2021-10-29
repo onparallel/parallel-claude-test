@@ -88,9 +88,6 @@ const config = {
     ];
   },
   productionBrowserSourceMaps: true,
-  experimental: {
-    esmExternals: false,
-  },
 };
 
 module.exports = [
