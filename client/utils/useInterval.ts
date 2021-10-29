@@ -1,8 +1,20 @@
 import { DependencyList, useEffect } from "react";
+import { isDefined } from "remeda";
 
-export function useInterval(effect: () => void, ms?: number, deps?: DependencyList) {
+export function useInterval(
+  effect: (clearTimeout: () => void) => void,
+  ms?: number,
+  deps?: DependencyList
+) {
   useEffect(() => {
-    const interval = setInterval(effect, ms);
-    return () => clearInterval(interval);
+    let interval: any = undefined;
+    const clear = () => {
+      if (isDefined(interval)) {
+        clearInterval(interval);
+        interval = undefined;
+      }
+    };
+    interval = setInterval(() => effect(clear), ms);
+    return clear;
   }, deps);
 }
