@@ -2,13 +2,13 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { Loader } from "../../util/fromDataLoader";
-import { Replace } from "../../util/types";
+import { Maybe, Replace } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { Task as _Task, TaskName } from "../__types";
 
 export type TaskInput<TName extends TaskName> = {
-  EXPORT_REPLIES: { petitionId: number };
+  EXPORT_REPLIES: { petitionId: number; pattern?: Maybe<string> };
   PRINT_PDF: { petitionId: number };
 }[TName];
 

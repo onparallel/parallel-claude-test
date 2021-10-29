@@ -841,6 +841,7 @@ export interface NexusGenFieldTypes {
     cloneUserGroup: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
+    createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
@@ -2010,6 +2011,7 @@ export interface NexusGenFieldTypeNames {
     cloneUserGroup: "UserGroup";
     createContact: "Contact";
     createEventSubscription: "PetitionEventSubscription";
+    createExportRepliesTask: "Task";
     createFileUploadReply: "PetitionFieldReply";
     createOrganization: "SupportMethodResponse";
     createOrganizationUser: "User";
@@ -3051,6 +3053,11 @@ export interface NexusGenArgTypes {
     createEventSubscription: {
       // args
       eventsUrl: string; // String!
+    };
+    createExportRepliesTask: {
+      // args
+      pattern?: string | null; // String
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     createFileUploadReply: {
       // args

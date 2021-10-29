@@ -2735,9 +2735,14 @@
     "context": "Remove tag \"{tag}\""
   },
   {
+    "term": "component.task-progress-dialog.export-replies.header",
+    "definition": "Exporting replies...",
+    "context": "Exporting replies..."
+  },
+  {
     "term": "component.task-progress-dialog.print-pdf.header",
-    "definition": "Generating PDF file",
-    "context": "Generating PDF file"
+    "definition": "Generating PDF file...",
+    "context": "Generating PDF file..."
   },
   {
     "term": "component.task-progress-dialog.server-error",

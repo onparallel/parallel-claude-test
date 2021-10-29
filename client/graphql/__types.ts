@@ -366,6 +366,8 @@ export interface Mutation {
   createContact: Contact;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
+  /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
+  createExportRepliesTask: Task;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
   /** Creates a new organization. */
@@ -645,6 +647,11 @@ export interface MutationcreateContactArgs {
 
 export interface MutationcreateEventSubscriptionArgs {
   eventsUrl: Scalars["String"];
+}
+
+export interface MutationcreateExportRepliesTaskArgs {
+  pattern?: Maybe<Scalars["String"]>;
+  petitionId: Scalars["GID"];
 }
 
 export interface MutationcreateFileUploadReplyArgs {
@@ -12842,17 +12849,13 @@ export type uploadFile_AWSPresignedPostDataFragment = {
   __typename?: "AWSPresignedPostData";
 } & Pick<AWSPresignedPostData, "url" | "fields">;
 
-export type useExportPdfTask_TaskFragment = { __typename?: "Task" } & Pick<
-  Task,
-  "id" | "name" | "output" | "status" | "progress"
->;
-
-export type useExportPdfTask_createPrintPdfTaskMutationVariables = Exact<{
+export type ExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
+  pattern?: Maybe<Scalars["String"]>;
 }>;
 
-export type useExportPdfTask_createPrintPdfTaskMutation = {
-  createPrintPdfTask: { __typename?: "Task" } & Pick<
+export type ExportRepliesTask_createExportRepliesTaskMutation = {
+  createExportRepliesTask: { __typename?: "Task" } & Pick<
     Task,
     "id" | "name" | "output" | "status" | "progress"
   >;
@@ -12940,6 +12943,17 @@ export type usePetitionsTableColumns_PetitionBaseFragment =
 
 export type usePetitionsTableColumns_UserFragment = { __typename?: "User" } & {
   hasPetitionSignature: User["hasFeatureFlag"];
+};
+
+export type PrintPdfTask_createPrintPdfTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PrintPdfTask_createPrintPdfTaskMutation = {
+  createPrintPdfTask: { __typename?: "Task" } & Pick<
+    Task,
+    "id" | "name" | "output" | "status" | "progress"
+  >;
 };
 
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
@@ -15709,15 +15723,6 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
   fragment uploadFile_AWSPresignedPostData on AWSPresignedPostData {
     url
     fields
-  }
-`;
-export const useExportPdfTask_TaskFragmentDoc = gql`
-  fragment useExportPdfTask_Task on Task {
-    id
-    name
-    output
-    status
-    progress
   }
 `;
 export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
@@ -20957,28 +20962,51 @@ export function useuseUpdateIsReadNotificationMutation(
 export type useUpdateIsReadNotificationMutationHookResult = ReturnType<
   typeof useuseUpdateIsReadNotificationMutation
 >;
-export const useExportPdfTask_createPrintPdfTaskDocument = gql`
-  mutation useExportPdfTask_createPrintPdfTask($petitionId: GID!) {
-    createPrintPdfTask(petitionId: $petitionId) {
-      ...useExportPdfTask_Task
+export const ExportRepliesTask_createExportRepliesTaskDocument = gql`
+  mutation ExportRepliesTask_createExportRepliesTask($petitionId: GID!, $pattern: String) {
+    createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
+      ...TaskProgressDialog_Task
     }
   }
-  ${useExportPdfTask_TaskFragmentDoc}
+  ${TaskProgressDialog_TaskFragmentDoc}
 `;
-export function useuseExportPdfTask_createPrintPdfTaskMutation(
+export function useExportRepliesTask_createExportRepliesTaskMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    useExportPdfTask_createPrintPdfTaskMutation,
-    useExportPdfTask_createPrintPdfTaskMutationVariables
+    ExportRepliesTask_createExportRepliesTaskMutation,
+    ExportRepliesTask_createExportRepliesTaskMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    useExportPdfTask_createPrintPdfTaskMutation,
-    useExportPdfTask_createPrintPdfTaskMutationVariables
-  >(useExportPdfTask_createPrintPdfTaskDocument, options);
+    ExportRepliesTask_createExportRepliesTaskMutation,
+    ExportRepliesTask_createExportRepliesTaskMutationVariables
+  >(ExportRepliesTask_createExportRepliesTaskDocument, options);
 }
-export type useExportPdfTask_createPrintPdfTaskMutationHookResult = ReturnType<
-  typeof useuseExportPdfTask_createPrintPdfTaskMutation
+export type ExportRepliesTask_createExportRepliesTaskMutationHookResult = ReturnType<
+  typeof useExportRepliesTask_createExportRepliesTaskMutation
+>;
+export const PrintPdfTask_createPrintPdfTaskDocument = gql`
+  mutation PrintPdfTask_createPrintPdfTask($petitionId: GID!) {
+    createPrintPdfTask(petitionId: $petitionId) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+`;
+export function usePrintPdfTask_createPrintPdfTaskMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PrintPdfTask_createPrintPdfTaskMutation,
+    PrintPdfTask_createPrintPdfTaskMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PrintPdfTask_createPrintPdfTaskMutation,
+    PrintPdfTask_createPrintPdfTaskMutationVariables
+  >(PrintPdfTask_createPrintPdfTaskDocument, options);
+}
+export type PrintPdfTask_createPrintPdfTaskMutationHookResult = ReturnType<
+  typeof usePrintPdfTask_createPrintPdfTaskMutation
 >;
 export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {

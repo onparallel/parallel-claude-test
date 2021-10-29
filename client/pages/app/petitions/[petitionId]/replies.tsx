@@ -95,11 +95,12 @@ import { withError } from "@parallel/utils/promises/withError";
 import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
-import { useExportPdfTask } from "@parallel/utils/useExportPdfTask";
+import { useExportRepliesTask } from "@parallel/utils/useExportRepliesTask";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
+import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -274,6 +275,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   };
   const showExportRepliesDialog = useExportRepliesDialog();
   const showExportRepliesProgressDialog = useExportRepliesProgressDialog();
+  const handleExportRepliesTask = useExportRepliesTask();
   const handleDownloadAllClick = useCallback(async () => {
     const hasFiles = petition.fields.some(
       (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
@@ -295,12 +297,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         }
 
         if (res.type === "DOWNLOAD_ZIP") {
-          window.open(
-            `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
-              res.pattern
-            )}`,
-            "_blank"
-          );
+          handleExportRepliesTask(petition.id, res.pattern);
         } else {
           const { pattern, externalClientId } = res;
           await showExportRepliesProgressDialog({
@@ -310,7 +307,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           });
         }
       } else {
-        window.open(`/api/downloads/petition/${petitionId}/files`, "_blank");
+        handleExportRepliesTask(petitionId);
       }
     } catch {}
   }, [petitionId, petition.fields]);
@@ -319,7 +316,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0
   );
 
-  const handleExportPetitionPDF = useExportPdfTask();
+  const handleExportPetitionPDF = usePrintPdfTask();
 
   const [createPetitionFieldComment] = usePetitionReplies_createPetitionFieldCommentMutation();
   async function handleAddComment(content: string, isInternal?: boolean) {

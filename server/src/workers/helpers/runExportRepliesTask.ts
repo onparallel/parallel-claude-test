@@ -1,49 +1,18 @@
-import contentDisposition from "content-disposition";
 import escapeStringRegexp from "escape-string-regexp";
-import { Router } from "express";
 import { indexBy, isDefined, zip } from "remeda";
-import { ApiContext } from "../context";
-import { createZipFile, ZipFileInput } from "../util/createZipFile";
-import { evaluateFieldVisibility } from "../util/fieldVisibility";
-import { fromGlobalId } from "../util/globalId";
-import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
-import { authenticate } from "./helpers/authenticate";
-import { PetitionExcelExport } from "./helpers/PetitionExcelExport";
-
-/**
- * This code is a bit messy. It needs some cleanup and tests
- */
-
-export const downloads = Router()
-  .use(authenticate())
-  .get("/petition/:petitionId/files", async (req, res, next) => {
-    try {
-      const ctx = req.context;
-      const user = ctx.user!;
-      const { id: petitionId } = fromGlobalId(req.params.petitionId, "Petition");
-      const hasAccess = await ctx.petitions.userHasAccessToPetitions(user.id, [petitionId]);
-      if (!hasAccess) {
-        throw new Error("No access");
-      }
-      const pattern = (req.query.pattern as string) ?? "#file-name#";
-      const petition = await ctx.petitions.loadPetition(petitionId);
-
-      const name = petition?.name?.replace(/\./g, "_") ?? "files";
-      res.header(
-        "content-disposition",
-        contentDisposition(sanitizeFilenameWithSuffix(name, ".zip"), { type: "attachment" })
-      );
-      const zipFile = createZipFile(getPetitionFiles(ctx, petitionId, pattern, petition?.locale));
-      zipFile.pipe(res);
-    } catch (error: any) {
-      next(error);
-    }
-  });
+import { PetitionExcelExport } from "../../api/helpers/PetitionExcelExport";
+import { WorkerContext } from "../../context";
+import { Task } from "../../db/repositories/TaskRepository";
+import { createZipFile, ZipFileInput } from "../../util/createZipFile";
+import { evaluateFieldVisibility } from "../../util/fieldVisibility";
+import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
+import { random } from "../../util/token";
+import { TaskUpdateHandler } from "../task-worker";
 
 const placeholders = ["field-number", "field-title", "file-name"] as const;
 
 async function* getPetitionFiles(
-  ctx: ApiContext,
+  ctx: WorkerContext,
   petitionId: number,
   pattern: string,
   locale = "en"
@@ -168,4 +137,51 @@ function rename<T extends string>(
       return part;
     })
     .join("");
+}
+
+export async function runExportRepliesTask(
+  task: Task<"EXPORT_REPLIES">,
+  ctx: WorkerContext,
+  onUpdate: TaskUpdateHandler<"EXPORT_REPLIES">
+) {
+  try {
+    const { petitionId, pattern } = task.input;
+
+    const hasAccess = await ctx.petitions.userHasAccessToPetitions(task.user_id, [petitionId]);
+    if (!hasAccess) {
+      return;
+    }
+    const petition = (await ctx.petitions.loadPetition(petitionId))!;
+    const name = petition.name?.replace(/\./g, "_") ?? "files";
+
+    onUpdate(25);
+
+    const zipFile = createZipFile(
+      getPetitionFiles(ctx, petitionId, pattern ?? "#file-name#", petition?.locale)
+    );
+
+    onUpdate(75);
+
+    const path = random(16);
+    const res = await ctx.aws.temporaryFiles.uploadFile(path, "application/zip", zipFile);
+    const tmpFile = await ctx.files.createTemporaryFile(
+      {
+        path,
+        content_type: "application/zip",
+        filename: sanitizeFilenameWithSuffix(name, ".zip"),
+        size: res["ContentLength"]!.toString(),
+      },
+      `TaskWorker:${task.id}`
+    );
+
+    const url = await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+      tmpFile.path,
+      tmpFile.filename,
+      "attachment"
+    );
+
+    onUpdate(100, undefined, { url });
+  } catch (error: any) {
+    onUpdate(null, { message: error.message });
+  }
 }

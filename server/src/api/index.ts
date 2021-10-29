@@ -4,7 +4,6 @@ import morgan from "morgan";
 import { ApiContext } from "../context";
 import { LOGGER, ILogger } from "../services/logger";
 import { auth } from "./auth";
-import { downloads } from "./downloads";
 import { lambdas } from "./lambdas";
 import { api as publicApi } from "./public";
 import { webhooks } from "./webhooks";
@@ -29,7 +28,6 @@ export function api(container: Container) {
       }) as any
     )
     .use("/auth", auth)
-    .use("/downloads", downloads)
     .use("/webhooks", webhooks)
     .use("/lambda", lambdas)
     .use("/v1", publicApi.handler())

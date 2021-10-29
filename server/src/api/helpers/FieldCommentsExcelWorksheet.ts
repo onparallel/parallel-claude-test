@@ -1,5 +1,5 @@
 import Excel from "exceljs";
-import { ApiContext } from "../../context";
+import { ApiContext, WorkerContext } from "../../context";
 import { Contact, PetitionField, PetitionFieldComment, User } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { Maybe } from "../../util/types";
@@ -15,7 +15,7 @@ export type FieldCommentRow = {
 };
 
 export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow> {
-  constructor(locale: string, wb: Excel.Workbook, private context: ApiContext) {
+  constructor(locale: string, wb: Excel.Workbook, private context: ApiContext | WorkerContext) {
     super(locale === "en" ? "Comments" : "Comentarios", locale, wb);
     this.page.columns = [
       {

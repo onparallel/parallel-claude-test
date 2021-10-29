@@ -2,12 +2,12 @@ import { gql } from "@apollo/client";
 import { useDialog } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { TaskProgressDialog } from "@parallel/components/common/TaskProgressDialog";
-import { useuseExportPdfTask_createPrintPdfTaskMutation } from "@parallel/graphql/__types";
+import { usePrintPdfTask_createPrintPdfTaskMutation } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { withError } from "./promises/withError";
 
-export function useExportPdfTask() {
-  const [createTask] = useuseExportPdfTask_createPrintPdfTaskMutation();
+export function usePrintPdfTask() {
+  const [createTask] = usePrintPdfTask_createPrintPdfTaskMutation();
   const showTaskProgressDialog = useDialog(TaskProgressDialog);
   const showErrorDialog = useErrorDialog();
   const intl = useIntl();
@@ -19,7 +19,7 @@ export function useExportPdfTask() {
         task: data!.createPrintPdfTask,
         dialogHeader: intl.formatMessage({
           id: "component.task-progress-dialog.print-pdf.header",
-          defaultMessage: "Generating PDF file",
+          defaultMessage: "Generating PDF file...",
         }),
       })
     );
@@ -39,25 +39,13 @@ export function useExportPdfTask() {
   };
 }
 
-useExportPdfTask.fragments = {
-  Task: gql`
-    fragment useExportPdfTask_Task on Task {
-      id
-      name
-      output
-      status
-      progress
-    }
-  `,
-};
-
-useExportPdfTask.mutations = [
+usePrintPdfTask.mutations = [
   gql`
-    mutation useExportPdfTask_createPrintPdfTask($petitionId: GID!) {
+    mutation PrintPdfTask_createPrintPdfTask($petitionId: GID!) {
       createPrintPdfTask(petitionId: $petitionId) {
-        ...useExportPdfTask_Task
+        ...TaskProgressDialog_Task
       }
     }
-    ${useExportPdfTask.fragments.Task}
+    ${TaskProgressDialog.fragments.Task}
   `,
 ];

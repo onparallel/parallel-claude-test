@@ -499,6 +499,11 @@ type Mutation {
   createEventSubscription(eventsUrl: String!): PetitionEventSubscription!
 
   """
+  Creates a task for exporting a ZIP file with petition replies and sends it to the queue
+  """
+  createExportRepliesTask(pattern: String, petitionId: GID!): Task!
+
+  """
   Creates a reply to a file upload field.
   """
   createFileUploadReply(fieldId: GID!, file: Upload!, petitionId: GID!): PetitionFieldReply!
