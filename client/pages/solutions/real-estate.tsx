@@ -156,7 +156,7 @@ export default function RealEstate() {
     <PublicLayout
       title={intl.formatMessage({
         id: "public.real-estate.title",
-        defaultMessage: "Sell and rent properties faster with the best client experience",
+        defaultMessage: "Software for Real Estate",
       })}
       description={intl.formatMessage({
         id: "public.real-estate.meta-description",
