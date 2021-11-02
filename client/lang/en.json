@@ -6395,11 +6395,6 @@
     "context": "Improve your customer experience"
   },
   {
-    "term": "public.law-firms.book-cta-title",
-    "definition": "How can we help you?",
-    "context": "How can we help you?"
-  },
-  {
     "term": "public.law-firms.hero-alt",
     "definition": "A picture showcasing the following templates from Parallel: KYC, income tax, incorporation of a limited liability company, share capital increase and carve-out of a company.",
     "context": "A picture showcasing the following templates from Parallel: KYC, income tax, incorporation of a limited liability company, share capital increase and carve-out of a company."
@@ -6451,8 +6446,8 @@
   },
   {
     "term": "public.law-use-cases.esignature-description",
-    "definition": "Enable an advance eSignature to your proccess, completely secure and legally valid..",
-    "context": "Enable an advance eSignature to your proccess, completely secure and legally valid.."
+    "definition": "Enable an advance eSignature to your proccess, completely secure and legally valid.",
+    "context": "Enable an advance eSignature to your proccess, completely secure and legally valid."
   },
   {
     "term": "public.law-use-cases.esignature-title",
@@ -7070,6 +7065,151 @@
     "context": "An error happened"
   },
   {
+    "term": "public.real-estate",
+    "definition": "Real Estate",
+    "context": "Real Estate"
+  },
+  {
+    "term": "public.real-estate.accessible-description",
+    "definition": "From your computer or mobile phone, your team and your clients can fill, review and sign all the forms and documents that you need.",
+    "context": "From your computer or mobile phone, your team and your clients can fill, review and sign all the forms and documents that you need."
+  },
+  {
+    "term": "public.real-estate.accessible-title",
+    "definition": "Accessible from anywhere",
+    "context": "Accessible from anywhere"
+  },
+  {
+    "term": "public.real-estate.advanced-esignature",
+    "definition": "Advanced eSignature of documents",
+    "context": "Advanced eSignature of documents"
+  },
+  {
+    "term": "public.real-estate.benefits-communication-message",
+    "definition": "Avoid chaos in long email threads. Centralize communications in a single place where you work with the information and the documents.",
+    "context": "Avoid chaos in long email threads. Centralize communications in a single place where you work with the information and the documents."
+  },
+  {
+    "term": "public.real-estate.benefits-communication-title",
+    "definition": "Make communications between the office and the commercial team easier",
+    "context": "Make communications between the office and the commercial team easier"
+  },
+  {
+    "term": "public.real-estate.benefits-efficiency-message",
+    "definition": "Parallel helps you manage the real estate transaction lifecycle in a fast and digital way. Say no more to physical paper and to email threads.",
+    "context": "Parallel helps you manage the real estate transaction lifecycle in a fast and digital way. Say no more to physical paper and to email threads."
+  },
+  {
+    "term": "public.real-estate.benefits-efficiency-title",
+    "definition": "More transactions, less paperwork",
+    "context": "More transactions, less paperwork"
+  },
+  {
+    "term": "public.real-estate.benefits-technology-message",
+    "definition": "Automate your processes without putting in check the flexibility of requesting anything you need, the documents you generate and the signers you name.",
+    "context": "Automate your processes without putting in check the flexibility of requesting anything you need, the documents you generate and the signers you name."
+  },
+  {
+    "term": "public.real-estate.benefits-technology-title",
+    "definition": "Technology + flexible",
+    "context": "Technology + flexible"
+  },
+  {
+    "term": "public.real-estate.customized-request",
+    "definition": "Customized and automated request of information of the owners and the properties",
+    "context": "Customized and automated request of information of the owners and the properties"
+  },
+  {
+    "term": "public.real-estate.end-to-end-body",
+    "definition": "Centralize your real estate transactions processes from end-to-end with:",
+    "context": "Centralize your real estate transactions processes from end-to-end with:"
+  },
+  {
+    "term": "public.real-estate.end-to-end-footer",
+    "definition": "Everything for you and your clients, in an easy, organized, secure and 100% online way.",
+    "context": "Everything for you and your clients, in an easy, organized, secure and 100% online way."
+  },
+  {
+    "term": "public.real-estate.end-to-end-solution",
+    "definition": "End-to-end solution",
+    "context": "End-to-end solution"
+  },
+  {
+    "term": "public.real-estate.end-to-end-title",
+    "definition": "A single solution for all the paperwork",
+    "context": "A single solution for all the paperwork"
+  },
+  {
+    "term": "public.real-estate.esignature-description",
+    "definition": "Execute contracts with an advanced eSignature in a simple, completely secure and with legal certainty way.",
+    "context": "Execute contracts with an advanced eSignature in a simple, completely secure and with legal certainty way."
+  },
+  {
+    "term": "public.real-estate.esignature-title",
+    "definition": "Advanced eSignature",
+    "context": "Advanced eSignature"
+  },
+  {
+    "term": "public.real-estate.hero-alt",
+    "definition": "A picture showcasing the following templates from Parallel: KYC, Deposit Agreement, Real Estate Mediation Agreement, Visit Sheet and Rental Data Request.",
+    "context": "A picture showcasing the following templates from Parallel: KYC, Deposit Agreement, Real Estate Mediation Agreement, Visit Sheet and Rental Data Request."
+  },
+  {
+    "term": "public.real-estate.hero-subtitle",
+    "definition": "Parallel is the software that accelerates the processes from end to end, including the owner’s mandate, buyers visit sheets, and the signature of the purchase agreement. Everything in an easy, totally secure and instant way.",
+    "context": "Parallel is the software that accelerates the processes from end to end, including the owner’s mandate, buyers visit sheets, and the signature of the purchase agreement. Everything in an easy, totally secure and instant way."
+  },
+  {
+    "term": "public.real-estate.hero-title",
+    "definition": "Sell and rent properties faster with the best client experience",
+    "context": "Sell and rent properties faster with the best client experience"
+  },
+  {
+    "term": "public.real-estate.meta-description",
+    "definition": "Software to automate back-office and legal tasks, from the collection of information to the signature of contracts, in an easy, secure and instant way.",
+    "context": "Software to automate back-office and legal tasks, from the collection of information to the signature of contracts, in an easy, secure and instant way."
+  },
+  {
+    "term": "public.real-estate.smart-document",
+    "definition": "Smart document generation",
+    "context": "Smart document generation"
+  },
+  {
+    "term": "public.real-estate.smart-forms-description",
+    "definition": "Make processes and technolgoy adapt to your needs and your clients needs, not the way around.",
+    "context": "Make processes and technolgoy adapt to your needs and your clients needs, not the way around."
+  },
+  {
+    "term": "public.real-estate.smart-forms-title",
+    "definition": "Smart forms and documents",
+    "context": "Smart forms and documents"
+  },
+  {
+    "term": "public.real-estate.solutions-title",
+    "definition": "Solutions for Real Estate Agencies",
+    "context": "Solutions for Real Estate Agencies"
+  },
+  {
+    "term": "public.real-estate.speed-up-body",
+    "definition": "Surprise your clients in the same visit of the property and leave with a signed mandate and all the information you need.",
+    "context": "Surprise your clients in the same visit of the property and leave with a signed mandate and all the information you need."
+  },
+  {
+    "term": "public.real-estate.speed-up-title",
+    "definition": "Add a new property to your portfolio in less than 15 minutes",
+    "context": "Add a new property to your portfolio in less than 15 minutes"
+  },
+  {
+    "term": "public.real-estate.title",
+    "definition": "Sell and rent properties faster with the best client experience",
+    "context": "Sell and rent properties faster with the best client experience"
+  },
+  {
+    "term": "public.real-estate.use-case",
+    "definition": "Use case",
+    "context": "Use case"
+  },
+  {
     "term": "public.request-information.cta-title",
     "definition": "Start streamlining your petitions for information",
     "context": "Start streamlining your petitions for information"
@@ -7305,6 +7445,11 @@
     "context": "BPO and accounting"
   },
   {
+    "term": "public.solutions.book-cta-title",
+    "definition": "How can we help you?",
+    "context": "How can we help you?"
+  },
+  {
     "term": "public.solutions.consultancy-link",
     "definition": "Consultancy",
     "context": "Consultancy"
@@ -7313,6 +7458,11 @@
     "term": "public.solutions.law-firms-link",
     "definition": "Law firms",
     "context": "Law firms"
+  },
+  {
+    "term": "public.solutions.real-estate-link",
+    "definition": "Real Estate",
+    "context": "Real Estate"
   },
   {
     "term": "public.solutions.security",

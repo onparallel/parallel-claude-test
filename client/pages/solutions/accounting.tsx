@@ -171,7 +171,7 @@ export default function Accounting() {
         wrapper={{ paddingY: 16, paddingBottom: 20 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/security.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/security.svg`}
           imageSize="300px"
         >
           <Heading as="h4" size="xs" lineHeight="24px" color="gray.600" textTransform="uppercase">
@@ -249,7 +249,7 @@ export default function Accounting() {
       </PublicContainer>
       <SolutionsDemoCta>
         <FormattedMessage
-          id="public.law-firms.book-cta-title"
+          id="public.solutions.book-cta-title"
           defaultMessage="How can we help you?"
         />
       </SolutionsDemoCta>

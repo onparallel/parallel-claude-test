@@ -6395,11 +6395,6 @@
     "context": "Improve your customer experience"
   },
   {
-    "term": "public.law-firms.book-cta-title",
-    "definition": "¿Te ayudamos?",
-    "context": "How can we help you?"
-  },
-  {
     "term": "public.law-firms.hero-alt",
     "definition": "Imagen que muestra las siguientes plantillas de Parallel: KYC, Due Diligence, Consitución de una S.L, ampliación de capital y escisión parcial de una sociedad.",
     "context": "A picture showcasing the following templates from Parallel: KYC, income tax, incorporation of a limited liability company, share capital increase and carve-out of a company."
@@ -6452,7 +6447,7 @@
   {
     "term": "public.law-use-cases.esignature-description",
     "definition": "Añade una firma digital avanzada a tus procesos de forma sencilla, completamente segura y legalmente válida.",
-    "context": "Enable an advance eSignature to your proccess, completely secure and legally valid.."
+    "context": "Enable an advance eSignature to your proccess, completely secure and legally valid."
   },
   {
     "term": "public.law-use-cases.esignature-title",
@@ -7070,6 +7065,151 @@
     "context": "An error happened"
   },
   {
+    "term": "public.real-estate",
+    "definition": "Inmobiliario",
+    "context": "Real Estate"
+  },
+  {
+    "term": "public.real-estate.accessible-description",
+    "definition": "Desde el ordenador o el móvil, tu equipo y tus clientes podrán rellenar, revisar y firmar los formularios y los documentos que necesites.",
+    "context": "From your computer or mobile phone, your team and your clients can fill, review and sign all the forms and documents that you need."
+  },
+  {
+    "term": "public.real-estate.accessible-title",
+    "definition": "Accesible desde cualquier lugar",
+    "context": "Accessible from anywhere"
+  },
+  {
+    "term": "public.real-estate.advanced-esignature",
+    "definition": "Firma electrónica avanzada de documentos",
+    "context": "Advanced eSignature of documents"
+  },
+  {
+    "term": "public.real-estate.benefits-communication-message",
+    "definition": "Evita el caos de las cadenas de correo. Centraliza la comunicación en el mismo lugar donde trabajas con la información y los documentos.",
+    "context": "Avoid chaos in long email threads. Centralize communications in a single place where you work with the information and the documents."
+  },
+  {
+    "term": "public.real-estate.benefits-communication-title",
+    "definition": "Facilita la comunicación entre la oficina y el equipo comercial",
+    "context": "Make communications between the office and the commercial team easier"
+  },
+  {
+    "term": "public.real-estate.benefits-efficiency-message",
+    "definition": "Te ayudamos a gestionar el ciclo de vida completo de las operaciones inmobiliarias de forma más rápida y digital, de verdad. Di adiós al papel y a las cadenas de correo.",
+    "context": "Parallel helps you manage the real estate transaction lifecycle in a fast and digital way. Say no more to physical paper and to email threads."
+  },
+  {
+    "term": "public.real-estate.benefits-efficiency-title",
+    "definition": "Más operaciones, menos papeleo",
+    "context": "More transactions, less paperwork"
+  },
+  {
+    "term": "public.real-estate.benefits-technology-message",
+    "definition": "Automatiza tus procesos sin poner en jaque la flexibilidad de poder adaptar lo que pides, los documentos que generas y las personas que firman.",
+    "context": "Automate your processes without putting in check the flexibility of requesting anything you need, the documents you generate and the signers you name."
+  },
+  {
+    "term": "public.real-estate.benefits-technology-title",
+    "definition": "Tecnología + flexible",
+    "context": "Technology + flexible"
+  },
+  {
+    "term": "public.real-estate.customized-request",
+    "definition": "Solicitud personalizada y automatizada de los datos de los propietarios y la información de los inmuebles",
+    "context": "Customized and automated request of information of the owners and the properties"
+  },
+  {
+    "term": "public.real-estate.end-to-end-body",
+    "definition": "Centraliza todos tus procesos inmobiliarios de principio a fin mediante la:",
+    "context": "Centralize your real estate transactions processes from end-to-end with:"
+  },
+  {
+    "term": "public.real-estate.end-to-end-footer",
+    "definition": "Todo ello para ti y para tus clientes, de forma muy fácil, ordenada, segura y 100% online.",
+    "context": "Everything for you and your clients, in an easy, organized, secure and 100% online way."
+  },
+  {
+    "term": "public.real-estate.end-to-end-solution",
+    "definition": "Solución integral",
+    "context": "End-to-end solution"
+  },
+  {
+    "term": "public.real-estate.end-to-end-title",
+    "definition": "Una solución para todo el papeleo",
+    "context": "A single solution for all the paperwork"
+  },
+  {
+    "term": "public.real-estate.esignature-description",
+    "definition": "Perfecciona los contratos con firma digital avanzada de forma sencilla, completamente segura y con plena validez jurídica.",
+    "context": "Execute contracts with an advanced eSignature in a simple, completely secure and with legal certainty way."
+  },
+  {
+    "term": "public.real-estate.esignature-title",
+    "definition": "Firma electrónica avanzada",
+    "context": "Advanced eSignature"
+  },
+  {
+    "term": "public.real-estate.hero-alt",
+    "definition": "Imagen que muestra las siguientes plantillas de Parallel: KYC, Contrato de arras, Contrato de mediación inmobiliaria, Hoja de visitas y Solicitud de datos para el alquiler.",
+    "context": "A picture showcasing the following templates from Parallel: KYC, Deposit Agreement, Real Estate Mediation Agreement, Visit Sheet and Rental Data Request."
+  },
+  {
+    "term": "public.real-estate.hero-subtitle",
+    "definition": "Parallel es el software que acelera los procesos de inicio a fin, desde el mandato del propietario, pasando por las visitas de los compradores, hasta la firma del contrato de compraventa, de forma fácil, totalmente segura e instantánea.",
+    "context": "Parallel is the software that accelerates the processes from end to end, including the owner’s mandate, buyers visit sheets, and the signature of the purchase agreement. Everything in an easy, totally secure and instant way."
+  },
+  {
+    "term": "public.real-estate.hero-title",
+    "definition": "Cierra más operaciones y minimiza errores automatizando las tareas administrativas",
+    "context": "Sell and rent properties faster with the best client experience"
+  },
+  {
+    "term": "public.real-estate.meta-description",
+    "definition": "Programa de automatización de tareas administrativas desde la obtención de información hasta la firma del contrato, de forma fácil, segura e instantánea.",
+    "context": "Software to automate back-office and legal tasks, from the collection of information to the signature of contracts, in an easy, secure and instant way."
+  },
+  {
+    "term": "public.real-estate.smart-document",
+    "definition": "Generación de documentos inteligente",
+    "context": "Smart document generation"
+  },
+  {
+    "term": "public.real-estate.smart-forms-description",
+    "definition": "Haz que los procesos y la tecnología se adapten a tus necesidades y a las de tu cliente, no al revés. ",
+    "context": "Make processes and technolgoy adapt to your needs and your clients needs, not the way around."
+  },
+  {
+    "term": "public.real-estate.smart-forms-title",
+    "definition": "Formularios y documentos inteligentes",
+    "context": "Smart forms and documents"
+  },
+  {
+    "term": "public.real-estate.solutions-title",
+    "definition": "Soluciones para Agencias inmobiliarias",
+    "context": "Solutions for Real Estate Agencies"
+  },
+  {
+    "term": "public.real-estate.speed-up-body",
+    "definition": "Sorprende a tu cliente en la misma visita del inmueble y sal con un mandato firmado y toda la documentación que necesitas.",
+    "context": "Surprise your clients in the same visit of the property and leave with a signed mandate and all the information you need."
+  },
+  {
+    "term": "public.real-estate.speed-up-title",
+    "definition": "Consigue una nueva propiedad en menos de 15 minutos",
+    "context": "Add a new property to your portfolio in less than 15 minutes"
+  },
+  {
+    "term": "public.real-estate.title",
+    "definition": "Vende y alquila más rápido mejorando la experiencia de tu cliente",
+    "context": "Sell and rent properties faster with the best client experience"
+  },
+  {
+    "term": "public.real-estate.use-case",
+    "definition": "Caso de uso",
+    "context": "Use case"
+  },
+  {
     "term": "public.request-information.cta-title",
     "definition": "Empieza a agilizar tus peticiones de información",
     "context": "Start streamlining your petitions for information"
@@ -7305,6 +7445,11 @@
     "context": "BPO and accounting"
   },
   {
+    "term": "public.solutions.book-cta-title",
+    "definition": "¿Te ayudamos?",
+    "context": "How can we help you?"
+  },
+  {
     "term": "public.solutions.consultancy-link",
     "definition": "Asesorías",
     "context": "Consultancy"
@@ -7313,6 +7458,11 @@
     "term": "public.solutions.law-firms-link",
     "definition": "Despachos de abogados",
     "context": "Law firms"
+  },
+  {
+    "term": "public.solutions.real-estate-link",
+    "definition": "Inmobiliario",
+    "context": "Real Estate"
   },
   {
     "term": "public.solutions.security",

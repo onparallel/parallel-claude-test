@@ -140,7 +140,7 @@ export default function LawFirms() {
       description: (
         <FormattedMessage
           id="public.law-use-cases.esignature-description"
-          defaultMessage="Enable an advance eSignature to your proccess, completely secure and legally valid.."
+          defaultMessage="Enable an advance eSignature to your proccess, completely secure and legally valid."
         />
       ),
     },
@@ -222,7 +222,7 @@ export default function LawFirms() {
         wrapper={{ paddingY: 16, paddingBottom: 32 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/security.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/security.svg`}
           imageSize="300px"
           isReversed
         >
@@ -268,7 +268,7 @@ export default function LawFirms() {
       </PublicContainer>
       <SolutionsDemoCta>
         <FormattedMessage
-          id="public.law-firms.book-cta-title"
+          id="public.solutions.book-cta-title"
           defaultMessage="How can we help you?"
         />
       </SolutionsDemoCta>

@@ -225,7 +225,7 @@ export default function Consultancy() {
       </PublicContainer>
       <SolutionsDemoCta>
         <FormattedMessage
-          id="public.law-firms.book-cta-title"
+          id="public.solutions.book-cta-title"
           defaultMessage="How can we help you?"
         />
       </SolutionsDemoCta>
