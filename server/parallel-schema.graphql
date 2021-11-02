@@ -739,7 +739,7 @@ type Mutation {
   """
   Returns a signed download url for tasks with file output
   """
-  getTaskResultFileUrl(preview: Boolean, taskId: GID!): String!
+  getTaskResultFileUrl(preview: Boolean, taskId: GID!): FileUploadDownloadLinkResult!
 
   """
   Generates a download link for a field attachment

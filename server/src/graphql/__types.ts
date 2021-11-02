@@ -868,7 +868,7 @@ export interface NexusGenFieldTypes {
     editPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
-    getTaskResultFileUrl: string; // String!
+    getTaskResultFileUrl: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
@@ -2037,7 +2037,7 @@ export interface NexusGenFieldTypeNames {
     editPetitionPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
-    getTaskResultFileUrl: "String";
+    getTaskResultFileUrl: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     publicCheckVerificationCode: "VerificationCodeCheck";

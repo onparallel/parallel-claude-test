@@ -3,6 +3,7 @@ import { Task } from "../../db/repositories/TaskRepository";
 import { authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { RESULT } from "../helpers/result";
 import { userHasAccessToPetitions } from "../petition/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
 
@@ -49,7 +50,7 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
 
 export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
   description: "Returns a signed download url for tasks with file output",
-  type: "String",
+  type: "FileUploadDownloadLinkResult",
   authorize: authenticateAnd(
     userHasAccessToTasks("taskId"),
     tasksAreOfType("taskId", ["EXPORT_REPLIES", "PRINT_PDF"])
@@ -59,21 +60,29 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
     preview: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
-    const task = (await ctx.tasks.loadTask(args.taskId)) as
-      | Task<"EXPORT_REPLIES">
-      | Task<"PRINT_PDF">;
+    try {
+      const task = (await ctx.tasks.loadTask(args.taskId)) as
+        | Task<"EXPORT_REPLIES">
+        | Task<"PRINT_PDF">;
 
-    const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
-    if (!file) {
-      throw new WhitelistedError(
-        `Temporary file not found for Task:${task.id} output`,
-        "FILE_NOT_FOUND_ERROR"
+      const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
+      if (!file) {
+        throw new WhitelistedError(
+          `Temporary file not found for Task:${task.id} output`,
+          "FILE_NOT_FOUND_ERROR"
+        );
+      }
+      const url = await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+        file?.path,
+        file?.filename,
+        args.preview ? "inline" : "attachment"
       );
-    }
-    return await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
-      file?.path,
-      file?.filename,
-      args.preview ? "inline" : "attachment"
-    );
+
+      return {
+        result: RESULT.SUCCESS,
+        url,
+      };
+    } catch {}
+    return { result: RESULT.FAILURE };
   },
 });

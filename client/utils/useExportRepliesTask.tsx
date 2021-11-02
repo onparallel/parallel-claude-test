@@ -45,7 +45,10 @@ export function useExportRepliesTask() {
     } else {
       openNewWindow(async () => {
         const { data } = await generateDownloadURL({ variables: { taskId: finishedTask!.id } });
-        return data!.getTaskResultFileUrl;
+        if (data?.getTaskResultFileUrl.result !== "SUCCESS") {
+          throw new Error();
+        }
+        return data.getTaskResultFileUrl.url!;
       });
     }
   };
@@ -62,7 +65,10 @@ useExportRepliesTask.mutations = [
   `,
   gql`
     mutation ExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: false)
+      getTaskResultFileUrl(taskId: $taskId, preview: false) {
+        result
+        url
+      }
     }
   `,
 ];

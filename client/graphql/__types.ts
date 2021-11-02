@@ -423,7 +423,7 @@ export interface Mutation {
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Returns a signed download url for tasks with file output */
-  getTaskResultFileUrl: Scalars["String"];
+  getTaskResultFileUrl: FileUploadDownloadLinkResult;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -12865,7 +12865,12 @@ export type ExportRepliesTask_getTaskResultFileUrlMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type ExportRepliesTask_getTaskResultFileUrlMutation = Pick<Mutation, "getTaskResultFileUrl">;
+export type ExportRepliesTask_getTaskResultFileUrlMutation = {
+  getTaskResultFileUrl: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
+};
 
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -12963,7 +12968,12 @@ export type PrintPdfTask_getTaskResultFileUrlMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type PrintPdfTask_getTaskResultFileUrlMutation = Pick<Mutation, "getTaskResultFileUrl">;
+export type PrintPdfTask_getTaskResultFileUrlMutation = {
+  getTaskResultFileUrl: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
+};
 
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
@@ -20994,7 +21004,10 @@ export type ExportRepliesTask_createExportRepliesTaskMutationHookResult = Return
 >;
 export const ExportRepliesTask_getTaskResultFileUrlDocument = gql`
   mutation ExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: false)
+    getTaskResultFileUrl(taskId: $taskId, preview: false) {
+      result
+      url
+    }
   }
 `;
 export function useExportRepliesTask_getTaskResultFileUrlMutation(
@@ -21037,7 +21050,10 @@ export type PrintPdfTask_createPrintPdfTaskMutationHookResult = ReturnType<
 >;
 export const PrintPdfTask_getTaskResultFileUrlDocument = gql`
   mutation PrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: true)
+    getTaskResultFileUrl(taskId: $taskId, preview: true) {
+      result
+      url
+    }
   }
 `;
 export function usePrintPdfTask_getTaskResultFileUrlMutation(

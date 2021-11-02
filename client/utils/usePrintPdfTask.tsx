@@ -45,7 +45,10 @@ export function usePrintPdfTask() {
     } else {
       openNewWindow(async () => {
         const { data } = await generateDownloadURL({ variables: { taskId: finishedTask!.id } });
-        return data!.getTaskResultFileUrl;
+        if (data?.getTaskResultFileUrl.result !== "SUCCESS") {
+          throw new Error();
+        }
+        return data.getTaskResultFileUrl.url!;
       });
     }
   };
@@ -62,7 +65,10 @@ usePrintPdfTask.mutations = [
   `,
   gql`
     mutation PrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: true)
+      getTaskResultFileUrl(taskId: $taskId, preview: true) {
+        result
+        url
+      }
     }
   `,
 ];
