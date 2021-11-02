@@ -259,7 +259,6 @@ export interface NexusGenEnums {
     | "sentAt_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
-  TaskName: db.TaskName;
   TaskStatus: db.TaskStatus;
   Tone: db.Tone;
   UserAuthenticationTokens_OrderBy:
@@ -869,6 +868,7 @@ export interface NexusGenFieldTypes {
     editPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
+    getTaskResultFileUrl: string; // String!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
@@ -1613,8 +1613,6 @@ export interface NexusGenFieldTypes {
   Task: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
-    name: NexusGenEnums["TaskName"]; // TaskName!
-    output: NexusGenScalars["JSONObject"]; // JSONObject!
     progress: number | null; // Int
     status: NexusGenEnums["TaskStatus"]; // TaskStatus!
   };
@@ -2039,6 +2037,7 @@ export interface NexusGenFieldTypeNames {
     editPetitionPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
+    getTaskResultFileUrl: "String";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     publicCheckVerificationCode: "VerificationCodeCheck";
@@ -2783,8 +2782,6 @@ export interface NexusGenFieldTypeNames {
   Task: {
     // field return type name
     id: "GID";
-    name: "TaskName";
-    output: "JSONObject";
     progress: "Int";
     status: "TaskStatus";
   };
@@ -3211,6 +3208,11 @@ export interface NexusGenArgTypes {
     generateUserAuthToken: {
       // args
       tokenName: string; // String!
+    };
+    getTaskResultFileUrl: {
+      // args
+      preview?: boolean | null; // Boolean
+      taskId: NexusGenScalars["GID"]; // GID!
     };
     petitionFieldAttachmentDownloadLink: {
       // args

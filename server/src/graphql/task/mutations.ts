@@ -1,7 +1,10 @@
-import { mutationField, nonNull, nullable } from "nexus";
+import { booleanArg, mutationField, nonNull, nullable } from "nexus";
+import { Task } from "../../db/repositories/TaskRepository";
 import { authenticateAnd } from "../helpers/authorize";
+import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToPetitions } from "../petition/authorizers";
+import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
 
 export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   description: "Creates a task for printing a PDF of the petition and sends it to the queue",
@@ -10,8 +13,16 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
   },
-  resolve: async (_, input, ctx) =>
-    await ctx.task.createTask({ name: "PRINT_PDF", input }, ctx.user!.id),
+  resolve: async (_, args, ctx) =>
+    await ctx.task.createTask(
+      {
+        name: "PRINT_PDF",
+        input: {
+          petition_id: args.petitionId,
+        },
+      },
+      ctx.user!.id
+    ),
 });
 
 export const createExportRepliesTask = mutationField("createExportRepliesTask", {
@@ -23,6 +34,46 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
     petitionId: nonNull(globalIdArg("Petition")),
     pattern: nullable("String"),
   },
-  resolve: async (_, input, ctx) =>
-    await ctx.task.createTask({ name: "EXPORT_REPLIES", input }, ctx.user!.id),
+  resolve: async (_, args, ctx) =>
+    await ctx.task.createTask(
+      {
+        name: "EXPORT_REPLIES",
+        input: {
+          petition_id: args.petitionId,
+          pattern: args.pattern,
+        },
+      },
+      ctx.user!.id
+    ),
+});
+
+export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
+  description: "Returns a signed download url for tasks with file output",
+  type: "String",
+  authorize: authenticateAnd(
+    userHasAccessToTasks("taskId"),
+    tasksAreOfType("taskId", ["EXPORT_REPLIES", "PRINT_PDF"])
+  ),
+  args: {
+    taskId: nonNull(globalIdArg("Task")),
+    preview: nullable(booleanArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    const task = (await ctx.task.loadTask(args.taskId)) as
+      | Task<"EXPORT_REPLIES">
+      | Task<"PRINT_PDF">;
+
+    const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
+    if (!file) {
+      throw new WhitelistedError(
+        `Temporary file not found for Task:${task.id} output`,
+        "FILE_NOT_FOUND_ERROR"
+      );
+    }
+    return await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+      file?.path,
+      file?.filename,
+      args.preview ? "inline" : "attachment"
+    );
+  },
 });

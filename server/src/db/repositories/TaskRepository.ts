@@ -8,13 +8,13 @@ import { KNEX } from "../knex";
 import { Task as _Task, TaskName } from "../__types";
 
 export type TaskInput<TName extends TaskName> = {
-  EXPORT_REPLIES: { petitionId: number; pattern?: Maybe<string> };
-  PRINT_PDF: { petitionId: number };
+  EXPORT_REPLIES: { petition_id: number; pattern?: Maybe<string> };
+  PRINT_PDF: { petition_id: number };
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {
-  EXPORT_REPLIES: { url: string };
-  PRINT_PDF: { url: string };
+  EXPORT_REPLIES: { temporary_file_id: number };
+  PRINT_PDF: { temporary_file_id: number };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<

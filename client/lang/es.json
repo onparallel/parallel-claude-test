@@ -660,6 +660,16 @@
     "context": "Open file in NetDocuments"
   },
   {
+    "term": "component.export-replies-task.confirm",
+    "definition": "Descargar ZIP",
+    "context": "Download ZIP"
+  },
+  {
+    "term": "component.export-replies-task.header",
+    "definition": "Exportando respuestas...",
+    "context": "Exporting replies..."
+  },
+  {
     "term": "component.file-icon.audio-file",
     "definition": "Archivo de audio",
     "context": "Audio file"
@@ -1800,6 +1810,16 @@
     "context": "On demand"
   },
   {
+    "term": "component.print-pdf-task.confirm",
+    "definition": "Descargar PDF",
+    "context": "Download PDF"
+  },
+  {
+    "term": "component.print-pdf-task.header",
+    "definition": "Generando archivo PDF...",
+    "context": "Generating PDF file..."
+  },
+  {
     "term": "component.public-signup-form-experience.complete-button",
     "definition": "Finalizar registro",
     "context": "Complete registration"
@@ -2735,19 +2755,9 @@
     "context": "Remove tag \"{tag}\""
   },
   {
-    "term": "component.task-progress-dialog.export-replies.header",
-    "definition": "Exportando respuestas...",
-    "context": "Exporting replies..."
-  },
-  {
-    "term": "component.task-progress-dialog.print-pdf.header",
-    "definition": "Generando archivo PDF...",
-    "context": "Generating PDF file..."
-  },
-  {
-    "term": "component.task-progress-dialog.server-error",
-    "definition": "Ocurrió un error inesperado, por favor intenta nuevamente.",
-    "context": "An unexpected error happened, please try again."
+    "term": "component.task-progress-dialog.unknown-task.confirm",
+    "definition": "Ver resultado",
+    "context": "Get result"
   },
   {
     "term": "component.task-progress-dialog.unknown-task.header",

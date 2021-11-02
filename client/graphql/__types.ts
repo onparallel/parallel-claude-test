@@ -422,6 +422,8 @@ export interface Mutation {
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
+  /** Returns a signed download url for tasks with file output */
+  getTaskResultFileUrl: Scalars["String"];
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -805,6 +807,11 @@ export interface MutationfileUploadReplyDownloadLinkArgs {
 
 export interface MutationgenerateUserAuthTokenArgs {
   tokenName: Scalars["String"];
+}
+
+export interface MutationgetTaskResultFileUrlArgs {
+  preview?: Maybe<Scalars["Boolean"]>;
+  taskId: Scalars["GID"];
 }
 
 export interface MutationpetitionFieldAttachmentDownloadLinkArgs {
@@ -2738,13 +2745,9 @@ export interface TagPagination {
 export interface Task {
   __typename?: "Task";
   id: Scalars["GID"];
-  name: TaskName;
-  output: Scalars["JSONObject"];
   progress?: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 }
-
-export type TaskName = "EXPORT_REPLIES" | "PRINT_PDF";
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
@@ -3182,7 +3185,7 @@ export type TagEditDialog_updateTagMutation = {
 
 export type TaskProgressDialog_TaskFragment = { __typename?: "Task" } & Pick<
   Task,
-  "id" | "name" | "output" | "status" | "progress"
+  "id" | "status" | "progress"
 >;
 
 export type TaskProgressDialog_TaskQueryVariables = Exact<{
@@ -3190,7 +3193,7 @@ export type TaskProgressDialog_TaskQueryVariables = Exact<{
 }>;
 
 export type TaskProgressDialog_TaskQuery = {
-  task: { __typename?: "Task" } & Pick<Task, "id" | "name" | "output" | "status" | "progress">;
+  task: { __typename?: "Task" } & Pick<Task, "id" | "status" | "progress">;
 };
 
 export type UserAvatar_UserFragment = { __typename?: "User" } & Pick<
@@ -12855,11 +12858,14 @@ export type ExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
 }>;
 
 export type ExportRepliesTask_createExportRepliesTaskMutation = {
-  createExportRepliesTask: { __typename?: "Task" } & Pick<
-    Task,
-    "id" | "name" | "output" | "status" | "progress"
-  >;
+  createExportRepliesTask: { __typename?: "Task" } & Pick<Task, "id" | "status" | "progress">;
 };
+
+export type ExportRepliesTask_getTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type ExportRepliesTask_getTaskResultFileUrlMutation = Pick<Mutation, "getTaskResultFileUrl">;
 
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -12950,11 +12956,14 @@ export type PrintPdfTask_createPrintPdfTaskMutationVariables = Exact<{
 }>;
 
 export type PrintPdfTask_createPrintPdfTaskMutation = {
-  createPrintPdfTask: { __typename?: "Task" } & Pick<
-    Task,
-    "id" | "name" | "output" | "status" | "progress"
-  >;
+  createPrintPdfTask: { __typename?: "Task" } & Pick<Task, "id" | "status" | "progress">;
 };
+
+export type PrintPdfTask_getTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type PrintPdfTask_getTaskResultFileUrlMutation = Pick<Mutation, "getTaskResultFileUrl">;
 
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
@@ -13028,8 +13037,6 @@ export const TagEditDialog_TagFragmentDoc = gql`
 export const TaskProgressDialog_TaskFragmentDoc = gql`
   fragment TaskProgressDialog_Task on Task {
     id
-    name
-    output
     status
     progress
   }
@@ -20985,6 +20992,26 @@ export function useExportRepliesTask_createExportRepliesTaskMutation(
 export type ExportRepliesTask_createExportRepliesTaskMutationHookResult = ReturnType<
   typeof useExportRepliesTask_createExportRepliesTaskMutation
 >;
+export const ExportRepliesTask_getTaskResultFileUrlDocument = gql`
+  mutation ExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
+    getTaskResultFileUrl(taskId: $taskId, preview: false)
+  }
+`;
+export function useExportRepliesTask_getTaskResultFileUrlMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ExportRepliesTask_getTaskResultFileUrlMutation,
+    ExportRepliesTask_getTaskResultFileUrlMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ExportRepliesTask_getTaskResultFileUrlMutation,
+    ExportRepliesTask_getTaskResultFileUrlMutationVariables
+  >(ExportRepliesTask_getTaskResultFileUrlDocument, options);
+}
+export type ExportRepliesTask_getTaskResultFileUrlMutationHookResult = ReturnType<
+  typeof useExportRepliesTask_getTaskResultFileUrlMutation
+>;
 export const PrintPdfTask_createPrintPdfTaskDocument = gql`
   mutation PrintPdfTask_createPrintPdfTask($petitionId: GID!) {
     createPrintPdfTask(petitionId: $petitionId) {
@@ -21007,6 +21034,26 @@ export function usePrintPdfTask_createPrintPdfTaskMutation(
 }
 export type PrintPdfTask_createPrintPdfTaskMutationHookResult = ReturnType<
   typeof usePrintPdfTask_createPrintPdfTaskMutation
+>;
+export const PrintPdfTask_getTaskResultFileUrlDocument = gql`
+  mutation PrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
+    getTaskResultFileUrl(taskId: $taskId, preview: true)
+  }
+`;
+export function usePrintPdfTask_getTaskResultFileUrlMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PrintPdfTask_getTaskResultFileUrlMutation,
+    PrintPdfTask_getTaskResultFileUrlMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PrintPdfTask_getTaskResultFileUrlMutation,
+    PrintPdfTask_getTaskResultFileUrlMutationVariables
+  >(PrintPdfTask_getTaskResultFileUrlDocument, options);
+}
+export type PrintPdfTask_getTaskResultFileUrlMutationHookResult = ReturnType<
+  typeof usePrintPdfTask_getTaskResultFileUrlMutation
 >;
 export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {

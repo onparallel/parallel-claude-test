@@ -12,15 +12,19 @@ import { FormattedMessage } from "react-intl";
 import { generateCssStripe } from "../../utils/css";
 import { ConfirmDialog } from "./ConfirmDialog";
 
+interface TaskProgressDialogProps {
+  confirmText?: ReactNode;
+  dialogHeader?: ReactNode;
+  pollInterval?: number;
+  task: TaskProgressDialog_TaskFragment;
+}
 export function TaskProgressDialog({
-  task,
-  pollInterval,
+  confirmText,
   dialogHeader,
+  pollInterval,
+  task,
   ...props
-}: DialogProps<
-  { task: TaskProgressDialog_TaskFragment; dialogHeader?: ReactNode; pollInterval?: number },
-  any
->) {
+}: DialogProps<TaskProgressDialogProps, TaskProgressDialog_TaskFragment>) {
   const { data, refetch } = useTaskProgressDialog_TaskQuery({ variables: { id: task.id } });
   const processingTask = data?.task ?? task;
 
@@ -30,7 +34,6 @@ export function TaskProgressDialog({
         const { data: updatedData } = await refetch();
         if (updatedData.task.status === "COMPLETED") {
           done();
-          props.onResolve(updatedData.task.output);
         } else if (updatedData.task.status === "FAILED") {
           done();
           props.onReject("SERVER_ERROR");
@@ -56,7 +59,20 @@ export function TaskProgressDialog({
         )
       }
       body={<TaskProgressBar progress={processingTask.progress} />}
-      confirm={null}
+      confirm={
+        <Button
+          colorScheme="purple"
+          disabled={processingTask.status !== "COMPLETED"}
+          onClick={() => props.onResolve(processingTask)}
+        >
+          {confirmText ?? (
+            <FormattedMessage
+              id="component.task-progress-dialog.unknown-task.confirm"
+              defaultMessage="Get result"
+            />
+          )}
+        </Button>
+      }
       cancel={
         <Button colorScheme="red" onClick={() => props.onReject()}>
           <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
@@ -88,8 +104,6 @@ TaskProgressDialog.fragments = {
   Task: gql`
     fragment TaskProgressDialog_Task on Task {
       id
-      name
-      output
       status
       progress
     }

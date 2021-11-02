@@ -11,7 +11,7 @@ export async function runPrintPdfTask(
   onUpdate: TaskUpdateHandler<"PRINT_PDF">
 ) {
   try {
-    const { petitionId } = task.input;
+    const { petition_id: petitionId } = task.input;
     const hasAccess = await ctx.petitions.userHasAccessToPetitions(task.user_id, [petitionId]);
     if (!hasAccess) {
       return;
@@ -43,13 +43,7 @@ export async function runPrintPdfTask(
       `TaskWorker:${task.id}`
     );
 
-    const url = await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
-      tmpFile.path,
-      tmpFile.filename,
-      "inline"
-    );
-
-    onUpdate(100, undefined, { url });
+    onUpdate(100, undefined, { temporary_file_id: tmpFile.id });
   } catch (error: any) {
     onUpdate(null, { message: error.message });
   }

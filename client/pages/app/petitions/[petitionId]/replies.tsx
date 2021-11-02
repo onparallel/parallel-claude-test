@@ -307,7 +307,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           });
         }
       } else {
-        handleExportRepliesTask(petitionId);
+        handleExportRepliesTask(petition.id);
       }
     } catch {}
   }, [petitionId, petition.fields]);
@@ -316,7 +316,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0
   );
 
-  const handleExportPetitionPDF = usePrintPdfTask();
+  const handlePrintPdfTask = usePrintPdfTask();
 
   const [createPetitionFieldComment] = usePetitionReplies_createPetitionFieldCommentMutation();
   async function handleAddComment(content: string, isInternal?: boolean) {
@@ -581,7 +581,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               <MenuItem
                 icon={<FilePdfIcon boxSize={5} />}
                 isDisabled={!me.hasPetitionPdfExport}
-                onClick={() => handleExportPetitionPDF(petition.id)}
+                onClick={() => handlePrintPdfTask(petition.id)}
                 maxWidth={"260px"}
               >
                 <Text>

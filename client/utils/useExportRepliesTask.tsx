@@ -2,40 +2,51 @@ import { gql } from "@apollo/client";
 import { useDialog } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { TaskProgressDialog } from "@parallel/components/common/TaskProgressDialog";
-import { useExportRepliesTask_createExportRepliesTaskMutation } from "@parallel/graphql/__types";
+import {
+  useExportRepliesTask_createExportRepliesTaskMutation,
+  useExportRepliesTask_getTaskResultFileUrlMutation,
+} from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
+import { openNewWindow } from "./openNewWindow";
 import { withError } from "./promises/withError";
 import { Maybe } from "./types";
 
 export function useExportRepliesTask() {
+  const showError = useErrorDialog();
   const [createTask] = useExportRepliesTask_createExportRepliesTaskMutation();
+  const [generateDownloadURL] = useExportRepliesTask_getTaskResultFileUrlMutation();
   const showTaskProgressDialog = useDialog(TaskProgressDialog);
-  const showErrorDialog = useErrorDialog();
   const intl = useIntl();
 
   return async (petitionId: string, pattern?: Maybe<string>) => {
-    const { data } = await createTask({ variables: { petitionId, pattern } });
-    const [error, output] = await withError<Error, { url: string }>(
-      showTaskProgressDialog({
+    const [error, finishedTask] = await withError(async () => {
+      const { data } = await createTask({ variables: { petitionId, pattern } });
+      return await showTaskProgressDialog({
         task: data!.createExportRepliesTask,
         dialogHeader: intl.formatMessage({
-          id: "component.task-progress-dialog.export-replies.header",
+          id: "component.export-replies-task.header",
           defaultMessage: "Exporting replies...",
         }),
-      })
-    );
+        confirmText: intl.formatMessage({
+          id: "component.export-replies-task.confirm",
+          defaultMessage: "Download ZIP",
+        }),
+      });
+    });
 
     if (error?.message === "SERVER_ERROR") {
-      await showErrorDialog({
+      await showError({
         message: intl.formatMessage({
-          id: "component.task-progress-dialog.server-error",
-          defaultMessage: "An unexpected error happened, please try again.",
+          id: "generic.unexpected-error-happened",
+          defaultMessage:
+            "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
         }),
       });
     } else {
-      if (output) {
-        window.open(output.url);
-      }
+      openNewWindow(async () => {
+        const { data } = await generateDownloadURL({ variables: { taskId: finishedTask!.id } });
+        return data!.getTaskResultFileUrl;
+      });
     }
   };
 }
@@ -48,5 +59,10 @@ useExportRepliesTask.mutations = [
       }
     }
     ${TaskProgressDialog.fragments.Task}
+  `,
+  gql`
+    mutation ExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
+      getTaskResultFileUrl(taskId: $taskId, preview: false)
+    }
   `,
 ];

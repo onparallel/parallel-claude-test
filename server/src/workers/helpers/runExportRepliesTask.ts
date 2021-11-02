@@ -145,7 +145,7 @@ export async function runExportRepliesTask(
   onUpdate: TaskUpdateHandler<"EXPORT_REPLIES">
 ) {
   try {
-    const { petitionId, pattern } = task.input;
+    const { petition_id: petitionId, pattern } = task.input;
 
     const hasAccess = await ctx.petitions.userHasAccessToPetitions(task.user_id, [petitionId]);
     if (!hasAccess) {
@@ -174,13 +174,7 @@ export async function runExportRepliesTask(
       `TaskWorker:${task.id}`
     );
 
-    const url = await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
-      tmpFile.path,
-      tmpFile.filename,
-      "attachment"
-    );
-
-    onUpdate(100, undefined, { url });
+    onUpdate(100, undefined, { temporary_file_id: tmpFile.id });
   } catch (error: any) {
     onUpdate(null, { message: error.message });
   }
