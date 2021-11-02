@@ -2,8 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
-import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
-import { random } from "../../util/token";
+import { toGlobalId } from "../../util/globalId";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -138,122 +137,52 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
 }
 /** signed document has been completed and is ready to be downloaded */
 async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const petition = await ctx.petitions.loadPetition(petitionId);
-
-  if (!petition) {
-    throw new Error(`petition with id ${petitionId} not found.`);
-  }
-
-  const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
-    petition.org_id,
-    "SIGNATURE"
-  );
-
-  const signaturitIntegration = signatureIntegrations.find((i) => i.provider === "SIGNATURIT");
-
-  if (!signaturitIntegration) {
-    throw new Error(`Can't load SignaturIt integration for org with id ${petition.org_id}`);
-  }
-  const client = ctx.signature.getClient(signaturitIntegration);
-
   const {
     id: documentId,
     signature: { id: signatureId },
   } = data.document;
 
   const signature = await fetchPetitionSignature(signatureId, ctx);
-  if (signature.status === "CANCELLED") {
-    throw new Error(
-      `Requested petition signature with externalId: ${signatureId} was previously cancelled`
-    );
-  }
-
-  const { title } = signature.signature_config;
-
-  const signedDoc = await storeDocument(
-    await client.downloadSignedDocument(`${signatureId}/${documentId}`),
-    sanitizeFilenameWithSuffix(title, `_${petition.locale === "es" ? "firmado" : "signed"}.pdf`),
-    signaturitIntegration.id,
-    ctx
-  );
-
-  const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
-    `SIGNATURIT/${signatureId}`,
-    {
-      status: "COMPLETED",
-      file_upload_id: signedDoc.id,
-    }
-  );
 
   const [signer] = findSigner(signature!.signature_config.signersInfo, data.document);
-
   await Promise.all([
-    ctx.emails.sendPetitionCompletedEmail(petition.id, {
-      signer,
-    }),
-    appendEventLogs(ctx, data),
-    ctx.petitions.createEvent({
-      type: "SIGNATURE_COMPLETED",
-      petition_id: petitionId,
-      data: {
-        petition_signature_request_id: signatureRequest.id,
-        file_upload_id: signedDoc.id,
+    ctx.aws.enqueueMessages("signature-worker", {
+      groupId: `signature-${toGlobalId("Petition", petitionId)}`,
+      body: {
+        type: "store-signed-document",
+        payload: {
+          petitionSignatureRequestId: signature.id,
+          signedDocumentExternalId: `${signatureId}/${documentId}`,
+          signer,
+        },
       },
     }),
-    ctx.petitions.updatePetition(
-      petitionId,
-      { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
-      `OrgIntegration:${signaturitIntegration.id}`
-    ),
+    appendEventLogs(ctx, data),
   ]);
 }
 
 /** audit trail has been completed and is ready to be downloaded */
 async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const petition = await ctx.petitions.loadPetition(petitionId);
-
-  if (!petition) {
-    throw new Error(`petition with id ${petitionId} not found.`);
-  }
-
-  const orgIntegration = await ctx.integrations.loadIntegrationsByOrgId(
-    petition.org_id,
-    "SIGNATURE"
-  );
-
-  const signaturitIntegration = orgIntegration.find((i) => i.provider === "SIGNATURIT");
-
-  if (!signaturitIntegration) {
-    throw new Error(`Can't load SignaturIt integration for org with id ${petition.org_id}`);
-  }
-  const client = ctx.signature.getClient(signaturitIntegration);
-
   const {
     id: documentId,
     signature: { id: signatureId },
   } = data.document;
 
   const signature = await fetchPetitionSignature(signatureId, ctx);
-  if (signature.status === "CANCELLED") {
-    throw new Error(
-      `Requested petition signature with externalId: ${signatureId} was previously cancelled`
-    );
-  }
 
-  const { title } = signature.signature_config;
-
-  const auditTrail = await storeDocument(
-    await client.downloadAuditTrail(`${signatureId}/${documentId}`),
-    sanitizeFilenameWithSuffix(title, "_audit_trail.pdf"),
-    signaturitIntegration.id,
-    ctx
-  );
-
-  await ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${signatureId}`, {
-    file_upload_audit_trail_id: auditTrail.id,
-  });
-
-  await appendEventLogs(ctx, data);
+  await Promise.all([
+    ctx.aws.enqueueMessages("signature-worker", {
+      groupId: `signature-${toGlobalId("Petition", petitionId)}`,
+      body: {
+        type: "store-audit-trail",
+        payload: {
+          petitionSignatureRequestId: signature.id,
+          signedDocumentExternalId: `${signatureId}/${documentId}`,
+        },
+      },
+    }),
+    appendEventLogs(ctx, data),
+  ]);
 }
 
 async function fetchPetitionSignature(signatureId: string, ctx: ApiContext) {
@@ -261,6 +190,11 @@ async function fetchPetitionSignature(signatureId: string, ctx: ApiContext) {
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(externalId);
   if (!signature) {
     throw new Error(`Petition signature request with externalId: ${externalId} not found.`);
+  }
+  if (signature.status === "CANCELLED") {
+    throw new Error(
+      `Requested petition signature with id: ${signature.id} was previously cancelled`
+    );
   }
 
   return signature;
@@ -270,27 +204,6 @@ async function appendEventLogs(ctx: ApiContext, data: SignaturItEventBody): Prom
   await ctx.petitions.appendPetitionSignatureEventLogs(`SIGNATURIT/${data.document.signature.id}`, [
     data,
   ]);
-}
-
-async function storeDocument(
-  buffer: Buffer,
-  filename: string,
-  integrationId: number,
-  ctx: ApiContext
-) {
-  const path = random(16);
-  const s3Response = await ctx.aws.fileUploads.uploadFile(path, "application/pdf", buffer);
-
-  return await ctx.files.createFileUpload(
-    {
-      content_type: "application/pdf",
-      filename,
-      path,
-      size: s3Response["ContentLength"]!.toString(),
-      upload_complete: true,
-    },
-    `OrgIntegration:${integrationId}`
-  );
 }
 
 function findSigner(

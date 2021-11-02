@@ -32,7 +32,7 @@ export async function petitionCompleted(
     }
     contact = await context.contacts.loadContact(access.contact_id);
   } else if (payload.signer) {
-    // if payload.signer_contact_id is set, the petition has been completed and signed by the contact
+    // if payload.signer is set, the petition has been completed and signed
     contact = {
       first_name: payload.signer.firstName,
       last_name: payload.signer.lastName,

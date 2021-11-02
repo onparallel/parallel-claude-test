@@ -189,10 +189,85 @@ async function sendSignatureReminder(
   await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
 }
 
+async function storeSignedDocument(
+  payload: {
+    petitionSignatureRequestId: number;
+    signedDocumentExternalId: string;
+    signer: PetitionSignatureConfigSigner;
+  },
+  ctx: WorkerContext
+) {
+  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+  const petition = await fetchPetition(signature.petition_id, ctx);
+
+  const { title, provider } = signature.signature_config;
+
+  const signaturitIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
+
+  const client = ctx.signature.getClient(signaturitIntegration);
+
+  const signedDocument = await storeDocument(
+    await client.downloadSignedDocument(payload.signedDocumentExternalId),
+    sanitizeFilenameWithSuffix(title, `_${petition.locale === "es" ? "firmado" : "signed"}.pdf`),
+    signaturitIntegration.id,
+    ctx
+  );
+
+  await Promise.all([
+    ctx.emails.sendPetitionCompletedEmail(petition.id, {
+      signer: payload.signer,
+    }),
+    ctx.petitions.createEvent({
+      type: "SIGNATURE_COMPLETED",
+      petition_id: petition.id,
+      data: {
+        petition_signature_request_id: payload.petitionSignatureRequestId,
+        file_upload_id: signedDocument.id,
+      },
+    }),
+    ctx.petitions.updatePetitionSignature(payload.petitionSignatureRequestId, {
+      status: "COMPLETED",
+      file_upload_id: signedDocument.id,
+    }),
+    ctx.petitions.updatePetition(
+      petition.id,
+      { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
+      `OrgIntegration:${signaturitIntegration.id}`
+    ),
+  ]);
+}
+
+async function storeAuditTrail(
+  payload: { petitionSignatureRequestId: number; signedDocumentExternalId: string },
+  ctx: WorkerContext
+) {
+  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+  const petition = await fetchPetition(signature.petition_id, ctx);
+
+  const { provider, title } = signature.signature_config;
+
+  const signatureIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
+
+  const client = ctx.signature.getClient(signatureIntegration);
+
+  const auditTrail = await storeDocument(
+    await client.downloadAuditTrail(payload.signedDocumentExternalId),
+    sanitizeFilenameWithSuffix(title, "_audit_trail.pdf"),
+    signatureIntegration.id,
+    ctx
+  );
+
+  await ctx.petitions.updatePetitionSignature(signature.id, {
+    file_upload_audit_trail_id: auditTrail.id,
+  });
+}
+
 const handlers = {
   "start-signature-process": startSignatureProcess,
   "cancel-signature-process": cancelSignatureProcess,
   "send-signature-reminder": sendSignatureReminder,
+  "store-signed-document": storeSignedDocument,
+  "store-audit-trail": storeAuditTrail,
 };
 
 type HandlerType = keyof typeof handlers;
@@ -276,4 +351,25 @@ function findSignerExternalId(
       )}. documents: ${JSON.stringify(documents)}`
     );
   }
+}
+
+async function storeDocument(
+  buffer: Buffer,
+  filename: string,
+  integrationId: number,
+  ctx: WorkerContext
+) {
+  const path = random(16);
+  const res = await ctx.aws.fileUploads.uploadFile(path, "application/pdf", buffer);
+
+  return await ctx.files.createFileUpload(
+    {
+      content_type: "application/pdf",
+      filename,
+      path,
+      size: res["ContentLength"]!.toString(),
+      upload_complete: true,
+    },
+    `OrgIntegration:${integrationId}`
+  );
 }
