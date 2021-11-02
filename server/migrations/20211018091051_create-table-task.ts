@@ -21,7 +21,7 @@ export async function up(knex: Knex): Promise<void> {
     t.jsonb("error_data").nullable();
     timestamps(t, { deleted: false });
   }).raw(/* sql */ `
-     alter table "task" add constraint "task_progress_bounds" check ((progress is not null and progress >= 0 and progress <= 100) or (progress is null));
+     alter table "task" add constraint "task_progress_bounds" check (progress is null or progress between 0 and 100);
      alter table "task" add constraint "task_failed_error_data" check ((status = 'FAILED' and error_data is not null) or (status <> 'FAILED' and error_data is null))
   `);
 }

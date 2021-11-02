@@ -4,45 +4,16 @@ import { PetitionEventType, SystemEventType } from "../db/__types";
 import { analyticsEventListener } from "./event-listeners/analytics-event-listener";
 import { eventSubscriptionsListener } from "./event-listeners/event-subscriptions-listener";
 import { userNotificationsListener } from "./event-listeners/user-notifications-listener";
+import { EventProcessor } from "./helpers/EventProcessor";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
-type Event = PetitionEvent | SystemEvent;
-type EventType = PetitionEventType | SystemEventType;
+export type Event = PetitionEvent | SystemEvent;
+export type EventType = PetitionEventType | SystemEventType;
 
 export type EventListener<TEvent extends Event = Event> = (
   event: TEvent,
   ctx: WorkerContext
 ) => Promise<void>;
-
-class EventProcessor {
-  private listeners = new Map<EventType, EventListener[]>();
-
-  register(types: EventType[], listener: EventListener<any>) {
-    for (const type of types) {
-      if (this.listeners.has(type)) {
-        this.listeners.get(type)!.push(listener);
-      } else {
-        this.listeners.set(type, [listener]);
-      }
-    }
-    return this;
-  }
-
-  listen() {
-    return async (event: Event, ctx: WorkerContext) => {
-      if (this.listeners.has(event.type)) {
-        for (const listener of this.listeners.get(event.type)!) {
-          try {
-            await listener(event, ctx);
-          } catch (error: any) {
-            // log error and continue to other listeners
-            ctx.logger.error(error.message, { stack: error.stack });
-          }
-        }
-      }
-    };
-  }
-}
 
 createQueueWorker(
   "event-processor",

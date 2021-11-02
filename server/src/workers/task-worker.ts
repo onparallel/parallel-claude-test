@@ -1,50 +1,41 @@
+import { isDefined } from "remeda";
 import { WorkerContext } from "../context";
-import { Task, TaskOutput } from "../db/repositories/TaskRepository";
+import { Task } from "../db/repositories/TaskRepository";
 import { TaskName } from "../db/__types";
 import { createQueueWorker } from "./helpers/createQueueWorker";
-import { runExportRepliesTask } from "./helpers/runExportRepliesTask";
-import { runPrintPdfTask } from "./helpers/runPrintPdfTask";
+import { TaskRunner } from "./helpers/TaskRunner";
+import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
+import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
 
-export type TaskUpdateHandler<TName extends TaskName> = (
-  progress: number | null,
-  error?: any,
-  output?: TaskOutput<TName>
-) => void;
-
-function taskUpdateHandler<TName extends TaskName>(
-  task: Task<TName>,
-  ctx: WorkerContext
-): TaskUpdateHandler<TName> {
-  return (progress, error, output) => {
-    ctx.task.updateTask(
-      task.id,
-      {
-        progress,
-        status: error ? "FAILED" : progress === 100 ? "COMPLETED" : "PROCESSING",
-        error_data: error,
-        output,
-      },
-      `TaskWorker:${task.id}`
-    );
-  };
-}
+const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
+  PRINT_PDF: PrintPdfRunner,
+  EXPORT_REPLIES: ExportRepliesRunner,
+};
 
 createQueueWorker("task-worker", async (payload: { taskId: number }, ctx) => {
-  const task = await ctx.task.loadTask(payload.taskId);
-  if (!task) return;
-
+  const task = await ctx.tasks.loadTask(payload.taskId);
+  if (!isDefined(task)) {
+    return;
+  }
   try {
-    switch (task.name) {
-      case "PRINT_PDF":
-        runPrintPdfTask(task, ctx, taskUpdateHandler(task, ctx));
-        break;
-      case "EXPORT_REPLIES":
-        runExportRepliesTask(task, ctx, taskUpdateHandler(task, ctx));
-        break;
-      default:
-        break;
-    }
+    await ctx.tasks.updateTask(
+      task.id,
+      { status: "PROCESSING", progress: 0 },
+      `TaskWorker:${task.id}`
+    );
+    const Runner = RUNNERS[task.name];
+    const result = await new Runner(ctx, task).run();
+    await ctx.tasks.updateTask(
+      task.id,
+      { status: "COMPLETED", progress: 100, output: result },
+      `TaskWorker:${task.id}`
+    );
   } catch (error: any) {
     ctx.logger.error(error.message, { stack: error.stack });
+    await ctx.tasks.updateTask(
+      task.id,
+      { status: "FAILED", error_data: { message: error.message, stack: error.stack } },
+      `TaskWorker:${task.id}`
+    );
   }
 });

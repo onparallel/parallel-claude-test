@@ -5,7 +5,7 @@ import { Loader } from "../../util/fromDataLoader";
 import { Maybe, Replace } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { Task as _Task, TaskName } from "../__types";
+import { Task as DbTask, TaskName } from "../__types";
 
 export type TaskInput<TName extends TaskName> = {
   EXPORT_REPLIES: { petition_id: number; pattern?: Maybe<string> };
@@ -18,7 +18,7 @@ export type TaskOutput<TName extends TaskName> = {
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<
-  _Task,
+  DbTask,
   {
     name: TName;
     input: TaskInput<TName>;
@@ -26,7 +26,8 @@ export type Task<TName extends TaskName> = Replace<
   }
 >;
 
-type AnyTask = Task<"PRINT_PDF"> | Task<"EXPORT_REPLIES">;
+type _AnyTask<T extends TaskName> = T extends TaskName ? Task<T> : unknown;
+export type AnyTask = _AnyTask<TaskName>;
 
 @injectable()
 export class TaskRepository extends BaseRepository {

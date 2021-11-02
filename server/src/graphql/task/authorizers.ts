@@ -15,7 +15,7 @@ export function userHasAccessToTasks<
       if (taskIds.length === 0) {
         return true;
       }
-      return await ctx.task.userHasAccessToTasks(taskIds, ctx.user!.id);
+      return await ctx.tasks.userHasAccessToTasks(taskIds, ctx.user!.id);
     } catch {}
     return false;
   };
@@ -32,7 +32,7 @@ export function tasksAreOfType<
       if (taskIds.length === 0) {
         return true;
       }
-      const tasks = await ctx.task.loadTask(taskIds);
+      const tasks = await ctx.tasks.loadTask(taskIds);
       return tasks.every((t) => t && allowedTypes.includes(t.name));
     } catch {}
     return false;

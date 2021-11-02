@@ -14,7 +14,7 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   resolve: async (_, args, ctx) =>
-    await ctx.task.createTask(
+    await ctx.tasks.createTask(
       {
         name: "PRINT_PDF",
         input: {
@@ -35,7 +35,7 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
     pattern: nullable("String"),
   },
   resolve: async (_, args, ctx) =>
-    await ctx.task.createTask(
+    await ctx.tasks.createTask(
       {
         name: "EXPORT_REPLIES",
         input: {
@@ -59,7 +59,7 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
     preview: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
-    const task = (await ctx.task.loadTask(args.taskId)) as
+    const task = (await ctx.tasks.loadTask(args.taskId)) as
       | Task<"EXPORT_REPLIES">
       | Task<"PRINT_PDF">;
 

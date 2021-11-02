@@ -9,5 +9,5 @@ export const GetTask = queryField("task", {
   args: {
     id: nonNull(globalIdArg("Task")),
   },
-  resolve: async (_, { id }, ctx) => (await ctx.task.loadTask(id))!,
+  resolve: async (_, { id }, ctx) => (await ctx.tasks.loadTask(id))!,
 });

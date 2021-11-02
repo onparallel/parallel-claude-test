@@ -61,7 +61,7 @@ export class ApiContext {
     public readonly tags: TagRepository,
     public readonly system: SystemRepository,
     public readonly subscriptions: SubscriptionRepository,
-    public readonly task: TaskRepository
+    public readonly tasks: TaskRepository
   ) {}
 }
 
@@ -90,6 +90,6 @@ export class WorkerContext {
     public readonly system: SystemRepository,
     public readonly userGroups: UserGroupRepository,
     public readonly subscriptions: SubscriptionRepository,
-    public readonly task: TaskRepository
+    public readonly tasks: TaskRepository
   ) {}
 }
