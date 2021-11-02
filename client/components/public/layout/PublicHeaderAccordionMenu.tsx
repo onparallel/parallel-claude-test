@@ -31,7 +31,7 @@ export function PublicHeaderAccordionMenu(props: StackProps) {
         gridGap={2}
         borderColor="transparent"
         sx={{
-          button: {
+          "a, button": {
             paddingX: 2,
             rounded: "md",
             justifyContent: "flex-start",
@@ -156,6 +156,7 @@ export const PublicHeaderAccordionInnerButton = chakraForwardRef<
   return (
     <NakedLink href={href}>
       <Button
+        as="a"
         width="100%"
         ref={ref as any}
         aria-current={isCurrent ? "page" : undefined}
