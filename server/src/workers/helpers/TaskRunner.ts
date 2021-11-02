@@ -15,7 +15,7 @@ export abstract class TaskRunner<T extends TaskName> {
       this.task.id,
       {
         status: "PROCESSING",
-        progress: value,
+        progress: Math.round(value),
       },
       `Task:${this.task.id}`
     );

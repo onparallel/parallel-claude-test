@@ -42,10 +42,11 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
   }
   private previousProgress = 0;
   private async notifyProgress(value: number) {
+    const currentProgress = value * 100;
     // Avoid updating progress too many times.
-    if (value > this.previousProgress + 10) {
-      await this.onProgress(value);
-      this.previousProgress = value;
+    if (currentProgress > this.previousProgress + 10) {
+      await this.onProgress(currentProgress);
+      this.previousProgress = currentProgress;
     }
   }
 
