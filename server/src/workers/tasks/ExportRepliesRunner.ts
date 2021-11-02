@@ -1,7 +1,6 @@
 import escapeStringRegexp from "escape-string-regexp";
 import { indexBy, isDefined, zip } from "remeda";
 import { PetitionExcelExport } from "../../api/helpers/PetitionExcelExport";
-import { TaskOutput } from "../../db/repositories/TaskRepository";
 import { createZipFile, ZipFileInput } from "../../util/createZipFile";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
@@ -11,7 +10,7 @@ import { TaskRunner } from "../helpers/TaskRunner";
 const placeholders = ["field-number", "field-title", "file-name"] as const;
 
 export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
-  async run(): Promise<TaskOutput<"EXPORT_REPLIES">> {
+  async run() {
     const { petition_id: petitionId, pattern } = this.task.input;
 
     const hasAccess = await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [
@@ -36,7 +35,7 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
         filename: sanitizeFilenameWithSuffix(name, ".zip"),
         size: res["ContentLength"]!.toString(),
       },
-      `TaskWorker:${task.id}`
+      `TaskWorker:${this.task.id}`
     );
 
     return { temporary_file_id: tmpFile.id };

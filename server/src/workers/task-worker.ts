@@ -23,11 +23,11 @@ createQueueWorker("task-worker", async (payload: { taskId: number }, ctx) => {
       { status: "PROCESSING", progress: 0 },
       `TaskWorker:${task.id}`
     );
-    const Runner = RUNNERS[task.name];
-    const result = await new Runner(ctx, task).run();
+    const Runner = RUNNERS[task.name as TaskName];
+    const output = await new Runner(ctx, task).run();
     await ctx.tasks.updateTask(
       task.id,
-      { status: "COMPLETED", progress: 100, output: result },
+      { status: "COMPLETED", progress: 100, output },
       `TaskWorker:${task.id}`
     );
   } catch (error: any) {

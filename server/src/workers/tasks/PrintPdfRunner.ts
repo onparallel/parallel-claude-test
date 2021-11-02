@@ -1,11 +1,10 @@
 import { URLSearchParams } from "url";
-import { TaskOutput } from "../../db/repositories/TaskRepository";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { random } from "../../util/token";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
-  async run(): Promise<TaskOutput<"PRINT_PDF">> {
+  async run() {
     const { petition_id: petitionId } = this.task.input;
     const hasAccess = await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [
       petitionId,
@@ -37,7 +36,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
         filename: sanitizeFilenameWithSuffix(petition!.name ?? "parallel", ".pdf"),
         size: res["ContentLength"]!.toString(),
       },
-      `TaskWorker:${task.id}`
+      `TaskWorker:${this.task.id}`
     );
 
     return { temporary_file_id: tmpFile.id };

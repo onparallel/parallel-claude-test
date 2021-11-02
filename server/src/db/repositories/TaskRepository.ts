@@ -26,16 +26,13 @@ export type Task<TName extends TaskName> = Replace<
   }
 >;
 
-type _AnyTask<T extends TaskName> = T extends TaskName ? Task<T> : unknown;
-export type AnyTask = _AnyTask<TaskName>;
-
 @injectable()
 export class TaskRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
     super(knex);
   }
 
-  readonly loadTask: Loader<number, AnyTask | null> = this.buildLoadBy("task", "id");
+  readonly loadTask: Loader<number, Task<any> | null> = this.buildLoadBy("task", "id");
 
   async createTask<TName extends TaskName>(data: Partial<Task<TName>>, userId: number) {
     const [task] = await this.from("task").insert(
