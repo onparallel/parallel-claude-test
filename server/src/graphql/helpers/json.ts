@@ -1,4 +1,4 @@
-import GraphQLJSON, { GraphQLJSONObject } from "graphql-type-json";
+import { GraphQLJSONObject, GraphQLJSON } from "graphql-scalars";
 import { arg, asNexusMethod, core } from "nexus";
 
 export const JSONObject = asNexusMethod(GraphQLJSONObject, "jsonObject", "{[key: string]: any}");

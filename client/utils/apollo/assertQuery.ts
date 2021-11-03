@@ -1,6 +1,6 @@
-import { QueryResult } from "@apollo/react-common";
-import { Assert } from "../types";
+import { QueryResult } from "@apollo/client/react";
 import { useRef } from "react";
+import { Assert } from "../types";
 
 export function assertQuery<T extends QueryResult>(
   result: T
