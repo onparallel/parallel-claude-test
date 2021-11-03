@@ -7,7 +7,7 @@ import {
   useTaskProgressDialog_TaskQuery,
 } from "@parallel/graphql/__types";
 import { useInterval } from "@parallel/utils/useInterval";
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { generateCssStripe } from "../../utils/css";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -46,10 +46,14 @@ export function TaskProgressDialog({
     pollInterval || 1000,
     []
   );
+  const confirmRef = useRef<HTMLButtonElement>(null);
 
   return (
     <ConfirmDialog
       {...props}
+      initialFocusRef={confirmRef}
+      closeOnOverlayClick={false}
+      closeOnEsc={false}
       header={
         dialogHeader ?? (
           <FormattedMessage
@@ -61,8 +65,9 @@ export function TaskProgressDialog({
       body={<TaskProgressBar progress={processingTask.progress} />}
       confirm={
         <Button
+          ref={confirmRef}
           colorScheme="purple"
-          disabled={processingTask.status !== "COMPLETED"}
+          isDisabled={processingTask.status !== "COMPLETED"}
           onClick={() => props.onResolve(processingTask)}
         >
           {confirmText ?? (
@@ -71,11 +76,6 @@ export function TaskProgressDialog({
               defaultMessage="Get result"
             />
           )}
-        </Button>
-      }
-      cancel={
-        <Button colorScheme="red" onClick={() => props.onReject()}>
-          <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
         </Button>
       }
     />
