@@ -17,7 +17,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       petitionId,
     });
 
-    this.onProgress(25);
+    await this.onProgress(25);
 
     const buffer = await this.ctx.printer.pdf(
       `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
@@ -25,7 +25,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       })}`
     );
 
-    this.onProgress(75);
+    await this.onProgress(75);
 
     const path = random(16);
     const res = await this.ctx.aws.temporaryFiles.uploadFile(path, "application/pdf", buffer);
