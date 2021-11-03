@@ -1017,7 +1017,7 @@ describe("GraphQL/Petitions", () => {
           timezone: "Europe/Madrid",
           weekdaysOnly: true,
         },
-        deadline: deadline.toISOString(),
+        deadline: deadline,
       });
     });
 
@@ -1657,7 +1657,7 @@ describe("GraphQL/Petitions", () => {
       const variables = {
         name: "Petition4 new name",
         locale: "en",
-        deadline: "2019-12-03T10:15:30.000Z",
+        deadline: new Date("2019-12-03T10:15:30.000Z"),
         emailSubject: "subject for the email",
         emailBody: [{ children: [{ text: "new email body" }] }],
       };
