@@ -332,6 +332,8 @@ export type Mutation = {
   createContact: Contact;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
+  /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
+  createExportRepliesTask: Task;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: PetitionFieldReply;
   /** Creates a new organization. */
@@ -346,14 +348,14 @@ export type Mutation = {
   createPetitionFieldAttachmentUploadLink: CreateFileUploadFieldAttachment;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionField;
+  /** Creates a task for printing a PDF of the petition and sends it to the queue */
+  createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PetitionTemplate;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
   createTag: Tag;
-  /** Creates a task and sends it to the queue to process it */
-  createTask: Task;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
@@ -386,6 +388,8 @@ export type Mutation = {
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
+  /** Returns a signed download url for tasks with file output */
+  getTaskResultFileUrl: FileUploadDownloadLinkResult;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -613,6 +617,11 @@ export type MutationcreateEventSubscriptionArgs = {
   eventsUrl: Scalars["String"];
 };
 
+export type MutationcreateExportRepliesTaskArgs = {
+  pattern?: Maybe<Scalars["String"]>;
+  petitionId: Scalars["GID"];
+};
+
 export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
@@ -658,6 +667,10 @@ export type MutationcreatePetitionFieldCommentArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationcreatePrintPdfTaskArgs = {
+  petitionId: Scalars["GID"];
+};
+
 export type MutationcreatePublicPetitionLinkArgs = {
   description: Scalars["String"];
   otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
@@ -676,11 +689,6 @@ export type MutationcreateSimpleReplyArgs = {
 export type MutationcreateTagArgs = {
   color: Scalars["String"];
   name: Scalars["String"];
-};
-
-export type MutationcreateTaskArgs = {
-  input: Scalars["JSONObject"];
-  name: TaskName;
 };
 
 export type MutationcreateUserArgs = {
@@ -765,6 +773,11 @@ export type MutationfileUploadReplyDownloadLinkArgs = {
 
 export type MutationgenerateUserAuthTokenArgs = {
   tokenName: Scalars["String"];
+};
+
+export type MutationgetTaskResultFileUrlArgs = {
+  preview?: Maybe<Scalars["Boolean"]>;
+  taskId: Scalars["GID"];
 };
 
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
@@ -2250,7 +2263,7 @@ export type Query = {
   subscriptions: Array<PetitionEventSubscription>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
-  task: Maybe<Task>;
+  task: Task;
   /** The available templates */
   templates: PetitionTemplatePagination;
   userGroup: Maybe<UserGroup>;
@@ -2622,15 +2635,11 @@ export type TagPagination = {
 
 export type Task = {
   id: Scalars["GID"];
-  name: TaskName;
-  output: Scalars["JSONObject"];
   progress: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 };
 
-export type TaskName = "EXPORT_REPLIES" | "PRINT_PDF";
-
-export type TaskStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
 export type TemplateUsedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
