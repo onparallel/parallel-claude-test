@@ -108,6 +108,12 @@ export function PublicHeaderAccordionMenu(props: StackProps) {
                   defaultMessage="BPO and accounting"
                 />
               </PublicHeaderAccordionInnerButton>
+              <PublicHeaderAccordionInnerButton href="/solutions/real-estate">
+                <FormattedMessage
+                  id="public.solutions.real-estate-link"
+                  defaultMessage="Real Estate"
+                />
+              </PublicHeaderAccordionInnerButton>
             </Stack>
           </AccordionPanel>
         </AccordionItem>

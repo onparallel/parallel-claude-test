@@ -88,6 +88,12 @@ export function PublicHeaderMenu(props: StackProps) {
                   defaultMessage="BPO and accounting"
                 />
               </PublicHeaderMenuItemLink>
+              <PublicHeaderMenuItemLink href="/solutions/real-estate">
+                <FormattedMessage
+                  id="public.solutions.real-estate-link"
+                  defaultMessage="Real Estate"
+                />
+              </PublicHeaderMenuItemLink>
             </MenuList>
           </Portal>
         </Menu>
