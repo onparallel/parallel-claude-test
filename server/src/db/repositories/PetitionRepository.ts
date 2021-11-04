@@ -3238,6 +3238,12 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
+  async loadPendingSignatureRequestsByIntegrationId(orgIntegrationId: number) {
+    return await this.from("petition_signature_request")
+      .whereRaw("signature_config ->> 'orgIntegrationId' = ?", orgIntegrationId)
+      .whereIn("status", ["PROCESSING", "ENQUEUED"]);
+  }
+
   async createPetitionSignature(petitionId: number, config: PetitionSignatureConfig) {
     const [row] = await this.insert("petition_signature_request", {
       petition_id: petitionId,
@@ -3278,12 +3284,12 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async cancelPetitionSignatureRequest<CancelReason extends PetitionSignatureCancelReason>(
-    petitionSignatureId: number,
+    petitionSignatureIds: MaybeArray<number>,
     reason: CancelReason,
     cancelData: PetitionSignatureRequestCancelData<CancelReason>
   ) {
     const [row] = await this.from("petition_signature_request")
-      .where("id", petitionSignatureId)
+      .whereIn("id", unMaybeArray(petitionSignatureIds))
       .update({
         status: "CANCELLED",
         cancel_reason: reason,

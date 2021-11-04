@@ -452,6 +452,8 @@ export interface OrgIntegration {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  is_default: boolean; // bool
+  name: string; // varchar
 }
 
 export type CreateOrgIntegration = PartialProps<
@@ -464,6 +466,7 @@ export type CreateOrgIntegration = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "is_default"
 >;
 
 export interface Petition {

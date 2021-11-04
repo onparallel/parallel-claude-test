@@ -149,7 +149,14 @@ async function cancelSignatureProcess(
   }
 
   const { orgIntegrationId } = signature.signature_config;
-  const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
+
+  // here we need to lookup all signature integrations, also disabled and deleted ones
+  // this is because the user could have deleted their signature integration, triggering a cancel of all pending signature requests
+  const signatureIntegration = await ctx.integrations.loadAnyIntegration(orgIntegrationId);
+
+  if (!signatureIntegration || signatureIntegration.type !== "SIGNATURE") {
+    throw new Error(`Couldn't find a signature integration for OrgIntegration:${orgIntegrationId}`);
+  }
   const signatureClient = ctx.signature.getClient(signatureIntegration);
   await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
 }

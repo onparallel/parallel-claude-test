@@ -81,7 +81,7 @@ function _PetitionSettings({
   const locales = useSupportedLocales();
   const intl = useIntl();
   const hasSignature =
-    user.hasPetitionSignature && user.organization.signatureIntegrations.length > 0;
+    user.hasPetitionSignature && user.organization.signatureIntegrations.items.length > 0;
 
   const ongoingSignatureRequest =
     petition.__typename === "Petition" &&
@@ -121,7 +121,7 @@ function _PetitionSettings({
       }
       const signatureConfig = await showSignatureConfigDialog({
         petition,
-        providers: user.organization.signatureIntegrations,
+        providers: user.organization.signatureIntegrations.items,
       });
 
       const previous = petition.signatureConfig;
@@ -532,8 +532,10 @@ const fragments = {
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
       organization {
         id
-        signatureIntegrations: integrations(type: SIGNATURE) {
-          ...SignatureConfigDialog_OrgIntegration
+        signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
+          items {
+            ...SignatureConfigDialog_OrgIntegration
+          }
         }
       }
     }

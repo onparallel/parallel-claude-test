@@ -1,37 +1,59 @@
 import { gql } from "@apollo/client";
 import { addDays } from "date-fns";
-import { Knex } from "knex";
+import knex, { Knex } from "knex";
+import { countBy, omit } from "remeda";
 import { USER_COGNITO_ID } from "../../../test/mocks";
+
 import { KNEX } from "../../db/knex";
+import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { OrgIntegration } from "../../db/__types";
-import { toGlobalId } from "../../util/globalId";
+import {
+  Organization,
+  OrgIntegration,
+  Petition,
+  PetitionSignatureRequest,
+  User,
+} from "../../db/__types";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/OrgIntegrations", () => {
   let testClient: TestClient;
   let mocks: Mocks;
   let integrations: OrgIntegration[];
+  let organization: Organization;
+  let user: User;
+
+  let petition: Petition;
+  let signatureRequest: PetitionSignatureRequest;
+
+  let normalUserApiKey: string;
 
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    const [organization] = await mocks.createRandomOrganizations(1, () => ({
+    [organization] = await mocks.createRandomOrganizations(1, () => ({
       name: "Parallel",
       status: "DEV",
     }));
 
-    await mocks.createRandomUsers(organization.id, 1, () => ({
+    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
       cognito_id: USER_COGNITO_ID,
       first_name: "Harvey",
       last_name: "Specter",
       org_id: organization.id,
+      organization_role: "ADMIN",
     }));
 
-    integrations = await Promise.all([
-      mocks.createOrgIntegration({
+    const [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
+      organization_role: "NORMAL",
+    }));
+    ({ apiKey: normalUserApiKey } = await mocks.createUserAuthToken("normal-token", normalUser.id));
+
+    integrations = await mocks.createOrgIntegration([
+      {
         org_id: organization.id,
         type: "USER_PROVISIONING",
         provider: "COGNITO",
@@ -40,8 +62,19 @@ describe("GraphQL/OrgIntegrations", () => {
         },
         created_at: new Date(),
         is_enabled: true,
-      }),
-      mocks.createOrgIntegration({
+      },
+      {
+        org_id: organization.id,
+        type: "SIGNATURE",
+        provider: "SIGNATURIT",
+        settings: {
+          API_KEY: "<APIKEY>",
+        },
+        created_at: addDays(new Date(), 1),
+        is_enabled: true,
+        is_default: true,
+      },
+      {
         org_id: organization.id,
         type: "SIGNATURE",
         provider: "SIGNATURIT",
@@ -50,8 +83,30 @@ describe("GraphQL/OrgIntegrations", () => {
         },
         created_at: addDays(new Date(), 1),
         is_enabled: false,
-      }),
+        name: "Signaturit 2",
+      },
     ]);
+
+    [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+    [signatureRequest] = await mocks.knex
+      .from<PetitionSignatureRequest>("petition_signature_request")
+      .insert(
+        {
+          petition_id: petition.id,
+          status: "PROCESSING",
+          signature_config: {
+            orgIntegrationId: integrations[1].id,
+            signersInfo: [],
+            timezone: "Europe/Madrid",
+            title: "test",
+            letRecipientsChooseSigners: true,
+            review: false,
+          },
+        },
+        "*"
+      );
+
+    await mocks.createFeatureFlags([{ name: "PETITION_SIGNATURE", default_value: true }]);
   });
 
   afterAll(async () => {
@@ -64,11 +119,15 @@ describe("GraphQL/OrgIntegrations", () => {
         query {
           me {
             organization {
-              integrations {
-                id
-                name
-                type
-                provider
+              integrations(limit: 100) {
+                totalCount
+                items {
+                  id
+                  name
+                  type
+                  provider
+                  isDefault
+                }
               }
             }
           }
@@ -77,13 +136,300 @@ describe("GraphQL/OrgIntegrations", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data?.me.organization.integrations).toEqual([
+    expect(data?.me.organization.integrations).toEqual({
+      totalCount: 2,
+      items: [
+        {
+          id: toGlobalId("OrgIntegration", integrations[1].id),
+          name: "Signaturit",
+          type: "SIGNATURE",
+          provider: "SIGNATURIT",
+          isDefault: true,
+        },
+        {
+          id: toGlobalId("OrgIntegration", integrations[0].id),
+          name: "Cognito",
+          type: "USER_PROVISIONING",
+          provider: "COGNITO",
+          isDefault: false,
+        },
+      ],
+    });
+  });
+
+  it("creates a new signature integration", async () => {
+    const { data, errors } = await testClient.mutate({
+      mutation: gql`
+        mutation ($name: String!, $provider: SignatureIntegrationProvider!, $apiKey: String!) {
+          createSignatureIntegration(name: $name, provider: $provider, apiKey: $apiKey) {
+            name
+            isDefault
+            provider
+            type
+            status
+          }
+        }
+      `,
+      variables: {
+        name: "My signature integration",
+        provider: "SIGNATURIT",
+        apiKey: "<APIKEY>",
+      },
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data?.createSignatureIntegration).toEqual({
+      name: "My signature integration",
+      isDefault: false,
+      provider: "SIGNATURIT",
+      type: "SIGNATURE",
+      status: "DEMO",
+    });
+  });
+
+  it("creates a new signature integration and sets it as default", async () => {
+    const { data, errors } = await testClient.mutate({
+      mutation: gql`
+        mutation (
+          $name: String!
+          $provider: SignatureIntegrationProvider!
+          $apiKey: String!
+          $isDefault: Boolean
+        ) {
+          createSignatureIntegration(
+            name: $name
+            provider: $provider
+            apiKey: $apiKey
+            isDefault: $isDefault
+          ) {
+            id
+            name
+            isDefault
+            provider
+            type
+            status
+          }
+        }
+      `,
+      variables: {
+        name: "My signature integration",
+        provider: "SIGNATURIT",
+        apiKey: "<APIKEY>",
+        isDefault: true,
+      },
+    });
+
+    expect(errors).toBeUndefined();
+    expect(omit(data?.createSignatureIntegration, ["id"])).toEqual({
+      name: "My signature integration",
+      isDefault: true,
+      provider: "SIGNATURIT",
+      type: "SIGNATURE",
+      status: "DEMO",
+    });
+
+    // also check that the other signature integrations is_default is set to false
+    const signatureIntegrations = await mocks.knex
+      .from<OrgIntegration>("org_integration")
+      .where({ org_id: organization.id, is_enabled: true, deleted_at: null, type: "SIGNATURE" })
+      .orderBy("created_at", "desc")
+      .select("id", "is_default");
+
+    const defaultSignatureIntegration = signatureIntegrations.filter((i) => i.is_default);
+    expect(defaultSignatureIntegration).toEqual([
       {
-        id: toGlobalId("OrgIntegration", integrations[0].id),
-        name: "Cognito",
-        type: "USER_PROVISIONING",
-        provider: "COGNITO",
+        id: fromGlobalId(data!.createSignatureIntegration.id, "OrgIntegration").id,
+        is_default: true,
       },
     ]);
+  });
+
+  it("marks a signature integration as default and unchecks all others", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($id: GID!) {
+          markSignatureIntegrationAsDefault(id: $id) {
+            id
+            isDefault
+          }
+        }
+      `,
+      variables: {
+        id: toGlobalId("OrgIntegration", integrations[1].id),
+      },
+    });
+    expect(errors).toBeUndefined();
+    expect(data?.markSignatureIntegrationAsDefault).toEqual({
+      id: toGlobalId("OrgIntegration", integrations[1].id),
+      isDefault: true,
+    });
+
+    // also check that the other signature integrations is_default is set to false
+    const signatureIntegrations = await mocks.knex
+      .from<OrgIntegration>("org_integration")
+      .where({ org_id: organization.id, deleted_at: null, type: "SIGNATURE" })
+      .orderBy("created_at", "desc")
+      .select("id", "is_default");
+
+    const defaultSignatureIntegration = signatureIntegrations.filter((i) => i.is_default);
+    expect(defaultSignatureIntegration).toEqual([
+      {
+        id: fromGlobalId(data!.markSignatureIntegrationAsDefault.id, "OrgIntegration").id,
+        is_default: true,
+      },
+    ]);
+  });
+
+  it("throws error if trying to set as default an integration with type !== SIGNATURE", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($id: GID!) {
+          markSignatureIntegrationAsDefault(id: $id) {
+            id
+          }
+        }
+      `,
+      variables: {
+        id: toGlobalId("OrgIntegration", integrations[0].id),
+      },
+    });
+
+    expect(errors).toContainGraphQLError("FORBIDDEN");
+    expect(data).toBeNull();
+  });
+
+  it("throws error if trying to delete an integration with type !== SIGNATURE", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($id: GID!) {
+          deleteSignatureIntegration(id: $id)
+        }
+      `,
+      variables: {
+        id: toGlobalId("OrgIntegration", integrations[0].id),
+      },
+    });
+
+    expect(errors).toContainGraphQLError("FORBIDDEN");
+    expect(data).toBeNull();
+  });
+
+  it("throws error if trying to delete a signature integration with pending signature requests", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($id: GID!) {
+          deleteSignatureIntegration(id: $id)
+        }
+      `,
+      variables: {
+        id: toGlobalId("OrgIntegration", integrations[1].id),
+      },
+    });
+
+    expect(errors).toContainGraphQLError("SIGNATURE_INTEGRATION_IN_USE_ERROR");
+    expect(data).toBeNull();
+  });
+
+  it("deletes the signature integration and cancels pending signature requests when passing force arg", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($id: GID!) {
+          deleteSignatureIntegration(id: $id, force: true)
+        }
+      `,
+      variables: {
+        id: toGlobalId("OrgIntegration", integrations[1].id),
+      },
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data!.deleteSignatureIntegration).toEqual("SUCCESS");
+
+    const request = await mocks.knex
+      .from("petition_signature_request")
+      .where({ id: signatureRequest.id })
+      .select("status");
+
+    expect(request).toEqual([{ status: "CANCELLED" }]);
+  });
+
+  it("throws error if a normal user tries to create an integration", async () => {
+    const { errors, data } = await testClient.withApiKey(normalUserApiKey).mutate({
+      mutation: gql`
+        mutation (
+          $name: String!
+          $provider: SignatureIntegrationProvider!
+          $apiKey: String!
+          $isDefault: Boolean
+        ) {
+          createSignatureIntegration(
+            name: $name
+            provider: $provider
+            apiKey: $apiKey
+            isDefault: $isDefault
+          ) {
+            id
+          }
+        }
+      `,
+      variables: {
+        name: "My signature integration",
+        provider: "SIGNATURIT",
+        apiKey: "<APIKEY>",
+        isDefault: true,
+      },
+    });
+
+    expect(errors).toContainGraphQLError("FORBIDDEN");
+    expect(data).toBeNull();
+  });
+
+  it("throws error if a normal user tries to delete an integration", async () => {
+    const { errors, data } = await testClient.withApiKey(normalUserApiKey).mutate({
+      mutation: gql`
+        mutation ($id: GID!) {
+          deleteSignatureIntegration(id: $id, force: true)
+        }
+      `,
+      variables: {
+        id: toGlobalId("OrgIntegration", integrations[2].id),
+      },
+    });
+
+    expect(errors).toContainGraphQLError("FORBIDDEN");
+    expect(data).toBeNull();
+  });
+
+  it("throws error if a normal user tries to mark an integration as default", async () => {
+    const { errors, data } = await testClient.withApiKey(normalUserApiKey).mutate({
+      mutation: gql`
+        mutation ($id: GID!) {
+          markSignatureIntegrationAsDefault(id: $id) {
+            id
+          }
+        }
+      `,
+      variables: {
+        id: toGlobalId("OrgIntegration", integrations[2].id),
+      },
+    });
+    expect(errors).toContainGraphQLError("FORBIDDEN");
+    expect(data).toBeNull();
+  });
+
+  it("deletes a signature integration", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($id: GID!) {
+          deleteSignatureIntegration(id: $id)
+        }
+      `,
+      variables: {
+        id: toGlobalId("OrgIntegration", integrations[2].id),
+      },
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data?.deleteSignatureIntegration).toEqual("SUCCESS");
   });
 });

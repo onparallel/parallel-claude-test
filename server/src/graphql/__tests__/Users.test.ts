@@ -728,16 +728,14 @@ describe("GraphQL/Users", () => {
     });
 
     it("should not create a user if the email domain has SSO enabled", async () => {
-      const [integration] = await mocks.knex.from("org_integration").insert(
-        {
-          org_id: sessionUser.org_id,
-          type: "SSO",
-          provider: "AZURE",
-          settings: { EMAIL_DOMAINS: ["onparallel.com"] },
-          is_enabled: true,
-        },
-        "*"
-      );
+      const [integration] = await mocks.createOrgIntegration({
+        org_id: sessionUser.org_id,
+        type: "SSO",
+        provider: "AZURE",
+        settings: { EMAIL_DOMAINS: ["onparallel.com"] },
+        is_enabled: true,
+      });
+
       const [, sessionUserDomain] = sessionUser.email.split("@");
       const { errors, data } = await testClient.mutate({
         mutation: gql`

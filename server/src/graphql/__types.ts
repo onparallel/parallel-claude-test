@@ -217,6 +217,7 @@ export interface NexusGenEnums {
     | "PETITION_COMPOSE"
     | "PETITION_REVIEW";
   OnboardingStatus: "FINISHED" | "SKIPPED";
+  OrgIntegrationStatus: "DEMO" | "PRODUCTION";
   OrganizationRole: "ADMIN" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
   OrganizationUsers_OrderBy:
@@ -269,6 +270,7 @@ export interface NexusGenEnums {
     | "sentAt_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
+  SignatureIntegrationProvider: "SIGNATURIT";
   TaskStatus: db.TaskStatus;
   Tone: db.Tone;
   UserAuthenticationTokens_OrderBy:
@@ -358,6 +360,11 @@ export interface NexusGenObjects {
   MessageSentEvent: events.MessageSentEvent;
   Mutation: {};
   OrgIntegration: db.OrgIntegration;
+  OrgIntegrationPagination: {
+    // root type
+    items: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
+    totalCount: number; // Int!
+  };
   Organization: db.Organization;
   OrganizationPagination: {
     // root type
@@ -857,6 +864,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
+    createSignatureIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -869,6 +877,7 @@ export interface NexusGenFieldTypes {
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionReply: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
+    deleteSignatureIntegration: NexusGenEnums["Result"]; // Result!
     deleteTag: NexusGenEnums["Result"]; // Result!
     deleteUserGroup: NexusGenEnums["Result"]; // Result!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -876,6 +885,7 @@ export interface NexusGenFieldTypes {
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getTaskResultFileUrl: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
@@ -953,9 +963,16 @@ export interface NexusGenFieldTypes {
   OrgIntegration: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
     name: string; // String!
     provider: string; // String!
+    status: NexusGenEnums["OrgIntegrationStatus"]; // OrgIntegrationStatus!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
+  };
+  OrgIntegrationPagination: {
+    // field return type
+    items: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
+    totalCount: number; // Int!
   };
   Organization: {
     // field return type
@@ -964,7 +981,7 @@ export interface NexusGenFieldTypes {
     customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
-    integrations: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
+    integrations: NexusGenRootTypes["OrgIntegrationPagination"]; // OrgIntegrationPagination!
     logoUrl: string | null; // String
     name: string; // String!
     preferredTone: NexusGenEnums["Tone"]; // Tone!
@@ -2034,6 +2051,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldComment: "PetitionField";
     createPrintPdfTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
+    createSignatureIntegration: "OrgIntegration";
     createSimpleReply: "PetitionFieldReply";
     createTag: "Tag";
     createUser: "SupportMethodResponse";
@@ -2046,6 +2064,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionFieldComment: "PetitionField";
     deletePetitionReply: "Result";
     deletePetitions: "Result";
+    deleteSignatureIntegration: "Result";
     deleteTag: "Result";
     deleteUserGroup: "Result";
     dynamicSelectFieldFileDownloadLink: "FileUploadDownloadLinkResult";
@@ -2053,6 +2072,7 @@ export interface NexusGenFieldTypeNames {
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getTaskResultFileUrl: "FileUploadDownloadLinkResult";
+    markSignatureIntegrationAsDefault: "OrgIntegration";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     publicCheckVerificationCode: "VerificationCodeCheck";
@@ -2130,9 +2150,16 @@ export interface NexusGenFieldTypeNames {
   OrgIntegration: {
     // field return type name
     id: "GID";
+    isDefault: "Boolean";
     name: "String";
     provider: "String";
+    status: "OrgIntegrationStatus";
     type: "IntegrationType";
+  };
+  OrgIntegrationPagination: {
+    // field return type name
+    items: "OrgIntegration";
+    totalCount: "Int";
   };
   Organization: {
     // field return type name
@@ -2141,7 +2168,7 @@ export interface NexusGenFieldTypeNames {
     customHost: "String";
     hasSsoProvider: "Boolean";
     id: "GID";
-    integrations: "OrgIntegration";
+    integrations: "OrgIntegrationPagination";
     logoUrl: "String";
     name: "String";
     preferredTone: "Tone";
@@ -3140,6 +3167,13 @@ export interface NexusGenArgTypes {
       templateId: NexusGenScalars["GID"]; // GID!
       title: string; // String!
     };
+    createSignatureIntegration: {
+      // args
+      apiKey: string; // String!
+      isDefault?: boolean | null; // Boolean
+      name: string; // String!
+      provider: NexusGenEnums["SignatureIntegrationProvider"]; // SignatureIntegrationProvider!
+    };
     createSimpleReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
@@ -3205,6 +3239,11 @@ export interface NexusGenArgTypes {
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };
+    deleteSignatureIntegration: {
+      // args
+      force?: boolean | null; // Boolean
+      id: NexusGenScalars["GID"]; // GID!
+    };
     deleteTag: {
       // args
       id: NexusGenScalars["GID"]; // GID!
@@ -3239,6 +3278,10 @@ export interface NexusGenArgTypes {
       // args
       preview?: boolean | null; // Boolean
       taskId: NexusGenScalars["GID"]; // GID!
+    };
+    markSignatureIntegrationAsDefault: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
     };
     petitionFieldAttachmentDownloadLink: {
       // args
@@ -3672,6 +3715,8 @@ export interface NexusGenArgTypes {
   Organization: {
     integrations: {
       // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
       type?: NexusGenEnums["IntegrationType"] | null; // IntegrationType
     };
     users: {

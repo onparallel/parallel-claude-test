@@ -599,6 +599,16 @@ type Mutation {
   ): PublicPetitionLink!
 
   """
+  Creates a new signature integration on the user's organization
+  """
+  createSignatureIntegration(
+    apiKey: String!
+    isDefault: Boolean
+    name: String!
+    provider: SignatureIntegrationProvider!
+  ): OrgIntegration!
+
+  """
   Creates a reply to a text or select field.
   """
   createSimpleReply(fieldId: GID!, petitionId: GID!, reply: String!): PetitionFieldReply!
@@ -699,6 +709,11 @@ type Mutation {
   deletePetitions(force: Boolean = false, ids: [GID!]!): Result!
 
   """
+  Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests
+  """
+  deleteSignatureIntegration(force: Boolean = false, id: GID!): Result!
+
+  """
   Removes the tag from every petition and soft-deletes it
   """
   deleteTag(id: GID!): Result!
@@ -745,6 +760,11 @@ type Mutation {
   Returns a signed download url for tasks with file output
   """
   getTaskResultFileUrl(preview: Boolean, taskId: GID!): FileUploadDownloadLinkResult!
+
+  """
+  marks a Signature integration as default
+  """
+  markSignatureIntegrationAsDefault(id: GID!): OrgIntegration!
 
   """
   Generates a download link for a field attachment
@@ -1341,7 +1361,12 @@ type OrgIntegration {
   id: GID!
 
   """
-  The name of the integration.
+  Wether this integration is the default to be used if the user has more than one of the same type
+  """
+  isDefault: Boolean!
+
+  """
+  Custom name of this integration, provided by the user
   """
   name: String!
 
@@ -1351,9 +1376,31 @@ type OrgIntegration {
   provider: String!
 
   """
+  Status of this integration, to differentiate between sandbox and production-ready integrations
+  """
+  status: OrgIntegrationStatus!
+
+  """
   The type of the integration.
   """
   type: IntegrationType!
+}
+
+type OrgIntegrationPagination {
+  """
+  The requested slice of items.
+  """
+  items: [OrgIntegration!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
+enum OrgIntegrationStatus {
+  DEMO
+  PRODUCTION
 }
 
 """
@@ -1381,12 +1428,26 @@ type Organization implements Timestamps {
   The ID of the organization.
   """
   id: GID!
+
+  """
+  A paginated list with enabled integrations for the organization
+  """
   integrations(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
     """
     Filter by integration type.
     """
     type: IntegrationType
-  ): [OrgIntegration!]!
+  ): OrgIntegrationPagination!
 
   """
   URL of the organization logo
@@ -3691,6 +3752,10 @@ input SignatureConfigInputSigner {
   email: String!
   firstName: String!
   lastName: String!
+}
+
+enum SignatureIntegrationProvider {
+  SIGNATURIT
 }
 
 type SignatureStartedEvent implements PetitionEvent {

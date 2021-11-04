@@ -1,5 +1,4 @@
 import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
-import { titleize } from "../../util/strings";
 import { userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -21,32 +20,6 @@ export const Tone = enumType({
   name: "Tone",
   members: ["FORMAL", "INFORMAL"],
   description: "The preferred tone of organization",
-});
-export const IntegrationType = enumType({
-  name: "IntegrationType",
-  members: ["SIGNATURE", "SSO", "USER_PROVISIONING"],
-  description: "The types of integrations available.",
-});
-
-export const OrgIntegration = objectType({
-  name: "OrgIntegration",
-  definition(t) {
-    t.globalId("id");
-    t.string("name", {
-      description: "The name of the integration.",
-      resolve: (o) => {
-        const isSandbox = o.type === "SIGNATURE" && o.settings.ENVIRONMENT !== "production";
-        return titleize(o.provider) + (isSandbox ? " Sandbox" : "");
-      },
-    });
-    t.field("type", {
-      type: "IntegrationType",
-      description: "The type of the integration.",
-    });
-    t.string("provider", {
-      description: "The provider used for this integration.",
-    });
-  },
 });
 
 export const Organization = objectType({
@@ -124,9 +97,10 @@ export const Organization = objectType({
         });
       },
     });
-    t.list.nonNull.field("integrations", {
+    t.paginationField("integrations", {
       type: "OrgIntegration",
-      args: {
+      description: "A paginated list with enabled integrations for the organization",
+      extendArgs: {
         type: nullable(
           arg({
             type: "IntegrationType",
@@ -135,8 +109,12 @@ export const Organization = objectType({
         ),
       },
       authorize: isOwnOrgOrSuperAdmin(),
-      resolve: async (root, { type }, ctx) =>
-        await ctx.integrations.loadIntegrationsByOrgId(root.id, type),
+      resolve: async (root, { limit, offset, type }, ctx) =>
+        await ctx.integrations.loadPaginatedIntegrations(root.id, {
+          type,
+          offset,
+          limit,
+        }),
     });
     t.nonNull.field("usageLimits", {
       authorize: isOwnOrgOrSuperAdmin(),

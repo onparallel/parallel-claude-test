@@ -2,8 +2,9 @@ import faker from "faker";
 import { Knex } from "knex";
 import { range } from "remeda";
 import { unMaybeArray } from "../../../util/arrays";
+import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
-import { MaybeArray } from "../../../util/types";
+import { MaybeArray, Replace } from "../../../util/types";
 import {
   Contact,
   ContactAuthentication,
@@ -515,9 +516,17 @@ export class Mocks {
     return row;
   }
 
-  async createOrgIntegration(data: CreateOrgIntegration) {
-    const [row] = await this.knex<OrgIntegration>("org_integration").insert(data, "*");
-    return row;
+  async createOrgIntegration(
+    data: MaybeArray<Replace<CreateOrgIntegration, { name?: string | null }>>
+  ) {
+    const dataArr = unMaybeArray(data).map((d) => ({
+      ...d,
+      name: d.name ?? titleize(d.provider),
+    }));
+    if (dataArr.length === 0) {
+      return [];
+    }
+    return await this.knex<OrgIntegration>("org_integration").insert(dataArr, "*");
   }
 
   async createEventSubscription(data: MaybeArray<CreatePetitionEventSubscription>) {

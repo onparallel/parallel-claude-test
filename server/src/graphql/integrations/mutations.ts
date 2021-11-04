@@ -1,0 +1,144 @@
+import { booleanArg, enumType, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { ApiContext } from "../../context";
+import { toGlobalId } from "../../util/globalId";
+import { authenticateAnd } from "../helpers/authorize";
+import { WhitelistedError } from "../helpers/errors";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { RESULT } from "../helpers/result";
+import { userHasFeatureFlag } from "../petition/authorizers";
+import { contextUserIsAdmin } from "../users/authorizers";
+import { userHasAccessToIntegrations } from "./authorizers";
+
+export const markSignatureIntegrationAsDefault = mutationField(
+  "markSignatureIntegrationAsDefault",
+  {
+    type: "OrgIntegration",
+    description: "marks a Signature integration as default",
+    authorize: authenticateAnd(
+      contextUserIsAdmin(),
+      userHasAccessToIntegrations("id", ["SIGNATURE"])
+    ),
+    args: {
+      id: nonNull(globalIdArg("OrgIntegration")),
+    },
+    resolve: async (_, { id }, ctx) => {
+      return await ctx.integrations.setDefaultOrgIntegration(id, "SIGNATURE", ctx.user!);
+    },
+  }
+);
+
+export const createSignatureIntegration = mutationField("createSignatureIntegration", {
+  description: "Creates a new signature integration on the user's organization",
+  type: nonNull("OrgIntegration"),
+  authorize: authenticateAnd(contextUserIsAdmin(), userHasFeatureFlag("PETITION_SIGNATURE")),
+  args: {
+    name: nonNull(stringArg()),
+    provider: nonNull(enumType({ name: "SignatureIntegrationProvider", members: ["SIGNATURIT"] })),
+    apiKey: nonNull(stringArg()),
+    isDefault: nullable(booleanArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    const environment = await checkSignaturitApiKey(args.apiKey, ctx);
+    const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE">(
+      {
+        type: "SIGNATURE",
+        org_id: ctx.user!.org_id,
+        provider: args.provider,
+        name: args.name,
+        settings: {
+          API_KEY: args.apiKey,
+          ENVIRONMENT: environment,
+        },
+        is_enabled: true,
+      },
+      `User:${ctx.user!.id}`
+    );
+
+    if (args.isDefault) {
+      return await ctx.integrations.setDefaultOrgIntegration(
+        newIntegration.id,
+        "SIGNATURE",
+        ctx.user!
+      );
+    } else {
+      return newIntegration;
+    }
+  },
+});
+
+export const deleteSignatureIntegration = mutationField("deleteSignatureIntegration", {
+  description:
+    "Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests",
+  type: "Result",
+  authorize: authenticateAnd(
+    contextUserIsAdmin(),
+    userHasAccessToIntegrations("id", ["SIGNATURE"])
+  ),
+  args: {
+    id: nonNull(globalIdArg("OrgIntegration")),
+    force: booleanArg({ default: false }),
+  },
+  resolve: async (_, args, ctx) => {
+    const pendingSignatures = await ctx.petitions.loadPendingSignatureRequestsByIntegrationId(
+      args.id
+    );
+    if (pendingSignatures.length > 0 && !args.force) {
+      throw new WhitelistedError(
+        "There are pending signature requests using this integration. Pass `force` argument to cancel this requests and delete the integration.",
+        "SIGNATURE_INTEGRATION_IN_USE_ERROR"
+      );
+    }
+
+    try {
+      if (pendingSignatures.length > 0) {
+        await Promise.all([
+          ctx.petitions.cancelPetitionSignatureRequest(
+            pendingSignatures.map((s) => s.id),
+            "CANCELLED_BY_USER",
+            { canceller_id: ctx.user!.id }
+          ),
+          ctx.aws.enqueueMessages(
+            "signature-worker",
+            pendingSignatures
+              .filter((s) => s.status === "PROCESSING")
+              .map((s) => ({
+                id: `signature-${toGlobalId("Petition", s.petition_id)}`,
+                groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
+                body: {
+                  type: "cancel-signature-process",
+                  payload: { petitionSignatureRequestId: s.id },
+                },
+              }))
+          ),
+        ]);
+      }
+
+      await ctx.integrations.deleteOrgIntegration(args.id, `User:${ctx.user!.id}`);
+      return RESULT.SUCCESS;
+    } catch {}
+    return RESULT.FAILURE;
+  },
+});
+
+async function checkSignaturitApiKey(apiKey: string, ctx: ApiContext) {
+  const [sandboxTest, productionTest] = await Promise.all([
+    ctx.fetch.fetchWithTimeout(
+      "https://api.sandbox.signaturit.com/v3/team/users.json",
+      { headers: { authorization: `Bearer ${apiKey}` } },
+      5000
+    ),
+    ctx.fetch.fetchWithTimeout(
+      "https://api.signaturit.com/v3/team/users.json",
+      { headers: { authorization: `Bearer ${apiKey}` } },
+      5000
+    ),
+  ]);
+
+  if (sandboxTest.status !== 200 && productionTest.status !== 200) {
+    throw new WhitelistedError(
+      `Unable to check Signaturit APIKEY environment`,
+      "INVALID_APIKEY_ERROR"
+    );
+  }
+  return sandboxTest.status === 200 ? "sandbox" : "production";
+}

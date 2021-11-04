@@ -355,6 +355,8 @@ export type Mutation = {
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
+  /** Creates a new signature integration on the user's organization */
+  createSignatureIntegration: OrgIntegration;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
@@ -379,6 +381,8 @@ export type Mutation = {
   deletePetitionReply: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
+  deleteSignatureIntegration: Result;
   /** Removes the tag from every petition and soft-deletes it */
   deleteTag: Result;
   /** Deletes a group */
@@ -393,6 +397,8 @@ export type Mutation = {
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Returns a signed download url for tasks with file output */
   getTaskResultFileUrl: FileUploadDownloadLinkResult;
+  /** marks a Signature integration as default */
+  markSignatureIntegrationAsDefault: OrgIntegration;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -689,6 +695,13 @@ export type MutationcreatePublicPetitionLinkArgs = {
   title: Scalars["String"];
 };
 
+export type MutationcreateSignatureIntegrationArgs = {
+  apiKey: Scalars["String"];
+  isDefault?: Maybe<Scalars["Boolean"]>;
+  name: Scalars["String"];
+  provider: SignatureIntegrationProvider;
+};
+
 export type MutationcreateSimpleReplyArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -754,6 +767,11 @@ export type MutationdeletePetitionsArgs = {
   ids: Array<Scalars["GID"]>;
 };
 
+export type MutationdeleteSignatureIntegrationArgs = {
+  force?: Maybe<Scalars["Boolean"]>;
+  id: Scalars["GID"];
+};
+
 export type MutationdeleteTagArgs = {
   id: Scalars["GID"];
 };
@@ -787,6 +805,10 @@ export type MutationgenerateUserAuthTokenArgs = {
 export type MutationgetTaskResultFileUrlArgs = {
   preview?: Maybe<Scalars["Boolean"]>;
   taskId: Scalars["GID"];
+};
+
+export type MutationmarkSignatureIntegrationAsDefaultArgs = {
+  id: Scalars["GID"];
 };
 
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
@@ -1229,13 +1251,26 @@ export type OnboardingStatus = "FINISHED" | "SKIPPED";
 
 export type OrgIntegration = {
   id: Scalars["GID"];
-  /** The name of the integration. */
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"];
+  /** Custom name of this integration, provided by the user */
   name: Scalars["String"];
   /** The provider used for this integration. */
   provider: Scalars["String"];
+  /** Status of this integration, to differentiate between sandbox and production-ready integrations */
+  status: OrgIntegrationStatus;
   /** The type of the integration. */
   type: IntegrationType;
 };
+
+export type OrgIntegrationPagination = {
+  /** The requested slice of items. */
+  items: Array<OrgIntegration>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
+export type OrgIntegrationStatus = "DEMO" | "PRODUCTION";
 
 /** An organization in the system. */
 export type Organization = Timestamps & {
@@ -1249,7 +1284,8 @@ export type Organization = Timestamps & {
   hasSsoProvider: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
-  integrations: Array<OrgIntegration>;
+  /** A paginated list with enabled integrations for the organization */
+  integrations: OrgIntegrationPagination;
   /** URL of the organization logo */
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
@@ -1269,6 +1305,8 @@ export type Organization = Timestamps & {
 
 /** An organization in the system. */
 export type OrganizationintegrationsArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
   type?: Maybe<IntegrationType>;
 };
 
@@ -2155,7 +2193,7 @@ export type PublicPetitionLink = {
   owner: User;
   slug: Scalars["String"];
   title: Scalars["String"];
-  urlPrefix: Scalars["String"];
+  url: Scalars["String"];
 };
 
 /** A public message in a petition */
@@ -2558,10 +2596,10 @@ export type SignatureCompletedUserNotification = PetitionUserNotification & {
 
 /** The signature settings of a petition */
 export type SignatureConfig = {
+  /** The signature integration selected for this signature config. */
+  integration: Maybe<OrgIntegration>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
-  /** The selected provider for the signature. */
-  provider: Scalars["String"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The signers of the generated document. */
@@ -2576,8 +2614,8 @@ export type SignatureConfig = {
 export type SignatureConfigInput = {
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
-  /** The selected provider for the signature. */
-  provider: Scalars["String"];
+  /** The Global ID of the signature integration to be used. */
+  orgIntegrationId: Scalars["ID"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   signersInfo: Array<SignatureConfigInputSigner>;
@@ -2594,6 +2632,8 @@ export type SignatureConfigInputSigner = {
   firstName: Scalars["String"];
   lastName: Scalars["String"];
 };
+
+export type SignatureIntegrationProvider = "SIGNATURIT";
 
 export type SignatureStartedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];

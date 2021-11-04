@@ -101,7 +101,7 @@ describe("GraphQL/Petitions", () => {
     // user from other organization
     [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
 
-    signatureIntegration = await mocks.createOrgIntegration({
+    [signatureIntegration] = await mocks.createOrgIntegration({
       type: "SIGNATURE",
       provider: "SIGNATURIT",
       org_id: organization.id,

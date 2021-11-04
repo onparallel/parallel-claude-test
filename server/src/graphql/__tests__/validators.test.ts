@@ -39,21 +39,21 @@ describe("GraphQL custom validators", () => {
       ...(await mocks.createRandomUsers(organizations[1].id, 1)),
     ];
 
-    signatureIntegration = await mocks.createOrgIntegration({
+    [signatureIntegration] = await mocks.createOrgIntegration({
       type: "SIGNATURE",
       provider: "SIGNATURIT",
       org_id: organizations[0].id,
       settings: { API_KEY: "<APIKEY>" },
       is_enabled: true,
     });
-    org1SignatureIntegration = await mocks.createOrgIntegration({
+    [org1SignatureIntegration] = await mocks.createOrgIntegration({
       type: "SIGNATURE",
       provider: "SIGNATURIT",
       org_id: organizations[1].id,
       settings: { API_KEY: "<APIKEY>" },
       is_enabled: true,
     });
-    ssoIntegration = await mocks.createOrgIntegration({
+    [ssoIntegration] = await mocks.createOrgIntegration({
       type: "USER_PROVISIONING",
       provider: "AZURE",
       org_id: organizations[0].id,
@@ -68,7 +68,7 @@ describe("GraphQL custom validators", () => {
 
   describe("emailDomainIsNotSSO", () => {
     beforeAll(async () => {
-      await knex.from<OrgIntegration>("org_integration").insert([
+      await mocks.createOrgIntegration([
         {
           is_enabled: true,
           org_id: organizations[0].id,
@@ -188,25 +188,22 @@ describe("GraphQL custom validators", () => {
         { feature_flag_name: "PETITION_SIGNATURE", user_id: users[1].id, value: false },
       ]);
 
-      await knex.from("org_integration").insert(
-        [
-          {
-            is_enabled: true,
-            org_id: organizations[0].id,
-            provider: "SIGNATURIT",
-            type: "SIGNATURE",
-            settings: {},
-          },
-          {
-            is_enabled: false,
-            org_id: organizations[1].id,
-            provider: "SIGNATURIT",
-            type: "SIGNATURE",
-            settings: {},
-          },
-        ],
-        "*"
-      );
+      await mocks.createOrgIntegration([
+        {
+          is_enabled: true,
+          org_id: organizations[0].id,
+          provider: "SIGNATURIT",
+          type: "SIGNATURE",
+          settings: {},
+        },
+        {
+          is_enabled: false,
+          org_id: organizations[1].id,
+          provider: "SIGNATURIT",
+          type: "SIGNATURE",
+          settings: {},
+        },
+      ]);
     });
 
     it("validates the signature configuration", async () => {

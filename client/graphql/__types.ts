@@ -1272,6 +1272,14 @@ export interface OrgIntegration {
   type: IntegrationType;
 }
 
+export interface OrgIntegrationPagination {
+  __typename?: "OrgIntegrationPagination";
+  /** The requested slice of items. */
+  items: Array<OrgIntegration>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+}
+
 /** An organization in the system. */
 export interface Organization extends Timestamps {
   __typename?: "Organization";
@@ -1285,7 +1293,8 @@ export interface Organization extends Timestamps {
   hasSsoProvider: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
-  integrations: Array<OrgIntegration>;
+  /** A paginated list with enabled integrations for the organization */
+  integrations: OrgIntegrationPagination;
   /** URL of the organization logo */
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
@@ -1305,6 +1314,8 @@ export interface Organization extends Timestamps {
 
 /** An organization in the system. */
 export interface OrganizationintegrationsArgs {
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
   type?: Maybe<IntegrationType>;
 }
 
@@ -5312,12 +5323,14 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   hasHideRecipientViewContents: User["hasFeatureFlag"];
 } & {
   organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
-      signatureIntegrations: Array<
-        { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-            value: OrgIntegration["id"];
-            label: OrgIntegration["name"];
-          }
-      >;
+      signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
+        items: Array<
+          { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+              value: OrgIntegration["id"];
+              label: OrgIntegration["name"];
+            }
+        >;
+      };
     };
 };
 
@@ -6461,12 +6474,14 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
 
 export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
   organization: { __typename?: "Organization" } & {
-    signatureIntegrations: Array<
-      { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-          value: OrgIntegration["id"];
-          label: OrgIntegration["name"];
-        }
-    >;
+    signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
+      items: Array<
+        { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+            value: OrgIntegration["id"];
+            label: OrgIntegration["name"];
+          }
+      >;
+    };
   };
 };
 
@@ -8085,28 +8100,29 @@ export type OrganizationSettingsQuery = {
 export type OrganizationIntegrationsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationIntegrationsQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    firstName?: Maybe<string>;
-    lastName?: Maybe<string>;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    isSuperAdmin: boolean;
-    role: OrganizationRole;
-    avatarUrl?: Maybe<string>;
-    initials?: Maybe<string>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
     };
-  };
 };
 
 export type OrganizationUsageQueryVariables = Exact<{ [key: string]: never }>;
@@ -10035,12 +10051,14 @@ export type PetitionCompose_UserFragment = { __typename?: "User" } & Pick<
     hasPetitionPdfExport: User["hasFeatureFlag"];
   } & {
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
-        signatureIntegrations: Array<
-          { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-              value: OrgIntegration["id"];
-              label: OrgIntegration["name"];
-            }
-        >;
+        signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
+          items: Array<
+            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
+                label: OrgIntegration["name"];
+              }
+          >;
+        };
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
           petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
             OrganizationUsagePetitionLimit,
@@ -10612,12 +10630,14 @@ export type PetitionComposeUserQuery = {
       hasPetitionPdfExport: User["hasFeatureFlag"];
     } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
-          signatureIntegrations: Array<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
-          >;
+          signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
+            items: Array<
+              { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                  value: OrgIntegration["id"];
+                  label: OrgIntegration["name"];
+                }
+            >;
+          };
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
               OrganizationUsagePetitionLimit,
@@ -11035,12 +11055,14 @@ export type PetitionReplies_UserFragment = { __typename?: "User" } & Pick<
     hasExportCuatrecasas: User["hasFeatureFlag"];
   } & {
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
-        signatureIntegrations: Array<
-          { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-              value: OrgIntegration["id"];
-              label: OrgIntegration["name"];
-            }
-        >;
+        signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
+          items: Array<
+            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
+                label: OrgIntegration["name"];
+              }
+          >;
+        };
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
           petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
             OrganizationUsagePetitionLimit,
@@ -11270,12 +11292,14 @@ export type PetitionRepliesUserQuery = {
       hasExportCuatrecasas: User["hasFeatureFlag"];
     } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
-          signatureIntegrations: Array<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
-          >;
+          signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
+            items: Array<
+              { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                  value: OrgIntegration["id"];
+                  label: OrgIntegration["name"];
+                }
+            >;
+          };
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
               OrganizationUsagePetitionLimit,
@@ -15172,8 +15196,10 @@ export const PetitionSettings_UserFragmentDoc = gql`
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     organization {
       id
-      signatureIntegrations: integrations(type: SIGNATURE) {
-        ...SignatureConfigDialog_OrgIntegration
+      signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
+        items {
+          ...SignatureConfigDialog_OrgIntegration
+        }
       }
     }
   }
@@ -15436,8 +15462,10 @@ export const ExportRepliesDialog_UserFragmentDoc = gql`
 export const PetitionSignaturesCard_UserFragmentDoc = gql`
   fragment PetitionSignaturesCard_User on User {
     organization {
-      signatureIntegrations: integrations(type: SIGNATURE) {
-        ...SignatureConfigDialog_OrgIntegration
+      signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
+        items {
+          ...SignatureConfigDialog_OrgIntegration
+        }
       }
     }
   }

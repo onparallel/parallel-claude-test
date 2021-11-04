@@ -38,8 +38,10 @@ const fragments = {
   User: gql`
     fragment PetitionSignaturesCard_User on User {
       organization {
-        signatureIntegrations: integrations(type: SIGNATURE) {
-          ...SignatureConfigDialog_OrgIntegration
+        signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
+          items {
+            ...SignatureConfigDialog_OrgIntegration
+          }
         }
       }
     }
@@ -190,7 +192,7 @@ export const PetitionSignaturesCard = Object.assign(
         }
         const signatureConfig = await showSignatureConfigDialog({
           petition,
-          providers: user.organization.signatureIntegrations,
+          providers: user.organization.signatureIntegrations.items,
         });
         await updateSignatureConfig({
           variables: { petitionId: petition.id, signatureConfig },
