@@ -1,0 +1,26 @@
+diff --git a/node_modules/@chakra-ui/color-mode/dist/cjs/color-mode-provider.js b/node_modules/@chakra-ui/color-mode/dist/cjs/color-mode-provider.js
+index 70a43f6..1131e7f 100644
+--- a/node_modules/@chakra-ui/color-mode/dist/cjs/color-mode-provider.js
++++ b/node_modules/@chakra-ui/color-mode/dist/cjs/color-mode-provider.js
+@@ -83,7 +83,7 @@ function ColorModeProvider(props) {
+      * - previously stored value
+      */
+     if (_utils.isBrowser && colorModeManager.type === "localStorage") {
+-      var mode = useSystemColorMode ? (0, _colorMode.getColorScheme)(defaultColorMode) : _colorMode.root.get() || colorModeManager.get() || (0, _colorMode.getColorScheme)(defaultColorMode);
++      var mode = useSystemColorMode ? (0, _colorMode.getColorScheme)(defaultColorMode) : _colorMode.root.get() || colorModeManager.get() || defaultColorMode;
+ 
+       if (mode) {
+         rawSetColorMode(mode);
+diff --git a/node_modules/@chakra-ui/color-mode/dist/esm/color-mode-provider.js b/node_modules/@chakra-ui/color-mode/dist/esm/color-mode-provider.js
+index 6263455..d85b6eb 100644
+--- a/node_modules/@chakra-ui/color-mode/dist/esm/color-mode-provider.js
++++ b/node_modules/@chakra-ui/color-mode/dist/esm/color-mode-provider.js
+@@ -63,7 +63,7 @@ export function ColorModeProvider(props) {
+      * - previously stored value
+      */
+     if (isBrowser && colorModeManager.type === "localStorage") {
+-      var mode = useSystemColorMode ? getColorScheme(defaultColorMode) : root.get() || colorModeManager.get() || getColorScheme(defaultColorMode);
++      var mode = useSystemColorMode ? getColorScheme(defaultColorMode) : root.get() || colorModeManager.get() || defaultColorMode;
+ 
+       if (mode) {
+         rawSetColorMode(mode);
