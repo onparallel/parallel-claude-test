@@ -31,11 +31,6 @@ export function SettingsRowAlias({
       controlId="alias-field"
       isInvalid={isInvalid}
       alignItems="flex-start"
-      sx={{
-        label: {
-          paddingTop: 1,
-        },
-      }}
     >
       <Stack width="100%" paddingX={2}>
         <Input

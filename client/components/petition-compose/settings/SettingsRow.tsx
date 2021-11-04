@@ -19,7 +19,7 @@ export function SettingsRow({
 }: SettingsRowProps) {
   return (
     <FormControl display="flex" alignItems="center" id={controlId} {...props}>
-      <FormLabel display="flex" alignItems="center" fontWeight="normal" margin={0}>
+      <FormLabel display="flex" alignItems="center" fontWeight="normal" margin={0} minHeight={8}>
         {label}
         <HelpPopover>{description}</HelpPopover>
       </FormLabel>
