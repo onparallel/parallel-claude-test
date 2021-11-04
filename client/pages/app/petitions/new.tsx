@@ -77,6 +77,7 @@ function NewPetition() {
   const { data: templateData } = useNewPetitionUserTemplateQuery({
     variables: { templateId: state.template! },
     skip: !state.template,
+    fetchPolicy: "cache-and-network",
   });
 
   const {
