@@ -16,7 +16,8 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { PetitionComposeFieldSettingsProps, SettingsRow } from "../PetitionComposeFieldSettings";
+import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
+import { SettingsRow } from "./SettingsRow";
 
 export function CheckboxSettings({
   field,

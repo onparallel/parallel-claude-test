@@ -95,6 +95,7 @@ export const PetitionFieldFragment = gql`
     title
     type
     fromPetitionFieldId
+    alias
   }
 `;
 

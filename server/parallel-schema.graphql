@@ -1975,6 +1975,11 @@ A field within a petition.
 """
 type PetitionField {
   """
+  The alias of the petition field.
+  """
+  alias: String
+
+  """
   A list of files attached to this field.
   """
   attachments: [PetitionFieldAttachment!]!
@@ -3803,6 +3808,7 @@ input UpdateEventSubscriptionInput {
 }
 
 input UpdatePetitionFieldInput {
+  alias: String
   description: String
   multiple: Boolean
   optional: Boolean

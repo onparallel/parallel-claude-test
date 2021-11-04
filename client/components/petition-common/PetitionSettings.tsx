@@ -429,6 +429,7 @@ function _PetitionSettings({
 const fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
+      hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)

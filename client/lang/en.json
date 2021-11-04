@@ -3155,6 +3155,21 @@
     "context": "Please try again later and if the error persists <a>reach out to support</a> for help."
   },
   {
+    "term": "field-settings.alias-description",
+    "definition": "Unique identifier within the petition that serves to easily identify the field in API responses.",
+    "context": "Unique identifier within the petition that serves to easily identify the field in API responses."
+  },
+  {
+    "term": "field-settings.alias-exists-error",
+    "definition": "This alias already exists, please choose another one",
+    "context": "This alias already exists, please choose another one"
+  },
+  {
+    "term": "field-settings.alias-label",
+    "definition": "Alias",
+    "context": "Alias"
+  },
+  {
     "term": "field-settings.dynamic-select.import-from-excel.attach-xlsx",
     "definition": "Attach an .xlsx file like the one in the model.",
     "context": "Attach an .xlsx file like the one in the model."
@@ -4993,6 +5008,11 @@
     "term": "petition.deadline-label",
     "definition": "Deadline",
     "context": "Deadline"
+  },
+  {
+    "term": "petition.developers",
+    "definition": "Developers",
+    "context": "Developers"
   },
   {
     "term": "petition.dynamic-select-field-without-options-error",

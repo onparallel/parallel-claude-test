@@ -1581,6 +1581,8 @@ export type PetitionEventSubscription = {
 
 /** A field within a petition. */
 export type PetitionField = {
+  /** The alias of the petition field. */
+  alias: Maybe<Scalars["String"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
   /** The comments for this field. */
@@ -2667,6 +2669,7 @@ export type UpdateEventSubscriptionInput = {
 };
 
 export type UpdatePetitionFieldInput = {
+  alias?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   multiple?: Maybe<Scalars["Boolean"]>;
   optional?: Maybe<Scalars["Boolean"]>;
@@ -2957,6 +2960,7 @@ export type PetitionFieldFragment = {
   title: string | null;
   type: PetitionFieldType;
   fromPetitionFieldId: string | null;
+  alias: string | null;
 };
 
 export type PetitionFieldReplyFragment = {
@@ -3164,6 +3168,7 @@ export type PetitionReplies_RepliesQuery = {
           title: string | null;
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
+          alias: string | null;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3178,6 +3183,7 @@ export type PetitionReplies_RepliesQuery = {
           title: string | null;
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
+          alias: string | null;
           replies: Array<{
             id: string;
             content: { [key: string]: any };

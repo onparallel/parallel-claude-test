@@ -625,6 +625,7 @@ export interface PetitionField {
   is_fixed: boolean; // bool
   visibility: Maybe<any>; // jsonb
   from_petition_field_id: Maybe<number>; // int4
+  alias: Maybe<string>; // text
 }
 
 export type CreatePetitionField = PartialProps<
@@ -644,6 +645,7 @@ export type CreatePetitionField = PartialProps<
   | "is_fixed"
   | "visibility"
   | "from_petition_field_id"
+  | "alias"
 >;
 
 export interface PetitionFieldAttachment {

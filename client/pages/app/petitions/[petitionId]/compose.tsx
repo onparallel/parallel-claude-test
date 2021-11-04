@@ -33,7 +33,7 @@ import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-c
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
-import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/PetitionComposeFieldSettings";
+import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
@@ -564,6 +564,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
                   isReadOnly={isReadOnly}
+                  hasApiTokens={me.hasApiTokens}
                 />
               ) : (
                 <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 6rem)`}>

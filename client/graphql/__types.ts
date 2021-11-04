@@ -1638,6 +1638,8 @@ export interface PetitionEventSubscription {
 /** A field within a petition. */
 export interface PetitionField {
   __typename?: "PetitionField";
+  /** The alias of the petition field. */
+  alias?: Maybe<Scalars["String"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
   /** The comments for this field. */
@@ -2778,6 +2780,7 @@ export interface UpdateEventSubscriptionInput {
 }
 
 export interface UpdatePetitionFieldInput {
+  alias?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   multiple?: Maybe<Scalars["Boolean"]>;
   optional?: Maybe<Scalars["Boolean"]>;
@@ -5265,6 +5268,7 @@ export type PetitionContents_PetitionFieldFragment = { __typename?: "PetitionFie
   };
 
 export type PetitionSettings_UserFragment = { __typename?: "User" } & {
+  hasApiTokens: User["hasFeatureFlag"];
   hasPetitionSignature: User["hasFeatureFlag"];
   hasSkipForwardSecurity: User["hasFeatureFlag"];
   hasHideRecipientViewContents: User["hasFeatureFlag"];
@@ -5861,31 +5865,6 @@ export type CopySignatureConfigDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
 } & Pick<PetitionSigner, "email" | "fullName">;
 
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  file: Scalars["Upload"];
-}>;
-
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
-  uploadDynamicSelectFieldFile: { __typename?: "PetitionField" } & Pick<
-    PetitionField,
-    "id" | "options"
-  >;
-};
-
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-}>;
-
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
-  dynamicSelectFieldFileDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
-    FileUploadDownloadLinkResult,
-    "result" | "url"
-  >;
-};
-
 export type PetitionComposeField_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
   PetitionField,
   | "id"
@@ -6030,21 +6009,6 @@ export type PetitionComposeFieldList_PetitionFragment = { __typename?: "Petition
   >;
 };
 
-export type PetitionComposeFieldSettings_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-} & Pick<
-  PetitionField,
-  | "id"
-  | "type"
-  | "optional"
-  | "multiple"
-  | "options"
-  | "isReadOnly"
-  | "isFixed"
-  | "position"
-  | "visibility"
->;
-
 export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "type" | "optional" | "options">;
@@ -6060,6 +6024,47 @@ export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
 export type ReferencedFieldDialogDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "title" | "type">;
+
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+}>;
+
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
+  uploadDynamicSelectFieldFile: { __typename?: "PetitionField" } & Pick<
+    PetitionField,
+    "id" | "options"
+  >;
+};
+
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+}>;
+
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
+  dynamicSelectFieldFileDownloadLink: { __typename?: "FileUploadDownloadLinkResult" } & Pick<
+    FileUploadDownloadLinkResult,
+    "result" | "url"
+  >;
+};
+
+export type PetitionComposeFieldSettings_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<
+  PetitionField,
+  | "id"
+  | "type"
+  | "optional"
+  | "multiple"
+  | "options"
+  | "isReadOnly"
+  | "isFixed"
+  | "position"
+  | "visibility"
+  | "alias"
+>;
 
 export type PetitionListTagFilter_TagFragment = { __typename?: "Tag" } & Pick<
   Tag,
@@ -9678,6 +9683,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Pet
         | "visibility"
         | "options"
         | "position"
+        | "alias"
         | "validated"
       > & {
           attachments: Array<
@@ -9765,6 +9771,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         | "visibility"
         | "options"
         | "position"
+        | "alias"
         | "validated"
       > & {
           attachments: Array<
@@ -9832,6 +9839,7 @@ export type PetitionCompose_PetitionFieldFragment = { __typename?: "PetitionFiel
   | "visibility"
   | "options"
   | "position"
+  | "alias"
   | "validated"
 > & {
     attachments: Array<
@@ -9861,6 +9869,7 @@ export type PetitionCompose_UserFragment = { __typename?: "User" } & Pick<
   | "avatarUrl"
   | "initials"
 > & {
+    hasApiTokens: User["hasFeatureFlag"];
     hasPetitionSignature: User["hasFeatureFlag"];
     hasSkipForwardSecurity: User["hasFeatureFlag"];
     hasHideRecipientViewContents: User["hasFeatureFlag"];
@@ -10055,6 +10064,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           | "visibility"
           | "options"
           | "position"
+          | "alias"
           | "validated"
         > & {
             attachments: Array<
@@ -10097,6 +10107,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           | "visibility"
           | "options"
           | "position"
+          | "alias"
           | "validated"
         > & {
             attachments: Array<
@@ -10140,6 +10151,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           | "visibility"
           | "options"
           | "position"
+          | "alias"
           | "validated"
         > & {
             attachments: Array<
@@ -10182,6 +10194,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           | "visibility"
           | "options"
           | "position"
+          | "alias"
           | "validated"
         > & {
             attachments: Array<
@@ -10252,6 +10265,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           | "visibility"
           | "options"
           | "position"
+          | "alias"
           | "validated"
         > & {
             attachments: Array<
@@ -10283,6 +10297,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           | "visibility"
           | "options"
           | "position"
+          | "alias"
           | "validated"
         > & {
             attachments: Array<
@@ -10325,6 +10340,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           | "visibility"
           | "options"
           | "position"
+          | "alias"
           | "validated"
         > & {
             attachments: Array<
@@ -10356,6 +10372,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           | "visibility"
           | "options"
           | "position"
+          | "alias"
           | "validated"
         > & {
             attachments: Array<
@@ -10414,6 +10431,7 @@ export type PetitionComposeUserQuery = {
     | "avatarUrl"
     | "initials"
   > & {
+      hasApiTokens: User["hasFeatureFlag"];
       hasPetitionSignature: User["hasFeatureFlag"];
       hasSkipForwardSecurity: User["hasFeatureFlag"];
       hasHideRecipientViewContents: User["hasFeatureFlag"];
@@ -10473,6 +10491,7 @@ export type PetitionComposeQuery = {
               | "visibility"
               | "options"
               | "position"
+              | "alias"
               | "validated"
             > & {
                 attachments: Array<
@@ -10568,6 +10587,7 @@ export type PetitionComposeQuery = {
               | "visibility"
               | "options"
               | "position"
+              | "alias"
               | "validated"
             > & {
                 attachments: Array<
@@ -14835,6 +14855,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     isFixed
     position
     visibility
+    alias
   }
 `;
 export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
@@ -14902,6 +14923,7 @@ export const SignatureConfigDialog_OrgIntegrationFragmentDoc = gql`
 `;
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
+    hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
@@ -16764,59 +16786,6 @@ export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryHookResul
 export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQueryHookResult = ReturnType<
   typeof usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQuery
 >;
-export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
-  mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
-    $petitionId: GID!
-    $fieldId: GID!
-    $file: Upload!
-  ) {
-    uploadDynamicSelectFieldFile(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
-      id
-      options
-    }
-  }
-`;
-export function useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    DynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
-    DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    DynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
-    DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables
-  >(DynamicSelectSettings_uploadDynamicSelectFieldFileDocument, options);
-}
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationHookResult = ReturnType<
-  typeof useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation
->;
-export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = gql`
-  mutation DynamicSelectSettings_dynamicSelectFieldFileDownloadLink(
-    $petitionId: GID!
-    $fieldId: GID!
-  ) {
-    dynamicSelectFieldFileDownloadLink(petitionId: $petitionId, fieldId: $fieldId) {
-      result
-      url
-    }
-  }
-`;
-export function useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
-    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
-    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
-  >(DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument, options);
-}
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationHookResult = ReturnType<
-  typeof useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation
->;
 export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument = gql`
   mutation PetitionComposeField_createPetitionFieldAttachmentUploadLink(
     $petitionId: GID!
@@ -16940,6 +16909,59 @@ export function usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutat
 }
 export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation
+>;
+export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
+  mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
+    $petitionId: GID!
+    $fieldId: GID!
+    $file: Upload!
+  ) {
+    uploadDynamicSelectFieldFile(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+      id
+      options
+    }
+  }
+`;
+export function useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
+    DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
+    DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables
+  >(DynamicSelectSettings_uploadDynamicSelectFieldFileDocument, options);
+}
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationHookResult = ReturnType<
+  typeof useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation
+>;
+export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = gql`
+  mutation DynamicSelectSettings_dynamicSelectFieldFileDownloadLink(
+    $petitionId: GID!
+    $fieldId: GID!
+  ) {
+    dynamicSelectFieldFileDownloadLink(petitionId: $petitionId, fieldId: $fieldId) {
+      result
+      url
+    }
+  }
+`;
+export function useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
+  >(DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument, options);
+}
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationHookResult = ReturnType<
+  typeof useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation
 >;
 export const PetitionListTagFilter_tagsDocument = gql`
   query PetitionListTagFilter_tags($search: String) {

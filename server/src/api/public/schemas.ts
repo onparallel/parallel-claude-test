@@ -398,6 +398,11 @@ const _PetitionFieldWithReply = {
       description: "The field ID from where this field was cloned",
       example: toGlobalId("PetitionField", 30),
     },
+    alias: {
+      type: ["string", "null"],
+      description: "The field alias specified within the request / template",
+      example: "first-name",
+    },
     replies: {
       type: "array",
       items: {

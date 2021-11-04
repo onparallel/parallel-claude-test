@@ -657,6 +657,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           t.nullable.boolean("optional");
           t.nullable.boolean("multiple");
           t.nullable.field("visibility", { type: "JSONObject" });
+          t.nullable.string("alias");
         },
       }).asArg()
     ),
@@ -664,6 +665,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
     maxLength((args) => args.data.title, "data.title", 500),
+    maxLength((args) => args.data.alias, "data.alias", 100),
     validateIf(
       (args) => isDefined(args.data.visibility),
       validFieldVisibilityJson(
@@ -675,7 +677,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     )
   ),
   resolve: async (_, args, ctx, info) => {
-    const { title, description, optional, multiple, options, visibility } = args.data;
+    const { title, description, optional, multiple, options, visibility, alias } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
       data.title = title?.trim() || null;
@@ -689,6 +691,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     if (isDefined(multiple)) {
       data.multiple = multiple;
     }
+    if (alias !== undefined) {
+      data.alias = alias?.trim() || null;
+    }
+
     if (isDefined(options)) {
       try {
         const field = await ctx.petitions.validateFieldData(args.fieldId, {
@@ -713,7 +719,23 @@ export const updatePetitionField = mutationField("updatePetitionField", {
             };
     }
 
-    return await ctx.petitions.updatePetitionField(args.petitionId, args.fieldId, data, ctx.user!);
+    try {
+      return await ctx.petitions.updatePetitionField(
+        args.petitionId,
+        args.fieldId,
+        data,
+        ctx.user!
+      );
+    } catch (error: any) {
+      if (error.constraint === "petition_field__petition_id__alias__unqiue") {
+        throw new WhitelistedError(
+          "The alias for this field already exists in this petition",
+          "ALIAS_ALREADY_EXISTS"
+        );
+      } else {
+        throw error;
+      }
+    }
   },
 });
 

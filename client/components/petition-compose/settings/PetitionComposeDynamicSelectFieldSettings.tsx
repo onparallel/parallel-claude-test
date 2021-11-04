@@ -1,6 +1,13 @@
 import { gql } from "@apollo/client";
 import { Box, Center, Flex, List, ListItem, Progress, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { Dropzone } from "@parallel/components/common/Dropzone";
+import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { FileName } from "@parallel/components/common/FileName";
+import { FileSize } from "@parallel/components/common/FileSize";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { NormalLink } from "@parallel/components/common/Link";
 import {
   useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
   useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
@@ -11,14 +18,8 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useMemo, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { DateTime } from "../common/DateTime";
-import { Dropzone } from "../common/Dropzone";
-import { useErrorDialog } from "../common/ErrorDialog";
-import { FileName } from "../common/FileName";
-import { FileSize } from "../common/FileSize";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NormalLink } from "../common/Link";
-import { PetitionComposeFieldSettingsProps, SettingsRow } from "./PetitionComposeFieldSettings";
+import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
+import { SettingsRow } from "./SettingsRow";
 
 export function DynamicSelectSettings({
   petitionId,

@@ -428,6 +428,10 @@ export const PetitionField = objectType({
       description: "The field GID used from which this field was cloned",
       resolve: (root) => root.from_petition_field_id,
     });
+    t.nullable.string("alias", {
+      description: "The alias of the petition field.",
+      resolve: (o) => o.alias,
+    });
   },
   sourceType: "db.PetitionField",
 });

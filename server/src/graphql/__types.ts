@@ -147,6 +147,7 @@ export interface NexusGenInputs {
   };
   UpdatePetitionFieldInput: {
     // input type
+    alias?: string | null; // String
     description?: string | null; // String
     multiple?: boolean | null; // Boolean
     optional?: boolean | null; // Boolean
@@ -1120,6 +1121,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionField: {
     // field return type
+    alias: string | null; // String
     attachments: NexusGenRootTypes["PetitionFieldAttachment"][]; // [PetitionFieldAttachment!]!
     comments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     description: string | null; // String
@@ -2289,6 +2291,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionField: {
     // field return type name
+    alias: "String";
     attachments: "PetitionFieldAttachment";
     comments: "PetitionFieldComment";
     description: "String";

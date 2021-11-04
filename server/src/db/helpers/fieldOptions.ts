@@ -184,6 +184,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: multiple ?? false,
+        alias: field?.alias ?? null,
         options: {
           placeholder: options?.placeholder ?? null,
         },
@@ -192,6 +193,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: multiple ?? false,
+        alias: field?.alias ?? null,
         options: {
           placeholder: options?.placeholder ?? null,
         },
@@ -200,6 +202,7 @@ export function defaultFieldOptions(
       return {
         optional: false,
         multiple: true,
+        alias: field?.alias ?? null,
         options: {
           accepts: null,
         },
@@ -208,6 +211,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: multiple ?? false,
+        alias: field?.alias ?? null,
         options: {
           values: options?.values ?? [],
           placeholder: options?.placeholder ?? null,
@@ -218,6 +222,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: multiple ?? false,
+        alias: field?.alias ?? null,
         options: {
           file: null,
           values: [],
@@ -229,6 +234,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: false,
+        alias: field?.alias ?? null,
         options: {
           values: options?.values ?? [],
           limit: {
