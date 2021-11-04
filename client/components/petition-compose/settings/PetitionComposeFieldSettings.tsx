@@ -155,7 +155,7 @@ export function PetitionComposeFieldSettings({
       </Stack>
       {hasApiTokens && field.type !== "HEADING" ? (
         <Stack padding={4} paddingTop={2} spacing={3}>
-          <Heading flex="1" as="h3" size="sm" overflowWrap="anywhere">
+          <Heading flex="1" as="h4" size="sm" overflowWrap="anywhere">
             <FormattedMessage id="petition.developers" defaultMessage="Developers" />
           </Heading>
           <SettingsRowAlias
