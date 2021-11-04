@@ -366,8 +366,8 @@ SignatureConfigDialog.fragments = {
     return gql`
       fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {
         id
+        value: id
         label: name
-        value: provider
       }
     `;
   },

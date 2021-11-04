@@ -5314,8 +5314,8 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
       signatureIntegrations: Array<
         { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+            value: OrgIntegration["id"];
             label: OrgIntegration["name"];
-            value: OrgIntegration["provider"];
           }
       >;
     };
@@ -5343,8 +5343,8 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = { __typename?: "Pe
       > & {
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           signers: Array<
@@ -5403,8 +5403,8 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
       > & {
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           signers: Array<
@@ -5858,8 +5858,8 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
       > & {
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           signers: Array<
@@ -5882,8 +5882,8 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
       > & {
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           signers: Array<
@@ -5903,7 +5903,7 @@ export type SignatureConfigDialog_PetitionBaseFragment =
 export type SignatureConfigDialog_OrgIntegrationFragment = { __typename?: "OrgIntegration" } & Pick<
   OrgIntegration,
   "id"
-> & { label: OrgIntegration["name"]; value: OrgIntegration["provider"] };
+> & { value: OrgIntegration["id"]; label: OrgIntegration["name"] };
 
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
   { __typename?: "TemplateDefaultUserGroupPermission" } & Pick<
@@ -6463,8 +6463,8 @@ export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
   organization: { __typename?: "Organization" } & {
     signatureIntegrations: Array<
       { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+          value: OrgIntegration["id"];
           label: OrgIntegration["name"];
-          value: OrgIntegration["provider"];
         }
     >;
   };
@@ -6506,8 +6506,8 @@ export type PetitionSignaturesCard_PetitionFragment = { __typename?: "Petition" 
       > & {
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id" | "name" | "provider"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           signers: Array<
@@ -6562,7 +6562,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
                   { __typename?: "OrgIntegration" } & Pick<
                     OrgIntegration,
                     "id" | "name" | "provider"
-                  > & { label: OrgIntegration["name"]; value: OrgIntegration["provider"] }
+                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
                 signers: Array<
                   { __typename?: "PetitionSigner" } & Pick<
@@ -9827,8 +9827,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Pet
           >;
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
         }
@@ -9940,8 +9940,8 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       > & {
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           signers: Array<
@@ -10010,8 +10010,8 @@ export type PetitionCompose_UserFragment = { __typename?: "User" } & Pick<
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         signatureIntegrations: Array<
           { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+              value: OrgIntegration["id"];
               label: OrgIntegration["name"];
-              value: OrgIntegration["provider"];
             }
         >;
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -10074,8 +10074,8 @@ export type PetitionCompose_updatePetitionMutation = {
                 >;
                 integration?: Maybe<
                   { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                      value: OrgIntegration["id"];
                       label: OrgIntegration["name"];
-                      value: OrgIntegration["provider"];
                     }
                 >;
               }
@@ -10149,8 +10149,8 @@ export type PetitionCompose_updatePetitionMutation = {
             > & {
                 integration?: Maybe<
                   { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                      value: OrgIntegration["id"];
                       label: OrgIntegration["name"];
-                      value: OrgIntegration["provider"];
                     }
                 >;
                 signers: Array<
@@ -10587,8 +10587,8 @@ export type PetitionComposeUserQuery = {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           signatureIntegrations: Array<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -10673,8 +10673,8 @@ export type PetitionComposeQuery = {
                 >;
                 integration?: Maybe<
                   { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                      value: OrgIntegration["id"];
                       label: OrgIntegration["name"];
-                      value: OrgIntegration["provider"];
                     }
                 >;
               }
@@ -10791,8 +10791,8 @@ export type PetitionComposeQuery = {
             > & {
                 integration?: Maybe<
                   { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                      value: OrgIntegration["id"];
                       label: OrgIntegration["name"];
-                      value: OrgIntegration["provider"];
                     }
                 >;
                 signers: Array<
@@ -10921,8 +10921,8 @@ export type PetitionReplies_PetitionFragment = { __typename?: "Petition" } & Pic
       > & {
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id" | "name" | "provider"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           signers: Array<
@@ -11010,8 +11010,8 @@ export type PetitionReplies_UserFragment = { __typename?: "User" } & Pick<
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         signatureIntegrations: Array<
           { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+              value: OrgIntegration["id"];
               label: OrgIntegration["name"];
-              value: OrgIntegration["provider"];
             }
         >;
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -11245,8 +11245,8 @@ export type PetitionRepliesUserQuery = {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           signatureIntegrations: Array<
             { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+                value: OrgIntegration["id"];
                 label: OrgIntegration["name"];
-                value: OrgIntegration["provider"];
               }
           >;
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -11383,7 +11383,7 @@ export type PetitionRepliesQuery = {
                   { __typename?: "OrgIntegration" } & Pick<
                     OrgIntegration,
                     "id" | "name" | "provider"
-                  > & { label: OrgIntegration["name"]; value: OrgIntegration["provider"] }
+                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
                 signers: Array<
                   { __typename?: "PetitionSigner" } & Pick<
@@ -14960,8 +14960,8 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
 export const SignatureConfigDialog_OrgIntegrationFragmentDoc = gql`
   fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {
     id
+    value: id
     label: name
-    value: provider
   }
 `;
 export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
