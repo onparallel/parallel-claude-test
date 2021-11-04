@@ -44,7 +44,7 @@
     "apollo-server-express": "^3.4.0",
     "apollo-server-plugin-base": "^3.3.0",
     "archiver": "^5.3.0",
-    "aws-sdk": "^2.1020.0",
+    "aws-sdk": "^2.1021.0",
     "byte-length": "^1.0.2",
     "content-disposition": "^0.5.3",
     "cookie": "^0.4.1",
