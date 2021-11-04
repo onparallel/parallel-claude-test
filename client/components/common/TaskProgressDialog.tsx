@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
-import { Button } from "@chakra-ui/react";
+import { Button, Progress } from "@chakra-ui/react";
 import { DialogProps } from "@parallel/components/common/DialogProvider";
-import { ProgressIndicator, ProgressTrack } from "@parallel/components/common/Progress";
 import {
   TaskProgressDialog_TaskFragment,
   useTaskProgressDialog_TaskQuery,
@@ -9,7 +8,6 @@ import {
 import { useInterval } from "@parallel/utils/useInterval";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { generateCssStripe } from "../../utils/css";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 interface TaskProgressDialogProps {
@@ -62,7 +60,15 @@ export function TaskProgressDialog({
           />
         )
       }
-      body={<TaskProgressBar progress={processingTask.progress} />}
+      body={
+        <Progress
+          size="md"
+          value={processingTask.progress ?? 0}
+          colorScheme="green"
+          borderRadius="full"
+          isIndeterminate={processingTask.status === "ENQUEUED"}
+        />
+      }
       confirm={
         <Button
           ref={confirmRef}
@@ -81,25 +87,6 @@ export function TaskProgressDialog({
     />
   );
 }
-
-function TaskProgressBar({ progress }: { progress?: number | null }) {
-  return (
-    <ProgressTrack min={0} max={100} size="md" value={progress ?? 100} backgroundColor="gray.200">
-      <ProgressIndicator
-        min={0}
-        max={100}
-        value={progress ?? 100}
-        backgroundColor="green.400"
-        sx={
-          progress
-            ? undefined
-            : generateCssStripe({ color: "gray.200", size: "1rem", isAnimated: true })
-        }
-      />
-    </ProgressTrack>
-  );
-}
-
 TaskProgressDialog.fragments = {
   Task: gql`
     fragment TaskProgressDialog_Task on Task {
