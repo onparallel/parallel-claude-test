@@ -28,7 +28,8 @@ export function NewSignatureRequestRow({
       if (signers.length === 0) {
         const { signersInfo } = await showSignerSelectDialog({});
         await onUpdateConfig({
-          ...omit(petition.signatureConfig!, ["signers", "__typename"]),
+          ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+          orgIntegrationId: petition.signatureConfig!.integration!.id,
           signersInfo,
         });
       }
@@ -110,7 +111,11 @@ NewSignatureRequestRow.fragments = {
           ...SignerReference_PetitionSigner
         }
         letRecipientsChooseSigners
-        provider
+        integration {
+          id
+          name
+          provider
+        }
         review
         timezone
         title

@@ -499,8 +499,12 @@ export const SignatureConfig = objectType({
   name: "SignatureConfig",
   description: "The signature settings of a petition",
   definition(t) {
-    t.string("provider", {
-      description: "The selected provider for the signature.",
+    t.nullable.field("integration", {
+      type: "OrgIntegration",
+      description: "The signature integration selected for this signature config.",
+      resolve: async (o, _, ctx) => {
+        return await ctx.integrations.loadIntegration(o.orgIntegrationId);
+      },
     });
     t.list.field("signers", {
       type: "PetitionSigner",
@@ -524,7 +528,7 @@ export const SignatureConfig = objectType({
     });
   },
   sourceType: /* ts */ `{
-    provider: string;
+    orgIntegrationId: number;
     signersInfo: {
       firstName: string;
       lastName: string;

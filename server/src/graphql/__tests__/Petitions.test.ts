@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { datatype, internet } from "faker";
 import { Knex } from "knex";
-import { omit, sortBy } from "remeda";
+import { sortBy } from "remeda";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -9,6 +9,7 @@ import {
   Contact,
   Organization,
   OrganizationUsageLimit,
+  OrgIntegration,
   Petition,
   PetitionField,
   PetitionFieldType,
@@ -18,12 +19,12 @@ import {
   UserGroup,
 } from "../../db/__types";
 import { AUTH, IAuth } from "../../services/auth";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { fromPlainText } from "../../util/slate";
 import { initServer, TestClient } from "./server";
 
-function petitionsBuilder(orgId: number) {
+function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
   return (index: number): Partial<Petition> => ({
     is_template: index > 5,
     status: index > 5 ? null : "DRAFT",
@@ -38,7 +39,7 @@ function petitionsBuilder(orgId: number) {
       index === 5
         ? {
             signersInfo: [],
-            provider: "SIGNATURIT",
+            orgIntegrationId: signatureIntegrationId,
             review: false,
             timezone: "Europe/Madrid",
             title: "Signature",
@@ -67,6 +68,8 @@ describe("GraphQL/Petitions", () => {
 
   let tags: Tag[];
   let privateTag: Tag;
+
+  let signatureIntegration: OrgIntegration;
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -98,12 +101,19 @@ describe("GraphQL/Petitions", () => {
     // user from other organization
     [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
 
+    signatureIntegration = await mocks.createOrgIntegration({
+      type: "SIGNATURE",
+      provider: "SIGNATURIT",
+      org_id: organization.id,
+      settings: { API_KEY: "<API_KEY>" },
+      is_enabled: true,
+    });
     // logged user petitions
     petitions = await mocks.createRandomPetitions(
       organization.id,
       sessionUser.id,
       10,
-      petitionsBuilder(organization.id)
+      petitionsBuilder(organization.id, signatureIntegration.id)
     );
 
     tags = await mocks.createRandomTags(organization.id, 11);
@@ -834,7 +844,7 @@ describe("GraphQL/Petitions", () => {
           signature_config: {
             title: "aaaa",
             review: false,
-            provider: "SIGNATURIT",
+            orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
             timezone: "Europe/Madrid",
             signersInfo: [
               {
@@ -889,7 +899,7 @@ describe("GraphQL/Petitions", () => {
           signature_config: {
             title: "aaaa",
             review: false,
-            provider: "SIGNATURIT",
+            orgIntegrationId: signatureIntegration.id,
             timezone: "Europe/Madrid",
             signersInfo: [
               {
@@ -915,6 +925,9 @@ describe("GraphQL/Petitions", () => {
             createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
               signatureConfig {
                 title
+                integration {
+                  provider
+                }
               }
             }
           }
@@ -928,7 +941,9 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.createPetition).toEqual({ signatureConfig: { title: "aaaa" } });
+      expect(data?.createPetition).toEqual({
+        signatureConfig: { title: "aaaa", integration: { provider: "SIGNATURIT" } },
+      });
     });
 
     it("don't copy deadline configuration when creating a petition from a template", async () => {
@@ -1366,7 +1381,9 @@ describe("GraphQL/Petitions", () => {
                   signers {
                     email
                   }
-                  provider
+                  integration {
+                    provider
+                  }
                   review
                   timezone
                   title
@@ -1384,7 +1401,7 @@ describe("GraphQL/Petitions", () => {
       expect(data?.clonePetitions[0]).toEqual({
         signatureConfig: {
           signers: [],
-          provider: "SIGNATURIT",
+          integration: { provider: "SIGNATURIT" },
           review: false,
           timezone: "Europe/Madrid",
           title: "Signature",
@@ -1428,7 +1445,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         2,
-        petitionsBuilder(organization.id)
+        petitionsBuilder(organization.id, signatureIntegration.id)
       );
 
       await mocks.sharePetitions([petitionsToDelete[0].id], sameOrgUser.id, "WRITE");
@@ -1497,7 +1514,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sameOrgUser.id,
         1,
-        petitionsBuilder(organization.id)
+        petitionsBuilder(organization.id, signatureIntegration.id)
       );
 
       //share the petition with the logged user

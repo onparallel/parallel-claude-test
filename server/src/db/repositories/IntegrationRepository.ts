@@ -29,6 +29,10 @@ export class IntegrationRepository extends BaseRepository {
     super(knex);
   }
 
+  readonly loadIntegration = this.buildLoadBy("org_integration", "id", (q) =>
+    q.whereNull("deleted_at").where("is_enabled", true)
+  );
+
   async loadIntegrationsByOrgId<IType extends IntegrationType>(
     orgId: number,
     type?: IType | null

@@ -54,7 +54,7 @@ export function SignatureConfigDialog({
     watch,
   } = useForm<{
     contacts: ContactSelectSelection[];
-    provider: string;
+    provider: SignatureConfigDialog_OrgIntegrationFragment;
     review: boolean;
     title: string;
     letRecipientsChooseSigners: boolean;
@@ -65,7 +65,7 @@ export function SignatureConfigDialog({
         ...omit(signer, ["contactId", "__typename"]),
         id: signer.contactId!,
       })),
-      provider: providers[0].value,
+      provider: petition.signatureConfig?.integration ?? providers[0],
       review: petition.signatureConfig?.review ?? true,
       title: petition.signatureConfig?.title ?? petition.name ?? "",
       letRecipientsChooseSigners: petition.signatureConfig?.letRecipientsChooseSigners ?? false,
@@ -134,7 +134,7 @@ export function SignatureConfigDialog({
                   firstName: c.firstName ?? "",
                   lastName: c.lastName ?? "",
                 })),
-                provider,
+                orgIntegrationId: provider.id,
                 review: petitionIsCompleted ? false : review,
                 title,
                 letRecipientsChooseSigners: false,
@@ -148,7 +148,7 @@ export function SignatureConfigDialog({
                   firstName: c.firstName ?? "",
                   lastName: c.lastName ?? "",
                 })),
-                provider,
+                orgIntegrationId: provider.id,
                 review: false,
                 title,
                 letRecipientsChooseSigners:
@@ -185,8 +185,8 @@ export function SignatureConfigDialog({
               render={({ field: { onChange, value } }) => (
                 <Select
                   {...reactSelectProps}
-                  value={providers.find((p) => p.value === value)}
-                  onChange={(p: any) => onChange(p.value)}
+                  value={providers.find((p) => p.id === value.id)}
+                  onChange={onChange}
                   options={providers}
                   isSearchable={false}
                 />
@@ -336,32 +336,41 @@ export function SignatureConfigDialog({
 }
 
 SignatureConfigDialog.fragments = {
-  PetitionBase: gql`
-    fragment SignatureConfigDialog_PetitionBase on PetitionBase {
-      name
-      signatureConfig {
-        provider
-        signers {
-          contactId
-          firstName
-          lastName
-          email
+  get PetitionBase() {
+    return gql`
+      fragment SignatureConfigDialog_PetitionBase on PetitionBase {
+        name
+        signatureConfig {
+          integration {
+            ...SignatureConfigDialog_OrgIntegration
+          }
+          signers {
+            contactId
+            firstName
+            lastName
+            email
+          }
+          title
+          review
+          letRecipientsChooseSigners
         }
-        title
-        review
-        letRecipientsChooseSigners
+        ... on Petition {
+          status
+        }
       }
-      ... on Petition {
-        status
+      ${this.OrgIntegration}
+    `;
+  },
+
+  get OrgIntegration() {
+    return gql`
+      fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {
+        id
+        label: name
+        value: provider
       }
-    }
-  `,
-  OrgIntegration: gql`
-    fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {
-      label: name
-      value: provider
-    }
-  `,
+    `;
+  },
 };
 
 export function useSignatureConfigDialog() {

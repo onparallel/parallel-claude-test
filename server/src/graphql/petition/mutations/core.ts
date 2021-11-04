@@ -398,8 +398,8 @@ export const SignatureConfigInput = inputObjectType({
   name: "SignatureConfigInput",
   description: "The signature settings for the petition",
   definition(t) {
-    t.nonNull.string("provider", {
-      description: "The selected provider for the signature.",
+    t.nonNull.id("orgIntegrationId", {
+      description: "The Global ID of the signature integration to be used.",
     });
     t.nonNull.list.nonNull.field("signersInfo", {
       type: inputObjectType({
@@ -541,6 +541,7 @@ export const updatePetition = mutationField("updatePetition", {
           ...signer,
           contactId: fromGlobalId(signer.contactId, "Contact").id,
         })),
+        orgIntegrationId: fromGlobalId(signatureConfig.orgIntegrationId, "OrgIntegration").id,
       };
     }
     if (description !== undefined) {

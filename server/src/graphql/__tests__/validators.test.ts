@@ -5,6 +5,7 @@ import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, OrgIntegration, User } from "../../db/__types";
+import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { random } from "../../util/token";
 import { WhitelistedError } from "../helpers/errors";
@@ -12,7 +13,6 @@ import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { validPassword } from "../helpers/validators/validPassword";
 import { validRemindersConfig } from "../helpers/validators/validRemindersConfig";
 import { validSignatureConfig } from "../helpers/validators/validSignatureConfig";
-import { validIntegrationSettings } from "../helpers/validators/validIntegrationSettings";
 
 describe("GraphQL custom validators", () => {
   let knex: Knex;
@@ -20,6 +20,10 @@ describe("GraphQL custom validators", () => {
   let organizations: Organization[];
   let users: User[];
   let mocks: Mocks;
+
+  let signatureIntegration: OrgIntegration;
+  let org1SignatureIntegration: OrgIntegration;
+  let ssoIntegration: OrgIntegration;
 
   beforeAll(async () => {
     const container = createTestContainer();
@@ -34,6 +38,28 @@ describe("GraphQL custom validators", () => {
       ...(await mocks.createRandomUsers(organizations[0].id, 1)),
       ...(await mocks.createRandomUsers(organizations[1].id, 1)),
     ];
+
+    signatureIntegration = await mocks.createOrgIntegration({
+      type: "SIGNATURE",
+      provider: "SIGNATURIT",
+      org_id: organizations[0].id,
+      settings: { API_KEY: "<APIKEY>" },
+      is_enabled: true,
+    });
+    org1SignatureIntegration = await mocks.createOrgIntegration({
+      type: "SIGNATURE",
+      provider: "SIGNATURIT",
+      org_id: organizations[1].id,
+      settings: { API_KEY: "<APIKEY>" },
+      is_enabled: true,
+    });
+    ssoIntegration = await mocks.createOrgIntegration({
+      type: "USER_PROVISIONING",
+      provider: "AZURE",
+      org_id: organizations[0].id,
+      settings: { AUTH_KEY: "<KEY>" },
+      is_enabled: true,
+    });
   });
 
   afterAll(async () => {
@@ -189,7 +215,7 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              provider: "SIGNATURIT",
+              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
               signersInfo: [
                 {
                   firstName: faker.name.firstName(),
@@ -199,7 +225,7 @@ describe("GraphQL custom validators", () => {
               ],
               timezone: "Europe/Madrid",
               title: "sign this!",
-              letRecipientChooseSigners: false,
+              letRecipientsChooseSigners: false,
               review: false,
             },
           },
@@ -209,13 +235,65 @@ describe("GraphQL custom validators", () => {
       ).resolves.not.toThrowError();
     });
 
+    it("throws error if used integration is of another organization", async () => {
+      await expect(
+        validSignatureConfig((args) => args.config, "config")(
+          {},
+          {
+            config: {
+              orgIntegrationId: toGlobalId("OrgIntegration", org1SignatureIntegration.id),
+              signersInfo: [
+                {
+                  firstName: faker.name.firstName(),
+                  lastName: faker.name.lastName(),
+                  email: faker.internet.email(),
+                },
+              ],
+              timezone: "Europe/Madrid",
+              title: "sign this!",
+              letRecipientsChooseSigners: false,
+              review: false,
+            },
+          },
+          { ...ctx, user: users[0] },
+          {} as any
+        )
+      ).rejects.toThrowError();
+    });
+
+    it("throws error if used integration is not of type SIGNATURE", async () => {
+      await expect(
+        validSignatureConfig((args) => args.config, "config")(
+          {},
+          {
+            config: {
+              orgIntegrationId: toGlobalId("OrgIntegration", ssoIntegration.id),
+              signersInfo: [
+                {
+                  firstName: faker.name.firstName(),
+                  lastName: faker.name.lastName(),
+                  email: faker.internet.email(),
+                },
+              ],
+              timezone: "Europe/Madrid",
+              title: "sign this!",
+              letRecipientsChooseSigners: false,
+              review: false,
+            },
+          },
+          { ...ctx, user: users[0] },
+          {} as any
+        )
+      ).rejects.toThrowError();
+    });
+
     it("throws error if some signer email is not valid", async () => {
       await expect(
         validSignatureConfig((args) => args.config, "config")(
           {},
           {
             config: {
-              provider: "SIGNATURIT",
+              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
               signersInfo: [
                 {
                   firstName: faker.name.firstName(),
@@ -230,7 +308,7 @@ describe("GraphQL custom validators", () => {
               ],
               timezone: "Europe/Madrid",
               title: "sign this!",
-              letRecipientChooseSigners: false,
+              letRecipientsChooseSigners: false,
               review: false,
             },
           },
@@ -246,11 +324,11 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              provider: "SIGNATURIT",
+              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
               signersInfo: [],
               timezone: "Europe/Madrid",
               title: "sign this!",
-              letRecipientChooseSigners: true,
+              letRecipientsChooseSigners: true,
               review: false,
             },
           },
@@ -261,16 +339,24 @@ describe("GraphQL custom validators", () => {
     });
 
     it("throws error if user does not have an enabled signature integration", async () => {
+      await knex
+        .from("feature_flag_override")
+        .where({ user_id: users[1].id, feature_flag_name: "PETITION_SIGNATURE" })
+        .update("value", true);
+      await knex
+        .from("org_integration")
+        .where("id", org1SignatureIntegration.id)
+        .update("is_enabled", false);
       await expect(
         validSignatureConfig((args) => args.config, "config")(
           {},
           {
             config: {
-              provider: "SIGNATURIT",
+              orgIntegrationId: toGlobalId("OrgIntegration", org1SignatureIntegration.id),
               signersInfo: [],
               timezone: "Europe/Madrid",
               title: "sign this!",
-              letRecipientChooseSigners: true,
+              letRecipientsChooseSigners: true,
               review: false,
             },
           },
@@ -278,6 +364,14 @@ describe("GraphQL custom validators", () => {
           {} as any
         )
       ).rejects.toThrowError();
+      await knex
+        .from("feature_flag_override")
+        .where({ user_id: users[1].id, feature_flag_name: "PETITION_SIGNATURE" })
+        .update("value", false);
+      await knex
+        .from("org_integration")
+        .where("id", org1SignatureIntegration.id)
+        .update("is_enabled", true);
     });
 
     it("throws error if timezone is invalid", async () => {
@@ -286,7 +380,7 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              provider: "SIGNATURIT",
+              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
               signersInfo: [
                 {
                   firstName: faker.name.firstName(),
@@ -296,7 +390,7 @@ describe("GraphQL custom validators", () => {
               ],
               timezone: "unknown",
               title: "sign this!",
-              letRecipientChooseSigners: false,
+              letRecipientsChooseSigners: false,
               review: false,
             },
           },
@@ -312,7 +406,7 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              provider: "SIGNATURIT",
+              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
               signersInfo: [
                 {
                   firstName: faker.name.firstName(),
@@ -321,7 +415,7 @@ describe("GraphQL custom validators", () => {
                 },
               ],
               timezone: "Europe/Madrid",
-              letRecipientChooseSigners: false,
+              letRecipientsChooseSigners: false,
               review: false,
             },
           },
@@ -337,11 +431,11 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              provider: "SIGNATURIT",
+              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
               signersInfo: [],
               timezone: "Europe/Madrid",
               title: "sign this!",
-              letRecipientChooseSigners: false,
+              letRecipientsChooseSigners: false,
               review: false,
             },
           },
@@ -423,116 +517,6 @@ describe("GraphQL custom validators", () => {
           {} as any
         )
       ).toThrowError();
-    });
-  });
-
-  describe("validIntegrationSettings", () => {
-    it("validates SIGNATURE integration minimal required settings", () => {
-      expect(() =>
-        validIntegrationSettings("SIGNATURE", () => ({ API_KEY: "<API_KEY>" }), "settings")(
-          {},
-          {},
-          ctx,
-          {} as any
-        )
-      ).not.toThrowError();
-    });
-
-    it("throws error if SIGNATURE integration settings has unknown key", () => {
-      expect(() =>
-        validIntegrationSettings(
-          "SIGNATURE",
-          () => ({ API_KEY: "<API_KEY>", UNKNOWN: 1 }),
-          "settings"
-        )({}, {}, ctx, {} as any)
-      ).toThrowError();
-    });
-
-    it("validates SIGNATURE integration full settings", () => {
-      expect(() =>
-        validIntegrationSettings(
-          "SIGNATURE",
-          () => ({
-            API_KEY: "<API_KEY>",
-            ENVIRONMENT: "sandbox",
-            EN_INFORMAL_BRANDING_ID: "<EN_INFORMAL_BRANDING_ID>",
-            ES_INFORMAL_BRANDING_ID: "<ES_INFORMAL_BRANDING_ID>",
-            EN_FORMAL_BRANDING_ID: "<EN_FORMAL_BRANDING_ID>",
-            ES_FORMAL_BRANDING_ID: "<ES_FORMAL_BRANDING_ID>",
-          }),
-          "settings"
-        )({}, {}, ctx, {} as any)
-      ).not.toThrowError();
-    });
-
-    it("throws error if SIGNATURE settings is missing required property API_KEY", () => {
-      expect(() =>
-        validIntegrationSettings("SIGNATURE", () => ({ ENVIRONMENT: "production" }), "settings")(
-          {},
-          {},
-          ctx,
-          {} as any
-        )
-      ).toThrowError();
-    });
-
-    it("throws error if SIGNATURE settings is empty", () => {
-      expect(() =>
-        validIntegrationSettings("SIGNATURE", () => ({}), "settings")({}, {}, ctx, {} as any)
-      ).toThrowError();
-    });
-
-    it("throws error if SIGNATURE settings API_KEY is not a string", () => {
-      expect(() =>
-        validIntegrationSettings("SIGNATURE", () => ({ API_KEY: 1000 }), "settings")(
-          {},
-          {},
-          ctx,
-          {} as any
-        )
-      ).toThrowError();
-    });
-
-    it("validates SSO integration minimal required settings", () => {
-      expect(() =>
-        validIntegrationSettings(
-          "SSO",
-          () => ({ EMAIL_DOMAINS: ["onparallel.com"], COGNITO_PROVIDER: "AZURE" }),
-          "settings"
-        )({}, {}, ctx, {} as any)
-      ).not.toThrowError();
-    });
-
-    it("throws error if SSO integration settings is empty", () => {
-      expect(() =>
-        validIntegrationSettings("SSO", () => ({}), "settings")({}, {}, ctx, {} as any)
-      ).toThrowError();
-    });
-
-    it("throws error if SSO integration settings has additional unknown keys", () => {
-      expect(() =>
-        validIntegrationSettings(
-          "SSO",
-          () => ({
-            EMAIL_DOMAINS: ["onparallel.com"],
-            COGNITO_PROVIDER: "AZURE",
-            UNKNOWN_KEY: true,
-          }),
-          "settings"
-        )({}, {}, ctx, {} as any)
-      ).toThrowError();
-    });
-
-    it("validates USER_PROVISIONING integration minimal required settings", () => {
-      expect(() =>
-        validIntegrationSettings(
-          "USER_PROVISIONING",
-          () => ({
-            AUTH_KEY: "<AUTH_KEY>",
-          }),
-          "settings"
-        )({}, {}, ctx, {} as any)
-      ).not.toThrowError();
     });
   });
 });

@@ -1,5 +1,6 @@
 import { core } from "nexus";
 import { isDefined } from "remeda";
+import { fromGlobalId } from "../../../util/globalId";
 import { isValidTimezone } from "../../../util/validators";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
@@ -14,11 +15,20 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
     if (signatureConfig) {
-      const { provider, signersInfo, timezone, title, letRecipientsChooseSigners, review } =
+      const { orgIntegrationId, signersInfo, timezone, title, letRecipientsChooseSigners, review } =
         signatureConfig;
-      const [hasFeatureFlag, integrations] = await Promise.all([
+
+      const { id: integrationId, type } = fromGlobalId(orgIntegrationId);
+      if (type !== "OrgIntegration") {
+        throw new ArgValidationError(
+          info,
+          argName,
+          `Invalid orgIntegrationId: ${orgIntegrationId}`
+        );
+      }
+      const [hasFeatureFlag, integration] = await Promise.all([
         ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, "PETITION_SIGNATURE"),
-        ctx.integrations.loadIntegrationsByOrgId(ctx.user!.org_id, "SIGNATURE"),
+        ctx.integrations.loadIntegration(integrationId),
       ]);
       if (!hasFeatureFlag) {
         throw new ArgValidationError(
@@ -27,7 +37,11 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           `Petition signature is not available for this user.`
         );
       }
-      if (!integrations.some((integration) => integration.provider === provider)) {
+      if (
+        integration?.type !== "SIGNATURE" ||
+        !integration.is_enabled ||
+        integration.org_id !== ctx.user!.org_id
+      ) {
         throw new ArgValidationError(info, `${argName}.provider`, `Invalid signature provider.`);
       }
 

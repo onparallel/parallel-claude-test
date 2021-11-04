@@ -33,7 +33,7 @@ async function startSignatureProcess(
   const org = await ctx.organizations.loadOrg(petition.org_id);
   const tone = org!.preferred_tone;
 
-  const { title, provider, signersInfo, message } = signature.signature_config;
+  const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
 
   let removeGeneratedPdf = true;
   const tmpPdfPath = resolve(
@@ -44,7 +44,7 @@ async function startSignatureProcess(
   );
 
   try {
-    const signatureIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
+    const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
 
     const recipients = signersInfo.map((signer) => ({
       name: fullName(signer.firstName, signer.lastName),
@@ -97,7 +97,7 @@ async function startSignatureProcess(
     );
 
     await ctx.petitions.updatePetitionSignature(signature.id, {
-      external_id: `${provider.toUpperCase()}/${data.id}`,
+      external_id: `${signatureIntegration.provider.toUpperCase()}/${data.id}`,
       data,
       signature_config: {
         ...signature.signature_config,
@@ -148,10 +148,8 @@ async function cancelSignatureProcess(
     );
   }
 
-  const petition = await fetchPetition(signature.petition_id, ctx);
-  const { provider } = signature.signature_config;
-  const signatureIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
-
+  const { orgIntegrationId } = signature.signature_config;
+  const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
   const signatureClient = ctx.signature.getClient(signatureIntegration);
   await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
 }
@@ -171,9 +169,8 @@ async function sendSignatureReminder(
       `Can't find external_id on petition signature request ${payload.petitionSignatureRequestId}`
     );
   }
-  const petition = await fetchPetition(signature.petition_id, ctx);
-  const { provider } = signature.signature_config;
-  const signatureIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
+  const { orgIntegrationId } = signature.signature_config;
+  const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
 
   const signatureClient = ctx.signature.getClient(signatureIntegration);
   await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
@@ -190,9 +187,9 @@ async function storeSignedDocument(
   const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
   const petition = await fetchPetition(signature.petition_id, ctx);
 
-  const { title, provider } = signature.signature_config;
+  const { title, orgIntegrationId } = signature.signature_config;
 
-  const signaturitIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
+  const signaturitIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
 
   const client = ctx.signature.getClient(signaturitIntegration);
 
@@ -232,12 +229,9 @@ async function storeAuditTrail(
   ctx: WorkerContext
 ) {
   const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-  const petition = await fetchPetition(signature.petition_id, ctx);
 
-  const { provider, title } = signature.signature_config;
-
-  const signatureIntegration = await fetchOrgSignatureIntegration(petition.org_id, provider, ctx);
-
+  const { orgIntegrationId, title } = signature.signature_config;
+  const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
   const client = ctx.signature.getClient(signatureIntegration);
 
   const auditTrail = await storeDocument(
@@ -277,20 +271,16 @@ createQueueWorker("signature-worker", async (data: SignatureWorkerPayload, ctx) 
   await handlers[data.type](data.payload as any, ctx);
 });
 
-async function fetchOrgSignatureIntegration(orgId: number, provider: string, ctx: WorkerContext) {
-  const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(orgId, "SIGNATURE");
+async function fetchOrgSignatureIntegration(orgIntegrationId: number, ctx: WorkerContext) {
+  const signatureIntegration = await ctx.integrations.loadIntegration(orgIntegrationId);
 
-  const orgSignatureIntegration = signatureIntegrations.find(
-    (i) => i.provider === provider.toUpperCase()
-  );
-
-  if (!orgSignatureIntegration) {
+  if (!signatureIntegration || signatureIntegration.type !== "SIGNATURE") {
     throw new Error(
-      `Couldn't find an enabled ${provider} signature integration for organization with id ${orgId}`
+      `Couldn't find an enabled signature integration for OrgIntegration:${orgIntegrationId}`
     );
   }
 
-  return orgSignatureIntegration;
+  return signatureIntegration;
 }
 
 async function fetchPetition(id: number, ctx: WorkerContext) {

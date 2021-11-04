@@ -129,7 +129,7 @@ export interface NexusGenInputs {
   SignatureConfigInput: {
     // input type
     letRecipientsChooseSigners: boolean; // Boolean!
-    provider: string; // String!
+    orgIntegrationId: string; // ID!
     review: boolean; // Boolean!
     signersInfo: NexusGenInputs["SignatureConfigInputSigner"][]; // [SignatureConfigInputSigner!]!
     timezone: string; // String!
@@ -520,7 +520,7 @@ export interface NexusGenObjects {
   SignatureCompletedEvent: events.SignatureCompletedEvent;
   SignatureCompletedUserNotification: notifications.SignatureCompletedUserNotification;
   SignatureConfig: {
-    provider: string;
+    orgIntegrationId: number;
     signersInfo: {
       firstName: string;
       lastName: string;
@@ -1579,8 +1579,8 @@ export interface NexusGenFieldTypes {
   };
   SignatureConfig: {
     // field return type
+    integration: NexusGenRootTypes["OrgIntegration"] | null; // OrgIntegration
     letRecipientsChooseSigners: boolean; // Boolean!
-    provider: string; // String!
     review: boolean; // Boolean!
     signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
     timezone: string; // String!
@@ -2756,8 +2756,8 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureConfig: {
     // field return type name
+    integration: "OrgIntegration";
     letRecipientsChooseSigners: "Boolean";
-    provider: "String";
     review: "Boolean";
     signers: "PetitionSigner";
     timezone: "String";

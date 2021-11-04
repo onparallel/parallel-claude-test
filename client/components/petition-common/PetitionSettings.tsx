@@ -111,7 +111,7 @@ function _PetitionSettings({
 
       const previous = petition.signatureConfig;
       const signatureConfigHasChanged = [
-        [signatureConfig.provider, previous?.provider],
+        [signatureConfig.orgIntegrationId, previous?.integration?.id],
         [
           signatureConfig.signersInfo
             .map((s) => JSON.stringify(pick(s, ["email", "firstName", "lastName"])))

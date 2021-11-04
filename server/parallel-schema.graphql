@@ -3622,14 +3622,14 @@ The signature settings of a petition
 """
 type SignatureConfig {
   """
+  The signature integration selected for this signature config.
+  """
+  integration: OrgIntegration
+
+  """
   If true, allows the recipients of the petition to select additional signers
   """
   letRecipientsChooseSigners: Boolean!
-
-  """
-  The selected provider for the signature.
-  """
-  provider: String!
 
   """
   If true, lets the user review the replies before starting the signature process
@@ -3662,9 +3662,9 @@ input SignatureConfigInput {
   letRecipientsChooseSigners: Boolean!
 
   """
-  The selected provider for the signature.
+  The Global ID of the signature integration to be used.
   """
-  provider: String!
+  orgIntegrationId: ID!
 
   """
   If true, lets the user review the replies before starting the signature process

@@ -97,22 +97,12 @@ export class SignatureService {
     client.on(
       "branding_updated",
       ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
-        switch (`${locale}_${tone}`) {
-          case "en_FORMAL":
-            settings.EN_FORMAL_BRANDING_ID = brandingId;
-            break;
-          case "es_FORMAL":
-            settings.ES_FORMAL_BRANDING_ID = brandingId;
-            break;
-          case "en_INFORMAL":
-            settings.EN_INFORMAL_BRANDING_ID = brandingId;
-            break;
-          case "es_INFORMAL":
-            settings.ES_INFORMAL_BRANDING_ID = brandingId;
-            break;
-          default:
-            break;
-        }
+        const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as `${
+          | "EN"
+          | "ES"}_${Tone}_BRANDING_ID`;
+
+        settings[key] = brandingId;
+
         this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
           integration.id,
           { settings },
@@ -148,24 +138,11 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     const locale = opts?.locale ?? "en";
     const tone = opts.templateData.tone;
 
-    let brandingId;
+    const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as `${
+      | "EN"
+      | "ES"}_${Tone}_BRANDING_ID`;
 
-    switch (`${locale}_${tone}`) {
-      case "en_FORMAL":
-        brandingId = this.settings.EN_FORMAL_BRANDING_ID;
-        break;
-      case "es_FORMAL":
-        brandingId = this.settings.ES_FORMAL_BRANDING_ID;
-        break;
-      case "en_INFORMAL":
-        brandingId = this.settings.EN_INFORMAL_BRANDING_ID;
-        break;
-      case "es_INFORMAL":
-        brandingId = this.settings.ES_INFORMAL_BRANDING_ID;
-        break;
-      default:
-        break;
-    }
+    let brandingId = this.settings[key];
 
     if (!brandingId) {
       brandingId = (await this.createOrgBranding(opts)).id;

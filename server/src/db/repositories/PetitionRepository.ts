@@ -89,7 +89,7 @@ export type PetitionSignatureConfigSigner = {
 };
 
 export type PetitionSignatureConfig = {
-  provider: string;
+  orgIntegrationId: number;
   signersInfo: PetitionSignatureConfigSigner[];
   timezone: string;
   title: string;

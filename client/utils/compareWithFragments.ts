@@ -90,6 +90,6 @@ function checkField(a: any, b: any, field: FieldNode, fragmentMap: FragmentMap) 
   if (!field.selectionSet) {
     return a?.[key] === b?.[key];
   } else {
-    return checkSelectionSet(a[key], b[key], field.selectionSet, fragmentMap);
+    return checkSelectionSet(a?.[key], b?.[key], field.selectionSet, fragmentMap);
   }
 }

@@ -34,7 +34,10 @@ export const OrgIntegration = objectType({
     t.globalId("id");
     t.string("name", {
       description: "The name of the integration.",
-      resolve: (o) => titleize(o.provider),
+      resolve: (o) => {
+        const isSandbox = o.type === "SIGNATURE" && o.settings.ENVIRONMENT !== "production";
+        return titleize(o.provider) + (isSandbox ? " Sandbox" : "");
+      },
     });
     t.field("type", {
       type: "IntegrationType",
