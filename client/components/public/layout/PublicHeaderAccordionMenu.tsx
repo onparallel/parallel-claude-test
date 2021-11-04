@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { NakedLink } from "@parallel/components/common/Link";
+import { usePublicMenu } from "@parallel/utils/usePublicMenu";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 import { PublicHeaderLink } from "./PublicHeaderMenu";
@@ -21,6 +22,8 @@ export function PublicHeaderAccordionMenu(props: StackProps) {
   function trackCTAClick() {
     window.analytics?.track("Register CTA Clicked", { from: "public-header" });
   }
+
+  const menu = usePublicMenu();
 
   return (
     <Stack {...props}>
@@ -47,92 +50,36 @@ export function PublicHeaderAccordionMenu(props: StackProps) {
           },
         }}
       >
-        <AccordionItem>
-          <PublicHeaderAccordionButton urlPrefix="/product">
-            <FormattedMessage id="public.product-link" defaultMessage="Product" />
-          </PublicHeaderAccordionButton>
-          <AccordionPanel>
-            <Stack>
-              <PublicHeaderAccordionInnerButton href="/product/request-information">
-                <FormattedMessage
-                  id="public.product.request-information-link"
-                  defaultMessage="Request information"
-                />
-              </PublicHeaderAccordionInnerButton>
-              <PublicHeaderAccordionInnerButton href="/product/monitor-progress">
-                <FormattedMessage
-                  id="public.product.monitor-link"
-                  defaultMessage="Monitor progress"
-                />
-              </PublicHeaderAccordionInnerButton>
-              <PublicHeaderAccordionInnerButton href="/product/review-files">
-                <FormattedMessage
-                  id="public.product.review-files-link"
-                  defaultMessage="Review your files"
-                />
-              </PublicHeaderAccordionInnerButton>
-              <PublicHeaderAccordionInnerButton href="/product/team-collaboration">
-                <FormattedMessage
-                  id="public.product.team-collaboration-link"
-                  defaultMessage="Collaborate with your team"
-                />
-              </PublicHeaderAccordionInnerButton>
-              <PublicHeaderAccordionInnerButton href="/security">
-                <FormattedMessage
-                  id="public.product.security-link"
-                  defaultMessage="A secure environment"
-                />
-              </PublicHeaderAccordionInnerButton>
-            </Stack>
-          </AccordionPanel>
-        </AccordionItem>
-
-        <AccordionItem>
-          <PublicHeaderAccordionButton urlPrefix="/solutions">
-            <FormattedMessage id="public.solutions-link" defaultMessage="Solutions" />
-          </PublicHeaderAccordionButton>
-          <AccordionPanel>
-            <Stack>
-              <PublicHeaderAccordionInnerButton href="/solutions/law-firms">
-                <FormattedMessage id="public.solutions.law-firms-link" defaultMessage="Law firms" />
-              </PublicHeaderAccordionInnerButton>
-              <PublicHeaderAccordionInnerButton href="/solutions/consultancy">
-                <FormattedMessage
-                  id="public.solutions.consultancy-link"
-                  defaultMessage="Consultancy"
-                />
-              </PublicHeaderAccordionInnerButton>
-              <PublicHeaderAccordionInnerButton href="/solutions/accounting">
-                <FormattedMessage
-                  id="public.solutions.accounting-link"
-                  defaultMessage="BPO and accounting"
-                />
-              </PublicHeaderAccordionInnerButton>
-              <PublicHeaderAccordionInnerButton href="/solutions/real-estate">
-                <FormattedMessage
-                  id="public.solutions.real-estate-link"
-                  defaultMessage="Real Estate"
-                />
-              </PublicHeaderAccordionInnerButton>
-            </Stack>
-          </AccordionPanel>
-        </AccordionItem>
-
-        <AccordionItem>
-          <PublicHeaderAccordionInnerButton href="/templates">
-            <Text as="b" flex="1" textAlign="left">
-              <FormattedMessage id="public.templates-link" defaultMessage="Templates" />
-            </Text>
-          </PublicHeaderAccordionInnerButton>
-        </AccordionItem>
-
-        <AccordionItem>
-          <PublicHeaderAccordionInnerButton href="/pricing">
-            <Text as="b" flex="1" textAlign="left">
-              <FormattedMessage id="public.pricing-link" defaultMessage="Pricing" />
-            </Text>
-          </PublicHeaderAccordionInnerButton>
-        </AccordionItem>
+        {menu.map((parent) => {
+          if (parent.children !== null) {
+            return (
+              <AccordionItem key={parent.path}>
+                <PublicHeaderAccordionButton urlPrefix={parent.path}>
+                  {parent.title}
+                </PublicHeaderAccordionButton>
+                <AccordionPanel>
+                  <Stack>
+                    {parent.children.map((children) => (
+                      <PublicHeaderAccordionInnerButton key={children.path} href={children.path}>
+                        {children.title}
+                      </PublicHeaderAccordionInnerButton>
+                    ))}
+                  </Stack>
+                </AccordionPanel>
+              </AccordionItem>
+            );
+          } else {
+            return (
+              <AccordionItem key={parent.path}>
+                <PublicHeaderAccordionInnerButton href={parent.path}>
+                  <Text as="b" flex="1" textAlign="left">
+                    {parent.title}
+                  </Text>
+                </PublicHeaderAccordionInnerButton>
+              </AccordionItem>
+            );
+          }
+        })}
       </Accordion>
       <PublicHeaderLink href="/login" variant="outline" id="pw-public-login">
         <FormattedMessage id="public.login-button" defaultMessage="Login" />

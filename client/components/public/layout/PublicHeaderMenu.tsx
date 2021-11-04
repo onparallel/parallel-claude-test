@@ -15,6 +15,7 @@ import {
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { NakedLink } from "@parallel/components/common/Link";
+import { usePublicMenu } from "@parallel/utils/usePublicMenu";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 
@@ -23,87 +24,38 @@ export function PublicHeaderMenu(props: StackProps) {
     window.analytics?.track("Register CTA Clicked", { from: "public-header" });
   }
 
+  const menu = usePublicMenu();
+
   return (
     <Stack {...props}>
-      <Flex>
-        <Menu placement="bottom" matchWidth={true}>
-          <PublicHeaderMenuButton flex="1" variant="ghost" urlPrefix="/product">
-            <FormattedMessage id="public.product-link" defaultMessage="Product" />
-          </PublicHeaderMenuButton>
-          <Portal>
-            <MenuList>
-              <PublicHeaderMenuItemLink href="/product/request-information">
-                <FormattedMessage
-                  id="public.product.request-information-link"
-                  defaultMessage="Request information"
-                />
-              </PublicHeaderMenuItemLink>
-              <PublicHeaderMenuItemLink href="/product/monitor-progress">
-                <FormattedMessage
-                  id="public.product.monitor-link"
-                  defaultMessage="Monitor progress"
-                />
-              </PublicHeaderMenuItemLink>
-              <PublicHeaderMenuItemLink href="/product/review-files">
-                <FormattedMessage
-                  id="public.product.review-files-link"
-                  defaultMessage="Review your files"
-                />
-              </PublicHeaderMenuItemLink>
-              <PublicHeaderMenuItemLink href="/product/team-collaboration">
-                <FormattedMessage
-                  id="public.product.team-collaboration-link"
-                  defaultMessage="Collaborate with your team"
-                />
-              </PublicHeaderMenuItemLink>
-              <PublicHeaderMenuItemLink href="/security">
-                <FormattedMessage
-                  id="public.product.security-link"
-                  defaultMessage="A secure environment"
-                />
-              </PublicHeaderMenuItemLink>
-            </MenuList>
-          </Portal>
-        </Menu>
-      </Flex>
-      <Flex>
-        <Menu placement="bottom" matchWidth={true}>
-          <PublicHeaderMenuButton flex="1" variant="ghost" urlPrefix="/solutions">
-            <FormattedMessage id="public.solutions-link" defaultMessage="Solutions" />
-          </PublicHeaderMenuButton>
-          <Portal>
-            <MenuList>
-              <PublicHeaderMenuItemLink href="/solutions/law-firms">
-                <FormattedMessage id="public.solutions.law-firms-link" defaultMessage="Law firms" />
-              </PublicHeaderMenuItemLink>
-              <PublicHeaderMenuItemLink href="/solutions/consultancy">
-                <FormattedMessage
-                  id="public.solutions.consultancy-link"
-                  defaultMessage="Consultancy"
-                />
-              </PublicHeaderMenuItemLink>
-              <PublicHeaderMenuItemLink href="/solutions/accounting">
-                <FormattedMessage
-                  id="public.solutions.accounting-link"
-                  defaultMessage="BPO and accounting"
-                />
-              </PublicHeaderMenuItemLink>
-              <PublicHeaderMenuItemLink href="/solutions/real-estate">
-                <FormattedMessage
-                  id="public.solutions.real-estate-link"
-                  defaultMessage="Real Estate"
-                />
-              </PublicHeaderMenuItemLink>
-            </MenuList>
-          </Portal>
-        </Menu>
-      </Flex>
-      <PublicHeaderLink href="/templates" variant="ghost">
-        <FormattedMessage id="public.templates-link" defaultMessage="Templates" />
-      </PublicHeaderLink>
-      <PublicHeaderLink href="/pricing" variant="ghost">
-        <FormattedMessage id="public.pricing-link" defaultMessage="Pricing" />
-      </PublicHeaderLink>
+      {menu.map((parent) => {
+        if (parent.children !== null) {
+          return (
+            <Flex key={parent.path}>
+              <Menu placement="bottom" matchWidth={true}>
+                <PublicHeaderMenuButton flex="1" variant="ghost" urlPrefix={parent.path}>
+                  {parent.title}
+                </PublicHeaderMenuButton>
+                <Portal>
+                  <MenuList>
+                    {parent.children.map((children) => (
+                      <PublicHeaderMenuItemLink key={children.path} href={children.path}>
+                        {children.title}
+                      </PublicHeaderMenuItemLink>
+                    ))}
+                  </MenuList>
+                </Portal>
+              </Menu>
+            </Flex>
+          );
+        } else {
+          return (
+            <PublicHeaderLink key={parent.path} href={parent.path} variant="ghost">
+              {parent.title}
+            </PublicHeaderLink>
+          );
+        }
+      })}
       <PublicHeaderLink href="/login" variant="outline" id="pw-public-login">
         <FormattedMessage id="public.login-button" defaultMessage="Login" />
       </PublicHeaderLink>

@@ -112,7 +112,7 @@ export default function RealEstate() {
       description: (
         <FormattedMessage
           id="public.real-estate.smart-forms-description"
-          defaultMessage="Make processes and technolgoy adapt to your needs and your clients needs, not the way around."
+          defaultMessage="Make processes and technology adapt to your needs and your clients needs, not the way around."
         />
       ),
     },

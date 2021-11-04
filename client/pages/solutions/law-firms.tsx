@@ -140,7 +140,7 @@ export default function LawFirms() {
       description: (
         <FormattedMessage
           id="public.law-use-cases.esignature-description"
-          defaultMessage="Enable an advance eSignature to your proccess, completely secure and legally valid."
+          defaultMessage="Enable an advanced eSignature to your proccess, completely secure and legally valid."
         />
       ),
     },
