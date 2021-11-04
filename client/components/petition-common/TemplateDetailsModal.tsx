@@ -30,6 +30,7 @@ import {
   CopyIcon,
   EditIcon,
   LinkIcon,
+  PaperPlaneArrowIcon,
   PaperPlaneIcon,
 } from "@parallel/chakra/icons";
 import {
@@ -236,7 +237,7 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                       {me.hasAutoSendTemplate ? (
                         <MenuItem
                           justifyContent="left"
-                          icon={<LinkIcon display="block" boxSize={4} />}
+                          icon={<PaperPlaneArrowIcon display="block" boxSize={4} />}
                           onClick={() => handleAutoSendPetition()}
                         >
                           <FormattedMessage

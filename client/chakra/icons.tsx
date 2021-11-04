@@ -239,6 +239,24 @@ export const PaperPlaneIcon = createIcon({
   ),
 });
 
+export const PaperPlaneArrowIcon = createIcon({
+  displayName: "PaperPlaneArrowIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m15.5 15.2993h6.5" />
+      <path d="m17.998 19-2.9987-3.7 2.9987-3.8" />
+      <path d="m11.2327 17.3847-3.0769 4.6154v-6.6666m3.0769 2.0512 1.5385 1.0257m-1.5385-1.0257.7693-3.7179-3.8462 1.6667m0 0-6.15385-4.1026 20.00005-9.23078-2 7" />
+    </g>
+  ),
+});
+
 export const UsersIcon = createIcon({
   displayName: "UsersIcon",
   viewBox: "0 0 24 24",
