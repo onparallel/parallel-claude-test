@@ -69,7 +69,12 @@ export class ContactRepository extends BaseRepository {
   );
 
   async loadOrCreate(
-    contacts: MaybeArray<{ email: string; orgId: number; firstName: string; lastName: string }>,
+    contacts: MaybeArray<{
+      email: string;
+      orgId: number;
+      firstName: Maybe<string>;
+      lastName: Maybe<string>;
+    }>,
     createdBy: string,
     t?: Knex.Transaction
   ) {

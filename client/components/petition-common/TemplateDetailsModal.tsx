@@ -3,16 +3,16 @@ import {
   Box,
   Button,
   ButtonGroup,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   Heading,
   IconButton,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -43,7 +43,6 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useRef } from "react";

@@ -626,7 +626,7 @@ export interface PetitionField {
   is_fixed: boolean; // bool
   visibility: Maybe<any>; // jsonb
   from_petition_field_id: Maybe<number>; // int4
-  alias: Maybe<string>; // text
+  alias: Maybe<string>; // varchar
 }
 
 export type CreatePetitionField = PartialProps<
@@ -706,8 +706,8 @@ export interface PetitionFieldReply {
   deleted_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   status: PetitionFieldReplyStatus; // petition_field_reply_status
-  metadata: any; // jsonb
   user_id: Maybe<number>; // int4
+  metadata: any; // jsonb
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -720,8 +720,8 @@ export type CreatePetitionFieldReply = PartialProps<
   | "deleted_by"
   | "petition_access_id"
   | "status"
-  | "metadata"
   | "user_id"
+  | "metadata"
 >;
 
 export interface PetitionMessage {

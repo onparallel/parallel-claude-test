@@ -12,7 +12,7 @@ import {
   stringArg,
 } from "nexus";
 import pMap from "p-map";
-import { isDefined, omit, pick, zip } from "remeda";
+import { isDefined, omit, zip } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
 import {
@@ -78,6 +78,7 @@ import {
   repliesBelongsToPetition,
   templateDoesNotHavePublicPetitionLink,
   userHasAccessToPetitions,
+  userHasFeatureFlag,
 } from "../authorizers";
 import {
   petitionAccessesNotOptedOut,
@@ -1669,7 +1670,8 @@ export const autoSendTemplate = mutationField("autoSendTemplate", {
   type: "String",
   description: "Creates a petition from a template and send",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("templateId"),
+    userHasFeatureFlag("AUTO_SEND_TEMPLATE"),
+    or(userHasAccessToPetitions("templateId"), petitionsArePublicTemplates("templateId")),
     petitionHasRepliableFields("templateId")
   ),
   args: {
@@ -1725,15 +1727,15 @@ export const autoSendTemplate = mutationField("autoSendTemplate", {
       },
     ]);
 
-    const contact =
-      (await ctx.contacts.loadContactByEmail({
-        orgId: ctx.user!.org_id,
+    const [contact] = await ctx.contacts.loadOrCreate(
+      {
         email: ctx.user!.email,
-      })) ??
-      (await ctx.contacts.createContact(
-        pick(ctx.user!, ["org_id", "email", "first_name", "last_name"]),
-        `User:${ctx.user!.id}`
-      ));
+        firstName: ctx.user!.first_name,
+        lastName: ctx.user!.last_name,
+        orgId: ctx.user!.org_id,
+      },
+      `User:${ctx.user!.id}`
+    );
 
     const [{ result, error, accesses, messages }] = await presendPetition(
       [[petition, [contact.id]]],
