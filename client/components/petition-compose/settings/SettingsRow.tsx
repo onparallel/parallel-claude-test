@@ -23,7 +23,7 @@ export function SettingsRow({
         {label}
         <HelpPopover>{description}</HelpPopover>
       </FormLabel>
-      <Spacer minWidth={4} />
+      <Spacer minWidth={6} />
       {children}
     </FormControl>
   );

@@ -41,7 +41,6 @@ export function SettingsRowPlaceholder({
       <Input
         id="text-placeholder"
         value={placeholder}
-        marginLeft={2}
         size="sm"
         onChange={onChange}
         isDisabled={isReadOnly}

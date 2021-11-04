@@ -32,7 +32,7 @@ export function SettingsRowAlias({
       isInvalid={isInvalid}
       alignItems="flex-start"
     >
-      <Stack width="100%" paddingX={2}>
+      <Stack width="100%">
         <Input
           id="alias-field"
           value={alias}
