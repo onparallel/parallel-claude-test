@@ -38,13 +38,7 @@ export function SettingsRowPlaceholder({
       }
       controlId="text-placeholder"
     >
-      <Input
-        id="text-placeholder"
-        value={placeholder}
-        size="sm"
-        onChange={onChange}
-        isDisabled={isReadOnly}
-      />
+      <Input value={placeholder} size="sm" onChange={onChange} />
     </SettingsRow>
   );
 }

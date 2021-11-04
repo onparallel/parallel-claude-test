@@ -30,17 +30,9 @@ export function SettingsRowAlias({
       }
       controlId="alias-field"
       isInvalid={isInvalid}
-      alignItems="flex-start"
     >
       <Stack width="100%">
-        <Input
-          id="alias-field"
-          value={alias}
-          size="sm"
-          onChange={onChange}
-          isDisabled={isReadOnly}
-          maxLength={100}
-        />
+        <Input value={alias} size="sm" onChange={onChange} maxLength={100} />
         <FormErrorMessage>
           <FormattedMessage
             id="field-settings.alias-exists-error"
