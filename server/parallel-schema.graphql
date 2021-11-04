@@ -216,6 +216,7 @@ enum EntityType {
 
 enum FeatureFlag {
   API_TOKENS
+  AUTO_SEND_TEMPLATE
   EXPORT_CUATRECASAS
   HIDE_RECIPIENT_VIEW_CONTENTS @deprecated(reason: "Don't use this")
   INTERNAL_COMMENTS
@@ -433,6 +434,11 @@ type Mutation {
     """
     userId: Int!
   ): SupportMethodResponse!
+
+  """
+  Creates a petition from a template and send
+  """
+  autoSendTemplate(name: String!, templateId: GID!): String!
 
   """
   Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages

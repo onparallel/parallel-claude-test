@@ -2770,6 +2770,61 @@
     "context": "Enabled link"
   },
   {
+    "term": "component.template-details-modal.about",
+    "definition": "Sobre esta plantilla",
+    "context": "About this template"
+  },
+  {
+    "term": "component.template-details-modal.auto-send",
+    "definition": "Auto-iniciar petición",
+    "context": "Auto-send template"
+  },
+  {
+    "term": "component.template-details-modal.auto-send-header",
+    "definition": "Nombre de la petición",
+    "context": "Petition name"
+  },
+  {
+    "term": "component.template-details-modal.auto-send-label",
+    "definition": "Introduce un nombre para la petición",
+    "context": "Enter a name for the petition"
+  },
+  {
+    "term": "component.template-details-modal.clone-template",
+    "definition": "Clonar plantilla",
+    "context": "Clone template"
+  },
+  {
+    "term": "component.template-details-modal.created-by",
+    "definition": "Creado por {name} de {organization}.",
+    "context": "Created by {name} from {organization}."
+  },
+  {
+    "term": "component.template-details-modal.edit-template",
+    "definition": "Editar plantilla",
+    "context": "Edit template"
+  },
+  {
+    "term": "component.template-details-modal.fields-list",
+    "definition": "Lista de información",
+    "context": "Information list"
+  },
+  {
+    "term": "component.template-details-modal.last-updated-on",
+    "definition": "Actualizada por última vez el {date}.",
+    "context": "Last updated on {date}."
+  },
+  {
+    "term": "component.template-details-modal.no-description-provided",
+    "definition": "Descripción no disponible.",
+    "context": "No description provided."
+  },
+  {
+    "term": "component.template-details-modal.use-template",
+    "definition": "Utilizar plantilla",
+    "context": "Use template"
+  },
+  {
     "term": "component.template-header.clone-label",
     "definition": "Clonar plantilla",
     "context": "Clone template"
@@ -3858,6 +3913,11 @@
     "term": "generic.required-field",
     "definition": "Campo requerido",
     "context": "Required field"
+  },
+  {
+    "term": "generic.required-field-error",
+    "definition": "El campo es requerido",
+    "context": "The field is required"
   },
   {
     "term": "generic.save",
@@ -7903,46 +7963,6 @@
     "term": "supported-locales.spanish",
     "definition": "Español",
     "context": "Spanish"
-  },
-  {
-    "term": "template-details.about",
-    "definition": "Sobre esta plantilla",
-    "context": "About this template"
-  },
-  {
-    "term": "template-details.clone-template",
-    "definition": "Clonar plantilla",
-    "context": "Clone template"
-  },
-  {
-    "term": "template-details.created-by",
-    "definition": "Creado por {name} de {organization}.",
-    "context": "Created by {name} from {organization}."
-  },
-  {
-    "term": "template-details.edit-template",
-    "definition": "Editar plantilla",
-    "context": "Edit template"
-  },
-  {
-    "term": "template-details.fields-list",
-    "definition": "Lista de información",
-    "context": "Information list"
-  },
-  {
-    "term": "template-details.last-updated-on",
-    "definition": "Actualizada por última vez el {date}.",
-    "context": "Last updated on {date}."
-  },
-  {
-    "term": "template-details.no-description-provided",
-    "definition": "Descripción no disponible.",
-    "context": "No description provided."
-  },
-  {
-    "term": "template-details.use-template",
-    "definition": "Utilizar plantilla",
-    "context": "Use template"
   },
   {
     "term": "template-sharing.insufficient-permissions",

@@ -37,11 +37,11 @@ export const createContact = mutationField("createContact", {
     try {
       return await ctx.contacts.createContact(
         {
+          org_id: ctx.user!.org_id,
           email: email.toLowerCase(),
           first_name: firstName || null,
           last_name: lastName || null,
         },
-        ctx.user!,
         `User:${ctx.user!.id}`
       );
     } catch (error: any) {

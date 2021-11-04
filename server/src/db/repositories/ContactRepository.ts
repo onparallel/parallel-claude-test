@@ -193,15 +193,10 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
-  async createContact(
-    { email, ...data }: Omit<CreateContact, "org_id">,
-    userOrContact: User | Contact,
-    createdBy: string
-  ) {
+  async createContact({ email, ...data }: CreateContact, createdBy: string) {
     const [row] = await this.insert("contact", {
       email: email.toLowerCase().trim(),
       ...data,
-      org_id: userOrContact.org_id,
       created_by: createdBy,
       updated_by: createdBy,
     });

@@ -361,6 +361,7 @@ function NewPetition() {
         <TemplateDetailsModal
           isOpen
           onClose={() => setQueryState((current) => omit(current, ["template"]))}
+          me={me}
           template={templateData?.petition as any}
         />
       ) : null}
@@ -378,8 +379,10 @@ NewPetition.fragments = {
   User: gql`
     fragment NewPetition_User on User {
       ...AppLayout_User
+      ...TemplateDetailsModal_User
     }
     ${AppLayout.fragments.User}
+    ${TemplateDetailsModal.fragments.User}
   `,
 };
 

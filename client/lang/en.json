@@ -2770,6 +2770,61 @@
     "context": "Enabled link"
   },
   {
+    "term": "component.template-details-modal.about",
+    "definition": "About this template",
+    "context": "About this template"
+  },
+  {
+    "term": "component.template-details-modal.auto-send",
+    "definition": "Auto-send template",
+    "context": "Auto-send template"
+  },
+  {
+    "term": "component.template-details-modal.auto-send-header",
+    "definition": "Petition name",
+    "context": "Petition name"
+  },
+  {
+    "term": "component.template-details-modal.auto-send-label",
+    "definition": "Enter a name for the petition",
+    "context": "Enter a name for the petition"
+  },
+  {
+    "term": "component.template-details-modal.clone-template",
+    "definition": "Clone template",
+    "context": "Clone template"
+  },
+  {
+    "term": "component.template-details-modal.created-by",
+    "definition": "Created by {name} from {organization}.",
+    "context": "Created by {name} from {organization}."
+  },
+  {
+    "term": "component.template-details-modal.edit-template",
+    "definition": "Edit template",
+    "context": "Edit template"
+  },
+  {
+    "term": "component.template-details-modal.fields-list",
+    "definition": "Information list",
+    "context": "Information list"
+  },
+  {
+    "term": "component.template-details-modal.last-updated-on",
+    "definition": "Last updated on {date}.",
+    "context": "Last updated on {date}."
+  },
+  {
+    "term": "component.template-details-modal.no-description-provided",
+    "definition": "No description provided.",
+    "context": "No description provided."
+  },
+  {
+    "term": "component.template-details-modal.use-template",
+    "definition": "Use template",
+    "context": "Use template"
+  },
+  {
     "term": "component.template-header.clone-label",
     "definition": "Clone template",
     "context": "Clone template"
@@ -3858,6 +3913,11 @@
     "term": "generic.required-field",
     "definition": "Required field",
     "context": "Required field"
+  },
+  {
+    "term": "generic.required-field-error",
+    "definition": "The field is required",
+    "context": "The field is required"
   },
   {
     "term": "generic.save",
@@ -7903,46 +7963,6 @@
     "term": "supported-locales.spanish",
     "definition": "Spanish",
     "context": "Spanish"
-  },
-  {
-    "term": "template-details.about",
-    "definition": "About this template",
-    "context": "About this template"
-  },
-  {
-    "term": "template-details.clone-template",
-    "definition": "Clone template",
-    "context": "Clone template"
-  },
-  {
-    "term": "template-details.created-by",
-    "definition": "Created by {name} from {organization}.",
-    "context": "Created by {name} from {organization}."
-  },
-  {
-    "term": "template-details.edit-template",
-    "definition": "Edit template",
-    "context": "Edit template"
-  },
-  {
-    "term": "template-details.fields-list",
-    "definition": "Information list",
-    "context": "Information list"
-  },
-  {
-    "term": "template-details.last-updated-on",
-    "definition": "Last updated on {date}.",
-    "context": "Last updated on {date}."
-  },
-  {
-    "term": "template-details.no-description-provided",
-    "definition": "No description provided.",
-    "context": "No description provided."
-  },
-  {
-    "term": "template-details.use-template",
-    "definition": "Use template",
-    "context": "Use template"
   },
   {
     "term": "template-sharing.insufficient-permissions",

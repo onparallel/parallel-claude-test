@@ -223,7 +223,7 @@ function LandingTemplateDetails({
             <Stack flex="1" spacing={2}>
               <Text fontSize="x-large" fontWeight="bold" paddingBottom={4}>
                 <FormattedMessage
-                  id="template-details.about"
+                  id="component.template-details-modal.about"
                   defaultMessage="About this template"
                 />
               </Text>
@@ -237,14 +237,14 @@ function LandingTemplateDetails({
               ) : (
                 <Text textStyle="hint">
                   <FormattedMessage
-                    id="template-details.no-description-provided"
+                    id="component.template-details-modal.no-description-provided"
                     defaultMessage="No description provided."
                   />
                 </Text>
               )}
               <Heading size="md" paddingTop={8} paddingBottom={4}>
                 <FormattedMessage
-                  id="template-details.fields-list"
+                  id="component.template-details-modal.fields-list"
                   defaultMessage="Information list"
                 />
               </Heading>

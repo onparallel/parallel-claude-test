@@ -60,7 +60,7 @@ export const TemplateCard = Object.assign(
         ) : (
           <Text fontSize="sm" textStyle="hint">
             <FormattedMessage
-              id="template-details.no-description-provided"
+              id="component.template-details-modal.no-description-provided"
               defaultMessage="No description provided."
             />
           </Text>

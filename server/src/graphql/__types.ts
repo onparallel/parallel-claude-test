@@ -830,6 +830,7 @@ export interface NexusGenFieldTypes {
     addPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    autoSendTemplate: string; // String!
     batchSendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     bulkCreateContacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
@@ -2000,6 +2001,7 @@ export interface NexusGenFieldTypeNames {
     addPetitionPermission: "Petition";
     addUsersToUserGroup: "UserGroup";
     assignPetitionToUser: "SupportMethodResponse";
+    autoSendTemplate: "String";
     batchSendPetition: "SendPetitionResult";
     bulkCreateContacts: "Contact";
     cancelScheduledMessage: "PetitionMessage";
@@ -2996,6 +2998,11 @@ export interface NexusGenArgTypes {
       // args
       petitionId: string; // ID!
       userId: number; // Int!
+    };
+    autoSendTemplate: {
+      // args
+      name: string; // String!
+      templateId: NexusGenScalars["GID"]; // GID!
     };
     batchSendPetition: {
       // args

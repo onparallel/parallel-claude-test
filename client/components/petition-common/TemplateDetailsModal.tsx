@@ -9,6 +9,10 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -28,23 +32,35 @@ import {
   LinkIcon,
   PaperPlaneIcon,
 } from "@parallel/chakra/icons";
-import { TemplateDetailsModal_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import {
+  TemplateDetailsModal_PetitionTemplateFragment,
+  TemplateDetailsModal_UserFragment,
+  useTemplateDetailsModal_autoSendTemplateMutation,
+} from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { withError } from "@parallel/utils/promises/withError";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
+import { useRef } from "react";
+import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
+import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DateTime } from "../common/DateTime";
+import { DialogProps, useDialog } from "../common/DialogProvider";
 import { Divider } from "../common/Divider";
 
 export interface TemplateDetailsModalProps extends Omit<ModalProps, "children"> {
+  me: TemplateDetailsModal_UserFragment;
   template: TemplateDetailsModal_PetitionTemplateFragment;
 }
 
-export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModalProps) {
+export function TemplateDetailsModal({ me, template, ...props }: TemplateDetailsModalProps) {
   const intl = useIntl();
 
   const canEdit = Boolean(
@@ -92,6 +108,18 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
     goToPetition(template.id, "compose");
   };
 
+  const confirmPetitionName = useDialog(PetitionNameDialog);
+  const [autoSendTemplate] = useTemplateDetailsModal_autoSendTemplateMutation();
+  const handleAutoSendPetition = async () => {
+    try {
+      const name = await confirmPetitionName({ defaultValue: template.name ?? "" });
+      await openNewWindow(async () => {
+        const { data } = await autoSendTemplate({ variables: { templateId: template.id, name } });
+        return data!.autoSendTemplate;
+      });
+    } catch {}
+  };
+
   return (
     <Modal size="4xl" {...props}>
       <ModalOverlay>
@@ -119,7 +147,7 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
           <ModalBody>
             <Text as="span" fontSize="sm" fontWeight="normal">
               <FormattedMessage
-                id="template-details.created-by"
+                id="component.template-details-modal.created-by"
                 defaultMessage="Created by {name} from {organization}."
                 values={{
                   name: <strong>{template.owner.fullName}</strong>,
@@ -127,7 +155,7 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
                 }}
               />{" "}
               <FormattedMessage
-                id="template-details.last-updated-on"
+                id="component.template-details-modal.last-updated-on"
                 defaultMessage="Last updated on {date}."
                 values={{
                   date: (
@@ -150,7 +178,7 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
                   onClick={handleCreatePetition}
                 >
                   <FormattedMessage
-                    id="template-details.use-template"
+                    id="component.template-details-modal.use-template"
                     defaultMessage="Use template"
                   />
                 </Button>
@@ -180,7 +208,7 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
                         icon={<CopyIcon display="block" boxSize={4} />}
                       >
                         <FormattedMessage
-                          id="template-details.clone-template"
+                          id="component.template-details-modal.clone-template"
                           defaultMessage="Clone template"
                         />
                       </MenuItem>
@@ -192,7 +220,7 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
                           icon={<EditIcon display="block" boxSize={4} />}
                         >
                           <FormattedMessage
-                            id="template-details.edit-template"
+                            id="component.template-details-modal.edit-template"
                             defaultMessage="Edit template"
                           />
                         </MenuItem>
@@ -206,13 +234,25 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
                           <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
                         </MenuItem>
                       )}
+                      {me.hasAutoSendTemplate ? (
+                        <MenuItem
+                          justifyContent="left"
+                          icon={<LinkIcon display="block" boxSize={4} />}
+                          onClick={() => handleAutoSendPetition()}
+                        >
+                          <FormattedMessage
+                            id="component.template-details-modal.auto-send"
+                            defaultMessage="Auto-send template"
+                          />
+                        </MenuItem>
+                      ) : null}
                     </MenuList>
                   </Portal>
                 </Menu>
               </ButtonGroup>
               <Heading flex="1" size="md">
                 <FormattedMessage
-                  id="template-details.about"
+                  id="component.template-details-modal.about"
                   defaultMessage="About this template"
                 />
               </Heading>
@@ -227,14 +267,14 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
             ) : (
               <Text textAlign="center" textStyle="hint">
                 <FormattedMessage
-                  id="template-details.no-description-provided"
+                  id="component.template-details-modal.no-description-provided"
                   defaultMessage="No description provided."
                 />
               </Text>
             )}
             <Heading size="md" marginTop={8} marginBottom={4}>
               <FormattedMessage
-                id="template-details.fields-list"
+                id="component.template-details-modal.fields-list"
                 defaultMessage="Information list"
               />
             </Heading>
@@ -273,7 +313,20 @@ export function TemplateDetailsModal({ template, ...props }: TemplateDetailsModa
   );
 }
 
+TemplateDetailsModal.mutations = [
+  gql`
+    mutation TemplateDetailsModal_autoSendTemplate($templateId: GID!, $name: String!) {
+      autoSendTemplate(templateId: $templateId, name: $name)
+    }
+  `,
+];
+
 TemplateDetailsModal.fragments = {
+  User: gql`
+    fragment TemplateDetailsModal_User on User {
+      hasAutoSendTemplate: hasFeatureFlag(featureFlag: AUTO_SEND_TEMPLATE)
+    }
+  `,
   PetitionTemplate: gql`
     fragment TemplateDetailsModal_PetitionTemplate on PetitionTemplate {
       id
@@ -306,3 +359,58 @@ TemplateDetailsModal.fragments = {
     }
   `,
 };
+
+function PetitionNameDialog({
+  defaultValue,
+  ...props
+}: DialogProps<{ defaultValue: string }, string>) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ name: string }>({
+    defaultValues: {
+      name: defaultValue,
+    },
+  });
+  const inputRef = useRef<HTMLInputElement>(null);
+  const inputProps = useRegisterWithRef(inputRef, register, "name", { required: true });
+  return (
+    <ConfirmDialog
+      {...props}
+      initialFocusRef={inputRef}
+      content={{
+        as: "form",
+        onSubmit: handleSubmit((data) => props.onResolve(data.name)),
+      }}
+      header={
+        <FormattedMessage
+          id="component.template-details-modal.auto-send-header"
+          defaultMessage="Petition name"
+        />
+      }
+      body={
+        <FormControl isInvalid={!!errors.name}>
+          <FormLabel>
+            <FormattedMessage
+              id="component.template-details-modal.auto-send-label"
+              defaultMessage="Enter a name for the petition"
+            />
+          </FormLabel>
+          <Input {...inputProps} />
+          <FormErrorMessage>
+            <FormattedMessage
+              id="generic.required-field-error"
+              defaultMessage="The field is required"
+            />
+          </FormErrorMessage>
+        </FormControl>
+      }
+      confirm={
+        <Button type="submit" colorScheme="purple">
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      }
+    />
+  );
+}

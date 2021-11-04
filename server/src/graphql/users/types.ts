@@ -26,6 +26,7 @@ export const FeatureFlag = enumType({
     },
     "SKIP_FORWARD_SECURITY",
     "EXPORT_CUATRECASAS",
+    "AUTO_SEND_TEMPLATE",
   ],
   sourceType: "db.FeatureFlagName",
 });

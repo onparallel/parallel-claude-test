@@ -11,7 +11,7 @@ import { RESULT } from "./result";
  * creates the required accesses and messages to send a petition to a group of contacts
  */
 export async function presendPetition(
-  petitionSendGroups: [Petition, number[]][],
+  petitionSendGroups: [Pick<Petition, "id" | "name">, number[]][],
   args: {
     remindersConfig?: PetitionAccessReminderConfig | null;
     scheduledAt?: Date | null;

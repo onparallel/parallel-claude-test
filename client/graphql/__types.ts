@@ -186,6 +186,7 @@ export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
   | "API_TOKENS"
+  | "AUTO_SEND_TEMPLATE"
   | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
@@ -345,6 +346,8 @@ export interface Mutation {
   addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
+  /** Creates a petition from a template and send */
+  autoSendTemplate: Scalars["String"];
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
   batchSendPetition: Array<SendPetitionResult>;
   /** Load contacts from an excel file, creating the ones not found on database */
@@ -592,6 +595,11 @@ export interface MutationaddUsersToUserGroupArgs {
 export interface MutationassignPetitionToUserArgs {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];
+}
+
+export interface MutationautoSendTemplateArgs {
+  name: Scalars["String"];
+  templateId: Scalars["GID"];
 }
 
 export interface MutationbatchSendPetitionArgs {
@@ -5839,6 +5847,17 @@ export type SignatureConfigDialog_PetitionBaseFragment =
 export type SignatureConfigDialog_OrgIntegrationFragment = { __typename?: "OrgIntegration" } & {
   label: OrgIntegration["name"];
   value: OrgIntegration["provider"];
+};
+
+export type TemplateDetailsModal_autoSendTemplateMutationVariables = Exact<{
+  templateId: Scalars["GID"];
+  name: Scalars["String"];
+}>;
+
+export type TemplateDetailsModal_autoSendTemplateMutation = Pick<Mutation, "autoSendTemplate">;
+
+export type TemplateDetailsModal_UserFragment = { __typename?: "User" } & {
+  hasAutoSendTemplate: User["hasFeatureFlag"];
 };
 
 export type TemplateDetailsModal_PetitionTemplateFragment = {
@@ -11550,7 +11569,7 @@ export type NewPetition_UserFragment = { __typename?: "User" } & Pick<
   | "role"
   | "avatarUrl"
   | "initials"
-> & {
+> & { hasAutoSendTemplate: User["hasFeatureFlag"] } & {
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
           petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -11609,7 +11628,7 @@ export type NewPetitionUserQuery = Pick<Query, "publicTemplateCategories"> & {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & {
+  > & { hasAutoSendTemplate: User["hasFeatureFlag"] } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -15336,11 +15355,18 @@ export const NewPetition_PetitionTemplateFragmentDoc = gql`
   }
   ${NewPetitionTemplatesList_PetitionTemplateFragmentDoc}
 `;
+export const TemplateDetailsModal_UserFragmentDoc = gql`
+  fragment TemplateDetailsModal_User on User {
+    hasAutoSendTemplate: hasFeatureFlag(featureFlag: AUTO_SEND_TEMPLATE)
+  }
+`;
 export const NewPetition_UserFragmentDoc = gql`
   fragment NewPetition_User on User {
     ...AppLayout_User
+    ...TemplateDetailsModal_User
   }
   ${AppLayout_UserFragmentDoc}
+  ${TemplateDetailsModal_UserFragmentDoc}
 `;
 export const useSettingsSections_UserFragmentDoc = gql`
   fragment useSettingsSections_User on User {
@@ -16785,6 +16811,26 @@ export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryHookResul
 >;
 export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQueryHookResult = ReturnType<
   typeof usePublicLinkSettingsDialog_isValidPublicPetitionLinkSlugLazyQuery
+>;
+export const TemplateDetailsModal_autoSendTemplateDocument = gql`
+  mutation TemplateDetailsModal_autoSendTemplate($templateId: GID!, $name: String!) {
+    autoSendTemplate(templateId: $templateId, name: $name)
+  }
+`;
+export function useTemplateDetailsModal_autoSendTemplateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    TemplateDetailsModal_autoSendTemplateMutation,
+    TemplateDetailsModal_autoSendTemplateMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    TemplateDetailsModal_autoSendTemplateMutation,
+    TemplateDetailsModal_autoSendTemplateMutationVariables
+  >(TemplateDetailsModal_autoSendTemplateDocument, options);
+}
+export type TemplateDetailsModal_autoSendTemplateMutationHookResult = ReturnType<
+  typeof useTemplateDetailsModal_autoSendTemplateMutation
 >;
 export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument = gql`
   mutation PetitionComposeField_createPetitionFieldAttachmentUploadLink(
