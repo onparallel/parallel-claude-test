@@ -1044,6 +1044,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         );
       }
 
+      // TODO: get linkOwner from public_petition_link.owner_id
       const [publicPetitionLink, [linkOwner]] = await Promise.all([
         ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId),
         ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(args.publicPetitionLinkId),
@@ -1059,6 +1060,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
               status: "DRAFT",
               from_public_petition_link_id: args.publicPetitionLinkId,
             },
+            // TODO pass true so the linkOwner permission is inserted here
             false, // do not insert permissions for the cloned petition
             t
           ),
@@ -1088,6 +1090,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             new Date(),
             t
           ),
+          // TODO: instead of this, insert every READ/WRITE permission in petition_default_permission by template_id
           ctx.petitions.clonePublicPetitionLinkUsersIntoPetitionPermission(
             args.publicPetitionLinkId,
             newPetition.id,
