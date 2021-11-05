@@ -370,6 +370,7 @@ function _PetitionSettings({
             }
             isChecked={isSharedByLink}
             onChange={handleToggleShareByLink}
+            controlId="share-by-link"
           />
         ) : null}
         {isSharedByLink ? (
@@ -574,7 +575,7 @@ export const PetitionSettings = Object.assign(
   { fragments, mutations }
 );
 
-interface SwitchSettingProps extends Omit<SettingsRowProps, "children"> {
+interface SwitchSettingProps extends Omit<SettingsRowProps, "children" | "onChange"> {
   icon?: ReactNode;
   isChecked: boolean;
   onChange: (value: boolean) => void;
