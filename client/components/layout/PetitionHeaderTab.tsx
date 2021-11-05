@@ -28,7 +28,6 @@ export const PetitionHeaderTab = chakraForwardRef<
         aria-current={isActive ? "page" : undefined}
         aria-disabled={isDisabled ? true : undefined}
         textTransform="uppercase"
-        isDisabled={isDisabled}
         variant="ghost"
         fontWeight="normal"
         _hover={{ color: "blue.600", backgroundColor: "white" }}
