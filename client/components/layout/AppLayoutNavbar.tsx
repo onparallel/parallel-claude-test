@@ -165,29 +165,29 @@ export const AppLayoutNavbar = Object.assign(
           ))}
         </Flex>
         <Spacer display={{ base: "none", sm: "block" }} />
-        <Stack spacing={4} alignItems="center">
-          <Stack spacing={2} alignItems="center" display={{ base: "none", sm: "flex" }}>
-            <NotificationsButton />
-            <IconButtonWithTooltip
-              label={intl.formatMessage({
-                id: "navbar.help-center",
-                defaultMessage: "Help center",
-              })}
-              placement="right"
-              size="md"
-              variant="ghost"
-              backgroundColor="white"
-              isRound
-              onClick={onHelpCenterClick}
-              icon={<HelpOutlineIcon fontSize="22px" />}
-            />
-          </Stack>
+        <Stack spacing={2} alignItems="center" display={{ base: "none", sm: "flex" }}>
+          <NotificationsButton />
+          <IconButtonWithTooltip
+            label={intl.formatMessage({
+              id: "navbar.help-center",
+              defaultMessage: "Help center",
+            })}
+            placement="right"
+            size="md"
+            variant="ghost"
+            backgroundColor="white"
+            isRound
+            onClick={onHelpCenterClick}
+            icon={<HelpOutlineIcon fontSize="22px" />}
+          />
+        </Stack>
+        <Center marginTop={{ base: 0, sm: 4 }}>
           <UserMenu
             placement={isMobile ? "top-end" : "right-end"}
             user={user}
             onHelpCenterClick={onHelpCenterClick}
           />
-        </Stack>
+        </Center>
       </Flex>
     );
   }),
