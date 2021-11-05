@@ -40,6 +40,7 @@ export type SignaturItEventBody = {
   };
   created_at: string;
   type: SignatureEvents;
+  reason?: string;
 };
 
 export function signaturItEventHandler(type: SignatureEvents) {
@@ -52,6 +53,8 @@ export function signaturItEventHandler(type: SignatureEvents) {
       return documentCompleted;
     case "audit_trail_completed":
       return auditTrailCompleted;
+    case "email_bounced":
+      return emailBounced;
     default:
       return appendEventLogs;
   }
@@ -59,11 +62,6 @@ export function signaturItEventHandler(type: SignatureEvents) {
 
 /** the document was signed by any of the assigned signers */
 async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const petition = await ctx.petitions.loadPetition(petitionId);
-  if (!petition) {
-    throw new Error(`petition with id ${petitionId} not found.`);
-  }
-
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
     `SIGNATURIT/${data.document.signature.id}`
   );
@@ -77,7 +75,7 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
     appendEventLogs(ctx, data),
     ctx.petitions.createEvent({
       type: "RECIPIENT_SIGNED",
-      petition_id: petition.id,
+      petition_id: petitionId,
       data: {
         signer,
         petition_signature_request_id: signature!.id,
@@ -88,11 +86,6 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
 
 /** signer declined the document. Whole signature process will be cancelled */
 async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const petition = await ctx.petitions.loadPetition(petitionId);
-  if (!petition) {
-    throw new Error(`Can't find petition with id ${petitionId}`);
-  }
-
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
     `SIGNATURIT/${data.document.signature.id}`
   );
@@ -179,6 +172,38 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
           petitionSignatureRequestId: signature.id,
           signedDocumentExternalId: `${signatureId}/${documentId}`,
         },
+      },
+    }),
+    appendEventLogs(ctx, data),
+  ]);
+}
+
+async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
+    `SIGNATURIT/${data.document.signature.id}`
+  );
+
+  if (!signature) {
+    throw new Error(
+      `Can't find PetitionSignatureRequest with external_id: SIGNATURIT/${data.document.signature.id}`
+    );
+  }
+
+  await Promise.all([
+    ctx.petitions.cancelPetitionSignatureRequestByExternalId(
+      `SIGNATURIT/${data.document.signature.id}`,
+      "REQUEST_ERROR",
+      {
+        error: data.reason ?? `email ${data.document.email} bounced`,
+      }
+    ),
+    ctx.petitions.createEvent({
+      type: "SIGNATURE_CANCELLED",
+      petition_id: petitionId,
+      data: {
+        petition_signature_request_id: signature.id,
+        cancel_reason: "REQUEST_ERROR",
+        cancel_data: { error: data.reason ?? `email ${data.document.email} bounced` },
       },
     }),
     appendEventLogs(ctx, data),
