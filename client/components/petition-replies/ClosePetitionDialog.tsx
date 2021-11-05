@@ -67,7 +67,7 @@ export function ClosePetitionDialog({
   const intl = useIntl();
   const placeholders = usePetitionMessagePlaceholderOptions();
   const [message, setMessage] = useState<RichTextEditorValue>(
-    textWithPlaceholderToSlateNodes(messages[intl.locale as PetitionLocale], placeholders)
+    textWithPlaceholderToSlateNodes(messages[locale], placeholders)
   );
   const [sendMessage, setSendMessage] = useState(requiredMessage);
   const messageRef = useRef<RichTextEditorInstance>(null);
