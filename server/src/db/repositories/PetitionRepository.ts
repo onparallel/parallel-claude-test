@@ -2617,7 +2617,7 @@ export class PetitionRepository extends BaseRepository {
       permissionType: PetitionPermissionType;
       isSubscribed: boolean;
     }[],
-    creator: User,
+    createdBy: string,
     t?: Knex.Transaction
   ) {
     const [newUsers, newUserGroups] = partition(data, (d) => d.type === "User");
@@ -2641,8 +2641,8 @@ export class PetitionRepository extends BaseRepository {
                       user_id: user.id,
                       is_subscribed: user.isSubscribed,
                       type: user.permissionType,
-                      created_by: `User:${creator.id}`,
-                      updated_by: `User:${creator.id}`,
+                      created_by: createdBy,
+                      updated_by: createdBy,
                     }))
                   )
                 ),
@@ -2664,8 +2664,8 @@ export class PetitionRepository extends BaseRepository {
                       user_group_id: userGroup.id,
                       is_subscribed: userGroup.isSubscribed,
                       type: userGroup.permissionType,
-                      created_by: `User:${creator.id}`,
-                      updated_by: `User:${creator.id}`,
+                      created_by: createdBy,
+                      updated_by: createdBy,
                     }))
                   )
                 ),
@@ -2693,8 +2693,8 @@ export class PetitionRepository extends BaseRepository {
                 select petition_id from (
                   values ${petitionIds.map(() => "(?::int)").join(", ")}
                 ) as t(petition_id))
-              insert into petition_permission(petition_id, user_id, from_user_group_id, is_subscribed, type, created_by)
-              select p.petition_id, gm.user_id, gm.user_group_id, gm.is_subscribed, gm.permission_type, ? 
+              insert into petition_permission(petition_id, user_id, from_user_group_id, is_subscribed, type, created_by, updated_by)
+              select p.petition_id, gm.user_id, gm.user_group_id, gm.is_subscribed, gm.permission_type, ?, ? 
               from gm cross join p
               on conflict do nothing returning *;
             `,
@@ -2702,7 +2702,8 @@ export class PetitionRepository extends BaseRepository {
                 ...newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]).flat(),
                 ...newUserGroups.map((ug) => ug.id),
                 ...petitionIds,
-                `User:${creator.id}`,
+                createdBy,
+                createdBy,
               ],
               t
             )
