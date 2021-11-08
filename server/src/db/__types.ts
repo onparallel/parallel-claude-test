@@ -156,6 +156,7 @@ export interface TableTypes {
   system_event: SystemEvent;
   tag: Tag;
   task: Task;
+  template_default_permission: TemplateDefaultPermission;
   temporary_file: TemporaryFile;
   user: User;
   user_authentication_token: UserAuthenticationToken;
@@ -197,6 +198,7 @@ export interface TableCreateTypes {
   system_event: CreateSystemEvent;
   tag: CreateTag;
   task: CreateTask;
+  template_default_permission: CreateTemplateDefaultPermission;
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
@@ -238,6 +240,7 @@ export interface TablePrimaryKeys {
   system_event: "id";
   tag: "id";
   task: "id";
+  template_default_permission: "id";
   temporary_file: "id";
   user: "id";
   user_authentication_token: "id";
@@ -881,6 +884,7 @@ export interface PublicPetitionLink {
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
+  owner_id: number; // int4
 }
 
 export type CreatePublicPetitionLink = PartialProps<
@@ -971,6 +975,34 @@ export type CreateTask = PartialProps<
   | "created_by"
   | "updated_at"
   | "updated_by"
+>;
+
+export interface TemplateDefaultPermission {
+  id: number; // int4
+  template_id: number; // int4
+  type: PetitionPermissionType; // petition_permission_type
+  user_id: Maybe<number>; // int4
+  user_group_id: Maybe<number>; // int4
+  is_subscribed: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateTemplateDefaultPermission = PartialProps<
+  Omit<TemplateDefaultPermission, "id">,
+  | "user_id"
+  | "user_group_id"
+  | "is_subscribed"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface TemporaryFile {
