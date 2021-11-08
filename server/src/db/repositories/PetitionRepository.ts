@@ -1482,9 +1482,9 @@ export class PetitionRepository extends BaseRepository {
 
   async clonePetition(
     petitionId: number,
-    user: User,
-    data?: Partial<TableTypes["petition"]>,
-    insertUserPermissions = true,
+    owner: User,
+    data: Partial<TableTypes["petition"]>,
+    createdBy = `User:${owner.id}`,
     t?: Knex.Transaction
   ) {
     const [sourcePetition, userPermissions] = await Promise.all([
@@ -1530,14 +1530,14 @@ export class PetitionRepository extends BaseRepository {
             // avoid copying signature_config if creating from a public template in another organization
             ...(sourcePetition?.is_template &&
             sourcePetition.template_public &&
-            sourcePetition.org_id !== user.org_id
+            sourcePetition.org_id !== owner.org_id
               ? (["signature_config"] as const)
               : ([] as const)),
           ]),
-          org_id: user.org_id,
+          org_id: owner.org_id,
           status: sourcePetition?.is_template ? null : "DRAFT",
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
+          created_by: createdBy,
+          updated_by: createdBy,
           from_template_id: fromTemplateId,
           ...data,
         },
@@ -1554,30 +1554,29 @@ export class PetitionRepository extends BaseRepository {
                 ...omit(field, ["id", "petition_id", "created_at", "updated_at", "validated"]),
                 petition_id: cloned.id,
                 from_petition_field_id: field.id,
-                created_by: `User:${user.id}`,
-                updated_by: `User:${user.id}`,
+                created_by: createdBy,
+                updated_by: createdBy,
               })),
               t
             ).returning("*"),
         // copy permissions
-        insertUserPermissions
-          ? this.insert(
+        this.insert(
               "petition_permission",
               {
                 petition_id: cloned.id,
-                user_id: user.id,
+            user_id: owner.id,
                 type: "OWNER",
+            // if cloning a petition clone, the is_subscribed from the original
                 is_subscribed: sourcePetition!.is_template
                   ? true
-                  : userPermissions.find((p) => p.user_id === user.id)?.is_subscribed ?? true,
-                created_by: `User:${user.id}`,
-                updated_by: `User:${user.id}`,
+              : userPermissions.find((p) => p.user_id === owner.id)?.is_subscribed ?? true,
+            created_by: createdBy,
+            updated_by: createdBy,
               },
               t
-            )
-          : [],
+        ),
         // clone tags if source petition is from same org
-        sourcePetition?.org_id === user.org_id
+        sourcePetition?.org_id === owner.org_id
           ? this.raw(
               /* sql */ `
               insert into petition_tag (petition_id, tag_id)
@@ -1649,7 +1648,7 @@ export class PetitionRepository extends BaseRepository {
               [
                 ...fields.map((f) => f.id),
                 ...fields.flatMap((f) => [f.id, newIds[f.id]]),
-                `User:${user.id}`,
+                createdBy,
               ],
               t
             )
@@ -3011,6 +3010,33 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("id", petitionIds)
         .returning("*");
     }, t);
+  }
+
+  readonly loadTemplateDefaultPermissions = this.buildLoadMultipleBy(
+    "template_default_permission",
+    "template_id"
+  );
+
+  async createPermissionsFromTemplateDefaultPermissions(
+    petitionId: number,
+    templateId: number,
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    const defaultPermissions = await this.loadTemplateDefaultPermissions(templateId);
+    if (defaultPermissions.length > 0) {
+      await this.addPetitionPermissions(
+        [petitionId],
+        defaultPermissions.map((p) => ({
+          type: p.user_id ? "User" : "UserGroup",
+          id: p.user_id ?? p.user_group_id!,
+          permissionType: p.type,
+          isSubscribed: p.is_subscribed,
+        })),
+        createdBy,
+        t
+      );
+    }
   }
 
   async arePublicTemplates(templateIds: MaybeArray<number>): Promise<boolean> {

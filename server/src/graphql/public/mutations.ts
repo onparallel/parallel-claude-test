@@ -1044,24 +1044,24 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         );
       }
 
-      // TODO: get linkOwner from public_petition_link.owner_id
-      const [publicPetitionLink, [linkOwner]] = await Promise.all([
-        ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId),
-        ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(args.publicPetitionLinkId),
-      ]);
+      const link = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
+
+      const owner = await ctx.users.loadUser(link.owner_id);
+      if (!isDefined(owner)) {
+        throw new Error(`User not found for public_petition_link.owner_id ${link.owner_id}`);
+      }
 
       const { messages, result } = await ctx.petitions.withTransaction(async (t) => {
-        const [newPetition, [contact]] = await Promise.all([
+        const [petition, [contact]] = await Promise.all([
           ctx.petitions.clonePetition(
-            publicPetitionLink!.template_id,
-            linkOwner!,
+            link!.template_id,
+            owner,
             {
               is_template: false,
               status: "DRAFT",
-              from_public_petition_link_id: args.publicPetitionLinkId,
+              from_public_petition_link_id: link.id,
             },
-            // TODO pass true so the linkOwner permission is inserted here
-            false, // do not insert permissions for the cloned petition
+            `PublicPetitionLink:${link.id}`,
             t
           ),
           ctx.contacts.loadOrCreate(
@@ -1069,9 +1069,9 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
               email: args.contactEmail,
               firstName: args.contactFirstName,
               lastName: args.contactLastName,
-              orgId: linkOwner!.org_id,
+              orgId: owner!.org_id,
             },
-            `PublicPetitionLink:${args.publicPetitionLinkId}`,
+            `PublicPetitionLink:${link.id}`,
             t
           ),
         ]);
@@ -1079,22 +1079,21 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         // presend petition to contact and insert petition_permissions
         const [[{ result, messages, error }]] = await Promise.all([
           presendPetition(
-            [[newPetition, [contact.id]]],
+            [[petition, [contact.id]]],
             {
-              subject: newPetition.email_subject ?? publicPetitionLink!.title,
-              body: JSON.parse(newPetition.email_body!),
+              subject: petition.email_subject ?? link!.title,
+              body: JSON.parse(petition.email_body!),
             },
-            linkOwner!,
+            owner!,
             true,
             ctx,
             new Date(),
             t
           ),
-          // TODO: instead of this, insert every READ/WRITE permission in petition_default_permission by template_id
-          ctx.petitions.clonePublicPetitionLinkUsersIntoPetitionPermission(
-            args.publicPetitionLinkId,
-            newPetition.id,
-            `PublicPetitionLink:${args.publicPetitionLinkId}`,
+          ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
+            petition.id,
+            link.template_id,
+            `PublicPetitionLink:${link.id}`,
             t
           ),
         ]);

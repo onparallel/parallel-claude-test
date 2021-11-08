@@ -131,12 +131,13 @@ export const createPetition = mutationField("createPetition", {
         name: original.is_template && !isTemplate ? name : original.name,
       });
 
-      /**
-       * TODO:
-       * if (original.is_template) {
-       *  copy every R/W permission in petition_default_permission to petition_permission by template_id: original.id
-       * }
-       */
+      if (original.is_template) {
+        await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
+          petition.id,
+          original.id,
+          `User:${ctx.user!.id}`
+        );
+      }
 
       if (original.is_template && !isTemplate) {
         await ctx.petitions.createEvent({
@@ -204,13 +205,6 @@ export const clonePetitions = mutationField("clonePetitions", {
         const cloned = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
           name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
         });
-
-        /**
-         * TODO:
-         * if petitionId points to a template,
-         *  copy every R/W permission in petition_default_permission to petition_permission by template_id: petitionId
-         * }
-         */
 
         await ctx.petitions.createEvent([
           {
@@ -1095,7 +1089,9 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       args.contactIdGroups
         .slice(1)
         // set the owner of the original petition as owner of the cloned ones
-        .map(() => ctx.petitions.clonePetition(args.petitionId, ctx.user!, undefined, false))
+        .map(() =>
+          ctx.petitions.clonePetition(args.petitionId, petitionOwner, {}, `User:${ctx.user!.id}`)
+        )
     );
 
     if (
