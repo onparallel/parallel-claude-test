@@ -389,6 +389,8 @@ export interface Mutation {
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
+  /** Creates a new signature integration on the user's organization */
+  createSignatureIntegration: OrgIntegration;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
@@ -413,6 +415,8 @@ export interface Mutation {
   deletePetitionReply: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
+  deleteSignatureIntegration: Result;
   /** Removes the tag from every petition and soft-deletes it */
   deleteTag: Result;
   /** Deletes a group */
@@ -427,6 +431,8 @@ export interface Mutation {
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Returns a signed download url for tasks with file output */
   getTaskResultFileUrl: FileUploadDownloadLinkResult;
+  /** marks a Signature integration as default */
+  markSignatureIntegrationAsDefault: OrgIntegration;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -723,6 +729,13 @@ export interface MutationcreatePublicPetitionLinkArgs {
   title: Scalars["String"];
 }
 
+export interface MutationcreateSignatureIntegrationArgs {
+  apiKey: Scalars["String"];
+  isDefault?: Maybe<Scalars["Boolean"]>;
+  name: Scalars["String"];
+  provider: SignatureIntegrationProvider;
+}
+
 export interface MutationcreateSimpleReplyArgs {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -788,6 +801,11 @@ export interface MutationdeletePetitionsArgs {
   ids: Array<Scalars["GID"]>;
 }
 
+export interface MutationdeleteSignatureIntegrationArgs {
+  force?: Maybe<Scalars["Boolean"]>;
+  id: Scalars["GID"];
+}
+
 export interface MutationdeleteTagArgs {
   id: Scalars["GID"];
 }
@@ -821,6 +839,10 @@ export interface MutationgenerateUserAuthTokenArgs {
 export interface MutationgetTaskResultFileUrlArgs {
   preview?: Maybe<Scalars["Boolean"]>;
   taskId: Scalars["GID"];
+}
+
+export interface MutationmarkSignatureIntegrationAsDefaultArgs {
+  id: Scalars["GID"];
 }
 
 export interface MutationpetitionFieldAttachmentDownloadLinkArgs {
@@ -1264,10 +1286,14 @@ export type OnboardingStatus = "FINISHED" | "SKIPPED";
 export interface OrgIntegration {
   __typename?: "OrgIntegration";
   id: Scalars["GID"];
-  /** The name of the integration. */
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"];
+  /** Custom name of this integration, provided by the user */
   name: Scalars["String"];
   /** The provider used for this integration. */
   provider: Scalars["String"];
+  /** Status of this integration, to differentiate between sandbox and production-ready integrations */
+  status: OrgIntegrationStatus;
   /** The type of the integration. */
   type: IntegrationType;
 }
@@ -1279,6 +1305,8 @@ export interface OrgIntegrationPagination {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 }
+
+export type OrgIntegrationStatus = "DEMO" | "PRODUCTION";
 
 /** An organization in the system. */
 export interface Organization extends Timestamps {
@@ -2708,6 +2736,8 @@ export interface SignatureConfigInputSigner {
   firstName: Scalars["String"];
   lastName: Scalars["String"];
 }
+
+export type SignatureIntegrationProvider = "SIGNATURIT";
 
 export interface SignatureStartedEvent extends PetitionEvent {
   __typename?: "SignatureStartedEvent";
@@ -8115,6 +8145,47 @@ export type OrganizationIntegrationsQuery = {
     | "initials"
   > & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+            petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+              OrganizationUsagePetitionLimit,
+              "limit" | "used"
+            >;
+          };
+        };
+    };
+};
+
+export type IntegrationsSignatureQueryVariables = Exact<{
+  limit: Scalars["Int"];
+}>;
+
+export type IntegrationsSignatureQuery = {
+  me: { __typename?: "User" } & Pick<
+    User,
+    | "id"
+    | "fullName"
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "createdAt"
+    | "canCreateUsers"
+    | "isSuperAdmin"
+    | "role"
+    | "avatarUrl"
+    | "initials"
+  > & {
+      organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+          signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & Pick<
+            OrgIntegrationPagination,
+            "totalCount"
+          > & {
+              items: Array<
+                { __typename?: "OrgIntegration" } & Pick<
+                  OrgIntegration,
+                  "id" | "name" | "provider" | "isDefault" | "status"
+                >
+              >;
+            };
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
               OrganizationUsagePetitionLimit,
@@ -18981,6 +19052,56 @@ export type OrganizationIntegrationsQueryHookResult = ReturnType<
 >;
 export type OrganizationIntegrationsLazyQueryHookResult = ReturnType<
   typeof useOrganizationIntegrationsLazyQuery
+>;
+export const IntegrationsSignatureDocument = gql`
+  query IntegrationsSignature($limit: Int!) {
+    me {
+      id
+      ...SettingsLayout_User
+      organization {
+        id
+        signatureIntegrations: integrations(type: SIGNATURE, limit: $limit) {
+          items {
+            id
+            name
+            provider
+            isDefault
+            status
+          }
+          totalCount
+        }
+      }
+    }
+  }
+  ${SettingsLayout_UserFragmentDoc}
+`;
+export function useIntegrationsSignatureQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    IntegrationsSignatureQuery,
+    IntegrationsSignatureQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<IntegrationsSignatureQuery, IntegrationsSignatureQueryVariables>(
+    IntegrationsSignatureDocument,
+    options
+  );
+}
+export function useIntegrationsSignatureLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    IntegrationsSignatureQuery,
+    IntegrationsSignatureQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<IntegrationsSignatureQuery, IntegrationsSignatureQueryVariables>(
+    IntegrationsSignatureDocument,
+    options
+  );
+}
+export type IntegrationsSignatureQueryHookResult = ReturnType<typeof useIntegrationsSignatureQuery>;
+export type IntegrationsSignatureLazyQueryHookResult = ReturnType<
+  typeof useIntegrationsSignatureLazyQuery
 >;
 export const OrganizationUsageDocument = gql`
   query OrganizationUsage {

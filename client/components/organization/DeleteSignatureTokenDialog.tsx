@@ -4,29 +4,29 @@ import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 
-function ResetSignaturitTokenDialog({ ...props }: DialogProps) {
+function DeleteSignatureTokenDialog({ ...props }: DialogProps) {
   return (
     <ConfirmDialog
       hasCloseButton
       header={
         <Text>
           <FormattedMessage
-            id="component.reset-signaturit-dialog.title"
-            defaultMessage="Reset access token"
+            id="component.remove-signature-token-dialog.title"
+            defaultMessage="Delete token"
           />
         </Text>
       }
       body={
         <Text>
           <FormattedMessage
-            id="component.reset-signaturit-dialog.body"
-            defaultMessage="Are you sure you want to reset your token? If continue, the signature will be deactivated and you will return to test mode. "
+            id="component.remove-signature-token-dialog.body"
+            defaultMessage="If you delete this token you will not be able to use this integration again, are you sure you want to delete it?"
           />
         </Text>
       }
       confirm={
         <Button type="submit" colorScheme="red" variant="solid" onClick={() => props.onResolve()}>
-          <FormattedMessage id="generic.yes-reset" defaultMessage="Yest, reset" />
+          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
       {...props}
@@ -34,6 +34,6 @@ function ResetSignaturitTokenDialog({ ...props }: DialogProps) {
   );
 }
 
-export function useResetSignaturitTokenDialog() {
-  return useDialog(ResetSignaturitTokenDialog);
+export function useDeleteSignatureTokenDialog() {
+  return useDialog(DeleteSignatureTokenDialog);
 }

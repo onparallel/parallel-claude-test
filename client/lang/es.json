@@ -65,22 +65,32 @@
     "context": "Recipients"
   },
   {
-    "term": "component.add-signaturit-apikey-dialog.apikey-help",
+    "term": "component.add-signature-apikey-dialog.apikey-help",
     "definition": "Esta clave la proporciona Signaturit y es necesaria para poder realizar la integración",
     "context": "This key is provided by Signaturit and is required to perform the integration"
   },
   {
-    "term": "component.add-signaturit-apikey-dialog.apikey-label",
+    "term": "component.add-signature-apikey-dialog.apikey-label",
     "definition": "Clave de la API",
     "context": "API Key"
   },
   {
-    "term": "component.add-signaturit-apikey-dialog.help",
+    "term": "component.add-signature-apikey-dialog.checkbox-set-default",
+    "definition": "Marcar como predeterminado",
+    "context": "Set as default"
+  },
+  {
+    "term": "component.add-signature-apikey-dialog.help",
     "definition": "Si necesitas ayuda para encontrar tu clave puedes encontrar más información <a>aquí</a>.",
     "context": "If you need help to find your key you can find more information <a>here</a>."
   },
   {
-    "term": "component.add-signaturit-apikey-dialog.title",
+    "term": "component.add-signature-apikey-dialog.name-help",
+    "definition": "No podrás cambiar este valor despues de crearse.",
+    "context": "You will not be able to change this value after it is created."
+  },
+  {
+    "term": "component.add-signature-apikey-dialog.title",
     "definition": "Introduce tu API Key",
     "context": "Enter your API Key"
   },
@@ -548,6 +558,16 @@
     "term": "component.delete-petitions.shared-error-singular",
     "definition": "La {type, select, PETITION {petición} other{plantilla}} {name} no se ha podido eliminar porque está siendo compartida. Por favor, transfiere la propiedad o elimina el acceso compartido primero.",
     "context": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
+  },
+  {
+    "term": "component.delete-signature-error-confirmation.body",
+    "definition": "Se han detectado <b>{count}</b> procesos de firma pendientes que utilizan este token. Si lo eliminas, se cancelarán todos. ¿Estás seguro de querer eliminarlo?",
+    "context": "We have detected <b>{count}</b> pending signature processes that use this token. If you delete it, they will all be cancelled. Are you sure you want to delete it?"
+  },
+  {
+    "term": "component.delete-signature-error-confirmation.title",
+    "definition": "Firmas pendientes",
+    "context": "Pending signatures"
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
@@ -1705,16 +1725,6 @@
     "context": "Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
   },
   {
-    "term": "component.petition-settings.signature-test-help",
-    "definition": "El modo de prueba, te permite enviar firmas pero no tendrán ninguna validez legal. Para activar la firma digital, <a>contacta con nuestro equipo de soporte.</a>",
-    "context": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
-  },
-  {
-    "term": "component.petition-settings.signature-test-label",
-    "definition": "PRUEBA",
-    "context": "TEST"
-  },
-  {
     "term": "component.petition-settings.skip-forward-security",
     "definition": "Deshabilitar protección de reenvío",
     "context": "Disable Forward Security"
@@ -2430,19 +2440,19 @@
     "context": "This field is being referenced"
   },
   {
+    "term": "component.remove-signature-token-dialog.body",
+    "definition": "Si eliminas este token no podrás volver a utilizar esta integración. ¿Estás seguro de querer eliminarlo?",
+    "context": "If you delete this token you will not be able to use this integration again, are you sure you want to delete it?"
+  },
+  {
+    "term": "component.remove-signature-token-dialog.title",
+    "definition": "Eliminar token",
+    "context": "Delete token"
+  },
+  {
     "term": "component.replies-field-comment.mark-as-unread",
     "definition": "Marcar como no leído",
     "context": "Mark as unread"
-  },
-  {
-    "term": "component.reset-signaturit-dialog.body",
-    "definition": "¿Estás seguro de querer restablecer tu token? Si continúas, se desactivará la firma y volverás al modo de prueba.",
-    "context": "Are you sure you want to reset your token? If continue, the signature will be deactivated and you will return to test mode."
-  },
-  {
-    "term": "component.reset-signaturit-dialog.title",
-    "definition": "Restablecer acceso del token",
-    "context": "Reset access token"
   },
   {
     "term": "component.rich-text-editor.add-link-header",
@@ -2743,6 +2753,16 @@
     "term": "component.signature-config-dialog.title-placeholder",
     "definition": "Escribe un título...",
     "context": "Enter a title..."
+  },
+  {
+    "term": "component.signature-tokens-table.default-description",
+    "definition": "El token predeterminado és el que aparecerá seleccionado por defecto al activar la firma.",
+    "context": "The default token is the one that will be selected by default when the signature is activated."
+  },
+  {
+    "term": "component.signature-tokens-table.set-as-default",
+    "definition": "Marcar predeterminado",
+    "context": "Set as default"
   },
   {
     "term": "component.solve-unreviewed-replies-dialog.approve",
@@ -3410,11 +3430,6 @@
     "context": "Actions"
   },
   {
-    "term": "generic.activate",
-    "definition": "Activar",
-    "context": "Activate"
-  },
-  {
     "term": "generic.activated",
     "definition": "Activado",
     "context": "Activated"
@@ -4030,11 +4045,6 @@
     "context": "The field is required"
   },
   {
-    "term": "generic.reset",
-    "definition": "Restablecer",
-    "context": "Reset"
-  },
-  {
     "term": "generic.save",
     "definition": "Guardar",
     "context": "Save"
@@ -4188,11 +4198,6 @@
     "term": "generic.upgrade-to-enable",
     "definition": "Actualiza tu plan para activar esta funcionalidad.",
     "context": "Upgrade to enable this feature."
-  },
-  {
-    "term": "generic.yes-reset",
-    "definition": "Sí, restablecer",
-    "context": "Yest, reset"
   },
   {
     "term": "generic.you",
@@ -4465,11 +4470,6 @@
     "context": "Select a user from your organization"
   },
   {
-    "term": "organization.integrations.parallel-api-button",
-    "definition": "Clave de la API",
-    "context": "API Key"
-  },
-  {
     "term": "organization.integrations.parallel-api-description",
     "definition": "Accede a nuestra API para automatizar todos tus flujos.",
     "context": "Access our API to automate all your flows."
@@ -4503,6 +4503,16 @@
     "term": "organization.role.normal",
     "definition": "Normal",
     "context": "Normal"
+  },
+  {
+    "term": "organization.signature-integrations.title",
+    "definition": "Integraciones de firmas",
+    "context": "Signature integrations"
+  },
+  {
+    "term": "organization.signature.add-new-token",
+    "definition": "Add token",
+    "context": "Añadir token"
   },
   {
     "term": "organization.usage.title",
@@ -4783,6 +4793,16 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Integración con Zapier",
     "context": "Zapier integration"
+  },
+  {
+    "term": "page.signature.upgrade-plan-alert-1",
+    "definition": "Actualmente tienes activadas las firmas de prueba ilimitadas incluidas en el plan gratuito.",
+    "context": "You currently have unlimited trial signatures included in the free plan."
+  },
+  {
+    "term": "page.signature.upgrade-plan-alert-2",
+    "definition": "<b>Amplia tu plan</b> para acceder a la integración de firma.",
+    "context": "<b>Upgrade your plan</b> to access signature integration."
   },
   {
     "term": "petition-access.header",

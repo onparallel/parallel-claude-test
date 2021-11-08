@@ -1,6 +1,5 @@
 import { DataProxy, gql } from "@apollo/client";
 import {
-  Badge,
   Box,
   Button,
   Center,
@@ -58,6 +57,7 @@ import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
+import { useTestSignatureDialog } from "../petition-compose/TestSignatureDialog";
 import { PublicLinkSettingsDialog, usePublicLinkSettingsDialog } from "./PublicLinkSettingsDialog";
 import { SignatureConfigDialog, useSignatureConfigDialog } from "./SignatureConfigDialog";
 import {

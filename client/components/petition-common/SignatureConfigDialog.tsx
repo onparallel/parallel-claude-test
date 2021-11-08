@@ -119,6 +119,7 @@ export function SignatureConfigDialog({
 
   return (
     <ConfirmDialog
+      hasCloseButton
       initialFocusRef={titleRef}
       size="xl"
       content={{

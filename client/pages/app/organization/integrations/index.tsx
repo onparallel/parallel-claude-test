@@ -1,22 +1,22 @@
 import { gql } from "@apollo/client";
 import {
+  Alert,
+  AlertIcon,
+  Badge,
+  Button,
   Center,
   Heading,
   HStack,
-  Stack,
-  Text,
-  Button,
-  StackProps,
   Image,
-  Badge,
-  Alert,
-  AlertIcon,
+  Stack,
+  StackProps,
+  Text,
 } from "@chakra-ui/react";
+import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { NormalLink } from "@parallel/components/common/Link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useAddSignaturitAPIKeyDialog } from "@parallel/components/organization/AddSignaturitAPIKeyDialog";
-import { useResetSignaturitTokenDialog } from "@parallel/components/organization/ResetSignaturitTokenDialog";
 import {
   OrganizationIntegrationsQuery,
   useOrganizationIntegrationsQuery,
@@ -34,22 +34,7 @@ function OrganizationIntegrations() {
   } = assertQuery(useOrganizationIntegrationsQuery());
   const sections = useOrganizationSections(me);
 
-  const addSignaturitAPIKey = useAddSignaturitAPIKeyDialog();
-  const resetSignaturit = useResetSignaturitTokenDialog();
-
   const signaturitEnabled = false;
-
-  const handleActivateSignaturit = async () => {
-    try {
-      await addSignaturitAPIKey({});
-    } catch {}
-  };
-
-  const handleResetSignaturit = async () => {
-    try {
-      await resetSignaturit({});
-    } catch {}
-  };
 
   const integrations = [
     {
@@ -75,15 +60,8 @@ function OrganizationIntegrations() {
         id: "organization.integrations.signaturit-description",
         defaultMessage: "Add digital signature to your requests.",
       }),
-      button: signaturitEnabled ? (
-        <Button variant="outline" onClick={handleResetSignaturit}>
-          <FormattedMessage id="generic.reset" defaultMessage="Reset" />
-        </Button>
-      ) : (
-        <Button colorScheme="purple" isDisabled={false} onClick={handleActivateSignaturit}>
-          <FormattedMessage id="generic.activate" defaultMessage="Activate" />
-        </Button>
-      ),
+      showButton: true,
+      route: "/app/organization/integrations/signature",
     },
     {
       isDisabled: true,
@@ -100,7 +78,8 @@ function OrganizationIntegrations() {
         id: "organization.integrations.zapier-description",
         defaultMessage: "Automate your workflows using its +400 services.",
       }),
-      button: null,
+      showButton: false,
+      route: "",
     },
     {
       isDisabled: false,
@@ -120,14 +99,8 @@ function OrganizationIntegrations() {
         id: "organization.integrations.parallel-api-description",
         defaultMessage: "Access our API to automate all your flows.",
       }),
-      button: (
-        <Button colorScheme="purple">
-          <FormattedMessage
-            id="organization.integrations.parallel-api-button"
-            defaultMessage="API Key"
-          />
-        </Button>
-      ),
+      showButton: true,
+      route: "/app/settings/developers",
     },
   ];
 
@@ -149,7 +122,7 @@ function OrganizationIntegrations() {
         </Heading>
       }
     >
-      <Stack padding={4} spacing={4} maxWidth="container.sm" w="100%">
+      <Stack padding={4} spacing={5} maxWidth="container.sm" w="100%">
         {integrations.map((integration, index) => (
           <Integration key={index} {...integration} />
         ))}
@@ -163,7 +136,13 @@ function OrganizationIntegrations() {
               />
             </Text>
             <Center>
-              <Button variant="outline" backgroundColor="white" colorScheme="blue">
+              <Button
+                as="a"
+                variant="outline"
+                backgroundColor="white"
+                colorScheme="blue"
+                href="mailto:support@onparallel.com"
+              >
                 <FormattedMessage id="generic.contact" defaultMessage="Contact" />
               </Button>
             </Center>
@@ -179,42 +158,73 @@ interface IntegrationProps extends StackProps {
   title: string;
   body: string;
   badge: ReactNode | null;
-  button: ReactNode | null;
   isDisabled: boolean;
+  showButton: boolean;
+  route: string;
 }
 
-function Integration({ logo, title, body, badge, button, isDisabled, ...props }: IntegrationProps) {
-  return (
-    <Stack
-      direction={{ base: "column", md: "row" }}
+function Integration({
+  logo,
+  title,
+  body,
+  badge,
+  isDisabled,
+  showButton,
+  route,
+  ...props
+}: IntegrationProps) {
+  const content = (
+    <HStack
+      position="relative"
       width="100%"
       backgroundColor="white"
       rounded="lg"
       shadow="short"
       paddingX={6}
       paddingY={4}
-      spacing={6}
       border="1px solid"
       borderColor={isDisabled ? "gray.100" : "gray.200"}
+      cursor={isDisabled ? "not-allowed" : "pointer"}
+      transition="all 0.3s ease"
       sx={{
         " > * ": {
           opacity: isDisabled ? 0.4 : 1,
         },
+        _hover: isDisabled
+          ? {}
+          : {
+              boxShadow: "long",
+              backgroundColor: "gray.50",
+            },
       }}
       {...props}
     >
-      <Center>{logo}</Center>
-      <Stack flex="1">
-        <HStack>
-          <Text fontSize="xl" as="b">
-            {title}
-          </Text>{" "}
-          {badge}
-        </HStack>
-        <Text color="gray.600">{body}</Text>
+      <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={6}>
+        <Center>{logo}</Center>
+        <Stack flex="1" paddingRight={10}>
+          <HStack>
+            <Text fontSize="xl" as="b">
+              {title}
+            </Text>
+            {badge}
+          </HStack>
+          <Text color="gray.600">{body}</Text>
+        </Stack>
       </Stack>
-      <Center>{button}</Center>
-    </Stack>
+      {showButton ? (
+        <Center position="absolute" right="0" paddingRight={5}>
+          <ChevronRightIcon boxSize={8} />
+        </Center>
+      ) : null}
+    </HStack>
+  );
+  if (isDisabled) {
+    return content;
+  }
+  return (
+    <NormalLink rounded="lg" href={route} color="inherit" _hover={{ color: "inherit" }}>
+      {content}
+    </NormalLink>
   );
 }
 
