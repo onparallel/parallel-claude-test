@@ -12,6 +12,12 @@ import { deleteAllData } from "../src/util/knexUtils";
 
 export async function seed(knex: Knex): Promise<any> {
   await deleteAllData(knex);
+
+  await knex.raw(/* sql */ `
+    insert into feature_flag (name, default_value)
+    select unnest(enum_range(NULL::feature_flag_name)) as name, true as default_value
+  `);
+
   const orgs: CreateOrganization[] = [
     {
       name: "Parallel",

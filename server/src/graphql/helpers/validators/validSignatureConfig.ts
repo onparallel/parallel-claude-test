@@ -26,17 +26,9 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           `Invalid orgIntegrationId: ${orgIntegrationId}`
         );
       }
-      const [hasFeatureFlag, integration] = await Promise.all([
-        ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, "PETITION_SIGNATURE"),
-        ctx.integrations.loadIntegration(integrationId),
-      ]);
-      if (!hasFeatureFlag) {
-        throw new ArgValidationError(
-          info,
-          `${argName}`,
-          `Petition signature is not available for this user.`
-        );
-      }
+
+      const integration = await ctx.integrations.loadIntegration(integrationId);
+
       if (
         integration?.type !== "SIGNATURE" ||
         !integration.is_enabled ||

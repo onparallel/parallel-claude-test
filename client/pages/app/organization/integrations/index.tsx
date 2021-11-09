@@ -34,8 +34,6 @@ function OrganizationIntegrations() {
   } = assertQuery(useOrganizationIntegrationsQuery());
   const sections = useOrganizationSections(me);
 
-  const signaturitEnabled = false;
-
   const integrations = [
     {
       isDisabled: false,
@@ -46,7 +44,7 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
-      badge: signaturitEnabled ? (
+      badge: me.hasPetitionSignature ? (
         <Badge colorScheme="green">
           <FormattedMessage id="generic.activated" defaultMessage="Activated" />
         </Badge>
@@ -82,7 +80,7 @@ function OrganizationIntegrations() {
       route: "",
     },
     {
-      isDisabled: false,
+      isDisabled: !me.hasApiTokens,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
@@ -99,7 +97,7 @@ function OrganizationIntegrations() {
         id: "organization.integrations.parallel-api-description",
         defaultMessage: "Access our API to automate all your flows.",
       }),
-      showButton: true,
+      showButton: me.hasApiTokens,
       route: "/app/settings/developers",
     },
   ];
@@ -236,6 +234,8 @@ OrganizationIntegrations.getInitialProps = async ({
     query OrganizationIntegrations {
       me {
         id
+        hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+        hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
         ...SettingsLayout_User
       }
     }

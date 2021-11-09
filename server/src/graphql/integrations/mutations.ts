@@ -16,6 +16,7 @@ export const markSignatureIntegrationAsDefault = mutationField(
     description: "marks a Signature integration as default",
     authorize: authenticateAnd(
       contextUserIsAdmin(),
+      userHasFeatureFlag("PETITION_SIGNATURE"),
       userHasAccessToIntegrations("id", ["SIGNATURE"])
     ),
     args: {
@@ -72,6 +73,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
   type: "Result",
   authorize: authenticateAnd(
     contextUserIsAdmin(),
+    userHasFeatureFlag("PETITION_SIGNATURE"),
     userHasAccessToIntegrations("id", ["SIGNATURE"])
   ),
   args: {
@@ -85,7 +87,8 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
     if (pendingSignatures.length > 0 && !args.force) {
       throw new WhitelistedError(
         "There are pending signature requests using this integration. Pass `force` argument to cancel this requests and delete the integration.",
-        "SIGNATURE_INTEGRATION_IN_USE_ERROR"
+        "SIGNATURE_INTEGRATION_IN_USE_ERROR",
+        { pendingSignaturesCount: pendingSignatures.length }
       );
     }
 

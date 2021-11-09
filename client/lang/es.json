@@ -75,6 +75,11 @@
     "context": "API Key"
   },
   {
+    "term": "component.add-signature-apikey-dialog.apikey-required-error",
+    "definition": "Por favor, introduzca una clave API",
+    "context": "Please, enter an API Key"
+  },
+  {
     "term": "component.add-signature-apikey-dialog.checkbox-set-default",
     "definition": "Marcar como predeterminado",
     "context": "Set as default"
@@ -88,6 +93,11 @@
     "term": "component.add-signature-apikey-dialog.name-help",
     "definition": "No podrás cambiar este valor despues de crearse.",
     "context": "You will not be able to change this value after it is created."
+  },
+  {
+    "term": "component.add-signature-apikey-dialog.name-required-error",
+    "definition": "El nombre es obligatorio",
+    "context": "Name is required"
   },
   {
     "term": "component.add-signature-apikey-dialog.title",
@@ -1740,6 +1750,16 @@
     "context": "Language of the template"
   },
   {
+    "term": "component.petition-settings.test-badge",
+    "definition": "prueba",
+    "context": "test"
+  },
+  {
+    "term": "component.petition-settings.test-badge-popover",
+    "definition": "El modo de prueba, te permite enviar firmas pero no tendrán ninguna validez legal. Para activar la firma digital, <a>contacta con nuestro equipo de soporte.</a>",
+    "context": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
+  },
+  {
     "term": "component.petition-sharing-dialog.subscribe",
     "definition": "Subscribir a las notificaciones",
     "context": "Subscribe to notifications"
@@ -2758,6 +2778,16 @@
     "term": "component.signature-tokens-table.default-description",
     "definition": "El token predeterminado és el que aparecerá seleccionado por defecto al activar la firma.",
     "context": "The default token is the one that will be selected by default when the signature is activated."
+  },
+  {
+    "term": "component.signature-tokens-table.default-token",
+    "definition": "Token por defecto",
+    "context": "Default token"
+  },
+  {
+    "term": "component.signature-tokens-table.delete-token",
+    "definition": "Borrar token",
+    "context": "Delete token"
   },
   {
     "term": "component.signature-tokens-table.set-as-default",
@@ -4793,6 +4823,16 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Integración con Zapier",
     "context": "Zapier integration"
+  },
+  {
+    "term": "page.signature.invalid-apikey-toast-description",
+    "definition": "Clave API inválida",
+    "context": "Invalid API Key"
+  },
+  {
+    "term": "page.signature.invalid-apikey-toast-title",
+    "definition": "Error",
+    "context": "Error"
   },
   {
     "term": "page.signature.upgrade-plan-alert-1",

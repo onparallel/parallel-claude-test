@@ -1,9 +1,10 @@
 import { Button } from "@chakra-ui/button";
 import { Checkbox } from "@chakra-ui/checkbox";
-import { FormControl, FormLabel } from "@chakra-ui/form-control";
+import { FormControl, FormLabel, FormErrorMessage } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { HStack, Stack, Text } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
+import { SignatureIntegrationProvider } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -15,23 +16,27 @@ import { NormalLink } from "../common/Link";
 
 interface AddSignatureAPIKeyDialogData {
   name: string;
-  provider: string;
-  apikey: string;
+  provider: SignatureIntegrationProvider;
+  apiKey: string;
   isDefault: boolean;
 }
 
 function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIKeyDialogData>) {
-  const { handleSubmit, register } = useForm<AddSignatureAPIKeyDialogData>({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<AddSignatureAPIKeyDialogData>({
     defaultValues: {
       name: "Signaturit",
       provider: "SIGNATURIT",
-      apikey: "",
+      apiKey: "",
       isDefault: false,
     },
   });
 
   const apikeyRef = useRef<HTMLInputElement>(null);
-  const apikeyRegisterProps = useRegisterWithRef(apikeyRef, register, "apikey", {
+  const apikeyRegisterProps = useRegisterWithRef(apikeyRef, register, "apiKey", {
     required: true,
   });
 
@@ -57,7 +62,7 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
             <FormLabel>Proveedor de firma</FormLabel>
             <Select variant="outline" placeholder="Signaturit" isDisabled={true} />
           </FormControl>
-          <FormControl id="name">
+          <FormControl id="name" isInvalid={!!errors.name}>
             <FormLabel>
               <FormattedMessage id="generic.name" defaultMessage="Name" />
             </FormLabel>
@@ -67,6 +72,12 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
                   required: true,
                 })}
               />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="component.add-signature-apikey-dialog.name-required-error"
+                  defaultMessage="Name is required"
+                />
+              </FormErrorMessage>
               <Text fontSize="sm">
                 <FormattedMessage
                   id="component.add-signature-apikey-dialog.name-help"
@@ -75,7 +86,7 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
               </Text>
             </Stack>
           </FormControl>
-          <FormControl id="apikey">
+          <FormControl id="apikey" isInvalid={!!errors.apiKey}>
             <FormLabel>
               <HStack alignContent="center">
                 <FormattedMessage
@@ -94,6 +105,12 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
             </FormLabel>
             <Stack>
               <Input {...apikeyRegisterProps} />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="component.add-signature-apikey-dialog.apikey-required-error"
+                  defaultMessage="Please, enter an API Key"
+                />
+              </FormErrorMessage>
               <Text fontSize="sm">
                 <FormattedMessage
                   id="component.add-signature-apikey-dialog.help"

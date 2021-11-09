@@ -4,8 +4,14 @@ import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 
-function DeleteSignatureErrorConfirmationDialog({ ...props }: DialogProps) {
-  const signaturesOpen = 3;
+export type DeleteSignatureErrorConfirmationDialogProps = {
+  pendingSignaturesCount: number;
+};
+
+function DeleteSignatureErrorConfirmationDialog({
+  pendingSignaturesCount,
+  ...props
+}: DialogProps<DeleteSignatureErrorConfirmationDialogProps, void>) {
   return (
     <ConfirmDialog
       hasCloseButton
@@ -22,7 +28,7 @@ function DeleteSignatureErrorConfirmationDialog({ ...props }: DialogProps) {
           <FormattedMessage
             id="component.delete-signature-error-confirmation.body"
             defaultMessage="We have detected <b>{count}</b> pending signature processes that use this token. If you delete it, they will all be cancelled. Are you sure you want to delete it?"
-            values={{ count: signaturesOpen }}
+            values={{ count: pendingSignaturesCount }}
           />
         </Text>
       }

@@ -28,6 +28,7 @@ import { omit } from "remeda";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
+import { sortBy } from "remeda";
 
 export type SignatureConfigDialogProps = {
   petition: SignatureConfigDialog_PetitionBaseFragment;
@@ -65,7 +66,7 @@ export function SignatureConfigDialog({
         ...omit(signer, ["contactId", "__typename"]),
         id: signer.contactId!,
       })),
-      provider: petition.signatureConfig?.integration ?? providers[0],
+      provider: petition.signatureConfig?.integration ?? sortBy(providers, (p) => !p.isDefault)[0],
       review: petition.signatureConfig?.review ?? true,
       title: petition.signatureConfig?.title ?? petition.name ?? "",
       letRecipientsChooseSigners: petition.signatureConfig?.letRecipientsChooseSigners ?? false,
@@ -369,6 +370,8 @@ SignatureConfigDialog.fragments = {
         id
         value: id
         label: name
+        isDefault
+        status
       }
     `;
   },

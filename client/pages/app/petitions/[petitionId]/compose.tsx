@@ -33,12 +33,13 @@ import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-c
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
-import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/PublicTemplateDialog";
 import { useReferencedFieldDialog } from "@parallel/components/petition-compose/ReferencedFieldDialog";
+import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
+import { useTestSignatureDialog } from "@parallel/components/petition-compose/TestSignatureDialog";
 import {
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
@@ -73,6 +74,7 @@ import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -359,6 +361,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return true;
   };
 
+  const [dontShowTestSignature, setDontShowTestSignature] = useUserPreference(
+    "dont-show-test-signature-dialog",
+    false
+  );
+  const showTestSignatureDialog = useTestSignatureDialog();
+
   const showErrorDialog = useErrorDialog();
   const [batchSendPetition] = usePetitionCompose_batchSendPetitionMutation();
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
@@ -372,7 +380,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     const isFieldsValid = await validPetitionFields();
     if (!isFieldsValid) return;
 
+    console.log(petition.signatureConfig);
+
     try {
+      if (!dontShowTestSignature && petition.signatureConfig?.integration?.status === "DEMO") {
+        const { dontShow } = await showTestSignatureDialog({});
+        if (dontShow) {
+          setDontShowTestSignature(true);
+        }
+      }
+
       const {
         recipientIdGroups,
         subject,

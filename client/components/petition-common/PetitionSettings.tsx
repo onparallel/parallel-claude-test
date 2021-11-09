@@ -15,6 +15,7 @@ import {
   Select,
   Stack,
   Switch,
+  Badge,
   Text,
 } from "@chakra-ui/react";
 import {
@@ -47,7 +48,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop, pick } from "remeda";
@@ -55,9 +55,10 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
+import { NormalLink } from "../common/Link";
+import { SmallPopover } from "../common/SmallPopover";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
-import { useTestSignatureDialog } from "../petition-compose/TestSignatureDialog";
 import { PublicLinkSettingsDialog, usePublicLinkSettingsDialog } from "./PublicLinkSettingsDialog";
 import { SignatureConfigDialog, useSignatureConfigDialog } from "./SignatureConfigDialog";
 import {
@@ -94,28 +95,15 @@ function _PetitionSettings({
 
   const publicLink = petition.__typename === "PetitionTemplate" ? petition.publicLink : null;
 
-  const [dontShowTestSignature, setDontShowTestSignature] = useUserPreference(
-    "dont-show-test-signature-dialog",
-    false
-  );
-
   const showSignatureConfigDialog = useSignatureConfigDialog();
-
   const showConfirmConfigureOngoingSignature = useDialog(ConfirmConfigureOngoingSignature);
   const showConfirmSignatureConfigChanged = useDialog(ConfirmSignatureConfigChanged);
-  const showTestSignatureDialog = useTestSignatureDialog();
+
   const [cancelSignatureRequest] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
   const [startSignatureRequest] = usePetitionSettings_startPetitionSignatureRequestMutation();
 
   async function handleConfigureSignatureClick() {
     try {
-      // TODO: comprobar si está en modo TEST
-      if (!dontShowTestSignature) {
-        const { dontShow } = await showTestSignatureDialog({});
-        if (dontShow) {
-          setDontShowTestSignature(true);
-        }
-      }
       if (ongoingSignatureRequest) {
         await showConfirmConfigureOngoingSignature({});
       }
@@ -351,10 +339,36 @@ function _PetitionSettings({
           <SwitchSetting
             icon={<SignatureIcon />}
             label={
-              <FormattedMessage
-                id="component.petition-settings.petition-signature-enable"
-                defaultMessage="Enable eSignature"
-              />
+              <HStack>
+                <FormattedMessage
+                  id="component.petition-settings.petition-signature-enable"
+                  defaultMessage="Enable eSignature"
+                />
+                {petition.signatureConfig?.integration?.status === "DEMO" || !hasSignature ? (
+                  <SmallPopover
+                    content={
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="component.petition-settings.test-badge-popover"
+                          defaultMessage="Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
+                          values={{
+                            a: (chunks: any) => (
+                              <NormalLink href="mailto:support@onparallel.com">{chunks}</NormalLink>
+                            ),
+                          }}
+                        />
+                      </Text>
+                    }
+                  >
+                    <Badge colorScheme="yellow" textTransform="uppercase">
+                      <FormattedMessage
+                        id="component.petition-settings.test-badge"
+                        defaultMessage="test"
+                      />
+                    </Badge>
+                  </SmallPopover>
+                ) : null}
+              </HStack>
             }
             onChange={handleSignatureChange}
             isChecked={Boolean(petition.signatureConfig)}

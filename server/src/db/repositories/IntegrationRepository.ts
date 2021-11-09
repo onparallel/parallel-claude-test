@@ -50,6 +50,7 @@ export class IntegrationRepository extends BaseRepository {
           }
         })
         .orderBy("created_at", "desc")
+        .orderBy("id", "desc")
         .select("*"),
       opts
     );

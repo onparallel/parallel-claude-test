@@ -1,3 +1,4 @@
+import { ApolloQueryResult } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -12,6 +13,7 @@ import {
   Stack,
   Text,
   Tooltip,
+  useToast,
 } from "@chakra-ui/react";
 import { DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -26,13 +28,19 @@ import { useAddSignatureAPIKeyDialog } from "@parallel/components/organization/A
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/DeleteSignatureErrorConfirmationDialog";
 import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/DeleteSignatureTokenDialog";
 import {
+  Exact,
   IntegrationsSignatureQuery,
   useIntegrationsSignatureQuery,
+  useIntegrationsSignature_createSignatureIntegrationMutation,
+  useIntegrationsSignature_deleteSignatureIntegrationMutation,
+  useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { integer, parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import gql from "graphql-tag";
 import { useCallback, useMemo, useState } from "react";
@@ -47,7 +55,7 @@ const QUERY_STATE = {
 function IntegrationsSignature() {
   const intl = useIntl();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-
+  const toast = useToast();
   const {
     data: { me },
     loading,
@@ -55,12 +63,12 @@ function IntegrationsSignature() {
   } = useAssertQueryOrPreviousData(
     useIntegrationsSignatureQuery({
       variables: {
+        offset: state.items * (state.page - 1),
         limit: state.items,
       },
     })
   );
 
-  console.log("signature me: ", me);
   const sections = useOrganizationSections(me);
 
   const [search, setSearch] = useState(state.search);
@@ -84,15 +92,48 @@ function IntegrationsSignature() {
     [debouncedOnSearchChange]
   );
 
-  const columns = useSignatureTokensTableColumns();
+  const columns = useSignatureTokensTableColumns({
+    refetch,
+    hasSignature: me.hasPetitionSignature,
+  });
 
   const addSignaturitAPIKey = useAddSignatureAPIKeyDialog();
+
+  const [createSignatureIntegration] =
+    useIntegrationsSignature_createSignatureIntegrationMutation();
+
+  const genericErrorToast = useGenericErrorToast();
 
   const handleAddSignatureToken = async () => {
     try {
       const data = await addSignaturitAPIKey({});
-      console.log("data: ", data);
-    } catch {}
+
+      await createSignatureIntegration({
+        variables: data,
+      });
+
+      refetch();
+    } catch (error) {
+      if (isApolloError(error)) {
+        console.log("error: ", error.graphQLErrors[0]?.extensions?.code);
+        if (error.graphQLErrors[0]?.extensions?.code === "INVALID_APIKEY_ERROR") {
+          toast({
+            title: intl.formatMessage({
+              id: "page.signature.invalid-apikey-toast-title",
+              defaultMessage: "Error",
+            }),
+            description: intl.formatMessage({
+              id: "page.signature.invalid-apikey-toast-description",
+              defaultMessage: "Invalid API Key",
+            }),
+            status: "error",
+            isClosable: true,
+          });
+        } else {
+          genericErrorToast();
+        }
+      }
+    }
   };
 
   return (
@@ -131,6 +172,7 @@ function IntegrationsSignature() {
           totalCount={me.organization.signatureIntegrations.totalCount}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
+          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <Stack direction="row" padding={2}>
               <Box flex="0 1 400px">
@@ -150,7 +192,11 @@ function IntegrationsSignature() {
                 })}
               />
               <Spacer />
-              <Button isDisabled={false} colorScheme="purple" onClick={handleAddSignatureToken}>
+              <Button
+                isDisabled={!me.hasPetitionSignature}
+                colorScheme="purple"
+                onClick={handleAddSignatureToken}
+              >
                 <FormattedMessage
                   id="organization.signature.add-new-token"
                   defaultMessage="Añadir token"
@@ -159,54 +205,108 @@ function IntegrationsSignature() {
             </Stack>
           }
         />
-
-        <Alert status="info" rounded="md">
-          <AlertIcon />
-          <HStack spacing={8} flex="1">
-            <Box flex="1">
-              <Text>
-                <FormattedMessage
-                  id="page.signature.upgrade-plan-alert-1"
-                  defaultMessage="You currently have unlimited trial signatures included in the free plan."
-                />
-              </Text>
-              <Text>
-                <FormattedMessage
-                  id="page.signature.upgrade-plan-alert-2"
-                  defaultMessage="<b>Upgrade your plan</b> to access signature integration."
-                />
-              </Text>
-            </Box>
-            <Center>
-              <Button
-                as="a"
-                variant="outline"
-                backgroundColor="white"
-                colorScheme="blue"
-                href="mailto:support@onparallel.com"
-              >
-                <FormattedMessage id="generic.contact" defaultMessage="Contact" />
-              </Button>
-            </Center>
-          </HStack>
-        </Alert>
+        {!me.hasPetitionSignature ? (
+          <Alert status="info" rounded="md">
+            <AlertIcon />
+            <HStack spacing={8} flex="1">
+              <Box flex="1">
+                <Text>
+                  <FormattedMessage
+                    id="page.signature.upgrade-plan-alert-1"
+                    defaultMessage="You currently have unlimited trial signatures included in the free plan."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="page.signature.upgrade-plan-alert-2"
+                    defaultMessage="<b>Upgrade your plan</b> to access signature integration."
+                  />
+                </Text>
+              </Box>
+              <Center>
+                <Button
+                  as="a"
+                  variant="outline"
+                  backgroundColor="white"
+                  colorScheme="blue"
+                  href="mailto:support@onparallel.com"
+                >
+                  <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+                </Button>
+              </Center>
+            </HStack>
+          </Alert>
+        ) : null}
       </Stack>
     </SettingsLayout>
   );
 }
 
-function useSignatureTokensTableColumns(): TableColumn<any>[] {
+function useSignatureTokensTableColumns({
+  refetch,
+  hasSignature,
+}: {
+  refetch: (
+    variables?:
+      | Partial<
+          Exact<{
+            limit: number;
+          }>
+        >
+      | undefined
+  ) => Promise<ApolloQueryResult<IntegrationsSignatureQuery>>;
+  hasSignature: boolean;
+}): TableColumn<any>[] {
   const intl = useIntl();
 
   const removeSignatureToken = useDeleteSignatureTokenDialog();
   const confirmRemoveSignatureToken = useDeleteSignatureErrorConfirmationDialog();
 
+  const [deleteSignatureIntegration] =
+    useIntegrationsSignature_deleteSignatureIntegrationMutation();
+
   const handleRemoveToken = async (id: string) => {
-    console.log("remove signature: ", id);
     try {
       await removeSignatureToken({});
-      await confirmRemoveSignatureToken({});
-    } catch {}
+
+      await deleteSignatureIntegration({
+        variables: {
+          id,
+        },
+      });
+
+      refetch();
+    } catch (error) {
+      if (
+        isApolloError(error) &&
+        error.graphQLErrors[0]?.extensions?.code === "SIGNATURE_INTEGRATION_IN_USE_ERROR"
+      ) {
+        await confirmRemoveSignatureToken({
+          pendingSignaturesCount: error.graphQLErrors[0]?.extensions?.pendingSignaturesCount,
+        });
+
+        await deleteSignatureIntegration({
+          variables: {
+            id,
+            force: true,
+          },
+        });
+      }
+    }
+  };
+
+  const [markIntegrationAsDefault] =
+    useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation();
+
+  const handleMarkAsDefault = async (id: string) => {
+    try {
+      await markIntegrationAsDefault({
+        variables: {
+          id,
+        },
+      });
+      refetch();
+    } catch (error) {}
   };
 
   function capitalize(text: string) {
@@ -266,7 +366,10 @@ function useSignatureTokensTableColumns(): TableColumn<any>[] {
               >
                 <IconButton
                   variant="ghost"
-                  aria-label="favorite"
+                  aria-label={intl.formatMessage({
+                    id: "component.signature-tokens-table.default-token",
+                    defaultMessage: "Default token",
+                  })}
                   color="purple.600"
                   fill="purple.600"
                   _hover={{}}
@@ -285,23 +388,32 @@ function useSignatureTokensTableColumns(): TableColumn<any>[] {
               >
                 <IconButton
                   variant="ghost"
-                  aria-label="favorite"
+                  aria-label={intl.formatMessage({
+                    id: "component.signature-tokens-table.set-as-default",
+                    defaultMessage: "Set as default",
+                  })}
                   color="gray.400"
                   fill="none"
                   _hover={{ color: "gray.500", fill: "gray.100" }}
                   icon={<StarIcon />}
                   size="sm"
                   fontSize={"16px"}
+                  onClick={() => handleMarkAsDefault(row.id)}
+                  isDisabled={!hasSignature}
                 />
               </Tooltip>
             )}
 
             <IconButton
-              aria-label="delete"
+              aria-label={intl.formatMessage({
+                id: "component.signature-tokens-table.delete-token",
+                defaultMessage: "Delete token",
+              })}
               icon={<DeleteIcon />}
               size="sm"
               fontSize={"16px"}
               onClick={() => handleRemoveToken(row.id)}
+              isDisabled={!hasSignature}
             />
           </HStack>
         ),
@@ -311,21 +423,64 @@ function useSignatureTokensTableColumns(): TableColumn<any>[] {
   );
 }
 
+IntegrationsSignature.mutations = [
+  gql`
+    mutation IntegrationsSignature_createSignatureIntegration(
+      $name: String!
+      $provider: SignatureIntegrationProvider!
+      $apiKey: String!
+      $isDefault: Boolean
+    ) {
+      createSignatureIntegration(
+        name: $name
+        provider: $provider
+        apiKey: $apiKey
+        isDefault: $isDefault
+      ) {
+        id
+        name
+        type
+        provider
+        isDefault
+        status
+      }
+    }
+  `,
+  gql`
+    mutation IntegrationsSignature_markSignatureIntegrationAsDefault($id: GID!) {
+      markSignatureIntegrationAsDefault(id: $id) {
+        id
+        name
+        type
+        provider
+        isDefault
+        status
+      }
+    }
+  `,
+  gql`
+    mutation IntegrationsSignature_deleteSignatureIntegration($id: GID!, $force: Boolean) {
+      deleteSignatureIntegration(id: $id, force: $force)
+    }
+  `,
+];
+
 IntegrationsSignature.getInitialProps = async ({
   fetchQuery,
   ...context
 }: WithApolloDataContext) => {
-  const { items } = parseQuery(context.query, QUERY_STATE);
+  const { items, page } = parseQuery(context.query, QUERY_STATE);
 
   await fetchQuery<IntegrationsSignatureQuery>(
     gql`
-      query IntegrationsSignature($limit: Int!) {
+      query IntegrationsSignature($limit: Int!, $offset: Int!) {
         me {
           id
+          hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
           ...SettingsLayout_User
           organization {
             id
-            signatureIntegrations: integrations(type: SIGNATURE, limit: $limit) {
+            signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
               items {
                 id
                 name
@@ -342,6 +497,7 @@ IntegrationsSignature.getInitialProps = async ({
     `,
     {
       variables: {
+        offset: items * (page - 1),
         limit: items,
       },
     }

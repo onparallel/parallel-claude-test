@@ -75,6 +75,11 @@
     "context": "API Key"
   },
   {
+    "term": "component.add-signature-apikey-dialog.apikey-required-error",
+    "definition": "Please, enter an API Key",
+    "context": "Please, enter an API Key"
+  },
+  {
     "term": "component.add-signature-apikey-dialog.checkbox-set-default",
     "definition": "Set as default",
     "context": "Set as default"
@@ -88,6 +93,11 @@
     "term": "component.add-signature-apikey-dialog.name-help",
     "definition": "You will not be able to change this value after it is created.",
     "context": "You will not be able to change this value after it is created."
+  },
+  {
+    "term": "component.add-signature-apikey-dialog.name-required-error",
+    "definition": "Name is required",
+    "context": "Name is required"
   },
   {
     "term": "component.add-signature-apikey-dialog.title",
@@ -1740,6 +1750,16 @@
     "context": "Language of the template"
   },
   {
+    "term": "component.petition-settings.test-badge",
+    "definition": "test",
+    "context": "test"
+  },
+  {
+    "term": "component.petition-settings.test-badge-popover",
+    "definition": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>",
+    "context": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
+  },
+  {
     "term": "component.petition-sharing-dialog.subscribe",
     "definition": "Subscribe to notifications",
     "context": "Subscribe to notifications"
@@ -2758,6 +2778,16 @@
     "term": "component.signature-tokens-table.default-description",
     "definition": "The default token is the one that will be selected by default when the signature is activated.",
     "context": "The default token is the one that will be selected by default when the signature is activated."
+  },
+  {
+    "term": "component.signature-tokens-table.default-token",
+    "definition": "Default token",
+    "context": "Default token"
+  },
+  {
+    "term": "component.signature-tokens-table.delete-token",
+    "definition": "Delete token",
+    "context": "Delete token"
   },
   {
     "term": "component.signature-tokens-table.set-as-default",
@@ -4793,6 +4823,16 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Zapier integration",
     "context": "Zapier integration"
+  },
+  {
+    "term": "page.signature.invalid-apikey-toast-description",
+    "definition": "Invalid API Key",
+    "context": "Invalid API Key"
+  },
+  {
+    "term": "page.signature.invalid-apikey-toast-title",
+    "definition": "Error",
+    "context": "Error"
   },
   {
     "term": "page.signature.upgrade-plan-alert-1",

@@ -5355,10 +5355,10 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
       signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
         items: Array<
-          { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-              value: OrgIntegration["id"];
-              label: OrgIntegration["name"];
-            }
+          { __typename?: "OrgIntegration" } & Pick<
+            OrgIntegration,
+            "id" | "isDefault" | "status"
+          > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
         >;
       };
     };
@@ -5385,10 +5385,10 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = { __typename?: "Pe
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -5445,10 +5445,10 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -5900,10 +5900,10 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -5924,10 +5924,10 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -5945,7 +5945,7 @@ export type SignatureConfigDialog_PetitionBaseFragment =
 
 export type SignatureConfigDialog_OrgIntegrationFragment = { __typename?: "OrgIntegration" } & Pick<
   OrgIntegration,
-  "id"
+  "id" | "isDefault" | "status"
 > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] };
 
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
@@ -6506,7 +6506,7 @@ export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
   organization: { __typename?: "Organization" } & {
     signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
       items: Array<
-        { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
+        { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id" | "isDefault" | "status"> & {
             value: OrgIntegration["id"];
             label: OrgIntegration["name"];
           }
@@ -6550,10 +6550,10 @@ export type PetitionSignaturesCard_PetitionFragment = { __typename?: "Petition" 
         "title" | "review" | "letRecipientsChooseSigners" | "timezone"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id" | "name" | "provider"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "name" | "provider" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -6606,7 +6606,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
                 integration?: Maybe<
                   { __typename?: "OrgIntegration" } & Pick<
                     OrgIntegration,
-                    "id" | "name" | "provider"
+                    "id" | "name" | "provider" | "isDefault" | "status"
                   > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
                 signers: Array<
@@ -8143,7 +8143,7 @@ export type OrganizationIntegrationsQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & {
+  > & { hasPetitionSignature: User["hasFeatureFlag"]; hasApiTokens: User["hasFeatureFlag"] } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -8155,8 +8155,44 @@ export type OrganizationIntegrationsQuery = {
     };
 };
 
+export type IntegrationsSignature_createSignatureIntegrationMutationVariables = Exact<{
+  name: Scalars["String"];
+  provider: SignatureIntegrationProvider;
+  apiKey: Scalars["String"];
+  isDefault?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type IntegrationsSignature_createSignatureIntegrationMutation = {
+  createSignatureIntegration: { __typename?: "OrgIntegration" } & Pick<
+    OrgIntegration,
+    "id" | "name" | "type" | "provider" | "isDefault" | "status"
+  >;
+};
+
+export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutationVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutation = {
+  markSignatureIntegrationAsDefault: { __typename?: "OrgIntegration" } & Pick<
+    OrgIntegration,
+    "id" | "name" | "type" | "provider" | "isDefault" | "status"
+  >;
+};
+
+export type IntegrationsSignature_deleteSignatureIntegrationMutationVariables = Exact<{
+  id: Scalars["GID"];
+  force?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type IntegrationsSignature_deleteSignatureIntegrationMutation = Pick<
+  Mutation,
+  "deleteSignatureIntegration"
+>;
+
 export type IntegrationsSignatureQueryVariables = Exact<{
   limit: Scalars["Int"];
+  offset: Scalars["Int"];
 }>;
 
 export type IntegrationsSignatureQuery = {
@@ -8173,7 +8209,7 @@ export type IntegrationsSignatureQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & {
+  > & { hasPetitionSignature: User["hasFeatureFlag"] } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & Pick<
             OrgIntegrationPagination,
@@ -9940,10 +9976,10 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Pet
             >
           >;
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
         }
     >;
@@ -10053,10 +10089,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -10124,10 +10160,10 @@ export type PetitionCompose_UserFragment = { __typename?: "User" } & Pick<
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
           items: Array<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
         };
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -10189,10 +10225,10 @@ export type PetitionCompose_updatePetitionMutation = {
                   >
                 >;
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                      value: OrgIntegration["id"];
-                      label: OrgIntegration["name"];
-                    }
+                  { __typename?: "OrgIntegration" } & Pick<
+                    OrgIntegration,
+                    "id" | "isDefault" | "status"
+                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
               }
           >;
@@ -10264,10 +10300,10 @@ export type PetitionCompose_updatePetitionMutation = {
               "title" | "review" | "letRecipientsChooseSigners"
             > & {
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                      value: OrgIntegration["id"];
-                      label: OrgIntegration["name"];
-                    }
+                  { __typename?: "OrgIntegration" } & Pick<
+                    OrgIntegration,
+                    "id" | "isDefault" | "status"
+                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
                 signers: Array<
                   { __typename?: "PetitionSigner" } & Pick<
@@ -10703,10 +10739,10 @@ export type PetitionComposeUserQuery = {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
             items: Array<
-              { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                  value: OrgIntegration["id"];
-                  label: OrgIntegration["name"];
-                }
+              { __typename?: "OrgIntegration" } & Pick<
+                OrgIntegration,
+                "id" | "isDefault" | "status"
+              > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
             >;
           };
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -10790,10 +10826,10 @@ export type PetitionComposeQuery = {
                   >
                 >;
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                      value: OrgIntegration["id"];
-                      label: OrgIntegration["name"];
-                    }
+                  { __typename?: "OrgIntegration" } & Pick<
+                    OrgIntegration,
+                    "id" | "isDefault" | "status"
+                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
               }
           >;
@@ -10908,10 +10944,10 @@ export type PetitionComposeQuery = {
               "title" | "review" | "letRecipientsChooseSigners"
             > & {
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                      value: OrgIntegration["id"];
-                      label: OrgIntegration["name"];
-                    }
+                  { __typename?: "OrgIntegration" } & Pick<
+                    OrgIntegration,
+                    "id" | "isDefault" | "status"
+                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
                 signers: Array<
                   { __typename?: "PetitionSigner" } & Pick<
@@ -11038,10 +11074,10 @@ export type PetitionReplies_PetitionFragment = { __typename?: "Petition" } & Pic
         "review" | "title" | "letRecipientsChooseSigners" | "timezone"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id" | "name" | "provider"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "name" | "provider" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -11128,10 +11164,10 @@ export type PetitionReplies_UserFragment = { __typename?: "User" } & Pick<
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
           items: Array<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                value: OrgIntegration["id"];
-                label: OrgIntegration["name"];
-              }
+            { __typename?: "OrgIntegration" } & Pick<
+              OrgIntegration,
+              "id" | "isDefault" | "status"
+            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
         };
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -11365,10 +11401,10 @@ export type PetitionRepliesUserQuery = {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
             items: Array<
-              { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id"> & {
-                  value: OrgIntegration["id"];
-                  label: OrgIntegration["name"];
-                }
+              { __typename?: "OrgIntegration" } & Pick<
+                OrgIntegration,
+                "id" | "isDefault" | "status"
+              > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
             >;
           };
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -11504,7 +11540,7 @@ export type PetitionRepliesQuery = {
                 integration?: Maybe<
                   { __typename?: "OrgIntegration" } & Pick<
                     OrgIntegration,
-                    "id" | "name" | "provider"
+                    "id" | "name" | "provider" | "isDefault" | "status"
                   > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
                 signers: Array<
@@ -15084,6 +15120,8 @@ export const SignatureConfigDialog_OrgIntegrationFragmentDoc = gql`
     id
     value: id
     label: name
+    isDefault
+    status
   }
 `;
 export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
@@ -19018,6 +19056,8 @@ export const OrganizationIntegrationsDocument = gql`
   query OrganizationIntegrations {
     me {
       id
+      hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+      hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
       ...SettingsLayout_User
     }
   }
@@ -19053,14 +19093,99 @@ export type OrganizationIntegrationsQueryHookResult = ReturnType<
 export type OrganizationIntegrationsLazyQueryHookResult = ReturnType<
   typeof useOrganizationIntegrationsLazyQuery
 >;
+export const IntegrationsSignature_createSignatureIntegrationDocument = gql`
+  mutation IntegrationsSignature_createSignatureIntegration(
+    $name: String!
+    $provider: SignatureIntegrationProvider!
+    $apiKey: String!
+    $isDefault: Boolean
+  ) {
+    createSignatureIntegration(
+      name: $name
+      provider: $provider
+      apiKey: $apiKey
+      isDefault: $isDefault
+    ) {
+      id
+      name
+      type
+      provider
+      isDefault
+      status
+    }
+  }
+`;
+export function useIntegrationsSignature_createSignatureIntegrationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    IntegrationsSignature_createSignatureIntegrationMutation,
+    IntegrationsSignature_createSignatureIntegrationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    IntegrationsSignature_createSignatureIntegrationMutation,
+    IntegrationsSignature_createSignatureIntegrationMutationVariables
+  >(IntegrationsSignature_createSignatureIntegrationDocument, options);
+}
+export type IntegrationsSignature_createSignatureIntegrationMutationHookResult = ReturnType<
+  typeof useIntegrationsSignature_createSignatureIntegrationMutation
+>;
+export const IntegrationsSignature_markSignatureIntegrationAsDefaultDocument = gql`
+  mutation IntegrationsSignature_markSignatureIntegrationAsDefault($id: GID!) {
+    markSignatureIntegrationAsDefault(id: $id) {
+      id
+      name
+      type
+      provider
+      isDefault
+      status
+    }
+  }
+`;
+export function useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    IntegrationsSignature_markSignatureIntegrationAsDefaultMutation,
+    IntegrationsSignature_markSignatureIntegrationAsDefaultMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    IntegrationsSignature_markSignatureIntegrationAsDefaultMutation,
+    IntegrationsSignature_markSignatureIntegrationAsDefaultMutationVariables
+  >(IntegrationsSignature_markSignatureIntegrationAsDefaultDocument, options);
+}
+export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutationHookResult = ReturnType<
+  typeof useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation
+>;
+export const IntegrationsSignature_deleteSignatureIntegrationDocument = gql`
+  mutation IntegrationsSignature_deleteSignatureIntegration($id: GID!, $force: Boolean) {
+    deleteSignatureIntegration(id: $id, force: $force)
+  }
+`;
+export function useIntegrationsSignature_deleteSignatureIntegrationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    IntegrationsSignature_deleteSignatureIntegrationMutation,
+    IntegrationsSignature_deleteSignatureIntegrationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    IntegrationsSignature_deleteSignatureIntegrationMutation,
+    IntegrationsSignature_deleteSignatureIntegrationMutationVariables
+  >(IntegrationsSignature_deleteSignatureIntegrationDocument, options);
+}
+export type IntegrationsSignature_deleteSignatureIntegrationMutationHookResult = ReturnType<
+  typeof useIntegrationsSignature_deleteSignatureIntegrationMutation
+>;
 export const IntegrationsSignatureDocument = gql`
-  query IntegrationsSignature($limit: Int!) {
+  query IntegrationsSignature($limit: Int!, $offset: Int!) {
     me {
       id
+      hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       ...SettingsLayout_User
       organization {
         id
-        signatureIntegrations: integrations(type: SIGNATURE, limit: $limit) {
+        signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
           items {
             id
             name
