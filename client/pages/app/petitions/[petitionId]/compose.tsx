@@ -384,7 +384,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
     try {
       if (!dontShowTestSignature && petition.signatureConfig?.integration?.status === "DEMO") {
-        const { dontShow } = await showTestSignatureDialog({});
+        const { dontShow } = await showTestSignatureDialog({
+          integrationName: petition.signatureConfig?.integration?.label ?? "",
+        });
         if (dontShow) {
           setDontShowTestSignature(true);
         }

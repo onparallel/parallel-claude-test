@@ -2790,6 +2790,16 @@
     "context": "Delete token"
   },
   {
+    "term": "component.signature-tokens-table.environment",
+    "definition": "Entorno",
+    "context": "Environment"
+  },
+  {
+    "term": "component.signature-tokens-table.provider",
+    "definition": "Proveedor",
+    "context": "Provider"
+  },
+  {
     "term": "component.signature-tokens-table.set-as-default",
     "definition": "Marcar predeterminado",
     "context": "Set as default"
@@ -2961,8 +2971,8 @@
   },
   {
     "term": "component.test-signature-dialog.body",
-    "definition": "Si continúas, se enviará la firma según la configuración indicada pero esta no tendrá ninguna validez legal. ",
-    "context": "If you continue, the signature will be sent according to the indicated configuration but it will not have any legal validity."
+    "definition": "Si continúas, se enviará la firma utilizando el entorno de pruebas <b>{env}</b> y no tendrá ninguna validez legal.",
+    "context": "If you continue, the signature will be sent using the <b>{env}</b> test environment and will have no legal validity."
   },
   {
     "term": "component.test-signature-dialog.dont-show-again",

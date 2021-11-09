@@ -10,7 +10,10 @@ interface TestSignatureDialogData {
   dontShow: boolean;
 }
 
-function TestSignatureDialog({ ...props }: DialogProps<{}, TestSignatureDialogData>) {
+function TestSignatureDialog({
+  integrationName,
+  ...props
+}: DialogProps<{ integrationName: string }, TestSignatureDialogData>) {
   const { handleSubmit, register } = useForm<{ dontShow: boolean }>({
     defaultValues: {
       dontShow: false,
@@ -36,7 +39,8 @@ function TestSignatureDialog({ ...props }: DialogProps<{}, TestSignatureDialogDa
           <Text>
             <FormattedMessage
               id="component.test-signature-dialog.body"
-              defaultMessage="If you continue, the signature will be sent according to the indicated configuration but it will not have any legal validity."
+              defaultMessage="If you continue, the signature will be sent using the <b>{env}</b> test environment and will have no legal validity."
+              values={{ env: integrationName }}
             />
           </Text>
           <Checkbox {...register("dontShow")}>

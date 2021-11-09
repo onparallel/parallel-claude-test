@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { NormalLink } from "@parallel/components/common/Link";
+import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
@@ -219,11 +219,7 @@ function Integration({
   if (isDisabled) {
     return content;
   }
-  return (
-    <NormalLink rounded="lg" href={route} color="inherit" _hover={{ color: "inherit" }}>
-      {content}
-    </NormalLink>
-  );
+  return <NakedLink href={route}>{content}</NakedLink>;
 }
 
 OrganizationIntegrations.getInitialProps = async ({

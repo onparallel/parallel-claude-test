@@ -18,7 +18,6 @@ import {
 import { DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { SearchInput } from "@parallel/components/common/SearchInput";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
@@ -38,18 +37,16 @@ import {
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
-import { integer, parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { integer, parseQuery, useQueryState, values } from "@parallel/utils/queryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import gql from "graphql-tag";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
-  search: string(),
 };
 
 function IntegrationsSignature() {
@@ -70,27 +67,6 @@ function IntegrationsSignature() {
   );
 
   const sections = useOrganizationSections(me);
-
-  const [search, setSearch] = useState(state.search);
-  const debouncedOnSearchChange = useDebouncedCallback(
-    (value) => {
-      setQueryState((current) => ({
-        ...current,
-        search: value,
-        page: 1,
-      }));
-    },
-    300,
-    [setQueryState]
-  );
-
-  const handleSearchChange = useCallback(
-    (value: string | null) => {
-      setSearch(value);
-      debouncedOnSearchChange(value || null);
-    },
-    [debouncedOnSearchChange]
-  );
 
   const columns = useSignatureTokensTableColumns({
     refetch,
@@ -175,12 +151,6 @@ function IntegrationsSignature() {
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <Stack direction="row" padding={2}>
-              <Box flex="0 1 400px">
-                <SearchInput
-                  value={search ?? ""}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                />
-              </Box>
               <IconButtonWithTooltip
                 onClick={() => refetch()}
                 icon={<RepeatIcon />}
@@ -331,7 +301,10 @@ function useSignatureTokensTableColumns({
       },
       {
         key: "provider",
-        header: "PROVIDER",
+        header: intl.formatMessage({
+          id: "component.signature-tokens-table.provider",
+          defaultMessage: "Provider",
+        }),
         CellContent: ({ row }) => (
           <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
             {capitalize(row.provider)}
@@ -340,7 +313,11 @@ function useSignatureTokensTableColumns({
       },
       {
         key: "status",
-        header: "STATE",
+        header: intl.formatMessage({
+          id: "component.signature-tokens-table.environment",
+          defaultMessage: "Environment",
+        }),
+        align: "center",
         CellContent: ({ row }) =>
           row.status === "DEMO" ? (
             <Badge colorScheme="yellow">TEST</Badge>
@@ -354,6 +331,7 @@ function useSignatureTokensTableColumns({
         cellProps: {
           width: "1px",
         },
+        align: "center",
         CellContent: ({ row }) => (
           <HStack>
             {row.isDefault ? (
