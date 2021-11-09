@@ -2,35 +2,44 @@ import { ForbiddenError } from "apollo-server-errors";
 import {
   GraphQLInputType,
   GraphQLResolveInfo,
+  isInputObjectType,
   isListType,
   isNonNullType,
   isScalarType,
 } from "graphql";
-import { core, dynamicOutputMethod, plugin } from "nexus";
-import { isDefined, mapValues, omit } from "remeda";
+import { core, dynamicInputMethod, dynamicOutputMethod, plugin } from "nexus";
+import { isDefined, mapValues } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { If, UnwrapArray } from "../../util/types";
 
 export type GlobalIdConfig = {
-  prefixName?: string;
+  prefixName: string;
 };
 
-export type GlobalIdConfigSpread<
+export type GlobalIdInputFieldConfig<
   TypeName extends string,
   FieldName extends string
-> = core.NeedsResolver<TypeName, FieldName> extends true
-  ? [
-      GlobalIdConfig &
-        GlobalIdResolverConfig<TypeName, FieldName> &
-        core.CommonOutputFieldConfig<TypeName, FieldName>
-    ]
-  :
-      | []
-      | [
-          GlobalIdConfig &
-            Partial<GlobalIdResolverConfig<TypeName, FieldName>> &
-            core.CommonOutputFieldConfig<TypeName, FieldName>
-        ];
+> = core.CommonInputFieldConfig<TypeName, FieldName> & GlobalIdConfig;
+
+export type GlobalIdOutputFieldConfig<
+  TypeName extends string,
+  FieldName extends string,
+  NeedsResolver extends boolean
+> = If<
+  NeedsResolver,
+  GlobalIdResolverConfig<TypeName, FieldName>,
+  Partial<GlobalIdResolverConfig<TypeName, FieldName>>
+> &
+  core.CommonOutputFieldConfig<TypeName, FieldName> &
+  Partial<GlobalIdConfig>;
+
+export type GlobalIdOutputFieldConfigSpread<TypeName extends string, FieldName extends string> = If<
+  core.NeedsResolver<TypeName, FieldName>,
+  // If a resolver is needed the config is required and with required resolver
+  [GlobalIdOutputFieldConfig<TypeName, FieldName, true>],
+  // If a resolver is **not** needed this makes the config optional with optional resolver
+  [] | [GlobalIdOutputFieldConfig<TypeName, FieldName, false>]
+>;
 
 export type GlobalIdResolverConfig<TypeName extends string, FieldName extends string> = {
   resolve: GlobalIdFieldResolver<TypeName, FieldName>;
@@ -78,39 +87,43 @@ export function globalIdArg(
   prefixNameOrOpts?: string | Omit<core.NexusArgConfig<"ID">, "type">,
   opts?: Omit<core.NexusArgConfig<"ID">, "type">
 ): core.NexusArgDef<any> {
-  opts = typeof prefixNameOrOpts === "string" ? opts : prefixNameOrOpts ?? {};
+  const { extensions, ...config } =
+    typeof prefixNameOrOpts === "string" ? opts ?? {} : prefixNameOrOpts ?? {};
   const prefixName = typeof prefixNameOrOpts === "string" ? prefixNameOrOpts : null;
   return core.arg({
-    ...{
-      [PREFIX_NAME]: prefixName,
-    },
+    ...config,
     type: "GID" as any,
-    ...opts,
+    extensions: {
+      ...extensions,
+      PREFIX_NAME: prefixName,
+    },
   });
 }
 
-const PREFIX_NAME = Symbol.for("PREFIX_NAME");
-
-function mapGlobalIds(type: GraphQLInputType, value: any, argConfig: core.AllNexusArgsDefs): any {
-  if (isScalarType(type)) {
-    if (type.name === "GID" && isDefined(value)) {
+function mapGlobalIds(type: GraphQLInputType, value: any, prefixName?: string): any {
+  if (isDefined(value)) {
+    if (isScalarType(type) && type.name === "GID") {
       try {
-        return fromGlobalId(value, ((argConfig as core.NexusArgDef<any>).value as any)[PREFIX_NAME])
-          .id;
+        return fromGlobalId(value, prefixName).id;
       } catch {
         throw new ForbiddenError("Invalid ID");
       }
+    } else if (isNonNullType(type)) {
+      return mapGlobalIds(type.ofType, value, prefixName);
+    } else if (isListType(type)) {
+      return (value as any[]).map((item) => mapGlobalIds(type.ofType, item, prefixName));
+    } else if (isInputObjectType(type)) {
+      const result: any = {};
+      for (const [name, field] of Object.entries(type.getFields())) {
+        if (name in value) {
+          const prefixName = (field.extensions as any)["PREFIX_NAME"] as string | undefined;
+          result[name] = mapGlobalIds(field.type, value[name], prefixName);
+        }
+      }
+      return result;
     } else {
       return value;
     }
-  } else if (isNonNullType(type)) {
-    return mapGlobalIds(type.ofType, value, (argConfig as core.NexusNonNullDef<any>).ofNexusType);
-  } else if (isListType(type)) {
-    return isDefined(value)
-      ? (value as any[]).map((item) =>
-          mapGlobalIds(type.ofType, item, (argConfig as core.NexusListDef<any>).ofNexusType)
-        )
-      : value;
   } else {
     return value;
   }
@@ -123,21 +136,21 @@ export function globalIdPlugin() {
     fieldDefTypes: [
       core.printedGenTypingImport({
         module: "./helpers/globalIdPlugin",
-        bindings: ["GlobalIdConfigSpread"],
+        bindings: ["GlobalIdOutputFieldConfigSpread", "GlobalIdInputFieldConfig"],
       }),
     ],
-    onCreateFieldResolver({ fieldConfig }) {
+    onCreateFieldResolver({ fieldConfig, ...rest }) {
       const config = fieldConfig.extensions?.nexus?.config as core.NexusOutputFieldDef;
       return async function (root, args, ctx, info, next) {
         // decode any GID args
         const _args = mapValues(args ?? {}, (argValue, argName) => {
-          const type = fieldConfig.args![argName as string].type;
-          const argConfig = config.args![argName as string];
-          return mapGlobalIds(type, argValue, argConfig);
+          const argConfig = fieldConfig.args![argName as string];
+          const prefixName = (argConfig.extensions as any)["PREFIX_NAME"] as string | undefined;
+          return mapGlobalIds(argConfig.type, argValue, prefixName);
         });
         const result = await next(root, _args, ctx, info);
         if (config.type === "GID") {
-          const prefixName = (config as any)[PREFIX_NAME] as string;
+          const prefixName = (fieldConfig.extensions as any)["PREFIX_NAME"] as string;
           if (!isDefined(result)) {
             return result;
           } else if (config.wrapping?.includes("List") && Array.isArray(result)) {
@@ -158,22 +171,51 @@ export function globalIdPlugin() {
         })
       );
       b.addType(
+        dynamicInputMethod({
+          name: "globalId",
+          typeDefinition: `<FieldName extends string>(
+              fieldName: FieldName,
+              opts: GlobalIdInputFieldConfig<TypeName, FieldName>
+            ): void;
+          `,
+          factory({ typeDef: t, args: factoryArgs }) {
+            const [fieldName, fieldConfig] = factoryArgs as [
+              string,
+              GlobalIdInputFieldConfig<any, any>
+            ];
+            const { prefixName, extensions, ...config } = fieldConfig;
+            t.field(fieldName, {
+              ...config,
+              type: "GID",
+              extensions: {
+                ...extensions,
+                PREFIX_NAME: prefixName,
+              },
+            });
+          },
+        })
+      );
+      b.addType(
         dynamicOutputMethod({
           name: "globalId",
           typeDefinition: `<FieldName extends string>(
               fieldName: FieldName,
-              ...opts: GlobalIdConfigSpread<TypeName, FieldName>
+              ...opts: GlobalIdOutputFieldConfigSpread<TypeName, FieldName>
             ): void;
           `,
           factory({ typeName, typeDef: t, args: factoryArgs }) {
-            const [fieldName, fieldConfig] = factoryArgs as [string, any];
-            const prefixName = fieldConfig?.prefixName ?? typeName;
+            const [fieldName, fieldConfig = {}] = factoryArgs as [
+              string,
+              GlobalIdOutputFieldConfig<any, any, any>
+            ];
+            const { prefixName, extensions, ...config } = fieldConfig;
             t.field(fieldName, {
-              ...{
-                [PREFIX_NAME]: prefixName,
-              },
-              ...omit(fieldConfig ?? {}, ["prefixName"]),
+              ...config,
               type: "GID",
+              extensions: {
+                ...extensions,
+                PREFIX_NAME: prefixName ?? typeName,
+              },
             });
           },
         })
