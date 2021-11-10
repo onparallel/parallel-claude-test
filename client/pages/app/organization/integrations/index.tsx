@@ -9,14 +9,12 @@ import {
   HStack,
   Image,
   Stack,
-  StackProps,
   Text,
 } from "@chakra-ui/react";
-import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { IntegrationCard } from "@parallel/components/organization/IntegrationCard";
 import {
   OrganizationIntegrationsQuery,
   useOrganizationIntegrationsQuery,
@@ -24,7 +22,6 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function OrganizationIntegrations() {
@@ -122,7 +119,7 @@ function OrganizationIntegrations() {
     >
       <Stack padding={4} spacing={5} maxWidth="container.sm" w="100%">
         {integrations.map((integration, index) => (
-          <Integration key={index} {...integration} />
+          <IntegrationCard key={index} {...integration} />
         ))}
         <Alert status="info" rounded="md">
           <AlertIcon />
@@ -149,77 +146,6 @@ function OrganizationIntegrations() {
       </Stack>
     </SettingsLayout>
   );
-}
-
-interface IntegrationProps extends StackProps {
-  logo: ReactNode | null;
-  title: string;
-  body: string;
-  badge: ReactNode | null;
-  isDisabled: boolean;
-  showButton: boolean;
-  route: string;
-}
-
-function Integration({
-  logo,
-  title,
-  body,
-  badge,
-  isDisabled,
-  showButton,
-  route,
-  ...props
-}: IntegrationProps) {
-  const content = (
-    <HStack
-      position="relative"
-      width="100%"
-      backgroundColor="white"
-      rounded="lg"
-      shadow="short"
-      paddingX={6}
-      paddingY={4}
-      border="1px solid"
-      borderColor={isDisabled ? "gray.100" : "gray.200"}
-      cursor={isDisabled ? "not-allowed" : "pointer"}
-      transition="all 0.3s ease"
-      sx={{
-        " > * ": {
-          opacity: isDisabled ? 0.4 : 1,
-        },
-        _hover: isDisabled
-          ? {}
-          : {
-              boxShadow: "long",
-              backgroundColor: "gray.50",
-            },
-      }}
-      {...props}
-    >
-      <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={6}>
-        <Center>{logo}</Center>
-        <Stack flex="1" paddingRight={10}>
-          <HStack>
-            <Text fontSize="xl" as="b">
-              {title}
-            </Text>
-            {badge}
-          </HStack>
-          <Text color="gray.600">{body}</Text>
-        </Stack>
-      </Stack>
-      {showButton ? (
-        <Center position="absolute" right="0" paddingRight={5}>
-          <ChevronRightIcon boxSize={8} />
-        </Center>
-      ) : null}
-    </HStack>
-  );
-  if (isDisabled) {
-    return content;
-  }
-  return <NakedLink href={route}>{content}</NakedLink>;
 }
 
 OrganizationIntegrations.getInitialProps = async ({
