@@ -378,8 +378,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     const isFieldsValid = await validPetitionFields();
     if (!isFieldsValid) return;
 
-    console.log(petition.signatureConfig);
-
     try {
       if (!dontShowTestSignature && petition.signatureConfig?.integration?.status === "DEMO") {
         const { dontShow } = await showTestSignatureDialog({

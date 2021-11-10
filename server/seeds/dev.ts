@@ -6,6 +6,7 @@ import {
   CreateUser,
   Organization,
   OrganizationUsageLimit,
+  OrgIntegration,
   User,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
@@ -136,4 +137,15 @@ export async function seed(knex: Knex): Promise<any> {
     },
   ];
   await knex<Contact>("contact").insert(contacts, "id");
+
+  await knex<OrgIntegration>("org_integration").insert({
+    org_id: orgIds[0],
+    type: "SIGNATURE",
+    provider: "SIGNATURIT",
+    name: "Signaturit Sandbox",
+    settings: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY, ENVIRONMENT: "sandbox" },
+    is_enabled: true,
+    created_by: `User:${userIds[0]}`,
+    is_default: true,
+  });
 }

@@ -169,7 +169,7 @@ function IntegrationsSignature() {
               >
                 <FormattedMessage
                   id="organization.signature.add-new-token"
-                  defaultMessage="Añadir token"
+                  defaultMessage="Add token"
                 />
               </Button>
             </Stack>
@@ -251,16 +251,17 @@ function useSignatureTokensTableColumns({
         isApolloError(error) &&
         error.graphQLErrors[0]?.extensions?.code === "SIGNATURE_INTEGRATION_IN_USE_ERROR"
       ) {
-        await confirmRemoveSignatureToken({
-          pendingSignaturesCount: error.graphQLErrors[0]?.extensions?.pendingSignaturesCount,
-        });
-
-        await deleteSignatureIntegration({
-          variables: {
-            id,
-            force: true,
-          },
-        });
+        try {
+          await confirmRemoveSignatureToken({
+            pendingSignaturesCount: error.graphQLErrors[0]?.extensions?.pendingSignaturesCount,
+          });
+          await deleteSignatureIntegration({
+            variables: {
+              id,
+              force: true,
+            },
+          });
+        } catch {}
       }
     }
   };

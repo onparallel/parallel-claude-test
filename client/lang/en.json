@@ -4561,8 +4561,8 @@
   },
   {
     "term": "organization.signature.add-new-token",
-    "definition": "Añadir token",
-    "context": "Añadir token"
+    "definition": "Add token",
+    "context": "Add token"
   },
   {
     "term": "organization.usage.title",

@@ -571,7 +571,7 @@
   },
   {
     "term": "component.delete-signature-error-confirmation.body",
-    "definition": "Se han detectado <b>{count}</b> procesos de firma pendientes que utilizan este token. Si lo eliminas, se cancelarán todos. ¿Estás seguro de querer eliminarlo?",
+    "definition": "{count, plural, =1 {Se ha detectado <b>#</b> proceso de firma pendiente que utiliza este token. Si lo eliminas, se cancelará} other {Se han detectado <b>#</b> procesos de firma pendientes que utilizan este token. Si lo eliminas, se cancelarán todos}}. ¿Estás seguro de querer eliminarlo?",
     "context": "We have detected <b>{count}</b> pending signature processes that use this token. If you delete it, they will all be cancelled. Are you sure you want to delete it?"
   },
   {
@@ -4561,8 +4561,8 @@
   },
   {
     "term": "organization.signature.add-new-token",
-    "definition": "Add token",
-    "context": "Añadir token"
+    "definition": "Añadir token",
+    "context": "Add token"
   },
   {
     "term": "organization.usage.title",
