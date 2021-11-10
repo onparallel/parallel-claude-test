@@ -2960,12 +2960,12 @@
     "context": "Use this template"
   },
   {
-    "term": "component.test-mode-signature-badge.label",
-    "definition": "prueba",
-    "context": "test"
+    "term": "component.test-mode-signature-badge.popover-text",
+    "definition": "Esta firma se ha configurado en modo de prueba. Podrás enviar firmas pero no tendrán ninguna validez legal.",
+    "context": "This eSignature has been configured in test mode. You will be able to send signatures but they will not have any legal validity."
   },
   {
-    "term": "component.test-mode-signature-badge.popover",
+    "term": "component.test-mode-signature-badge.popover-text-demo",
     "definition": "El modo de prueba, te permite enviar firmas pero no tendrán ninguna validez legal. Para activar la firma digital, <a>contacta con nuestro equipo de soporte.</a>",
     "context": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
   },
@@ -4065,6 +4065,11 @@
     "context": "Previous page"
   },
   {
+    "term": "generic.production-env",
+    "definition": "Producción",
+    "context": "Production"
+  },
+  {
     "term": "generic.reload-data",
     "definition": "Refrescar",
     "context": "Reload"
@@ -4162,6 +4167,11 @@
   {
     "term": "generic.test",
     "definition": "Probar",
+    "context": "Test"
+  },
+  {
+    "term": "generic.test-env",
+    "definition": "Prueba",
     "context": "Test"
   },
   {

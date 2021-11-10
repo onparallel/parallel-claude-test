@@ -343,7 +343,7 @@ function _PetitionSettings({
                   defaultMessage="Enable eSignature"
                 />
                 {petition.signatureConfig?.integration?.status === "DEMO" || !hasSignature ? (
-                  <TestModeSignatureBadge />
+                  <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
                 ) : null}
               </HStack>
             }
@@ -521,6 +521,7 @@ const fragments = {
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
+      ...TestModeSignatureBadge_User
       organization {
         id
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
@@ -530,6 +531,7 @@ const fragments = {
         }
       }
     }
+    ${TestModeSignatureBadge.fragments.User}
     ${SignatureConfigDialog.fragments.OrgIntegration}
   `,
   PetitionBase: gql`

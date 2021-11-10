@@ -335,42 +335,6 @@ describe("GraphQL custom validators", () => {
       ).rejects.toThrowError();
     });
 
-    it("throws error if user does not have an enabled signature integration", async () => {
-      await knex
-        .from("feature_flag_override")
-        .where({ user_id: users[1].id, feature_flag_name: "PETITION_SIGNATURE" })
-        .update("value", true);
-      await knex
-        .from("org_integration")
-        .where("id", org1SignatureIntegration.id)
-        .update("is_enabled", false);
-      await expect(
-        validSignatureConfig((args) => args.config, "config")(
-          {},
-          {
-            config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", org1SignatureIntegration.id),
-              signersInfo: [],
-              timezone: "Europe/Madrid",
-              title: "sign this!",
-              letRecipientsChooseSigners: true,
-              review: false,
-            },
-          },
-          { ...ctx, user: users[1] },
-          {} as any
-        )
-      ).rejects.toThrowError();
-      await knex
-        .from("feature_flag_override")
-        .where({ user_id: users[1].id, feature_flag_name: "PETITION_SIGNATURE" })
-        .update("value", false);
-      await knex
-        .from("org_integration")
-        .where("id", org1SignatureIntegration.id)
-        .update("is_enabled", true);
-    });
-
     it("throws error if timezone is invalid", async () => {
       await expect(
         validSignatureConfig((args) => args.config, "config")(

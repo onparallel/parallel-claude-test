@@ -9,7 +9,6 @@ import {
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
   userHasEnabledIntegration,
-  userHasFeatureFlag,
 } from "../authorizers";
 
 export const startSignatureRequest = mutationField("startSignatureRequest", {
@@ -18,7 +17,6 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   authorize: authenticateAnd(
-    userHasFeatureFlag("PETITION_SIGNATURE"),
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
   ),
@@ -79,7 +77,6 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
     petitionSignatureRequestId: nonNull(globalIdArg()),
   },
   authorize: authenticateAnd(
-    userHasFeatureFlag("PETITION_SIGNATURE"),
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
   ),
@@ -138,7 +135,6 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
 export const updateSignatureRequestMetadata = mutationField("updateSignatureRequestMetadata", {
   type: nonNull("PetitionSignatureRequest"),
   authorize: authenticateAnd(
-    userHasFeatureFlag("PETITION_SIGNATURE"),
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
   ),
@@ -157,7 +153,6 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
   description: "Generates a download link for the signed PDF petition.",
   type: "FileUploadDownloadLinkResult",
   authorize: authenticateAnd(
-    userHasFeatureFlag("PETITION_SIGNATURE"),
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
   ),
@@ -216,7 +211,6 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
   description: "Sends a reminder email to the pending signers",
   type: "Result",
   authorize: authenticateAnd(
-    userHasFeatureFlag("PETITION_SIGNATURE"),
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
   ),

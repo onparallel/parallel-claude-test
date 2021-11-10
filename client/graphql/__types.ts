@@ -6007,6 +6007,10 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
     >;
   };
 
+export type TestModeSignatureBadge_UserFragment = { __typename?: "User" } & {
+  hasPetitionSignature: User["hasFeatureFlag"];
+};
+
 export type CopySignatureConfigDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
 } & Pick<PetitionSigner, "email" | "fullName">;
@@ -6507,6 +6511,8 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   };
 
 export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
+  hasPetitionSignature: User["hasFeatureFlag"];
+} & {
   organization: { __typename?: "Organization" } & {
     signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
       items: Array<
@@ -15393,12 +15399,18 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   ${PetitionSettings_PetitionBaseFragmentDoc}
   ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
+export const TestModeSignatureBadge_UserFragmentDoc = gql`
+  fragment TestModeSignatureBadge_User on User {
+    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+  }
+`;
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
     hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
+    ...TestModeSignatureBadge_User
     organization {
       id
       signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
@@ -15408,6 +15420,7 @@ export const PetitionSettings_UserFragmentDoc = gql`
       }
     }
   }
+  ${TestModeSignatureBadge_UserFragmentDoc}
   ${SignatureConfigDialog_OrgIntegrationFragmentDoc}
 `;
 export const PetitionCompose_OrganizationFragmentDoc = gql`
@@ -15666,6 +15679,7 @@ export const ExportRepliesDialog_UserFragmentDoc = gql`
 `;
 export const PetitionSignaturesCard_UserFragmentDoc = gql`
   fragment PetitionSignaturesCard_User on User {
+    ...TestModeSignatureBadge_User
     organization {
       signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
         items {
@@ -15674,6 +15688,7 @@ export const PetitionSignaturesCard_UserFragmentDoc = gql`
       }
     }
   }
+  ${TestModeSignatureBadge_UserFragmentDoc}
   ${SignatureConfigDialog_OrgIntegrationFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`

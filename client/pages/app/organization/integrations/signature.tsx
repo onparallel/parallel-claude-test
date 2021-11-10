@@ -320,9 +320,13 @@ function useSignatureTokensTableColumns({
         align: "center",
         CellContent: ({ row }) =>
           row.status === "DEMO" ? (
-            <Badge colorScheme="yellow">TEST</Badge>
+            <Badge colorScheme="yellow">
+              <FormattedMessage id="generic.test-env" defaultMessage="Test" />
+            </Badge>
           ) : (
-            <Badge colorScheme="green">PRODUCTION</Badge>
+            <Badge colorScheme="green">
+              <FormattedMessage id="generic.production-env" defaultMessage="Production" />
+            </Badge>
           ),
       },
       {

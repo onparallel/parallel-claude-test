@@ -40,6 +40,7 @@ export interface PetitionSignaturesCardProps {
 const fragments = {
   User: gql`
     fragment PetitionSignaturesCard_User on User {
+      ...TestModeSignatureBadge_User
       organization {
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
           items {
@@ -49,6 +50,7 @@ const fragments = {
       }
     }
     ${SignatureConfigDialog.fragments.OrgIntegration}
+    ${TestModeSignatureBadge.fragments.User}
   `,
   Petition: gql`
     fragment PetitionSignaturesCard_Petition on Petition {
@@ -263,7 +265,9 @@ export const PetitionSignaturesCard = Object.assign(
               id="component.petition-signatures-card.header"
               defaultMessage="Petition eSignature"
             />
-            {signatureEnvironment === "DEMO" ? <TestModeSignatureBadge /> : null}
+            {signatureEnvironment === "DEMO" ? (
+              <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
+            ) : null}
           </HStack>
         </GenericCardHeader>
         {current || older.length > 0 || petition.signatureConfig ? (
