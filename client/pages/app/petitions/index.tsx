@@ -90,7 +90,6 @@ function Petitions() {
         sharedWith: removeInvalidLines(state.sharedWith),
       },
       sortBy: [`${sort.field}_${sort.direction}`],
-      hasPetitionSignature: me.hasPetitionSignature,
     },
   });
   const previousRef = useRef<PetitionsQuery>();
@@ -388,18 +387,14 @@ Petitions.fragments = {
     return gql`
       fragment Petitions_User on User {
         ...AppLayout_User
-        ...usePetitionsTableColumns_User
       }
       ${AppLayout.fragments.User}
-      ${usePetitionsTableColumns.fragments.User}
     `;
   },
 };
 
 Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  const {
-    data: { me },
-  } = await fetchQuery<PetitionsUserQuery>(gql`
+  await fetchQuery<PetitionsUserQuery>(gql`
     query PetitionsUser {
       me {
         ...Petitions_User
@@ -420,7 +415,6 @@ Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext)
         $limit: Int!
         $search: String
         $sortBy: [QueryPetitions_OrderBy!]
-        $hasPetitionSignature: Boolean!
         $filters: PetitionFilter
       ) {
         petitions(
@@ -447,7 +441,6 @@ Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext)
           tagIds: state.tags,
           sharedWith: removeInvalidLines(state.sharedWith),
         },
-        hasPetitionSignature: me.hasPetitionSignature,
       },
     }
   );

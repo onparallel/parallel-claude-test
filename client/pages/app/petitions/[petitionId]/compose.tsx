@@ -97,7 +97,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     usePetitionComposeQuery({
       variables: {
         id: petitionId,
-        hasPetitionSignature: me.hasPetitionSignature,
       },
     })
   );
@@ -152,7 +151,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: {
           petitionId,
           data,
-          hasPetitionSignature: me.hasPetitionSignature,
         },
       });
     }),
@@ -760,11 +758,7 @@ PetitionCompose.fragments = {
 
 PetitionCompose.mutations = [
   gql`
-    mutation PetitionCompose_updatePetition(
-      $petitionId: GID!
-      $data: UpdatePetitionInput!
-      $hasPetitionSignature: Boolean!
-    ) {
+    mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionLayout_PetitionBase
         ...PetitionSettings_PetitionBase
@@ -925,9 +919,7 @@ PetitionCompose.mutations = [
 ];
 
 PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  const {
-    data: { me },
-  } = await fetchQuery<PetitionComposeUserQuery>(
+  await fetchQuery<PetitionComposeUserQuery>(
     gql`
       query PetitionComposeUser {
         me {
@@ -939,7 +931,7 @@ PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   );
   await fetchQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
     gql`
-      query PetitionCompose($id: GID!, $hasPetitionSignature: Boolean!) {
+      query PetitionCompose($id: GID!) {
         petition(id: $id) {
           ...PetitionCompose_PetitionBase
         }
@@ -949,7 +941,6 @@ PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
     {
       variables: {
         id: query.petitionId as string,
-        hasPetitionSignature: me.hasPetitionSignature,
       },
       ignoreCache: true,
     }

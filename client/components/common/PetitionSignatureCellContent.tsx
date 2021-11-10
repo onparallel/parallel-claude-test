@@ -1,32 +1,40 @@
 import { gql } from "@apollo/client";
 import { Circle, Flex, Tooltip } from "@chakra-ui/react";
 import { AlertCircleIcon, SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
-import {
-  PetitionSignatureCellContent_PetitionFragment,
-  PetitionSignatureCellContent_UserFragment,
-} from "@parallel/graphql/__types";
-import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
+import { PetitionSignatureCellContent_PetitionFragment } from "@parallel/graphql/__types";
+import { usePetitionCurrentSignatureStatusAndEnv } from "@parallel/utils/usePetitionCurrentSignatureStatusAndEnv";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
+import { useIntl } from "react-intl";
 
 interface PetitionSignatureCellContentProps {
   petition: PetitionSignatureCellContent_PetitionFragment;
-  user: PetitionSignatureCellContent_UserFragment;
 }
-export function PetitionSignatureCellContent({
-  petition,
-  user,
-}: PetitionSignatureCellContentProps) {
+export function PetitionSignatureCellContent({ petition }: PetitionSignatureCellContentProps) {
+  const intl = useIntl();
+
   const labels = usePetitionSignatureStatusLabels();
-  const status = usePetitionCurrentSignatureStatus(petition);
+  const { status, env } = usePetitionCurrentSignatureStatusAndEnv(petition);
+
+  const envLabel =
+    env === "DEMO"
+      ? ` - ${intl.formatMessage({
+          id: "petition-signature-cell-content.test-environment",
+          defaultMessage: "Test environment",
+        })}`
+      : "";
+
   // do not show signature status on drafts
   if (petition.status === "DRAFT") return null;
-  return user.hasPetitionSignature && status ? (
-    <Tooltip label={labels[status]}>
+  return status ? (
+    <Tooltip label={labels[status] + envLabel}>
       <Flex alignItems="center">
         {status === "START" ? (
           <Circle boxSize={2} backgroundColor="purple.500" marginRight="2px" />
         ) : null}
-        <SignatureIcon color={status === "COMPLETED" ? "gray.700" : "gray.400"} />
+        <SignatureIcon
+          color={env === "DEMO" ? "yellow.700" : "gray.700"}
+          opacity={status === "COMPLETED" ? 1 : 0.4}
+        />
         {status === "PROCESSING" ? (
           <TimeIcon color="yellow.600" fontSize="13px" position="relative" top={-2} right={2} />
         ) : status === "CANCELLED" ? (
@@ -40,13 +48,8 @@ export function PetitionSignatureCellContent({
 PetitionSignatureCellContent.fragments = {
   Petition: gql`
     fragment PetitionSignatureCellContent_Petition on Petition {
-      ...usePetitionCurrentSignatureStatus_Petition @include(if: $hasPetitionSignature)
+      ...usePetitionCurrentSignatureStatusAndEnv_Petition
     }
-    ${usePetitionCurrentSignatureStatus.fragments.Petition}
-  `,
-  User: gql`
-    fragment PetitionSignatureCellContent_User on User {
-      hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-    }
+    ${usePetitionCurrentSignatureStatusAndEnv.fragments.Petition}
   `,
 };

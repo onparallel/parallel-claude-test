@@ -15,7 +15,6 @@ import {
   Select,
   Stack,
   Switch,
-  Badge,
   Text,
 } from "@chakra-ui/react";
 import {
@@ -55,8 +54,6 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
-import { NormalLink } from "../common/Link";
-import { SmallPopover } from "../common/SmallPopover";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
 import { PublicLinkSettingsDialog, usePublicLinkSettingsDialog } from "./PublicLinkSettingsDialog";
@@ -65,6 +62,7 @@ import {
   TemplateDefaultPermissionsDialog,
   useTemplateDefaultPermissionsDialog,
 } from "./TemplateDefaultPermissionsDialog";
+import { TestModeSignatureBadge } from "./TestModeSignatureBadge";
 
 export type PetitionSettingsProps = {
   user: PetitionSettings_UserFragment;
@@ -345,28 +343,7 @@ function _PetitionSettings({
                   defaultMessage="Enable eSignature"
                 />
                 {petition.signatureConfig?.integration?.status === "DEMO" || !hasSignature ? (
-                  <SmallPopover
-                    content={
-                      <Text fontSize="sm">
-                        <FormattedMessage
-                          id="component.petition-settings.test-badge-popover"
-                          defaultMessage="Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
-                          values={{
-                            a: (chunks: any) => (
-                              <NormalLink href="mailto:support@onparallel.com">{chunks}</NormalLink>
-                            ),
-                          }}
-                        />
-                      </Text>
-                    }
-                  >
-                    <Badge colorScheme="yellow" textTransform="uppercase">
-                      <FormattedMessage
-                        id="component.petition-settings.test-badge"
-                        defaultMessage="test"
-                      />
-                    </Badge>
-                  </SmallPopover>
+                  <TestModeSignatureBadge />
                 ) : null}
               </HStack>
             }
@@ -563,11 +540,11 @@ const fragments = {
       skipForwardSecurity
       isRecipientViewContentsHidden
       isReadOnly
-      ...SignatureConfigDialog_PetitionBase @include(if: $hasPetitionSignature)
+      ...SignatureConfigDialog_PetitionBase
       ... on Petition {
         status
         deadline
-        currentSignatureRequest @include(if: $hasPetitionSignature) {
+        currentSignatureRequest {
           id
           status
         }

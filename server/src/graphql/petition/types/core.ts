@@ -1,12 +1,10 @@
 import { extension } from "mime-types";
 import { enumType, inputObjectType, interfaceType, nullable, objectType, stringArg } from "nexus";
-import { isDefined, minBy } from "remeda";
+import { minBy } from "remeda";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
-import { or } from "../../helpers/authorize";
-import { userHasFeatureFlag } from "../authorizers";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -219,10 +217,6 @@ export const Petition = objectType({
       args: {
         token: nullable(stringArg()),
       },
-      authorize: or(
-        userHasFeatureFlag("PETITION_SIGNATURE"),
-        (_, { token }, ctx) => isDefined(token) && ctx.security.verifyAuthToken(token)
-      ),
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(root.id);
       },
@@ -230,7 +224,6 @@ export const Petition = objectType({
     t.nullable.list.nonNull.field("signatureRequests", {
       type: "PetitionSignatureRequest",
       description: "The list of signature requests.",
-      authorize: userHasFeatureFlag("PETITION_SIGNATURE"),
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetitionSignaturesByPetitionId(root.id);
       },

@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Grid, Text, useToast } from "@chakra-ui/react";
+import { Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
 import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
+  OrgIntegrationStatus,
   PetitionSignaturesCard_PetitionFragment,
   PetitionSignaturesCard_UserFragment,
   SignatureConfigInput,
@@ -23,6 +24,7 @@ import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
 } from "../petition-common/SignatureConfigDialog";
+import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
 import { useConfirmRestartSignatureRequestDialog } from "./ConfirmRestartSignatureRequestDialog";
 import { CurrentSignatureRequestRow } from "./CurrentSignatureRequestRow";
 import { NewSignatureRequestRow } from "./NewSignatureRequestRow";
@@ -31,6 +33,7 @@ import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
 export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
   user: PetitionSignaturesCard_UserFragment;
+  signatureEnvironment: OrgIntegrationStatus | undefined;
   onRefetchPetition: () => void;
 }
 
@@ -119,7 +122,7 @@ const mutations = [
 
 export const PetitionSignaturesCard = Object.assign(
   chakraForwardRef<"section", PetitionSignaturesCardProps>(function PetitionSignaturesCard(
-    { petition, user, onRefetchPetition, ...props },
+    { petition, user, signatureEnvironment, onRefetchPetition, ...props },
     ref
   ) {
     let current: Maybe<UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>> =
@@ -254,13 +257,14 @@ export const PetitionSignaturesCard = Object.assign(
             ) : null
           }
         >
-          <Box as="span" display="flex">
-            <SignatureIcon fontSize="20px" marginRight={2} lineHeight={5} />
+          <HStack as="span" gridGap={2}>
+            <SignatureIcon fontSize="20px" />
             <FormattedMessage
               id="component.petition-signatures-card.header"
               defaultMessage="Petition eSignature"
             />
-          </Box>
+            {signatureEnvironment === "DEMO" ? <TestModeSignatureBadge /> : null}
+          </HStack>
         </GenericCardHeader>
         {current || older.length > 0 || petition.signatureConfig ? (
           <Grid

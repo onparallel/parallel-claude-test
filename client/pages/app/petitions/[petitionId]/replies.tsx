@@ -99,7 +99,7 @@ import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { useExportRepliesTask } from "@parallel/utils/useExportRepliesTask";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
+import { usePetitionCurrentSignatureStatusAndEnv } from "@parallel/utils/usePetitionCurrentSignatureStatusAndEnv";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -122,7 +122,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     usePetitionRepliesQuery({
       variables: {
         id: petitionId,
-        hasPetitionSignature: me.hasPetitionSignature,
         hasInternalComments: me.hasInternalComments,
       },
     })
@@ -492,7 +491,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const [filter, setFilter] = useState<PetitionFieldFilter>(defaultFieldsFilter);
 
-  const petitionSignatureStatus = usePetitionCurrentSignatureStatus(petition);
+  const { status: petitionSignatureStatus, env: petitionSignatureEnv } =
+    usePetitionCurrentSignatureStatusAndEnv(petition);
 
   return (
     <PetitionLayout
@@ -686,17 +686,17 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   )
               )}
             </Stack>
-            {me.hasPetitionSignature ? (
-              <PetitionSignaturesCard
-                ref={signaturesRef as any}
-                id="signatures"
-                petition={petition}
-                user={me}
-                layerStyle="highlightable"
-                marginTop={8}
-                onRefetchPetition={refetch}
-              />
-            ) : null}
+
+            <PetitionSignaturesCard
+              ref={signaturesRef as any}
+              id="signatures"
+              petition={petition}
+              user={me}
+              signatureEnvironment={petitionSignatureEnv}
+              layerStyle="highlightable"
+              marginTop={8}
+              onRefetchPetition={refetch}
+            />
           </Box>
         </PaneWithFlyout>
       </Box>
@@ -715,18 +715,18 @@ PetitionReplies.fragments = {
           ...PetitionReplies_PetitionField
         }
         ...ShareButton_PetitionBase
-        currentSignatureRequest @include(if: $hasPetitionSignature) {
+        currentSignatureRequest {
           id
           status
         }
-        ...PetitionSignaturesCard_Petition @include(if: $hasPetitionSignature)
-        ...usePetitionCurrentSignatureStatus_Petition @include(if: $hasPetitionSignature)
+        ...PetitionSignaturesCard_Petition
+        ...usePetitionCurrentSignatureStatusAndEnv_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
       ${ShareButton.fragments.PetitionBase}
       ${PetitionSignaturesCard.fragments.Petition}
-      ${usePetitionCurrentSignatureStatus.fragments.Petition}
+      ${usePetitionCurrentSignatureStatusAndEnv.fragments.Petition}
     `;
   },
   get PetitionField() {
@@ -1064,11 +1064,7 @@ PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   );
   await fetchQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
     gql`
-      query PetitionReplies(
-        $id: GID!
-        $hasPetitionSignature: Boolean!
-        $hasInternalComments: Boolean!
-      ) {
+      query PetitionReplies($id: GID!, $hasInternalComments: Boolean!) {
         petition(id: $id) {
           ...PetitionReplies_Petition
         }
@@ -1078,7 +1074,6 @@ PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
     {
       variables: {
         id: query.petitionId as string,
-        hasPetitionSignature: me.hasPetitionSignature,
         hasInternalComments: me.hasInternalComments,
       },
     }

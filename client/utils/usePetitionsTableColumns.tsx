@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { Flex, IconButton, Text } from "@chakra-ui/react";
 import { BellSettingsIcon } from "@parallel/chakra/icons";
-import { ContactReference } from "@parallel/components/common/ContactReference";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -20,7 +20,6 @@ import {
   usePetitionsTableColumns_PetitionBaseFragment,
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
-  usePetitionsTableColumns_UserFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MouseEvent, useMemo } from "react";
@@ -30,25 +29,15 @@ import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
 import { useGoToPetition } from "./goToPetition";
 
-export type PetitionsTableColumnsContext = {
-  user: usePetitionsTableColumns_UserFragment;
-};
-
-type PetitionBaseTableColumn = TableColumn<
-  usePetitionsTableColumns_PetitionBaseFragment,
-  PetitionsTableColumnsContext,
-  any
->;
+type PetitionBaseTableColumn = TableColumn<usePetitionsTableColumns_PetitionBaseFragment, any>;
 
 type PetitionTableColumn = TableColumn<
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
-  PetitionsTableColumnsContext,
   any
 >;
 
 type PetitionTemplateTableColumn = TableColumn<
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
-  PetitionsTableColumnsContext,
   any
 >;
 
@@ -164,7 +153,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 cellProps: { padding: 0 },
                 CellContent: ({ row, context }) => (
                   <Flex alignItems="center" paddingRight="2">
-                    <PetitionSignatureCellContent petition={row} user={context!.user} />
+                    <PetitionSignatureCellContent petition={row} />
                   </Flex>
                 ),
               },
@@ -400,11 +389,5 @@ usePetitionsTableColumns.fragments = {
     ${ContactReference.fragments.Contact}
     ${PetitionStatusCellContent.fragments.Petition}
     ${PetitionSignatureCellContent.fragments.Petition}
-  `,
-  User: gql`
-    fragment usePetitionsTableColumns_User on User {
-      ...PetitionSignatureCellContent_User
-    }
-    ${PetitionSignatureCellContent.fragments.User}
   `,
 };

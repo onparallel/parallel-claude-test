@@ -15,11 +15,11 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
-import { OverflownText } from "@parallel/components/common/OverflownText";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -61,7 +61,6 @@ function Contact({ contactId }: ContactProps) {
     useContactQuery({
       variables: {
         id: contactId,
-        hasPetitionSignature: me.hasPetitionSignature,
       },
     })
   );
@@ -268,7 +267,7 @@ function useContactPetitionAccessesColumns() {
           cellProps: { padding: 0 },
           CellContent: ({ row: { petition }, context }) => (
             <Flex alignItems="center" paddingRight="2">
-              <PetitionSignatureCellContent petition={petition!} user={context!.user} />
+              <PetitionSignatureCellContent petition={petition!} />
             </Flex>
           ),
         },
@@ -383,10 +382,8 @@ Contact.fragments = {
   User: gql`
     fragment Contact_User on User {
       ...AppLayout_User
-      ...PetitionSignatureCellContent_User
     }
     ${AppLayout.fragments.User}
-    ${PetitionSignatureCellContent.fragments.User}
   `,
 };
 
@@ -429,9 +426,7 @@ const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(function ToggleI
 });
 
 Contact.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  const {
-    data: { me },
-  } = await fetchQuery<ContactUserQuery>(gql`
+  await fetchQuery<ContactUserQuery>(gql`
     query ContactUser {
       me {
         ...Contact_User
@@ -441,7 +436,7 @@ Contact.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) =
   `);
   await fetchQuery<ContactQuery, ContactQueryVariables>(
     gql`
-      query Contact($id: GID!, $hasPetitionSignature: Boolean!) {
+      query Contact($id: GID!) {
         contact(id: $id) {
           ...Contact_Contact
         }
@@ -451,7 +446,6 @@ Contact.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) =
     {
       variables: {
         id: query.contactId as string,
-        hasPetitionSignature: me.hasPetitionSignature,
       },
     }
   );

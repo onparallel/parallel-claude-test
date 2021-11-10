@@ -3104,14 +3104,18 @@ export type PetitionSignatureCellContent_PetitionFragment = { __typename?: "Peti
   "status"
 > & {
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
+          signatureConfig: { __typename?: "SignatureConfig" } & {
+            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          };
+        }
     >;
-    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+        }
+    >;
   };
-
-export type PetitionSignatureCellContent_UserFragment = { __typename?: "User" } & {
-  hasPetitionSignature: User["hasFeatureFlag"];
-};
 
 export type PetitionStatusCellContent_PetitionFragment = { __typename?: "Petition" } & Pick<
   Petition,
@@ -7444,10 +7448,20 @@ export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
                     { __typename?: "PetitionSignatureRequest" } & Pick<
                       PetitionSignatureRequest,
                       "status"
-                    >
+                    > & {
+                        signatureConfig: { __typename?: "SignatureConfig" } & {
+                          integration?: Maybe<
+                            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                          >;
+                        };
+                      }
                   >;
                   signatureConfig?: Maybe<
-                    { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+                    { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+                        integration?: Maybe<
+                          { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                        >;
+                      }
                   >;
                 }
             >;
@@ -7489,10 +7503,23 @@ export type Contact_PetitionAccessFragment = { __typename?: "PetitionAccess" } &
             "validated" | "replied" | "optional" | "total"
           >;
           currentSignatureRequest?: Maybe<
-            { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+            { __typename?: "PetitionSignatureRequest" } & Pick<
+              PetitionSignatureRequest,
+              "status"
+            > & {
+                signatureConfig: { __typename?: "SignatureConfig" } & {
+                  integration?: Maybe<
+                    { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                  >;
+                };
+              }
           >;
           signatureConfig?: Maybe<
-            { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+            { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+                integration?: Maybe<
+                  { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                >;
+              }
           >;
         }
     >;
@@ -7522,9 +7549,17 @@ export type Contact_PetitionFragment = { __typename?: "Petition" } & Pick<
       "validated" | "replied" | "optional" | "total"
     >;
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
+          signatureConfig: { __typename?: "SignatureConfig" } & {
+            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          };
+        }
     >;
-    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+        }
+    >;
   };
 
 export type Contact_UserFragment = { __typename?: "User" } & Pick<
@@ -7540,7 +7575,7 @@ export type Contact_UserFragment = { __typename?: "User" } & Pick<
   | "role"
   | "avatarUrl"
   | "initials"
-> & { hasPetitionSignature: User["hasFeatureFlag"] } & {
+> & {
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
           petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -7579,7 +7614,7 @@ export type ContactUserQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & { hasPetitionSignature: User["hasFeatureFlag"] } & {
+  > & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -7593,7 +7628,6 @@ export type ContactUserQuery = {
 
 export type ContactQueryVariables = Exact<{
   id: Scalars["GID"];
-  hasPetitionSignature: Scalars["Boolean"];
 }>;
 
 export type ContactQuery = {
@@ -7638,10 +7672,20 @@ export type ContactQuery = {
                         { __typename?: "PetitionSignatureRequest" } & Pick<
                           PetitionSignatureRequest,
                           "status"
-                        >
+                        > & {
+                            signatureConfig: { __typename?: "SignatureConfig" } & {
+                              integration?: Maybe<
+                                { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                              >;
+                            };
+                          }
                       >;
                       signatureConfig?: Maybe<
-                        { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+                        { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+                            integration?: Maybe<
+                              { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                            >;
+                          }
                       >;
                     }
                 >;
@@ -10187,7 +10231,6 @@ export type PetitionCompose_OrganizationFragment = { __typename?: "Organization"
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
-  hasPetitionSignature: Scalars["Boolean"];
 }>;
 
 export type PetitionCompose_updatePetitionMutation = {
@@ -10757,7 +10800,6 @@ export type PetitionComposeUserQuery = {
 
 export type PetitionComposeQueryVariables = Exact<{
   id: Scalars["GID"];
-  hasPetitionSignature: Scalars["Boolean"];
 }>;
 
 export type PetitionComposeQuery = {
@@ -11031,7 +11073,14 @@ export type PetitionReplies_PetitionFragment = { __typename?: "Petition" } & Pic
         }
     >;
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "id" | "status">
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "id" | "status"
+      > & {
+          signatureConfig: { __typename?: "SignatureConfig" } & {
+            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          };
+        }
     >;
     permissions: Array<
       | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
@@ -11076,7 +11125,7 @@ export type PetitionReplies_PetitionFragment = { __typename?: "Petition" } & Pic
           integration?: Maybe<
             { __typename?: "OrgIntegration" } & Pick<
               OrgIntegration,
-              "id" | "name" | "provider" | "isDefault" | "status"
+              "status" | "id" | "name" | "provider" | "isDefault"
             > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
           >;
           signers: Array<
@@ -11419,7 +11468,6 @@ export type PetitionRepliesUserQuery = {
 
 export type PetitionRepliesQueryVariables = Exact<{
   id: Scalars["GID"];
-  hasPetitionSignature: Scalars["Boolean"];
   hasInternalComments: Scalars["Boolean"];
 }>;
 
@@ -11495,7 +11543,13 @@ export type PetitionRepliesQuery = {
             { __typename?: "PetitionSignatureRequest" } & Pick<
               PetitionSignatureRequest,
               "id" | "status"
-            >
+            > & {
+                signatureConfig: { __typename?: "SignatureConfig" } & {
+                  integration?: Maybe<
+                    { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                  >;
+                };
+              }
           >;
           permissions: Array<
             | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
@@ -11540,7 +11594,7 @@ export type PetitionRepliesQuery = {
                 integration?: Maybe<
                   { __typename?: "OrgIntegration" } & Pick<
                     OrgIntegration,
-                    "id" | "name" | "provider" | "isDefault" | "status"
+                    "status" | "id" | "name" | "provider" | "isDefault"
                   > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
                 signers: Array<
@@ -11609,10 +11663,23 @@ export type Petitions_PetitionBasePaginationFragment = {
             >;
             tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
             currentSignatureRequest?: Maybe<
-              { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+              { __typename?: "PetitionSignatureRequest" } & Pick<
+                PetitionSignatureRequest,
+                "status"
+              > & {
+                  signatureConfig: { __typename?: "SignatureConfig" } & {
+                    integration?: Maybe<
+                      { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                    >;
+                  };
+                }
             >;
             signatureConfig?: Maybe<
-              { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+              { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+                  integration?: Maybe<
+                    { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                  >;
+                }
             >;
           })
       | ({ __typename?: "PetitionTemplate" } & Pick<
@@ -11677,9 +11744,17 @@ export type Petitions_PetitionBase_Petition_Fragment = { __typename?: "Petition"
     >;
     tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
+          signatureConfig: { __typename?: "SignatureConfig" } & {
+            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          };
+        }
     >;
-    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+        }
+    >;
   };
 
 export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
@@ -11723,7 +11798,7 @@ export type Petitions_UserFragment = { __typename?: "User" } & Pick<
   | "role"
   | "avatarUrl"
   | "initials"
-> & { hasPetitionSignature: User["hasFeatureFlag"] } & {
+> & {
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
           petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -11750,7 +11825,7 @@ export type PetitionsUserQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & { hasPetitionSignature: User["hasFeatureFlag"] } & {
+  > & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -11767,7 +11842,6 @@ export type PetitionsQueryVariables = Exact<{
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
-  hasPetitionSignature: Scalars["Boolean"];
   filters?: Maybe<PetitionFilter>;
 }>;
 
@@ -11823,10 +11897,20 @@ export type PetitionsQuery = {
                 { __typename?: "PetitionSignatureRequest" } & Pick<
                   PetitionSignatureRequest,
                   "status"
-                >
+                > & {
+                    signatureConfig: { __typename?: "SignatureConfig" } & {
+                      integration?: Maybe<
+                        { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                      >;
+                    };
+                  }
               >;
               signatureConfig?: Maybe<
-                { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+                { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+                    integration?: Maybe<
+                      { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                    >;
+                  }
               >;
             })
         | ({ __typename?: "PetitionTemplate" } & Pick<
@@ -13238,14 +13322,21 @@ export type useFilenamePlaceholdersRename_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
 } & Pick<PetitionFieldReply, "content">;
 
-export type usePetitionCurrentSignatureStatus_PetitionFragment = { __typename?: "Petition" } & Pick<
-  Petition,
-  "status"
-> & {
+export type usePetitionCurrentSignatureStatusAndEnv_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "status"> & {
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
+          signatureConfig: { __typename?: "SignatureConfig" } & {
+            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          };
+        }
     >;
-    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+        }
+    >;
   };
 
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
@@ -13280,9 +13371,17 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     >;
     tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status">
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
+          signatureConfig: { __typename?: "SignatureConfig" } & {
+            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          };
+        }
     >;
-    signatureConfig?: Maybe<{ __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">>;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+        }
+    >;
   };
 
 export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
@@ -13309,10 +13408,6 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
 export type usePetitionsTableColumns_PetitionBaseFragment =
   | usePetitionsTableColumns_PetitionBase_Petition_Fragment
   | usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
-
-export type usePetitionsTableColumns_UserFragment = { __typename?: "User" } & {
-  hasPetitionSignature: User["hasFeatureFlag"];
-};
 
 export type PrintPdfTask_createPrintPdfTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -14072,22 +14167,30 @@ export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
     }
   }
 `;
-export const usePetitionCurrentSignatureStatus_PetitionFragmentDoc = gql`
-  fragment usePetitionCurrentSignatureStatus_Petition on Petition {
+export const usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc = gql`
+  fragment usePetitionCurrentSignatureStatusAndEnv_Petition on Petition {
     status
     currentSignatureRequest {
       status
+      signatureConfig {
+        integration {
+          status
+        }
+      }
     }
     signatureConfig {
       review
+      integration {
+        status
+      }
     }
   }
 `;
 export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
   fragment PetitionSignatureCellContent_Petition on Petition {
-    ...usePetitionCurrentSignatureStatus_Petition @include(if: $hasPetitionSignature)
+    ...usePetitionCurrentSignatureStatusAndEnv_Petition
   }
-  ${usePetitionCurrentSignatureStatus_PetitionFragmentDoc}
+  ${usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc}
 `;
 export const Contact_PetitionFragmentDoc = gql`
   fragment Contact_Petition on Petition {
@@ -14137,18 +14240,11 @@ export const Contact_ContactFragmentDoc = gql`
   ${Contact_Contact_ProfileFragmentDoc}
   ${Contact_PetitionAccessFragmentDoc}
 `;
-export const PetitionSignatureCellContent_UserFragmentDoc = gql`
-  fragment PetitionSignatureCellContent_User on User {
-    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-  }
-`;
 export const Contact_UserFragmentDoc = gql`
   fragment Contact_User on User {
     ...AppLayout_User
-    ...PetitionSignatureCellContent_User
   }
   ${AppLayout_UserFragmentDoc}
-  ${PetitionSignatureCellContent_UserFragmentDoc}
 `;
 export const Contacts_ContactsListFragmentDoc = gql`
   fragment Contacts_ContactsList on ContactPagination {
@@ -15198,11 +15294,11 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     skipForwardSecurity
     isRecipientViewContentsHidden
     isReadOnly
-    ...SignatureConfigDialog_PetitionBase @include(if: $hasPetitionSignature)
+    ...SignatureConfigDialog_PetitionBase
     ... on Petition {
       status
       deadline
-      currentSignatureRequest @include(if: $hasPetitionSignature) {
+      currentSignatureRequest {
         id
         status
       }
@@ -15544,18 +15640,18 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       ...PetitionReplies_PetitionField
     }
     ...ShareButton_PetitionBase
-    currentSignatureRequest @include(if: $hasPetitionSignature) {
+    currentSignatureRequest {
       id
       status
     }
-    ...PetitionSignaturesCard_Petition @include(if: $hasPetitionSignature)
-    ...usePetitionCurrentSignatureStatus_Petition @include(if: $hasPetitionSignature)
+    ...PetitionSignaturesCard_Petition
+    ...usePetitionCurrentSignatureStatusAndEnv_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
   ${ShareButton_PetitionBaseFragmentDoc}
   ${PetitionSignaturesCard_PetitionFragmentDoc}
-  ${usePetitionCurrentSignatureStatus_PetitionFragmentDoc}
+  ${usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc}
 `;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {
@@ -15676,19 +15772,11 @@ export const Petitions_PetitionBasePaginationFragmentDoc = gql`
   }
   ${Petitions_PetitionBaseFragmentDoc}
 `;
-export const usePetitionsTableColumns_UserFragmentDoc = gql`
-  fragment usePetitionsTableColumns_User on User {
-    ...PetitionSignatureCellContent_User
-  }
-  ${PetitionSignatureCellContent_UserFragmentDoc}
-`;
 export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
     ...AppLayout_User
-    ...usePetitionsTableColumns_User
   }
   ${AppLayout_UserFragmentDoc}
-  ${usePetitionsTableColumns_UserFragmentDoc}
 `;
 export const TemplateCard_PetitionTemplateFragmentDoc = gql`
   fragment TemplateCard_PetitionTemplate on PetitionTemplate {
@@ -18486,7 +18574,7 @@ export function useContactUserLazyQuery(
 export type ContactUserQueryHookResult = ReturnType<typeof useContactUserQuery>;
 export type ContactUserLazyQueryHookResult = ReturnType<typeof useContactUserLazyQuery>;
 export const ContactDocument = gql`
-  query Contact($id: GID!, $hasPetitionSignature: Boolean!) {
+  query Contact($id: GID!) {
     contact(id: $id) {
       ...Contact_Contact
     }
@@ -19656,11 +19744,7 @@ export type PetitionActivityUserLazyQueryHookResult = ReturnType<
   typeof usePetitionActivityUserLazyQuery
 >;
 export const PetitionCompose_updatePetitionDocument = gql`
-  mutation PetitionCompose_updatePetition(
-    $petitionId: GID!
-    $data: UpdatePetitionInput!
-    $hasPetitionSignature: Boolean!
-  ) {
+  mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...PetitionLayout_PetitionBase
       ...PetitionSettings_PetitionBase
@@ -19968,7 +20052,7 @@ export type PetitionComposeUserLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeUserLazyQuery
 >;
 export const PetitionComposeDocument = gql`
-  query PetitionCompose($id: GID!, $hasPetitionSignature: Boolean!) {
+  query PetitionCompose($id: GID!) {
     petition(id: $id) {
       ...PetitionCompose_PetitionBase
     }
@@ -20323,11 +20407,7 @@ export type PetitionRepliesUserLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesUserLazyQuery
 >;
 export const PetitionRepliesDocument = gql`
-  query PetitionReplies(
-    $id: GID!
-    $hasPetitionSignature: Boolean!
-    $hasInternalComments: Boolean!
-  ) {
+  query PetitionReplies($id: GID!, $hasInternalComments: Boolean!) {
     petition(id: $id) {
       ...PetitionReplies_Petition
     }
@@ -20388,7 +20468,6 @@ export const PetitionsDocument = gql`
     $limit: Int!
     $search: String
     $sortBy: [QueryPetitions_OrderBy!]
-    $hasPetitionSignature: Boolean!
     $filters: PetitionFilter
   ) {
     petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {

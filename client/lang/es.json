@@ -1750,16 +1750,6 @@
     "context": "Language of the template"
   },
   {
-    "term": "component.petition-settings.test-badge",
-    "definition": "prueba",
-    "context": "test"
-  },
-  {
-    "term": "component.petition-settings.test-badge-popover",
-    "definition": "El modo de prueba, te permite enviar firmas pero no tendrán ninguna validez legal. Para activar la firma digital, <a>contacta con nuestro equipo de soporte.</a>",
-    "context": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
-  },
-  {
     "term": "component.petition-sharing-dialog.subscribe",
     "definition": "Subscribir a las notificaciones",
     "context": "Subscribe to notifications"
@@ -2968,6 +2958,16 @@
     "term": "component.template-header.use-template",
     "definition": "Usar esta plantilla",
     "context": "Use this template"
+  },
+  {
+    "term": "component.test-mode-signature-badge.label",
+    "definition": "prueba",
+    "context": "test"
+  },
+  {
+    "term": "component.test-mode-signature-badge.popover",
+    "definition": "El modo de prueba, te permite enviar firmas pero no tendrán ninguna validez legal. Para activar la firma digital, <a>contacta con nuestro equipo de soporte.</a>",
+    "context": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
   },
   {
     "term": "component.test-signature-dialog.body",
@@ -5113,6 +5113,11 @@
     "term": "petition-sharing.success-title",
     "definition": "{count, plural, =1 {Petición compartida} other {Peticiones compartidas}}",
     "context": "{count, plural, =1 {Petition} other {Petitions}} shared"
+  },
+  {
+    "term": "petition-signature-cell-content.test-environment",
+    "definition": "Entorno de pruebas",
+    "context": "Test environment"
   },
   {
     "term": "petition-signature-status-label.e-signature-cancelled",
