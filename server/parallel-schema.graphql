@@ -592,12 +592,11 @@ type Mutation {
   """
   createPublicPetitionLink(
     description: String!
-    otherPermissions: [UserOrUserGroupPublicLinkPermission!]
     ownerId: GID!
     slug: String
     templateId: GID!
     title: String!
-  ): PetitionTemplate!
+  ): PublicPetitionLink!
 
   """
   Creates a reply to a text or select field.
@@ -1227,7 +1226,6 @@ type Mutation {
   updatePublicPetitionLink(
     description: String
     isActive: Boolean
-    otherPermissions: [UserOrUserGroupPublicLinkPermission!]
     ownerId: GID
     publicPetitionLinkId: GID!
     slug: String
@@ -1247,6 +1245,14 @@ type Mutation {
   Updates the name and color of a given tag
   """
   updateTag(data: UpdateTagInput!, id: GID!): Tag!
+
+  """
+  Updates the template default permissions
+  """
+  updateTemplateDefaultPermissions(
+    permissions: [UserOrUserGroupPermissionInput!]
+    templateId: GID!
+  ): PetitionTemplate!
 
   """
   Updates the user with the provided data.
@@ -2570,6 +2576,7 @@ type PetitionTemplate implements PetitionBase {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  defaultPermissions: [TemplateDefaultPermission!]!
 
   """
   Description of the template.
@@ -3064,8 +3071,8 @@ type PublicPetitionLink {
   description: String!
   id: GID!
   isActive: Boolean!
-  linkPermissions: [PublicPetitionLinkPermission!]!
   organization: PublicPetitionLinkOwnerOrganization!
+  owner: PublicUser!
   slug: String!
   title: String!
 }
@@ -3073,50 +3080,6 @@ type PublicPetitionLink {
 type PublicPetitionLinkOwnerOrganization {
   logoUrl: String
   name: String!
-}
-
-interface PublicPetitionLinkPermission implements Timestamps {
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
-  isSubscribed: Boolean!
-  permissionType: PetitionPermissionType!
-
-  """
-  Time when the resource was last updated.
-  """
-  updatedAt: DateTime!
-}
-
-type PublicPetitionLinkUserGroupPermission implements PublicPetitionLinkPermission & Timestamps {
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
-  group: UserGroup!
-  isSubscribed: Boolean!
-  permissionType: PetitionPermissionType!
-
-  """
-  Time when the resource was last updated.
-  """
-  updatedAt: DateTime!
-}
-
-type PublicPetitionLinkUserPermission implements PublicPetitionLinkPermission & Timestamps {
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
-  isSubscribed: Boolean!
-  permissionType: PetitionPermissionType!
-
-  """
-  Time when the resource was last updated.
-  """
-  updatedAt: DateTime!
-  user: User!
 }
 
 """
@@ -3778,6 +3741,88 @@ enum TaskStatus {
   PROCESSING
 }
 
+interface TemplateDefaultPermission implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  wether user is will be subscribed or not to emails and alerts of the generated petition
+  """
+  isSubscribed: Boolean!
+
+  """
+  The type of the permission.
+  """
+  permissionType: PetitionPermissionType!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+The permission for a petition and user group
+"""
+type TemplateDefaultUserGroupPermission implements TemplateDefaultPermission & Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The group linked to the permission
+  """
+  group: UserGroup!
+
+  """
+  wether user is will be subscribed or not to emails and alerts of the generated petition
+  """
+  isSubscribed: Boolean!
+
+  """
+  The type of the permission.
+  """
+  permissionType: PetitionPermissionType!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+The permission for a petition and user
+"""
+type TemplateDefaultUserPermission implements TemplateDefaultPermission & Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  wether user is will be subscribed or not to emails and alerts of the generated petition
+  """
+  isSubscribed: Boolean!
+
+  """
+  The type of the permission.
+  """
+  permissionType: PetitionPermissionType!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+
+  """
+  The user linked to the permission
+  """
+  user: User!
+}
+
 type TemplateUsedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
@@ -4053,12 +4098,11 @@ union UserOrPetitionAccess = PetitionAccess | User
 
 union UserOrUserGroup = User | UserGroup
 
-input UserOrUserGroupPublicLinkPermission {
-  """
-  Global ID of the User or UserGroup
-  """
-  id: ID!
+input UserOrUserGroupPermissionInput {
+  isSubscribed: Boolean!
   permissionType: PetitionPermissionTypeRW!
+  userGroupId: GID
+  userId: GID
 }
 
 type UserPagination {

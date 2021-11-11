@@ -492,6 +492,7 @@ export class Mocks {
     const [data] = await this.knex<PublicPetitionLink>("public_petition_link")
       .insert({
         template_id: templateId,
+        owner_id: ownerId,
         description: faker.lorem.paragraph(),
         title: faker.lorem.words(),
         is_active: true,
@@ -499,12 +500,6 @@ export class Mocks {
         ...builder?.(),
       })
       .returning("*");
-
-    await this.knex<PublicPetitionLinkUser>("public_petition_link_user").insert({
-      public_petition_link_id: data.id,
-      user_id: ownerId,
-      type: "OWNER",
-    });
 
     return data;
   }

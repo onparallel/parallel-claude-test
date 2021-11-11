@@ -3,7 +3,10 @@ import type * as db from "./../db/__types";
 import type * as events from "./../db/events";
 import type * as notifications from "./../db/notifications";
 import type { ApiContext } from "./../context";
-import type { GlobalIdConfigSpread } from "./helpers/globalIdPlugin";
+import type {
+  GlobalIdOutputFieldConfigSpread,
+  GlobalIdInputFieldConfig,
+} from "./helpers/globalIdPlugin";
 import type { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import type { FieldValidateArgsResolver } from "./helpers/validateArgsPlugin";
 import type { core } from "nexus";
@@ -31,6 +34,10 @@ declare global {
       fieldName: FieldName,
       opts?: core.CommonInputFieldConfig<TypeName, FieldName>
     ): void; // "JSON";
+    globalId<FieldName extends string>(
+      fieldName: FieldName,
+      opts: GlobalIdInputFieldConfig<TypeName, FieldName>
+    ): void;
   }
 }
 declare global {
@@ -58,7 +65,7 @@ declare global {
     ): void; // "JSON";
     globalId<FieldName extends string>(
       fieldName: FieldName,
-      ...opts: GlobalIdConfigSpread<TypeName, FieldName>
+      ...opts: GlobalIdOutputFieldConfigSpread<TypeName, FieldName>
     ): void;
 
     paginationField<
@@ -185,10 +192,12 @@ export interface NexusGenInputs {
     lastName?: string | null; // String
     role?: NexusGenEnums["OrganizationRole"] | null; // OrganizationRole
   };
-  UserOrUserGroupPublicLinkPermission: {
+  UserOrUserGroupPermissionInput: {
     // input type
-    id: string; // ID!
+    isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
+    userGroupId?: NexusGenScalars["GID"] | null; // GID
+    userId?: NexusGenScalars["GID"] | null; // GID
   };
 }
 
@@ -481,8 +490,6 @@ export interface NexusGenObjects {
     logoUrl?: string | null; // String
     name: string; // String!
   };
-  PublicPetitionLinkUserGroupPermission: db.PublicPetitionLinkUser;
-  PublicPetitionLinkUserPermission: db.PublicPetitionLinkUser;
   PublicPetitionMessage: db.PetitionMessage;
   PublicSignatureConfig: {
     signersInfo: any[];
@@ -541,6 +548,8 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   Task: db.Task;
+  TemplateDefaultUserGroupPermission: db.TemplateDefaultPermission;
+  TemplateDefaultUserPermission: db.TemplateDefaultPermission;
   TemplateUsedEvent: events.TemplateUsedEvent;
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
@@ -594,7 +603,7 @@ export interface NexusGenInterfaces {
   PetitionEvent: events.PetitionEvent;
   PetitionPermission: db.PetitionPermission;
   PetitionUserNotification: db.PetitionUserNotification;
-  PublicPetitionLinkPermission: db.PublicPetitionLinkUser;
+  TemplateDefaultPermission: db.TemplateDefaultPermission;
   Timestamps: {
     created_at: Date;
     updated_at: Date;
@@ -851,7 +860,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["CreateFileUploadFieldAttachment"]; // CreateFileUploadFieldAttachment!
     createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
-    createPublicPetitionLink: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
+    createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -935,6 +944,7 @@ export interface NexusGenFieldTypes {
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     updateSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateTag: NexusGenRootTypes["Tag"]; // Tag!
+    updateTemplateDefaultPermissions: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
@@ -1254,6 +1264,7 @@ export interface NexusGenFieldTypes {
   PetitionTemplate: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
     description: NexusGenScalars["JSON"] | null; // JSON
     descriptionExcerpt: string | null; // String
     descriptionHtml: string | null; // String
@@ -1399,8 +1410,8 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     id: NexusGenScalars["GID"]; // GID!
     isActive: boolean; // Boolean!
-    linkPermissions: NexusGenRootTypes["PublicPetitionLinkPermission"][]; // [PublicPetitionLinkPermission!]!
     organization: NexusGenRootTypes["PublicPetitionLinkOwnerOrganization"]; // PublicPetitionLinkOwnerOrganization!
+    owner: NexusGenRootTypes["PublicUser"]; // PublicUser!
     slug: string; // String!
     title: string; // String!
   };
@@ -1408,22 +1419,6 @@ export interface NexusGenFieldTypes {
     // field return type
     logoUrl: string | null; // String
     name: string; // String!
-  };
-  PublicPetitionLinkUserGroupPermission: {
-    // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    group: NexusGenRootTypes["UserGroup"]; // UserGroup!
-    isSubscribed: boolean; // Boolean!
-    permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
-    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
-  };
-  PublicPetitionLinkUserPermission: {
-    // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    isSubscribed: boolean; // Boolean!
-    permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
-    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
-    user: NexusGenRootTypes["User"]; // User!
   };
   PublicPetitionMessage: {
     // field return type
@@ -1619,6 +1614,22 @@ export interface NexusGenFieldTypes {
     progress: number | null; // Int
     status: NexusGenEnums["TaskStatus"]; // TaskStatus!
   };
+  TemplateDefaultUserGroupPermission: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    group: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    isSubscribed: boolean; // Boolean!
+    permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  TemplateDefaultUserPermission: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    isSubscribed: boolean; // Boolean!
+    permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    user: NexusGenRootTypes["User"]; // User!
+  };
   TemplateUsedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1777,7 +1788,7 @@ export interface NexusGenFieldTypes {
     isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
   };
-  PublicPetitionLinkPermission: {
+  TemplateDefaultPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     isSubscribed: boolean; // Boolean!
@@ -2022,7 +2033,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldAttachmentUploadLink: "CreateFileUploadFieldAttachment";
     createPetitionFieldComment: "PetitionField";
     createPrintPdfTask: "Task";
-    createPublicPetitionLink: "PetitionTemplate";
+    createPublicPetitionLink: "PublicPetitionLink";
     createSimpleReply: "PetitionFieldReply";
     createTag: "Tag";
     createUser: "SupportMethodResponse";
@@ -2106,6 +2117,7 @@ export interface NexusGenFieldTypeNames {
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
     updateSimpleReply: "PetitionFieldReply";
     updateTag: "Tag";
+    updateTemplateDefaultPermissions: "PetitionTemplate";
     updateUser: "User";
     updateUserGroup: "UserGroup";
     updateUserStatus: "User";
@@ -2425,6 +2437,7 @@ export interface NexusGenFieldTypeNames {
   PetitionTemplate: {
     // field return type name
     createdAt: "DateTime";
+    defaultPermissions: "TemplateDefaultPermission";
     description: "JSON";
     descriptionExcerpt: "String";
     descriptionHtml: "String";
@@ -2570,8 +2583,8 @@ export interface NexusGenFieldTypeNames {
     description: "String";
     id: "GID";
     isActive: "Boolean";
-    linkPermissions: "PublicPetitionLinkPermission";
     organization: "PublicPetitionLinkOwnerOrganization";
+    owner: "PublicUser";
     slug: "String";
     title: "String";
   };
@@ -2579,22 +2592,6 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     logoUrl: "String";
     name: "String";
-  };
-  PublicPetitionLinkUserGroupPermission: {
-    // field return type name
-    createdAt: "DateTime";
-    group: "UserGroup";
-    isSubscribed: "Boolean";
-    permissionType: "PetitionPermissionType";
-    updatedAt: "DateTime";
-  };
-  PublicPetitionLinkUserPermission: {
-    // field return type name
-    createdAt: "DateTime";
-    isSubscribed: "Boolean";
-    permissionType: "PetitionPermissionType";
-    updatedAt: "DateTime";
-    user: "User";
   };
   PublicPetitionMessage: {
     // field return type name
@@ -2790,6 +2787,22 @@ export interface NexusGenFieldTypeNames {
     progress: "Int";
     status: "TaskStatus";
   };
+  TemplateDefaultUserGroupPermission: {
+    // field return type name
+    createdAt: "DateTime";
+    group: "UserGroup";
+    isSubscribed: "Boolean";
+    permissionType: "PetitionPermissionType";
+    updatedAt: "DateTime";
+  };
+  TemplateDefaultUserPermission: {
+    // field return type name
+    createdAt: "DateTime";
+    isSubscribed: "Boolean";
+    permissionType: "PetitionPermissionType";
+    updatedAt: "DateTime";
+    user: "User";
+  };
   TemplateUsedEvent: {
     // field return type name
     createdAt: "DateTime";
@@ -2948,7 +2961,7 @@ export interface NexusGenFieldTypeNames {
     isRead: "Boolean";
     petition: "PetitionBase";
   };
-  PublicPetitionLinkPermission: {
+  TemplateDefaultPermission: {
     // field return type name
     createdAt: "DateTime";
     isSubscribed: "Boolean";
@@ -3118,7 +3131,6 @@ export interface NexusGenArgTypes {
     createPublicPetitionLink: {
       // args
       description: string; // String!
-      otherPermissions?: NexusGenInputs["UserOrUserGroupPublicLinkPermission"][] | null; // [UserOrUserGroupPublicLinkPermission!]
       ownerId: NexusGenScalars["GID"]; // GID!
       slug?: string | null; // String
       templateId: NexusGenScalars["GID"]; // GID!
@@ -3572,7 +3584,6 @@ export interface NexusGenArgTypes {
       // args
       description?: string | null; // String
       isActive?: boolean | null; // Boolean
-      otherPermissions?: NexusGenInputs["UserOrUserGroupPublicLinkPermission"][] | null; // [UserOrUserGroupPublicLinkPermission!]
       ownerId?: NexusGenScalars["GID"] | null; // GID
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
       slug?: string | null; // String
@@ -3593,6 +3604,11 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateTagInput"]; // UpdateTagInput!
       id: NexusGenScalars["GID"]; // GID!
+    };
+    updateTemplateDefaultPermissions: {
+      // args
+      permissions?: NexusGenInputs["UserOrUserGroupPermissionInput"][] | null; // [UserOrUserGroupPermissionInput!]
+      templateId: NexusGenScalars["GID"]; // GID!
     };
     updateUser: {
       // args
@@ -3898,9 +3914,7 @@ export interface NexusGenAbstractTypeMembers {
     | "RemindersOptOutNotification"
     | "SignatureCancelledUserNotification"
     | "SignatureCompletedUserNotification";
-  PublicPetitionLinkPermission:
-    | "PublicPetitionLinkUserGroupPermission"
-    | "PublicPetitionLinkUserPermission";
+  TemplateDefaultPermission: "TemplateDefaultUserGroupPermission" | "TemplateDefaultUserPermission";
   Timestamps:
     | "Contact"
     | "Organization"
@@ -3911,8 +3925,8 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionUserPermission"
     | "PublicPetition"
     | "PublicPetitionFieldReply"
-    | "PublicPetitionLinkUserGroupPermission"
-    | "PublicPetitionLinkUserPermission"
+    | "TemplateDefaultUserGroupPermission"
+    | "TemplateDefaultUserPermission"
     | "User"
     | "UserGroup";
 }
@@ -3962,8 +3976,6 @@ export interface NexusGenTypeInterfaces {
   PetitionUserPermission: "PetitionPermission" | "Timestamps";
   PublicPetition: "Timestamps";
   PublicPetitionFieldReply: "Timestamps";
-  PublicPetitionLinkUserGroupPermission: "PublicPetitionLinkPermission" | "Timestamps";
-  PublicPetitionLinkUserPermission: "PublicPetitionLinkPermission" | "Timestamps";
   RecipientSignedEvent: "PetitionEvent";
   ReminderEmailBouncedUserNotification: "PetitionUserNotification";
   ReminderSentEvent: "PetitionEvent";
@@ -3977,6 +3989,8 @@ export interface NexusGenTypeInterfaces {
   SignatureCompletedEvent: "PetitionEvent";
   SignatureCompletedUserNotification: "PetitionUserNotification";
   SignatureStartedEvent: "PetitionEvent";
+  TemplateDefaultUserGroupPermission: "TemplateDefaultPermission" | "Timestamps";
+  TemplateDefaultUserPermission: "TemplateDefaultPermission" | "Timestamps";
   TemplateUsedEvent: "PetitionEvent";
   User: "Timestamps";
   UserAuthenticationToken: "CreatedAt";
@@ -3985,7 +3999,7 @@ export interface NexusGenTypeInterfaces {
   UserPermissionEditedEvent: "PetitionEvent";
   UserPermissionRemovedEvent: "PetitionEvent";
   PetitionPermission: "Timestamps";
-  PublicPetitionLinkPermission: "Timestamps";
+  TemplateDefaultPermission: "Timestamps";
 }
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
@@ -4009,8 +4023,8 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "PetitionEvent"
   | "PetitionPermission"
   | "PetitionUserNotification"
-  | "PublicPetitionLinkPermission"
   | "PublicUserOrContact"
+  | "TemplateDefaultPermission"
   | "Timestamps"
   | "UserOrContact"
   | "UserOrPetitionAccess"

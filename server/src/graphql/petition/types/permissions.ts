@@ -95,3 +95,63 @@ export const PetitionUserPermission = objectType({
     });
   },
 });
+
+export const TemplateDefaultPermission = interfaceType({
+  name: "TemplateDefaultPermission",
+  sourceType: "db.TemplateDefaultPermission",
+  resolveType: (o) => {
+    if (isDefined(o.user_id)) {
+      return "TemplateDefaultUserPermission";
+    } else if (isDefined(o.user_group_id)) {
+      return "TemplateDefaultUserGroupPermission";
+    }
+    throw new Error(
+      `Either user_id or user_group_id must be defined on petition_permission with id ${o.id}`
+    );
+  },
+  definition(t) {
+    t.implements("Timestamps");
+    t.field("permissionType", {
+      type: "PetitionPermissionType",
+      description: "The type of the permission.",
+      resolve: (o) => o.type,
+    });
+    t.boolean("isSubscribed", {
+      description:
+        "wether user is will be subscribed or not to emails and alerts of the generated petition",
+      resolve: (o) => o.is_subscribed,
+    });
+  },
+});
+
+export const TemplateDefaultUserGroupPermission = objectType({
+  name: "TemplateDefaultUserGroupPermission",
+  sourceType: "db.TemplateDefaultPermission",
+  description: "The permission for a petition and user group",
+  definition(t) {
+    t.implements("TemplateDefaultPermission");
+    t.field("group", {
+      type: "UserGroup",
+      description: "The group linked to the permission",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.userGroups.loadUserGroup(root.user_group_id!))!;
+      },
+    });
+  },
+});
+
+export const TemplateDefaultUserPermission = objectType({
+  name: "TemplateDefaultUserPermission",
+  sourceType: "db.TemplateDefaultPermission",
+  description: "The permission for a petition and user",
+  definition(t) {
+    t.implements("TemplateDefaultPermission");
+    t.field("user", {
+      type: "User",
+      description: "The user linked to the permission",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.user_id!))!;
+      },
+    });
+  },
+});

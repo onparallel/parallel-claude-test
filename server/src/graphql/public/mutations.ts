@@ -1132,15 +1132,16 @@ export const publicSendReminder = mutationField("publicSendReminder", {
   authorize: isValidPublicPetitionLink("publicPetitionLinkId"),
   validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
   resolve: async (_, args, ctx) => {
-    const [access, [linkOwner]] = await Promise.all([
+    const link = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
+    const [access, owner] = await Promise.all([
       ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(
         args.publicPetitionLinkId,
         args.contactEmail
       ),
-      ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(args.publicPetitionLinkId),
+      ctx.users.loadUser(link.owner_id),
     ]);
 
-    if (!access || access.status === "INACTIVE" || access.reminders_left === 0 || !linkOwner) {
+    if (!access || access.status === "INACTIVE" || access.reminders_left === 0 || !owner) {
       return RESULT.FAILURE;
     }
 
@@ -1162,7 +1163,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
           type: "MANUAL",
           status: "PROCESSING",
           petition_access_id: access.id,
-          sender_id: linkOwner.id,
+          sender_id: owner.id,
           email_body: null,
           created_by: `Contact:${access.contact_id}`,
         },

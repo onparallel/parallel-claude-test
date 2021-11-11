@@ -163,18 +163,10 @@ export function isValidPublicPetitionLink<
   return async (_, args, ctx) => {
     const id = args[argPublicPetitionLinkId] as number;
 
-    const [publicPetitionLink, publicPetitionLinkUsers] = await Promise.all([
-      ctx.petitions.loadPublicPetitionLink(id),
-      ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(id),
-    ]);
+    const publicPetitionLink = await ctx.petitions.loadPublicPetitionLink(id);
 
     // public link exists and is active
     if (!publicPetitionLink || !publicPetitionLink.is_active) {
-      return false;
-    }
-
-    // link owner exists
-    if (publicPetitionLinkUsers.length === 0 || !publicPetitionLinkUsers.every(isDefined)) {
       return false;
     }
 

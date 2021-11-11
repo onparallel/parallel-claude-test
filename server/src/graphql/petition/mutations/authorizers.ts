@@ -2,8 +2,7 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { isDefined } from "remeda";
 import { ApiContext } from "../../../context";
 import { partition, unMaybeArray } from "../../../util/arrays";
-import { fromGlobalId } from "../../../util/globalId";
-import { Maybe, MaybeArray } from "../../../util/types";
+import { MaybeArray } from "../../../util/types";
 import { Arg } from "../../helpers/authorize";
 import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
 
@@ -31,30 +30,33 @@ export function userHasAccessToUsers<
   };
 }
 
-export function userHasAccessToUserOrUserGroupPublicLinkPermission<
+type UserOrUserGroupPermissionInput = NexusGen["inputTypes"]["UserOrUserGroupPermissionInput"];
+
+export function userHasAccessToUserOrUserGroupPermissions<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, Maybe<{ id: string }[]>>
+  TArg extends Arg<TypeName, FieldName, UserOrUserGroupPermissionInput[] | null | undefined>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const userOrUserGroupGlobalIds = args[argName] as Maybe<{ id: string }[]>;
-      if (!userOrUserGroupGlobalIds) {
+      const permissions = args[argName] as UserOrUserGroupPermissionInput[] | null | undefined;
+      if (!isDefined(permissions)) {
         return true;
       }
-      const userOrUserGroupIds = userOrUserGroupGlobalIds.map(({ id }) => fromGlobalId(id));
-      if (!userOrUserGroupIds.every((gid) => gid.type === "User" || gid.type === "UserGroup")) {
-        return false;
+      for (const p of permissions) {
+        if (Number(isDefined(p.userId)) + Number(isDefined(p.userGroupId)) !== 1) {
+          return false;
+        }
       }
-      const [userIds, userGroupIds] = partition(userOrUserGroupIds, (gid) => gid.type === "User");
+      const [uPermissions, ugPermissions] = partition(permissions, (p) => isDefined(p.userId));
 
       const [hasAccessToUsers, hasAccessToUserGroups] = await Promise.all([
         contextUserHasAccessToUsers(
-          userIds.map(({ id }) => id),
+          uPermissions.map((p) => p.userId!),
           ctx
         ),
         contextUserHasAccessToUserGroups(
-          userGroupIds.map(({ id }) => id),
+          ugPermissions.map((p) => p.userGroupId!),
           ctx
         ),
       ]);

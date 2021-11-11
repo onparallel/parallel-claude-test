@@ -2,6 +2,7 @@ import { FieldValidateArgsResolver } from "./validateArgsPlugin";
 import { ValidatorOrConditionError } from "./errors";
 import { Maybe } from "../../util/types";
 import { ArgsValue } from "nexus/dist/core";
+import { isDefined } from "remeda";
 
 export function validateAnd<TypeName extends string, FieldName extends string>(
   ...validators: FieldValidateArgsResolver<TypeName, FieldName>[]
@@ -40,6 +41,17 @@ export function validateIf<TypeName extends string, FieldName extends string>(
 ) {
   return (async (root, args, ctx, info) => {
     if (check(args)) {
+      await validator(root, args, ctx, info);
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateIfDefined<TypeName extends string, FieldName extends string>(
+  prop: (args: ArgsValue<TypeName, FieldName>) => any,
+  validator: FieldValidateArgsResolver<TypeName, FieldName>
+) {
+  return (async (root, args, ctx, info) => {
+    if (isDefined(prop(args))) {
       await validator(root, args, ctx, info);
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

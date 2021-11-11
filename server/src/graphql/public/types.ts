@@ -1,6 +1,5 @@
 import { extension } from "mime-types";
-import { core, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
-import { isDefined } from "remeda";
+import { core, enumType, inputObjectType, objectType, unionType } from "nexus";
 import { Contact } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -455,59 +454,6 @@ export const PublicPetitionFieldComment = objectType({
   },
 });
 
-export const PublicPetitionLinkPermission = interfaceType({
-  name: "PublicPetitionLinkPermission",
-  sourceType: "db.PublicPetitionLinkUser",
-  resolveType: (o) => {
-    if (isDefined(o.user_id)) {
-      return "PublicPetitionLinkUserPermission";
-    } else if (isDefined(o.user_group_id)) {
-      return "PublicPetitionLinkUserGroupPermission";
-    }
-    throw new Error(
-      `Either user_id or user_group_id must be defined on PublicPetitionLinkUser:${o.id}`
-    );
-  },
-  definition(t) {
-    t.implements("Timestamps");
-    t.field("permissionType", {
-      type: "PetitionPermissionType",
-      resolve: (o) => o.type,
-    });
-    t.boolean("isSubscribed", {
-      resolve: (o) => o.is_subscribed,
-    });
-  },
-});
-
-export const PublicPetitionLinkUserPermission = objectType({
-  name: "PublicPetitionLinkUserPermission",
-  sourceType: "db.PublicPetitionLinkUser",
-  definition(t) {
-    t.implements("PublicPetitionLinkPermission");
-    t.field("user", {
-      type: "User",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.user_id!))!;
-      },
-    });
-  },
-});
-
-export const PublicPetitionLinkUserGroupPermission = objectType({
-  name: "PublicPetitionLinkUserGroupPermission",
-  sourceType: "db.PublicPetitionLinkUser",
-  definition(t) {
-    t.implements("PublicPetitionLinkPermission");
-    t.field("group", {
-      type: "UserGroup",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.userGroups.loadUserGroup(root.user_group_id!))!;
-      },
-    });
-  },
-});
-
 export const PublicPetitionLink = objectType({
   name: "PublicPetitionLink",
   definition(t) {
@@ -518,10 +464,10 @@ export const PublicPetitionLink = objectType({
     t.nonNull.boolean("isActive", {
       resolve: (o) => o.is_active,
     });
-    t.nonNull.list.field("linkPermissions", {
-      type: "PublicPetitionLinkPermission",
+    t.nonNull.field("owner", {
+      type: "PublicUser",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPublicPetitionLinkUserByPublicPetitionLinkId(root.id);
+        return (await ctx.users.loadUser(root.owner_id))!;
       },
     });
 
@@ -534,15 +480,13 @@ export const PublicPetitionLink = objectType({
         },
       }),
       resolve: async (root, _, ctx) => {
-        const [linkOwner] = await ctx.petitions.getPublicPetitionLinkUsersByPublicPetitionLinkId(
-          root.id
-        );
-        if (!linkOwner) {
+        const owner = await ctx.users.loadUser(root.owner_id);
+        if (!owner) {
           throw new Error(`Can't find owner of PublicPetitionLink:${root.id}`);
         }
-        const organization = await ctx.organizations.loadOrg(linkOwner.org_id);
+        const organization = await ctx.organizations.loadOrg(owner.org_id);
         if (!organization) {
-          throw new Error(`Can't find organization of User:${linkOwner.id}`);
+          throw new Error(`Can't find organization of User:${owner.id}`);
         }
 
         return {

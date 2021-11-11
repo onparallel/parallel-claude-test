@@ -1,12 +1,12 @@
 import { extension } from "mime-types";
 import { enumType, inputObjectType, interfaceType, nullable, objectType, stringArg } from "nexus";
 import { isDefined, minBy } from "remeda";
+import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
 import { or } from "../../helpers/authorize";
 import { userHasFeatureFlag } from "../authorizers";
-import { fullName } from "../../../util/fullName";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -288,10 +288,14 @@ export const PetitionTemplate = objectType({
       description: "The public link linked to this template",
       resolve: async (root, _, ctx) => {
         // for now we just expose only the first created
-        const [publicLink] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id, {
-          refresh: true,
-        });
+        const [publicLink] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id);
         return publicLink;
+      },
+    });
+    t.list.field("defaultPermissions", {
+      type: "TemplateDefaultPermission",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadTemplateDefaultPermissions(root.id);
       },
     });
   },
@@ -740,10 +744,12 @@ export const AWSPresignedPostData = objectType({
   },
 });
 
-export const UserOrUserGroupPublicLinkPermission = inputObjectType({
-  name: "UserOrUserGroupPublicLinkPermission",
+export const UserOrUserGroupPermissionInput = inputObjectType({
+  name: "UserOrUserGroupPermissionInput",
   definition(t) {
-    t.nonNull.id("id", { description: "Global ID of the User or UserGroup" });
+    t.globalId("userId", { prefixName: "User" });
+    t.globalId("userGroupId", { prefixName: "UserGroup" });
     t.nonNull.field("permissionType", { type: "PetitionPermissionTypeRW" });
+    t.nonNull.boolean("isSubscribed");
   },
 });

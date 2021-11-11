@@ -984,6 +984,7 @@ export interface TemplateDefaultPermission {
   user_id: Maybe<number>; // int4
   user_group_id: Maybe<number>; // int4
   is_subscribed: boolean; // bool
+  position: number; // int4
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz

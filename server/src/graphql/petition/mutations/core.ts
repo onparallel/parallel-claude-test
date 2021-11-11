@@ -46,7 +46,7 @@ import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues
 import { presendPetition, sendPetitionMessageEmails } from "../../helpers/presendPetition";
 import { RESULT } from "../../helpers/result";
 import { uploadArg } from "../../helpers/upload";
-import { validateAnd, validateIf, validateOr } from "../../helpers/validateArgs";
+import { validateAnd, validateIf, validateIfDefined, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";
 import { maxLength } from "../../helpers/validators/maxLength";
@@ -90,7 +90,7 @@ import {
 import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
 import {
   userHasAccessToPublicPetitionLink,
-  userHasAccessToUserOrUserGroupPublicLinkPermission,
+  userHasAccessToUserOrUserGroupPermissions,
   userHasAccessToUsers,
 } from "./authorizers";
 
@@ -1073,7 +1073,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
   ),
   resolve: async (_, args, ctx) => {
-    const [petition, petitionOwner] = await Promise.all([
+    const [petition, onwer] = await Promise.all([
       ctx.petitions.loadPetition(args.petitionId),
       ctx.petitions.loadPetitionOwner(args.petitionId),
     ]);
@@ -1081,17 +1081,20 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     if (!petition) {
       throw new Error(`Petition:${args.petitionId} not found`);
     }
-    if (!petitionOwner) {
+    if (!onwer) {
       throw new Error(`Owner of Petition:${args.petitionId} not found`);
     }
 
-    const clonedPetitions = await Promise.all(
-      args.contactIdGroups
-        .slice(1)
-        // set the owner of the original petition as owner of the cloned ones
-        .map(() =>
-          ctx.petitions.clonePetition(args.petitionId, petitionOwner, {}, `User:${ctx.user!.id}`)
-        )
+    const clonedPetitions = await pMap(
+      args.contactIdGroups.slice(1),
+      async () =>
+        await ctx.petitions.clonePetition(
+          args.petitionId,
+          onwer, // set the owner of the original petition as owner of the cloned ones
+          {},
+          `User:${ctx.user!.id}`
+        ),
+      { concurrency: 5 }
     );
 
     if (
@@ -1534,67 +1537,60 @@ export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFie
   },
 });
 
-export const createPublicPetitionLink = mutationField("createPublicPetitionLink", {
-  description: "Creates a public link from a user's template",
+export const updateTemplateDefaultPermissions = mutationField("updateTemplateDefaultPermissions", {
+  description: "Updates the template default permissions",
   type: "PetitionTemplate",
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
+    userHasAccessToUserOrUserGroupPermissions("permissions")
+  ),
+  args: {
+    templateId: nonNull(globalIdArg("Petition")),
+    permissions: nullable(list(nonNull("UserOrUserGroupPermissionInput"))),
+  },
+  resolve: async (_, args, ctx) => {
+    await ctx.petitions.updateTemplateDefaultPermissions(
+      args.templateId,
+      args.permissions as any,
+      `User:${ctx.user!.id}`
+    );
+    return (await ctx.petitions.loadPetition(args.templateId))!;
+  },
+});
+
+export const createPublicPetitionLink = mutationField("createPublicPetitionLink", {
+  description: "Creates a public link from a user's template",
+  type: "PublicPetitionLink",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("templateId"),
+    petitionsAreOfTypeTemplate("templateId"),
     templateDoesNotHavePublicPetitionLink("templateId"),
-    userHasAccessToUsers("ownerId"),
-    userHasAccessToUserOrUserGroupPublicLinkPermission("otherPermissions" as never)
+    userHasAccessToUsers("ownerId")
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
     title: nonNull(stringArg()),
     description: nonNull(stringArg()),
     ownerId: nonNull(globalIdArg("User")),
-    otherPermissions: nullable(list(nonNull("UserOrUserGroupPublicLinkPermission"))),
     slug: nullable(stringArg()),
   },
-  validateArgs: validateIf(
-    (args) => isDefined(args.slug),
+  validateArgs: validateIfDefined(
+    (args) => args.slug,
     validatePublicPetitionLinkSlug((args) => args.slug!, "slug")
   ),
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.withTransaction(async (t) => {
-      const publicPetitionLink = await ctx.petitions.createPublicPetitionLink(
-        {
-          template_id: args.templateId,
-          title: args.title,
-          description: args.description,
-          slug: args.slug ?? random(10),
-          is_active: true,
-        },
-        `User:${ctx.user!.id}`,
-        t
-      );
-
-      await ctx.petitions.createPublicPetitionLinkUser(
-        publicPetitionLink.id,
-        [
-          {
-            id: args.ownerId,
-            type: "User",
-            isSubscribed: true,
-            permissionType: "OWNER",
-          },
-          ...(args.otherPermissions ?? []).map(({ id: gid, permissionType }) => {
-            const { id, type } = fromGlobalId(gid);
-            return {
-              id,
-              type: type as "User" | "UserGroup",
-              isSubscribed: true,
-              permissionType,
-            };
-          }),
-        ],
-        `User:${ctx.user!.id}`,
-        t
-      );
-
-      return (await ctx.petitions.loadPetition(args.templateId))!;
-    });
+    return await ctx.petitions.createPublicPetitionLink(
+      {
+        template_id: args.templateId,
+        title: args.title,
+        description: args.description,
+        slug: args.slug ?? random(10),
+        owner_id: args.ownerId,
+        is_active: true,
+      },
+      `User:${ctx.user!.id}`
+    );
   },
 });
 
@@ -1603,11 +1599,7 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
   type: "PublicPetitionLink",
   authorize: authenticateAnd(
     userHasAccessToPublicPetitionLink("publicPetitionLinkId"),
-    ifArgDefined((args) => args.ownerId, userHasAccessToUsers("ownerId" as never)),
-    ifArgDefined(
-      (args) => args.otherPermissions,
-      userHasAccessToUserOrUserGroupPublicLinkPermission("otherPermissions" as never)
-    )
+    ifArgDefined((args) => args.ownerId, userHasAccessToUsers("ownerId" as any))
   ),
   args: {
     publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
@@ -1615,7 +1607,6 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     title: stringArg(),
     description: stringArg(),
     ownerId: globalIdArg("User"),
-    otherPermissions: list(nonNull("UserOrUserGroupPublicLinkPermission")),
     slug: stringArg(),
   },
   validateArgs: validateIf(
@@ -1637,42 +1628,17 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     if (isDefined(args.isActive)) {
       publicPetitionLinkData.is_active = args.isActive;
     }
-
     if (isDefined(args.slug)) {
       publicPetitionLinkData.slug = args.slug;
     }
-
-    return await ctx.petitions.withTransaction(async (t) => {
-      await ctx.petitions.replacePublicPetitionLinkPermissions(
-        args.publicPetitionLinkId,
-        args.ownerId
-          ? {
-              userId: args.ownerId,
-              isSubscribed: true,
-            }
-          : null,
-        args.otherPermissions
-          ? args.otherPermissions.map((p) => {
-              const { id, type } = fromGlobalId(p.id);
-              return {
-                id,
-                type: type as "User" | "UserGroup",
-                permissionType: p.permissionType,
-                isSubscribed: true,
-              };
-            })
-          : null,
-        `User:${ctx.user!.id}`,
-        t
-      );
-
-      return await ctx.petitions.updatePublicPetitionLink(
-        args.publicPetitionLinkId,
-        publicPetitionLinkData,
-        `User:${ctx.user!.id}`,
-        t
-      );
-    });
+    if (isDefined(args.ownerId)) {
+      publicPetitionLinkData.owner_id = args.ownerId;
+    }
+    return await ctx.petitions.updatePublicPetitionLink(
+      args.publicPetitionLinkId,
+      publicPetitionLinkData,
+      `User:${ctx.user!.id}`
+    );
   },
 });
 
@@ -1717,6 +1683,12 @@ export const autoSendTemplate = mutationField("autoSendTemplate", {
       status: "DRAFT",
       name: args.name,
     });
+
+    await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
+      petition.id,
+      template.id,
+      `User:${ctx.user!.id}`
+    );
 
     await ctx.petitions.createEvent([
       {
