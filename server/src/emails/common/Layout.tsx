@@ -35,7 +35,6 @@ export type LayoutProps = {
   omitGdprDisclaimer?: boolean;
   tone?: string;
   utmCampaign?: string;
-  hideTermsAndPrivacy?: boolean;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -51,7 +50,6 @@ export const Layout: FC<LayoutProps> = function Layout({
   omitGdprDisclaimer,
   utmCampaign,
   tone,
-  hideTermsAndPrivacy,
 }) {
   const { locale } = useIntl();
   const utm = new URLSearchParams({
@@ -59,6 +57,7 @@ export const Layout: FC<LayoutProps> = function Layout({
     utm_medium: "email",
     ...(utmCampaign ? { utm_campaign: utmCampaign } : {}),
   });
+
   return (
     <Mjml>
       <MjmlHead>
@@ -171,7 +170,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               <br />
               C/Almogàvers 165, 59.203, 08018 | Barcelona, Spain
             </MjmlText>
-            {hideTermsAndPrivacy ? null : (
+            {useAlternativeSlogan ? null : (
               <MjmlText align="center">
                 <a
                   className="link"

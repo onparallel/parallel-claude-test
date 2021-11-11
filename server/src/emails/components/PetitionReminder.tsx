@@ -169,7 +169,6 @@ const email: Email<PetitionReminderProps> = {
         })}
         utmCampaign="recipients"
         tone={tone}
-        hideTermsAndPrivacy
       >
         <MjmlSection padding="0">
           <MjmlColumn>

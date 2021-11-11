@@ -81,7 +81,6 @@ const email: Email<SignatureReminderProps> = {
         })}
         utmCampaign="recipients"
         tone={tone}
-        hideTermsAndPrivacy
       >
         <MjmlSection padding="0">
           <MjmlColumn>

@@ -92,7 +92,6 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         logoAlt={logoAlt}
         utmCampaign="recipients"
         tone={tone}
-        hideTermsAndPrivacy
       >
         <MjmlSection padding="0">
           <MjmlColumn>

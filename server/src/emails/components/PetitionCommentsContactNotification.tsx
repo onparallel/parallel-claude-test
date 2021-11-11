@@ -95,7 +95,6 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         logoAlt={logoAlt}
         utmCampaign="recipients"
         tone={tone}
-        hideTermsAndPrivacy
       >
         <MjmlSection padding="0">
           <MjmlColumn>
