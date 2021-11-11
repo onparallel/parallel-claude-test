@@ -123,6 +123,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         logoAlt={logoAlt}
         utmCampaign="recipients"
         tone={tone}
+        hideTermsAndPrivacy
       >
         <MjmlSection padding="0">
           <MjmlColumn>

@@ -35,6 +35,7 @@ export type LayoutProps = {
   omitGdprDisclaimer?: boolean;
   tone?: string;
   utmCampaign?: string;
+  hideTermsAndPrivacy?: boolean;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -50,6 +51,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   omitGdprDisclaimer,
   utmCampaign,
   tone,
+  hideTermsAndPrivacy,
 }) {
   const { locale } = useIntl();
   const utm = new URLSearchParams({
@@ -169,21 +171,27 @@ export const Layout: FC<LayoutProps> = function Layout({
               <br />
               C/Almogàvers 165, 59.203, 08018 | Barcelona, Spain
             </MjmlText>
-            <MjmlText align="center">
-              <a className="link" href={`https://www.onparallel.com/${locale}/legal/terms?${utm}`}>
-                <FormattedMessage
-                  id="layout.terms-and-conditions-link"
-                  defaultMessage="Terms and conditions"
-                />
-              </a>
-              <span> | </span>
-              <a
-                className="link"
-                href={`https://www.onparallel.com/${locale}/legal/privacy?${utm}`}
-              >
-                <FormattedMessage id="layout.privacy-link" defaultMessage="Privacy" />
-              </a>
-            </MjmlText>
+            {hideTermsAndPrivacy ? null : (
+              <MjmlText align="center">
+                <a
+                  className="link"
+                  href={`https://www.onparallel.com/${locale}/legal/terms?${utm}`}
+                >
+                  <FormattedMessage
+                    id="layout.terms-and-conditions-link"
+                    defaultMessage="Terms and conditions"
+                  />
+                </a>
+                <span> | </span>
+                <a
+                  className="link"
+                  href={`https://www.onparallel.com/${locale}/legal/privacy?${utm}`}
+                >
+                  <FormattedMessage id="layout.privacy-link" defaultMessage="Privacy" />
+                </a>
+              </MjmlText>
+            )}
+
             {optOutUrl ? (
               <MjmlText align="center" fontSize="14px">
                 <a className="link" href={optOutUrl}>

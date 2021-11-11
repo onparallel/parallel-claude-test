@@ -73,6 +73,7 @@ const email: Email<SignatureCompletedProps> = {
         })}
         utmCampaign="recipients"
         tone={tone}
+        hideTermsAndPrivacy
       >
         <MjmlSection padding="0">
           <MjmlColumn>
