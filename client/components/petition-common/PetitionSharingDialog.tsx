@@ -267,7 +267,7 @@ export function PetitionSharingDialog({
                       placeholder={
                         petitionsOwned.length
                           ? intl.formatMessage({
-                              id: "petition-sharing.input-placeholder",
+                              id: "generic.petition-sharing-placeholder",
                               defaultMessage: "Add users and teams from your organization",
                             })
                           : intl.formatMessage({

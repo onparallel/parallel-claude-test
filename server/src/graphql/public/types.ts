@@ -454,8 +454,8 @@ export const PublicPetitionFieldComment = objectType({
   },
 });
 
-export const PublicPetitionLink = objectType({
-  name: "PublicPetitionLink",
+export const PublicPublicPetitionLink = objectType({
+  name: "PublicPublicPetitionLink",
   definition(t) {
     t.globalId("id");
     t.nonNull.string("title");

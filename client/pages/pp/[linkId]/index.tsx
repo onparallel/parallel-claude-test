@@ -246,8 +246,8 @@ function PublicPetitionLink({
 }
 
 PublicPetitionLink.fragments = {
-  PublicPetitionLink: gql`
-    fragment PublicPetitionLink_PublicPetitionLink on PublicPetitionLink {
+  PublicPublicPetitionLink: gql`
+    fragment PublicPetitionLink_PublicPublicPetitionLink on PublicPublicPetitionLink {
       id
       title
       description
@@ -310,10 +310,10 @@ export async function getServerSideProps({
       query: gql`
         query PublicTemplateLink_publicPetitionLinkBySlug($slug: String!) {
           publicPetitionLinkBySlug(slug: $slug) {
-            ...PublicPetitionLink_PublicPetitionLink
+            ...PublicPetitionLink_PublicPublicPetitionLink
           }
         }
-        ${PublicPetitionLink.fragments.PublicPetitionLink}
+        ${PublicPetitionLink.fragments.PublicPublicPetitionLink}
       `,
       variables: {
         slug: linkId as string,

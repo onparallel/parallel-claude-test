@@ -491,6 +491,13 @@ export interface NexusGenObjects {
     name: string; // String!
   };
   PublicPetitionMessage: db.PetitionMessage;
+  PublicPublicPetitionLink: {
+    // root type
+    description: string; // String!
+    id: NexusGenScalars["GID"]; // GID!
+    slug: string; // String!
+    title: string; // String!
+  };
   PublicSignatureConfig: {
     signersInfo: any[];
     review?: boolean;
@@ -1410,8 +1417,7 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     id: NexusGenScalars["GID"]; // GID!
     isActive: boolean; // Boolean!
-    organization: NexusGenRootTypes["PublicPetitionLinkOwnerOrganization"]; // PublicPetitionLinkOwnerOrganization!
-    owner: NexusGenRootTypes["PublicUser"]; // PublicUser!
+    owner: NexusGenRootTypes["User"]; // User!
     slug: string; // String!
     title: string; // String!
   };
@@ -1424,6 +1430,16 @@ export interface NexusGenFieldTypes {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
     subject: string | null; // String
+  };
+  PublicPublicPetitionLink: {
+    // field return type
+    description: string; // String!
+    id: NexusGenScalars["GID"]; // GID!
+    isActive: boolean; // Boolean!
+    organization: NexusGenRootTypes["PublicPetitionLinkOwnerOrganization"]; // PublicPetitionLinkOwnerOrganization!
+    owner: NexusGenRootTypes["PublicUser"]; // PublicUser!
+    slug: string; // String!
+    title: string; // String!
   };
   PublicSignatureConfig: {
     // field return type
@@ -1465,7 +1481,7 @@ export interface NexusGenFieldTypes {
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     publicOrgLogoUrl: string | null; // String
-    publicPetitionLinkBySlug: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
+    publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
     publicTemplateCategories: string[]; // [String!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
@@ -2583,8 +2599,7 @@ export interface NexusGenFieldTypeNames {
     description: "String";
     id: "GID";
     isActive: "Boolean";
-    organization: "PublicPetitionLinkOwnerOrganization";
-    owner: "PublicUser";
+    owner: "User";
     slug: "String";
     title: "String";
   };
@@ -2597,6 +2612,16 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     id: "GID";
     subject: "String";
+  };
+  PublicPublicPetitionLink: {
+    // field return type name
+    description: "String";
+    id: "GID";
+    isActive: "Boolean";
+    organization: "PublicPetitionLinkOwnerOrganization";
+    owner: "PublicUser";
+    slug: "String";
+    title: "String";
   };
   PublicSignatureConfig: {
     // field return type name
@@ -2638,7 +2663,7 @@ export interface NexusGenFieldTypeNames {
     petitions: "PetitionBasePagination";
     petitionsById: "PetitionBase";
     publicOrgLogoUrl: "String";
-    publicPetitionLinkBySlug: "PublicPetitionLink";
+    publicPetitionLinkBySlug: "PublicPublicPetitionLink";
     publicTemplateCategories: "String";
     searchUsers: "UserOrUserGroup";
     subscriptions: "PetitionEventSubscription";
@@ -3607,7 +3632,7 @@ export interface NexusGenArgTypes {
     };
     updateTemplateDefaultPermissions: {
       // args
-      permissions?: NexusGenInputs["UserOrUserGroupPermissionInput"][] | null; // [UserOrUserGroupPermissionInput!]
+      permissions: NexusGenInputs["UserOrUserGroupPermissionInput"][]; // [UserOrUserGroupPermissionInput!]!
       templateId: NexusGenScalars["GID"]; // GID!
     };
     updateUser: {

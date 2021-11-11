@@ -4860,7 +4860,7 @@
     "context": "Share with people and groups"
   },
   {
-    "term": "petition-sharing.input-placeholder",
+    "term": "generic.petition-sharing-placeholder",
     "definition": "Añade usuarios y equipos de tu organización",
     "context": "Add users and teams from your organization"
   },

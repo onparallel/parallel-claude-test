@@ -115,8 +115,19 @@ export const UserSelect = Object.assign(
       }
       if (needsLoading) {
         return await getUsersOrGroups(value as any);
+      } else {
+        return value;
       }
-    }, [needsLoading, needsLoading ? unMaybeArray(value as any).join(",") : null]);
+    }, [
+      needsLoading,
+      value === null
+        ? null
+        : needsLoading
+        ? unMaybeArray(value as any).join(",")
+        : unMaybeArray(value as any)
+            .map((x) => x.id)
+            .join(","),
+    ]);
 
     const loadOptions = useCallback(
       async (search) => {

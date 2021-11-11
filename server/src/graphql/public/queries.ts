@@ -41,7 +41,7 @@ export const publicOrgLogo = queryField("publicOrgLogoUrl", {
 });
 
 export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
-  type: nullable("PublicPetitionLink"),
+  type: nullable("PublicPublicPetitionLink"),
   args: {
     slug: nonNull(stringArg()),
   },

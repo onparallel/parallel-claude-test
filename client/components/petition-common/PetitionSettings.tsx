@@ -1,10 +1,10 @@
-import { gql } from "@apollo/client";
+import { DataProxy, gql } from "@apollo/client";
 import {
   Box,
   Button,
+  Center,
   CloseButton,
   Collapse,
-  Flex,
   FormControl,
   FormLabel,
   HStack,
@@ -27,6 +27,7 @@ import {
   ShieldIcon,
   SignatureIcon,
   TimeIcon,
+  UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionSettings_PetitionBaseFragment,
@@ -37,7 +38,9 @@ import {
   usePetitionSettings_createPublicPetitionLinkMutation,
   usePetitionSettings_startPetitionSignatureRequestMutation,
   usePetitionSettings_updatePublicPetitionLinkMutation,
+  usePetitionSettings_updateTemplateDefaultPermissionsMutation,
 } from "@parallel/graphql/__types";
+import { assertTypename } from "@parallel/utils/apollo/assertTypename";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
@@ -45,7 +48,7 @@ import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { noop, pick } from "remeda";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DialogProps, useDialog } from "../common/DialogProvider";
@@ -54,6 +57,10 @@ import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineD
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
 import { PublicLinkSettingsDialog, usePublicLinkSettingsDialog } from "./PublicLinkSettingsDialog";
 import { SignatureConfigDialog, useSignatureConfigDialog } from "./SignatureConfigDialog";
+import {
+  TemplateDefaultPermissionsDialog,
+  useTemplateDefaultPermissionsDialog,
+} from "./TemplateDefaultPermissionsDialog";
 
 export type PetitionSettingsProps = {
   user: PetitionSettings_UserFragment;
@@ -160,11 +167,15 @@ function _PetitionSettings({
       await onUpdatePetition({ skipForwardSecurity: value });
     } catch {}
   }
-  const { customHost } = petition.organization;
-  const url = customHost
-    ? `${process.env.NODE_ENV === "production" ? "https" : "http"}://${customHost}`
-    : process.env.NEXT_PUBLIC_PARALLEL_URL;
-  const publicLinkUrl = `${url}/${petition.locale}/pp/${publicLink?.slug}`;
+
+  let publicLinkUrl = "";
+  if (petition.__typename === "PetitionTemplate") {
+    const { customHost } = petition.organization;
+    const url = customHost
+      ? `${process.env.NODE_ENV === "production" ? "https" : "http"}://${customHost}`
+      : process.env.NEXT_PUBLIC_PARALLEL_URL;
+    publicLinkUrl = `${url}/${petition.locale}/pp/${publicLink?.slug}`;
+  }
 
   const onCopyPublicLink = useClipboardWithToast({
     value: publicLinkUrl,
@@ -174,44 +185,43 @@ function _PetitionSettings({
     }),
   });
 
+  const hasActivePublicLink = publicLink?.isActive ?? false;
   const [createPublicPetitionLink] = usePetitionSettings_createPublicPetitionLinkMutation();
   const [updatePublicPetitionLink] = usePetitionSettings_updatePublicPetitionLinkMutation();
-
-  const publicLinkSettingDialog = usePublicLinkSettingsDialog();
-
+  const showPublicLinkSettingDialog = usePublicLinkSettingsDialog();
   const handleToggleShareByLink = async () => {
+    assertTypename(petition, "PetitionTemplate");
     try {
-      if (publicLink) {
-        if (!publicLink.isActive) {
-          const isFieldsValid = await validPetitionFields();
-          if (!isFieldsValid) return;
+      if ((publicLink && !publicLink.isActive) || !publicLink) {
+        if (!(await validPetitionFields())) {
+          return;
         }
-
+      }
+      if (publicLink) {
         await updatePublicPetitionLink({
           variables: { publicPetitionLinkId: publicLink.id, isActive: !publicLink.isActive },
+          update(cache, result) {
+            if (result.data) {
+              updatePetitionLinkCache(cache, petition.id, result.data.updatePublicPetitionLink);
+            }
+          },
         });
       } else {
-        const isFieldsValid = await validPetitionFields();
-        if (!isFieldsValid) return;
-
-        const _ownerId = petition.owner.id ?? "";
-
-        const publicLinkSettings = await publicLinkSettingDialog({
-          ownerId: _ownerId,
-          locale: petition.locale,
-          petitionName: petition.name ?? null,
-          customHost: petition.organization.customHost,
-        });
-
+        const publicLinkSettings = await showPublicLinkSettingDialog({ template: petition });
         const { data } = await createPublicPetitionLink({
           variables: {
             templateId: petition.id,
             ...publicLinkSettings,
           },
+          update(cache, result) {
+            if (result.data) {
+              updatePetitionLinkCache(cache, petition.id, result.data.createPublicPetitionLink);
+            }
+          },
         });
 
         if (data) {
-          const { publicLink } = data.createPublicPetitionLink;
+          const publicLink = data.createPublicPetitionLink;
           onCopyPublicLink({
             value: `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${petition.locale}/pp/${publicLink?.slug}`,
           });
@@ -219,15 +229,15 @@ function _PetitionSettings({
       }
     } catch {}
   };
-
   const handleEditPublicPetitionLink = async () => {
-    if (!publicLink) return;
+    assertTypename(petition, "PetitionTemplate");
+    if (!publicLink) {
+      return;
+    }
     try {
-      const publicLinkSettings = await publicLinkSettingDialog({
-        publicLink: publicLink as PublicLinkSettingsDialog_PublicPetitionLinkFragment,
-        locale: petition.locale,
-        petitionName: petition.name ?? null,
-        customHost: petition.organization.customHost,
+      const publicLinkSettings = await showPublicLinkSettingDialog({
+        publicLink: publicLink,
+        template: petition,
       });
 
       await updatePublicPetitionLink({
@@ -235,11 +245,38 @@ function _PetitionSettings({
           publicPetitionLinkId: publicLink.id,
           ...publicLinkSettings,
         },
+        update(cache, result) {
+          if (result.data) {
+            updatePetitionLinkCache(cache, petition.id, result.data.updatePublicPetitionLink);
+          }
+        },
       });
     } catch {}
   };
 
-  const isSharedByLink = !!publicLink?.isActive;
+  const hasDefaultPermissions =
+    petition.__typename === "PetitionTemplate" && petition.defaultPermissions.length > 0;
+
+  const showTemplateDefaultPermissionsDialog = useTemplateDefaultPermissionsDialog();
+  const [updateTemplateDefaultPermissions] =
+    usePetitionSettings_updateTemplateDefaultPermissionsMutation();
+  const handleUpdateTemplateDefaultPermissions = async (enable: boolean) => {
+    assertTypename(petition, "PetitionTemplate");
+    if (enable) {
+      try {
+        const { permissions } = await showTemplateDefaultPermissionsDialog({
+          permissions: petition.defaultPermissions,
+        });
+        await updateTemplateDefaultPermissions({
+          variables: { templateId: petition.id, permissions },
+        });
+      } catch {}
+    } else {
+      await updateTemplateDefaultPermissions({
+        variables: { templateId: petition.id, permissions: [] },
+      });
+    }
+  };
 
   return (
     <Stack padding={4} spacing={4}>
@@ -304,33 +341,30 @@ function _PetitionSettings({
           isDisabled={isReadOnly}
         />
         {petition.signatureConfig || hasSignature ? (
-          <Box>
-            <SwitchSetting
-              icon={<SignatureIcon />}
-              label={
-                <FormattedMessage
-                  id="component.petition-settings.petition-signature-enable"
-                  defaultMessage="Enable eSignature"
-                />
-              }
-              onChange={handleSignatureChange}
-              isChecked={Boolean(petition.signatureConfig)}
-              isDisabled={!hasSignature}
-              controlId="enable-esignature"
-            />
-            <Collapse in={Boolean(petition.signatureConfig)}>
-              <Flex justifyContent="center" marginTop={2}>
-                <Button onClick={handleConfigureSignatureClick} isDisabled={!hasSignature}>
-                  <Text as="span">
-                    <FormattedMessage
-                      id="component.petition-settings.petition-signature-configure"
-                      defaultMessage="Configure eSignature"
-                    />
-                  </Text>
-                </Button>
-              </Flex>
-            </Collapse>
-          </Box>
+          <SwitchSetting
+            icon={<SignatureIcon />}
+            label={
+              <FormattedMessage
+                id="component.petition-settings.petition-signature-enable"
+                defaultMessage="Enable eSignature"
+              />
+            }
+            onChange={handleSignatureChange}
+            isChecked={Boolean(petition.signatureConfig)}
+            isDisabled={!hasSignature}
+            controlId="enable-esignature"
+          >
+            <Center>
+              <Button onClick={handleConfigureSignatureClick} isDisabled={!hasSignature}>
+                <Text as="span">
+                  <FormattedMessage
+                    id="component.petition-settings.petition-signature-configure"
+                    defaultMessage="Configure eSignature"
+                  />
+                </Text>
+              </Button>
+            </Center>
+          </SwitchSetting>
         ) : null}
         <SwitchSetting
           isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}
@@ -355,6 +389,35 @@ function _PetitionSettings({
         />
         {petition.__typename === "PetitionTemplate" ? (
           <SwitchSetting
+            icon={<UserArrowIcon />}
+            label={
+              <FormattedMessage
+                id="component.petition-settings.share-automatically"
+                defaultMessage="Share automatically"
+              />
+            }
+            description={
+              <FormattedMessage
+                id="component.petition-settings.share-automatically-description"
+                defaultMessage="Specify which users or groups of users the petitions created from this template are automatically shared with"
+              />
+            }
+            isChecked={hasDefaultPermissions}
+            onChange={handleUpdateTemplateDefaultPermissions}
+            controlId="share-by-link"
+          >
+            <Center>
+              <Button onClick={() => handleUpdateTemplateDefaultPermissions(true)}>
+                <FormattedMessage
+                  id="component.petition-settings.share-automatically-settings"
+                  defaultMessage="Sharing settings"
+                />
+              </Button>
+            </Center>
+          </SwitchSetting>
+        ) : null}
+        {petition.__typename === "PetitionTemplate" ? (
+          <SwitchSetting
             icon={<LinkIcon />}
             label={
               <FormattedMessage
@@ -368,22 +431,21 @@ function _PetitionSettings({
                 defaultMessage="Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
               />
             }
-            isChecked={isSharedByLink}
+            isChecked={hasActivePublicLink}
             onChange={handleToggleShareByLink}
             controlId="share-by-link"
-          />
-        ) : null}
-        {isSharedByLink ? (
-          <HStack paddingLeft={5}>
-            <Input type="text" value={publicLinkUrl} readOnly />
-            <CopyToClipboardButton text={publicLinkUrl} />
-            <IconButton
-              variant="outline"
-              aria-label="public link settings"
-              onClick={handleEditPublicPetitionLink}
-              icon={<SettingsIcon boxSize={"1.125rem"} />}
-            />
-          </HStack>
+          >
+            <HStack paddingLeft={6}>
+              <Input type="text" value={publicLinkUrl} onChange={noop} />
+              <CopyToClipboardButton text={publicLinkUrl} />
+              <IconButton
+                variant="outline"
+                aria-label="public link settings"
+                onClick={handleEditPublicPetitionLink}
+                icon={<SettingsIcon boxSize={"1.125rem"} />}
+              />
+            </HStack>
+          </SwitchSetting>
         ) : null}
         {user.hasSkipForwardSecurity ? (
           <SwitchSetting
@@ -434,6 +496,26 @@ function _PetitionSettings({
   );
 }
 
+function updatePetitionLinkCache(
+  proxy: DataProxy,
+  templateId: string,
+  data: PublicLinkSettingsDialog_PublicPetitionLinkFragment
+) {
+  proxy.writeFragment<PublicLinkSettingsDialog_PublicPetitionLinkFragment>({
+    id: templateId,
+    fragment: gql`
+      fragment PetitionSettings_updatePetitionLink_PetitionTemplate on PetitionTemplate {
+        publicLink {
+          ...PublicLinkSettingsDialog_PublicPetitionLink
+        }
+      }
+      ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
+    `,
+    fragmentName: "PetitionSettings_updatePetitionLink_PetitionTemplate",
+    data,
+  });
+}
+
 const fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
@@ -458,13 +540,6 @@ const fragments = {
       skipForwardSecurity
       isRecipientViewContentsHidden
       isReadOnly
-      name
-      organization {
-        customHost
-      }
-      owner {
-        id
-      }
       ...SignatureConfigDialog_PetitionBase @include(if: $hasPetitionSignature)
       ... on Petition {
         status
@@ -476,13 +551,24 @@ const fragments = {
       }
       ... on PetitionTemplate {
         isPublic
+        organization {
+          customHost
+        }
+        ...PublicLinkSettingsDialog_PetitionTemplate
         publicLink {
+          id
+          isActive
           ...PublicLinkSettingsDialog_PublicPetitionLink
+        }
+        defaultPermissions {
+          ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
         }
       }
     }
-    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
     ${SignatureConfigDialog.fragments.PetitionBase}
+    ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
+    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
+    ${TemplateDefaultPermissionsDialog.fragments.PublicPetitionLink}
   `,
 };
 const mutations = [
@@ -508,7 +594,6 @@ const mutations = [
       $title: String!
       $description: String!
       $ownerId: GID!
-      $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
       $slug: String
     ) {
       createPublicPetitionLink(
@@ -516,21 +601,12 @@ const mutations = [
         title: $title
         description: $description
         ownerId: $ownerId
-        otherPermissions: $otherPermissions
         slug: $slug
       ) {
-        id
-        publicLink {
-          id
-          title
-          description
-          slug
-          linkPermissions {
-            permissionType
-          }
-        }
+        ...PublicLinkSettingsDialog_PublicPetitionLink
       }
     }
+    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
   `,
   gql`
     mutation PetitionSettings_updatePublicPetitionLink(
@@ -539,7 +615,6 @@ const mutations = [
       $title: String
       $description: String
       $ownerId: GID
-      $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
       $slug: String
     ) {
       updatePublicPetitionLink(
@@ -548,19 +623,26 @@ const mutations = [
         title: $title
         description: $description
         ownerId: $ownerId
-        otherPermissions: $otherPermissions
         slug: $slug
       ) {
+        ...PublicLinkSettingsDialog_PublicPetitionLink
+      }
+    }
+    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
+  `,
+  gql`
+    mutation PetitionSettings_updateTemplateDefaultPermissions(
+      $templateId: GID!
+      $permissions: [UserOrUserGroupPermissionInput!]!
+    ) {
+      updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
         id
-        title
-        description
-        slug
-        isActive
-        linkPermissions {
-          permissionType
+        defaultPermissions {
+          ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
         }
       }
     }
+    ${TemplateDefaultPermissionsDialog.fragments.PublicPetitionLink}
   `,
 ];
 
@@ -575,25 +657,40 @@ export const PetitionSettings = Object.assign(
   { fragments, mutations }
 );
 
-interface SwitchSettingProps extends Omit<SettingsRowProps, "children" | "onChange"> {
+interface SwitchSettingProps extends Omit<SettingsRowProps, "onChange"> {
   icon?: ReactNode;
   isChecked: boolean;
   onChange: (value: boolean) => void;
+  children?: ReactNode;
 }
 
-function SwitchSetting({ label, icon, isChecked, onChange, ...props }: SwitchSettingProps) {
+function SwitchSetting({
+  label,
+  icon,
+  isChecked,
+  onChange,
+  children,
+  ...props
+}: SwitchSettingProps) {
   return (
-    <SettingsRow
-      label={
-        <Stack direction="row" alignItems="center">
-          {icon}
-          <Text as="span">{label}</Text>
-        </Stack>
-      }
-      {...props}
-    >
-      <Switch isChecked={isChecked} onChange={(e) => onChange(e.target.checked)} />
-    </SettingsRow>
+    <Box>
+      <SettingsRow
+        label={
+          <Stack direction="row" alignItems="center">
+            {icon}
+            <Text as="span">{label}</Text>
+          </Stack>
+        }
+        {...props}
+      >
+        <Switch isChecked={isChecked} onChange={(e) => onChange(e.target.checked)} />
+      </SettingsRow>
+      {children ? (
+        <Collapse in={isChecked}>
+          <Box marginTop={2}>{children}</Box>
+        </Collapse>
+      ) : null}
+    </Box>
   );
 }
 

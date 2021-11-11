@@ -753,3 +753,22 @@ export const UserOrUserGroupPermissionInput = inputObjectType({
     t.nonNull.boolean("isSubscribed");
   },
 });
+
+export const PublicPetitionLink = objectType({
+  name: "PublicPetitionLink",
+  definition(t) {
+    t.globalId("id");
+    t.nonNull.string("title");
+    t.nonNull.string("description");
+    t.nonNull.string("slug");
+    t.nonNull.boolean("isActive", {
+      resolve: (o) => o.is_active,
+    });
+    t.nonNull.field("owner", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.owner_id))!;
+      },
+    });
+  },
+});

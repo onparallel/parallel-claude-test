@@ -19,19 +19,21 @@ import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
+  PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
+  PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables,
   PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
   PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables,
+  PublicLinkSettingsDialog_PetitionTemplateFragment,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
-  usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQuery,
-  UserOrUserGroupPublicLinkPermission,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { Maybe } from "@parallel/utils/types";
+import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined, pick } from "remeda";
 import { HelpPopover } from "../common/HelpPopover";
 import { UserSelect, useSearchUsers } from "../common/UserSelect";
 
@@ -40,88 +42,50 @@ interface PublicLinkSettingsData {
   description: string;
   ownerId: string;
   slug: string;
-  petitionName: string | null;
-  customHost: Maybe<string> | undefined;
-  otherPermissions: UserOrUserGroupPublicLinkPermission[];
 }
 
+interface PublicLinkSettingsDialogProps {
+  publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment;
+  template: PublicLinkSettingsDialog_PetitionTemplateFragment;
+}
 export function PublicLinkSettingsDialog({
   publicLink,
-  ownerId,
-  locale,
-  petitionName,
-  customHost,
+  template,
   ...props
-}: DialogProps<
-  {
-    publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment;
-    ownerId?: string;
-    locale: string;
-    petitionName: string | null;
-    customHost: Maybe<string> | undefined;
-  },
-  PublicLinkSettingsData
->) {
+}: DialogProps<PublicLinkSettingsDialogProps, PublicLinkSettingsData>) {
   const apollo = useApolloClient();
   const intl = useIntl();
   const _handleSearchUsers = useSearchUsers();
 
-  const owner = publicLink?.linkPermissions.find((p) => p.permissionType === "OWNER");
-
-  const {
-    handleSubmit,
-    register,
-    watch,
-    control,
-    setValue,
-    formState: { errors, isDirty, dirtyFields },
-  } = useForm<PublicLinkSettingsData>({
-    mode: "onChange",
-    defaultValues: {
-      title: publicLink?.title ?? "",
-      description: publicLink?.description ?? "",
-      slug: publicLink?.slug ?? "",
-      ownerId:
-        owner?.__typename === "PublicPetitionLinkUserPermission" ? owner.user.id : ownerId ?? "",
-      otherPermissions:
-        (publicLink?.linkPermissions
-          ?.filter((p) => p.permissionType !== "OWNER")
-          ?.map((p) => {
-            if (p.__typename === "PublicPetitionLinkUserGroupPermission") {
-              return {
-                id: p.group.id,
-                permissionType: p.permissionType,
-              };
-            } else if (p.__typename === "PublicPetitionLinkUserPermission") {
-              return {
-                id: p.user.id,
-                permissionType: p.permissionType,
-              };
-            }
-          }) as UserOrUserGroupPublicLinkPermission[]) ?? [],
-    },
-  });
-
-  const [getSlugLazy, { data: getSlugData, loading: getSlugLoading }] =
-    usePublicLinkSettingsDialog_getSlugForPublicPetitionLinkLazyQuery({
-      fetchPolicy: "network-only",
+  const { handleSubmit, register, control, setValue, formState } =
+    useForm<PublicLinkSettingsDialog_PublicPetitionLinkFragment>({
+      mode: "onChange",
+      defaultValues: {
+        title: publicLink?.title ?? "",
+        description: publicLink?.description ?? "",
+        slug: publicLink?.slug ?? "",
+        owner: publicLink?.owner ?? template.owner,
+      },
     });
+  const { errors, dirtyFields, isValidating } = formState;
 
-  useEffect(() => {
+  useAsyncEffect(async (isMounted) => {
     if (!publicLink) {
-      getSlugLazy({
-        variables: {
-          petitionName,
-        },
+      const {
+        data: { getSlugForPublicPetitionLink: slug },
+      } = await apollo.query<
+        PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
+        PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables
+      >({
+        query: PublicLinkSettingsDialog.queries.getSlug,
+        variables: { petitionName: template.name },
+        fetchPolicy: "network-only",
       });
+      if (isMounted()) {
+        setValue("slug", slug);
+      }
     }
   }, []);
-
-  useEffect(() => {
-    if (getSlugData?.getSlugForPublicPetitionLink) {
-      setValue("slug", getSlugData?.getSlugForPublicPetitionLink);
-    }
-  }, [getSlugData]);
 
   const titleRef = useRef<HTMLInputElement>(null);
   const titleRegisterProps = useRegisterWithRef(titleRef, register, "title", {
@@ -135,18 +99,6 @@ export function PublicLinkSettingsDialog({
       });
     },
     [_handleSearchUsers]
-  );
-
-  const watchOwnerId = watch("ownerId");
-
-  const handleSearchUsers = useCallback(
-    async (search: string, excludeUsers: string[]) => {
-      return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers, watchOwnerId],
-        includeGroups: true,
-      });
-    },
-    [_handleSearchUsers, watchOwnerId]
   );
 
   const debouncedIsValidSlug = useDebouncedAsync(
@@ -166,7 +118,6 @@ export function PublicLinkSettingsDialog({
   );
 
   const isValidSlug = async (value: string) => {
-    if (dirtyFields.slug !== true) return true;
     try {
       return await debouncedIsValidSlug(value);
     } catch (e) {
@@ -181,6 +132,7 @@ export function PublicLinkSettingsDialog({
     }
   };
 
+  const { customHost } = template.organization;
   const parallelUrl = customHost
     ? `${process.env.NODE_ENV === "production" ? "https" : "http"}://${customHost}`
     : process.env.NEXT_PUBLIC_PARALLEL_URL;
@@ -191,12 +143,12 @@ export function PublicLinkSettingsDialog({
       hasCloseButton
       content={{
         as: "form",
-        onSubmit: isDirty
-          ? handleSubmit((data) => props.onResolve(data))
-          : (evnt) => {
-              evnt.preventDefault();
-              props.onReject();
-            },
+        onSubmit: handleSubmit((data) => {
+          props.onResolve({
+            ...pick(data, ["title", "description", "slug"]),
+            ownerId: data.owner.id,
+          });
+        }),
       }}
       initialFocusRef={titleRef}
       header={
@@ -219,7 +171,7 @@ export function PublicLinkSettingsDialog({
                     defaultMessage="The link has been edited. If you save, you will no longer be able to access the request through the old link:"
                   />
                 </Text>
-                <Text as="b">{`${parallelUrl}/${locale}/pp/${publicLink?.slug}`}</Text>
+                <Text as="b">{`${parallelUrl}/${template.locale}/pp/${publicLink?.slug}`}</Text>
               </Stack>
             </Alert>
           ) : null}
@@ -244,8 +196,6 @@ export function PublicLinkSettingsDialog({
             </FormLabel>
             <Input
               {...titleRegisterProps}
-              type="text"
-              name="title"
               placeholder={intl.formatMessage({
                 id: "component.settings-public-link-dialog.page-title-placeholder",
                 defaultMessage: "Include the title your recipients will see",
@@ -272,8 +222,6 @@ export function PublicLinkSettingsDialog({
             </FormLabel>
             <Textarea
               {...register("description", { required: true })}
-              type="text"
-              name="description"
               placeholder={intl.formatMessage({
                 id: "component.settings-public-link-dialog.description-placeholder",
                 defaultMessage:
@@ -300,9 +248,9 @@ export function PublicLinkSettingsDialog({
               </Text>
             </FormLabel>
             <Controller
-              name="ownerId"
+              name="owner"
               control={control}
-              rules={{ minLength: 1 }}
+              rules={{ validate: { isDefined } }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <UserSelect
                   value={value}
@@ -311,9 +259,7 @@ export function PublicLinkSettingsDialog({
                       e.preventDefault();
                     }
                   }}
-                  onChange={(users) => {
-                    onChange(users?.id);
-                  }}
+                  onChange={onChange}
                   onBlur={onBlur}
                   onSearch={handleSearchOwner}
                   placeholder={intl.formatMessage({
@@ -324,49 +270,8 @@ export function PublicLinkSettingsDialog({
               )}
             />
           </FormControl>
-
-          <FormControl id="editors">
-            <FormLabel>
-              <FormattedMessage
-                id="component.settings-public-link-dialog.editors-label"
-                defaultMessage="Editors"
-              />
-            </FormLabel>
-            <Controller
-              name="otherPermissions"
-              control={control}
-              rules={{ minLength: 1 }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <UserSelect
-                  isMulti
-                  includeGroups
-                  value={value.map((v) => v.id)}
-                  onKeyDown={(e: KeyboardEvent) => {
-                    if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
-                      e.preventDefault();
-                    }
-                  }}
-                  onChange={(usersOrGroups) => {
-                    onChange(
-                      usersOrGroups.map((value) => ({
-                        id: value.id,
-                        permissionType: "WRITE",
-                      }))
-                    );
-                  }}
-                  onBlur={onBlur}
-                  onSearch={handleSearchUsers}
-                  placeholder={intl.formatMessage({
-                    id: "component.settings-public-link-dialog.editors-placeholder",
-                    defaultMessage: "Add users and teams from your organization",
-                  })}
-                />
-              )}
-            />
-          </FormControl>
           <FormControl
-            isInvalid={errors.slug?.message !== "DEBOUNCED" && !!errors.slug && dirtyFields.slug}
-            isDisabled={getSlugLoading}
+            isInvalid={errors.slug && errors.slug.message !== "DEBOUNCED" && dirtyFields.slug}
           >
             <FormLabel display="flex" alignItems="center">
               <Text as="span">
@@ -394,29 +299,29 @@ export function PublicLinkSettingsDialog({
                 required: true,
                 validate: { isValidSlug },
               }}
-              render={({ field: { onChange, ...field } }) => (
+              render={({ field: { onChange, ...props } }) => (
                 <InputGroup>
-                  <InputLeftAddon>{`${parallelUrl}/${locale}/pp/`}</InputLeftAddon>
+                  <InputLeftAddon>{`${parallelUrl}/${template.locale}/pp/`}</InputLeftAddon>
                   <Input
                     onChange={(e) => onChange(e.target.value.replace(/[^a-z0-9-]/gi, ""))}
-                    {...field}
+                    {...props}
                   />
-                  {!publicLink || dirtyFields.slug === true ? (
-                    <InputRightElement>
-                      {getSlugLoading || errors.slug?.message === "DEBOUNCED" ? (
-                        <Spinner
-                          thickness="2px"
-                          speed="0.65s"
-                          emptyColor="gray.200"
-                          color="gray.500"
-                        />
-                      ) : !errors.slug ? (
-                        <CheckIcon color="green.500" />
-                      ) : errors.slug ? (
-                        <CloseIcon color="red.500" fontSize="sm" />
-                      ) : null}
-                    </InputRightElement>
-                  ) : null}
+                  <InputRightElement>
+                    {publicLink?.isActive && !dirtyFields.slug ? (
+                      <CheckIcon color="green.500" />
+                    ) : isValidating || errors.slug?.message === "DEBOUNCED" ? (
+                      <Spinner
+                        thickness="2px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color="gray.500"
+                      />
+                    ) : !errors.slug ? (
+                      <CheckIcon color="green.500" />
+                    ) : (
+                      <CloseIcon color="red.500" fontSize="sm" />
+                    )}
+                  </InputRightElement>
                 </InputGroup>
               )}
             />
@@ -470,27 +375,30 @@ PublicLinkSettingsDialog.queries = {
 };
 
 PublicLinkSettingsDialog.fragments = {
-  PublicPetitionLink: gql`
-    fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
-      id
-      title
-      isActive
-      description
-      slug
-      linkPermissions {
-        ... on PublicPetitionLinkUserPermission {
-          user {
-            id
-          }
-        }
-        ... on PublicPetitionLinkUserGroupPermission {
-          group {
-            id
-          }
-        }
-        permissionType
+  PetitionTemplate: gql`
+    fragment PublicLinkSettingsDialog_PetitionTemplate on PetitionTemplate {
+      name
+      locale
+      organization {
+        customHost
+      }
+      owner {
+        ...UserSelect_User
       }
     }
+    ${UserSelect.fragments.User}
+  `,
+  PublicPetitionLink: gql`
+    fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
+      isActive
+      title
+      description
+      slug
+      owner {
+        ...UserSelect_User
+      }
+    }
+    ${UserSelect.fragments.User}
   `,
 };
 

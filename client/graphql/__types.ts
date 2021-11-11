@@ -388,7 +388,7 @@ export interface Mutation {
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
-  createPublicPetitionLink: PetitionTemplate;
+  createPublicPetitionLink: PublicPetitionLink;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
@@ -560,6 +560,8 @@ export interface Mutation {
   updateSimpleReply: PetitionFieldReply;
   /** Updates the name and color of a given tag */
   updateTag: Tag;
+  /** Updates the template default permissions */
+  updateTemplateDefaultPermissions: PetitionTemplate;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the name of a given user group */
@@ -715,7 +717,6 @@ export interface MutationcreatePrintPdfTaskArgs {
 
 export interface MutationcreatePublicPetitionLinkArgs {
   description: Scalars["String"];
-  otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
   ownerId: Scalars["GID"];
   slug?: Maybe<Scalars["String"]>;
   templateId: Scalars["GID"];
@@ -1169,7 +1170,6 @@ export interface MutationupdatePetitionUserNotificationReadStatusArgs {
 export interface MutationupdatePublicPetitionLinkArgs {
   description?: Maybe<Scalars["String"]>;
   isActive?: Maybe<Scalars["Boolean"]>;
-  otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
   ownerId?: Maybe<Scalars["GID"]>;
   publicPetitionLinkId: Scalars["GID"];
   slug?: Maybe<Scalars["String"]>;
@@ -1190,6 +1190,11 @@ export interface MutationupdateSimpleReplyArgs {
 export interface MutationupdateTagArgs {
   data: UpdateTagInput;
   id: Scalars["GID"];
+}
+
+export interface MutationupdateTemplateDefaultPermissionsArgs {
+  permissions: Array<UserOrUserGroupPermissionInput>;
+  templateId: Scalars["GID"];
 }
 
 export interface MutationupdateUserArgs {
@@ -1961,6 +1966,7 @@ export interface PetitionTemplate extends PetitionBase {
   __typename?: "PetitionTemplate";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
   description?: Maybe<Scalars["JSON"]>;
   /** HTML excerpt of the template description. */
@@ -2229,8 +2235,7 @@ export interface PublicPetitionLink {
   description: Scalars["String"];
   id: Scalars["GID"];
   isActive: Scalars["Boolean"];
-  linkPermissions: Array<PublicPetitionLinkPermission>;
-  organization: PublicPetitionLinkOwnerOrganization;
+  owner: User;
   slug: Scalars["String"];
   title: Scalars["String"];
 }
@@ -2239,39 +2244,6 @@ export interface PublicPetitionLinkOwnerOrganization {
   __typename?: "PublicPetitionLinkOwnerOrganization";
   logoUrl?: Maybe<Scalars["String"]>;
   name: Scalars["String"];
-}
-
-export interface PublicPetitionLinkPermission {
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  isSubscribed: Scalars["Boolean"];
-  permissionType: PetitionPermissionType;
-  /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-}
-
-export interface PublicPetitionLinkUserGroupPermission
-  extends PublicPetitionLinkPermission,
-    Timestamps {
-  __typename?: "PublicPetitionLinkUserGroupPermission";
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  group: UserGroup;
-  isSubscribed: Scalars["Boolean"];
-  permissionType: PetitionPermissionType;
-  /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-}
-
-export interface PublicPetitionLinkUserPermission extends PublicPetitionLinkPermission, Timestamps {
-  __typename?: "PublicPetitionLinkUserPermission";
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  isSubscribed: Scalars["Boolean"];
-  permissionType: PetitionPermissionType;
-  /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-  user: User;
 }
 
 /** A public message in a petition */
@@ -2287,6 +2259,17 @@ export interface PublicPetitionSignerDataInput {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
+}
+
+export interface PublicPublicPetitionLink {
+  __typename?: "PublicPublicPetitionLink";
+  description: Scalars["String"];
+  id: Scalars["GID"];
+  isActive: Scalars["Boolean"];
+  organization: PublicPetitionLinkOwnerOrganization;
+  owner: PublicUser;
+  slug: Scalars["String"];
+  title: Scalars["String"];
 }
 
 /** The public signature settings of a petition */
@@ -2356,7 +2339,7 @@ export interface Query {
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
-  publicPetitionLinkBySlug?: Maybe<PublicPetitionLink>;
+  publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
@@ -2761,6 +2744,47 @@ export interface Task {
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
+export interface TemplateDefaultPermission {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** wether user is will be subscribed or not to emails and alerts of the generated petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionPermissionType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+}
+
+/** The permission for a petition and user group */
+export interface TemplateDefaultUserGroupPermission extends TemplateDefaultPermission, Timestamps {
+  __typename?: "TemplateDefaultUserGroupPermission";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** The group linked to the permission */
+  group: UserGroup;
+  /** wether user is will be subscribed or not to emails and alerts of the generated petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionPermissionType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+}
+
+/** The permission for a petition and user */
+export interface TemplateDefaultUserPermission extends TemplateDefaultPermission, Timestamps {
+  __typename?: "TemplateDefaultUserPermission";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** wether user is will be subscribed or not to emails and alerts of the generated petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionPermissionType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+  /** The user linked to the permission */
+  user: User;
+}
+
 export interface TemplateUsedEvent extends PetitionEvent {
   __typename?: "TemplateUsedEvent";
   createdAt: Scalars["DateTime"];
@@ -2954,10 +2978,11 @@ export type UserOrPetitionAccess = PetitionAccess | User;
 
 export type UserOrUserGroup = User | UserGroup;
 
-export interface UserOrUserGroupPublicLinkPermission {
-  /** Global ID of the User or UserGroup */
-  id: Scalars["ID"];
+export interface UserOrUserGroupPermissionInput {
+  isSubscribed: Scalars["Boolean"];
   permissionType: PetitionPermissionTypeRW;
+  userGroupId?: Maybe<Scalars["GID"]>;
+  userId?: Maybe<Scalars["GID"]>;
 }
 
 export interface UserPagination {
@@ -5275,6 +5300,17 @@ export type PetitionContents_PetitionFieldFragment = { __typename?: "PetitionFie
     replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
   };
 
+export type PetitionSettings_updatePetitionLink_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+} & {
+  publicLink?: Maybe<
+    { __typename?: "PublicPetitionLink" } & Pick<
+      PublicPetitionLink,
+      "isActive" | "title" | "description" | "slug"
+    > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
+  >;
+};
+
 export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   hasApiTokens: User["hasFeatureFlag"];
   hasPetitionSignature: User["hasFeatureFlag"];
@@ -5306,8 +5342,6 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = { __typename?: "Pe
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "id" | "status">
     >;
-    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
-    owner: { __typename?: "User" } & Pick<User, "id">;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<
         SignatureConfig,
@@ -5336,25 +5370,32 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   | "isReadOnly"
   | "name"
 > & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
     publicLink?: Maybe<
       { __typename?: "PublicPetitionLink" } & Pick<
         PublicPetitionLink,
-        "id" | "title" | "isActive" | "description" | "slug"
-      > & {
-          linkPermissions: Array<
-            | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
-                PublicPetitionLinkUserGroupPermission,
-                "permissionType"
-              > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
-            | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
-                PublicPetitionLinkUserPermission,
-                "permissionType"
-              > & { user: { __typename?: "User" } & Pick<User, "id"> })
-          >;
-        }
+        "id" | "isActive" | "title" | "description" | "slug"
+      > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
     >;
-    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
-    owner: { __typename?: "User" } & Pick<User, "id">;
+    defaultPermissions: Array<
+      | ({ __typename?: "TemplateDefaultUserGroupPermission" } & Pick<
+          TemplateDefaultUserGroupPermission,
+          "permissionType" | "isSubscribed"
+        > & {
+            group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+                members: Array<
+                  { __typename?: "UserGroupMember" } & {
+                    user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+                  }
+                >;
+              };
+          })
+      | ({ __typename?: "TemplateDefaultUserPermission" } & Pick<
+          TemplateDefaultUserPermission,
+          "permissionType" | "isSubscribed"
+        > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
+    >;
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<
         SignatureConfig,
@@ -5401,32 +5442,14 @@ export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
   title: Scalars["String"];
   description: Scalars["String"];
   ownerId: Scalars["GID"];
-  otherPermissions?: Maybe<
-    Array<UserOrUserGroupPublicLinkPermission> | UserOrUserGroupPublicLinkPermission
-  >;
   slug?: Maybe<Scalars["String"]>;
 }>;
 
 export type PetitionSettings_createPublicPetitionLinkMutation = {
-  createPublicPetitionLink: { __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
-      publicLink?: Maybe<
-        { __typename?: "PublicPetitionLink" } & Pick<
-          PublicPetitionLink,
-          "id" | "title" | "description" | "slug"
-        > & {
-            linkPermissions: Array<
-              | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
-                  PublicPetitionLinkUserGroupPermission,
-                  "permissionType"
-                >)
-              | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
-                  PublicPetitionLinkUserPermission,
-                  "permissionType"
-                >)
-            >;
-          }
-      >;
-    };
+  createPublicPetitionLink: { __typename?: "PublicPetitionLink" } & Pick<
+    PublicPetitionLink,
+    "isActive" | "title" | "description" | "slug"
+  > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> };
 };
 
 export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
@@ -5435,26 +5458,43 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
   title?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   ownerId?: Maybe<Scalars["GID"]>;
-  otherPermissions?: Maybe<
-    Array<UserOrUserGroupPublicLinkPermission> | UserOrUserGroupPublicLinkPermission
-  >;
   slug?: Maybe<Scalars["String"]>;
 }>;
 
 export type PetitionSettings_updatePublicPetitionLinkMutation = {
   updatePublicPetitionLink: { __typename?: "PublicPetitionLink" } & Pick<
     PublicPetitionLink,
-    "id" | "title" | "description" | "slug" | "isActive"
+    "isActive" | "title" | "description" | "slug"
+  > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> };
+};
+
+export type PetitionSettings_updateTemplateDefaultPermissionsMutationVariables = Exact<{
+  templateId: Scalars["GID"];
+  permissions: Array<UserOrUserGroupPermissionInput> | UserOrUserGroupPermissionInput;
+}>;
+
+export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
+  updateTemplateDefaultPermissions: { __typename?: "PetitionTemplate" } & Pick<
+    PetitionTemplate,
+    "id"
   > & {
-      linkPermissions: Array<
-        | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
-            PublicPetitionLinkUserGroupPermission,
-            "permissionType"
-          >)
-        | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
-            PublicPetitionLinkUserPermission,
-            "permissionType"
-          >)
+      defaultPermissions: Array<
+        | ({ __typename?: "TemplateDefaultUserGroupPermission" } & Pick<
+            TemplateDefaultUserGroupPermission,
+            "permissionType" | "isSubscribed"
+          > & {
+              group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+                  members: Array<
+                    { __typename?: "UserGroupMember" } & {
+                      user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+                    }
+                  >;
+                };
+            })
+        | ({ __typename?: "TemplateDefaultUserPermission" } & Pick<
+            TemplateDefaultUserPermission,
+            "permissionType" | "isSubscribed"
+          > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
       >;
     };
 };
@@ -5789,19 +5829,17 @@ export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery = Pick<
   "isValidPublicPetitionLinkSlug"
 >;
 
+export type PublicLinkSettingsDialog_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "name" | "locale"> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+  };
+
 export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   __typename?: "PublicPetitionLink";
-} & Pick<PublicPetitionLink, "id" | "title" | "isActive" | "description" | "slug"> & {
-    linkPermissions: Array<
-      | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
-          PublicPetitionLinkUserGroupPermission,
-          "permissionType"
-        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
-      | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
-          PublicPetitionLinkUserPermission,
-          "permissionType"
-        > & { user: { __typename?: "User" } & Pick<User, "id"> })
-    >;
+} & Pick<PublicPetitionLink, "isActive" | "title" | "description" | "slug"> & {
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
   };
 
 export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
@@ -5848,6 +5886,30 @@ export type SignatureConfigDialog_OrgIntegrationFragment = { __typename?: "OrgIn
   label: OrgIntegration["name"];
   value: OrgIntegration["provider"];
 };
+
+export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
+  { __typename?: "TemplateDefaultUserGroupPermission" } & Pick<
+    TemplateDefaultUserGroupPermission,
+    "permissionType" | "isSubscribed"
+  > & {
+      group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+          members: Array<
+            { __typename?: "UserGroupMember" } & {
+              user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+            }
+          >;
+        };
+    };
+
+export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserPermission_Fragment =
+  { __typename?: "TemplateDefaultUserPermission" } & Pick<
+    TemplateDefaultUserPermission,
+    "permissionType" | "isSubscribed"
+  > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> };
+
+export type TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment =
+  | TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment
+  | TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserPermission_Fragment;
 
 export type TemplateDetailsModal_autoSendTemplateMutationVariables = Exact<{
   templateId: Scalars["GID"];
@@ -9738,7 +9800,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Pet
         "offset" | "time" | "timezone" | "weekdaysOnly"
       >
     >;
-    organization: { __typename?: "Organization" } & Pick<Organization, "id" | "customHost"> & {
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
           petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
             OrganizationUsagePetitionLimit,
@@ -9749,7 +9811,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Pet
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "id" | "status">
     >;
-    owner: { __typename?: "User" } & Pick<User, "id">;
     myEffectivePermission?: Maybe<
       { __typename?: "EffectivePetitionUserPermission" } & Pick<
         EffectivePetitionUserPermission,
@@ -9807,25 +9868,32 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
           replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
         }
     >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
     publicLink?: Maybe<
       { __typename?: "PublicPetitionLink" } & Pick<
         PublicPetitionLink,
-        "id" | "title" | "isActive" | "description" | "slug"
-      > & {
-          linkPermissions: Array<
-            | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
-                PublicPetitionLinkUserGroupPermission,
-                "permissionType"
-              > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
-            | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
-                PublicPetitionLinkUserPermission,
-                "permissionType"
-              > & { user: { __typename?: "User" } & Pick<User, "id"> })
-          >;
-        }
+        "id" | "isActive" | "title" | "description" | "slug"
+      > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
     >;
-    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
-    owner: { __typename?: "User" } & Pick<User, "id">;
+    defaultPermissions: Array<
+      | ({ __typename?: "TemplateDefaultUserGroupPermission" } & Pick<
+          TemplateDefaultUserGroupPermission,
+          "permissionType" | "isSubscribed"
+        > & {
+            group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+                members: Array<
+                  { __typename?: "UserGroupMember" } & {
+                    user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+                  }
+                >;
+              };
+          })
+      | ({ __typename?: "TemplateDefaultUserPermission" } & Pick<
+          TemplateDefaultUserPermission,
+          "permissionType" | "isSubscribed"
+        > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
+    >;
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<
         SignatureConfig,
@@ -9948,18 +10016,6 @@ export type PetitionCompose_updatePetitionMutation = {
               "id" | "status"
             >
           >;
-          organization: { __typename?: "Organization" } & Pick<
-            Organization,
-            "customHost" | "id"
-          > & {
-              usageLimits: { __typename?: "OrganizationUsageLimit" } & {
-                petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
-                  OrganizationUsagePetitionLimit,
-                  "limit" | "used"
-                >;
-              };
-            };
-          owner: { __typename?: "User" } & Pick<User, "id">;
           signatureConfig?: Maybe<
             { __typename?: "SignatureConfig" } & Pick<
               SignatureConfig,
@@ -9979,6 +10035,14 @@ export type PetitionCompose_updatePetitionMutation = {
               "offset" | "time" | "timezone" | "weekdaysOnly"
             >
           >;
+          organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+              usageLimits: { __typename?: "OrganizationUsageLimit" } & {
+                petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
+                  OrganizationUsagePetitionLimit,
+                  "limit" | "used"
+                >;
+              };
+            };
           myEffectivePermission?: Maybe<
             { __typename?: "EffectivePetitionUserPermission" } & Pick<
               EffectivePetitionUserPermission,
@@ -10001,25 +10065,32 @@ export type PetitionCompose_updatePetitionMutation = {
         | "description"
         | "updatedAt"
       > & {
+          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
           publicLink?: Maybe<
             { __typename?: "PublicPetitionLink" } & Pick<
               PublicPetitionLink,
-              "id" | "title" | "isActive" | "description" | "slug"
-            > & {
-                linkPermissions: Array<
-                  | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
-                      PublicPetitionLinkUserGroupPermission,
-                      "permissionType"
-                    > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
-                  | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
-                      PublicPetitionLinkUserPermission,
-                      "permissionType"
-                    > & { user: { __typename?: "User" } & Pick<User, "id"> })
-                >;
-              }
+              "id" | "isActive" | "title" | "description" | "slug"
+            > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
           >;
-          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
-          owner: { __typename?: "User" } & Pick<User, "id">;
+          defaultPermissions: Array<
+            | ({ __typename?: "TemplateDefaultUserGroupPermission" } & Pick<
+                TemplateDefaultUserGroupPermission,
+                "permissionType" | "isSubscribed"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+                      members: Array<
+                        { __typename?: "UserGroupMember" } & {
+                          user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+                        }
+                      >;
+                    };
+                })
+            | ({ __typename?: "TemplateDefaultUserPermission" } & Pick<
+                TemplateDefaultUserPermission,
+                "permissionType" | "isSubscribed"
+              > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
+          >;
+          owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
           signatureConfig?: Maybe<
             { __typename?: "SignatureConfig" } & Pick<
               SignatureConfig,
@@ -10551,10 +10622,7 @@ export type PetitionComposeQuery = {
               "offset" | "time" | "timezone" | "weekdaysOnly"
             >
           >;
-          organization: { __typename?: "Organization" } & Pick<
-            Organization,
-            "id" | "customHost"
-          > & {
+          organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
               usageLimits: { __typename?: "OrganizationUsageLimit" } & {
                 petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
                   OrganizationUsagePetitionLimit,
@@ -10568,7 +10636,6 @@ export type PetitionComposeQuery = {
               "id" | "status"
             >
           >;
-          owner: { __typename?: "User" } & Pick<User, "id">;
           myEffectivePermission?: Maybe<
             { __typename?: "EffectivePetitionUserPermission" } & Pick<
               EffectivePetitionUserPermission,
@@ -10628,25 +10695,32 @@ export type PetitionComposeQuery = {
                 >;
               }
           >;
+          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
           publicLink?: Maybe<
             { __typename?: "PublicPetitionLink" } & Pick<
               PublicPetitionLink,
-              "id" | "title" | "isActive" | "description" | "slug"
-            > & {
-                linkPermissions: Array<
-                  | ({ __typename?: "PublicPetitionLinkUserGroupPermission" } & Pick<
-                      PublicPetitionLinkUserGroupPermission,
-                      "permissionType"
-                    > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
-                  | ({ __typename?: "PublicPetitionLinkUserPermission" } & Pick<
-                      PublicPetitionLinkUserPermission,
-                      "permissionType"
-                    > & { user: { __typename?: "User" } & Pick<User, "id"> })
-                >;
-              }
+              "id" | "isActive" | "title" | "description" | "slug"
+            > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
           >;
-          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
-          owner: { __typename?: "User" } & Pick<User, "id">;
+          defaultPermissions: Array<
+            | ({ __typename?: "TemplateDefaultUserGroupPermission" } & Pick<
+                TemplateDefaultUserGroupPermission,
+                "permissionType" | "isSubscribed"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+                      members: Array<
+                        { __typename?: "UserGroupMember" } & {
+                          user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+                        }
+                      >;
+                    };
+                })
+            | ({ __typename?: "TemplateDefaultUserPermission" } & Pick<
+                TemplateDefaultUserPermission,
+                "permissionType" | "isSubscribed"
+              > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
+          >;
+          owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
           signatureConfig?: Maybe<
             { __typename?: "SignatureConfig" } & Pick<
               SignatureConfig,
@@ -12447,9 +12521,9 @@ export type PublicOptOutQuery = {
   >;
 };
 
-export type PublicPetitionLink_PublicPetitionLinkFragment = {
-  __typename?: "PublicPetitionLink";
-} & Pick<PublicPetitionLink, "id" | "title" | "description"> & {
+export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
+  __typename?: "PublicPublicPetitionLink";
+} & Pick<PublicPublicPetitionLink, "id" | "title" | "description"> & {
     organization: { __typename?: "PublicPetitionLinkOwnerOrganization" } & Pick<
       PublicPetitionLinkOwnerOrganization,
       "name" | "logoUrl"
@@ -12482,8 +12556,8 @@ export type PublicTemplateLink_publicPetitionLinkBySlugQueryVariables = Exact<{
 
 export type PublicTemplateLink_publicPetitionLinkBySlugQuery = {
   publicPetitionLinkBySlug?: Maybe<
-    { __typename?: "PublicPetitionLink" } & Pick<
-      PublicPetitionLink,
+    { __typename?: "PublicPublicPetitionLink" } & Pick<
+      PublicPublicPetitionLink,
       "id" | "title" | "description"
     > & {
         organization: { __typename?: "PublicPetitionLinkOwnerOrganization" } & Pick<
@@ -13097,25 +13171,6 @@ export const UserListPopover_UserGroupFragmentDoc = gql`
     initials
   }
 `;
-export const UserSelect_UserFragmentDoc = gql`
-  fragment UserSelect_User on User {
-    id
-    fullName
-    email
-  }
-`;
-export const UserSelect_UserGroupFragmentDoc = gql`
-  fragment UserSelect_UserGroup on UserGroup {
-    id
-    name
-    members {
-      user {
-        ...UserSelect_User
-      }
-    }
-  }
-  ${UserSelect_UserFragmentDoc}
-`;
 export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
@@ -13332,6 +13387,33 @@ export const OrganizationUsersListTableHeader_UserFragmentDoc = gql`
     id
     role
   }
+`;
+export const UserSelect_UserFragmentDoc = gql`
+  fragment UserSelect_User on User {
+    id
+    fullName
+    email
+  }
+`;
+export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
+  fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
+    isActive
+    title
+    description
+    slug
+    owner {
+      ...UserSelect_User
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+`;
+export const PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc = gql`
+  fragment PetitionSettings_updatePetitionLink_PetitionTemplate on PetitionTemplate {
+    publicLink {
+      ...PublicLinkSettingsDialog_PublicPetitionLink
+    }
+  }
+  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 `;
 export const UserAvatar_UserFragmentDoc = gql`
   fragment UserAvatar_User on User {
@@ -14807,27 +14889,48 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
     }
   }
 `;
-export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
-  fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
-    id
-    title
-    isActive
-    description
-    slug
-    linkPermissions {
-      ... on PublicPetitionLinkUserPermission {
-        user {
-          id
-        }
-      }
-      ... on PublicPetitionLinkUserGroupPermission {
-        group {
-          id
-        }
-      }
-      permissionType
+export const PublicLinkSettingsDialog_PetitionTemplateFragmentDoc = gql`
+  fragment PublicLinkSettingsDialog_PetitionTemplate on PetitionTemplate {
+    name
+    locale
+    organization {
+      customHost
+    }
+    owner {
+      ...UserSelect_User
     }
   }
+  ${UserSelect_UserFragmentDoc}
+`;
+export const UserSelect_UserGroupFragmentDoc = gql`
+  fragment UserSelect_UserGroup on UserGroup {
+    id
+    name
+    members {
+      user {
+        ...UserSelect_User
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+`;
+export const TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc = gql`
+  fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
+    ... on TemplateDefaultUserPermission {
+      user {
+        ...UserSelect_User
+      }
+    }
+    ... on TemplateDefaultUserGroupPermission {
+      group {
+        ...UserSelect_UserGroup
+      }
+    }
+    permissionType
+    isSubscribed
+  }
+  ${UserSelect_UserFragmentDoc}
+  ${UserSelect_UserGroupFragmentDoc}
 `;
 export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
@@ -14837,13 +14940,6 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     skipForwardSecurity
     isRecipientViewContentsHidden
     isReadOnly
-    name
-    organization {
-      customHost
-    }
-    owner {
-      id
-    }
     ...SignatureConfigDialog_PetitionBase @include(if: $hasPetitionSignature)
     ... on Petition {
       status
@@ -14855,13 +14951,24 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     }
     ... on PetitionTemplate {
       isPublic
+      organization {
+        customHost
+      }
+      ...PublicLinkSettingsDialog_PetitionTemplate
       publicLink {
+        id
+        isActive
         ...PublicLinkSettingsDialog_PublicPetitionLink
+      }
+      defaultPermissions {
+        ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
       }
     }
   }
   ${SignatureConfigDialog_PetitionBaseFragmentDoc}
+  ${PublicLinkSettingsDialog_PetitionTemplateFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
+  ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
 `;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
@@ -15697,8 +15804,8 @@ export const OptOut_PublicPetitionAccessFragmentDoc = gql`
   }
   ${OptOut_PublicUserFragmentDoc}
 `;
-export const PublicPetitionLink_PublicPetitionLinkFragmentDoc = gql`
-  fragment PublicPetitionLink_PublicPetitionLink on PublicPetitionLink {
+export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
+  fragment PublicPetitionLink_PublicPublicPetitionLink on PublicPublicPetitionLink {
     id
     title
     description
@@ -16527,7 +16634,6 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
     $title: String!
     $description: String!
     $ownerId: GID!
-    $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
     $slug: String
   ) {
     createPublicPetitionLink(
@@ -16535,21 +16641,12 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
       title: $title
       description: $description
       ownerId: $ownerId
-      otherPermissions: $otherPermissions
       slug: $slug
     ) {
-      id
-      publicLink {
-        id
-        title
-        description
-        slug
-        linkPermissions {
-          permissionType
-        }
-      }
+      ...PublicLinkSettingsDialog_PublicPetitionLink
     }
   }
+  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 `;
 export function usePetitionSettings_createPublicPetitionLinkMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -16573,7 +16670,6 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
     $title: String
     $description: String
     $ownerId: GID
-    $otherPermissions: [UserOrUserGroupPublicLinkPermission!]
     $slug: String
   ) {
     updatePublicPetitionLink(
@@ -16582,19 +16678,12 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
       title: $title
       description: $description
       ownerId: $ownerId
-      otherPermissions: $otherPermissions
       slug: $slug
     ) {
-      id
-      title
-      description
-      slug
-      isActive
-      linkPermissions {
-        permissionType
-      }
+      ...PublicLinkSettingsDialog_PublicPetitionLink
     }
   }
+  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 `;
 export function usePetitionSettings_updatePublicPetitionLinkMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -16610,6 +16699,35 @@ export function usePetitionSettings_updatePublicPetitionLinkMutation(
 }
 export type PetitionSettings_updatePublicPetitionLinkMutationHookResult = ReturnType<
   typeof usePetitionSettings_updatePublicPetitionLinkMutation
+>;
+export const PetitionSettings_updateTemplateDefaultPermissionsDocument = gql`
+  mutation PetitionSettings_updateTemplateDefaultPermissions(
+    $templateId: GID!
+    $permissions: [UserOrUserGroupPermissionInput!]!
+  ) {
+    updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
+      id
+      defaultPermissions {
+        ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
+      }
+    }
+  }
+  ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
+`;
+export function usePetitionSettings_updateTemplateDefaultPermissionsMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSettings_updateTemplateDefaultPermissionsMutation,
+    PetitionSettings_updateTemplateDefaultPermissionsMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionSettings_updateTemplateDefaultPermissionsMutation,
+    PetitionSettings_updateTemplateDefaultPermissionsMutationVariables
+  >(PetitionSettings_updateTemplateDefaultPermissionsDocument, options);
+}
+export type PetitionSettings_updateTemplateDefaultPermissionsMutationHookResult = ReturnType<
+  typeof usePetitionSettings_updateTemplateDefaultPermissionsMutation
 >;
 export const PetitionSharingModal_addPetitionPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionPermission(
@@ -20534,10 +20652,10 @@ export type PublicPetitionLink_publicSendReminderMutationHookResult = ReturnType
 export const PublicTemplateLink_publicPetitionLinkBySlugDocument = gql`
   query PublicTemplateLink_publicPetitionLinkBySlug($slug: String!) {
     publicPetitionLinkBySlug(slug: $slug) {
-      ...PublicPetitionLink_PublicPetitionLink
+      ...PublicPetitionLink_PublicPublicPetitionLink
     }
   }
-  ${PublicPetitionLink_PublicPetitionLinkFragmentDoc}
+  ${PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc}
 `;
 export function usePublicTemplateLink_publicPetitionLinkBySlugQuery(
   baseOptions: Apollo.QueryHookOptions<

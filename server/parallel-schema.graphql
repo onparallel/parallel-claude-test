@@ -1250,7 +1250,7 @@ type Mutation {
   Updates the template default permissions
   """
   updateTemplateDefaultPermissions(
-    permissions: [UserOrUserGroupPermissionInput!]
+    permissions: [UserOrUserGroupPermissionInput!]!
     templateId: GID!
   ): PetitionTemplate!
 
@@ -3071,8 +3071,7 @@ type PublicPetitionLink {
   description: String!
   id: GID!
   isActive: Boolean!
-  organization: PublicPetitionLinkOwnerOrganization!
-  owner: PublicUser!
+  owner: User!
   slug: String!
   title: String!
 }
@@ -3101,6 +3100,16 @@ input PublicPetitionSignerDataInput {
   email: String!
   firstName: String!
   lastName: String!
+}
+
+type PublicPublicPetitionLink {
+  description: String!
+  id: GID!
+  isActive: Boolean!
+  organization: PublicPetitionLinkOwnerOrganization!
+  owner: PublicUser!
+  slug: String!
+  title: String!
 }
 
 """
@@ -3322,7 +3331,7 @@ type Query {
   ): PetitionBasePagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
   publicOrgLogoUrl(id: GID!): String
-  publicPetitionLinkBySlug(slug: String!): PublicPetitionLink
+  publicPetitionLinkBySlug(slug: String!): PublicPublicPetitionLink
   publicTemplateCategories: [String!]!
 
   """

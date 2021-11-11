@@ -1547,7 +1547,7 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
-    permissions: nullable(list(nonNull("UserOrUserGroupPermissionInput"))),
+    permissions: nonNull(list(nonNull("UserOrUserGroupPermissionInput"))),
   },
   resolve: async (_, args, ctx) => {
     await ctx.petitions.updateTemplateDefaultPermissions(
