@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   Box,
   Button,
+  ButtonGroup,
   Menu,
   MenuButton,
   MenuItem,
@@ -16,7 +17,6 @@ import {
   CommentIcon,
   DownloadIcon,
   FilePdfIcon,
-  FileZipIcon,
   ListIcon,
   RepeatIcon,
   ThumbUpIcon,
@@ -550,26 +550,22 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           />
         </Button>
         {showDownloadAll ? (
-          <Menu>
-            <MenuButton
-              as={Button}
-              colorScheme="purple"
-              leftIcon={<DownloadIcon fontSize="lg" display="block" />}
-              rightIcon={<ChevronDownIcon fontSize="lg" />}
-              id="download-all"
-            >
-              <FormattedMessage
-                id="petition-replies.export-replies"
-                defaultMessage="Export replies"
-              />
-            </MenuButton>
-            <MenuList>
-              <MenuItem icon={<FileZipIcon boxSize={5} />} onClick={handleDownloadAllClick}>
+          <Menu placement="bottom-end">
+            <ButtonGroup isAttached colorScheme="purple">
+              <Button
+                leftIcon={<DownloadIcon fontSize="lg" display="block" />}
+                onClick={handleDownloadAllClick}
+              >
                 <FormattedMessage
-                  id="page.petition-replies.export-all-to-zip"
-                  defaultMessage="Export all to ZIP"
+                  id="petition-replies.export-replies"
+                  defaultMessage="Export replies"
                 />
-              </MenuItem>
+              </Button>
+              <MenuButton as={Button} paddingX={2}>
+                <ChevronDownIcon fontSize="lg" />
+              </MenuButton>
+            </ButtonGroup>
+            <MenuList>
               <MenuItem
                 icon={<FilePdfIcon boxSize={5} />}
                 isDisabled={!me.hasPetitionPdfExport}

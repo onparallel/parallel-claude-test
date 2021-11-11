@@ -4400,11 +4400,6 @@
     "context": "Users"
   },
   {
-    "term": "page.petition-replies.export-all-to-zip",
-    "definition": "Exportar todo en ZIP",
-    "context": "Export all to ZIP"
-  },
-  {
     "term": "page.petition-replies.export-pdf",
     "definition": "Exportar a PDF",
     "context": "Export to PDF"
