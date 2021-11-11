@@ -40,7 +40,6 @@ import { usePetitionSharingDialog } from "@parallel/components/petition-common/P
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 import {
-  ExportParams,
   ExportRepliesDialog,
   useExportRepliesDialog,
 } from "@parallel/components/petition-replies/ExportRepliesDialog";
@@ -280,21 +279,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     const hasFiles = petition.fields.some(
       (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
     );
+    const hasSignature = petition.currentSignatureRequest?.status === "COMPLETED";
 
     try {
-      if (hasFiles || petition.currentSignatureRequest?.status === "COMPLETED") {
-        let res = {
-          type: "DOWNLOAD_ZIP",
-          pattern: "#field-title#",
-          externalClientId: "",
-        } as ExportParams;
-
-        if (hasFiles || me.hasExportCuatrecasas) {
-          res = await showExportRepliesDialog({
-            user: me,
-            fields: petition.fields,
-          });
-        }
+      if (hasFiles || hasSignature) {
+        const res = await showExportRepliesDialog({
+          user: me,
+          fields: petition.fields,
+        });
 
         if (res.type === "DOWNLOAD_ZIP") {
           handleExportRepliesTask(petition.id, res.pattern);
