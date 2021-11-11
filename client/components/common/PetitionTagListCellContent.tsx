@@ -323,6 +323,7 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
   { value, onAddTag, onRemoveTag, onEditTags, onCreateTag, ...props },
   ref
 ) {
+  const intl = useIntl();
   const [newTagColor, setNewTagColor] = useState(randomColor());
   const innerRef = useRef<TagSelectInstance>();
   useEffect(() => {
@@ -418,6 +419,10 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
       }}
       newTagColor={newTagColor}
       onEditTags={onEditTags}
+      placeholder={intl.formatMessage({
+        id: "component.tag-select.placeholder",
+        defaultMessage: "Enter tags...",
+      })}
     />
   );
 });

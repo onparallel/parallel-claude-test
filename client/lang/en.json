@@ -2750,6 +2750,11 @@
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
   },
   {
+    "term": "component.tag-select.placeholder",
+    "definition": "Enter tags...",
+    "context": "Enter tags..."
+  },
+  {
     "term": "component.tag.remove-tag",
     "definition": "Remove tag \"{tag}\"",
     "context": "Remove tag \"{tag}\""
