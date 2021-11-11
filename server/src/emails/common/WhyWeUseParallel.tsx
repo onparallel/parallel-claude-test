@@ -81,7 +81,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
         <MjmlSection key={index}>
           <MjmlGroup>
             <MjmlColumn verticalAlign="middle" width="12%">
-              <MjmlImage padding="0px" width="32px" src={reason.imageSrc} />
+              <MjmlImage padding="0px" width="32px" src={reason.imageSrc} alt="" />
             </MjmlColumn>
             <MjmlColumn verticalAlign="middle" width="88%">
               <MjmlText
