@@ -81,18 +81,48 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
     force: booleanArg({ default: false }),
   },
   resolve: async (_, args, ctx) => {
+    const currentSignatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
+      ctx.user!.org_id,
+      "SIGNATURE"
+    );
+
+    if (currentSignatureIntegrations.length < 2) {
+      throw new WhitelistedError(
+        "There are not enough integrations to be able to delete the requested integration.",
+        "INSUFICIENT_SIGNATURE_INTEGRATIONS_ERROR"
+      );
+    }
+
     const pendingSignatures = await ctx.petitions.loadPendingSignatureRequestsByIntegrationId(
       args.id
     );
-    if (pendingSignatures.length > 0 && !args.force) {
+    const pendingPetitionsWithSignatures = await ctx.petitions.loadPetitionsByOrgIntegrationId(
+      args.id
+    );
+
+    if (
+      (pendingSignatures.length > 0 || pendingPetitionsWithSignatures.length > 0) &&
+      !args.force
+    ) {
       throw new WhitelistedError(
         "There are pending signature requests using this integration. Pass `force` argument to cancel this requests and delete the integration.",
         "SIGNATURE_INTEGRATION_IN_USE_ERROR",
-        { pendingSignaturesCount: pendingSignatures.length }
+        {
+          pendingSignaturesCount: pendingPetitionsWithSignatures.length || pendingSignatures.length,
+        }
       );
     }
 
     try {
+      if (pendingPetitionsWithSignatures.length > 0) {
+        await ctx.petitions.updatePetition(
+          pendingPetitionsWithSignatures.flatMap((p) => p.id),
+          {
+            signature_config: null,
+          },
+          `User:${ctx.user!.id}`
+        );
+      }
       if (pendingSignatures.length > 0) {
         await Promise.all([
           ctx.petitions.cancelPetitionSignatureRequest(

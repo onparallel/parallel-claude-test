@@ -571,8 +571,8 @@
   },
   {
     "term": "component.delete-signature-error-confirmation.body",
-    "definition": "We have detected <b>{count}</b> pending signature processes that use this token. If you delete it, they will all be cancelled. Are you sure you want to delete it?",
-    "context": "We have detected <b>{count}</b> pending signature processes that use this token. If you delete it, they will all be cancelled. Are you sure you want to delete it?"
+    "definition": "We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be modified and all pending signature processes will be cancelled. Are you sure you want to delete it?",
+    "context": "We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be modified and all pending signature processes will be cancelled. Are you sure you want to delete it?"
   },
   {
     "term": "component.delete-signature-error-confirmation.title",

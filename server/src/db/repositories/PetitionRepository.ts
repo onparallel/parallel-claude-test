@@ -3244,6 +3244,12 @@ export class PetitionRepository extends BaseRepository {
       .whereIn("status", ["PROCESSING", "ENQUEUED"]);
   }
 
+  async loadPetitionsByOrgIntegrationId(orgIntegrationId: number) {
+    return await this.from("petition")
+      .whereRaw("signature_config ->> 'orgIntegrationId' = ?", orgIntegrationId)
+      .whereNull("deleted_at");
+  }
+
   async createPetitionSignature(petitionId: number, config: PetitionSignatureConfig) {
     const [row] = await this.insert("petition_signature_request", {
       petition_id: petitionId,

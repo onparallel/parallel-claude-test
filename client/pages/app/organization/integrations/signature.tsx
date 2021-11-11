@@ -71,6 +71,7 @@ function IntegrationsSignature() {
   const columns = useSignatureTokensTableColumns({
     refetch,
     hasSignature: me.hasPetitionSignature,
+    numberOfTokens: me.organization.signatureIntegrations.totalCount,
   });
 
   const addSignaturitAPIKey = useAddSignatureAPIKeyDialog();
@@ -215,6 +216,7 @@ function IntegrationsSignature() {
 function useSignatureTokensTableColumns({
   refetch,
   hasSignature,
+  numberOfTokens,
 }: {
   refetch: (
     variables?:
@@ -226,6 +228,7 @@ function useSignatureTokensTableColumns({
       | undefined
   ) => Promise<ApolloQueryResult<IntegrationsSignatureQuery>>;
   hasSignature: boolean;
+  numberOfTokens: number;
 }): TableColumn<any>[] {
   const intl = useIntl();
 
@@ -236,6 +239,7 @@ function useSignatureTokensTableColumns({
     useIntegrationsSignature_deleteSignatureIntegrationMutation();
 
   const handleRemoveToken = async (id: string) => {
+    if (numberOfTokens < 2) return;
     try {
       await removeSignatureToken({});
 
@@ -244,8 +248,6 @@ function useSignatureTokensTableColumns({
           id,
         },
       });
-
-      refetch();
     } catch (error) {
       if (
         isApolloError(error) &&
@@ -264,6 +266,7 @@ function useSignatureTokensTableColumns({
         } catch {}
       }
     }
+    refetch();
   };
 
   const [markIntegrationAsDefault] =
@@ -396,13 +399,13 @@ function useSignatureTokensTableColumns({
               size="sm"
               fontSize={"16px"}
               onClick={() => handleRemoveToken(row.id)}
-              isDisabled={!hasSignature}
+              isDisabled={!hasSignature || numberOfTokens === 1}
             />
           </HStack>
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale, hasSignature, numberOfTokens]
   );
 }
 

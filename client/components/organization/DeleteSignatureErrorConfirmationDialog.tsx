@@ -27,7 +27,7 @@ function DeleteSignatureErrorConfirmationDialog({
         <Text>
           <FormattedMessage
             id="component.delete-signature-error-confirmation.body"
-            defaultMessage="We have detected <b>{count}</b> pending signature processes that use this token. If you delete it, they will all be cancelled. Are you sure you want to delete it?"
+            defaultMessage="We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be modified and all pending signature processes will be cancelled. Are you sure you want to delete it?"
             values={{ count: pendingSignaturesCount }}
           />
         </Text>
