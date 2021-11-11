@@ -46,7 +46,7 @@
     "core-js": "^3.19.1",
     "date-fns": "^2.25.0",
     "escape-string-regexp": "^4.0.0",
-    "framer-motion": "^5.2.0",
+    "framer-motion": "^4.1.17",
     "graphql": "^15.6.1",
     "jwt-decode": "^3.1.2",
     "linkify-it": "^3.0.3",
