@@ -908,11 +908,22 @@ async function publicStartSignatureRequest(
     ]);
   }
 
-  const signatureRequest = await ctx.petitions.createPetitionSignature(petition.id, {
-    ...(omit(petition.signature_config, ["additionalSignersInfo"]) as any),
-    signersInfo: userSigners.concat(additionalSignersInfo),
-    message,
-  });
+  const orgIntegration = await ctx.integrations.loadIntegration(
+    petition!.signature_config.orgIntegrationId
+  );
+
+  const signatureEnv =
+    orgIntegration!.settings.environment === "production" ? "PRODUCTION" : "DEMO";
+
+  const signatureRequest = await ctx.petitions.createPetitionSignature(
+    petition.id,
+    {
+      ...(omit(petition.signature_config, ["additionalSignersInfo"]) as any),
+      signersInfo: userSigners.concat(additionalSignersInfo),
+      message,
+    },
+    signatureEnv
+  );
 
   await ctx.aws.enqueueMessages("signature-worker", {
     groupId: `signature-${toGlobalId("Petition", petition.id)}`,

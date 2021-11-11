@@ -2551,6 +2551,11 @@ type PetitionSignatureRequest implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+
+  """
+  The environment of the petition signature.
+  """
+  environment: OrgIntegrationStatus
   id: GID!
 
   """

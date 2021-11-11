@@ -47,6 +47,7 @@ import {
   PetitionSignatureRequest,
   PetitionStatus,
   PublicPetitionLink,
+  SignatureEnvironment,
   TemplateDefaultPermission,
   User,
 } from "../__types";
@@ -3250,10 +3251,15 @@ export class PetitionRepository extends BaseRepository {
       .whereNull("deleted_at");
   }
 
-  async createPetitionSignature(petitionId: number, config: PetitionSignatureConfig) {
+  async createPetitionSignature(
+    petitionId: number,
+    config: PetitionSignatureConfig,
+    environment: SignatureEnvironment
+  ) {
     const [row] = await this.insert("petition_signature_request", {
       petition_id: petitionId,
       signature_config: config,
+      environment,
     }).returning("*");
 
     return row;

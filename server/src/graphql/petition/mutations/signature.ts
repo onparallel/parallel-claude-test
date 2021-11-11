@@ -45,9 +45,17 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       }
     }
 
+    const orgIntegration = await ctx.integrations.loadIntegration(
+      petition!.signature_config.orgIntegrationId
+    );
+
+    const signatureEnv =
+      orgIntegration!.settings.environment === "production" ? "PRODUCTION" : "DEMO";
+
     const signatureRequest = await ctx.petitions.createPetitionSignature(
       petitionId,
-      petition!.signature_config
+      petition!.signature_config,
+      signatureEnv
     );
 
     await Promise.all([

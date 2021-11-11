@@ -33,7 +33,7 @@ import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
 export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
   user: PetitionSignaturesCard_UserFragment;
-  signatureEnvironment: OrgIntegrationStatus | undefined;
+  signatureEnvironment: OrgIntegrationStatus | undefined | null;
   onRefetchPetition: () => void;
 }
 

@@ -55,6 +55,11 @@ export const PetitionSignatureRequest = objectType({
       type: "PetitionSignatureRequestStatus",
       description: "The status of the petition signature.",
     });
+    t.nullable.field("environment", {
+      type: "OrgIntegrationStatus",
+      description: "The environment of the petition signature.",
+      resolve: (o) => o.environment,
+    });
     t.nonNull.list.nonNull.field("signerStatus", {
       type: "PetitionSignatureRequestSignerStatus",
       resolve: (o) =>

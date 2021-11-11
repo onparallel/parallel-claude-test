@@ -8,12 +8,11 @@ import {
 export function usePetitionCurrentSignatureStatusAndEnv(
   petition: usePetitionCurrentSignatureStatusAndEnv_PetitionFragment
 ): {
-  env: OrgIntegrationStatus | undefined;
+  env: OrgIntegrationStatus | undefined | null;
   status: PetitionSignatureRequestStatus | "START" | null;
 } {
   const env =
-    petition.signatureConfig?.integration?.status ||
-    petition.currentSignatureRequest?.signatureConfig.integration?.status;
+    petition.signatureConfig?.integration?.status || petition.currentSignatureRequest?.environment;
 
   const status =
     petition.signatureConfig?.review &&
@@ -33,11 +32,7 @@ usePetitionCurrentSignatureStatusAndEnv.fragments = {
       status
       currentSignatureRequest {
         status
-        signatureConfig {
-          integration {
-            status
-          }
-        }
+        environment
       }
       signatureConfig {
         review

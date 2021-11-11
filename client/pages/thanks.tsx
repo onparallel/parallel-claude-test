@@ -46,10 +46,10 @@ function ThanksForSigning() {
           <Center>
             {logoUrl ? <Image src={logoUrl} width="200px" /> : <Logo width="200px" />}
           </Center>
-          <Card paddingY={8} paddingX={4} textAlign="center">
+          <Card paddingY={8} paddingX={10} textAlign="center">
             <Stack spacing={4}>
-              <Center margin="auto" borderRadius="full" background="purple.500" boxSize={8}>
-                <CheckIcon color="white" role="presentation" />
+              <Center margin="auto" borderRadius="full" background="purple.500" boxSize={10}>
+                <CheckIcon color="white" role="presentation" boxSize={6} />
               </Center>
               <Heading size="md">
                 <FormattedMessage

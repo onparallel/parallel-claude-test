@@ -1956,6 +1956,8 @@ export interface PetitionSignatureRequest extends Timestamps {
   auditTrailFilename?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** The environment of the petition signature. */
+  environment?: Maybe<OrgIntegrationStatus>;
   id: Scalars["GID"];
   /** Metadata for this signature request. */
   metadata: Scalars["JSONObject"];
@@ -3104,11 +3106,10 @@ export type PetitionSignatureCellContent_PetitionFragment = { __typename?: "Peti
   "status"
 > & {
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
-          signatureConfig: { __typename?: "SignatureConfig" } & {
-            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
-          };
-        }
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "status" | "environment"
+      >
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -7453,14 +7454,8 @@ export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
                   currentSignatureRequest?: Maybe<
                     { __typename?: "PetitionSignatureRequest" } & Pick<
                       PetitionSignatureRequest,
-                      "status"
-                    > & {
-                        signatureConfig: { __typename?: "SignatureConfig" } & {
-                          integration?: Maybe<
-                            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
-                          >;
-                        };
-                      }
+                      "status" | "environment"
+                    >
                   >;
                   signatureConfig?: Maybe<
                     { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -7511,14 +7506,8 @@ export type Contact_PetitionAccessFragment = { __typename?: "PetitionAccess" } &
           currentSignatureRequest?: Maybe<
             { __typename?: "PetitionSignatureRequest" } & Pick<
               PetitionSignatureRequest,
-              "status"
-            > & {
-                signatureConfig: { __typename?: "SignatureConfig" } & {
-                  integration?: Maybe<
-                    { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
-                  >;
-                };
-              }
+              "status" | "environment"
+            >
           >;
           signatureConfig?: Maybe<
             { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -7555,11 +7544,10 @@ export type Contact_PetitionFragment = { __typename?: "Petition" } & Pick<
       "validated" | "replied" | "optional" | "total"
     >;
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
-          signatureConfig: { __typename?: "SignatureConfig" } & {
-            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
-          };
-        }
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "status" | "environment"
+      >
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -7677,14 +7665,8 @@ export type ContactQuery = {
                       currentSignatureRequest?: Maybe<
                         { __typename?: "PetitionSignatureRequest" } & Pick<
                           PetitionSignatureRequest,
-                          "status"
-                        > & {
-                            signatureConfig: { __typename?: "SignatureConfig" } & {
-                              integration?: Maybe<
-                                { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
-                              >;
-                            };
-                          }
+                          "status" | "environment"
+                        >
                       >;
                       signatureConfig?: Maybe<
                         { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -11081,12 +11063,8 @@ export type PetitionReplies_PetitionFragment = { __typename?: "Petition" } & Pic
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<
         PetitionSignatureRequest,
-        "id" | "status"
-      > & {
-          signatureConfig: { __typename?: "SignatureConfig" } & {
-            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
-          };
-        }
+        "id" | "status" | "environment"
+      >
     >;
     permissions: Array<
       | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
@@ -11548,14 +11526,8 @@ export type PetitionRepliesQuery = {
           currentSignatureRequest?: Maybe<
             { __typename?: "PetitionSignatureRequest" } & Pick<
               PetitionSignatureRequest,
-              "id" | "status"
-            > & {
-                signatureConfig: { __typename?: "SignatureConfig" } & {
-                  integration?: Maybe<
-                    { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
-                  >;
-                };
-              }
+              "id" | "status" | "environment"
+            >
           >;
           permissions: Array<
             | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
@@ -11671,14 +11643,8 @@ export type Petitions_PetitionBasePaginationFragment = {
             currentSignatureRequest?: Maybe<
               { __typename?: "PetitionSignatureRequest" } & Pick<
                 PetitionSignatureRequest,
-                "status"
-              > & {
-                  signatureConfig: { __typename?: "SignatureConfig" } & {
-                    integration?: Maybe<
-                      { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
-                    >;
-                  };
-                }
+                "status" | "environment"
+              >
             >;
             signatureConfig?: Maybe<
               { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -11750,11 +11716,10 @@ export type Petitions_PetitionBase_Petition_Fragment = { __typename?: "Petition"
     >;
     tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
-          signatureConfig: { __typename?: "SignatureConfig" } & {
-            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
-          };
-        }
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "status" | "environment"
+      >
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -11902,14 +11867,8 @@ export type PetitionsQuery = {
               currentSignatureRequest?: Maybe<
                 { __typename?: "PetitionSignatureRequest" } & Pick<
                   PetitionSignatureRequest,
-                  "status"
-                > & {
-                    signatureConfig: { __typename?: "SignatureConfig" } & {
-                      integration?: Maybe<
-                        { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
-                      >;
-                    };
-                  }
+                  "status" | "environment"
+                >
               >;
               signatureConfig?: Maybe<
                 { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -13332,11 +13291,10 @@ export type usePetitionCurrentSignatureStatusAndEnv_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "status"> & {
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
-          signatureConfig: { __typename?: "SignatureConfig" } & {
-            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
-          };
-        }
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "status" | "environment"
+      >
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -13377,11 +13335,10 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     >;
     tags: Array<{ __typename?: "Tag" } & Pick<Tag, "id" | "name" | "color">>;
     currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "status"> & {
-          signatureConfig: { __typename?: "SignatureConfig" } & {
-            integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
-          };
-        }
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "status" | "environment"
+      >
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
@@ -14178,11 +14135,7 @@ export const usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc = gql`
     status
     currentSignatureRequest {
       status
-      signatureConfig {
-        integration {
-          status
-        }
-      }
+      environment
     }
     signatureConfig {
       review

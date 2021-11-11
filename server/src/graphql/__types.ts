@@ -1252,6 +1252,7 @@ export interface NexusGenFieldTypes {
     // field return type
     auditTrailFilename: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    environment: NexusGenEnums["OrgIntegrationStatus"] | null; // OrgIntegrationStatus
     id: NexusGenScalars["GID"]; // GID!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     petition: NexusGenRootTypes["Petition"]; // Petition!
@@ -2439,6 +2440,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     auditTrailFilename: "String";
     createdAt: "DateTime";
+    environment: "OrgIntegrationStatus";
     id: "GID";
     metadata: "JSONObject";
     petition: "Petition";
