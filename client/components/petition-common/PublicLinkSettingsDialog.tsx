@@ -166,6 +166,7 @@ export function PublicLinkSettingsDialog({
   );
 
   const isValidSlug = async (value: string) => {
+    if (dirtyFields.slug !== true) return true;
     try {
       return await debouncedIsValidSlug(value);
     } catch (e) {
