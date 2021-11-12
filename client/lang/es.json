@@ -2091,13 +2091,13 @@
   },
   {
     "term": "component.public-signup-form-organization.upload-organizationLogo-size-error",
-    "definition": "Archivo demasiado pesado. Adjunte un archivo de hasta 50kB",
-    "context": "File too heavy. Attach a file up to 50kB"
+    "definition": "Archivo demasiado pesado. Adjunte un archivo de hasta 150kB",
+    "context": "File too heavy. Attach a file up to 150kB"
   },
   {
     "term": "component.public-signup-form-organization.upload-organizationLogo-text",
-    "definition": "(Archivo PNG de hasta 50 kB)",
-    "context": "(PNG file of size up 50kB)"
+    "definition": "(Archivo PNG de hasta 150kB)",
+    "context": "(PNG file of size up 150kB)"
   },
   {
     "term": "component.public-signup-form-organization.upload-other-organizationLogo-button",

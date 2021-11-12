@@ -167,6 +167,7 @@ export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
   | "API_TOKENS"
+  | "AUTO_SEND_TEMPLATE"
   | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
@@ -311,6 +312,8 @@ export type Mutation = {
   addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
+  /** Creates a petition from a template and send */
+  autoSendTemplate: Scalars["String"];
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
   batchSendPetition: Array<SendPetitionResult>;
   /** Load contacts from an excel file, creating the ones not found on database */
@@ -558,6 +561,11 @@ export type MutationaddUsersToUserGroupArgs = {
 export type MutationassignPetitionToUserArgs = {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];
+};
+
+export type MutationautoSendTemplateArgs = {
+  name: Scalars["String"];
+  templateId: Scalars["GID"];
 };
 
 export type MutationbatchSendPetitionArgs = {

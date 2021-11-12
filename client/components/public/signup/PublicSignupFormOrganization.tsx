@@ -136,7 +136,7 @@ function SelectLogoInput({
   const [isMaxSizeExceeded, setIsMaxSizeExceeded] = useState(false);
   const organizationLogoInputRef = useRef<HTMLInputElement>(null);
   const handleFileChange = (files: Maybe<FileList>) => {
-    const maxSize = 1024 * 50; //50 kB
+    const maxSize = 1024 * 150; //150 kB
     if (files?.length) {
       if (files[0].size <= maxSize) {
         setOrganizationLogo(files[0] as any);
@@ -202,7 +202,7 @@ function SelectLogoInput({
           ) : (
             <FormattedMessage
               id="component.public-signup-form-organization.upload-organizationLogo-text"
-              defaultMessage="(PNG file of size up 50kB)"
+              defaultMessage="(PNG file of size up 150kB)"
             />
           )}
         </Text>
@@ -211,7 +211,7 @@ function SelectLogoInput({
         <Text fontSize="sm" color="red.600" paddingTop={4}>
           <FormattedMessage
             id="component.public-signup-form-organization.upload-organizationLogo-size-error"
-            defaultMessage="File too heavy. Attach a file up to 50kB"
+            defaultMessage="File too heavy. Attach a file up to 150kB"
           />
         </Text>
       )}
