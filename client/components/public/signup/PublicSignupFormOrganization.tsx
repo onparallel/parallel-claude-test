@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
+import { fileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Maybe } from "@parallel/utils/types";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -133,10 +134,12 @@ function SelectLogoInput({
   setOrganizationLogo: (arg0: File | undefined) => void;
 }) {
   const intl = useIntl();
+
+  const maxSize = 1024 * 150; //150 kB
+
   const [isMaxSizeExceeded, setIsMaxSizeExceeded] = useState(false);
   const organizationLogoInputRef = useRef<HTMLInputElement>(null);
   const handleFileChange = (files: Maybe<FileList>) => {
-    const maxSize = 1024 * 150; //150 kB
     if (files?.length) {
       if (files[0].size <= maxSize) {
         setOrganizationLogo(files[0] as any);
@@ -202,7 +205,10 @@ function SelectLogoInput({
           ) : (
             <FormattedMessage
               id="component.public-signup-form-organization.upload-organizationLogo-text"
-              defaultMessage="(PNG file of size up 150kB)"
+              defaultMessage="(PNG file of size up {size})"
+              values={{
+                size: fileSize(intl, maxSize),
+              }}
             />
           )}
         </Text>
@@ -211,7 +217,10 @@ function SelectLogoInput({
         <Text fontSize="sm" color="red.600" paddingTop={4}>
           <FormattedMessage
             id="component.public-signup-form-organization.upload-organizationLogo-size-error"
-            defaultMessage="File too heavy. Attach a file up to 150kB"
+            defaultMessage="File too heavy. Attach a file up to {size}"
+            values={{
+              size: fileSize(intl, maxSize),
+            }}
           />
         </Text>
       )}
