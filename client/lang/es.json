@@ -1660,6 +1660,21 @@
     "context": "Enable this option to prevent users from accidentally making changes to this petition."
   },
   {
+    "term": "component.petition-settings.share-automatically",
+    "definition": "Compartir automáticamente",
+    "context": "Share automatically"
+  },
+  {
+    "term": "component.petition-settings.share-automatically-description",
+    "definition": "Indica los usuarios y equipos a los que quieras que se compartan automáticamente las peticiones creadas a partir de esta plantilla.",
+    "context": "Specify which users or groups of users the petitions created from this template are automatically shared with"
+  },
+  {
+    "term": "component.petition-settings.share-automatically-settings",
+    "definition": "Ajustes de compartido",
+    "context": "Sharing settings"
+  },
+  {
     "term": "component.petition-settings.share-by-link",
     "definition": "Compartir por enlace",
     "context": "Share by link"
@@ -2515,16 +2530,6 @@
     "context": "Explain what the service is and what kind of information you will need"
   },
   {
-    "term": "component.settings-public-link-dialog.editors-label",
-    "definition": "Editores",
-    "context": "Editors"
-  },
-  {
-    "term": "component.settings-public-link-dialog.editors-placeholder",
-    "definition": "Añade usuarios y equipos de tu organización",
-    "context": "Add users and teams from your organization"
-  },
-  {
     "term": "component.settings-public-link-dialog.generate-link",
     "definition": "Generar enlace",
     "context": "Generate link"
@@ -2773,6 +2778,26 @@
     "term": "component.template-card.active-link",
     "definition": "Enlace activado",
     "context": "Enabled link"
+  },
+  {
+    "term": "component.template-default-permissions-dialog.description",
+    "definition": "Indica los usuarios y equipos a los que quieras que se compartan automáticamente las peticiones creadas a partir de esta plantilla.",
+    "context": "Specify the users or groups of users with whom you want to share the petitions created from this template."
+  },
+  {
+    "term": "component.template-default-permissions-dialog.subscribe",
+    "definition": "Subscribir a las notificaciones",
+    "context": "Subscribe to notifications"
+  },
+  {
+    "term": "component.template-default-permissions-dialog.subscribe-explanation",
+    "definition": "Los usuarios recibirán notificaciones de las peticiones creadas a partir de esta plantilla.",
+    "context": "These users will be receive notifications from the petitions created from this template."
+  },
+  {
+    "term": "component.template-default-permissions-dialog.title",
+    "definition": "Compartir automáticamente",
+    "context": "Share automatically"
   },
   {
     "term": "component.template-details-modal.about",
@@ -3745,6 +3770,11 @@
     "context": "Go to page {page}"
   },
   {
+    "term": "generic.help",
+    "definition": "Ayuda",
+    "context": "Help"
+  },
+  {
     "term": "generic.i-understand",
     "definition": "Ok, entiendo",
     "context": "I understand"
@@ -3848,6 +3878,11 @@
     "term": "generic.page-break",
     "definition": "Salto de página",
     "context": "Page break"
+  },
+  {
+    "term": "generic.petition-sharing-placeholder",
+    "definition": "Añade usuarios y equipos de tu organización",
+    "context": "Add users and teams from your organization"
   },
   {
     "term": "generic.petition-status.closed",
@@ -4860,11 +4895,6 @@
     "context": "Share with people and groups"
   },
   {
-    "term": "generic.petition-sharing-placeholder",
-    "definition": "Añade usuarios y equipos de tu organización",
-    "context": "Add users and teams from your organization"
-  },
-  {
     "term": "petition-sharing.input-placeholder-not-owner",
     "definition": "Solamente el propietario de la petición puede compartirla",
     "context": "Only the petition owner can share it"
@@ -5451,31 +5481,31 @@
   },
   {
     "term": "public-petition-email-exists.body",
-    "definition": "Ya existe un acceso asociado a este contacto. Si empiezas una nueva petición, se creará un nuevo acceso para completar la información desde cero. ¿Qué quieres hacer?",
-    "context": "There is already an access associated to this contact. If you start a new petition, new access will be created to complete the information afresh. What do you want to do?"
+    "definition": "Ya existe un proceso en marcha asociado a este correo. Si empiezas uno nuevo, deberás completar la información desde cero. ¿Qué quieres hacer?",
+    "context": "There is already an ongoing process associated to this email. If you start a new process, you will have to fill the information from scratch. What would you like to do?"
   },
   {
     "term": "public-petition-email-exists.continue-existing-button",
     "definition": "Continuar existente",
-    "context": "Continue the existing"
+    "context": "Continue existing process"
   },
   {
     "term": "public-petition-email-exists.new-petition-button",
-    "definition": "Empezar una nueva petición",
-    "context": "Start new petition"
+    "definition": "Empezar de nuevo",
+    "context": "Start again"
   },
   {
     "term": "public-petition-email-exists.title",
     "definition": "Correo existente",
-    "context": "Existing mail"
+    "context": "Existing email"
   },
   {
-    "term": "public-petition-email-sent.body.parraf-1",
+    "term": "public-petition-email-sent.body.explanation-1",
     "definition": "Hemos enviado un correo a <b>{email}</b> con el acceso para completar la información. Esto nos ayudará a verificar tu correo electrónico y asegurar la privacidad y seguridad de tus datos.",
     "context": "We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure your privacy and security."
   },
   {
-    "term": "public-petition-email-sent.body.parraf-2",
+    "term": "public-petition-email-sent.body.explanation-2",
     "definition": "¿No encuentras nuestro correo? Revisa la bandeja de spam y si no está ponte en contacto con la persona que te haya compartido el enlace.",
     "context": "Can’t find our email? Check your spam folder and if you don’t find it contact with the person who shared you the link."
   },
@@ -5485,19 +5515,29 @@
     "context": "Check your inbox"
   },
   {
-    "term": "public-petition-reminder.body.parraf-1",
-    "definition": "Hemos enviado un recordatorio a <b>{email}</b> con el acceso a tu petición para que puedas volver acceder y seguir completándola.",
-    "context": "We have sent a reminder to <b>{email}</b> with access to your previous petition so you can get back and continue to complete it."
+    "term": "public-petition-reminder.body.explanation-1",
+    "definition": "Hemos enviado un recordatorio a <b>{email}</b> con un enlace a tu proceso en marcha para que puedas acceder y seguir completándolo.",
+    "context": "We have sent a reminder to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it."
   },
   {
-    "term": "public-petition-reminder.body.parraf-2",
+    "term": "public-petition-reminder.body.explanation-2",
     "definition": "¿No encuentras nuestro correo? Revisa la bandeja de spam y si no está ponte en contacto con la persona que te haya compartido el enlace.",
-    "context": "Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link."
+    "context": "Can’t find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link."
   },
   {
     "term": "public-petition-reminder.title",
     "definition": "Recordatorio enviado",
     "context": "Reminder sent"
+  },
+  {
+    "term": "public-petition.help.explanation-1",
+    "definition": "Si te han mandado o has encontrado este enlace, significa que necesitan solicitarte información. Por seguridad, necesitamos identificarte para  <b>asociar tu correo a un portal seguro</b> donde podrás completarla.",
+    "context": "If you have found this link or someone has sent it to you, it means that they need some information. For security, we need to identify you and so we can <b>associate your email to a secure portal</b> where you can complete it."
+  },
+  {
+    "term": "public-petition.help.explanation-2",
+    "definition": "Además, te enviaremos un <b>correo con el enlace</b> para que puedas volver y terminar de completarlo cuando quieras.",
+    "context": "In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want."
   },
   {
     "term": "public-petition.help.form-title",
@@ -5508,16 +5548,6 @@
     "term": "public-petition.help.more-faq",
     "definition": "Ver más preguntas frecuentes",
     "context": "See more frequently asked questions"
-  },
-  {
-    "term": "public-petition.help.parraf-1",
-    "definition": "Si te han mandado o has encontrado este enlace, significa que necesitan solicitarte información. Por seguridad, necesitamos identificarte para  <b>asociar tu correo a un portal seguro</b> donde podrás completarla.",
-    "context": "If you have found this link or someone has sent it to you, it means that they need some information. For security, we need to identify you and so we can <b>associate your email to a secure portal</b> where you can complete it."
-  },
-  {
-    "term": "public-petition.help.parraf-2",
-    "definition": "Además, te enviaremos un <b>correo con el enlace</b> para que puedas volver y terminar de completarlo cuando quieras.",
-    "context": "In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want."
   },
   {
     "term": "public-petition.help.request-access-button",

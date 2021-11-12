@@ -36,15 +36,15 @@ export function PublicPetitionReminder({ organization, email }: PublicPetitionRe
         <Stack spacing={4}>
           <Text>
             <FormattedMessage
-              id="public-petition-reminder.body.parraf-1"
-              defaultMessage="We have sent a reminder to <b>{email}</b> with access to your previous petition so you can get back and continue to complete it."
+              id="public-petition-reminder.body.explanation-1"
+              defaultMessage="We have sent a reminder to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it."
               values={{ email }}
             />
           </Text>
           <Text>
             <FormattedMessage
-              id="public-petition-reminder.body.parraf-2"
-              defaultMessage="Can’t find our email? Check your spam folder and if you don’t found it contact with the person who shared you the link."
+              id="public-petition-reminder.body.explanation-2"
+              defaultMessage="Can’t find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link."
             />
           </Text>
         </Stack>

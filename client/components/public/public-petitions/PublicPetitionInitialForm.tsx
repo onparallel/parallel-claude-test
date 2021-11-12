@@ -160,14 +160,14 @@ export function PublicPetitionInitialForm({
               rounded="full"
               size="xs"
               variant="ghost"
-              aria-label="help"
+              aria-label={intl.formatMessage({ id: "generic.help", defaultMessage: "Help" })}
               fontSize="md"
               color="gray.400"
               _hover={{ color: "gray.600" }}
               _focus={{ color: "gray.600", outline: "none" }}
               _focusVisible={{
                 color: "gray.600",
-                boxShadow: "var(--chakra-shadows-outline)",
+                shadow: "outline",
               }}
               icon={<QuestionOutlineIcon />}
               onClick={() => setDialogIsOpen(true)}
@@ -179,7 +179,6 @@ export function PublicPetitionInitialForm({
               <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" /> *
             </FormLabel>
             <Input
-              type="text"
               autoComplete="given-name"
               {...register("firstName", {
                 required: true,
@@ -200,7 +199,6 @@ export function PublicPetitionInitialForm({
               <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" /> *
             </FormLabel>
             <Input
-              type="text"
               autoComplete="family-name"
               {...register("lastName", {
                 required: true,
@@ -216,7 +214,7 @@ export function PublicPetitionInitialForm({
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl id="first-name" isInvalid={!!errors.email}>
+          <FormControl id="email" isInvalid={!!errors.email}>
             <FormLabel>
               <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" /> *
             </FormLabel>
@@ -270,14 +268,14 @@ export function PublicPetitionInitialForm({
               <Stack spacing={4}>
                 <Text>
                   <FormattedMessage
-                    id="public-petition.help.parraf-1"
+                    id="public-petition.help.explanation-1"
                     defaultMessage="If you have found this link or someone has sent it to you, it means that they need some information. For security, we need to identify you and so we can <b>associate your email to a secure portal</b> where you can complete it."
                   />
                 </Text>
                 <Text>
                   <FormattedMessage
-                    id="public-petition.help.parraf-2"
-                    defaultMessage="In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want."
+                    id="public-petition.help.explanation-2"
+                    defaultMessage="In addition, we will send you an <b>email with the link</b> so that you can return and continue at any time."
                   />
                 </Text>
               </Stack>

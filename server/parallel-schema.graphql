@@ -787,7 +787,7 @@ type Mutation {
     Set to true to force the creation + send of a new petition if the contact already has an active access on this public link
     """
     force: Boolean
-    publicPetitionLinkId: GID!
+    slug: ID!
   ): Result!
 
   """
@@ -905,7 +905,7 @@ type Mutation {
     """
     preview: Boolean
   ): FileUploadDownloadLinkResult!
-  publicSendReminder(contactEmail: String!, publicPetitionLinkId: GID!): Result!
+  publicSendReminder(contactEmail: String!, slug: ID!): Result!
   publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
 
   """
@@ -3076,11 +3076,6 @@ type PublicPetitionLink {
   title: String!
 }
 
-type PublicPetitionLinkOwnerOrganization {
-  logoUrl: String
-  name: String!
-}
-
 """
 A public message in a petition
 """
@@ -3104,9 +3099,8 @@ input PublicPetitionSignerDataInput {
 
 type PublicPublicPetitionLink {
   description: String!
-  id: GID!
   isActive: Boolean!
-  organization: PublicPetitionLinkOwnerOrganization!
+  organization: PublicOrganization!
   owner: PublicUser!
   slug: String!
   title: String!
@@ -3331,7 +3325,7 @@ type Query {
   ): PetitionBasePagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
   publicOrgLogoUrl(id: GID!): String
-  publicPetitionLinkBySlug(slug: String!): PublicPublicPetitionLink
+  publicPetitionLinkBySlug(slug: ID!): PublicPublicPetitionLink
   publicTemplateCategories: [String!]!
 
   """

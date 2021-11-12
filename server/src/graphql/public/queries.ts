@@ -1,4 +1,4 @@
-import { idArg, list, nonNull, nullable, queryField, stringArg } from "nexus";
+import { idArg, list, nonNull, nullable, queryField } from "nexus";
 import { chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { authenticatePublicAccess, fieldBelongsToAccess } from "./authorizers";
@@ -43,7 +43,7 @@ export const publicOrgLogo = queryField("publicOrgLogoUrl", {
 export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
   type: nullable("PublicPublicPetitionLink"),
   args: {
-    slug: nonNull(stringArg()),
+    slug: nonNull(idArg()),
   },
   resolve: async (_, { slug }, ctx) => {
     const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);

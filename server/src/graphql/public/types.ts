@@ -456,8 +456,8 @@ export const PublicPetitionFieldComment = objectType({
 
 export const PublicPublicPetitionLink = objectType({
   name: "PublicPublicPetitionLink",
+  sourceType: "db.PublicPetitionLink",
   definition(t) {
-    t.globalId("id");
     t.nonNull.string("title");
     t.nonNull.string("description");
     t.nonNull.string("slug");
@@ -472,13 +472,7 @@ export const PublicPublicPetitionLink = objectType({
     });
 
     t.nonNull.field("organization", {
-      type: objectType({
-        name: "PublicPetitionLinkOwnerOrganization",
-        definition(t) {
-          t.nonNull.string("name");
-          t.nullable.string("logoUrl");
-        },
-      }),
+      type: "PublicOrganization",
       resolve: async (root, _, ctx) => {
         const owner = await ctx.users.loadUser(root.owner_id);
         if (!owner) {
@@ -488,11 +482,7 @@ export const PublicPublicPetitionLink = objectType({
         if (!organization) {
           throw new Error(`Can't find organization of User:${owner.id}`);
         }
-
-        return {
-          name: organization.name,
-          logoUrl: await ctx.organizations.getOrgLogoUrl(organization.id),
-        };
+        return organization;
       },
     });
   },

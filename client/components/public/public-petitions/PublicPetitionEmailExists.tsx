@@ -42,13 +42,13 @@ export function PublicPetitionEmailExists({
         <Text fontSize="2xl" fontWeight="bold">
           <FormattedMessage
             id="public-petition-email-exists.title"
-            defaultMessage="Existing mail"
+            defaultMessage="Existing email"
           />
         </Text>
         <Text>
           <FormattedMessage
             id="public-petition-email-exists.body"
-            defaultMessage="There is already an access associated to this contact. If you start a new petition, new access will be created to complete the information afresh. What do you want to do?"
+            defaultMessage="There is already an ongoing process associated to this email. If you start a new process, you will have to fill the information from scratch. What would you like to do?"
           />
         </Text>
 
@@ -63,7 +63,7 @@ export function PublicPetitionEmailExists({
           >
             <FormattedMessage
               id="public-petition-email-exists.new-petition-button"
-              defaultMessage="Start new petition"
+              defaultMessage="Start again"
             />
           </Button>
           <Button
@@ -76,7 +76,7 @@ export function PublicPetitionEmailExists({
           >
             <FormattedMessage
               id="public-petition-email-exists.continue-existing-button"
-              defaultMessage="Continue the existing"
+              defaultMessage="Continue existing process"
             />
           </Button>
         </Stack>

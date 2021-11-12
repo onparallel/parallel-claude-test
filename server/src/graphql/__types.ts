@@ -485,19 +485,8 @@ export interface NexusGenObjects {
   PublicPetitionFieldComment: db.PetitionFieldComment;
   PublicPetitionFieldReply: db.PetitionFieldReply;
   PublicPetitionLink: db.PublicPetitionLink;
-  PublicPetitionLinkOwnerOrganization: {
-    // root type
-    logoUrl?: string | null; // String
-    name: string; // String!
-  };
   PublicPetitionMessage: db.PetitionMessage;
-  PublicPublicPetitionLink: {
-    // root type
-    description: string; // String!
-    id: NexusGenScalars["GID"]; // GID!
-    slug: string; // String!
-    title: string; // String!
-  };
+  PublicPublicPetitionLink: db.PublicPetitionLink;
   PublicSignatureConfig: {
     signersInfo: any[];
     review?: boolean;
@@ -1421,11 +1410,6 @@ export interface NexusGenFieldTypes {
     slug: string; // String!
     title: string; // String!
   };
-  PublicPetitionLinkOwnerOrganization: {
-    // field return type
-    logoUrl: string | null; // String
-    name: string; // String!
-  };
   PublicPetitionMessage: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
@@ -1434,9 +1418,8 @@ export interface NexusGenFieldTypes {
   PublicPublicPetitionLink: {
     // field return type
     description: string; // String!
-    id: NexusGenScalars["GID"]; // GID!
     isActive: boolean; // Boolean!
-    organization: NexusGenRootTypes["PublicPetitionLinkOwnerOrganization"]; // PublicPetitionLinkOwnerOrganization!
+    organization: NexusGenRootTypes["PublicOrganization"]; // PublicOrganization!
     owner: NexusGenRootTypes["PublicUser"]; // PublicUser!
     slug: string; // String!
     title: string; // String!
@@ -2603,11 +2586,6 @@ export interface NexusGenFieldTypeNames {
     slug: "String";
     title: "String";
   };
-  PublicPetitionLinkOwnerOrganization: {
-    // field return type name
-    logoUrl: "String";
-    name: "String";
-  };
   PublicPetitionMessage: {
     // field return type name
     id: "GID";
@@ -2616,9 +2594,8 @@ export interface NexusGenFieldTypeNames {
   PublicPublicPetitionLink: {
     // field return type name
     description: "String";
-    id: "GID";
     isActive: "Boolean";
-    organization: "PublicPetitionLinkOwnerOrganization";
+    organization: "PublicOrganization";
     owner: "PublicUser";
     slug: "String";
     title: "String";
@@ -3291,7 +3268,7 @@ export interface NexusGenArgTypes {
       contactFirstName: string; // String!
       contactLastName: string; // String!
       force?: boolean | null; // Boolean
-      publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
+      slug: string; // ID!
     };
     publicCreateCheckboxReply: {
       // args
@@ -3375,7 +3352,7 @@ export interface NexusGenArgTypes {
     publicSendReminder: {
       // args
       contactEmail: string; // String!
-      publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
+      slug: string; // ID!
     };
     publicSendVerificationCode: {
       // args
@@ -3816,7 +3793,7 @@ export interface NexusGenArgTypes {
     };
     publicPetitionLinkBySlug: {
       // args
-      slug: string; // String!
+      slug: string; // ID!
     };
     searchUsers: {
       // args

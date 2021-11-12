@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, SimpleGrid, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Center, Flex, SimpleGrid, Spacer, Text, useToast } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicPetitionEmailExists } from "@parallel/components/public/public-petitions/PublicPetitionEmailExists";
@@ -10,7 +10,7 @@ import {
 } from "@parallel/components/public/public-petitions/PublicPetitionInitialForm";
 import { PublicPetitionReminder } from "@parallel/components/public/public-petitions/PublicPetitionReminder";
 import {
-  PublicPetitionLink_PublicPetitionLinkFragment,
+  PublicPetitionLink_PublicPublicPetitionLinkFragment,
   PublicTemplateLink_publicPetitionLinkBySlugQuery,
   PublicTemplateLink_publicPetitionLinkBySlugQueryVariables,
   usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation,
@@ -19,7 +19,11 @@ import {
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isInsecureBrowser } from "@parallel/utils/isInsecureBrowser";
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import {
+  GetServerSidePropsContext,
+  GetServerSidePropsResult,
+  InferGetServerSidePropsType,
+} from "next";
 import Head from "next/head";
 import { useState } from "react";
 import { SubmitHandler } from "react-hook-form";
@@ -32,7 +36,8 @@ export type HandleNewPublicPetitionProps = {
 };
 
 function PublicPetitionLink({
-  publicPetitionLinkBySlug,
+  slug,
+  publicPetitionLink,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
 
@@ -42,8 +47,7 @@ function PublicPetitionLink({
 
   const [submittedData, setSubmittedData] = useState<PublicPetitionInitialFormInputs>();
 
-  const { id, description, title, organization } =
-    publicPetitionLinkBySlug as PublicPetitionLink_PublicPetitionLinkFragment;
+  const { description, title, organization } = publicPetitionLink;
 
   const [createPublicPetition, { loading }] =
     usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation({});
@@ -78,7 +82,7 @@ function PublicPetitionLink({
 
       const { data, errors } = await createPublicPetition({
         variables: {
-          publicPetitionLinkId: id,
+          slug,
           contactFirstName: _data?.firstName ?? "",
           contactLastName: _data?.lastName ?? "",
           contactEmail: _data?.email ?? "",
@@ -111,7 +115,7 @@ function PublicPetitionLink({
     try {
       const { data, errors } = await sendReminder({
         variables: {
-          publicPetitionLinkId: id,
+          slug,
           contactEmail: submittedData?.email ?? "",
         },
       });
@@ -164,8 +168,8 @@ function PublicPetitionLink({
         backgroundColor="gray.50"
         overflow="auto"
       >
-        <Stack
-          spacing={0}
+        <Flex
+          flexDirection="column"
           width={{ base: "full", md: "auto" }}
           height={{ base: "full", md: "auto" }}
           rounded={{ base: undefined, md: "xl" }}
@@ -210,8 +214,9 @@ function PublicPetitionLink({
               />
             )}
           </SimpleGrid>
-          <Flex justifyContent="flex-end" alignItems="flex-end" flex="1">
-            <NakedLink href="/?ref=parallel_public_link" passHref>
+          <Spacer />
+          <Flex justifyContent="flex-end">
+            <NakedLink href="/?ref=parallel_public_link">
               <Box
                 as="a"
                 target="_blank"
@@ -219,27 +224,18 @@ function PublicPetitionLink({
                 borderTopLeftRadius="xl"
                 paddingX={4}
                 paddingY={1.5}
-                width="min-content"
-                cursor="pointer"
-                height="min-content"
+                fontSize="sm"
+                whiteSpace="nowrap"
               >
-                <Text as="span" fontSize="sm" whiteSpace="nowrap">
-                  <FormattedMessage
-                    id="recipient-view.powered-by"
-                    defaultMessage="Powered by {parallel}"
-                    values={{
-                      parallel: (
-                        <Text as="a" fontWeight="bold" fontFamily="hero">
-                          Parallel
-                        </Text>
-                      ),
-                    }}
-                  />
-                </Text>
+                <FormattedMessage
+                  id="recipient-view.powered-by"
+                  defaultMessage="Powered by {parallel}"
+                  values={{ parallel: <Text as="b">Parallel</Text> }}
+                />
               </Box>
             </NakedLink>
           </Flex>
-        </Stack>
+        </Flex>
       </Center>
     </>
   );
@@ -248,7 +244,6 @@ function PublicPetitionLink({
 PublicPetitionLink.fragments = {
   PublicPublicPetitionLink: gql`
     fragment PublicPetitionLink_PublicPublicPetitionLink on PublicPublicPetitionLink {
-      id
       title
       description
       organization {
@@ -262,14 +257,14 @@ PublicPetitionLink.fragments = {
 PublicPetitionLink.mutations = [
   gql`
     mutation PublicPetitionLink_publicCreateAndSendPetitionFromPublicLink(
-      $publicPetitionLinkId: GID!
+      $slug: ID!
       $contactFirstName: String!
       $contactLastName: String!
       $contactEmail: String!
       $force: Boolean
     ) {
       publicCreateAndSendPetitionFromPublicLink(
-        publicPetitionLinkId: $publicPetitionLinkId
+        slug: $slug
         contactFirstName: $contactFirstName
         contactLastName: $contactLastName
         contactEmail: $contactEmail
@@ -278,20 +273,22 @@ PublicPetitionLink.mutations = [
     }
   `,
   gql`
-    mutation PublicPetitionLink_publicSendReminder(
-      $publicPetitionLinkId: GID!
-      $contactEmail: String!
-    ) {
-      publicSendReminder(publicPetitionLinkId: $publicPetitionLinkId, contactEmail: $contactEmail)
+    mutation PublicPetitionLink_publicSendReminder($slug: ID!, $contactEmail: String!) {
+      publicSendReminder(slug: $slug, contactEmail: $contactEmail)
     }
   `,
 ];
 
 export async function getServerSideProps({
   req,
-  query: { linkId },
+  query: { slug },
   locale,
-}: GetServerSidePropsContext) {
+}: GetServerSidePropsContext): Promise<
+  GetServerSidePropsResult<{
+    slug: string;
+    publicPetitionLink: PublicPetitionLink_PublicPublicPetitionLinkFragment;
+  }>
+> {
   if (isInsecureBrowser(req.headers["user-agent"])) {
     return {
       redirect: {
@@ -308,7 +305,7 @@ export async function getServerSideProps({
       PublicTemplateLink_publicPetitionLinkBySlugQueryVariables
     >({
       query: gql`
-        query PublicTemplateLink_publicPetitionLinkBySlug($slug: String!) {
+        query PublicTemplateLink_publicPetitionLinkBySlug($slug: ID!) {
           publicPetitionLinkBySlug(slug: $slug) {
             ...PublicPetitionLink_PublicPublicPetitionLink
           }
@@ -316,19 +313,13 @@ export async function getServerSideProps({
         ${PublicPetitionLink.fragments.PublicPublicPetitionLink}
       `,
       variables: {
-        slug: linkId as string,
+        slug: slug as string,
       },
     });
 
-    if (!data?.publicPetitionLinkBySlug) {
-      return {
-        notFound: true,
-      };
-    } else {
-      return {
-        props: { publicPetitionLinkBySlug: data.publicPetitionLinkBySlug },
-      };
-    }
+    return data?.publicPetitionLinkBySlug
+      ? { props: { slug: slug as string, publicPetitionLink: data.publicPetitionLinkBySlug } }
+      : { notFound: true };
   } catch (err) {
     return {
       notFound: true,

@@ -852,7 +852,7 @@ export interface MutationpublicCreateAndSendPetitionFromPublicLinkArgs {
   contactFirstName: Scalars["String"];
   contactLastName: Scalars["String"];
   force?: Maybe<Scalars["Boolean"]>;
-  publicPetitionLinkId: Scalars["GID"];
+  slug: Scalars["ID"];
 }
 
 export interface MutationpublicCreateCheckboxReplyArgs {
@@ -936,7 +936,7 @@ export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
 
 export interface MutationpublicSendReminderArgs {
   contactEmail: Scalars["String"];
-  publicPetitionLinkId: Scalars["GID"];
+  slug: Scalars["ID"];
 }
 
 export interface MutationpublicSendVerificationCodeArgs {
@@ -2240,12 +2240,6 @@ export interface PublicPetitionLink {
   title: Scalars["String"];
 }
 
-export interface PublicPetitionLinkOwnerOrganization {
-  __typename?: "PublicPetitionLinkOwnerOrganization";
-  logoUrl?: Maybe<Scalars["String"]>;
-  name: Scalars["String"];
-}
-
 /** A public message in a petition */
 export interface PublicPetitionMessage {
   __typename?: "PublicPetitionMessage";
@@ -2264,9 +2258,8 @@ export interface PublicPetitionSignerDataInput {
 export interface PublicPublicPetitionLink {
   __typename?: "PublicPublicPetitionLink";
   description: Scalars["String"];
-  id: Scalars["GID"];
   isActive: Scalars["Boolean"];
-  organization: PublicPetitionLinkOwnerOrganization;
+  organization: PublicOrganization;
   owner: PublicUser;
   slug: Scalars["String"];
   title: Scalars["String"];
@@ -2452,7 +2445,7 @@ export interface QuerypublicOrgLogoUrlArgs {
 }
 
 export interface QuerypublicPetitionLinkBySlugArgs {
-  slug: Scalars["String"];
+  slug: Scalars["ID"];
 }
 
 export interface QuerysearchUsersArgs {
@@ -12523,15 +12516,15 @@ export type PublicOptOutQuery = {
 
 export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
   __typename?: "PublicPublicPetitionLink";
-} & Pick<PublicPublicPetitionLink, "id" | "title" | "description"> & {
-    organization: { __typename?: "PublicPetitionLinkOwnerOrganization" } & Pick<
-      PublicPetitionLinkOwnerOrganization,
+} & Pick<PublicPublicPetitionLink, "title" | "description"> & {
+    organization: { __typename?: "PublicOrganization" } & Pick<
+      PublicOrganization,
       "name" | "logoUrl"
     >;
   };
 
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables = Exact<{
-  publicPetitionLinkId: Scalars["GID"];
+  slug: Scalars["ID"];
   contactFirstName: Scalars["String"];
   contactLastName: Scalars["String"];
   contactEmail: Scalars["String"];
@@ -12544,24 +12537,24 @@ export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation
 >;
 
 export type PublicPetitionLink_publicSendReminderMutationVariables = Exact<{
-  publicPetitionLinkId: Scalars["GID"];
+  slug: Scalars["ID"];
   contactEmail: Scalars["String"];
 }>;
 
 export type PublicPetitionLink_publicSendReminderMutation = Pick<Mutation, "publicSendReminder">;
 
 export type PublicTemplateLink_publicPetitionLinkBySlugQueryVariables = Exact<{
-  slug: Scalars["String"];
+  slug: Scalars["ID"];
 }>;
 
 export type PublicTemplateLink_publicPetitionLinkBySlugQuery = {
   publicPetitionLinkBySlug?: Maybe<
     { __typename?: "PublicPublicPetitionLink" } & Pick<
       PublicPublicPetitionLink,
-      "id" | "title" | "description"
+      "title" | "description"
     > & {
-        organization: { __typename?: "PublicPetitionLinkOwnerOrganization" } & Pick<
-          PublicPetitionLinkOwnerOrganization,
+        organization: { __typename?: "PublicOrganization" } & Pick<
+          PublicOrganization,
           "name" | "logoUrl"
         >;
       }
@@ -15806,7 +15799,6 @@ export const OptOut_PublicPetitionAccessFragmentDoc = gql`
 `;
 export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
   fragment PublicPetitionLink_PublicPublicPetitionLink on PublicPublicPetitionLink {
-    id
     title
     description
     organization {
@@ -20597,14 +20589,14 @@ export type PublicOptOutQueryHookResult = ReturnType<typeof usePublicOptOutQuery
 export type PublicOptOutLazyQueryHookResult = ReturnType<typeof usePublicOptOutLazyQuery>;
 export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument = gql`
   mutation PublicPetitionLink_publicCreateAndSendPetitionFromPublicLink(
-    $publicPetitionLinkId: GID!
+    $slug: ID!
     $contactFirstName: String!
     $contactLastName: String!
     $contactEmail: String!
     $force: Boolean
   ) {
     publicCreateAndSendPetitionFromPublicLink(
-      publicPetitionLinkId: $publicPetitionLinkId
+      slug: $slug
       contactFirstName: $contactFirstName
       contactLastName: $contactLastName
       contactEmail: $contactEmail
@@ -20627,11 +20619,8 @@ export function usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkM
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationHookResult =
   ReturnType<typeof usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation>;
 export const PublicPetitionLink_publicSendReminderDocument = gql`
-  mutation PublicPetitionLink_publicSendReminder(
-    $publicPetitionLinkId: GID!
-    $contactEmail: String!
-  ) {
-    publicSendReminder(publicPetitionLinkId: $publicPetitionLinkId, contactEmail: $contactEmail)
+  mutation PublicPetitionLink_publicSendReminder($slug: ID!, $contactEmail: String!) {
+    publicSendReminder(slug: $slug, contactEmail: $contactEmail)
   }
 `;
 export function usePublicPetitionLink_publicSendReminderMutation(
@@ -20650,7 +20639,7 @@ export type PublicPetitionLink_publicSendReminderMutationHookResult = ReturnType
   typeof usePublicPetitionLink_publicSendReminderMutation
 >;
 export const PublicTemplateLink_publicPetitionLinkBySlugDocument = gql`
-  query PublicTemplateLink_publicPetitionLinkBySlug($slug: String!) {
+  query PublicTemplateLink_publicPetitionLinkBySlug($slug: ID!) {
     publicPetitionLinkBySlug(slug: $slug) {
       ...PublicPetitionLink_PublicPublicPetitionLink
     }

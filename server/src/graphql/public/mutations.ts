@@ -35,12 +35,11 @@ import {
   fieldBelongsToAccess,
   fieldHasType,
   getContactAuthCookieValue,
-  isValidPublicPetitionLink,
   replyBelongsToAccess,
   replyIsForFieldOfType,
+  validPublicPetitionLinkSlug,
 } from "./authorizers";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "./utils";
-
 function anonymizePart(part: string) {
   return part.length > 2
     ? part[0] + "*".repeat(part.length - 2) + part[part.length - 1]
@@ -1017,7 +1016,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
       "Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args",
     type: "Result",
     args: {
-      publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
+      slug: nonNull(idArg()),
       contactFirstName: nonNull(stringArg()),
       contactLastName: nonNull(stringArg()),
       contactEmail: nonNull(stringArg()),
@@ -1028,23 +1027,19 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         })
       ),
     },
-    authorize: isValidPublicPetitionLink("publicPetitionLinkId"),
+    authorize: validPublicPetitionLinkSlug("slug"),
     validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
     resolve: async (_, args, ctx) => {
+      const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
       if (
         !args.force &&
-        (await ctx.petitions.contactHasAccessFromPublicPetitionLink(
-          args.contactEmail,
-          args.publicPetitionLinkId
-        ))
+        (await ctx.petitions.contactHasAccessFromPublicPetitionLink(args.contactEmail, link.id))
       ) {
         throw new WhitelistedError(
           "Contact already has access on this link.",
           "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
         );
       }
-
-      const link = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
 
       const owner = await ctx.users.loadUser(link.owner_id);
       if (!isDefined(owner)) {
@@ -1126,18 +1121,15 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
 export const publicSendReminder = mutationField("publicSendReminder", {
   type: "Result",
   args: {
-    publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
+    slug: nonNull(idArg()),
     contactEmail: nonNull(stringArg()),
   },
-  authorize: isValidPublicPetitionLink("publicPetitionLinkId"),
+  authorize: validPublicPetitionLinkSlug("slug"),
   validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
   resolve: async (_, args, ctx) => {
-    const link = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
+    const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
     const [access, owner] = await Promise.all([
-      ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(
-        args.publicPetitionLinkId,
-        args.contactEmail
-      ),
+      ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(link.id, args.contactEmail),
       ctx.users.loadUser(link.owner_id),
     ]);
 

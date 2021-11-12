@@ -39,14 +39,14 @@ export function PublicPetitionEmailSent({ organization, email }: PublicPetitionE
         <Stack spacing={4}>
           <Text>
             <FormattedMessage
-              id="public-petition-email-sent.body.parraf-1"
+              id="public-petition-email-sent.body.explanation-1"
               defaultMessage="We have sent an email to <b>{email}</b> with access to complete the information. This will help us verify your email and ensure your privacy and security."
               values={{ email }}
             />
           </Text>
           <Text>
             <FormattedMessage
-              id="public-petition-email-sent.body.parraf-2"
+              id="public-petition-email-sent.body.explanation-2"
               defaultMessage="Can’t find our email? Check your spam folder and if you don’t find it contact with the person who shared you the link."
             />
           </Text>

@@ -155,7 +155,22 @@ export function commentsBelongsToAccess<
   };
 }
 
-export function isValidPublicPetitionLink<
+export function validPublicPetitionLinkSlug<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, string>
+>(argSlug: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const slug = args[argSlug] as string;
+    const publicPetitionLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
+    if (!isDefined(publicPetitionLink) || !publicPetitionLink.is_active) {
+      return false;
+    }
+    return true;
+  };
+}
+
+export function validPublicPetitionLink<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, number>
@@ -165,8 +180,7 @@ export function isValidPublicPetitionLink<
 
     const publicPetitionLink = await ctx.petitions.loadPublicPetitionLink(id);
 
-    // public link exists and is active
-    if (!publicPetitionLink || !publicPetitionLink.is_active) {
+    if (!isDefined(publicPetitionLink) || !publicPetitionLink.is_active) {
       return false;
     }
 
