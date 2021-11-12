@@ -3,12 +3,14 @@ import {
   Box,
   Button,
   ButtonGroup,
+  IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Stack,
   Text,
+  Tooltip,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -550,45 +552,59 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           />
         </Button>
         {showDownloadAll ? (
-          <Menu placement="bottom-end">
-            <ButtonGroup isAttached colorScheme="purple">
-              <Button
-                leftIcon={<DownloadIcon fontSize="lg" display="block" />}
-                onClick={handleDownloadAllClick}
+          <ButtonGroup isAttached colorScheme="purple">
+            <Button
+              leftIcon={<DownloadIcon fontSize="lg" display="block" />}
+              onClick={handleDownloadAllClick}
+            >
+              <FormattedMessage
+                id="petition-replies.export-replies"
+                defaultMessage="Export replies"
+              />
+            </Button>
+            <Divider isVertical color="purple.600" />
+            <Menu placement="bottom-end">
+              <Tooltip
+                label={intl.formatMessage({
+                  id: "generic.more-options",
+                  defaultMessage: "More options...",
+                })}
               >
-                <FormattedMessage
-                  id="petition-replies.export-replies"
-                  defaultMessage="Export replies"
+                <MenuButton
+                  as={IconButton}
+                  icon={<ChevronDownIcon fontSize="lg" />}
+                  aria-label={intl.formatMessage({
+                    id: "generic.more-options",
+                    defaultMessage: "More options...",
+                  })}
+                  minWidth={8}
                 />
-              </Button>
-              <MenuButton as={Button} paddingX={2}>
-                <ChevronDownIcon fontSize="lg" />
-              </MenuButton>
-            </ButtonGroup>
-            <MenuList>
-              <MenuItem
-                icon={<FilePdfIcon boxSize={5} />}
-                isDisabled={!me.hasPetitionPdfExport}
-                onClick={() => handlePrintPdfTask(petition.id)}
-                maxWidth={"260px"}
-              >
-                <Text>
-                  <FormattedMessage
-                    id="page.petition-replies.export-pdf"
-                    defaultMessage="Export to PDF"
-                  />
-                </Text>
-                {me.hasPetitionPdfExport ? null : (
-                  <Text fontSize="sm">
+              </Tooltip>
+              <MenuList>
+                <MenuItem
+                  icon={<FilePdfIcon boxSize={5} />}
+                  isDisabled={!me.hasPetitionPdfExport}
+                  onClick={() => handlePrintPdfTask(petition.id)}
+                  maxWidth={"260px"}
+                >
+                  <Text>
                     <FormattedMessage
-                      id="generic.upgrade-to-enable"
-                      defaultMessage="Upgrade to enable this feature."
+                      id="page.petition-replies.export-pdf"
+                      defaultMessage="Export to PDF"
                     />
                   </Text>
-                )}
-              </MenuItem>
-            </MenuList>
-          </Menu>
+                  {me.hasPetitionPdfExport ? null : (
+                    <Text fontSize="sm">
+                      <FormattedMessage
+                        id="generic.upgrade-to-enable"
+                        defaultMessage="Upgrade to enable this feature."
+                      />
+                    </Text>
+                  )}
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </ButtonGroup>
         ) : null}
       </Stack>
       <Divider />
