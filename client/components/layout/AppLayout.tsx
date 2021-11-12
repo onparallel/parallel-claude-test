@@ -81,6 +81,7 @@ export const AppLayout = Object.assign(
         locale: router.locale,
         firstName: user.firstName,
         lastName: user.lastName,
+        orgId: user.organization.id,
       });
     }, [user.id]);
 
