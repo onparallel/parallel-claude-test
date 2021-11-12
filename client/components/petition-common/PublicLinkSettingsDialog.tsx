@@ -118,6 +118,9 @@ export function PublicLinkSettingsDialog({
   );
 
   const isValidSlug = async (value: string) => {
+    if (publicLink?.isActive && publicLink.slug === value) {
+      return true;
+    }
     try {
       return await debouncedIsValidSlug(value);
     } catch (e) {

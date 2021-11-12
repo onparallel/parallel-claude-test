@@ -1071,27 +1071,26 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           ),
         ]);
 
-        // presend petition to contact and insert petition_permissions
-        const [[{ result, messages, error }]] = await Promise.all([
-          presendPetition(
-            [[petition, [contact.id]]],
-            {
-              subject: petition.email_subject ?? link!.title,
-              body: JSON.parse(petition.email_body!),
-            },
-            owner!,
-            true,
-            ctx,
-            new Date(),
-            t
-          ),
-          ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
-            petition.id,
-            link.template_id,
-            `PublicPetitionLink:${link.id}`,
-            t
-          ),
-        ]);
+        const [{ result, messages, error }] = await presendPetition(
+          [[petition, [contact.id]]],
+          {
+            subject: petition.email_subject ?? link!.title,
+            body: JSON.parse(petition.email_body!),
+          },
+          owner!,
+          true,
+          ctx,
+          new Date(),
+          t
+        );
+
+        // don't do in parallel with presend so the owner gets created before any possible default permission
+        await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
+          petition.id,
+          link.template_id,
+          `PublicPetitionLink:${link.id}`,
+          t
+        );
 
         if (error) throw error; // transaction rollback
 

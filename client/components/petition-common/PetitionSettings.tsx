@@ -31,6 +31,7 @@ import {
 } from "@parallel/chakra/icons";
 import {
   PetitionSettings_PetitionBaseFragment,
+  PetitionSettings_updatePetitionLink_PetitionTemplateFragment,
   PetitionSettings_UserFragment,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
   UpdatePetitionInput,
@@ -499,9 +500,9 @@ function _PetitionSettings({
 function updatePetitionLinkCache(
   proxy: DataProxy,
   templateId: string,
-  data: PublicLinkSettingsDialog_PublicPetitionLinkFragment
+  publicLink: PublicLinkSettingsDialog_PublicPetitionLinkFragment
 ) {
-  proxy.writeFragment<PublicLinkSettingsDialog_PublicPetitionLinkFragment>({
+  proxy.writeFragment<PetitionSettings_updatePetitionLink_PetitionTemplateFragment>({
     id: templateId,
     fragment: gql`
       fragment PetitionSettings_updatePetitionLink_PetitionTemplate on PetitionTemplate {
@@ -512,7 +513,7 @@ function updatePetitionLinkCache(
       ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
     `,
     fragmentName: "PetitionSettings_updatePetitionLink_PetitionTemplate",
-    data,
+    data: { publicLink },
   });
 }
 
