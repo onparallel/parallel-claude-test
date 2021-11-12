@@ -7726,8 +7726,8 @@
   },
   {
     "term": "recipient-view.doubts-button",
-    "definition": "Doubts?",
-    "context": "Doubts?"
+    "definition": "Questions?",
+    "context": "Questions?"
   },
   {
     "term": "recipient-view.expired-code-description",

@@ -243,7 +243,7 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
       hideIconOnDesktop={true}
       label={intl.formatMessage({
         id: "recipient-view.doubts-button",
-        defaultMessage: "Doubts?",
+        defaultMessage: "Questions?",
       })}
       {...common}
     />
