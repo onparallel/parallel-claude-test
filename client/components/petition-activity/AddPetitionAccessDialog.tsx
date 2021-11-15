@@ -256,6 +256,7 @@ export function AddPetitionAccessDialog({
             marginTop={2}
             value={remindersConfig}
             onChange={handleRemindersConfigChange}
+            defaultActive={Boolean(remindersConfig)}
           />
         </>
       }

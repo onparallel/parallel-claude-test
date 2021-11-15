@@ -2039,6 +2039,8 @@ export interface PetitionTemplate extends PetitionBase {
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
   publicLink?: Maybe<PublicPetitionLink>;
+  /** The reminders configuration for the template. */
+  remindersConfig?: Maybe<RemindersConfig>;
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -5456,6 +5458,12 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   | "isReadOnly"
   | "name"
 > & {
+    remindersConfig?: Maybe<
+      { __typename?: "RemindersConfig" } & Pick<
+        RemindersConfig,
+        "offset" | "time" | "timezone" | "weekdaysOnly"
+      >
+    >;
     publicLink?: Maybe<
       { __typename?: "PublicPetitionLink" } & Pick<
         PublicPetitionLink,
@@ -10256,6 +10264,12 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
           replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
         }
     >;
+    remindersConfig?: Maybe<
+      { __typename?: "RemindersConfig" } & Pick<
+        RemindersConfig,
+        "offset" | "time" | "timezone" | "weekdaysOnly"
+      >
+    >;
     publicLink?: Maybe<
       { __typename?: "PublicPetitionLink" } & Pick<
         PublicPetitionLink,
@@ -10468,6 +10482,12 @@ export type PetitionCompose_updatePetitionMutation = {
         | "description"
         | "updatedAt"
       > & {
+          remindersConfig?: Maybe<
+            { __typename?: "RemindersConfig" } & Pick<
+              RemindersConfig,
+              "offset" | "time" | "timezone" | "weekdaysOnly"
+            >
+          >;
           publicLink?: Maybe<
             { __typename?: "PublicPetitionLink" } & Pick<
               PublicPetitionLink,
@@ -11112,6 +11132,12 @@ export type PetitionComposeQuery = {
                   { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
                 >;
               }
+          >;
+          remindersConfig?: Maybe<
+            { __typename?: "RemindersConfig" } & Pick<
+              RemindersConfig,
+              "offset" | "time" | "timezone" | "weekdaysOnly"
+            >
           >;
           publicLink?: Maybe<
             { __typename?: "PublicPetitionLink" } & Pick<
@@ -15497,6 +15523,12 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     ... on PetitionTemplate {
       isPublic
       ...PublicLinkSettingsDialog_PetitionTemplate
+      remindersConfig {
+        offset
+        time
+        timezone
+        weekdaysOnly
+      }
       publicLink {
         id
         url

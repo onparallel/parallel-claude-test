@@ -1518,9 +1518,9 @@ export class PetitionRepository extends BaseRepository {
             "updated_at",
             "template_public",
             "from_template_id",
-            // avoid copying reminders and deadline data if creating a template or cloning from a template
+            // avoid copying deadline data if creating a template or cloning from a template
             ...(data?.is_template || sourcePetition?.is_template
-              ? (["reminders_active", "reminders_config", "deadline"] as const)
+              ? (["deadline"] as const)
               : ([] as const)),
             // avoid copying template_description if creating a petition
             ...(sourcePetition?.is_template &&

@@ -207,8 +207,8 @@ export const Petition = objectType({
     t.nullable.field("remindersConfig", {
       type: "RemindersConfig",
       description: "The reminders configuration for the petition.",
-      resolve: async (root, _, ctx) => {
-        return root.reminders_config;
+      resolve: (o) => {
+        return o.reminders_config;
       },
     });
     t.nullable.field("currentSignatureRequest", {
@@ -289,6 +289,13 @@ export const PetitionTemplate = objectType({
       type: "TemplateDefaultPermission",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadTemplateDefaultPermissions(root.id);
+      },
+    });
+    t.nullable.field("remindersConfig", {
+      type: "RemindersConfig",
+      description: "The reminders configuration for the template.",
+      resolve: (o) => {
+        return o.reminders_config;
       },
     });
   },

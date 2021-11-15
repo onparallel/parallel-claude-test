@@ -17,7 +17,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useTimeInput } from "@parallel/utils/useTimeInput";
 import { addDays, addWeeks, isWeekend, parse, startOfToday, startOfWeek } from "date-fns";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
 
@@ -25,16 +25,31 @@ export function PetitionRemindersConfig({
   value,
   defaultActive,
   onChange,
+  hideRemindersActiveCheckbox,
   ...props
 }: {
   value: Maybe<RemindersConfig>;
   onChange: (config: Maybe<RemindersConfig>) => void;
   defaultActive?: boolean;
+  hideRemindersActiveCheckbox?: boolean;
 } & Omit<BoxProps, "onChange">) {
   let day = addDays(startOfToday(), value?.offset ?? 2);
   if (value?.weekdaysOnly && isWeekend(day)) {
     day = addWeeks(startOfWeek(day, { weekStartsOn: 1 }), 1);
   }
+
+  useEffect(() => {
+    if (hideRemindersActiveCheckbox) {
+      onChange(
+        previousValueRef.current ?? {
+          offset: 2,
+          time: sendTime,
+          timezone,
+          weekdaysOnly: true,
+        }
+      );
+    }
+  }, []);
 
   const possibleSendTimes = [
     "08:00",
@@ -79,22 +94,24 @@ export function PetitionRemindersConfig({
 
   return (
     <Box {...props}>
-      <Flex alignItems="center">
-        <Checkbox
-          colorScheme="purple"
-          size="lg"
-          marginRight={2}
-          isChecked={isActive}
-          onChange={handleEnableRemindersChange}
-        >
-          <Text fontSize="md" as="span">
-            <FormattedMessage
-              id="petition.reminders-label"
-              defaultMessage="Enable automatic reminders"
-            />
-          </Text>
-        </Checkbox>
-      </Flex>
+      {hideRemindersActiveCheckbox ? null : (
+        <Flex alignItems="center">
+          <Checkbox
+            colorScheme="purple"
+            size="lg"
+            marginRight={2}
+            isChecked={isActive}
+            onChange={handleEnableRemindersChange}
+          >
+            <Text fontSize="md" as="span">
+              <FormattedMessage
+                id="petition.reminders-label"
+                defaultMessage="Enable automatic reminders"
+              />
+            </Text>
+          </Checkbox>
+        </Flex>
+      )}
       {value && isActive ? (
         <Box
           as="form"

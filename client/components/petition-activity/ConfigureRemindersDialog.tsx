@@ -25,12 +25,14 @@ export type ConfigureRemindersDialogProps = {
   accesses: PetitionAccessTable_PetitionAccessFragment[];
   defaultRemindersConfig: Maybe<RemindersConfig>;
   remindersActive: boolean;
+  hideRemindersActiveCheckbox?: boolean;
 };
 
 export function ConfigureRemindersDialog({
   accesses,
   defaultRemindersConfig,
   remindersActive,
+  hideRemindersActiveCheckbox,
   ...props
 }: DialogProps<ConfigureRemindersDialogProps, Maybe<RemindersConfig>>) {
   const [remindersConfig, setRemindersConfig] =
@@ -77,6 +79,7 @@ export function ConfigureRemindersDialog({
             defaultActive={remindersActive}
             onChange={setRemindersConfig}
             marginTop={2}
+            hideRemindersActiveCheckbox={hideRemindersActiveCheckbox}
           />
         </Stack>
       }

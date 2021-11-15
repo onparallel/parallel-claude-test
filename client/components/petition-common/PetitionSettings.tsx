@@ -18,6 +18,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
+  BellSettingsIcon,
   CommentIcon,
   LinkIcon,
   ListIcon,
@@ -54,6 +55,7 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
+import { useConfigureRemindersDialog } from "../petition-activity/ConfigureRemindersDialog";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
 import { PublicLinkSettingsDialog, usePublicLinkSettingsDialog } from "./PublicLinkSettingsDialog";
@@ -277,6 +279,35 @@ function _PetitionSettings({
     }
   };
 
+  const templateRemindersConfig =
+    petition.__typename === "PetitionTemplate" ? petition.remindersConfig : null;
+
+  const configureRemindersDialog = useConfigureRemindersDialog();
+
+  const handleAutomaticReminders = async (value: boolean) => {
+    if (value) {
+      handleConfigureAutomaticReminders();
+    } else {
+      try {
+        await onUpdatePetition({ remindersConfig: null });
+      } catch {}
+    }
+  };
+
+  const handleConfigureAutomaticReminders = async () => {
+    try {
+      //show reminders dialog
+      const remindersConfig = await configureRemindersDialog({
+        accesses: [],
+        defaultRemindersConfig: templateRemindersConfig ?? null,
+        remindersActive: true,
+        hideRemindersActiveCheckbox: true,
+      });
+      delete remindersConfig?.__typename;
+      await onUpdatePetition({ remindersConfig });
+    } catch {}
+  };
+
   return (
     <Stack padding={4} spacing={4}>
       <FormControl id="petition-locale" isDisabled={isReadOnly}>
@@ -498,6 +529,34 @@ function _PetitionSettings({
             controlId="hide-recipient-view-contents"
           />
         ) : null}
+        {petition.__typename === "PetitionTemplate" ? (
+          <Box>
+            <SwitchSetting
+              icon={<BellSettingsIcon />}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.automatic-reminders"
+                  defaultMessage="Enable automatic reminders"
+                />
+              }
+              isChecked={Boolean(templateRemindersConfig)}
+              onChange={handleAutomaticReminders}
+              controlId="automatic-reminders"
+            />
+            <Collapse in={Boolean(templateRemindersConfig)}>
+              <Flex justifyContent="center" marginTop={2}>
+                <Button onClick={handleConfigureAutomaticReminders}>
+                  <Text as="span">
+                    <FormattedMessage
+                      id="component.petition-settings.automatic-reminders-configure"
+                      defaultMessage="Configure reminders"
+                    />
+                  </Text>
+                </Button>
+              </Flex>
+            </Collapse>
+          </Box>
+        ) : null}
       </Stack>
     </Stack>
   );
@@ -564,6 +623,12 @@ const fragments = {
       ... on PetitionTemplate {
         isPublic
         ...PublicLinkSettingsDialog_PetitionTemplate
+        remindersConfig {
+          offset
+          time
+          timezone
+          weekdaysOnly
+        }
         publicLink {
           id
           url

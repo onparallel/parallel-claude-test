@@ -1650,6 +1650,16 @@
     "context": "Fields not shown to the recipient because the visibility conditions are not met."
   },
   {
+    "term": "component.petition-settings.automatic-reminders",
+    "definition": "Activar recordatorios automáticos",
+    "context": "Enable automatic reminders"
+  },
+  {
+    "term": "component.petition-settings.automatic-reminders-configure",
+    "definition": "Configurar recordatorios",
+    "context": "Configure reminders"
+  },
+  {
     "term": "component.petition-settings.deadline-description",
     "definition": "Esta fecha se utiliza para informar a los destinatarios de la fecha límite para la cuál necesitas tener la información.",
     "context": "This date is used to inform the recipients of the deadline for which you need to have the information."

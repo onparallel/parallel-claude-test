@@ -1968,6 +1968,8 @@ export type PetitionTemplate = PetitionBase & {
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
   publicLink: Maybe<PublicPetitionLink>;
+  /** The reminders configuration for the template. */
+  remindersConfig: Maybe<RemindersConfig>;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */

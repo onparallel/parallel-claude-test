@@ -1292,6 +1292,7 @@ export interface NexusGenFieldTypes {
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     publicLink: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
+    remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
@@ -2501,6 +2502,7 @@ export interface NexusGenFieldTypeNames {
     owner: "User";
     permissions: "PetitionPermission";
     publicLink: "PublicPetitionLink";
+    remindersConfig: "RemindersConfig";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
     tags: "Tag";
