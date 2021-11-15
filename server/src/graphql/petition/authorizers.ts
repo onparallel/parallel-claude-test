@@ -1,5 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { countBy, isDefined } from "remeda";
+import { countBy, isDefined, uniq } from "remeda";
 import { FeatureFlagName, IntegrationType, PetitionPermissionType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
@@ -43,10 +43,14 @@ export function userHasAccessToSignatureRequest<
       if (signatureRequestIds.length === 0) {
         return true;
       }
+      const signatureRequests = await ctx.petitions.loadPetitionSignatureById(signatureRequestIds);
+      if (signatureRequests.some((s) => !isDefined(s))) {
+        return false;
+      }
 
-      return await ctx.petitions.userHasAccessToPetitionSignatureRequests(
+      return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
-        signatureRequestIds,
+        uniq(signatureRequests.map((s) => s!.petition_id)),
         permissionTypes
       );
     } catch {}

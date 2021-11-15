@@ -3246,31 +3246,6 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async userHasAccessToPetitionSignatureRequests(
-    userId: number,
-    ids: number[],
-    petitionPermissionTypes?: PetitionPermissionType[]
-  ) {
-    const [{ count }] = await this.from("petition_signature_request")
-      .join(
-        "petition_permission",
-        "petition_signature_request.petition_id",
-        "petition_permission.petition_id"
-      )
-      .whereIn("petition_signature_request.id", ids)
-      .where("petition_permission.user_id", userId)
-      .whereNull("petition_permission.deleted_at")
-      .whereNull("petition_permission.deleted_at")
-      .mmodify((q) => {
-        if (petitionPermissionTypes) {
-          q.whereIn("petition_permission.type", petitionPermissionTypes);
-        }
-      })
-      .select(this.count());
-
-    return count === new Set(ids).size;
-  }
-
   async loadUsersOnPetition(petitionId: number) {
     return await this.from("user")
       .join("petition_permission", "user.id", "petition_permission.user_id")
