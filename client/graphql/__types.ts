@@ -2238,6 +2238,7 @@ export interface PublicPetitionLink {
   owner: User;
   slug: Scalars["String"];
   title: Scalars["String"];
+  url: Scalars["String"];
 }
 
 /** A public message in a petition */
@@ -5299,7 +5300,7 @@ export type PetitionSettings_updatePetitionLink_PetitionTemplateFragment = {
   publicLink?: Maybe<
     { __typename?: "PublicPetitionLink" } & Pick<
       PublicPetitionLink,
-      "isActive" | "title" | "description" | "slug"
+      "isActive" | "title" | "description" | "slug" | "url"
     > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
   >;
 };
@@ -5363,11 +5364,10 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   | "isReadOnly"
   | "name"
 > & {
-    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
     publicLink?: Maybe<
       { __typename?: "PublicPetitionLink" } & Pick<
         PublicPetitionLink,
-        "id" | "isActive" | "title" | "description" | "slug"
+        "id" | "url" | "isActive" | "title" | "description" | "slug"
       > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
     >;
     defaultPermissions: Array<
@@ -5388,6 +5388,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
           "permissionType" | "isSubscribed"
         > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
     >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
     owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<
@@ -5441,7 +5442,7 @@ export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
 export type PetitionSettings_createPublicPetitionLinkMutation = {
   createPublicPetitionLink: { __typename?: "PublicPetitionLink" } & Pick<
     PublicPetitionLink,
-    "isActive" | "title" | "description" | "slug"
+    "isActive" | "title" | "description" | "slug" | "url"
   > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> };
 };
 
@@ -5457,7 +5458,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
 export type PetitionSettings_updatePublicPetitionLinkMutation = {
   updatePublicPetitionLink: { __typename?: "PublicPetitionLink" } & Pick<
     PublicPetitionLink,
-    "isActive" | "title" | "description" | "slug"
+    "isActive" | "title" | "description" | "slug" | "url"
   > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> };
 };
 
@@ -5831,7 +5832,7 @@ export type PublicLinkSettingsDialog_PetitionTemplateFragment = {
 
 export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   __typename?: "PublicPetitionLink";
-} & Pick<PublicPetitionLink, "isActive" | "title" | "description" | "slug"> & {
+} & Pick<PublicPetitionLink, "isActive" | "title" | "description" | "slug" | "url"> & {
     owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
   };
 
@@ -9861,11 +9862,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
           replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
         }
     >;
-    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
     publicLink?: Maybe<
       { __typename?: "PublicPetitionLink" } & Pick<
         PublicPetitionLink,
-        "id" | "isActive" | "title" | "description" | "slug"
+        "id" | "url" | "isActive" | "title" | "description" | "slug"
       > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
     >;
     defaultPermissions: Array<
@@ -9886,6 +9886,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
           "permissionType" | "isSubscribed"
         > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
     >;
+    organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
     owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<
@@ -10058,11 +10059,10 @@ export type PetitionCompose_updatePetitionMutation = {
         | "description"
         | "updatedAt"
       > & {
-          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
           publicLink?: Maybe<
             { __typename?: "PublicPetitionLink" } & Pick<
               PublicPetitionLink,
-              "id" | "isActive" | "title" | "description" | "slug"
+              "id" | "url" | "isActive" | "title" | "description" | "slug"
             > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
           >;
           defaultPermissions: Array<
@@ -10083,6 +10083,7 @@ export type PetitionCompose_updatePetitionMutation = {
                 "permissionType" | "isSubscribed"
               > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
           >;
+          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
           owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
           signatureConfig?: Maybe<
             { __typename?: "SignatureConfig" } & Pick<
@@ -10688,11 +10689,10 @@ export type PetitionComposeQuery = {
                 >;
               }
           >;
-          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
           publicLink?: Maybe<
             { __typename?: "PublicPetitionLink" } & Pick<
               PublicPetitionLink,
-              "id" | "isActive" | "title" | "description" | "slug"
+              "id" | "url" | "isActive" | "title" | "description" | "slug"
             > & { owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> }
           >;
           defaultPermissions: Array<
@@ -10713,6 +10713,7 @@ export type PetitionComposeQuery = {
                 "permissionType" | "isSubscribed"
               > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email"> })
           >;
+          organization: { __typename?: "Organization" } & Pick<Organization, "customHost">;
           owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
           signatureConfig?: Maybe<
             { __typename?: "SignatureConfig" } & Pick<
@@ -13394,6 +13395,7 @@ export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
     title
     description
     slug
+    url
     owner {
       ...UserSelect_User
     }
@@ -14944,12 +14946,10 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     }
     ... on PetitionTemplate {
       isPublic
-      organization {
-        customHost
-      }
       ...PublicLinkSettingsDialog_PetitionTemplate
       publicLink {
         id
+        url
         isActive
         ...PublicLinkSettingsDialog_PublicPetitionLink
       }

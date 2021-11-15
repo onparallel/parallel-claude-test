@@ -174,7 +174,7 @@ export function PublicLinkSettingsDialog({
                     defaultMessage="The link has been edited. If you save, you will no longer be able to access the request through the old link:"
                   />
                 </Text>
-                <Text as="b">{`${parallelUrl}/${template.locale}/pp/${publicLink?.slug}`}</Text>
+                <Text as="b">{publicLink.url}</Text>
               </Stack>
             </Alert>
           ) : null}
@@ -397,6 +397,7 @@ PublicLinkSettingsDialog.fragments = {
       title
       description
       slug
+      url
       owner {
         ...UserSelect_User
       }

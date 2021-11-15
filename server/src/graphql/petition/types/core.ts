@@ -764,6 +764,17 @@ export const PublicPetitionLink = objectType({
     t.nonNull.boolean("isActive", {
       resolve: (o) => o.is_active,
     });
+    t.nonNull.string("url", {
+      resolve: async (root, _, ctx) => {
+        const template = (await ctx.petitions.loadPetition(root.template_id))!;
+        const org = (await ctx.organizations.loadOrg(template.org_id))!;
+        const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+        const prefix = org.custom_host
+          ? `${protocol}://${org.custom_host}`
+          : ctx.config.misc.parallelUrl;
+        return `${prefix}/${template.locale}/pp/${root.slug}`;
+      },
+    });
     t.nonNull.field("owner", {
       type: "User",
       resolve: async (root, _, ctx) => {

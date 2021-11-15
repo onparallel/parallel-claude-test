@@ -169,17 +169,8 @@ function _PetitionSettings({
     } catch {}
   }
 
-  let publicLinkUrl = "";
-  if (petition.__typename === "PetitionTemplate") {
-    const { customHost } = petition.organization;
-    const url = customHost
-      ? `${process.env.NODE_ENV === "production" ? "https" : "http"}://${customHost}`
-      : process.env.NEXT_PUBLIC_PARALLEL_URL;
-    publicLinkUrl = `${url}/${petition.locale}/pp/${publicLink?.slug}`;
-  }
-
   const onCopyPublicLink = useClipboardWithToast({
-    value: publicLinkUrl,
+    value: petition.__typename === "PetitionTemplate" ? petition.publicLink?.url : "",
     text: intl.formatMessage({
       id: "component.petition-settings.link-copied-toast",
       defaultMessage: "Link copied to clipboard",
@@ -437,8 +428,8 @@ function _PetitionSettings({
             controlId="share-by-link"
           >
             <HStack paddingLeft={6}>
-              <Input type="text" value={publicLinkUrl} onChange={noop} />
-              <CopyToClipboardButton text={publicLinkUrl} />
+              <Input type="text" value={petition.publicLink?.url} onChange={noop} />
+              <CopyToClipboardButton text={petition.publicLink?.url as string} />
               <IconButton
                 variant="outline"
                 aria-label="public link settings"
@@ -552,12 +543,10 @@ const fragments = {
       }
       ... on PetitionTemplate {
         isPublic
-        organization {
-          customHost
-        }
         ...PublicLinkSettingsDialog_PetitionTemplate
         publicLink {
           id
+          url
           isActive
           ...PublicLinkSettingsDialog_PublicPetitionLink
         }

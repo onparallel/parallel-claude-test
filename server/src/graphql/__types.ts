@@ -1409,6 +1409,7 @@ export interface NexusGenFieldTypes {
     owner: NexusGenRootTypes["User"]; // User!
     slug: string; // String!
     title: string; // String!
+    url: string; // String!
   };
   PublicPetitionMessage: {
     // field return type
@@ -2585,6 +2586,7 @@ export interface NexusGenFieldTypeNames {
     owner: "User";
     slug: "String";
     title: "String";
+    url: "String";
   };
   PublicPetitionMessage: {
     // field return type name

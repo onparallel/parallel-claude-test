@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Stack, Switch, Text, Heading } from "@chakra-ui/react";
+import { Box, Heading, Stack, Switch, Text } from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,

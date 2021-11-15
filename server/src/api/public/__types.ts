@@ -354,7 +354,7 @@ export type Mutation = {
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
-  createPublicPetitionLink: PetitionTemplate;
+  createPublicPetitionLink: PublicPetitionLink;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
@@ -526,6 +526,8 @@ export type Mutation = {
   updateSimpleReply: PetitionFieldReply;
   /** Updates the name and color of a given tag */
   updateTag: Tag;
+  /** Updates the template default permissions */
+  updateTemplateDefaultPermissions: PetitionTemplate;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the name of a given user group */
@@ -681,7 +683,6 @@ export type MutationcreatePrintPdfTaskArgs = {
 
 export type MutationcreatePublicPetitionLinkArgs = {
   description: Scalars["String"];
-  otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
   ownerId: Scalars["GID"];
   slug?: Maybe<Scalars["String"]>;
   templateId: Scalars["GID"];
@@ -817,7 +818,7 @@ export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
   contactFirstName: Scalars["String"];
   contactLastName: Scalars["String"];
   force?: Maybe<Scalars["Boolean"]>;
-  publicPetitionLinkId: Scalars["GID"];
+  slug: Scalars["ID"];
 };
 
 export type MutationpublicCreateCheckboxReplyArgs = {
@@ -901,7 +902,7 @@ export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
 
 export type MutationpublicSendReminderArgs = {
   contactEmail: Scalars["String"];
-  publicPetitionLinkId: Scalars["GID"];
+  slug: Scalars["ID"];
 };
 
 export type MutationpublicSendVerificationCodeArgs = {
@@ -1135,7 +1136,6 @@ export type MutationupdatePetitionUserNotificationReadStatusArgs = {
 export type MutationupdatePublicPetitionLinkArgs = {
   description?: Maybe<Scalars["String"]>;
   isActive?: Maybe<Scalars["Boolean"]>;
-  otherPermissions?: Maybe<Array<UserOrUserGroupPublicLinkPermission>>;
   ownerId?: Maybe<Scalars["GID"]>;
   publicPetitionLinkId: Scalars["GID"];
   slug?: Maybe<Scalars["String"]>;
@@ -1156,6 +1156,11 @@ export type MutationupdateSimpleReplyArgs = {
 export type MutationupdateTagArgs = {
   data: UpdateTagInput;
   id: Scalars["GID"];
+};
+
+export type MutationupdateTemplateDefaultPermissionsArgs = {
+  permissions: Array<UserOrUserGroupPermissionInput>;
+  templateId: Scalars["GID"];
 };
 
 export type MutationupdateUserArgs = {
@@ -1890,6 +1895,7 @@ export type PetitionStatus =
 export type PetitionTemplate = PetitionBase & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
   description: Maybe<Scalars["JSON"]>;
   /** HTML excerpt of the template description. */
@@ -2146,47 +2152,11 @@ export type PublicPetitionLink = {
   description: Scalars["String"];
   id: Scalars["GID"];
   isActive: Scalars["Boolean"];
-  linkPermissions: Array<PublicPetitionLinkPermission>;
-  organization: PublicPetitionLinkOwnerOrganization;
+  owner: User;
   slug: Scalars["String"];
   title: Scalars["String"];
+  urlPrefix: Scalars["String"];
 };
-
-export type PublicPetitionLinkOwnerOrganization = {
-  logoUrl: Maybe<Scalars["String"]>;
-  name: Scalars["String"];
-};
-
-export type PublicPetitionLinkPermission = {
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  isSubscribed: Scalars["Boolean"];
-  permissionType: PetitionPermissionType;
-  /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-};
-
-export type PublicPetitionLinkUserGroupPermission = PublicPetitionLinkPermission &
-  Timestamps & {
-    /** Time when the resource was created. */
-    createdAt: Scalars["DateTime"];
-    group: UserGroup;
-    isSubscribed: Scalars["Boolean"];
-    permissionType: PetitionPermissionType;
-    /** Time when the resource was last updated. */
-    updatedAt: Scalars["DateTime"];
-  };
-
-export type PublicPetitionLinkUserPermission = PublicPetitionLinkPermission &
-  Timestamps & {
-    /** Time when the resource was created. */
-    createdAt: Scalars["DateTime"];
-    isSubscribed: Scalars["Boolean"];
-    permissionType: PetitionPermissionType;
-    /** Time when the resource was last updated. */
-    updatedAt: Scalars["DateTime"];
-    user: User;
-  };
 
 /** A public message in a petition */
 export type PublicPetitionMessage = {
@@ -2200,6 +2170,15 @@ export type PublicPetitionSignerDataInput = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
+};
+
+export type PublicPublicPetitionLink = {
+  description: Scalars["String"];
+  isActive: Scalars["Boolean"];
+  organization: PublicOrganization;
+  owner: PublicUser;
+  slug: Scalars["String"];
+  title: Scalars["String"];
 };
 
 /** The public signature settings of a petition */
@@ -2266,7 +2245,7 @@ export type Query = {
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
-  publicPetitionLinkBySlug: Maybe<PublicPetitionLink>;
+  publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
@@ -2379,7 +2358,7 @@ export type QuerypublicOrgLogoUrlArgs = {
 };
 
 export type QuerypublicPetitionLinkBySlugArgs = {
-  slug: Scalars["String"];
+  slug: Scalars["ID"];
 };
 
 export type QuerysearchUsersArgs = {
@@ -2651,6 +2630,47 @@ export type Task = {
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
+export type TemplateDefaultPermission = {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** wether user is will be subscribed or not to emails and alerts of the generated petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionPermissionType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+};
+
+/** The permission for a petition and user group */
+export type TemplateDefaultUserGroupPermission = TemplateDefaultPermission &
+  Timestamps & {
+    /** Time when the resource was created. */
+    createdAt: Scalars["DateTime"];
+    /** The group linked to the permission */
+    group: UserGroup;
+    /** wether user is will be subscribed or not to emails and alerts of the generated petition */
+    isSubscribed: Scalars["Boolean"];
+    /** The type of the permission. */
+    permissionType: PetitionPermissionType;
+    /** Time when the resource was last updated. */
+    updatedAt: Scalars["DateTime"];
+  };
+
+/** The permission for a petition and user */
+export type TemplateDefaultUserPermission = TemplateDefaultPermission &
+  Timestamps & {
+    /** Time when the resource was created. */
+    createdAt: Scalars["DateTime"];
+    /** wether user is will be subscribed or not to emails and alerts of the generated petition */
+    isSubscribed: Scalars["Boolean"];
+    /** The type of the permission. */
+    permissionType: PetitionPermissionType;
+    /** Time when the resource was last updated. */
+    updatedAt: Scalars["DateTime"];
+    /** The user linked to the permission */
+    user: User;
+  };
+
 export type TemplateUsedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -2836,10 +2856,11 @@ export type UserOrPetitionAccess = PetitionAccess | User;
 
 export type UserOrUserGroup = User | UserGroup;
 
-export type UserOrUserGroupPublicLinkPermission = {
-  /** Global ID of the User or UserGroup */
-  id: Scalars["ID"];
+export type UserOrUserGroupPermissionInput = {
+  isSubscribed: Scalars["Boolean"];
   permissionType: PetitionPermissionTypeRW;
+  userGroupId?: Maybe<Scalars["GID"]>;
+  userId?: Maybe<Scalars["GID"]>;
 };
 
 export type UserPagination = {

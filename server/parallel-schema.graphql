@@ -3074,6 +3074,7 @@ type PublicPetitionLink {
   owner: User!
   slug: String!
   title: String!
+  url: String!
 }
 
 """
