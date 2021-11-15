@@ -786,7 +786,7 @@ describe("GraphQL/Petitions", () => {
       expect(data?.createPetition).toEqual({ tags: [] });
     });
 
-    it("don't copy reminders configuration when creating a petition from a template", async () => {
+    it("copy reminders configuration when creating a petition from a template", async () => {
       const [template] = await mocks.createRandomPetitions(
         organization.id,
         sessionUser.id,
@@ -828,7 +828,12 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.createPetition).toEqual({ remindersConfig: null });
+      expect(data?.createPetition).toEqual({ remindersConfig: {
+        time: "12:00",
+        offset: 1,
+        timezone: "Europe/Madrid",
+        weekdaysOnly: true,
+      } });
     });
 
     it("don't copy signature configuration when creating a petition from a public template of another organization", async () => {

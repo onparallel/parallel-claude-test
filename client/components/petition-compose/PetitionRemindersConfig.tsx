@@ -38,19 +38,6 @@ export function PetitionRemindersConfig({
     day = addWeeks(startOfWeek(day, { weekStartsOn: 1 }), 1);
   }
 
-  useEffect(() => {
-    if (hideRemindersActiveCheckbox) {
-      onChange(
-        previousValueRef.current ?? {
-          offset: 2,
-          time: sendTime,
-          timezone,
-          weekdaysOnly: true,
-        }
-      );
-    }
-  }, []);
-
   const possibleSendTimes = [
     "08:00",
     "08:30",
@@ -75,17 +62,23 @@ export function PetitionRemindersConfig({
   const previousValueRef = useRef<RemindersConfig | null>(value);
   const [isActive, setIsActive] = useState(defaultActive ?? false);
 
+  const defaultRemindersConfig = {
+    offset: 2,
+    time: sendTime,
+    timezone,
+    weekdaysOnly: true,
+  };
+
+  useEffect(() => {
+    if (hideRemindersActiveCheckbox) {
+      onChange(previousValueRef.current ?? defaultRemindersConfig);
+    }
+  }, []);
+
   function handleEnableRemindersChange(event: ChangeEvent<HTMLInputElement>) {
     setIsActive(event.target.checked);
     if (event.target.checked) {
-      onChange(
-        previousValueRef.current ?? {
-          offset: 2,
-          time: sendTime,
-          timezone,
-          weekdaysOnly: true,
-        }
-      );
+      onChange(previousValueRef.current ?? defaultRemindersConfig);
     } else {
       assignRef(previousValueRef, value);
       onChange(null);
