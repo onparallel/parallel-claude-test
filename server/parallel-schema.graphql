@@ -1914,6 +1914,11 @@ interface PetitionBase {
   permissions: [PetitionPermission!]!
 
   """
+  The reminders configuration for the petition.
+  """
+  remindersConfig: RemindersConfig
+
+  """
   The signature configuration for the petition.
   """
   signatureConfig: SignatureConfig
@@ -2713,7 +2718,7 @@ type PetitionTemplate implements PetitionBase {
   publicLink: PublicPetitionLink
 
   """
-  The reminders configuration for the template.
+  The reminders configuration for the petition.
   """
   remindersConfig: RemindersConfig
 

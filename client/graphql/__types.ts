@@ -1582,6 +1582,8 @@ export interface PetitionBase {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The reminders configuration for the petition. */
+  remindersConfig?: Maybe<RemindersConfig>;
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -2039,7 +2041,7 @@ export interface PetitionTemplate extends PetitionBase {
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
   publicLink?: Maybe<PublicPetitionLink>;
-  /** The reminders configuration for the template. */
+  /** The reminders configuration for the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;

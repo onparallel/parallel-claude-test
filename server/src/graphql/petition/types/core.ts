@@ -116,6 +116,13 @@ export const PetitionBase = interfaceType({
       description: "The body of the petition.",
       resolve: (o) => safeJsonParse(o.email_body),
     });
+    t.nullable.field("remindersConfig", {
+      type: "RemindersConfig",
+      description: "The reminders configuration for the petition.",
+      resolve: (o) => {
+        return o.reminders_config;
+      },
+    });
     t.boolean("hasCommentsEnabled", {
       description: "Whether comments are enabled or not.",
       resolve: (o) => o.comments_enabled,
@@ -204,13 +211,6 @@ export const Petition = objectType({
         return ctx.petitions.loadAccessesForPetition(root.id);
       },
     });
-    t.nullable.field("remindersConfig", {
-      type: "RemindersConfig",
-      description: "The reminders configuration for the petition.",
-      resolve: (o) => {
-        return o.reminders_config;
-      },
-    });
     t.nullable.field("currentSignatureRequest", {
       type: "PetitionSignatureRequest",
       description: "The current signature request.",
@@ -289,13 +289,6 @@ export const PetitionTemplate = objectType({
       type: "TemplateDefaultPermission",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadTemplateDefaultPermissions(root.id);
-      },
-    });
-    t.nullable.field("remindersConfig", {
-      type: "RemindersConfig",
-      description: "The reminders configuration for the template.",
-      resolve: (o) => {
-        return o.reminders_config;
       },
     });
   },
