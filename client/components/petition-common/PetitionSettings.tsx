@@ -647,7 +647,7 @@ export const PetitionSettings = Object.assign(
   { fragments, mutations }
 );
 
-interface SwitchSettingProps extends Omit<SettingsRowProps, "onChange"> {
+interface SwitchSettingProps extends Omit<SettingsRowProps, "children" | "onChange"> {
   icon?: ReactNode;
   isChecked: boolean;
   onChange: (value: boolean) => void;
