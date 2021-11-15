@@ -35,6 +35,19 @@ export function PublicLayout({
   return (
     <>
       <Head>
+        {([["source-sans-pro-v14-latin", ["600"]]] as [string, string[]][]).flatMap(
+          ([name, types]) =>
+            types.map((type) => (
+              <link
+                key={`${name}-${type}`}
+                rel="preload"
+                href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/${name}-${type}.woff2`}
+                as="font"
+                type="font/woff2"
+                crossOrigin="anonymous"
+              />
+            ))
+        )}
         <title>{title} | Parallel</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
@@ -54,19 +67,6 @@ export function PublicLayout({
             pathname === "/" ? "" : resolveUrl(pathname, query)
           }`}
         />
-        {([["source-sans-pro-v14-latin", ["600"]]] as [string, string[]][]).flatMap(
-          ([name, types]) =>
-            types.map((type) => (
-              <link
-                key={`${name}-${type}`}
-                rel="preload"
-                href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/${name}-${type}.woff2`}
-                as="font"
-                type="font/woff2"
-                crossOrigin="anonymous"
-              />
-            ))
-        )}
       </Head>
       {(canonicalLocale ? [canonicalLocale] : languages.map((lang) => lang.locale)).map(
         (locale) => (
