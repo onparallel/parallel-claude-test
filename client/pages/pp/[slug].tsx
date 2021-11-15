@@ -188,17 +188,20 @@ function PublicPetitionLink({
           >
             {step === "REMINDER_SENT" ? (
               <PublicPetitionReminder
-                organization={organization}
+                organizationName={organization.name}
+                logoUrl={organization.logoUrl}
                 email={submittedData?.email ?? ""}
               />
             ) : step === "EMAIL_SENT" ? (
               <PublicPetitionEmailSent
-                organization={organization}
+                organizationName={organization.name}
+                logoUrl={organization.logoUrl}
                 email={submittedData?.email ?? ""}
               />
             ) : step === "EMAIL_EXISTS" ? (
               <PublicPetitionEmailExists
-                organization={organization}
+                organizationName={organization.name}
+                logoUrl={organization.logoUrl}
                 onContinue={handleContinueExisting}
                 onNewPetition={handleNewPublicPetition}
                 isNewRequestLoading={loading}
@@ -206,7 +209,8 @@ function PublicPetitionLink({
               />
             ) : (
               <PublicPetitionInitialForm
-                organization={organization}
+                organizationName={organization.name}
+                logoUrl={organization.logoUrl}
                 title={title}
                 description={description}
                 onSubmit={onSubmit}

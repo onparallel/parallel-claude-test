@@ -1,14 +1,18 @@
 import { Img, Stack, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
-import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-type PublicPetitionReminderProps = {
-  organization: PublicPetitionLinkOwnerOrganization;
+interface PublicPetitionReminderProps {
+  organizationName: string;
+  logoUrl?: string | null;
   email: string;
-};
+}
 
-export function PublicPetitionReminder({ organization, email }: PublicPetitionReminderProps) {
+export function PublicPetitionReminder({
+  organizationName,
+  logoUrl,
+  email,
+}: PublicPetitionReminderProps) {
   return (
     <Stack
       spacing={{ base: 6, md: 8 }}
@@ -17,10 +21,10 @@ export function PublicPetitionReminder({ organization, email }: PublicPetitionRe
       margin="0 auto"
       alignItems="flex-start"
     >
-      {organization.logoUrl ? (
+      {logoUrl ? (
         <Img
-          src={organization.logoUrl}
-          aria-label={organization.name}
+          src={logoUrl}
+          aria-label={organizationName}
           width="auto"
           height="40px"
           objectFit="contain"

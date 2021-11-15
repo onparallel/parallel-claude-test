@@ -1,14 +1,18 @@
 import { Img, Stack, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
-import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-type PublicPetitionEmailSentProps = {
-  organization: PublicPetitionLinkOwnerOrganization;
+interface PublicPetitionEmailSentProps {
+  organizationName: string;
+  logoUrl?: string | null;
   email: string;
-};
+}
 
-export function PublicPetitionEmailSent({ organization, email }: PublicPetitionEmailSentProps) {
+export function PublicPetitionEmailSent({
+  organizationName,
+  logoUrl,
+  email,
+}: PublicPetitionEmailSentProps) {
   return (
     <Stack
       spacing={{ base: 6, md: 8 }}
@@ -17,10 +21,10 @@ export function PublicPetitionEmailSent({ organization, email }: PublicPetitionE
       margin="0 auto"
       alignItems="flex-start"
     >
-      {organization.logoUrl ? (
+      {logoUrl ? (
         <Img
-          src={organization.logoUrl}
-          aria-label={organization.name}
+          src={logoUrl}
+          aria-label={organizationName}
           width="auto"
           height="40px"
           objectFit="contain"

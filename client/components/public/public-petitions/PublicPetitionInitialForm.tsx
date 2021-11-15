@@ -22,7 +22,6 @@ import {
 import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -30,22 +29,24 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver from "react-resize-observer";
 
-export type PublicPetitionInitialFormInputs = {
+export interface PublicPetitionInitialFormInputs {
   firstName: string;
   lastName: string;
   email: string;
-};
+}
 
-type PublicPetitionInitialFormProps = {
-  organization: PublicPetitionLinkOwnerOrganization;
+interface PublicPetitionInitialFormProps {
+  organizationName: string;
+  logoUrl?: string | null;
   title: string;
   description: string;
   onSubmit: SubmitHandler<PublicPetitionInitialFormInputs>;
   isLoading: boolean;
-};
+}
 
 export function PublicPetitionInitialForm({
-  organization,
+  organizationName,
+  logoUrl,
   title,
   description,
   onSubmit,
@@ -97,10 +98,10 @@ export function PublicPetitionInitialForm({
         margin="0 auto"
         alignItems="flex-start"
       >
-        {organization.logoUrl ? (
+        {logoUrl ? (
           <Img
-            src={organization.logoUrl}
-            aria-label={organization.name}
+            src={logoUrl}
+            aria-label={organizationName}
             width="auto"
             height="40px"
             objectFit="contain"
@@ -110,7 +111,7 @@ export function PublicPetitionInitialForm({
         )}
         <Stack spacing={0} maxWidth={{ base: "auto", md: "25rem" }}>
           <Text fontSize="sm" color="gray.500">
-            {organization.name}
+            {organizationName}
           </Text>
           <Text fontSize="2xl" fontWeight="bold">
             {title}

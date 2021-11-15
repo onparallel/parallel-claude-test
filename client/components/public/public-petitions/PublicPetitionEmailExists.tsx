@@ -1,18 +1,19 @@
 import { Button, Img, Stack, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
-import { PublicPetitionLinkOwnerOrganization } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-type PublicPetitionEmailExistsProps = {
-  organization: PublicPetitionLinkOwnerOrganization;
+interface PublicPetitionEmailExistsProps {
+  organizationName: string;
+  logoUrl?: string | null;
   onNewPetition: (props: { force: boolean }) => void;
   onContinue: () => void;
   isNewRequestLoading: boolean;
   isReminderLoading: boolean;
-};
+}
 
 export function PublicPetitionEmailExists({
-  organization,
+  organizationName,
+  logoUrl,
   onNewPetition,
   onContinue,
   isNewRequestLoading,
@@ -26,10 +27,10 @@ export function PublicPetitionEmailExists({
       margin="0 auto"
       alignItems="flex-start"
     >
-      {organization.logoUrl ? (
+      {logoUrl ? (
         <Img
-          src={organization.logoUrl}
-          aria-label={organization.name}
+          src={logoUrl}
+          aria-label={organizationName}
           width="auto"
           height="40px"
           objectFit="contain"
