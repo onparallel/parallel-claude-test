@@ -12,6 +12,7 @@ import {
   HStack,
   Text,
   Stack,
+  Tooltip,
 } from "@chakra-ui/react";
 import {
   BellIcon,
@@ -51,19 +52,36 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
 
   return (
     <Menu placement={placement}>
-      <MenuButton
-        as={Button}
-        aria-label={intl.formatMessage({
+      <Tooltip
+        label={intl.formatMessage({
           id: "header.user-menu-button",
           defaultMessage: "User menu",
         })}
-        borderRadius="full"
-        height={12}
-        paddingLeft={0}
-        paddingRight={0}
+        placement="right"
       >
-        <UserAvatar user={user} size="md" />
-      </MenuButton>
+        <MenuButton
+          as={Button}
+          aria-label={intl.formatMessage({
+            id: "header.user-menu-button",
+            defaultMessage: "User menu",
+          })}
+          _hover={{
+            shadow: "long",
+            transform: "scale(1.1)",
+          }}
+          _active={{
+            shadow: "long",
+            transform: "scale(1.1)",
+          }}
+          borderRadius="full"
+          height={12}
+          paddingLeft={0}
+          paddingRight={0}
+          transition="all 200ms"
+        >
+          <UserAvatar user={user} size="md" />
+        </MenuButton>
+      </Tooltip>
       <Portal>
         <MenuList>
           <HStack paddingX={3.5} paddingY={1}>
