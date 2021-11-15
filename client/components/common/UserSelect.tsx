@@ -120,11 +120,14 @@ export const UserSelect = Object.assign(
       }
     }, [
       needsLoading,
+      // Rerun when value changes
       value === null
         ? null
         : needsLoading
-        ? unMaybeArray(value as any).join(",")
-        : unMaybeArray(value as any)
+        ? // value is string | string[]
+          unMaybeArray(value as any).join(",")
+        : // value is UserSelection | UserSelection[]
+          unMaybeArray(value as any)
             .map((x) => x.id)
             .join(","),
     ]);
