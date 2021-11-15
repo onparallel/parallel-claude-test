@@ -279,9 +279,6 @@ function _PetitionSettings({
     }
   };
 
-  const templateRemindersConfig =
-    petition.__typename === "PetitionTemplate" ? petition.remindersConfig : null;
-
   const configureRemindersDialog = useConfigureRemindersDialog();
 
   const handleAutomaticReminders = async (value: boolean) => {
@@ -295,11 +292,12 @@ function _PetitionSettings({
   };
 
   const handleConfigureAutomaticReminders = async () => {
+    assertTypename(petition, "PetitionTemplate");
     try {
       //show reminders dialog
       const remindersConfig = await configureRemindersDialog({
         accesses: [],
-        defaultRemindersConfig: templateRemindersConfig ?? null,
+        defaultRemindersConfig: petition.remindersConfig ?? null,
         remindersActive: true,
         hideRemindersActiveCheckbox: true,
       });
@@ -530,32 +528,29 @@ function _PetitionSettings({
           />
         ) : null}
         {petition.__typename === "PetitionTemplate" ? (
-          <Box>
-            <SwitchSetting
-              icon={<BellSettingsIcon />}
-              label={
-                <FormattedMessage
-                  id="component.petition-settings.automatic-reminders"
-                  defaultMessage="Enable automatic reminders"
-                />
-              }
-              isChecked={Boolean(templateRemindersConfig)}
-              onChange={handleAutomaticReminders}
-              controlId="automatic-reminders"
-            />
-            <Collapse in={Boolean(templateRemindersConfig)}>
-              <Flex justifyContent="center" marginTop={2}>
-                <Button onClick={handleConfigureAutomaticReminders}>
-                  <Text as="span">
-                    <FormattedMessage
-                      id="component.petition-settings.automatic-reminders-configure"
-                      defaultMessage="Configure reminders"
-                    />
-                  </Text>
-                </Button>
-              </Flex>
-            </Collapse>
-          </Box>
+          <SwitchSetting
+            icon={<BellSettingsIcon />}
+            label={
+              <FormattedMessage
+                id="component.petition-settings.automatic-reminders"
+                defaultMessage="Enable automatic reminders"
+              />
+            }
+            isChecked={Boolean(petition.remindersConfig)}
+            onChange={handleAutomaticReminders}
+            controlId="automatic-reminders"
+          >
+            <Center>
+              <Button onClick={handleConfigureAutomaticReminders}>
+                <Text as="span">
+                  <FormattedMessage
+                    id="component.petition-settings.automatic-reminders-configure"
+                    defaultMessage="Configure reminders"
+                  />
+                </Text>
+              </Button>
+            </Center>
+          </SwitchSetting>
         ) : null}
       </Stack>
     </Stack>
