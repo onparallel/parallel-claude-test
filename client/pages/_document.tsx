@@ -84,22 +84,18 @@ class MyDocument extends Document<MyDocumentProps> {
           {process.env.NODE_ENV === "production" ? (
             <link href={localeDataUrl} rel="preload" as="script" crossOrigin="anonymous" />
           ) : null}
-          {(
-            [
-              ["ibm-plex-sans-v8-latin", ["regular", "600"]],
-              ["source-sans-pro-v14-latin", ["600"]],
-            ] as [string, string[]][]
-          ).flatMap(([name, types]) =>
-            types.map((type) => (
-              <link
-                key={`${name}-${type}`}
-                rel="preload"
-                href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/${name}-${type}.woff2`}
-                as="font"
-                type="font/woff2"
-                crossOrigin="anonymous"
-              />
-            ))
+          {([["ibm-plex-sans-v8-latin", ["regular", "600"]]] as [string, string[]][]).flatMap(
+            ([name, types]) =>
+              types.map((type) => (
+                <link
+                  key={`${name}-${type}`}
+                  rel="preload"
+                  href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/${name}-${type}.woff2`}
+                  as="font"
+                  type="font/woff2"
+                  crossOrigin="anonymous"
+                />
+              ))
           )}
         </Head>
         <body>
