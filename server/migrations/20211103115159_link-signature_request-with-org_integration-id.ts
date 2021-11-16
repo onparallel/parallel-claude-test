@@ -1,19 +1,30 @@
 import { Knex } from "knex";
 import pMap from "p-map";
-import { omit } from "remeda";
-import { PetitionSignatureRequest, OrgIntegration, Petition } from "../src/db/__types";
+import { OrgIntegration, Petition, PetitionSignatureRequest } from "../src/db/__types";
 
 export async function up(knex: Knex): Promise<void> {
-  const [petitions, signatureRequests, signatureIntegrations] = await Promise.all([
-    knex.from<Petition>("petition").select("*"),
-    knex.from<PetitionSignatureRequest>("petition_signature_request").select("*"),
-    knex.from<OrgIntegration>("org_integration").where("type", "SIGNATURE").select("*"),
-  ]);
+  const signatureRequests = await knex
+    .from<PetitionSignatureRequest>("petition_signature_request")
+    .select("*");
+
+  const signatureIntegrations = await knex
+    .from<OrgIntegration>("org_integration")
+    .where("type", "SIGNATURE")
+    .select("*");
+
+  const { rows: _petitions } = await knex.raw<{
+    rows: Pick<Petition, "id" | "org_id">[];
+  }>(/* sql */ `
+    select distinct p.id, p.org_id from petition p where p.id in (
+      select distinct psr.petition_id from petition_signature_request psr
+    )
+  `);
+  const orgIdsbyPetitionId = Object.fromEntries(_petitions.map((x) => [x.id, x.org_id]));
 
   await pMap(
     signatureRequests,
     async (s) => {
-      const orgId = petitions.find((p) => p.id === s.petition_id)?.org_id;
+      const orgId = orgIdsbyPetitionId[s.petition_id];
       if (!orgId) {
         throw new Error();
       }
@@ -24,20 +35,21 @@ export async function up(knex: Knex): Promise<void> {
         throw new Error();
       }
 
-      await knex
-        .from<PetitionSignatureRequest>("petition_signature_request")
-        .where("id", s.id)
-        .update(
-          "signature_config",
-          JSON.stringify({
-            ...omit(s.signature_config, ["provider"]),
-            orgIntegrationId,
-          })
-        );
+      await knex.raw(
+        /* sql */ `
+        update petition_signature_request
+        set signature_config = jsonb_set(signature_config - 'provider', '{orgIntegrationId}', ?::jsonb)
+        where id = ?
+      `,
+        [`${orgIntegrationId}`, s.id]
+      );
     },
-    { concurrency: 1 }
+    { concurrency: 5 }
   );
 
+  const petitions = await knex
+    .from<Petition>("petition")
+    .select("id", "org_id", "signature_config");
   await pMap(
     petitions.filter((p) => !!p.signature_config),
     async (p) => {
@@ -48,19 +60,16 @@ export async function up(knex: Knex): Promise<void> {
         throw new Error();
       }
 
-      await knex
-        .from<Petition>("petition")
-        .where("id", p.id)
-        .whereNotNull("signature_config")
-        .update(
-          "signature_config",
-          JSON.stringify({
-            ...omit(p.signature_config, ["provider"]),
-            orgIntegrationId,
-          })
-        );
+      await knex.raw(
+        /* sql */ `
+        update petition
+        set signature_config = jsonb_set(signature_config - 'provider', '{orgIntegrationId}', ?::jsonb)
+        where id = ?
+      `,
+        [`${orgIntegrationId}`, p.id]
+      );
     },
-    { concurrency: 1 }
+    { concurrency: 5 }
   );
 }
 
@@ -80,15 +89,17 @@ export async function down(knex: Knex): Promise<void> {
       if (!provider) {
         throw new Error();
       }
-      await knex
-        .from<PetitionSignatureRequest>("petition_signature_request")
-        .where("id", s.id)
-        .update("signature_config", {
-          ...omit(s.signature_config, ["orgIntegrationId"]),
-          provider,
-        });
+
+      await knex.raw(
+        /* sql */ `
+        update petition_signature_request
+        set signature_config = jsonb_set(signature_config - 'orgIntegrationId', '{provider}', ?::jsonb)
+        where id = ?
+      `,
+        [provider, s.id]
+      );
     },
-    { concurrency: 1 }
+    { concurrency: 5 }
   );
 
   await pMap(
@@ -100,17 +111,15 @@ export async function down(knex: Knex): Promise<void> {
       if (!provider) {
         throw new Error();
       }
-      await knex
-        .from<Petition>("petition")
-        .where("id", p.id)
-        .update(
-          "signature_config",
-          JSON.stringify({
-            ...omit(p.signature_config, ["orgIntegrationId"]),
-            provider,
-          })
-        );
+      await knex.raw(
+        /* sql */ `
+        update petition
+        set signature_config = jsonb_set(signature_config - 'orgIntegrationId', '{provider}', ?::jsonb)
+        where id = ?
+      `,
+        [provider, p.id]
+      );
     },
-    { concurrency: 1 }
+    { concurrency: 5 }
   );
 }
