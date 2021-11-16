@@ -1666,8 +1666,8 @@
   },
   {
     "term": "component.petition-settings.share-automatically-description",
-    "definition": "Specify which users or groups of users the petitions created from this template are automatically shared with",
-    "context": "Specify which users or groups of users the petitions created from this template are automatically shared with"
+    "definition": "Specify which users or groups of users the petitions created from this template are shared with",
+    "context": "Specify which users or groups of users the petitions created from this template are shared with"
   },
   {
     "term": "component.petition-settings.share-automatically-settings",
@@ -5536,8 +5536,8 @@
   },
   {
     "term": "public-petition.help.explanation-2",
-    "definition": "In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want.",
-    "context": "In addition, we will send you an <b>email with the link</b> so that you can return and finish completing it whenever you want."
+    "definition": "In addition, we will send you an <b>email with the link</b> so that you can return and continue at any time.",
+    "context": "In addition, we will send you an <b>email with the link</b> so that you can return and continue at any time."
   },
   {
     "term": "public-petition.help.form-title",
