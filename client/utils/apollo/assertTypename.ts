@@ -6,3 +6,12 @@ export function assertTypename<T extends { __typename?: string }, Typename exten
     throw new Error("Invalid typename");
   }
 }
+
+export function assertTypenameArray<T extends { __typename?: string }, Typename extends string>(
+  value: T[],
+  typename: Typename
+): asserts value is (T & { __typename: Typename })[] {
+  if (value.some((v) => v.__typename !== typename)) {
+    throw new Error("Invalid typename");
+  }
+}

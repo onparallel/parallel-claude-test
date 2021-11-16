@@ -699,7 +699,7 @@ export type MutationcreateSignatureIntegrationArgs = {
   apiKey: Scalars["String"];
   isDefault?: Maybe<Scalars["Boolean"]>;
   name: Scalars["String"];
-  provider: SignatureIntegrationProvider;
+  provider: SignatureOrgIntegrationProvider;
 };
 
 export type MutationcreateSimpleReplyArgs = {
@@ -1257,8 +1257,6 @@ export type OrgIntegration = {
   name: Scalars["String"];
   /** The provider used for this integration. */
   provider: Scalars["String"];
-  /** Status of this integration, to differentiate between sandbox and production-ready integrations */
-  status: OrgIntegrationStatus;
   /** The type of the integration. */
   type: IntegrationType;
 };
@@ -1269,8 +1267,6 @@ export type OrgIntegrationPagination = {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 };
-
-export type OrgIntegrationStatus = "DEMO" | "PRODUCTION";
 
 /** An organization in the system. */
 export type Organization = Timestamps & {
@@ -1888,7 +1884,7 @@ export type PetitionSignatureRequest = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The environment of the petition signature. */
-  environment: Maybe<Scalars["String"]>;
+  environment: Maybe<SignatureOrgIntegrationEnvironment>;
   id: Scalars["GID"];
   /** Metadata for this signature request. */
   metadata: Scalars["JSONObject"];
@@ -2599,7 +2595,7 @@ export type SignatureCompletedUserNotification = PetitionUserNotification & {
 /** The signature settings of a petition */
 export type SignatureConfig = {
   /** The signature integration selected for this signature config. */
-  integration: Maybe<OrgIntegration>;
+  integration: Maybe<SignatureOrgIntegration>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -2635,7 +2631,23 @@ export type SignatureConfigInputSigner = {
   lastName: Scalars["String"];
 };
 
-export type SignatureIntegrationProvider = "SIGNATURIT";
+export type SignatureOrgIntegrationProvider = "SIGNATURIT";
+
+export type SignatureOrgIntegration = OrgIntegration & {
+  /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
+  environment: SignatureOrgIntegrationEnvironment;
+  id: Scalars["GID"];
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"];
+  /** Custom name of this integration, provided by the user */
+  name: Scalars["String"];
+  /** The provider used for this integration. */
+  provider: Scalars["String"];
+  /** The type of the integration. */
+  type: IntegrationType;
+};
+
+export type SignatureOrgIntegrationEnvironment = "DEMO" | "PRODUCTION";
 
 export type SignatureStartedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];

@@ -390,7 +390,7 @@ export interface Mutation {
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates a new signature integration on the user's organization */
-  createSignatureIntegration: OrgIntegration;
+  createSignatureIntegration: SignatureOrgIntegration;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
@@ -733,7 +733,7 @@ export interface MutationcreateSignatureIntegrationArgs {
   apiKey: Scalars["String"];
   isDefault?: Maybe<Scalars["Boolean"]>;
   name: Scalars["String"];
-  provider: SignatureIntegrationProvider;
+  provider: SignatureOrgIntegrationProvider;
 }
 
 export interface MutationcreateSimpleReplyArgs {
@@ -1284,16 +1284,11 @@ export type OnboardingKey =
 export type OnboardingStatus = "FINISHED" | "SKIPPED";
 
 export interface OrgIntegration {
-  __typename?: "OrgIntegration";
   id: Scalars["GID"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
   /** Custom name of this integration, provided by the user */
   name: Scalars["String"];
-  /** The provider used for this integration. */
-  provider: Scalars["String"];
-  /** Status of this integration, to differentiate between sandbox and production-ready integrations */
-  status: OrgIntegrationStatus;
   /** The type of the integration. */
   type: IntegrationType;
 }
@@ -1305,8 +1300,6 @@ export interface OrgIntegrationPagination {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 }
-
-export type OrgIntegrationStatus = "DEMO" | "PRODUCTION";
 
 /** An organization in the system. */
 export interface Organization extends Timestamps {
@@ -1957,7 +1950,7 @@ export interface PetitionSignatureRequest extends Timestamps {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The environment of the petition signature. */
-  environment?: Maybe<OrgIntegrationStatus>;
+  environment?: Maybe<SignatureOrgIntegrationEnvironment>;
   id: Scalars["GID"];
   /** Metadata for this signature request. */
   metadata: Scalars["JSONObject"];
@@ -2703,7 +2696,7 @@ export interface SignatureCompletedUserNotification extends PetitionUserNotifica
 export interface SignatureConfig {
   __typename?: "SignatureConfig";
   /** The signature integration selected for this signature config. */
-  integration?: Maybe<OrgIntegration>;
+  integration?: Maybe<SignatureOrgIntegration>;
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -2739,12 +2732,39 @@ export interface SignatureConfigInputSigner {
   lastName: Scalars["String"];
 }
 
-export type SignatureIntegrationProvider = "SIGNATURIT";
+export interface SignatureOrgIntegration extends OrgIntegration {
+  __typename?: "SignatureOrgIntegration";
+  /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
+  environment: SignatureOrgIntegrationEnvironment;
+  id: Scalars["GID"];
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"];
+  /** Custom name of this integration, provided by the user */
+  name: Scalars["String"];
+  provider: SignatureOrgIntegrationProvider;
+  /** The type of the integration. */
+  type: IntegrationType;
+}
+
+export type SignatureOrgIntegrationEnvironment = "DEMO" | "PRODUCTION";
+
+export type SignatureOrgIntegrationProvider = "SIGNATURIT";
 
 export interface SignatureStartedEvent extends PetitionEvent {
   __typename?: "SignatureStartedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+}
+
+export interface SsoOrgIntegration extends OrgIntegration {
+  __typename?: "SsoOrgIntegration";
+  id: Scalars["GID"];
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"];
+  /** Custom name of this integration, provided by the user */
+  name: Scalars["String"];
+  /** The type of the integration. */
+  type: IntegrationType;
 }
 
 /** Return type for all support methods */
@@ -3056,6 +3076,17 @@ export interface UserPermissionRemovedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
+export interface UserProvisioningOrgIntegration extends OrgIntegration {
+  __typename?: "UserProvisioningOrgIntegration";
+  id: Scalars["GID"];
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"];
+  /** Custom name of this integration, provided by the user */
+  name: Scalars["String"];
+  /** The type of the integration. */
+  type: IntegrationType;
+}
+
 export type UserStatus = "ACTIVE" | "INACTIVE";
 
 export interface VerificationCodeCheck {
@@ -3113,7 +3144,12 @@ export type PetitionSignatureCellContent_PetitionFragment = { __typename?: "Peti
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
-          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          integration?: Maybe<
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "environment"
+            >
+          >;
         }
     >;
   };
@@ -5360,10 +5396,12 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
       signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
         items: Array<
-          { __typename?: "OrgIntegration" } & Pick<
-            OrgIntegration,
-            "id" | "isDefault" | "status"
-          > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+          | ({ __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "id" | "name" | "isDefault" | "environment"
+            >)
+          | { __typename?: "SsoOrgIntegration" }
+          | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
     };
@@ -5390,10 +5428,10 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = { __typename?: "Pe
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "id" | "name" | "isDefault" | "environment"
+            >
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -5450,10 +5488,10 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "id" | "name" | "isDefault" | "environment"
+            >
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -5905,10 +5943,10 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "id" | "name" | "isDefault" | "environment"
+            >
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -5929,10 +5967,10 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "id" | "name" | "isDefault" | "environment"
+            >
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -5948,10 +5986,9 @@ export type SignatureConfigDialog_PetitionBaseFragment =
   | SignatureConfigDialog_PetitionBase_Petition_Fragment
   | SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment;
 
-export type SignatureConfigDialog_OrgIntegrationFragment = { __typename?: "OrgIntegration" } & Pick<
-  OrgIntegration,
-  "id" | "isDefault" | "status"
-> & { value: OrgIntegration["id"]; label: OrgIntegration["name"] };
+export type SignatureConfigDialog_SignatureOrgIntegrationFragment = {
+  __typename?: "SignatureOrgIntegration";
+} & Pick<SignatureOrgIntegration, "id" | "name" | "isDefault" | "environment">;
 
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
   { __typename?: "TemplateDefaultUserGroupPermission" } & Pick<
@@ -6383,7 +6420,10 @@ export type NewSignatureRequestRow_PetitionFragment = { __typename?: "Petition" 
             { __typename?: "PetitionSigner" } & Pick<PetitionSigner, "email" | "fullName">
           >;
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id" | "name" | "provider">
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "id" | "name" | "provider"
+            >
           >;
         }
     >;
@@ -6517,10 +6557,12 @@ export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
   organization: { __typename?: "Organization" } & {
     signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
       items: Array<
-        { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "id" | "isDefault" | "status"> & {
-            value: OrgIntegration["id"];
-            label: OrgIntegration["name"];
-          }
+        | ({ __typename?: "SignatureOrgIntegration" } & Pick<
+            SignatureOrgIntegration,
+            "id" | "name" | "isDefault" | "environment"
+          >)
+        | { __typename?: "SsoOrgIntegration" }
+        | { __typename?: "UserProvisioningOrgIntegration" }
       >;
     };
   };
@@ -6561,10 +6603,10 @@ export type PetitionSignaturesCard_PetitionFragment = { __typename?: "Petition" 
         "title" | "review" | "letRecipientsChooseSigners" | "timezone"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "name" | "provider" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "id" | "name" | "provider" | "isDefault" | "environment"
+            >
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -6615,10 +6657,10 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
               "title" | "review" | "letRecipientsChooseSigners" | "timezone"
             > & {
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<
-                    OrgIntegration,
-                    "id" | "name" | "provider" | "isDefault" | "status"
-                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+                  { __typename?: "SignatureOrgIntegration" } & Pick<
+                    SignatureOrgIntegration,
+                    "id" | "name" | "provider" | "isDefault" | "environment"
+                  >
                 >;
                 signers: Array<
                   { __typename?: "PetitionSigner" } & Pick<
@@ -7460,7 +7502,10 @@ export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
                   signatureConfig?: Maybe<
                     { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
                         integration?: Maybe<
-                          { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                          { __typename?: "SignatureOrgIntegration" } & Pick<
+                            SignatureOrgIntegration,
+                            "environment"
+                          >
                         >;
                       }
                   >;
@@ -7512,7 +7557,10 @@ export type Contact_PetitionAccessFragment = { __typename?: "PetitionAccess" } &
           signatureConfig?: Maybe<
             { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                  { __typename?: "SignatureOrgIntegration" } & Pick<
+                    SignatureOrgIntegration,
+                    "environment"
+                  >
                 >;
               }
           >;
@@ -7551,7 +7599,12 @@ export type Contact_PetitionFragment = { __typename?: "Petition" } & Pick<
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
-          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          integration?: Maybe<
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "environment"
+            >
+          >;
         }
     >;
   };
@@ -7671,7 +7724,10 @@ export type ContactQuery = {
                       signatureConfig?: Maybe<
                         { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
                             integration?: Maybe<
-                              { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                              { __typename?: "SignatureOrgIntegration" } & Pick<
+                                SignatureOrgIntegration,
+                                "environment"
+                              >
                             >;
                           }
                       >;
@@ -8187,17 +8243,21 @@ export type OrganizationIntegrationsQuery = {
     };
 };
 
+export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
+  __typename?: "SignatureOrgIntegration";
+} & Pick<SignatureOrgIntegration, "id" | "name" | "provider" | "isDefault" | "environment">;
+
 export type IntegrationsSignature_createSignatureIntegrationMutationVariables = Exact<{
   name: Scalars["String"];
-  provider: SignatureIntegrationProvider;
+  provider: SignatureOrgIntegrationProvider;
   apiKey: Scalars["String"];
   isDefault?: Maybe<Scalars["Boolean"]>;
 }>;
 
 export type IntegrationsSignature_createSignatureIntegrationMutation = {
-  createSignatureIntegration: { __typename?: "OrgIntegration" } & Pick<
-    OrgIntegration,
-    "id" | "name" | "type" | "provider" | "isDefault" | "status"
+  createSignatureIntegration: { __typename?: "SignatureOrgIntegration" } & Pick<
+    SignatureOrgIntegration,
+    "id" | "name" | "provider" | "isDefault" | "environment"
   >;
 };
 
@@ -8206,10 +8266,13 @@ export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutationVaria
 }>;
 
 export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutation = {
-  markSignatureIntegrationAsDefault: { __typename?: "OrgIntegration" } & Pick<
-    OrgIntegration,
-    "id" | "name" | "type" | "provider" | "isDefault" | "status"
-  >;
+  markSignatureIntegrationAsDefault:
+    | ({ __typename?: "SignatureOrgIntegration" } & Pick<
+        SignatureOrgIntegration,
+        "id" | "name" | "provider" | "isDefault" | "environment"
+      >)
+    | { __typename?: "SsoOrgIntegration" }
+    | { __typename?: "UserProvisioningOrgIntegration" };
 };
 
 export type IntegrationsSignature_deleteSignatureIntegrationMutationVariables = Exact<{
@@ -8248,10 +8311,12 @@ export type IntegrationsSignatureQuery = {
             "totalCount"
           > & {
               items: Array<
-                { __typename?: "OrgIntegration" } & Pick<
-                  OrgIntegration,
-                  "id" | "name" | "provider" | "isDefault" | "status"
-                >
+                | ({ __typename?: "SignatureOrgIntegration" } & Pick<
+                    SignatureOrgIntegration,
+                    "id" | "name" | "provider" | "isDefault" | "environment"
+                  >)
+                | { __typename?: "SsoOrgIntegration" }
+                | { __typename?: "UserProvisioningOrgIntegration" }
               >;
             };
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -9965,6 +10030,25 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Pet
   | "isReadOnly"
   | "updatedAt"
 > & {
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "title" | "review" | "letRecipientsChooseSigners"
+      > & {
+          integration?: Maybe<
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "environment" | "name" | "id" | "isDefault"
+            >
+          >;
+          signers: Array<
+            { __typename?: "PetitionSigner" } & Pick<
+              PetitionSigner,
+              "contactId" | "firstName" | "lastName" | "email" | "fullName"
+            >
+          >;
+        }
+    >;
     fields: Array<
       { __typename?: "PetitionField" } & Pick<
         PetitionField,
@@ -9994,25 +10078,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Pet
             { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
           >;
           replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
-        }
-    >;
-    signatureConfig?: Maybe<
-      { __typename?: "SignatureConfig" } & Pick<
-        SignatureConfig,
-        "title" | "review" | "letRecipientsChooseSigners"
-      > & {
-          signers: Array<
-            { __typename?: "PetitionSigner" } & Pick<
-              PetitionSigner,
-              "contactId" | "firstName" | "lastName" | "email" | "fullName"
-            >
-          >;
-          integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
-          >;
         }
     >;
     remindersConfig?: Maybe<
@@ -10121,10 +10186,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         "title" | "review" | "letRecipientsChooseSigners"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "id" | "name" | "isDefault" | "environment"
+            >
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -10192,10 +10257,12 @@ export type PetitionCompose_UserFragment = { __typename?: "User" } & Pick<
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
           items: Array<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            | ({ __typename?: "SignatureOrgIntegration" } & Pick<
+                SignatureOrgIntegration,
+                "id" | "name" | "isDefault" | "environment"
+              >)
+            | { __typename?: "SsoOrgIntegration" }
+            | { __typename?: "UserProvisioningOrgIntegration" }
           >;
         };
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -10256,10 +10323,10 @@ export type PetitionCompose_updatePetitionMutation = {
                   >
                 >;
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<
-                    OrgIntegration,
-                    "id" | "isDefault" | "status"
-                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+                  { __typename?: "SignatureOrgIntegration" } & Pick<
+                    SignatureOrgIntegration,
+                    "id" | "name" | "isDefault" | "environment"
+                  >
                 >;
               }
           >;
@@ -10331,10 +10398,10 @@ export type PetitionCompose_updatePetitionMutation = {
               "title" | "review" | "letRecipientsChooseSigners"
             > & {
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<
-                    OrgIntegration,
-                    "id" | "isDefault" | "status"
-                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+                  { __typename?: "SignatureOrgIntegration" } & Pick<
+                    SignatureOrgIntegration,
+                    "id" | "name" | "isDefault" | "environment"
+                  >
                 >;
                 signers: Array<
                   { __typename?: "PetitionSigner" } & Pick<
@@ -10770,10 +10837,12 @@ export type PetitionComposeUserQuery = {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
             items: Array<
-              { __typename?: "OrgIntegration" } & Pick<
-                OrgIntegration,
-                "id" | "isDefault" | "status"
-              > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+              | ({ __typename?: "SignatureOrgIntegration" } & Pick<
+                  SignatureOrgIntegration,
+                  "id" | "name" | "isDefault" | "environment"
+                >)
+              | { __typename?: "SsoOrgIntegration" }
+              | { __typename?: "UserProvisioningOrgIntegration" }
             >;
           };
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -10808,6 +10877,25 @@ export type PetitionComposeQuery = {
         | "isReadOnly"
         | "updatedAt"
       > & {
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "title" | "review" | "letRecipientsChooseSigners"
+            > & {
+                integration?: Maybe<
+                  { __typename?: "SignatureOrgIntegration" } & Pick<
+                    SignatureOrgIntegration,
+                    "environment" | "name" | "id" | "isDefault"
+                  >
+                >;
+                signers: Array<
+                  { __typename?: "PetitionSigner" } & Pick<
+                    PetitionSigner,
+                    "contactId" | "firstName" | "lastName" | "email" | "fullName"
+                  >
+                >;
+              }
+          >;
           fields: Array<
             { __typename?: "PetitionField" } & Pick<
               PetitionField,
@@ -10841,25 +10929,6 @@ export type PetitionComposeQuery = {
                 >;
                 replies: Array<
                   { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
-                >;
-              }
-          >;
-          signatureConfig?: Maybe<
-            { __typename?: "SignatureConfig" } & Pick<
-              SignatureConfig,
-              "title" | "review" | "letRecipientsChooseSigners"
-            > & {
-                signers: Array<
-                  { __typename?: "PetitionSigner" } & Pick<
-                    PetitionSigner,
-                    "contactId" | "firstName" | "lastName" | "email" | "fullName"
-                  >
-                >;
-                integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<
-                    OrgIntegration,
-                    "id" | "isDefault" | "status"
-                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
                 >;
               }
           >;
@@ -10974,10 +11043,10 @@ export type PetitionComposeQuery = {
               "title" | "review" | "letRecipientsChooseSigners"
             > & {
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<
-                    OrgIntegration,
-                    "id" | "isDefault" | "status"
-                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+                  { __typename?: "SignatureOrgIntegration" } & Pick<
+                    SignatureOrgIntegration,
+                    "id" | "name" | "isDefault" | "environment"
+                  >
                 >;
                 signers: Array<
                   { __typename?: "PetitionSigner" } & Pick<
@@ -11107,10 +11176,10 @@ export type PetitionReplies_PetitionFragment = { __typename?: "Petition" } & Pic
         "review" | "title" | "letRecipientsChooseSigners" | "timezone"
       > & {
           integration?: Maybe<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "status" | "id" | "name" | "provider" | "isDefault"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "environment" | "id" | "name" | "provider" | "isDefault"
+            >
           >;
           signers: Array<
             { __typename?: "PetitionSigner" } & Pick<
@@ -11197,10 +11266,12 @@ export type PetitionReplies_UserFragment = { __typename?: "User" } & Pick<
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
           items: Array<
-            { __typename?: "OrgIntegration" } & Pick<
-              OrgIntegration,
-              "id" | "isDefault" | "status"
-            > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+            | ({ __typename?: "SignatureOrgIntegration" } & Pick<
+                SignatureOrgIntegration,
+                "id" | "name" | "isDefault" | "environment"
+              >)
+            | { __typename?: "SsoOrgIntegration" }
+            | { __typename?: "UserProvisioningOrgIntegration" }
           >;
         };
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -11434,10 +11505,12 @@ export type PetitionRepliesUserQuery = {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
             items: Array<
-              { __typename?: "OrgIntegration" } & Pick<
-                OrgIntegration,
-                "id" | "isDefault" | "status"
-              > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+              | ({ __typename?: "SignatureOrgIntegration" } & Pick<
+                  SignatureOrgIntegration,
+                  "id" | "name" | "isDefault" | "environment"
+                >)
+              | { __typename?: "SsoOrgIntegration" }
+              | { __typename?: "UserProvisioningOrgIntegration" }
             >;
           };
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
@@ -11570,10 +11643,10 @@ export type PetitionRepliesQuery = {
               "review" | "title" | "letRecipientsChooseSigners" | "timezone"
             > & {
                 integration?: Maybe<
-                  { __typename?: "OrgIntegration" } & Pick<
-                    OrgIntegration,
-                    "status" | "id" | "name" | "provider" | "isDefault"
-                  > & { value: OrgIntegration["id"]; label: OrgIntegration["name"] }
+                  { __typename?: "SignatureOrgIntegration" } & Pick<
+                    SignatureOrgIntegration,
+                    "environment" | "id" | "name" | "provider" | "isDefault"
+                  >
                 >;
                 signers: Array<
                   { __typename?: "PetitionSigner" } & Pick<
@@ -11649,7 +11722,10 @@ export type Petitions_PetitionBasePaginationFragment = {
             signatureConfig?: Maybe<
               { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
                   integration?: Maybe<
-                    { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                    { __typename?: "SignatureOrgIntegration" } & Pick<
+                      SignatureOrgIntegration,
+                      "environment"
+                    >
                   >;
                 }
             >;
@@ -11723,7 +11799,12 @@ export type Petitions_PetitionBase_Petition_Fragment = { __typename?: "Petition"
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
-          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          integration?: Maybe<
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "environment"
+            >
+          >;
         }
     >;
   };
@@ -11873,7 +11954,10 @@ export type PetitionsQuery = {
               signatureConfig?: Maybe<
                 { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
                     integration?: Maybe<
-                      { __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">
+                      { __typename?: "SignatureOrgIntegration" } & Pick<
+                        SignatureOrgIntegration,
+                        "environment"
+                      >
                     >;
                   }
               >;
@@ -13298,7 +13382,12 @@ export type usePetitionCurrentSignatureStatusAndEnv_PetitionFragment = {
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
-          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          integration?: Maybe<
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "environment"
+            >
+          >;
         }
     >;
   };
@@ -13342,7 +13431,12 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
-          integration?: Maybe<{ __typename?: "OrgIntegration" } & Pick<OrgIntegration, "status">>;
+          integration?: Maybe<
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "environment"
+            >
+          >;
         }
     >;
   };
@@ -14140,7 +14234,7 @@ export const usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc = gql`
     signatureConfig {
       review
       integration {
-        status
+        environment
       }
     }
   }
@@ -14285,6 +14379,15 @@ export const OrganizationGroups_UserFragmentDoc = gql`
     ...SettingsLayout_User
   }
   ${SettingsLayout_UserFragmentDoc}
+`;
+export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
+  fragment IntegrationsSignature_SignatureOrgIntegration on SignatureOrgIntegration {
+    id
+    name
+    provider
+    isDefault
+    environment
+  }
 `;
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
@@ -15170,13 +15273,12 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
     isReadOnly
   }
 `;
-export const SignatureConfigDialog_OrgIntegrationFragmentDoc = gql`
-  fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {
+export const SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc = gql`
+  fragment SignatureConfigDialog_SignatureOrgIntegration on SignatureOrgIntegration {
     id
-    value: id
-    label: name
+    name
     isDefault
-    status
+    environment
   }
 `;
 export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
@@ -15184,7 +15286,7 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
     name
     signatureConfig {
       integration {
-        ...SignatureConfigDialog_OrgIntegration
+        ...SignatureConfigDialog_SignatureOrgIntegration
       }
       signers {
         contactId
@@ -15200,7 +15302,7 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
       status
     }
   }
-  ${SignatureConfigDialog_OrgIntegrationFragmentDoc}
+  ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
 `;
 export const PublicLinkSettingsDialog_PetitionTemplateFragmentDoc = gql`
   fragment PublicLinkSettingsDialog_PetitionTemplate on PetitionTemplate {
@@ -15341,6 +15443,12 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     }
     ... on Petition {
       status
+      signatureConfig {
+        integration {
+          environment
+          name
+        }
+      }
     }
     ... on PetitionTemplate {
       isPublic
@@ -15368,13 +15476,15 @@ export const PetitionSettings_UserFragmentDoc = gql`
       id
       signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
         items {
-          ...SignatureConfigDialog_OrgIntegration
+          ... on SignatureOrgIntegration {
+            ...SignatureConfigDialog_SignatureOrgIntegration
+          }
         }
       }
     }
   }
   ${TestModeSignatureBadge_UserFragmentDoc}
-  ${SignatureConfigDialog_OrgIntegrationFragmentDoc}
+  ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
 `;
 export const PetitionCompose_OrganizationFragmentDoc = gql`
   fragment PetitionCompose_Organization on Organization {
@@ -15636,13 +15746,15 @@ export const PetitionSignaturesCard_UserFragmentDoc = gql`
     organization {
       signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
         items {
-          ...SignatureConfigDialog_OrgIntegration
+          ... on SignatureOrgIntegration {
+            ...SignatureConfigDialog_SignatureOrgIntegration
+          }
         }
       }
     }
   }
   ${TestModeSignatureBadge_UserFragmentDoc}
-  ${SignatureConfigDialog_OrgIntegrationFragmentDoc}
+  ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
@@ -19152,7 +19264,7 @@ export type OrganizationIntegrationsLazyQueryHookResult = ReturnType<
 export const IntegrationsSignature_createSignatureIntegrationDocument = gql`
   mutation IntegrationsSignature_createSignatureIntegration(
     $name: String!
-    $provider: SignatureIntegrationProvider!
+    $provider: SignatureOrgIntegrationProvider!
     $apiKey: String!
     $isDefault: Boolean
   ) {
@@ -19162,14 +19274,10 @@ export const IntegrationsSignature_createSignatureIntegrationDocument = gql`
       apiKey: $apiKey
       isDefault: $isDefault
     ) {
-      id
-      name
-      type
-      provider
-      isDefault
-      status
+      ...IntegrationsSignature_SignatureOrgIntegration
     }
   }
+  ${IntegrationsSignature_SignatureOrgIntegrationFragmentDoc}
 `;
 export function useIntegrationsSignature_createSignatureIntegrationMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -19189,14 +19297,10 @@ export type IntegrationsSignature_createSignatureIntegrationMutationHookResult =
 export const IntegrationsSignature_markSignatureIntegrationAsDefaultDocument = gql`
   mutation IntegrationsSignature_markSignatureIntegrationAsDefault($id: GID!) {
     markSignatureIntegrationAsDefault(id: $id) {
-      id
-      name
-      type
-      provider
-      isDefault
-      status
+      ...IntegrationsSignature_SignatureOrgIntegration
     }
   }
+  ${IntegrationsSignature_SignatureOrgIntegrationFragmentDoc}
 `;
 export function useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -19243,11 +19347,13 @@ export const IntegrationsSignatureDocument = gql`
         id
         signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
           items {
-            id
-            name
-            provider
-            isDefault
-            status
+            ... on SignatureOrgIntegration {
+              id
+              name
+              provider
+              isDefault
+              environment
+            }
           }
           totalCount
         }

@@ -217,7 +217,6 @@ export interface NexusGenEnums {
     | "PETITION_COMPOSE"
     | "PETITION_REVIEW";
   OnboardingStatus: "FINISHED" | "SKIPPED";
-  OrgIntegrationStatus: "DEMO" | "PRODUCTION";
   OrganizationRole: "ADMIN" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
   OrganizationUsers_OrderBy:
@@ -270,7 +269,8 @@ export interface NexusGenEnums {
     | "sentAt_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
-  SignatureIntegrationProvider: "SIGNATURIT";
+  SignatureOrgIntegrationEnvironment: "DEMO" | "PRODUCTION";
+  SignatureOrgIntegrationProvider: "SIGNATURIT";
   TaskStatus: db.TaskStatus;
   Tone: db.Tone;
   UserAuthenticationTokens_OrderBy:
@@ -359,7 +359,6 @@ export interface NexusGenObjects {
   MessageScheduledEvent: events.MessageScheduledEvent;
   MessageSentEvent: events.MessageSentEvent;
   Mutation: {};
-  OrgIntegration: db.OrgIntegration;
   OrgIntegrationPagination: {
     // root type
     items: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
@@ -538,7 +537,9 @@ export interface NexusGenObjects {
     review?: boolean;
     letRecipientsChooseSigners?: boolean;
   };
+  SignatureOrgIntegration: db.OrgIntegration;
   SignatureStartedEvent: events.SignatureStartedEvent;
+  SsoOrgIntegration: db.OrgIntegration;
   SupportMethodResponse: {
     // root type
     message?: string | null; // String
@@ -581,6 +582,7 @@ export interface NexusGenObjects {
   UserPermissionAddedEvent: events.UserPermissionAddedEvent;
   UserPermissionEditedEvent: events.UserPermissionEditedEvent;
   UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
+  UserProvisioningOrgIntegration: db.OrgIntegration;
   VerificationCodeCheck: {
     // root type
     remainingAttempts?: number | null; // Int
@@ -598,6 +600,7 @@ export interface NexusGenInterfaces {
   CreatedAt: {
     created_at: Date;
   };
+  OrgIntegration: db.OrgIntegration;
   PetitionBase: db.Petition;
   PetitionBaseAndField: {
     petition: db.Petition;
@@ -864,7 +867,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
-    createSignatureIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
+    createSignatureIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -959,15 +962,6 @@ export interface NexusGenFieldTypes {
     userSignUp: NexusGenRootTypes["User"]; // User!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
-  };
-  OrgIntegration: {
-    // field return type
-    id: NexusGenScalars["GID"]; // GID!
-    isDefault: boolean; // Boolean!
-    name: string; // String!
-    provider: string; // String!
-    status: NexusGenEnums["OrgIntegrationStatus"]; // OrgIntegrationStatus!
-    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
   OrgIntegrationPagination: {
     // field return type
@@ -1252,7 +1246,7 @@ export interface NexusGenFieldTypes {
     // field return type
     auditTrailFilename: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    environment: NexusGenEnums["OrgIntegrationStatus"] | null; // OrgIntegrationStatus
+    environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"] | null; // SignatureOrgIntegrationEnvironment
     id: NexusGenScalars["GID"]; // GID!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     petition: NexusGenRootTypes["Petition"]; // Petition!
@@ -1597,17 +1591,33 @@ export interface NexusGenFieldTypes {
   };
   SignatureConfig: {
     // field return type
-    integration: NexusGenRootTypes["OrgIntegration"] | null; // OrgIntegration
+    integration: NexusGenRootTypes["SignatureOrgIntegration"] | null; // SignatureOrgIntegration
     letRecipientsChooseSigners: boolean; // Boolean!
     review: boolean; // Boolean!
     signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
     timezone: string; // String!
     title: string; // String!
   };
+  SignatureOrgIntegration: {
+    // field return type
+    environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"]; // SignatureOrgIntegrationEnvironment!
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    name: string; // String!
+    provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
+    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
+  };
   SignatureStartedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+  };
+  SsoOrgIntegration: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    name: string; // String!
+    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
   SupportMethodResponse: {
     // field return type
@@ -1743,6 +1753,13 @@ export interface NexusGenFieldTypes {
     permissionUser: NexusGenRootTypes["User"] | null; // User
     user: NexusGenRootTypes["User"] | null; // User
   };
+  UserProvisioningOrgIntegration: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    name: string; // String!
+    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
+  };
   VerificationCodeCheck: {
     // field return type
     remainingAttempts: number | null; // Int
@@ -1757,6 +1774,13 @@ export interface NexusGenFieldTypes {
   CreatedAt: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  OrgIntegration: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    name: string; // String!
+    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
   PetitionBase: {
     // field return type
@@ -2052,7 +2076,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldComment: "PetitionField";
     createPrintPdfTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
-    createSignatureIntegration: "OrgIntegration";
+    createSignatureIntegration: "SignatureOrgIntegration";
     createSimpleReply: "PetitionFieldReply";
     createTag: "Tag";
     createUser: "SupportMethodResponse";
@@ -2147,15 +2171,6 @@ export interface NexusGenFieldTypeNames {
     userSignUp: "User";
     validatePetitionFields: "PetitionAndPartialFields";
     verifyPublicAccess: "PublicAccessVerification";
-  };
-  OrgIntegration: {
-    // field return type name
-    id: "GID";
-    isDefault: "Boolean";
-    name: "String";
-    provider: "String";
-    status: "OrgIntegrationStatus";
-    type: "IntegrationType";
   };
   OrgIntegrationPagination: {
     // field return type name
@@ -2440,7 +2455,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     auditTrailFilename: "String";
     createdAt: "DateTime";
-    environment: "OrgIntegrationStatus";
+    environment: "SignatureOrgIntegrationEnvironment";
     id: "GID";
     metadata: "JSONObject";
     petition: "Petition";
@@ -2785,17 +2800,33 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureConfig: {
     // field return type name
-    integration: "OrgIntegration";
+    integration: "SignatureOrgIntegration";
     letRecipientsChooseSigners: "Boolean";
     review: "Boolean";
     signers: "PetitionSigner";
     timezone: "String";
     title: "String";
   };
+  SignatureOrgIntegration: {
+    // field return type name
+    environment: "SignatureOrgIntegrationEnvironment";
+    id: "GID";
+    isDefault: "Boolean";
+    name: "String";
+    provider: "SignatureOrgIntegrationProvider";
+    type: "IntegrationType";
+  };
   SignatureStartedEvent: {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+  };
+  SsoOrgIntegration: {
+    // field return type name
+    id: "GID";
+    isDefault: "Boolean";
+    name: "String";
+    type: "IntegrationType";
   };
   SupportMethodResponse: {
     // field return type name
@@ -2931,6 +2962,13 @@ export interface NexusGenFieldTypeNames {
     permissionUser: "User";
     user: "User";
   };
+  UserProvisioningOrgIntegration: {
+    // field return type name
+    id: "GID";
+    isDefault: "Boolean";
+    name: "String";
+    type: "IntegrationType";
+  };
   VerificationCodeCheck: {
     // field return type name
     remainingAttempts: "Int";
@@ -2945,6 +2983,13 @@ export interface NexusGenFieldTypeNames {
   CreatedAt: {
     // field return type name
     createdAt: "DateTime";
+  };
+  OrgIntegration: {
+    // field return type name
+    id: "GID";
+    isDefault: "Boolean";
+    name: "String";
+    type: "IntegrationType";
   };
   PetitionBase: {
     // field return type name
@@ -3174,7 +3219,7 @@ export interface NexusGenArgTypes {
       apiKey: string; // String!
       isDefault?: boolean | null; // Boolean
       name: string; // String!
-      provider: NexusGenEnums["SignatureIntegrationProvider"]; // SignatureIntegrationProvider!
+      provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
     };
     createSimpleReply: {
       // args
@@ -3915,6 +3960,10 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionMessage"
     | "PetitionReminder"
     | "UserAuthenticationToken";
+  OrgIntegration:
+    | "SignatureOrgIntegration"
+    | "SsoOrgIntegration"
+    | "UserProvisioningOrgIntegration";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionBaseAndField: "PetitionAndField" | "PetitionTemplateAndField";
   PetitionEvent:
@@ -4039,7 +4088,9 @@ export interface NexusGenTypeInterfaces {
   SignatureCancelledUserNotification: "PetitionUserNotification";
   SignatureCompletedEvent: "PetitionEvent";
   SignatureCompletedUserNotification: "PetitionUserNotification";
+  SignatureOrgIntegration: "OrgIntegration";
   SignatureStartedEvent: "PetitionEvent";
+  SsoOrgIntegration: "OrgIntegration";
   TemplateDefaultUserGroupPermission: "TemplateDefaultPermission" | "Timestamps";
   TemplateDefaultUserPermission: "TemplateDefaultPermission" | "Timestamps";
   TemplateUsedEvent: "PetitionEvent";
@@ -4049,6 +4100,7 @@ export interface NexusGenTypeInterfaces {
   UserPermissionAddedEvent: "PetitionEvent";
   UserPermissionEditedEvent: "PetitionEvent";
   UserPermissionRemovedEvent: "PetitionEvent";
+  UserProvisioningOrgIntegration: "OrgIntegration";
   PetitionPermission: "Timestamps";
   TemplateDefaultPermission: "Timestamps";
 }
@@ -4069,6 +4121,7 @@ export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
 export type NexusGenAbstractsUsingStrategyResolveType =
   | "CreatedAt"
+  | "OrgIntegration"
   | "PetitionBase"
   | "PetitionBaseAndField"
   | "PetitionEvent"

@@ -41,7 +41,7 @@ import {
   usePetitionSettings_updatePublicPetitionLinkMutation,
   usePetitionSettings_updateTemplateDefaultPermissionsMutation,
 } from "@parallel/graphql/__types";
-import { assertTypename } from "@parallel/utils/apollo/assertTypename";
+import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
@@ -79,8 +79,9 @@ function _PetitionSettings({
 }: PetitionSettingsProps) {
   const locales = useSupportedLocales();
   const intl = useIntl();
-  const hasSignature =
-    user.hasPetitionSignature && user.organization.signatureIntegrations.items.length > 0;
+
+  const signatureIntegrations = user.organization.signatureIntegrations.items;
+  const hasSignature = user.hasPetitionSignature && signatureIntegrations.length > 0;
 
   const ongoingSignatureRequest =
     petition.__typename === "Petition" &&
@@ -105,9 +106,10 @@ function _PetitionSettings({
       if (ongoingSignatureRequest) {
         await showConfirmConfigureOngoingSignature({});
       }
+      assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
       const signatureConfig = await showSignatureConfigDialog({
         petition,
-        providers: user.organization.signatureIntegrations.items,
+        providers: signatureIntegrations,
       });
 
       const previous = petition.signatureConfig;
@@ -342,7 +344,7 @@ function _PetitionSettings({
                   id="component.petition-settings.petition-signature-enable"
                   defaultMessage="Enable eSignature"
                 />
-                {petition.signatureConfig?.integration?.status === "DEMO" || !hasSignature ? (
+                {petition.signatureConfig?.integration?.environment === "DEMO" || !hasSignature ? (
                   <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
                 ) : null}
               </HStack>
@@ -526,13 +528,15 @@ const fragments = {
         id
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
           items {
-            ...SignatureConfigDialog_OrgIntegration
+            ... on SignatureOrgIntegration {
+              ...SignatureConfigDialog_SignatureOrgIntegration
+            }
           }
         }
       }
     }
     ${TestModeSignatureBadge.fragments.User}
-    ${SignatureConfigDialog.fragments.OrgIntegration}
+    ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
   `,
   PetitionBase: gql`
     fragment PetitionSettings_PetitionBase on PetitionBase {

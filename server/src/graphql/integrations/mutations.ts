@@ -1,4 +1,4 @@
-import { booleanArg, enumType, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { arg, booleanArg, enumType, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { ApiContext } from "../../context";
 import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
@@ -30,11 +30,11 @@ export const markSignatureIntegrationAsDefault = mutationField(
 
 export const createSignatureIntegration = mutationField("createSignatureIntegration", {
   description: "Creates a new signature integration on the user's organization",
-  type: nonNull("OrgIntegration"),
+  type: nonNull("SignatureOrgIntegration"),
   authorize: authenticateAnd(contextUserIsAdmin(), userHasFeatureFlag("PETITION_SIGNATURE")),
   args: {
     name: nonNull(stringArg()),
-    provider: nonNull(enumType({ name: "SignatureIntegrationProvider", members: ["SIGNATURIT"] })),
+    provider: nonNull(arg({ type: "SignatureOrgIntegrationProvider" })),
     apiKey: nonNull(stringArg()),
     isDefault: nullable(booleanArg()),
   },

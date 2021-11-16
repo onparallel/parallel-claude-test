@@ -12,7 +12,7 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
-  SignatureConfigDialog_OrgIntegrationFragment,
+  SignatureConfigDialog_SignatureOrgIntegrationFragment,
   SignatureConfigDialog_PetitionBaseFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
@@ -30,9 +30,11 @@ import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
 import { sortBy } from "remeda";
 
+type SignatureIntegration = SignatureConfigDialog_SignatureOrgIntegrationFragment;
+
 export type SignatureConfigDialogProps = {
   petition: SignatureConfigDialog_PetitionBaseFragment;
-  providers: SignatureConfigDialog_OrgIntegrationFragment[];
+  providers: SignatureIntegration[];
 };
 
 export function SignatureConfigDialog({
@@ -55,7 +57,7 @@ export function SignatureConfigDialog({
     watch,
   } = useForm<{
     contacts: ContactSelectSelection[];
-    provider: SignatureConfigDialog_OrgIntegrationFragment;
+    provider: SignatureIntegration;
     review: boolean;
     title: string;
     letRecipientsChooseSigners: boolean;
@@ -101,6 +103,7 @@ export function SignatureConfigDialog({
     [intl.locale]
   );
 
+  const signatureIntegrationReactProps = useReactSelectProps<SignatureIntegration, false>();
   const reactSelectProps = useReactSelectProps();
 
   const contactProps = useMemo(
@@ -186,7 +189,9 @@ export function SignatureConfigDialog({
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Select
-                  {...reactSelectProps}
+                  {...signatureIntegrationReactProps}
+                  getOptionLabel={(p) => p.name}
+                  getOptionValue={(p) => p.id}
                   value={providers.find((p) => p.id === value.id)}
                   onChange={onChange}
                   options={providers}
@@ -344,7 +349,7 @@ SignatureConfigDialog.fragments = {
         name
         signatureConfig {
           integration {
-            ...SignatureConfigDialog_OrgIntegration
+            ...SignatureConfigDialog_SignatureOrgIntegration
           }
           signers {
             contactId
@@ -360,18 +365,17 @@ SignatureConfigDialog.fragments = {
           status
         }
       }
-      ${this.OrgIntegration}
+      ${this.SignatureOrgIntegration}
     `;
   },
 
-  get OrgIntegration() {
+  get SignatureOrgIntegration() {
     return gql`
-      fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {
+      fragment SignatureConfigDialog_SignatureOrgIntegration on SignatureOrgIntegration {
         id
-        value: id
-        label: name
+        name
         isDefault
-        status
+        environment
       }
     `;
   },

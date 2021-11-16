@@ -160,7 +160,7 @@ describe("GraphQL/OrgIntegrations", () => {
   it("creates a new signature integration", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation ($name: String!, $provider: SignatureIntegrationProvider!, $apiKey: String!) {
+        mutation ($name: String!, $provider: SignatureOrgIntegrationProvider!, $apiKey: String!) {
           createSignatureIntegration(name: $name, provider: $provider, apiKey: $apiKey) {
             name
             isDefault
@@ -192,7 +192,7 @@ describe("GraphQL/OrgIntegrations", () => {
       mutation: gql`
         mutation (
           $name: String!
-          $provider: SignatureIntegrationProvider!
+          $provider: SignatureOrgIntegrationProvider!
           $apiKey: String!
           $isDefault: Boolean
         ) {
@@ -358,7 +358,7 @@ describe("GraphQL/OrgIntegrations", () => {
       mutation: gql`
         mutation (
           $name: String!
-          $provider: SignatureIntegrationProvider!
+          $provider: SignatureOrgIntegrationProvider!
           $apiKey: String!
           $isDefault: Boolean
         ) {

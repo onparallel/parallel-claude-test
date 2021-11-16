@@ -56,7 +56,7 @@ export const PetitionSignatureRequest = objectType({
       description: "The status of the petition signature.",
     });
     t.nullable.field("environment", {
-      type: "OrgIntegrationStatus",
+      type: "SignatureOrgIntegrationEnvironment",
       description: "The environment of the petition signature.",
       resolve: (o) => o.environment,
     });

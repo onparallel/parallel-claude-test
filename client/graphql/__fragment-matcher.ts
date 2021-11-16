@@ -11,6 +11,11 @@ const result: PossibleTypesResultData = {
       "PetitionReminder",
       "UserAuthenticationToken",
     ],
+    OrgIntegration: [
+      "SignatureOrgIntegration",
+      "SsoOrgIntegration",
+      "UserProvisioningOrgIntegration",
+    ],
     PetitionBase: ["Petition", "PetitionTemplate"],
     PetitionBaseAndField: ["PetitionAndField", "PetitionTemplateAndField"],
     PetitionEvent: [

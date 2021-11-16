@@ -409,11 +409,23 @@ function useSignatureTokensTableColumns({
   );
 }
 
+IntegrationsSignature.fragments = {
+  SignatureOrgIntegration: gql`
+    fragment IntegrationsSignature_SignatureOrgIntegration on SignatureOrgIntegration {
+      id
+      name
+      provider
+      isDefault
+      environment
+    }
+  `,
+};
+
 IntegrationsSignature.mutations = [
   gql`
     mutation IntegrationsSignature_createSignatureIntegration(
       $name: String!
-      $provider: SignatureIntegrationProvider!
+      $provider: SignatureOrgIntegrationProvider!
       $apiKey: String!
       $isDefault: Boolean
     ) {
@@ -423,26 +435,18 @@ IntegrationsSignature.mutations = [
         apiKey: $apiKey
         isDefault: $isDefault
       ) {
-        id
-        name
-        type
-        provider
-        isDefault
-        status
+        ...IntegrationsSignature_SignatureOrgIntegration
       }
     }
+    ${IntegrationsSignature.fragments.SignatureOrgIntegration}
   `,
   gql`
     mutation IntegrationsSignature_markSignatureIntegrationAsDefault($id: GID!) {
       markSignatureIntegrationAsDefault(id: $id) {
-        id
-        name
-        type
-        provider
-        isDefault
-        status
+        ...IntegrationsSignature_SignatureOrgIntegration
       }
     }
+    ${IntegrationsSignature.fragments.SignatureOrgIntegration}
   `,
   gql`
     mutation IntegrationsSignature_deleteSignatureIntegration($id: GID!, $force: Boolean) {
@@ -468,11 +472,13 @@ IntegrationsSignature.getInitialProps = async ({
             id
             signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
               items {
-                id
-                name
-                provider
-                isDefault
-                status
+                ... on SignatureOrgIntegration {
+                  id
+                  name
+                  provider
+                  isDefault
+                  environment
+                }
               }
               totalCount
             }

@@ -4,7 +4,7 @@ import { FormControl, FormLabel, FormErrorMessage } from "@chakra-ui/form-contro
 import { Input } from "@chakra-ui/input";
 import { HStack, Stack, Text } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
-import { SignatureIntegrationProvider } from "@parallel/graphql/__types";
+import { SignatureOrgIntegrationProvider } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -16,7 +16,7 @@ import { NormalLink } from "../common/Link";
 
 interface AddSignatureAPIKeyDialogData {
   name: string;
-  provider: SignatureIntegrationProvider;
+  provider: SignatureOrgIntegrationProvider;
   apiKey: string;
   isDefault: boolean;
 }

@@ -605,8 +605,8 @@ type Mutation {
     apiKey: String!
     isDefault: Boolean
     name: String!
-    provider: SignatureIntegrationProvider!
-  ): OrgIntegration!
+    provider: SignatureOrgIntegrationProvider!
+  ): SignatureOrgIntegration!
 
   """
   Creates a reply to a text or select field.
@@ -1357,7 +1357,7 @@ enum OnboardingStatus {
   SKIPPED
 }
 
-type OrgIntegration {
+interface OrgIntegration {
   id: GID!
 
   """
@@ -1369,16 +1369,6 @@ type OrgIntegration {
   Custom name of this integration, provided by the user
   """
   name: String!
-
-  """
-  The provider used for this integration.
-  """
-  provider: String!
-
-  """
-  Status of this integration, to differentiate between sandbox and production-ready integrations
-  """
-  status: OrgIntegrationStatus!
 
   """
   The type of the integration.
@@ -1396,11 +1386,6 @@ type OrgIntegrationPagination {
   The total count of items in the list.
   """
   totalCount: Int!
-}
-
-enum OrgIntegrationStatus {
-  DEMO
-  PRODUCTION
 }
 
 """
@@ -2555,7 +2540,7 @@ type PetitionSignatureRequest implements Timestamps {
   """
   The environment of the petition signature.
   """
-  environment: OrgIntegrationStatus
+  environment: SignatureOrgIntegrationEnvironment
   id: GID!
 
   """
@@ -3690,7 +3675,7 @@ type SignatureConfig {
   """
   The signature integration selected for this signature config.
   """
-  integration: OrgIntegration
+  integration: SignatureOrgIntegration
 
   """
   If true, allows the recipients of the petition to select additional signers
@@ -3759,13 +3744,61 @@ input SignatureConfigInputSigner {
   lastName: String!
 }
 
-enum SignatureIntegrationProvider {
+type SignatureOrgIntegration implements OrgIntegration {
+  """
+  Environment of this integration, to differentiate between sandbox and production-ready integrations
+  """
+  environment: SignatureOrgIntegrationEnvironment!
+  id: GID!
+
+  """
+  Wether this integration is the default to be used if the user has more than one of the same type
+  """
+  isDefault: Boolean!
+
+  """
+  Custom name of this integration, provided by the user
+  """
+  name: String!
+  provider: SignatureOrgIntegrationProvider!
+
+  """
+  The type of the integration.
+  """
+  type: IntegrationType!
+}
+
+enum SignatureOrgIntegrationEnvironment {
+  DEMO
+  PRODUCTION
+}
+
+enum SignatureOrgIntegrationProvider {
   SIGNATURIT
 }
 
 type SignatureStartedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+}
+
+type SsoOrgIntegration implements OrgIntegration {
+  id: GID!
+
+  """
+  Wether this integration is the default to be used if the user has more than one of the same type
+  """
+  isDefault: Boolean!
+
+  """
+  Custom name of this integration, provided by the user
+  """
+  name: String!
+
+  """
+  The type of the integration.
+  """
+  type: IntegrationType!
 }
 
 """
@@ -4212,6 +4245,25 @@ type UserPermissionRemovedEvent implements PetitionEvent {
   id: GID!
   permissionUser: User
   user: User
+}
+
+type UserProvisioningOrgIntegration implements OrgIntegration {
+  id: GID!
+
+  """
+  Wether this integration is the default to be used if the user has more than one of the same type
+  """
+  isDefault: Boolean!
+
+  """
+  Custom name of this integration, provided by the user
+  """
+  name: String!
+
+  """
+  The type of the integration.
+  """
+  type: IntegrationType!
 }
 
 enum UserStatus {

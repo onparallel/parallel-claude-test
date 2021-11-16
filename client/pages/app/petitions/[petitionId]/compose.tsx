@@ -379,9 +379,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     if (!isFieldsValid) return;
 
     try {
-      if (!dontShowTestSignature && petition.signatureConfig?.integration?.status === "DEMO") {
+      if (!dontShowTestSignature && petition.signatureConfig?.integration?.environment === "DEMO") {
         const { dontShow } = await showTestSignatureDialog({
-          integrationName: petition.signatureConfig?.integration?.label ?? "",
+          integrationName: petition.signatureConfig.integration.name,
         });
         if (dontShow) {
           setDontShowTestSignature(true);
@@ -699,6 +699,12 @@ PetitionCompose.fragments = {
         }
         ... on Petition {
           status
+          signatureConfig {
+            integration {
+              environment
+              name
+            }
+          }
         }
         ... on PetitionTemplate {
           isPublic

@@ -1,4 +1,4 @@
-import { enumType, objectType } from "nexus";
+import { enumType, interfaceType, objectType } from "nexus";
 
 export const IntegrationType = enumType({
   name: "IntegrationType",
@@ -6,12 +6,7 @@ export const IntegrationType = enumType({
   description: "The types of integrations available.",
 });
 
-export const OrgIntegrationStatus = enumType({
-  name: "OrgIntegrationStatus",
-  members: ["DEMO", "PRODUCTION"],
-});
-
-export const OrgIntegration = objectType({
+export const OrgIntegration = interfaceType({
   name: "OrgIntegration",
   definition(t) {
     t.globalId("id");
@@ -22,21 +17,56 @@ export const OrgIntegration = objectType({
       type: "IntegrationType",
       description: "The type of the integration.",
     });
-    t.string("provider", {
-      description: "The provider used for this integration.",
-    });
     t.boolean("isDefault", {
       description:
         "Wether this integration is the default to be used if the user has more than one of the same type",
       resolve: (o) => o.is_default,
     });
-    t.field("status", {
-      type: "OrgIntegrationStatus",
+  },
+  resolveType: (o) =>
+    ((
+      {
+        SIGNATURE: "SignatureOrgIntegration",
+        SSO: "SsoOrgIntegration",
+        USER_PROVISIONING: "UserProvisioningOrgIntegration",
+      } as const
+    )[o.type]),
+});
+
+export const SignatureOrgIntegration = objectType({
+  name: "SignatureOrgIntegration",
+  definition(t) {
+    t.implements("OrgIntegration");
+    t.field("provider", {
+      type: enumType({ name: "SignatureOrgIntegrationProvider", members: ["SIGNATURIT"] }),
+    });
+    t.field("environment", {
+      type: enumType({
+        name: "SignatureOrgIntegrationEnvironment",
+        members: ["DEMO", "PRODUCTION"],
+      }),
       description:
-        "Status of this integration, to differentiate between sandbox and production-ready integrations",
+        "Environment of this integration, to differentiate between sandbox and production-ready integrations",
       resolve: (o) => {
         return o.settings.ENVIRONMENT === "production" ? "PRODUCTION" : "DEMO";
       },
     });
   },
+  sourceType: "db.OrgIntegration",
+});
+
+export const UserProvisioningOrgIntegration = objectType({
+  name: "UserProvisioningOrgIntegration",
+  definition(t) {
+    t.implements("OrgIntegration");
+  },
+  sourceType: "db.OrgIntegration",
+});
+
+export const SsoOrgIntegration = objectType({
+  name: "SsoOrgIntegration",
+  definition(t) {
+    t.implements("OrgIntegration");
+  },
+  sourceType: "db.OrgIntegration",
 });

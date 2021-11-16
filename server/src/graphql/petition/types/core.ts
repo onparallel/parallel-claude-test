@@ -493,7 +493,7 @@ export const SignatureConfig = objectType({
   description: "The signature settings of a petition",
   definition(t) {
     t.nullable.field("integration", {
-      type: "OrgIntegration",
+      type: "SignatureOrgIntegration",
       description: "The signature integration selected for this signature config.",
       resolve: async (o, _, ctx) => {
         return await ctx.integrations.loadIntegration(o.orgIntegrationId);

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import {
-  OrgIntegrationStatus,
+  SignatureOrgIntegrationEnvironment,
   PetitionSignatureRequestStatus,
   usePetitionCurrentSignatureStatusAndEnv_PetitionFragment,
 } from "@parallel/graphql/__types";
@@ -8,11 +8,12 @@ import {
 export function usePetitionCurrentSignatureStatusAndEnv(
   petition: usePetitionCurrentSignatureStatusAndEnv_PetitionFragment
 ): {
-  env: OrgIntegrationStatus | undefined | null;
+  env: SignatureOrgIntegrationEnvironment | undefined | null;
   status: PetitionSignatureRequestStatus | "START" | null;
 } {
   const env =
-    petition.signatureConfig?.integration?.status || petition.currentSignatureRequest?.environment;
+    petition.signatureConfig?.integration?.environment ||
+    petition.currentSignatureRequest?.environment;
 
   const status =
     petition.signatureConfig?.review &&
@@ -37,7 +38,7 @@ usePetitionCurrentSignatureStatusAndEnv.fragments = {
       signatureConfig {
         review
         integration {
-          status
+          environment
         }
       }
     }

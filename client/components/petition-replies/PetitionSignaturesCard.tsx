@@ -3,7 +3,7 @@ import { Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
 import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
-  OrgIntegrationStatus,
+  SignatureOrgIntegrationEnvironment,
   PetitionSignaturesCard_PetitionFragment,
   PetitionSignaturesCard_UserFragment,
   SignatureConfigInput,
@@ -13,6 +13,7 @@ import {
   usePetitionSignaturesCard_startSignatureRequestMutation,
   usePetitionSignaturesCard_updatePetitionSignatureConfigMutation,
 } from "@parallel/graphql/__types";
+import { assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback } from "react";
@@ -33,7 +34,7 @@ import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
 export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
   user: PetitionSignaturesCard_UserFragment;
-  signatureEnvironment: OrgIntegrationStatus | undefined | null;
+  signatureEnvironment: SignatureOrgIntegrationEnvironment | undefined | null;
   onRefetchPetition: () => void;
 }
 
@@ -44,12 +45,14 @@ const fragments = {
       organization {
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
           items {
-            ...SignatureConfigDialog_OrgIntegration
+            ... on SignatureOrgIntegration {
+              ...SignatureConfigDialog_SignatureOrgIntegration
+            }
           }
         }
       }
     }
-    ${SignatureConfigDialog.fragments.OrgIntegration}
+    ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
     ${TestModeSignatureBadge.fragments.User}
   `,
   Petition: gql`
@@ -130,6 +133,7 @@ export const PetitionSignaturesCard = Object.assign(
     let current: Maybe<UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>> =
       petition.signatureRequests![0];
     const older = petition.signatureRequests!.slice(1);
+    const signatureIntegrations = user.organization.signatureIntegrations.items;
     /**
      * If the signature config is defined on the petition and the last request is finished,
      * we consider that a new signature will be needed.
@@ -191,13 +195,14 @@ export const PetitionSignaturesCard = Object.assign(
 
     const showConfirmRestartSignature = useConfirmRestartSignatureRequestDialog();
     async function handleAddNewSignature() {
+      assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
       try {
         if (current?.status === "COMPLETED") {
           await showConfirmRestartSignature({});
         }
         const signatureConfig = await showSignatureConfigDialog({
           petition,
-          providers: user.organization.signatureIntegrations.items,
+          providers: signatureIntegrations,
         });
         await updateSignatureConfig({
           variables: { petitionId: petition.id, signatureConfig },
