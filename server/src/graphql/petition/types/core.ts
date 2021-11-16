@@ -123,10 +123,6 @@ export const PetitionBase = interfaceType({
         return o.reminders_config;
       },
     });
-    t.boolean("hasCommentsEnabled", {
-      description: "Whether comments are enabled or not.",
-      resolve: (o) => o.comments_enabled,
-    });
     t.boolean("skipForwardSecurity", {
       description: "Whether to skip the forward security check on the recipient view.",
       resolve: (o) => o.skip_forward_security,
