@@ -9,6 +9,9 @@ const SCHEMAS = {
     required: ["placeholder"],
     additionalProperties: false,
     properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
       placeholder: {
         type: ["string", "null"],
       },
@@ -19,6 +22,9 @@ const SCHEMAS = {
     required: ["placeholder"],
     additionalProperties: false,
     properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
       placeholder: {
         type: ["string", "null"],
       },
@@ -29,6 +35,9 @@ const SCHEMAS = {
     required: ["accepts"],
     additionalProperties: false,
     properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
       accepts: {
         type: ["array", "null"],
         items: {
@@ -43,6 +52,9 @@ const SCHEMAS = {
     required: ["hasPageBreak"],
     additionalProperties: false,
     properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
       hasPageBreak: {
         type: "boolean",
       },
@@ -53,6 +65,9 @@ const SCHEMAS = {
     required: ["values"],
     additionalProperties: false,
     properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
       values: {
         type: ["array", "null"],
         items: {
@@ -85,6 +100,9 @@ const SCHEMAS = {
         required: ["values", "labels"],
         additionalProperties: false,
         properties: {
+          hasCommentsEnabled: {
+            type: "boolean",
+          },
           values: {
             type: "array",
             items: { $ref: "#/definitions/option" },
@@ -115,6 +133,9 @@ const SCHEMAS = {
     required: ["values"],
     additionalProperties: false,
     properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
       values: {
         type: ["array", "null"],
         items: {
@@ -162,7 +183,11 @@ export function defaultFieldOptions(
   let { options, multiple, optional } = field || {};
 
   if (!field || !isOptionsCompatible(field.type, type)) {
-    options = {};
+    // check if old field is HEADING for not drag the default disabled option, otherwise take the old value
+    options = {
+      // common options here
+      hasCommentsEnabled: field?.type === "HEADING" ? true : options?.hasCommentsEnabled ?? true,
+    };
   }
 
   if (!field || !isSettingsCompatible(field.type, type)) {
@@ -176,6 +201,7 @@ export function defaultFieldOptions(
         optional: true,
         multiple: false,
         options: {
+          hasCommentsEnabled: false,
           hasPageBreak: false,
         },
       };
@@ -186,6 +212,7 @@ export function defaultFieldOptions(
         multiple: multiple ?? false,
         alias: field?.alias ?? null,
         options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           placeholder: options?.placeholder ?? null,
         },
       };
@@ -195,6 +222,7 @@ export function defaultFieldOptions(
         multiple: multiple ?? false,
         alias: field?.alias ?? null,
         options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           placeholder: options?.placeholder ?? null,
         },
       };
@@ -204,6 +232,7 @@ export function defaultFieldOptions(
         multiple: true,
         alias: field?.alias ?? null,
         options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           accepts: null,
         },
       };
@@ -213,6 +242,7 @@ export function defaultFieldOptions(
         multiple: multiple ?? false,
         alias: field?.alias ?? null,
         options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           values: options?.values ?? [],
           placeholder: options?.placeholder ?? null,
         },
@@ -224,6 +254,7 @@ export function defaultFieldOptions(
         multiple: multiple ?? false,
         alias: field?.alias ?? null,
         options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           file: null,
           values: [],
           labels: [],
@@ -236,6 +267,7 @@ export function defaultFieldOptions(
         multiple: false,
         alias: field?.alias ?? null,
         options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           values: options?.values ?? [],
           limit: {
             type: "UNLIMITED",

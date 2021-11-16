@@ -168,7 +168,6 @@ export interface NexusGenInputs {
     description?: NexusGenScalars["JSON"] | null; // JSON
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
-    hasCommentsEnabled?: boolean | null; // Boolean
     isReadOnly?: boolean | null; // Boolean
     isRecipientViewContentsHidden?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
@@ -1024,7 +1023,6 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     fromTemplateId: NexusGenScalars["GID"] | null; // GID
-    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
@@ -1280,7 +1278,6 @@ export interface NexusGenFieldTypes {
     emailSubject: string | null; // String
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
-    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isPublic: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
@@ -1362,7 +1359,6 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
-    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
@@ -1790,7 +1786,6 @@ export interface NexusGenFieldTypes {
     emailSubject: string | null; // String
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
-    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
@@ -2235,7 +2230,6 @@ export interface NexusGenFieldTypeNames {
     fieldCount: "Int";
     fields: "PetitionField";
     fromTemplateId: "GID";
-    hasCommentsEnabled: "Boolean";
     id: "GID";
     isReadOnly: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
@@ -2491,7 +2485,6 @@ export interface NexusGenFieldTypeNames {
     emailSubject: "String";
     fieldCount: "Int";
     fields: "PetitionField";
-    hasCommentsEnabled: "Boolean";
     id: "GID";
     isPublic: "Boolean";
     isReadOnly: "Boolean";
@@ -2573,7 +2566,6 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     deadline: "DateTime";
     fields: "PublicPetitionField";
-    hasCommentsEnabled: "Boolean";
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
@@ -3001,7 +2993,6 @@ export interface NexusGenFieldTypeNames {
     emailSubject: "String";
     fieldCount: "Int";
     fields: "PetitionField";
-    hasCommentsEnabled: "Boolean";
     id: "GID";
     isReadOnly: "Boolean";
     isRecipientViewContentsHidden: "Boolean";

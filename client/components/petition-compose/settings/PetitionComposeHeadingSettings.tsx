@@ -12,57 +12,54 @@ export function HeadingSettings({
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const options = field.options as FieldOptions["HEADING"];
   return (
-    // dont show switch for field is the first on the list
-    field.position > 0 ? (
-      <SettingsRow
-        isDisabled={isReadOnly}
-        label={
+    <SettingsRow
+      isDisabled={isReadOnly}
+      label={
+        <FormattedMessage
+          id="field-settings.heading-page-break-label"
+          defaultMessage="Start new page"
+        />
+      }
+      description={
+        <Text fontSize="sm">
           <FormattedMessage
-            id="field-settings.heading-page-break-label"
-            defaultMessage="Start new page"
+            id="field-settings.heading-page-break-description"
+            defaultMessage="Enabling this will create a new page and use this as the heading of the new page"
           />
-        }
-        description={
+        </Text>
+      }
+      controlId="heading-page-break"
+    >
+      <SmallPopover
+        isDisabled={!field.visibility}
+        content={
           <Text fontSize="sm">
             <FormattedMessage
-              id="field-settings.heading-page-break-description"
-              defaultMessage="Enabling this will create a new page and use this as the heading of the new page"
+              id="field-settings.heading-page-break-visibility"
+              defaultMessage="Can't add page breaks on headings with visibility conditions"
             />
           </Text>
         }
-        controlId="heading-page-break"
       >
-        <SmallPopover
-          isDisabled={!field.visibility}
-          content={
-            <Text fontSize="sm">
-              <FormattedMessage
-                id="field-settings.heading-page-break-visibility"
-                defaultMessage="Can't add page breaks on headings with visibility conditions"
-              />
-            </Text>
-          }
-        >
-          <Box>
-            <Switch
-              isDisabled={field.visibility !== null || isReadOnly}
-              height="20px"
-              display="block"
-              id="heading-page-break"
-              color="green"
-              isChecked={options.hasPageBreak}
-              onChange={(event) =>
-                onFieldEdit(field.id, {
-                  options: {
-                    ...field.options,
-                    hasPageBreak: event.target.checked,
-                  },
-                })
-              }
-            />
-          </Box>
-        </SmallPopover>
-      </SettingsRow>
-    ) : null
+        <Box>
+          <Switch
+            isDisabled={field.visibility !== null || isReadOnly || field.isFixed}
+            height="20px"
+            display="block"
+            id="heading-page-break"
+            color="green"
+            isChecked={options.hasPageBreak}
+            onChange={(event) =>
+              onFieldEdit(field.id, {
+                options: {
+                  ...field.options,
+                  hasPageBreak: event.target.checked,
+                },
+              })
+            }
+          />
+        </Box>
+      </SmallPopover>
+    </SettingsRow>
   );
 }

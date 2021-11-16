@@ -1438,8 +1438,6 @@ export interface Petition extends PetitionBase {
   fields: Array<PetitionField>;
   /** The template GID used for this petition */
   fromTemplateId?: Maybe<Scalars["GID"]>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   isReadOnly: Scalars["Boolean"];
@@ -1562,8 +1560,6 @@ export interface PetitionBase {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   isReadOnly: Scalars["Boolean"];
@@ -2017,8 +2013,6 @@ export interface PetitionTemplate extends PetitionBase {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
@@ -2172,8 +2166,6 @@ export interface PublicPetition extends Timestamps {
   deadline?: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /**
@@ -2887,7 +2879,6 @@ export interface UpdatePetitionInput {
   description?: Maybe<Scalars["JSON"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
-  hasCommentsEnabled?: Maybe<Scalars["Boolean"]>;
   isReadOnly?: Maybe<Scalars["Boolean"]>;
   isRecipientViewContentsHidden?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
@@ -5417,7 +5408,6 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = { __typename?: "Pe
   | "deadline"
   | "id"
   | "locale"
-  | "hasCommentsEnabled"
   | "skipForwardSecurity"
   | "isRecipientViewContentsHidden"
   | "isReadOnly"
@@ -5454,7 +5444,6 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   | "isPublic"
   | "id"
   | "locale"
-  | "hasCommentsEnabled"
   | "skipForwardSecurity"
   | "isRecipientViewContentsHidden"
   | "isReadOnly"
@@ -10136,7 +10125,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = { __typename?: "Pet
   | "emailBody"
   | "deadline"
   | "locale"
-  | "hasCommentsEnabled"
   | "skipForwardSecurity"
   | "isRecipientViewContentsHidden"
   | "isReadOnly"
@@ -10230,7 +10218,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   | "description"
   | "isReadOnly"
   | "locale"
-  | "hasCommentsEnabled"
   | "skipForwardSecurity"
   | "isRecipientViewContentsHidden"
   | "updatedAt"
@@ -10415,7 +10402,6 @@ export type PetitionCompose_updatePetitionMutation = {
         | "status"
         | "deadline"
         | "locale"
-        | "hasCommentsEnabled"
         | "skipForwardSecurity"
         | "isRecipientViewContentsHidden"
         | "isReadOnly"
@@ -10475,7 +10461,6 @@ export type PetitionCompose_updatePetitionMutation = {
         | "name"
         | "isPublic"
         | "locale"
-        | "hasCommentsEnabled"
         | "skipForwardSecurity"
         | "isRecipientViewContentsHidden"
         | "isReadOnly"
@@ -10995,7 +10980,6 @@ export type PetitionComposeQuery = {
         | "emailBody"
         | "deadline"
         | "locale"
-        | "hasCommentsEnabled"
         | "skipForwardSecurity"
         | "isRecipientViewContentsHidden"
         | "isReadOnly"
@@ -11094,7 +11078,6 @@ export type PetitionComposeQuery = {
         | "description"
         | "isReadOnly"
         | "locale"
-        | "hasCommentsEnabled"
         | "skipForwardSecurity"
         | "isRecipientViewContentsHidden"
         | "updatedAt"
@@ -11203,14 +11186,7 @@ export type PetitionQuery = {
 
 export type PetitionReplies_PetitionFragment = { __typename?: "Petition" } & Pick<
   Petition,
-  | "id"
-  | "hasCommentsEnabled"
-  | "name"
-  | "status"
-  | "locale"
-  | "deadline"
-  | "updatedAt"
-  | "isReadOnly"
+  "id" | "name" | "status" | "locale" | "deadline" | "updatedAt" | "isReadOnly"
 > & {
     fields: Array<
       { __typename?: "PetitionField" } & Pick<
@@ -11662,14 +11638,7 @@ export type PetitionRepliesQuery = {
   petition?: Maybe<
     | ({ __typename?: "Petition" } & Pick<
         Petition,
-        | "id"
-        | "hasCommentsEnabled"
-        | "name"
-        | "status"
-        | "locale"
-        | "deadline"
-        | "updatedAt"
-        | "isReadOnly"
+        "id" | "name" | "status" | "locale" | "deadline" | "updatedAt" | "isReadOnly"
       > & {
           fields: Array<
             { __typename?: "PetitionField" } & Pick<
@@ -12552,13 +12521,7 @@ export type RecipientView_PublicPetitionAccessFragment = { __typename?: "PublicP
   petition?: Maybe<
     { __typename?: "PublicPetition" } & Pick<
       PublicPetition,
-      | "id"
-      | "status"
-      | "deadline"
-      | "hasCommentsEnabled"
-      | "isRecipientViewContentsHidden"
-      | "tone"
-      | "signatureStatus"
+      "id" | "status" | "deadline" | "isRecipientViewContentsHidden" | "tone" | "signatureStatus"
     > & {
         fields: Array<
           { __typename?: "PublicPetitionField" } & Pick<
@@ -12644,13 +12607,7 @@ export type RecipientView_PublicPetitionMessageFragment = {
 
 export type RecipientView_PublicPetitionFragment = { __typename?: "PublicPetition" } & Pick<
   PublicPetition,
-  | "id"
-  | "status"
-  | "deadline"
-  | "hasCommentsEnabled"
-  | "isRecipientViewContentsHidden"
-  | "tone"
-  | "signatureStatus"
+  "id" | "status" | "deadline" | "isRecipientViewContentsHidden" | "tone" | "signatureStatus"
 > & {
     fields: Array<
       { __typename?: "PublicPetitionField" } & Pick<
@@ -12763,13 +12720,7 @@ export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
 export type RecipientView_publicCompletePetitionMutation = {
   publicCompletePetition: { __typename?: "PublicPetition" } & Pick<
     PublicPetition,
-    | "id"
-    | "status"
-    | "deadline"
-    | "hasCommentsEnabled"
-    | "isRecipientViewContentsHidden"
-    | "tone"
-    | "signatureStatus"
+    "id" | "status" | "deadline" | "isRecipientViewContentsHidden" | "tone" | "signatureStatus"
   > & {
       fields: Array<
         { __typename?: "PublicPetitionField" } & Pick<
@@ -12844,7 +12795,6 @@ export type PublicPetitionQuery = {
           | "id"
           | "status"
           | "deadline"
-          | "hasCommentsEnabled"
           | "isRecipientViewContentsHidden"
           | "tone"
           | "signatureStatus"
@@ -15509,7 +15459,6 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
     id
     locale
-    hasCommentsEnabled
     skipForwardSecurity
     isRecipientViewContentsHidden
     isReadOnly
@@ -15875,7 +15824,6 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
-    hasCommentsEnabled
     ...PetitionLayout_PetitionBase
     fields {
       ...PetitionReplies_PetitionField
@@ -16268,7 +16216,6 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     id
     status
     deadline
-    hasCommentsEnabled
     isRecipientViewContentsHidden
     tone
     fields {

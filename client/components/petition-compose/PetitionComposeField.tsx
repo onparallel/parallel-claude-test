@@ -898,7 +898,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
         <IconButtonWithTooltip
           className="field-settings-button"
           icon={<SettingsIcon />}
-          isDisabled={field.isFixed}
+          isDisabled={isReadOnly}
           size="sm"
           variant="ghost"
           placement="bottom"

@@ -1960,15 +1960,18 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to turn on/off the comments", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
-            updatePetition(petitionId: $petitionId, data: $data) {
-              id
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              petition {
+                id
+              }
             }
           }
         `,
         variables: {
           petitionId: toGlobalId("Petition", readonlyPetition.id),
-          data: { hasCommentsEnabled: true },
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          data: { options: { hasCommentsEnabled: false } },
         },
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");

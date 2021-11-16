@@ -19,7 +19,6 @@ import {
 } from "@chakra-ui/react";
 import {
   BellSettingsIcon,
-  CommentIcon,
   LinkIcon,
   ListIcon,
   LockClosedIcon,
@@ -354,19 +353,6 @@ function _PetitionSettings({
         </FormControl>
       ) : null}
       <Stack spacing={2}>
-        <SwitchSetting
-          icon={<CommentIcon />}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.petition-comments-enable"
-              defaultMessage="Enable comments"
-            />
-          }
-          controlId="enable-comments"
-          isChecked={petition.hasCommentsEnabled}
-          onChange={async (value) => await onUpdatePetition({ hasCommentsEnabled: value })}
-          isDisabled={isReadOnly}
-        />
         {petition.signatureConfig || hasSignature ? (
           <SwitchSetting
             icon={<SignatureIcon />}
@@ -601,7 +587,6 @@ const fragments = {
     fragment PetitionSettings_PetitionBase on PetitionBase {
       id
       locale
-      hasCommentsEnabled
       skipForwardSecurity
       isRecipientViewContentsHidden
       isReadOnly

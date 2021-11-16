@@ -109,10 +109,6 @@ export const PublicPetition = objectType({
         return (await ctx.contacts.loadContact(contactIds)) as Contact[];
       },
     });
-    t.boolean("hasCommentsEnabled", {
-      description: "Whether comments are enabled or not.",
-      resolve: (o) => o.comments_enabled,
-    });
     t.boolean("isRecipientViewContentsHidden", {
       description: "Whether the contents card is hidden in the recipient view.",
       deprecation: "Don't use this",

@@ -1691,8 +1691,8 @@
   },
   {
     "term": "component.petition-settings.petition-comments-enable",
-    "definition": "Enable comments",
-    "context": "Enable comments"
+    "definition": "Allow comments",
+    "context": "Allow comments"
   },
   {
     "term": "component.petition-settings.petition-signature-configure",

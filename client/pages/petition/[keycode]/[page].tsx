@@ -333,7 +333,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                 {petition.isRecipientViewContentsHidden ? null : (
                   <RecipientViewContentsCard
                     currentPage={currentPage}
-                    hasCommentsEnabled={petition.hasCommentsEnabled}
                     sender={granter}
                     petition={petition}
                     display={{ base: "none", [breakpoint]: "flex" }}
@@ -359,7 +358,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           completedFieldReplies(field).length === 0 &&
                           !field.optional
                         }
-                        hasCommentsEnabled={petition.hasCommentsEnabled}
+                        hasCommentsEnabled={field.options.hasCommentsEnabled}
                       />
                     </motion.div>
                   ))}
@@ -471,7 +470,6 @@ RecipientView.fragments = {
         id
         status
         deadline
-        hasCommentsEnabled
         isRecipientViewContentsHidden
         tone
         fields {

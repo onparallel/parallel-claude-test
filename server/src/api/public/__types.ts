@@ -1396,8 +1396,6 @@ export type Petition = PetitionBase & {
   fields: Array<PetitionField>;
   /** The template GID used for this petition */
   fromTemplateId: Maybe<Scalars["GID"]>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   isReadOnly: Scalars["Boolean"];
@@ -1516,8 +1514,6 @@ export type PetitionBase = {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   isReadOnly: Scalars["Boolean"];
@@ -1944,8 +1940,6 @@ export type PetitionTemplate = PetitionBase & {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
@@ -2092,8 +2086,6 @@ export type PublicPetition = Timestamps & {
   deadline: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /**
@@ -2774,7 +2766,6 @@ export type UpdatePetitionInput = {
   description?: Maybe<Scalars["JSON"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
-  hasCommentsEnabled?: Maybe<Scalars["Boolean"]>;
   isReadOnly?: Maybe<Scalars["Boolean"]>;
   isRecipientViewContentsHidden?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;

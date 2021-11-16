@@ -87,7 +87,8 @@ export const PetitionRepliesField = Object.assign(
       <Stack
         ref={ref as any}
         spacing={1}
-        paddingX={{ base: 4, md: 6 }}
+        paddingLeft={{ base: 4, md: 6 }}
+        paddingRight={4}
         paddingY={2}
         as="section"
         {...props}
@@ -112,6 +113,17 @@ export const PetitionRepliesField = Object.assign(
               </Heading>
             )}
           </Box>
+          {/* This Flex element makes the reviewed buttons to be aligned */}
+          <Flex width="66px">
+            <Spacer />
+            <CommentsButton
+              data-action="see-field-comments"
+              isActive={isShowingComments}
+              commentCount={field.comments.length}
+              hasUnreadComments={field.comments.some((c) => c.isUnread)}
+              onClick={onToggleComments}
+            />
+          </Flex>
         </Flex>
         {field.description ? (
           <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
@@ -136,7 +148,8 @@ export const PetitionRepliesField = Object.assign(
         flexDirection="column"
         position="relative"
         paddingY={4}
-        paddingX={{ base: 4, md: 6 }}
+        paddingLeft={{ base: 4, md: 6 }}
+        paddingRight={4}
         {...props}
       >
         <Flex flexWrap="wrap" justifyContent="space-between">
@@ -422,6 +435,7 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
     size: "sm",
     variant: isActive ? "solid" : "ghost",
     colorScheme: isActive ? "purple" : "gray",
+    padding: 2,
     ...props,
   } as const;
   return commentCount > 0 ? (
@@ -456,7 +470,7 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
     </Button>
   ) : (
     <IconButton
-      icon={<CommentIcon />}
+      icon={<CommentIcon fontSize="md" />}
       {...common}
       aria-label={intl.formatMessage(
         {

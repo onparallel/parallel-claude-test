@@ -38,10 +38,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     });
   };
   return props.field.type === "HEADING" ? (
-    <RecipientViewPetitionFieldHeading
-      field={props.field}
-      onDownloadAttachment={handleDownloadAttachment}
-    />
+    <RecipientViewPetitionFieldHeading {...props} onDownloadAttachment={handleDownloadAttachment} />
   ) : props.field.type === "TEXT" || props.field.type === "SHORT_TEXT" ? (
     <RecipientViewPetitionFieldText {...props} onDownloadAttachment={handleDownloadAttachment} />
   ) : props.field.type === "SELECT" ? (

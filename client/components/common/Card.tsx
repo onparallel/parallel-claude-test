@@ -67,7 +67,14 @@ export function GenericCardHeader({
 }: GenericCardHeaderProps) {
   return (
     <>
-      <Stack direction="row" as="header" paddingX={4} minHeight="52px" alignItems="center">
+      <Stack
+        direction="row"
+        as="header"
+        paddingX={4}
+        paddingY={3}
+        minHeight="52px"
+        alignItems="center"
+      >
         <Heading flex="1" as={as} size={size} overflowWrap="anywhere">
           {children}
         </Heading>

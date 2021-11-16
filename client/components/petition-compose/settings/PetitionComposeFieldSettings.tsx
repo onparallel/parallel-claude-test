@@ -76,19 +76,41 @@ export function PetitionComposeFieldSettings({
         <FormattedMessage id="petition.field-settings" defaultMessage="Field settings" />
       </CardHeader>
       <Stack spacing={4} padding={4} direction="column">
-        {!field.isFixed && (
-          <Box>
-            <PetitionFieldTypeSelect
-              type={field.type}
-              onChange={(type) => {
-                if (type !== field.type) {
-                  onFieldTypeChange(field.id, type);
-                }
-              }}
-              isDisabled={isReadOnly}
+        <Box>
+          <PetitionFieldTypeSelect
+            type={field.type}
+            onChange={(type) => {
+              if (type !== field.type) {
+                onFieldTypeChange(field.id, type);
+              }
+            }}
+            isDisabled={isReadOnly || field.isFixed}
+          />
+        </Box>
+        <SettingsRow
+          isDisabled={isReadOnly}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.petition-comments-enable"
+              defaultMessage="Allow comments"
             />
-          </Box>
-        )}
+          }
+          controlId="enable-comments"
+        >
+          <Switch
+            height="20px"
+            display="block"
+            id="enable-comments"
+            color="green"
+            isChecked={field.options.hasCommentsEnabled}
+            onChange={(event) =>
+              onFieldEdit(field.id, {
+                options: { ...field.options, hasCommentsEnabled: event.target.checked },
+              })
+            }
+            isDisabled={isReadOnly}
+          />
+        </SettingsRow>
 
         {!field.isReadOnly && field.type !== "CHECKBOX" && (
           <SettingsRow

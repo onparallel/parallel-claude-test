@@ -477,12 +477,7 @@ export const updatePetition = mutationField("updatePetition", {
     userHasAccessToPetitions("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     ifSomeDefined(
-      (args) => [
-        args.data.name,
-        args.data.locale,
-        args.data.hasCommentsEnabled,
-        args.data.description,
-      ],
+      (args) => [args.data.name, args.data.locale, args.data.description],
       petitionsAreEditable("petitionId")
     ),
     ifSomeDefined(
@@ -504,7 +499,6 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.field("remindersConfig", {
             type: "RemindersConfigInput",
           });
-          t.nullable.boolean("hasCommentsEnabled");
           t.nullable.boolean("skipForwardSecurity");
           t.nullable.boolean("isRecipientViewContentsHidden");
           t.nullable.field("signatureConfig", { type: "SignatureConfigInput" });
@@ -532,7 +526,6 @@ export const updatePetition = mutationField("updatePetition", {
       emailSubject,
       emailBody,
       remindersConfig,
-      hasCommentsEnabled,
       skipForwardSecurity,
       isRecipientViewContentsHidden,
       signatureConfig,
@@ -563,9 +556,6 @@ export const updatePetition = mutationField("updatePetition", {
         data.reminders_config = remindersConfig;
         data.reminders_active = true;
       }
-    }
-    if (isDefined(hasCommentsEnabled)) {
-      data.comments_enabled = hasCommentsEnabled;
     }
     if (isDefined(skipForwardSecurity)) {
       data.skip_forward_security = skipForwardSecurity;

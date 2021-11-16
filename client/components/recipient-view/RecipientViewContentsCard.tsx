@@ -18,14 +18,12 @@ import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
 interface RecipientViewContentsCardProps extends CardProps {
   currentPage: number;
-  hasCommentsEnabled: boolean;
   sender: RecipientViewContentsCard_PublicUserFragment;
   petition: RecipientViewContentsCard_PublicPetitionFragment;
 }
 
 export function RecipientViewContentsCard({
   currentPage,
-  hasCommentsEnabled,
   sender,
   petition,
   ...props
