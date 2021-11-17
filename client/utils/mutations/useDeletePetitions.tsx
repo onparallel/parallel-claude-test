@@ -11,7 +11,6 @@ import {
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { clearCache } from "../apollo/clearCache";
 import { isApolloError } from "../apollo/isApolloError";
 
 export function useDeletePetitions() {
@@ -27,12 +26,7 @@ export function useDeletePetitions() {
       mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {
         deletePetitions(ids: $ids)
       }
-    `,
-    {
-      update(cache) {
-        clearCache(cache, /\$ROOT_QUERY\.petitions\(/);
-      },
-    }
+    `
   );
 
   const { cache } = useApolloClient();
@@ -71,6 +65,14 @@ export function useDeletePetitions() {
         });
         await deletePetitions({
           variables: { ids: petitionIds! },
+          update(client, { data }) {
+            if (data?.deletePetitions === "SUCCESS") {
+              for (const petitionId of petitionIds) {
+                client.evict({ id: petitionId });
+              }
+              client.gc();
+            }
+          },
         });
       } catch (error) {
         if (isApolloError(error)) {
