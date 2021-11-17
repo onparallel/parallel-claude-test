@@ -169,6 +169,11 @@ export default function LawFirms() {
         id: "public.law-firms.title",
         defaultMessage: "Software for law firms",
       })}
+      description={intl.formatMessage({
+        id: "public.law-firms.meta-description",
+        defaultMessage:
+          "With Parallel, automate the most repetitive processes of your firm and accelerate the closing of matters easily, securely and with full legal validity.",
+      })}
     >
       <PublicHero {...hero} />
       <SolutionsTrust logos={logos} />

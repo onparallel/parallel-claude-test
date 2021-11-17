@@ -161,6 +161,11 @@ export default function Accounting() {
         id: "public.accounting.title",
         defaultMessage: "Software for BPO (business process outsourcing) and Accounting",
       })}
+      description={intl.formatMessage({
+        id: "public.accounting.meta-description",
+        defaultMessage:
+          "Request information from your clients effortlessly: just set up the process in Parallel and let the automatic reminders do the following up for you.",
+      })}
     >
       <PublicHero {...hero} />
       <SolutionsTrust logos={logos} />

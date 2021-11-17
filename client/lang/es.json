@@ -5765,6 +5765,11 @@
     "context": "Accelerate processes by automating services with your clients"
   },
   {
+    "term": "public.accounting.meta-description",
+    "definition": "Solicita información a tus clientes sin esfuerzo, solo configura el proceso en Parallel y deja que los recordatorios automáticos hagan el seguimiento por ti.",
+    "context": "Request information from your clients effortlessly: just set up the process in Parallel and let the automatic reminders do the following up for you."
+  },
+  {
     "term": "public.accounting.solutions-title",
     "definition": "Soluciones para gestorías y BPOs",
     "context": "Solutions for BPOs and Accounting"
@@ -6033,6 +6038,11 @@
     "term": "public.consultancy.hero-title",
     "definition": "Agiliza el trabajo con tus clientes",
     "context": "Speed up the work with your clients"
+  },
+  {
+    "term": "public.consultancy.meta-description",
+    "definition": "Trabaja de forma más eficiente con tus clientes gracias a Parallel y a sus plantillas, con las que puedes acelerar las tareas más repetitivas de tu empresa.",
+    "context": "Work more efficiently with your clients thanks to Parallel and its templates, with which you can speed up the most repetitive tasks of your company."
   },
   {
     "term": "public.consultancy.solutions-title",
@@ -6438,6 +6448,11 @@
     "term": "public.law-firms.hero-title",
     "definition": "Aumenta la facturación y el retorno de tu equipo",
     "context": "Increase your team’s billing and return"
+  },
+  {
+    "term": "public.law-firms.meta-description",
+    "definition": "Con Parallel, automatiza los procesos más repetitivos de tu despacho y acelera el cierre de asuntos de forma fácil, segura y con plena validez jurídica.",
+    "context": "With Parallel, automate the most repetitive processes of your firm and accelerate the closing of matters easily, securely and with full legal validity."
   },
   {
     "term": "public.law-firms.solutions-title",

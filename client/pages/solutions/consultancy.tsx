@@ -157,6 +157,11 @@ export default function Consultancy() {
         id: "public.consultancy.title",
         defaultMessage: "Software for consultancy",
       })}
+      description={intl.formatMessage({
+        id: "public.consultancy.meta-description",
+        defaultMessage:
+          "Work more efficiently with your clients thanks to Parallel and its templates, with which you can speed up the most repetitive tasks of your company.",
+      })}
     >
       <PublicHero {...hero} />
       <SolutionsTrust logos={logos} />
