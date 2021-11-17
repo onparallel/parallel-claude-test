@@ -34,7 +34,7 @@ import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
 export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
   user: PetitionSignaturesCard_UserFragment;
-  signatureEnvironment: SignatureOrgIntegrationEnvironment | undefined | null;
+  signatureEnvironment: SignatureOrgIntegrationEnvironment;
   onRefetchPetition: () => void;
 }
 

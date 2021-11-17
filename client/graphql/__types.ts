@@ -1950,7 +1950,7 @@ export interface PetitionSignatureRequest extends Timestamps {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The environment of the petition signature. */
-  environment?: Maybe<SignatureOrgIntegrationEnvironment>;
+  environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
   /** Metadata for this signature request. */
   metadata: Scalars["JSONObject"];

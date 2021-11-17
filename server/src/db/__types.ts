@@ -105,8 +105,6 @@ export type PetitionUserNotificationType =
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED";
 
-export type SignatureEnvironment = "DEMO" | "PRODUCTION";
-
 export type SystemEventType =
   | "EMAIL_OPENED"
   | "EMAIL_VERIFIED"
@@ -815,7 +813,6 @@ export interface PetitionSignatureRequest {
   file_upload_audit_trail_id: Maybe<number>; // int4
   metadata: any; // jsonb
   signer_status: any; // jsonb
-  environment: Maybe<SignatureEnvironment>; // signature_environment
 }
 
 export type CreatePetitionSignatureRequest = PartialProps<
@@ -832,7 +829,6 @@ export type CreatePetitionSignatureRequest = PartialProps<
   | "file_upload_audit_trail_id"
   | "metadata"
   | "signer_status"
-  | "environment"
 >;
 
 export interface PetitionTag {

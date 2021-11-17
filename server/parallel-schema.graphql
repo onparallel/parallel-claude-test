@@ -2540,7 +2540,7 @@ type PetitionSignatureRequest implements Timestamps {
   """
   The environment of the petition signature.
   """
-  environment: SignatureOrgIntegrationEnvironment
+  environment: SignatureOrgIntegrationEnvironment!
   id: GID!
 
   """

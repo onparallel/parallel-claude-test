@@ -8,13 +8,13 @@ import {
 export function usePetitionCurrentSignatureStatusAndEnv(
   petition: usePetitionCurrentSignatureStatusAndEnv_PetitionFragment
 ): {
-  env: SignatureOrgIntegrationEnvironment | undefined | null;
+  env: SignatureOrgIntegrationEnvironment | null;
   status: PetitionSignatureRequestStatus | "START" | null;
 } {
   const env =
-    petition.signatureConfig?.integration?.environment ||
-    petition.currentSignatureRequest?.environment;
-
+    petition.currentSignatureRequest?.environment ??
+    petition.signatureConfig?.integration?.environment ??
+    null;
   const status =
     petition.signatureConfig?.review &&
     ["COMPLETED", "CLOSED"].includes(petition.status) &&

@@ -55,10 +55,15 @@ export const PetitionSignatureRequest = objectType({
       type: "PetitionSignatureRequestStatus",
       description: "The status of the petition signature.",
     });
-    t.nullable.field("environment", {
+    t.field("environment", {
       type: "SignatureOrgIntegrationEnvironment",
       description: "The environment of the petition signature.",
-      resolve: (o) => o.environment,
+      resolve: async (root, _, ctx) => {
+        const integration = (await ctx.integrations.loadIntegration(
+          root.signature_config.orgIntegrationId
+        ))!;
+        return integration.settings.ENVIRONMENT === "production" ? "PRODUCTION" : "DEMO";
+      },
     });
     t.nonNull.list.nonNull.field("signerStatus", {
       type: "PetitionSignatureRequestSignerStatus",

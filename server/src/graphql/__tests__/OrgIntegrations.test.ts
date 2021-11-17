@@ -1,11 +1,9 @@
 import { gql } from "@apollo/client";
 import { addDays } from "date-fns";
-import knex, { Knex } from "knex";
-import { countBy, omit } from "remeda";
+import { Knex } from "knex";
+import { omit } from "remeda";
 import { USER_COGNITO_ID } from "../../../test/mocks";
-
 import { KNEX } from "../../db/knex";
-import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
@@ -55,8 +53,9 @@ describe("GraphQL/OrgIntegrations", () => {
     integrations = await mocks.createOrgIntegration([
       {
         org_id: organization.id,
+        name: "SCIM user provisioning",
         type: "USER_PROVISIONING",
-        provider: "COGNITO",
+        provider: "SCIM",
         settings: {
           AUTH_KEY: "<AUTH_KEY>",
         },
@@ -65,6 +64,7 @@ describe("GraphQL/OrgIntegrations", () => {
       },
       {
         org_id: organization.id,
+        name: "Signaturit",
         type: "SIGNATURE",
         provider: "SIGNATURIT",
         settings: {
@@ -76,6 +76,7 @@ describe("GraphQL/OrgIntegrations", () => {
       },
       {
         org_id: organization.id,
+        name: "Signaturit 2",
         type: "SIGNATURE",
         provider: "SIGNATURIT",
         settings: {
@@ -83,7 +84,6 @@ describe("GraphQL/OrgIntegrations", () => {
         },
         created_at: addDays(new Date(), 1),
         is_enabled: false,
-        name: "Signaturit 2",
       },
     ]);
 
@@ -125,8 +125,10 @@ describe("GraphQL/OrgIntegrations", () => {
                   id
                   name
                   type
-                  provider
                   isDefault
+                  ... on SignatureOrgIntegration {
+                    provider
+                  }
                 }
               }
             }
@@ -148,9 +150,8 @@ describe("GraphQL/OrgIntegrations", () => {
         },
         {
           id: toGlobalId("OrgIntegration", integrations[0].id),
-          name: "Cognito",
+          name: "SCIM user provisioning",
           type: "USER_PROVISIONING",
-          provider: "COGNITO",
           isDefault: false,
         },
       ],
@@ -166,7 +167,7 @@ describe("GraphQL/OrgIntegrations", () => {
             isDefault
             provider
             type
-            status
+            environment
           }
         }
       `,
@@ -183,7 +184,7 @@ describe("GraphQL/OrgIntegrations", () => {
       isDefault: false,
       provider: "SIGNATURIT",
       type: "SIGNATURE",
-      status: "DEMO",
+      environment: "DEMO",
     });
   });
 
@@ -207,7 +208,7 @@ describe("GraphQL/OrgIntegrations", () => {
             isDefault
             provider
             type
-            status
+            environment
           }
         }
       `,
@@ -225,7 +226,7 @@ describe("GraphQL/OrgIntegrations", () => {
       isDefault: true,
       provider: "SIGNATURIT",
       type: "SIGNATURE",
-      status: "DEMO",
+      environment: "DEMO",
     });
 
     // also check that the other signature integrations is_default is set to false

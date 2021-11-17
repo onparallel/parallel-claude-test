@@ -154,24 +154,31 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
 });
 
 async function checkSignaturitApiKey(apiKey: string, ctx: ApiContext) {
-  const [sandboxTest, productionTest] = await Promise.all([
-    ctx.fetch.fetchWithTimeout(
-      "https://api.sandbox.signaturit.com/v3/team/users.json",
-      { headers: { authorization: `Bearer ${apiKey}` } },
-      5000
-    ),
-    ctx.fetch.fetchWithTimeout(
-      "https://api.signaturit.com/v3/team/users.json",
-      { headers: { authorization: `Bearer ${apiKey}` } },
-      5000
-    ),
-  ]);
-
-  if (sandboxTest.status !== 200 && productionTest.status !== 200) {
+  try {
+    return await Promise.any(
+      Object.entries({
+        sandbox: "https://api.sandbox.signaturit.com",
+        production: "https://api.signaturit.com",
+      }).map(([environment, url]) =>
+        ctx.fetch
+          .fetchWithTimeout(
+            `${url}/v3/team/users.json`,
+            { headers: { authorization: `Bearer ${apiKey}` } },
+            5000
+          )
+          .then((res) => {
+            if (res.status === 200) {
+              return environment as "sandbox" | "production";
+            } else {
+              throw new Error();
+            }
+          })
+      )
+    );
+  } catch {
     throw new WhitelistedError(
       `Unable to check Signaturit APIKEY environment`,
       "INVALID_APIKEY_ERROR"
     );
   }
-  return sandboxTest.status === 200 ? "sandbox" : "production";
 }
