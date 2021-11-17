@@ -27,19 +27,20 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
           {field.replies.map((reply) =>
             field.type === "FILE_UPLOAD" ? (
               <Text key={reply.id}>
-                <FormattedMessage
-                  key={reply.id}
-                  id="petition-signature.file-submitted.pending-review"
-                  defaultMessage="{filename} - {size} (Pending review)"
-                  values={{
-                    filename: reply.content.filename,
-                    size: (
-                      <Text as="span" fontStyle="italic">
-                        <FileSize value={reply.content.size} />
-                      </Text>
-                    ),
-                  }}
-                />
+                {reply.content.filename}
+                <Text as="span"> - </Text>
+                <Text as="span" fontStyle="italic">
+                  <FileSize value={reply.content.size} />
+                </Text>
+                {reply.status === "APPROVED" ? null : (
+                  <Text as="span">
+                    {" "}
+                    <FormattedMessage
+                      id="petition-signature.file-submitted.pending-review"
+                      defaultMessage="(Pending review)"
+                    />
+                  </Text>
+                )}
               </Text>
             ) : field.type === "DYNAMIC_SELECT" ? (
               <Stack spacing={0} key={reply.id}>

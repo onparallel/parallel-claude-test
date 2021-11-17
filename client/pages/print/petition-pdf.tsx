@@ -135,6 +135,7 @@ PetitionPdf.fragments = {
         validated
         replies {
           id
+          status
           content
         }
         ...useFieldVisibility_PetitionField

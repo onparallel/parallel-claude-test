@@ -12572,7 +12572,10 @@ export type PetitionPdf_PetitionFragment = { __typename?: "Petition" } & Pick<
         "id" | "type" | "title" | "options" | "description" | "validated" | "visibility"
       > & {
           replies: Array<
-            { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+            { __typename?: "PetitionFieldReply" } & Pick<
+              PetitionFieldReply,
+              "id" | "status" | "content"
+            >
           >;
         }
     >;
@@ -12593,7 +12596,7 @@ export type PetitionPdf_PetitionFieldFragment = { __typename?: "PetitionField" }
   "id" | "type" | "title" | "options" | "description" | "validated" | "visibility"
 > & {
     replies: Array<
-      { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+      { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "status" | "content">
     >;
   };
 
@@ -12610,7 +12613,10 @@ export type PdfViewPetitionQuery = {
             "id" | "type" | "title" | "options" | "description" | "validated" | "visibility"
           > & {
               replies: Array<
-                { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id" | "content">
+                { __typename?: "PetitionFieldReply" } & Pick<
+                  PetitionFieldReply,
+                  "id" | "status" | "content"
+                >
               >;
             }
         >;
@@ -15817,6 +15823,7 @@ export const PetitionPdf_PetitionFieldFragmentDoc = gql`
     validated
     replies {
       id
+      status
       content
     }
     ...useFieldVisibility_PetitionField

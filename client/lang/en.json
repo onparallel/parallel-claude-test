@@ -4951,8 +4951,8 @@
   },
   {
     "term": "petition-signature.file-submitted.pending-review",
-    "definition": "{filename} - {size} (Pending review)",
-    "context": "{filename} - {size} (Pending review)"
+    "definition": "(Pending review)",
+    "context": "(Pending review)"
   },
   {
     "term": "petition-signature.no-reply-submitted",
