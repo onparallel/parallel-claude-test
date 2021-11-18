@@ -15,7 +15,7 @@ export async function seed(knex: Knex): Promise<any> {
   const orgs: CreateOrganization[] = [
     {
       name: "Parallel",
-      status: "DEV",
+      status: "ROOT",
       usage_details: {
         USER_LIMIT: 100,
         PETITION_SEND: {
