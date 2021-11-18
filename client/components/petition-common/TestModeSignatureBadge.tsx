@@ -27,7 +27,7 @@ export function TestModeSignatureBadge({
   return (
     <SmallPopover content={<Text fontSize="sm">{popoverText}</Text>}>
       <Badge colorScheme="yellow" textTransform="uppercase">
-        <FormattedMessage id="generic.test-env" defaultMessage="Test" />
+        <FormattedMessage id="generic.signature-demo-environment" defaultMessage="Test" />
       </Badge>
     </SmallPopover>
   );

@@ -65,14 +65,19 @@
     "context": "Recipients"
   },
   {
+    "term": "component.add-signature-api-key-dialog.title",
+    "definition": "Enter your API Key",
+    "context": "Enter your API Key"
+  },
+  {
+    "term": "component.add-signature-apikey-dialog.api-key-label",
+    "definition": "API Key",
+    "context": "API Key"
+  },
+  {
     "term": "component.add-signature-apikey-dialog.apikey-help",
     "definition": "This key is provided by Signaturit and is required to perform the integration",
     "context": "This key is provided by Signaturit and is required to perform the integration"
-  },
-  {
-    "term": "component.add-signature-apikey-dialog.apikey-label",
-    "definition": "API Key",
-    "context": "API Key"
   },
   {
     "term": "component.add-signature-apikey-dialog.apikey-required-error",
@@ -86,23 +91,13 @@
   },
   {
     "term": "component.add-signature-apikey-dialog.help",
-    "definition": "If you need help to find your key you can find more information <a>here</a>.",
-    "context": "If you need help to find your key you can find more information <a>here</a>."
+    "definition": "If you need help to get your key you can find more information <a>here</a>.",
+    "context": "If you need help to get your key you can find more information <a>here</a>."
   },
   {
     "term": "component.add-signature-apikey-dialog.name-help",
     "definition": "You will not be able to change this value after it is created.",
     "context": "You will not be able to change this value after it is created."
-  },
-  {
-    "term": "component.add-signature-apikey-dialog.name-required-error",
-    "definition": "Name is required",
-    "context": "Name is required"
-  },
-  {
-    "term": "component.add-signature-apikey-dialog.title",
-    "definition": "Enter your API Key",
-    "context": "Enter your API Key"
   },
   {
     "term": "component.app-layout.new-version-available",
@@ -2780,16 +2775,6 @@
     "context": "Delete token"
   },
   {
-    "term": "component.signature-tokens-table.environment",
-    "definition": "Environment",
-    "context": "Environment"
-  },
-  {
-    "term": "component.signature-tokens-table.provider",
-    "definition": "Provider",
-    "context": "Provider"
-  },
-  {
     "term": "component.signature-tokens-table.set-as-default",
     "definition": "Set as default",
     "context": "Set as default"
@@ -3915,6 +3900,16 @@
     "context": "This user is inactive"
   },
   {
+    "term": "generic.integration-name",
+    "definition": "Name",
+    "context": "Name"
+  },
+  {
+    "term": "generic.integration-provider",
+    "definition": "Provider",
+    "context": "Provider"
+  },
+  {
     "term": "generic.last-active-at",
     "definition": "Last active at",
     "context": "Last active at"
@@ -4065,11 +4060,6 @@
     "context": "Previous page"
   },
   {
-    "term": "generic.production-env",
-    "definition": "Production",
-    "context": "Production"
-  },
-  {
     "term": "generic.reload-data",
     "definition": "Reload",
     "context": "Reload"
@@ -4130,6 +4120,21 @@
     "context": "Show {more, select, true {more} other {less}}"
   },
   {
+    "term": "generic.signature-demo-environment",
+    "definition": "Test",
+    "context": "Test"
+  },
+  {
+    "term": "generic.signature-environment",
+    "definition": "Environment",
+    "context": "Environment"
+  },
+  {
+    "term": "generic.signature-production-environment",
+    "definition": "Production",
+    "context": "Production"
+  },
+  {
     "term": "generic.something-went-wrong",
     "definition": "Something went wrong",
     "context": "Something went wrong"
@@ -4166,11 +4171,6 @@
   },
   {
     "term": "generic.test",
-    "definition": "Test",
-    "context": "Test"
-  },
-  {
-    "term": "generic.test-env",
     "definition": "Test",
     "context": "Test"
   },

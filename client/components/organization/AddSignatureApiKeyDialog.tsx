@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/button";
 import { Checkbox } from "@chakra-ui/checkbox";
-import { FormControl, FormLabel, FormErrorMessage } from "@chakra-ui/form-control";
+import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { HStack, Stack, Text } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
@@ -8,25 +8,26 @@ import { SignatureOrgIntegrationProvider } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { NormalLink } from "../common/Link";
 
-interface AddSignatureAPIKeyDialogData {
+interface AddSignatureApiKeyDialogData {
   name: string;
   provider: SignatureOrgIntegrationProvider;
   apiKey: string;
   isDefault: boolean;
 }
 
-function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIKeyDialogData>) {
+function AddSignatureApiKeyDialog({ ...props }: DialogProps<{}, AddSignatureApiKeyDialogData>) {
+  const intl = useIntl();
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<AddSignatureAPIKeyDialogData>({
+  } = useForm<AddSignatureApiKeyDialogData>({
     defaultValues: {
       name: "Signaturit",
       provider: "SIGNATURIT",
@@ -36,7 +37,7 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
   });
 
   const apikeyRef = useRef<HTMLInputElement>(null);
-  const apikeyRegisterProps = useRegisterWithRef(apikeyRef, register, "apiKey", {
+  const apiKeyInputProps = useRegisterWithRef(apikeyRef, register, "apiKey", {
     required: true,
   });
 
@@ -51,7 +52,7 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
       header={
         <Text>
           <FormattedMessage
-            id="component.add-signature-apikey-dialog.title"
+            id="component.add-signature-api-key-dialog.title"
             defaultMessage="Enter your API Key"
           />
         </Text>
@@ -59,29 +60,27 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
       body={
         <Stack spacing={4}>
           <FormControl id="provider">
-            <FormLabel>Proveedor de firma</FormLabel>
+            <FormLabel>
+              <FormattedMessage id="generic.integration-provider" defaultMessage="Provider" />
+            </FormLabel>
             <Select variant="outline" placeholder="Signaturit" isDisabled={true} />
           </FormControl>
           <FormControl id="name" isInvalid={!!errors.name}>
             <FormLabel>
-              <FormattedMessage id="generic.name" defaultMessage="Name" />
+              <FormattedMessage id="generic.integration-name" defaultMessage="Name" />
             </FormLabel>
             <Stack>
-              <Input
-                {...register("name", {
-                  required: true,
-                })}
-              />
+              <Input {...register("name", { required: true })} />
               <FormErrorMessage>
                 <FormattedMessage
-                  id="component.add-signature-apikey-dialog.name-required-error"
-                  defaultMessage="Name is required"
+                  id="generic.required-field-error"
+                  defaultMessage="The field is required"
                 />
               </FormErrorMessage>
               <Text fontSize="sm">
                 <FormattedMessage
                   id="component.add-signature-apikey-dialog.name-help"
-                  defaultMessage=" You will not be able to change this value after it is created."
+                  defaultMessage="You will not be able to change this value after it is created."
                 />
               </Text>
             </Stack>
@@ -90,7 +89,7 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
             <FormLabel>
               <HStack alignContent="center">
                 <FormattedMessage
-                  id="component.add-signature-apikey-dialog.apikey-label"
+                  id="component.add-signature-apikey-dialog.api-key-label"
                   defaultMessage="API Key"
                 />
                 <HelpPopover>
@@ -104,7 +103,7 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
               </HStack>
             </FormLabel>
             <Stack>
-              <Input {...apikeyRegisterProps} />
+              <Input {...apiKeyInputProps} />
               <FormErrorMessage>
                 <FormattedMessage
                   id="component.add-signature-apikey-dialog.apikey-required-error"
@@ -114,12 +113,16 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
               <Text fontSize="sm">
                 <FormattedMessage
                   id="component.add-signature-apikey-dialog.help"
-                  defaultMessage="If you need help to find your key you can find more information <a>here</a>."
+                  defaultMessage="If you need help to get your key you can find more information <a>here</a>."
                   values={{
                     a: (chunks: any) => (
                       <NormalLink
-                        target="_blank"
-                        href="https://help.signaturit.com/hc/es/articles/360000259318-Acceso-API-consigue-tu-token"
+                        isExternal
+                        href={
+                          intl.locale === "en"
+                            ? "https://help.signaturit.com/hc/en-us/articles/360000259318-API-Access-get-your-token"
+                            : "https://help.signaturit.com/hc/es/articles/360000259318-Acceso-API-consigue-tu-token"
+                        }
                       >
                         {chunks}
                       </NormalLink>
@@ -148,6 +151,6 @@ function AddSignatureAPIKeyDialog({ ...props }: DialogProps<{}, AddSignatureAPIK
   );
 }
 
-export function useAddSignatureAPIKeyDialog() {
-  return useDialog(AddSignatureAPIKeyDialog);
+export function useAddSignatureApiKeyDialog() {
+  return useDialog(AddSignatureApiKeyDialog);
 }

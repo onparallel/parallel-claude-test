@@ -1,4 +1,3 @@
-import { ApolloQueryResult } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -9,6 +8,7 @@ import {
   Heading,
   HStack,
   IconButton,
+  Image,
   Spacer,
   Stack,
   Text,
@@ -23,18 +23,19 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useAddSignatureAPIKeyDialog } from "@parallel/components/organization/AddSignatureAPIKeyDialog";
+import { useAddSignatureApiKeyDialog } from "@parallel/components/organization/AddSignatureApiKeyDialog";
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/DeleteSignatureErrorConfirmationDialog";
 import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/DeleteSignatureTokenDialog";
 import {
-  Exact,
   IntegrationsSignatureQuery,
+  IntegrationsSignature_SignatureOrgIntegrationFragment,
   useIntegrationsSignatureQuery,
   useIntegrationsSignature_createSignatureIntegrationMutation,
   useIntegrationsSignature_deleteSignatureIntegrationMutation,
   useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { integer, parseQuery, useQueryState, values } from "@parallel/utils/queryState";
@@ -48,6 +49,13 @@ const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
 };
+
+interface SignatureTokensTableContext {
+  hasSignature: boolean;
+  numberOfIntegrations: number;
+  onDeleteIntegration: (id: string) => void;
+  onMarkIntegrationAsDefault: (id: string) => void;
+}
 
 function IntegrationsSignature() {
   const intl = useIntl();
@@ -65,22 +73,16 @@ function IntegrationsSignature() {
       },
     })
   );
-
+  const { totalCount: numberOfIntegrations, items: integrations } =
+    me.organization.signatureIntegrations;
+  assertTypenameArray(integrations, "SignatureOrgIntegration");
   const sections = useOrganizationSections(me);
-
-  const columns = useSignatureTokensTableColumns({
-    refetch,
-    hasSignature: me.hasPetitionSignature,
-    numberOfTokens: me.organization.signatureIntegrations.totalCount,
-  });
-
-  const addSignaturitAPIKey = useAddSignatureAPIKeyDialog();
-
-  const [createSignatureIntegration] =
-    useIntegrationsSignature_createSignatureIntegrationMutation();
+  const columns = useSignatureTokensTableColumns();
 
   const genericErrorToast = useGenericErrorToast();
-
+  const addSignaturitAPIKey = useAddSignatureApiKeyDialog();
+  const [createSignatureIntegration] =
+    useIntegrationsSignature_createSignatureIntegrationMutation();
   const handleAddSignatureToken = async () => {
     try {
       const data = await addSignaturitAPIKey({});
@@ -113,6 +115,47 @@ function IntegrationsSignature() {
     }
   };
 
+  const removeSignatureToken = useDeleteSignatureTokenDialog();
+  const confirmRemoveSignatureToken = useDeleteSignatureErrorConfirmationDialog();
+  const [deleteSignatureIntegration] =
+    useIntegrationsSignature_deleteSignatureIntegrationMutation();
+  const handleDeleteIntegration = async (id: string) => {
+    if (numberOfIntegrations < 2) return;
+    try {
+      await removeSignatureToken({});
+      await deleteSignatureIntegration({ variables: { id } });
+    } catch (error) {
+      if (
+        isApolloError(error) &&
+        error.graphQLErrors[0]?.extensions?.code === "SIGNATURE_INTEGRATION_IN_USE_ERROR"
+      ) {
+        try {
+          await confirmRemoveSignatureToken({
+            pendingSignaturesCount: error.graphQLErrors[0]?.extensions?.pendingSignaturesCount,
+          });
+          await deleteSignatureIntegration({ variables: { id, force: true } });
+        } catch {}
+      }
+    }
+    refetch();
+  };
+
+  const [markIntegrationAsDefault] =
+    useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation();
+  const handleMarkIntegrationAsDefault = async (id: string) => {
+    try {
+      await markIntegrationAsDefault({ variables: { id } });
+      refetch();
+    } catch (error) {}
+  };
+
+  const context = {
+    hasSignature: me.hasPetitionSignature,
+    numberOfIntegrations,
+    onDeleteIntegration: handleDeleteIntegration,
+    onMarkIntegrationAsDefault: handleMarkIntegrationAsDefault,
+  } as SignatureTokensTableContext;
+
   return (
     <SettingsLayout
       title={intl.formatMessage({
@@ -141,7 +184,8 @@ function IntegrationsSignature() {
           minHeight={0}
           isHighlightable
           columns={columns}
-          rows={me.organization.signatureIntegrations.items}
+          rows={integrations}
+          context={context}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
@@ -213,199 +257,144 @@ function IntegrationsSignature() {
   );
 }
 
-function useSignatureTokensTableColumns({
-  refetch,
-  hasSignature,
-  numberOfTokens,
-}: {
-  refetch: (
-    variables?:
-      | Partial<
-          Exact<{
-            limit: number;
-          }>
-        >
-      | undefined
-  ) => Promise<ApolloQueryResult<IntegrationsSignatureQuery>>;
-  hasSignature: boolean;
-  numberOfTokens: number;
-}): TableColumn<any>[] {
+function useSignatureTokensTableColumns() {
   const intl = useIntl();
-
-  const removeSignatureToken = useDeleteSignatureTokenDialog();
-  const confirmRemoveSignatureToken = useDeleteSignatureErrorConfirmationDialog();
-
-  const [deleteSignatureIntegration] =
-    useIntegrationsSignature_deleteSignatureIntegrationMutation();
-
-  const handleRemoveToken = async (id: string) => {
-    if (numberOfTokens < 2) return;
-    try {
-      await removeSignatureToken({});
-
-      await deleteSignatureIntegration({
-        variables: {
-          id,
-        },
-      });
-    } catch (error) {
-      if (
-        isApolloError(error) &&
-        error.graphQLErrors[0]?.extensions?.code === "SIGNATURE_INTEGRATION_IN_USE_ERROR"
-      ) {
-        try {
-          await confirmRemoveSignatureToken({
-            pendingSignaturesCount: error.graphQLErrors[0]?.extensions?.pendingSignaturesCount,
-          });
-          await deleteSignatureIntegration({
-            variables: {
-              id,
-              force: true,
-            },
-          });
-        } catch {}
-      }
-    }
-    refetch();
-  };
-
-  const [markIntegrationAsDefault] =
-    useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation();
-
-  const handleMarkAsDefault = async (id: string) => {
-    try {
-      await markIntegrationAsDefault({
-        variables: {
-          id,
-        },
-      });
-      refetch();
-    } catch (error) {}
-  };
-
-  function capitalize(text: string) {
-    return text.charAt(0).toUpperCase().concat(text.slice(1).toLowerCase());
-  }
-
   return useMemo(
-    () => [
-      {
-        key: "name",
-        header: intl.formatMessage({
-          id: "generic.name",
-          defaultMessage: "Name",
-        }),
-        CellContent: ({ row }) => {
-          return (
-            <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
-              {row.name}
-            </Text>
-          );
+    () =>
+      [
+        {
+          key: "name",
+          header: intl.formatMessage({
+            id: "generic.integration-name",
+            defaultMessage: "Name",
+          }),
+          CellContent: ({ row }) => {
+            return (
+              <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
+                {row.name}
+              </Text>
+            );
+          },
         },
-      },
-      {
-        key: "provider",
-        header: intl.formatMessage({
-          id: "component.signature-tokens-table.provider",
-          defaultMessage: "Provider",
-        }),
-        CellContent: ({ row }) => (
-          <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
-            {capitalize(row.provider)}
-          </Text>
-        ),
-      },
-      {
-        key: "status",
-        header: intl.formatMessage({
-          id: "component.signature-tokens-table.environment",
-          defaultMessage: "Environment",
-        }),
-        align: "center",
-        CellContent: ({ row }) =>
-          row.status === "DEMO" ? (
-            <Badge colorScheme="yellow">
-              <FormattedMessage id="generic.test-env" defaultMessage="Test" />
-            </Badge>
-          ) : (
-            <Badge colorScheme="green">
-              <FormattedMessage id="generic.production-env" defaultMessage="Production" />
-            </Badge>
-          ),
-      },
-      {
-        key: "isDefault",
-        header: "",
-        cellProps: {
-          width: "1px",
+        {
+          key: "provider",
+          header: intl.formatMessage({
+            id: "generic.integration-provider",
+            defaultMessage: "Provider",
+          }),
+          CellContent: ({ row }) =>
+            row.provider === "SIGNATURIT" ? (
+              <Image
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
+                alt="Signaturit"
+                maxWidth="80px"
+              />
+            ) : null,
         },
-        align: "center",
-        CellContent: ({ row }) => (
-          <HStack>
-            {row.isDefault ? (
-              <SmallPopover
-                content={intl.formatMessage({
-                  id: "component.signature-tokens-table.default-description",
-                  defaultMessage:
-                    "The default token is the one that will be selected by default when the signature is activated.",
-                })}
-              >
-                <IconButton
-                  variant="ghost"
-                  aria-label={intl.formatMessage({
-                    id: "component.signature-tokens-table.default-token",
-                    defaultMessage: "Default token",
-                  })}
-                  color="purple.600"
-                  fill="purple.600"
-                  _hover={{}}
-                  _active={{}}
-                  icon={<StarIcon />}
-                  size="sm"
-                  fontSize={"16px"}
-                />
-              </SmallPopover>
+        {
+          key: "environment",
+          header: intl.formatMessage({
+            id: "generic.signature-environment",
+            defaultMessage: "Environment",
+          }),
+          align: "center",
+          CellContent: ({ row }) =>
+            row.environment === "DEMO" ? (
+              <Badge colorScheme="yellow">
+                <FormattedMessage id="generic.signature-demo-environment" defaultMessage="Test" />
+              </Badge>
             ) : (
-              <Tooltip
-                label={intl.formatMessage({
-                  id: "component.signature-tokens-table.set-as-default",
-                  defaultMessage: "Set as default",
-                })}
-              >
-                <IconButton
-                  variant="ghost"
-                  aria-label={intl.formatMessage({
+              <Badge colorScheme="green">
+                <FormattedMessage
+                  id="generic.signature-production-environment"
+                  defaultMessage="Production"
+                />
+              </Badge>
+            ),
+        },
+        {
+          key: "actions",
+          header: "",
+          cellProps: {
+            width: "1px",
+          },
+          align: "center",
+          CellContent: ({
+            row,
+            context: {
+              numberOfIntegrations,
+              hasSignature,
+              onMarkIntegrationAsDefault,
+              onDeleteIntegration,
+            },
+          }) => (
+            <HStack>
+              {row.isDefault ? (
+                <SmallPopover
+                  content={intl.formatMessage({
+                    id: "component.signature-tokens-table.default-description",
+                    defaultMessage:
+                      "The default token is the one that will be selected by default when the signature is activated.",
+                  })}
+                >
+                  <IconButton
+                    variant="ghost"
+                    aria-label={intl.formatMessage({
+                      id: "component.signature-tokens-table.default-token",
+                      defaultMessage: "Default token",
+                    })}
+                    color="purple.600"
+                    fill="purple.600"
+                    _hover={{}}
+                    _active={{}}
+                    icon={<StarIcon fontSize="16px" />}
+                    size="sm"
+                  />
+                </SmallPopover>
+              ) : (
+                <Tooltip
+                  label={intl.formatMessage({
                     id: "component.signature-tokens-table.set-as-default",
                     defaultMessage: "Set as default",
                   })}
-                  color="gray.400"
-                  fill="none"
-                  _hover={{ color: "gray.500", fill: "gray.100" }}
-                  icon={<StarIcon />}
-                  size="sm"
-                  fontSize={"16px"}
-                  onClick={() => handleMarkAsDefault(row.id)}
-                  isDisabled={!hasSignature}
-                />
-              </Tooltip>
-            )}
+                >
+                  <IconButton
+                    variant="ghost"
+                    aria-label={intl.formatMessage({
+                      id: "component.signature-tokens-table.set-as-default",
+                      defaultMessage: "Set as default",
+                    })}
+                    color="gray.400"
+                    fill="none"
+                    _hover={{ color: "gray.500", fill: "gray.100" }}
+                    icon={<StarIcon />}
+                    size="sm"
+                    fontSize="16px"
+                    onClick={() => onMarkIntegrationAsDefault(row.id)}
+                    isDisabled={!hasSignature}
+                  />
+                </Tooltip>
+              )}
 
-            <IconButton
-              aria-label={intl.formatMessage({
-                id: "component.signature-tokens-table.delete-token",
-                defaultMessage: "Delete token",
-              })}
-              icon={<DeleteIcon />}
-              size="sm"
-              fontSize={"16px"}
-              onClick={() => handleRemoveToken(row.id)}
-              isDisabled={!hasSignature || numberOfTokens === 1}
-            />
-          </HStack>
-        ),
-      },
-    ],
-    [intl.locale, hasSignature, numberOfTokens]
+              <IconButton
+                aria-label={intl.formatMessage({
+                  id: "component.signature-tokens-table.delete-token",
+                  defaultMessage: "Delete token",
+                })}
+                icon={<DeleteIcon />}
+                size="sm"
+                fontSize={"16px"}
+                onClick={() => onDeleteIntegration(row.id)}
+                isDisabled={!hasSignature || numberOfIntegrations === 1}
+              />
+            </HStack>
+          ),
+        },
+      ] as TableColumn<
+        IntegrationsSignature_SignatureOrgIntegrationFragment,
+        SignatureTokensTableContext
+      >[],
+    [intl.locale]
   );
 }
 

@@ -65,44 +65,39 @@
     "context": "Recipients"
   },
   {
-    "term": "component.add-signature-apikey-dialog.apikey-help",
-    "definition": "Esta clave la proporciona Signaturit y es necesaria para poder realizar la integración",
-    "context": "This key is provided by Signaturit and is required to perform the integration"
+    "term": "component.add-signature-api-key-dialog.title",
+    "definition": "Introduce tu API Key",
+    "context": "Enter your API Key"
   },
   {
-    "term": "component.add-signature-apikey-dialog.apikey-label",
-    "definition": "Clave de la API",
+    "term": "component.add-signature-apikey-dialog.api-key-label",
+    "definition": "",
     "context": "API Key"
   },
   {
+    "term": "component.add-signature-apikey-dialog.apikey-help",
+    "definition": "",
+    "context": "This key is provided by Signaturit and is required to perform the integration"
+  },
+  {
     "term": "component.add-signature-apikey-dialog.apikey-required-error",
-    "definition": "Por favor, introduzca una clave API",
+    "definition": "",
     "context": "Please, enter an API Key"
   },
   {
     "term": "component.add-signature-apikey-dialog.checkbox-set-default",
-    "definition": "Marcar como predeterminado",
+    "definition": "",
     "context": "Set as default"
   },
   {
     "term": "component.add-signature-apikey-dialog.help",
-    "definition": "Si necesitas ayuda para encontrar tu clave puedes encontrar más información <a>aquí</a>.",
-    "context": "If you need help to find your key you can find more information <a>here</a>."
+    "definition": "",
+    "context": "If you need help to get your key you can find more information <a>here</a>."
   },
   {
     "term": "component.add-signature-apikey-dialog.name-help",
-    "definition": "No podrás cambiar este valor despues de crearse.",
+    "definition": "",
     "context": "You will not be able to change this value after it is created."
-  },
-  {
-    "term": "component.add-signature-apikey-dialog.name-required-error",
-    "definition": "El nombre es obligatorio",
-    "context": "Name is required"
-  },
-  {
-    "term": "component.add-signature-apikey-dialog.title",
-    "definition": "Introduce tu API Key",
-    "context": "Enter your API Key"
   },
   {
     "term": "component.app-layout.new-version-available",
@@ -2780,16 +2775,6 @@
     "context": "Delete token"
   },
   {
-    "term": "component.signature-tokens-table.environment",
-    "definition": "Entorno",
-    "context": "Environment"
-  },
-  {
-    "term": "component.signature-tokens-table.provider",
-    "definition": "Proveedor",
-    "context": "Provider"
-  },
-  {
     "term": "component.signature-tokens-table.set-as-default",
     "definition": "Marcar predeterminado",
     "context": "Set as default"
@@ -3915,6 +3900,16 @@
     "context": "This user is inactive"
   },
   {
+    "term": "generic.integration-name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "generic.integration-provider",
+    "definition": "Proveedor",
+    "context": "Provider"
+  },
+  {
     "term": "generic.last-active-at",
     "definition": "Activo por última vez",
     "context": "Last active at"
@@ -4065,11 +4060,6 @@
     "context": "Previous page"
   },
   {
-    "term": "generic.production-env",
-    "definition": "Producción",
-    "context": "Production"
-  },
-  {
     "term": "generic.reload-data",
     "definition": "Refrescar",
     "context": "Reload"
@@ -4130,6 +4120,21 @@
     "context": "Show {more, select, true {more} other {less}}"
   },
   {
+    "term": "generic.signature-demo-environment",
+    "definition": "Demo",
+    "context": "Test"
+  },
+  {
+    "term": "generic.signature-environment",
+    "definition": "Entorno",
+    "context": "Environment"
+  },
+  {
+    "term": "generic.signature-production-environment",
+    "definition": "Producción",
+    "context": "Production"
+  },
+  {
     "term": "generic.something-went-wrong",
     "definition": "Algo ha fallado",
     "context": "Something went wrong"
@@ -4167,11 +4172,6 @@
   {
     "term": "generic.test",
     "definition": "Probar",
-    "context": "Test"
-  },
-  {
-    "term": "generic.test-env",
-    "definition": "Prueba",
     "context": "Test"
   },
   {

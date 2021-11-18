@@ -38,7 +38,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
-          alt="Signaturit logo"
+          alt="Signaturit"
           maxWidth="124px"
         />
       ),
