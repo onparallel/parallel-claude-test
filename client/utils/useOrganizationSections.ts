@@ -22,20 +22,6 @@ export function useOrganizationSections(user: Pick<User, "role">) {
         }),
         path: "/app/organization/groups",
       },
-      {
-        title: intl.formatMessage({
-          id: "organization.usage.title",
-          defaultMessage: "Usage",
-        }),
-        path: "/app/organization/usage",
-      },
-      {
-        title: intl.formatMessage({
-          id: "organization.integrations.title",
-          defaultMessage: "Integrations",
-        }),
-        path: "/app/organization/integrations",
-      },
       ...(userIsAdmin
         ? [
             {
@@ -44,6 +30,20 @@ export function useOrganizationSections(user: Pick<User, "role">) {
                 defaultMessage: "Branding",
               }),
               path: "/app/organization/branding",
+            },
+            {
+              title: intl.formatMessage({
+                id: "organization.usage.title",
+                defaultMessage: "Usage",
+              }),
+              path: "/app/organization/usage",
+            },
+            {
+              title: intl.formatMessage({
+                id: "organization.integrations.title",
+                defaultMessage: "Integrations",
+              }),
+              path: "/app/organization/integrations",
             },
           ]
         : []),

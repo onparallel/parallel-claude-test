@@ -10,10 +10,13 @@ import {
   Text,
   VisuallyHidden,
 } from "@chakra-ui/react";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useOrganizationUsageQuery } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 
@@ -139,4 +142,4 @@ OrganizationUsage.getInitialProps = async ({ fetchQuery }: WithApolloDataContext
   );
 };
 
-export default withApolloData(OrganizationUsage);
+export default compose(withDialogs, withAdminOrganizationRole, withApolloData)(OrganizationUsage);
