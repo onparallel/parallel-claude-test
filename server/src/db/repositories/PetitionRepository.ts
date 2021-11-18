@@ -2937,6 +2937,25 @@ export class PetitionRepository extends BaseRepository {
   }
 
   /**
+   * Update the owner of the petition links owned by one of the given ownerIds
+   */
+  async transferPublicLinkOwnership(
+    ownersIds: number[],
+    toUserId: number,
+    updatedBy: User,
+    t?: Knex.Transaction
+  ) {
+    await this.from("public_petition_link", t)
+      .whereIn("owner_id", ownersIds)
+      .update({
+        updated_by: `User:${updatedBy.id}`,
+        updated_at: this.now(),
+        owner_id: toUserId,
+      })
+      .returning("*");
+  }
+
+  /**
    * sets new OWNER of petitions to @param toUserId.
    * original owner gets a WRITE permission.
    */

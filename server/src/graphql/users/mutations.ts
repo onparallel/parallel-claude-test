@@ -274,6 +274,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
                     t
                   )
                 : undefined,
+              ctx.petitions.transferPublicLinkOwnership([userId], transferToUserId!, ctx.user!, t),
             ]);
             return user;
           },
