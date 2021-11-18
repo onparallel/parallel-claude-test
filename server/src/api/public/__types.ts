@@ -248,6 +248,7 @@ export type LandingTemplate = {
   organizationName: Scalars["String"];
   ownerAvatarUrl: Maybe<Scalars["String"]>;
   ownerFullName: Scalars["String"];
+  publicLink: Maybe<PublicPetitionLink>;
   shortDescription: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];

@@ -324,6 +324,7 @@ type LandingTemplate {
   organizationName: String!
   ownerAvatarUrl: String
   ownerFullName: String!
+  publicLinkUrl: String
   shortDescription: String
   slug: String!
   updatedAt: DateTime!

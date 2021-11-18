@@ -14,7 +14,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { Link } from "@parallel/components/common/Link";
+import { Link, NakedLink } from "@parallel/components/common/Link";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
@@ -79,6 +79,7 @@ function LandingTemplateDetails({
   );
 
   const indices = useFieldIndices(filteredFields);
+
   return (
     <PublicLayout
       title={name as string}
@@ -138,6 +139,23 @@ function LandingTemplateDetails({
                     }}
                   />
                 </Text>
+                <HStack paddingTop={4}>
+                  <NakedLink href="/signup">
+                    <Button as="a" colorScheme="purple">
+                      <FormattedMessage
+                        id="public.try-for-free-button"
+                        defaultMessage="Try for free"
+                      />
+                    </Button>
+                  </NakedLink>
+                  {template.publicLinkUrl ? (
+                    <NakedLink href={template.publicLinkUrl}>
+                      <Button as="a" variant="outline" target="_blank">
+                        <FormattedMessage id="public.preview-button" defaultMessage="Preview" />
+                      </Button>
+                    </NakedLink>
+                  ) : null}
+                </HStack>
                 <Spacer />
                 <HStack spacing={2}>
                   <UserAvatar showImage boxSize="40px" user={owner} />
@@ -340,6 +358,7 @@ LandingTemplateDetails.fragments = {
       descriptionHtml
       shortDescription
       updatedAt
+      publicLinkUrl
       fields {
         id
         type

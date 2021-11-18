@@ -792,6 +792,7 @@ export interface NexusGenFieldTypes {
     organizationName: string; // String!
     ownerAvatarUrl: string | null; // String
     ownerFullName: string; // String!
+    publicLinkUrl: string | null; // String
     shortDescription: string | null; // String
     slug: string; // String!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1999,6 +2000,7 @@ export interface NexusGenFieldTypeNames {
     organizationName: "String";
     ownerAvatarUrl: "String";
     ownerFullName: "String";
+    publicLinkUrl: "String";
     shortDescription: "String";
     slug: "String";
     updatedAt: "DateTime";

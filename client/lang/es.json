@@ -7020,6 +7020,11 @@
     "context": "Powered by AWS Cloud Computing"
   },
   {
+    "term": "public.preview-button",
+    "definition": "Previsualizar",
+    "context": "Preview"
+  },
+  {
     "term": "public.pricing-link",
     "definition": "Precios",
     "context": "Pricing"

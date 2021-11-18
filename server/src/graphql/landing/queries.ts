@@ -90,6 +90,15 @@ export const LandingTemplate = objectType({
         return await ctx.petitions.loadFieldsForPetition(o.id);
       },
     });
+    t.nullable.string("publicLinkUrl", {
+      resolve: async (root, _, ctx) => {
+        // for now we just expose only the first created
+        const [link] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id);
+        return link?.is_active
+          ? `${ctx.config.misc.parallelUrl}/${root.locale}/pp/${link.slug}`
+          : null;
+      },
+    });
   },
 });
 

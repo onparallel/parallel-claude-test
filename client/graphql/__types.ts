@@ -274,6 +274,7 @@ export interface LandingTemplate {
   organizationName: Scalars["String"];
   ownerAvatarUrl?: Maybe<Scalars["String"]>;
   ownerFullName: Scalars["String"];
+  publicLinkUrl?: Maybe<Scalars["String"]>;
   shortDescription?: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];
@@ -13131,6 +13132,7 @@ export type LandingTemplateDetails_LandingTemplateFragment = {
   | "descriptionHtml"
   | "shortDescription"
   | "updatedAt"
+  | "publicLinkUrl"
 > & {
     fields: Array<
       { __typename?: "LandingTemplateField" } & Pick<LandingTemplateField, "id" | "type" | "title">
@@ -13160,6 +13162,7 @@ export type LandingTemplateDetails_landingTemplateBySlugQuery = {
       | "descriptionHtml"
       | "shortDescription"
       | "updatedAt"
+      | "publicLinkUrl"
     > & {
         fields: Array<
           { __typename?: "LandingTemplateField" } & Pick<
@@ -16414,6 +16417,7 @@ export const LandingTemplateDetails_LandingTemplateFragmentDoc = gql`
     descriptionHtml
     shortDescription
     updatedAt
+    publicLinkUrl
     fields {
       id
       type
