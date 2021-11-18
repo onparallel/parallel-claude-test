@@ -1,18 +1,1 @@
-<svg width="56" height="48" viewBox="0 0 56 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0)">
-<rect opacity="0.4" width="52.7787" height="34.2793" rx="5" transform="matrix(0.999773 -0.102905 0.0983729 0.986376 0 14.1877)" fill="url(#paint0_linear)"/>
-<path d="M41 15C34.5 30.5 13 29.5 13 29.5V35H41V15Z" fill="white"/>
-<path d="M13 9C13 13.2615 13 28.0857 13 33.5002C13 34.6048 13.8946 35.5 14.9992 35.5C20.4511 35.5 35.5027 35.5 40.5 35.5" stroke="#1A202C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M16 29.5C16 29.5 37 31 40 12" stroke="#1A202C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M44.2189 15.7157L41.2238 9.93725L35 11.8412" stroke="#1A202C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-</g>
-<defs>
-<linearGradient id="paint0_linear" x1="0.366519" y1="10.0251" x2="54.6662" y2="16.1738" gradientUnits="userSpaceOnUse">
-<stop stop-color="#938EFF"/>
-<stop offset="1" stop-color="#B0ACFB"/>
-</linearGradient>
-<clipPath id="clip0">
-<rect width="56" height="48" fill="white"/>
-</clipPath>
-</defs>
-</svg>
+<svg fill="none" height="48" viewBox="0 0 56 48" width="56" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="a" gradientUnits="userSpaceOnUse" x1=".366519" x2="54.6662" y1="10.0251" y2="16.1738"><stop offset="0" stop-color="#938eff"/><stop offset="1" stop-color="#b0acfb"/></linearGradient><clipPath id="b"><path d="m0 0h56v48h-56z"/></clipPath><g clip-path="url(#b)"><rect fill="url(#a)" height="34.2793" opacity=".4" rx="5" transform="matrix(.999773 -.102905 .0983729 .986376 0 14.1877)" width="52.7787"/><path d="m41 15c-6.5 15.5-28 14.5-28 14.5v5.5h28z" fill="#fff"/><g stroke="#1a202c" stroke-linecap="round" stroke-linejoin="round"><path d="m13 9v24.5002c0 1.1046.8946 1.9998 1.9992 1.9998h25.5008" stroke-width="2"/><path d="m16 29.5s21 1.5 24-17.5" stroke-width="3"/><path d="m44.2189 15.7157-2.9951-5.77845-6.2238 1.90395" stroke-width="3"/></g></g></svg>

@@ -1,16 +1,1 @@
-<svg width="56" height="48" viewBox="0 0 56 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0)">
-<rect opacity="0.4" width="52.6406" height="34.2784" rx="5" transform="matrix(0.999773 -0.102905 0.0983729 0.986376 0 14.1878)" fill="url(#paint0_linear)"/>
-<path d="M20.333 4.1659C17.055 0.835785 12.1381 5.83096 15.416 9.16108L30.9864 24.9791L37.5424 26.6442L35.9034 19.984L20.333 4.1659Z" fill="#FAFDFF" stroke="#1A202C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M11.3203 36.6346C13.2296 35.6647 20.1206 29.0101 19.8579 25.0926C19.5152 19.984 12.9593 19.984 11.8311 24.6632C10.9591 28.2795 14.5983 33.3045 16.2373 34.9695C17.8763 36.6346 21.1542 38.2996 23.6155 33.9402C27.7768 26.5696 26.498 36.6185 29.3492 36.6346C32.6271 36.6346 34.0219 29.6969 35.6998 32.2304C40.8221 39.9647 47.378 36.6346 44.1 31.6394" stroke="#1A202C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</g>
-<defs>
-<linearGradient id="paint0_linear" x1="0.36556" y1="10.0248" x2="54.5266" y2="16.142" gradientUnits="userSpaceOnUse">
-<stop stop-color="#938EFF"/>
-<stop offset="1" stop-color="#B0ACFB"/>
-</linearGradient>
-<clipPath id="clip0">
-<rect width="56.0007" height="47.9992" fill="white"/>
-</clipPath>
-</defs>
-</svg>
+<svg fill="none" height="48" viewBox="0 0 56 48" width="56" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="a" gradientUnits="userSpaceOnUse" x1=".36556" x2="54.5266" y1="10.0248" y2="16.142"><stop offset="0" stop-color="#938eff"/><stop offset="1" stop-color="#b0acfb"/></linearGradient><clipPath id="b"><path d="m0 0h56.0007v47.9992h-56.0007z"/></clipPath><g clip-path="url(#b)"><rect fill="url(#a)" height="34.2784" opacity=".4" rx="5" transform="matrix(.999773 -.102905 .0983729 .986376 0 14.1878)" width="52.6406"/><g stroke="#1a202c" stroke-linecap="round" stroke-linejoin="round"><path d="m20.333 4.1659c-3.278-3.330115-8.1949 1.66506-4.917 4.99518l15.5704 15.81802 6.556 1.6651-1.639-6.6602z" fill="#fafdff" stroke-width="3"/><path d="m11.3203 36.6346c1.9093-.9699 8.8003-7.6245 8.5376-11.542-.3427-5.1086-6.8986-5.1086-8.0268-.4294-.872 3.6163 2.7672 8.6413 4.4062 10.3063 1.639 1.6651 4.9169 3.3301 7.3782-1.0293 4.1613-7.3706 2.8825 2.6783 5.7337 2.6944 3.2779 0 4.6727-6.9377 6.3506-4.4042 5.1223 7.7343 11.6782 4.4042 8.4002-.591" stroke-width="2"/></g></g></svg>
