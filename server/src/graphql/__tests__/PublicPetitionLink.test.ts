@@ -64,9 +64,8 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("should query a public link by slug", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query ($slug: String!) {
+          query ($slug: ID!) {
             publicPetitionLinkBySlug(slug: $slug) {
-              id
               title
               description
               organization {
@@ -83,7 +82,6 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.publicPetitionLinkBySlug).toEqual({
-        id: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
         title: publicPetitionLink.title,
         description: publicPetitionLink.description,
         organization: {
@@ -96,9 +94,8 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("should return null if the slug is not found", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query ($slug: String!) {
+          query ($slug: ID!) {
             publicPetitionLinkBySlug(slug: $slug) {
-              id
               title
               description
               organization {
@@ -124,9 +121,9 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       const { errors, data } = await testClient.query({
         query: gql`
-          query ($slug: String!) {
+          query ($slug: ID!) {
             publicPetitionLinkBySlug(slug: $slug) {
-              id
+              title
             }
           }
         `,
@@ -292,13 +289,13 @@ describe("GraphQL/PublicPetitionLink", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
-            $publicPetitionLinkId: GID!
+            $slug: ID!
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
           ) {
             publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
+              slug: $slug
               contactFirstName: $contactFirstName
               contactLastName: $contactLastName
               contactEmail: $contactEmail
@@ -306,7 +303,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: publicPetitionLink.slug,
           contactFirstName: "Roger",
           contactLastName: "Waters",
           contactEmail: "rogerwaters@gmail.com",
@@ -360,13 +357,13 @@ describe("GraphQL/PublicPetitionLink", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
-            $publicPetitionLinkId: GID!
+            $slug: ID!
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
           ) {
             publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
+              slug: $slug
               contactFirstName: $contactFirstName
               contactLastName: $contactLastName
               contactEmail: $contactEmail
@@ -374,7 +371,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: publicPetitionLink.slug,
           contactFirstName: "Roger",
           contactLastName: "Waters",
           contactEmail: contact.email,
@@ -400,13 +397,13 @@ describe("GraphQL/PublicPetitionLink", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
-            $publicPetitionLinkId: GID!
+            $slug: ID!
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
           ) {
             publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
+              slug: $slug
               contactFirstName: $contactFirstName
               contactLastName: $contactLastName
               contactEmail: $contactEmail
@@ -414,7 +411,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: publicPetitionLink.slug,
           contactFirstName: contact.first_name,
           contactLastName: contact.last_name,
           contactEmail: contact.email,
@@ -430,92 +427,6 @@ describe("GraphQL/PublicPetitionLink", () => {
         .update({ is_active: true });
     });
 
-    it("sends error if the petition does not have fields", async () => {
-      const [emptyPetition] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1,
-        () => ({ is_template: true, status: null })
-      );
-      const invalidPublicPetitionLink = await mocks.createRandomPublicPetitionLink(
-        emptyPetition.id,
-        user.id,
-        () => ({ slug: "aaaa" })
-      );
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation (
-            $publicPetitionLinkId: GID!
-            $contactFirstName: String!
-            $contactLastName: String!
-            $contactEmail: String!
-          ) {
-            publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
-              contactFirstName: $contactFirstName
-              contactLastName: $contactLastName
-              contactEmail: $contactEmail
-            )
-          }
-        `,
-        variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", invalidPublicPetitionLink.id),
-          contactFirstName: contact.first_name,
-          contactLastName: contact.last_name,
-          contactEmail: contact.email,
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
-    it("sends error if the petition does not have repliable fields", async () => {
-      const [petitionWithHeading] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1,
-        () => ({ is_template: true, status: null })
-      );
-      await mocks.createRandomPetitionFields(petitionWithHeading.id, 1, () => ({
-        type: "HEADING",
-      }));
-
-      const invalidPublicPetitionLink = await mocks.createRandomPublicPetitionLink(
-        petitionWithHeading.id,
-        user.id,
-        () => ({ slug: "bbbb" })
-      );
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation (
-            $publicPetitionLinkId: GID!
-            $contactFirstName: String!
-            $contactLastName: String!
-            $contactEmail: String!
-          ) {
-            publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
-              contactFirstName: $contactFirstName
-              contactLastName: $contactLastName
-              contactEmail: $contactEmail
-            )
-          }
-        `,
-        variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", invalidPublicPetitionLink.id),
-          contactFirstName: contact.first_name,
-          contactLastName: contact.last_name,
-          contactEmail: contact.email,
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
     it("inserts user permissions based on the public link users", async () => {
       const [otherUser] = await mocks.createRandomUsers(organization.id, 1);
       await knex.from("template_default_permission").insert({
@@ -529,13 +440,13 @@ describe("GraphQL/PublicPetitionLink", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
-            $publicPetitionLinkId: GID!
+            $slug: ID!
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
           ) {
             publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
+              slug: $slug
               contactFirstName: $contactFirstName
               contactLastName: $contactLastName
               contactEmail: $contactEmail
@@ -543,7 +454,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
           contactEmail: "bojack@test.com",
@@ -576,13 +487,13 @@ describe("GraphQL/PublicPetitionLink", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
-            $publicPetitionLinkId: GID!
+            $slug: ID!
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
           ) {
             publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
+              slug: $slug
               contactFirstName: $contactFirstName
               contactLastName: $contactLastName
               contactEmail: $contactEmail
@@ -590,7 +501,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
           contactEmail: "bojack@test.com",
@@ -605,13 +516,13 @@ describe("GraphQL/PublicPetitionLink", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
-            $publicPetitionLinkId: GID!
+            $slug: ID!
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
           ) {
             publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
+              slug: $slug
               contactFirstName: $contactFirstName
               contactLastName: $contactLastName
               contactEmail: $contactEmail
@@ -620,7 +531,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
           contactEmail: "bojack@test.com",
@@ -640,13 +551,13 @@ describe("GraphQL/PublicPetitionLink", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
-            $publicPetitionLinkId: GID!
+            $slug: ID!
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
           ) {
             publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
+              slug: $slug
               contactFirstName: $contactFirstName
               contactLastName: $contactLastName
               contactEmail: $contactEmail
@@ -654,7 +565,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
+          slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
           contactEmail: "bojack@test.com",
@@ -683,15 +594,12 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("fails if the contact didn't previously start a petition through the public link", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($publicPetitionLinkId: GID!, $contactEmail: String!) {
-            publicSendReminder(
-              publicPetitionLinkId: $publicPetitionLinkId
-              contactEmail: $contactEmail
-            )
+          mutation ($slug: ID!, $contactEmail: String!) {
+            publicSendReminder(slug: $slug, contactEmail: $contactEmail)
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", newPetitionLink.id),
+          slug: newPetitionLink.slug,
           contactEmail: "contact@gmail.com",
         },
       });
@@ -708,13 +616,13 @@ describe("GraphQL/PublicPetitionLink", () => {
       const { errors: createErrors } = await testClient.mutate({
         mutation: gql`
           mutation (
-            $publicPetitionLinkId: GID!
+            $slug: ID!
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
           ) {
             publicCreateAndSendPetitionFromPublicLink(
-              publicPetitionLinkId: $publicPetitionLinkId
+              slug: $slug
               contactFirstName: $contactFirstName
               contactLastName: $contactLastName
               contactEmail: $contactEmail
@@ -722,7 +630,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", newPetitionLink.id),
+          slug: newPetitionLink.slug,
           contactFirstName: "Roger",
           contactLastName: "Waters",
           contactEmail: "rogerwaters@gmail.com",
@@ -731,15 +639,12 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(createErrors).toBeUndefined();
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($publicPetitionLinkId: GID!, $contactEmail: String!) {
-            publicSendReminder(
-              publicPetitionLinkId: $publicPetitionLinkId
-              contactEmail: $contactEmail
-            )
+          mutation ($slug: ID!, $contactEmail: String!) {
+            publicSendReminder(slug: $slug, contactEmail: $contactEmail)
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", newPetitionLink.id),
+          slug: newPetitionLink.slug,
           contactEmail: "rogerwaters@gmail.com",
         },
       });
@@ -758,15 +663,12 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($publicPetitionLinkId: GID!, $contactEmail: String!) {
-            publicSendReminder(
-              publicPetitionLinkId: $publicPetitionLinkId
-              contactEmail: $contactEmail
-            )
+          mutation ($slug: ID!, $contactEmail: String!) {
+            publicSendReminder(slug: $slug, contactEmail: $contactEmail)
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", newPetitionLink.id),
+          slug: newPetitionLink.slug,
           contactEmail: "rogerwaters@gmail.com",
         },
       });
@@ -790,15 +692,12 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($publicPetitionLinkId: GID!, $contactEmail: String!) {
-            publicSendReminder(
-              publicPetitionLinkId: $publicPetitionLinkId
-              contactEmail: $contactEmail
-            )
+          mutation ($slug: ID!, $contactEmail: String!) {
+            publicSendReminder(slug: $slug, contactEmail: $contactEmail)
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", newPetitionLink.id),
+          slug: newPetitionLink.slug,
           contactEmail: "rogerwaters@gmail.com",
         },
       });
@@ -815,15 +714,12 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if the contact already asked for a reminder in the past 24 hs", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($publicPetitionLinkId: GID!, $contactEmail: String!) {
-            publicSendReminder(
-              publicPetitionLinkId: $publicPetitionLinkId
-              contactEmail: $contactEmail
-            )
+          mutation ($slug: ID!, $contactEmail: String!) {
+            publicSendReminder(slug: $slug, contactEmail: $contactEmail)
           }
         `,
         variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", newPetitionLink.id),
+          slug: newPetitionLink.slug,
           contactEmail: "rogerwaters@gmail.com",
         },
       });
@@ -917,7 +813,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("creates a public link with user as owner and other permissions", async () => {
       const { errors: errors1, data: data1 } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
               defaultPermissions {

@@ -64,7 +64,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       );
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
             }
@@ -90,7 +90,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       const [petition] = await mocks.createRandomPetitions(organization.id, users[0].id, 1);
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
             }
@@ -114,7 +114,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if user does not have access to all the users in otherPermissions", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
             }
@@ -136,7 +136,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("deletes previous user permissions", async () => {
       const { errors: errors1, data: data1 } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
               defaultPermissions {
@@ -181,7 +181,7 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       const { errors: errors2, data: data2 } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
               defaultPermissions {
@@ -238,7 +238,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("updates previous user permissions", async () => {
       const { errors: errors1, data: data1 } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
               defaultPermissions {
@@ -283,7 +283,7 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       const { errors: errors2, data: data2 } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
               defaultPermissions {
@@ -340,7 +340,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("adds default permissions so petitions created from the template inherit them", async () => {
       const res = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]) {
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
             updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
               id
             }
