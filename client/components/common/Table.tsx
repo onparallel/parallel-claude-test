@@ -77,7 +77,7 @@ export interface TableProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
 export interface TableHeaderProps<TRow, TContext = unknown, TFilter = unknown>
   extends HTMLChakraProps<"th"> {
   column: TableColumn<TRow, TContext, TFilter>;
-  context?: TContext;
+  context: TContext;
   filter: any;
   onFilterChange: (value: any) => void;
   sort: TableSorting<any> | undefined;
@@ -89,7 +89,7 @@ export interface TableHeaderProps<TRow, TContext = unknown, TFilter = unknown>
 
 export interface TableCellProps<TRow, TContext = unknown, TFilter = unknown> {
   row: TRow;
-  context?: TContext;
+  context: TContext;
   rowKey: string;
   column: TableColumn<TRow, TContext, TFilter>;
   isSelected?: boolean;
@@ -101,7 +101,6 @@ export interface TableCellProps<TRow, TContext = unknown, TFilter = unknown> {
 export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   key: string;
   align?: BoxProps["textAlign"];
-  context?: TContext;
   isSortable?: true;
   isFilterable?: true;
   Filter?: ComponentType<TableColumnFilterProps<TFilter, TContext>>;
@@ -287,7 +286,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               <column.Header
                 key={column.key}
                 column={column}
-                context={context}
+                context={context!}
                 sort={sort}
                 filter={filter?.[column.key]}
                 onFilterChange={(value) => onFilterChange?.(column.key, value)}
@@ -323,7 +322,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             <Row
               key={key}
               row={row}
-              context={context}
+              context={context!}
               rowKey={key}
               columns={columns}
               isSelected={isSelected}
@@ -369,7 +368,7 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   onToggleExpand,
 }: {
   row: TImpl;
-  context?: TContext;
+  context: TContext;
   rowKey: string;
   isSelected: boolean;
   isExpanded: boolean;
