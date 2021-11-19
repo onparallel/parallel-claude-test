@@ -190,7 +190,8 @@ export function RecipientViewPetitionFieldText({
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
-      showAddNewReply={!isDisabled && !showNewReply && field.multiple}
+      showAddNewReply={!isDisabled && field.multiple}
+      addNewReplyIsDisabled={showNewReply}
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >

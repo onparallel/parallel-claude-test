@@ -28,6 +28,7 @@ export interface RecipientViewPetitionFieldCardProps {
   isInvalid: boolean;
   hasCommentsEnabled: boolean;
   showAddNewReply?: boolean;
+  addNewReplyIsDisabled?: boolean;
   children: ReactNode;
   onAddNewReply?: () => void;
   onDownloadAttachment: (attachmentId: string) => void;
@@ -40,6 +41,7 @@ export function RecipientViewPetitionFieldCard({
   isInvalid,
   hasCommentsEnabled,
   showAddNewReply,
+  addNewReplyIsDisabled,
   onAddNewReply,
   onDownloadAttachment,
   children,
@@ -143,6 +145,7 @@ export function RecipientViewPetitionFieldCard({
       {showAddNewReply ? (
         <Center marginTop={2}>
           <IconButtonWithTooltip
+            isDisabled={addNewReplyIsDisabled}
             icon={<AddIcon />}
             variant="outline"
             isRound

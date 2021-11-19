@@ -105,13 +105,8 @@ export function RecipientViewPetitionFieldDynamicSelect({
     setTimeout(() => newReplyRef.current?.focus());
   }
 
-  const showAddNewReply =
-    !isDisabled &&
-    !showNewReply &&
-    field.multiple &&
-    field.options.labels.length &&
-    field.replies.length > 0 &&
-    completedFieldReplies(field).length === field.replies.length;
+  const showAddNewReply = !isDisabled && field.multiple;
+
   return (
     <RecipientViewPetitionFieldCard
       keycode={keycode}
@@ -120,6 +115,9 @@ export function RecipientViewPetitionFieldDynamicSelect({
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
       showAddNewReply={showAddNewReply}
+      addNewReplyIsDisabled={
+        showNewReply || completedFieldReplies(field).length !== field.replies.length
+      }
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >
