@@ -64,7 +64,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
-          alt="Zapier logo"
+          alt="Zapier"
           maxWidth="124px"
         />
       ),
@@ -82,7 +82,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
-          alt="Zapier logo"
+          alt="Parallel API"
           maxWidth="124px"
         />
       ),
