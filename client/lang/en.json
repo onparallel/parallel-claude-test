@@ -65,39 +65,39 @@
     "context": "Recipients"
   },
   {
-    "term": "component.add-signature-api-key-dialog.title",
-    "definition": "Enter your API Key",
-    "context": "Enter your API Key"
+    "term": "component.add-signature-api-key-dialog.api-key-help",
+    "definition": "This key is provided by Signaturit and is required to activate the integration",
+    "context": "This key is provided by Signaturit and is required to activate the integration"
   },
   {
-    "term": "component.add-signature-apikey-dialog.api-key-label",
+    "term": "component.add-signature-api-key-dialog.api-key-label",
     "definition": "API Key",
     "context": "API Key"
   },
   {
-    "term": "component.add-signature-apikey-dialog.apikey-help",
-    "definition": "This key is provided by Signaturit and is required to perform the integration",
-    "context": "This key is provided by Signaturit and is required to perform the integration"
-  },
-  {
-    "term": "component.add-signature-apikey-dialog.apikey-required-error",
+    "term": "component.add-signature-api-key-dialog.api-key-required-error",
     "definition": "Please, enter an API Key",
     "context": "Please, enter an API Key"
   },
   {
-    "term": "component.add-signature-apikey-dialog.checkbox-set-default",
+    "term": "component.add-signature-api-key-dialog.checkbox-set-default",
     "definition": "Set as default",
     "context": "Set as default"
   },
   {
-    "term": "component.add-signature-apikey-dialog.help",
+    "term": "component.add-signature-api-key-dialog.help",
     "definition": "If you need help to get your key you can find more information <a>here</a>.",
     "context": "If you need help to get your key you can find more information <a>here</a>."
   },
   {
-    "term": "component.add-signature-apikey-dialog.name-help",
+    "term": "component.add-signature-api-key-dialog.name-help",
     "definition": "You will not be able to change this value after it is created.",
     "context": "You will not be able to change this value after it is created."
+  },
+  {
+    "term": "component.add-signature-api-key-dialog.title",
+    "definition": "Enter your API Key",
+    "context": "Enter your API Key"
   },
   {
     "term": "component.app-layout.new-version-available",
@@ -566,8 +566,8 @@
   },
   {
     "term": "component.delete-signature-error-confirmation.body",
-    "definition": "We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be modified and all pending signature processes will be cancelled. Are you sure you want to delete it?",
-    "context": "We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be modified and all pending signature processes will be cancelled. Are you sure you want to delete it?"
+    "definition": "We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be reset and all pending signature processes will be cancelled. Are you sure you want to delete it?",
+    "context": "We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be reset and all pending signature processes will be cancelled. Are you sure you want to delete it?"
   },
   {
     "term": "component.delete-signature-error-confirmation.title",

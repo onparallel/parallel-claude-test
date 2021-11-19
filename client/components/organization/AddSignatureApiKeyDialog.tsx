@@ -79,7 +79,7 @@ function AddSignatureApiKeyDialog({ ...props }: DialogProps<{}, AddSignatureApiK
               </FormErrorMessage>
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="component.add-signature-apikey-dialog.name-help"
+                  id="component.add-signature-api-key-dialog.name-help"
                   defaultMessage="You will not be able to change this value after it is created."
                 />
               </Text>
@@ -89,14 +89,14 @@ function AddSignatureApiKeyDialog({ ...props }: DialogProps<{}, AddSignatureApiK
             <FormLabel>
               <HStack alignContent="center">
                 <FormattedMessage
-                  id="component.add-signature-apikey-dialog.api-key-label"
+                  id="component.add-signature-api-key-dialog.api-key-label"
                   defaultMessage="API Key"
                 />
                 <HelpPopover>
                   <Text fontSize="sm">
                     <FormattedMessage
-                      id="component.add-signature-apikey-dialog.apikey-help"
-                      defaultMessage="This key is provided by Signaturit and is required to perform the integration"
+                      id="component.add-signature-api-key-dialog.api-key-help"
+                      defaultMessage="This key is provided by Signaturit and is required to activate the integration"
                     />
                   </Text>
                 </HelpPopover>
@@ -106,13 +106,13 @@ function AddSignatureApiKeyDialog({ ...props }: DialogProps<{}, AddSignatureApiK
               <Input {...apiKeyInputProps} />
               <FormErrorMessage>
                 <FormattedMessage
-                  id="component.add-signature-apikey-dialog.apikey-required-error"
+                  id="component.add-signature-api-key-dialog.api-key-required-error"
                   defaultMessage="Please, enter an API Key"
                 />
               </FormErrorMessage>
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="component.add-signature-apikey-dialog.help"
+                  id="component.add-signature-api-key-dialog.help"
                   defaultMessage="If you need help to get your key you can find more information <a>here</a>."
                   values={{
                     a: (chunks: any) => (
@@ -135,7 +135,7 @@ function AddSignatureApiKeyDialog({ ...props }: DialogProps<{}, AddSignatureApiK
 
           <Checkbox {...register("isDefault")}>
             <FormattedMessage
-              id="component.add-signature-apikey-dialog.checkbox-set-default"
+              id="component.add-signature-api-key-dialog.checkbox-set-default"
               defaultMessage="Set as default"
             />
           </Checkbox>

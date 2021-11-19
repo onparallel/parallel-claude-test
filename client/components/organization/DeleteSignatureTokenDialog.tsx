@@ -25,7 +25,7 @@ function DeleteSignatureTokenDialog({ ...props }: DialogProps) {
         </Text>
       }
       confirm={
-        <Button type="submit" colorScheme="red" variant="solid" onClick={() => props.onResolve()}>
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }

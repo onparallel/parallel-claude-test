@@ -27,13 +27,13 @@ function DeleteSignatureErrorConfirmationDialog({
         <Text>
           <FormattedMessage
             id="component.delete-signature-error-confirmation.body"
-            defaultMessage="We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be modified and all pending signature processes will be cancelled. Are you sure you want to delete it?"
+            defaultMessage="We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be reset and all pending signature processes will be cancelled. Are you sure you want to delete it?"
             values={{ count: pendingSignaturesCount }}
           />
         </Text>
       }
       confirm={
-        <Button type="submit" colorScheme="red" variant="solid" onClick={() => props.onResolve()}>
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
