@@ -6021,9 +6021,9 @@ export type TemplateDetailsModal_autoSendTemplateMutationVariables = Exact<{
 
 export type TemplateDetailsModal_autoSendTemplateMutation = Pick<Mutation, "autoSendTemplate">;
 
-export type TemplateDetailsModal_UserFragment = { __typename?: "User" } & {
-  hasAutoSendTemplate: User["hasFeatureFlag"];
-};
+export type TemplateDetailsModal_UserFragment = { __typename?: "User" } & Pick<User, "id"> & {
+    hasAutoSendTemplate: User["hasFeatureFlag"];
+  };
 
 export type TemplateDetailsModal_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
@@ -6280,7 +6280,7 @@ export type NewPetitionTemplatesList_PetitionTemplateFragment = {
 
 export type TemplateCard_PetitionTemplateFragment = { __typename?: "PetitionTemplate" } & Pick<
   PetitionTemplate,
-  "name" | "descriptionExcerpt" | "locale"
+  "id" | "name" | "descriptionExcerpt" | "locale"
 > & {
     owner: { __typename?: "User" } & Pick<User, "id" | "fullName" | "avatarUrl" | "initials">;
     publicLink?: Maybe<
@@ -15900,6 +15900,7 @@ export const Petitions_UserFragmentDoc = gql`
 `;
 export const TemplateCard_PetitionTemplateFragmentDoc = gql`
   fragment TemplateCard_PetitionTemplate on PetitionTemplate {
+    id
     name
     descriptionExcerpt
     locale
@@ -15930,6 +15931,7 @@ export const NewPetition_PetitionTemplateFragmentDoc = gql`
 `;
 export const TemplateDetailsModal_UserFragmentDoc = gql`
   fragment TemplateDetailsModal_User on User {
+    id
     hasAutoSendTemplate: hasFeatureFlag(featureFlag: AUTO_SEND_TEMPLATE)
   }
 `;

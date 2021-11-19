@@ -95,6 +95,7 @@ export const TemplateCard = Object.assign(
     fragments: {
       PetitionTemplate: gql`
         fragment TemplateCard_PetitionTemplate on PetitionTemplate {
+          id
           name
           descriptionExcerpt
           locale

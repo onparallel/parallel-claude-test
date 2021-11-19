@@ -32,6 +32,7 @@ import {
   LinkIcon,
   PaperPlaneArrowIcon,
   PaperPlaneIcon,
+  UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
   TemplateDetailsModal_PetitionTemplateFragment,
@@ -54,6 +55,7 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DateTime } from "../common/DateTime";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { Divider } from "../common/Divider";
+import { usePetitionSharingDialog } from "./PetitionSharingDialog";
 
 export interface TemplateDetailsModalProps extends Omit<ModalProps, "children"> {
   me: TemplateDetailsModal_UserFragment;
@@ -116,6 +118,17 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
       await openNewWindow(async () => {
         const { data } = await autoSendTemplate({ variables: { templateId: template.id, name } });
         return data!.autoSendTemplate;
+      });
+    } catch {}
+  };
+
+  const showPetitionSharingDialog = usePetitionSharingDialog();
+  const handlePetitionSharingClick = async () => {
+    try {
+      await showPetitionSharingDialog({
+        userId: me.id,
+        petitionIds: [template.id],
+        isTemplate: true,
       });
     } catch {}
   };
@@ -203,6 +216,27 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                   </Tooltip>
                   <Portal>
                     <MenuList minWidth={0}>
+                      {me.hasAutoSendTemplate ? (
+                        <MenuItem
+                          justifyContent="left"
+                          icon={<PaperPlaneArrowIcon display="block" boxSize={4} />}
+                          onClick={() => handleAutoSendPetition()}
+                        >
+                          <FormattedMessage
+                            id="component.template-details-modal.auto-send"
+                            defaultMessage="Auto-send template"
+                          />
+                        </MenuItem>
+                      ) : null}
+                      {template.publicLink?.isActive && (
+                        <MenuItem
+                          justifyContent="left"
+                          icon={<LinkIcon display="block" boxSize={4} />}
+                          onClick={() => onCopyPublicLink()}
+                        >
+                          <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
+                        </MenuItem>
+                      )}
                       <MenuItem
                         onClick={handleCloneTemplate}
                         icon={<CopyIcon display="block" boxSize={4} />}
@@ -225,27 +259,15 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                           />
                         </MenuItem>
                       )}
-                      {template.publicLink?.isActive && (
-                        <MenuItem
-                          justifyContent="left"
-                          icon={<LinkIcon display="block" boxSize={4} />}
-                          onClick={() => onCopyPublicLink()}
-                        >
-                          <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
-                        </MenuItem>
-                      )}
-                      {me.hasAutoSendTemplate ? (
-                        <MenuItem
-                          justifyContent="left"
-                          icon={<PaperPlaneArrowIcon display="block" boxSize={4} />}
-                          onClick={() => handleAutoSendPetition()}
-                        >
-                          <FormattedMessage
-                            id="component.template-details-modal.auto-send"
-                            defaultMessage="Auto-send template"
-                          />
-                        </MenuItem>
-                      ) : null}
+                      <MenuItem
+                        onClick={handlePetitionSharingClick}
+                        icon={<UserArrowIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.template-header.share-label"
+                          defaultMessage="Share template"
+                        />
+                      </MenuItem>
                     </MenuList>
                   </Portal>
                 </Menu>
@@ -324,6 +346,7 @@ TemplateDetailsModal.mutations = [
 TemplateDetailsModal.fragments = {
   User: gql`
     fragment TemplateDetailsModal_User on User {
+      id
       hasAutoSendTemplate: hasFeatureFlag(featureFlag: AUTO_SEND_TEMPLATE)
     }
   `,
