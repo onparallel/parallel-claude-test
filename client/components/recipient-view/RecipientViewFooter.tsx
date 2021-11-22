@@ -1,10 +1,10 @@
-import { Box, BoxProps, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { FlexProps, Flex, List, ListItem, Stack } from "@chakra-ui/react";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 
-export type RecipientViewFooterProps = BoxProps;
+export type RecipientViewFooterProps = FlexProps;
 
 export function RecipientViewFooter(props: RecipientViewFooterProps) {
   const router = useRouter();
@@ -16,7 +16,7 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
   )[router.locale!];
   return (
     <Flex flexDirection="column" marginTop={12} as="footer" alignItems="center" {...props}>
-      <Text as="div" fontSize="sm">
+      <Flex fontSize="sm" alignItems="center">
         <FormattedMessage
           id="recipient-view.powered-by"
           defaultMessage="Powered by {parallel}"
@@ -26,14 +26,14 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
                 href="/?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
                 passHref
               >
-                <Box as="a" marginLeft={1.5} position="relative" top="-1px">
+                <Flex as="a" marginLeft={2.5}>
                   <Logo display="inline-block" width="100px" />
-                </Box>
+                </Flex>
               </NakedLink>
             ),
           }}
         />
-      </Text>
+      </Flex>
       <Stack
         as={List}
         textAlign="center"
