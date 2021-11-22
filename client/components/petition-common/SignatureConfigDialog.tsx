@@ -12,8 +12,8 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
-  SignatureConfigDialog_SignatureOrgIntegrationFragment,
   SignatureConfigDialog_PetitionBaseFragment,
+  SignatureConfigDialog_SignatureOrgIntegrationFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
@@ -28,13 +28,10 @@ import { omit } from "remeda";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
-import { sortBy } from "remeda";
-
-type SignatureIntegration = SignatureConfigDialog_SignatureOrgIntegrationFragment;
 
 export type SignatureConfigDialogProps = {
   petition: SignatureConfigDialog_PetitionBaseFragment;
-  providers: SignatureIntegration[];
+  providers: SignatureConfigDialog_SignatureOrgIntegrationFragment[];
 };
 
 export function SignatureConfigDialog({
@@ -57,7 +54,7 @@ export function SignatureConfigDialog({
     watch,
   } = useForm<{
     contacts: ContactSelectSelection[];
-    provider: SignatureIntegration;
+    provider: SignatureConfigDialog_SignatureOrgIntegrationFragment;
     review: boolean;
     title: string;
     letRecipientsChooseSigners: boolean;
@@ -68,7 +65,8 @@ export function SignatureConfigDialog({
         ...omit(signer, ["contactId", "__typename"]),
         id: signer.contactId!,
       })),
-      provider: petition.signatureConfig?.integration ?? sortBy(providers, (p) => !p.isDefault)[0],
+      provider:
+        petition.signatureConfig?.integration ?? providers.find((p) => p.isDefault) ?? providers[0],
       review: petition.signatureConfig?.review ?? true,
       title: petition.signatureConfig?.title ?? petition.name ?? "",
       letRecipientsChooseSigners: petition.signatureConfig?.letRecipientsChooseSigners ?? false,
@@ -103,7 +101,10 @@ export function SignatureConfigDialog({
     [intl.locale]
   );
 
-  const signatureIntegrationReactProps = useReactSelectProps<SignatureIntegration, false>();
+  const signatureIntegrationReactProps = useReactSelectProps<
+    SignatureConfigDialog_SignatureOrgIntegrationFragment,
+    false
+  >();
   const reactSelectProps = useReactSelectProps();
 
   const contactProps = useMemo(
