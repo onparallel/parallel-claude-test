@@ -340,10 +340,12 @@ function _PetitionSettings({
             icon={<SignatureIcon />}
             label={
               <HStack>
-                <FormattedMessage
-                  id="component.petition-settings.petition-signature-enable"
-                  defaultMessage="Enable eSignature"
-                />
+                <Text as="span">
+                  <FormattedMessage
+                    id="component.petition-settings.petition-signature-enable"
+                    defaultMessage="Enable eSignature"
+                  />
+                </Text>
                 {petition.signatureConfig?.integration?.environment === "DEMO" || !hasSignature ? (
                   <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
                 ) : null}
