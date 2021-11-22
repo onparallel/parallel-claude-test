@@ -6605,7 +6605,7 @@ export type PetitionSignaturesCard_PetitionFragment = { __typename?: "Petition" 
           integration?: Maybe<
             { __typename?: "SignatureOrgIntegration" } & Pick<
               SignatureOrgIntegration,
-              "id" | "name" | "provider" | "isDefault" | "environment"
+              "id" | "name" | "provider" | "environment" | "isDefault"
             >
           >;
           signers: Array<
@@ -6615,6 +6615,9 @@ export type PetitionSignaturesCard_PetitionFragment = { __typename?: "Petition" 
             >
           >;
         }
+    >;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "environment">
     >;
   };
 
@@ -6659,7 +6662,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
                 integration?: Maybe<
                   { __typename?: "SignatureOrgIntegration" } & Pick<
                     SignatureOrgIntegration,
-                    "id" | "name" | "provider" | "isDefault" | "environment"
+                    "id" | "name" | "provider" | "environment" | "isDefault"
                   >
                 >;
                 signers: Array<
@@ -6669,6 +6672,12 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
                   >
                 >;
               }
+          >;
+          currentSignatureRequest?: Maybe<
+            { __typename?: "PetitionSignatureRequest" } & Pick<
+              PetitionSignatureRequest,
+              "environment"
+            >
           >;
         })
     | { __typename?: "PetitionTemplate" };
@@ -13228,6 +13237,41 @@ export type filterPetitionFields_PetitionFieldFragment = { __typename?: "Petitio
     replies: Array<{ __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">>;
   };
 
+export type getPetitionSignatureEnvironment_PetitionFragment = { __typename?: "Petition" } & {
+  currentSignatureRequest?: Maybe<
+    { __typename?: "PetitionSignatureRequest" } & Pick<PetitionSignatureRequest, "environment">
+  >;
+  signatureConfig?: Maybe<
+    { __typename?: "SignatureConfig" } & {
+      integration?: Maybe<
+        { __typename?: "SignatureOrgIntegration" } & Pick<SignatureOrgIntegration, "environment">
+      >;
+    }
+  >;
+};
+
+export type getPetitionSignatureStatus_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "status"
+> & {
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "status" | "environment"
+      >
+    >;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
+          integration?: Maybe<
+            { __typename?: "SignatureOrgIntegration" } & Pick<
+              SignatureOrgIntegration,
+              "environment"
+            >
+          >;
+        }
+    >;
+  };
+
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
@@ -13370,27 +13414,6 @@ export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
 export type useFilenamePlaceholdersRename_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
 } & Pick<PetitionFieldReply, "content">;
-
-export type usePetitionCurrentSignatureStatusAndEnv_PetitionFragment = {
-  __typename?: "Petition";
-} & Pick<Petition, "status"> & {
-    currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<
-        PetitionSignatureRequest,
-        "status" | "environment"
-      >
-    >;
-    signatureConfig?: Maybe<
-      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review"> & {
-          integration?: Maybe<
-            { __typename?: "SignatureOrgIntegration" } & Pick<
-              SignatureOrgIntegration,
-              "environment"
-            >
-          >;
-        }
-    >;
-  };
 
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -14224,8 +14247,8 @@ export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
     }
   }
 `;
-export const usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc = gql`
-  fragment usePetitionCurrentSignatureStatusAndEnv_Petition on Petition {
+export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
+  fragment getPetitionSignatureStatus_Petition on Petition {
     status
     currentSignatureRequest {
       status
@@ -14239,11 +14262,25 @@ export const usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc = gql`
     }
   }
 `;
+export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
+  fragment getPetitionSignatureEnvironment_Petition on Petition {
+    currentSignatureRequest {
+      environment
+    }
+    signatureConfig {
+      integration {
+        environment
+      }
+    }
+  }
+`;
 export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
   fragment PetitionSignatureCellContent_Petition on Petition {
-    ...usePetitionCurrentSignatureStatusAndEnv_Petition
+    ...getPetitionSignatureStatus_Petition
+    ...getPetitionSignatureEnvironment_Petition
   }
-  ${usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc}
+  ${getPetitionSignatureStatus_PetitionFragmentDoc}
+  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
 `;
 export const Contact_PetitionFragmentDoc = gql`
   fragment Contact_Petition on Petition {
@@ -15701,11 +15738,13 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
       ...CurrentSignatureRequestRow_PetitionSignatureRequest
       ...OlderSignatureRequestRows_PetitionSignatureRequest
     }
+    ...getPetitionSignatureEnvironment_Petition
   }
   ${SignatureConfigDialog_PetitionBaseFragmentDoc}
   ${NewSignatureRequestRow_PetitionFragmentDoc}
   ${CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc}
   ${OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc}
+  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
 `;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
@@ -15721,13 +15760,13 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       status
     }
     ...PetitionSignaturesCard_Petition
-    ...usePetitionCurrentSignatureStatusAndEnv_Petition
+    ...getPetitionSignatureStatus_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
   ${ShareButton_PetitionBaseFragmentDoc}
   ${PetitionSignaturesCard_PetitionFragmentDoc}
-  ${usePetitionCurrentSignatureStatusAndEnv_PetitionFragmentDoc}
+  ${getPetitionSignatureStatus_PetitionFragmentDoc}
 `;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {

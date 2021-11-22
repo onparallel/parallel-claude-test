@@ -2,7 +2,8 @@ import { gql } from "@apollo/client";
 import { Circle, Flex, Tooltip } from "@chakra-ui/react";
 import { AlertCircleIcon, SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
 import { PetitionSignatureCellContent_PetitionFragment } from "@parallel/graphql/__types";
-import { usePetitionCurrentSignatureStatusAndEnv } from "@parallel/utils/usePetitionCurrentSignatureStatusAndEnv";
+import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
+import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 import { useIntl } from "react-intl";
 
@@ -13,10 +14,11 @@ export function PetitionSignatureCellContent({ petition }: PetitionSignatureCell
   const intl = useIntl();
 
   const labels = usePetitionSignatureStatusLabels();
-  const { status, env } = usePetitionCurrentSignatureStatusAndEnv(petition);
+  const status = getPetitionSignatureStatus(petition);
+  const environment = getPetitionSignatureEnvironment(petition);
 
   const envLabel =
-    env === "DEMO"
+    environment === "DEMO"
       ? ` - ${intl.formatMessage({
           id: "petition-signature-cell-content.test-environment",
           defaultMessage: "Test environment",
@@ -32,7 +34,7 @@ export function PetitionSignatureCellContent({ petition }: PetitionSignatureCell
           <Circle boxSize={2} backgroundColor="purple.500" marginRight="2px" />
         ) : null}
         <SignatureIcon
-          color={env === "DEMO" ? "yellow.700" : "gray.700"}
+          color={environment === "DEMO" ? "yellow.700" : "gray.700"}
           opacity={status === "COMPLETED" ? 1 : 0.4}
         />
         {status === "PROCESSING" ? (
@@ -48,8 +50,10 @@ export function PetitionSignatureCellContent({ petition }: PetitionSignatureCell
 PetitionSignatureCellContent.fragments = {
   Petition: gql`
     fragment PetitionSignatureCellContent_Petition on Petition {
-      ...usePetitionCurrentSignatureStatusAndEnv_Petition
+      ...getPetitionSignatureStatus_Petition
+      ...getPetitionSignatureEnvironment_Petition
     }
-    ${usePetitionCurrentSignatureStatusAndEnv.fragments.Petition}
+    ${getPetitionSignatureStatus.fragments.Petition}
+    ${getPetitionSignatureEnvironment.fragments.Petition}
   `,
 };

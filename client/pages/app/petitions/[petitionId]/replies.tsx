@@ -90,6 +90,7 @@ import {
   filterPetitionFields,
   PetitionFieldFilter,
 } from "@parallel/utils/filterPetitionFields";
+import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -99,7 +100,6 @@ import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { useExportRepliesTask } from "@parallel/utils/useExportRepliesTask";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { usePetitionCurrentSignatureStatusAndEnv } from "@parallel/utils/usePetitionCurrentSignatureStatusAndEnv";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -491,8 +491,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const [filter, setFilter] = useState<PetitionFieldFilter>(defaultFieldsFilter);
 
-  const { status: petitionSignatureStatus, env: petitionSignatureEnv } =
-    usePetitionCurrentSignatureStatusAndEnv(petition);
+  const petitionSignatureStatus = getPetitionSignatureStatus(petition);
 
   return (
     <PetitionLayout
@@ -692,7 +691,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               id="signatures"
               petition={petition}
               user={me}
-              signatureEnvironment={petitionSignatureEnv}
               layerStyle="highlightable"
               marginTop={8}
               onRefetchPetition={refetch}
@@ -720,13 +718,13 @@ PetitionReplies.fragments = {
           status
         }
         ...PetitionSignaturesCard_Petition
-        ...usePetitionCurrentSignatureStatusAndEnv_Petition
+        ...getPetitionSignatureStatus_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
       ${ShareButton.fragments.PetitionBase}
       ${PetitionSignaturesCard.fragments.Petition}
-      ${usePetitionCurrentSignatureStatusAndEnv.fragments.Petition}
+      ${getPetitionSignatureStatus.fragments.Petition}
     `;
   },
   get PetitionField() {

@@ -3,7 +3,6 @@ import { Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
 import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
-  SignatureOrgIntegrationEnvironment,
   PetitionSignaturesCard_PetitionFragment,
   PetitionSignaturesCard_UserFragment,
   SignatureConfigInput,
@@ -14,6 +13,7 @@ import {
   usePetitionSignaturesCard_updatePetitionSignatureConfigMutation,
 } from "@parallel/graphql/__types";
 import { assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
+import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback } from "react";
@@ -34,7 +34,6 @@ import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
 export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
   user: PetitionSignaturesCard_UserFragment;
-  signatureEnvironment: SignatureOrgIntegrationEnvironment;
   onRefetchPetition: () => void;
 }
 
@@ -65,11 +64,13 @@ const fragments = {
         ...CurrentSignatureRequestRow_PetitionSignatureRequest
         ...OlderSignatureRequestRows_PetitionSignatureRequest
       }
+      ...getPetitionSignatureEnvironment_Petition
     }
     ${SignatureConfigDialog.fragments.PetitionBase}
     ${NewSignatureRequestRow.fragments.Petition}
     ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
     ${OlderSignatureRequestRows.fragments.PetitionSignatureRequest}
+    ${getPetitionSignatureEnvironment.fragments.Petition}
   `,
 };
 const mutations = [
@@ -127,13 +128,14 @@ const mutations = [
 
 export const PetitionSignaturesCard = Object.assign(
   chakraForwardRef<"section", PetitionSignaturesCardProps>(function PetitionSignaturesCard(
-    { petition, user, signatureEnvironment, onRefetchPetition, ...props },
+    { petition, user, onRefetchPetition, ...props },
     ref
   ) {
     let current: Maybe<UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>> =
       petition.signatureRequests![0];
     const older = petition.signatureRequests!.slice(1);
     const signatureIntegrations = user.organization.signatureIntegrations.items;
+    const signatureEnvironment = getPetitionSignatureEnvironment(petition);
     /**
      * If the signature config is defined on the petition and the last request is finished,
      * we consider that a new signature will be needed.
