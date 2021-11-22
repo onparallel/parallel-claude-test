@@ -39,7 +39,7 @@ export function NewSignatureRequestRow({
 
   return (
     <>
-      <Box>
+      <Box padding={2} paddingLeft={4}>
         <Heading size="xs" as="h4">
           <FormattedMessage
             id="component.petition-signatures-card.status"
@@ -56,7 +56,7 @@ export function NewSignatureRequestRow({
           </Text>
         </Stack>
       </Box>
-      <Box>
+      <Box padding={2}>
         <Heading size="xs" as="h4">
           <FormattedMessage
             id="component.petition-signatures-card.signers"
@@ -75,7 +75,7 @@ export function NewSignatureRequestRow({
           )}
         </Box>
       </Box>
-      <Box>
+      <Box padding={2} paddingRight={4}>
         {petition.status === "PENDING" ? (
           <Button width="24" colorScheme="red" onClick={() => onUpdateConfig(null)}>
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />

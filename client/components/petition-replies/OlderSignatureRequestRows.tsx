@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, Flex, GridItem, Heading } from "@chakra-ui/react";
+import { Box, Button, Flex, GridItem, Heading } from "@chakra-ui/react";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
@@ -18,22 +18,22 @@ export function OlderSignatureRequestRows({
     <>
       <GridItem colSpan={3}>
         <Divider />
-      </GridItem>
-      <GridItem colSpan={3}>
-        <Heading size="xs">
-          <FormattedMessage
-            id="component.petition-signatures-card.previous-signatures"
-            defaultMessage="Previous signatures"
-          />
-        </Heading>
-      </GridItem>
-      <GridItem colSpan={3}>
+        <Box paddingY={2} paddingX={4}>
+          <Heading size="xs">
+            <FormattedMessage
+              id="component.petition-signatures-card.previous-signatures"
+              defaultMessage="Previous signatures"
+            />
+          </Heading>
+        </Box>
         <Divider />
       </GridItem>
       {signatures.map((signature, i) => (
         <Fragment key={i}>
-          <PetitionSignatureRequestStatusText status={signature.status} />
-          <GridItem colSpan={signature.status === "COMPLETED" ? 1 : 2}>
+          <Box padding={2} paddingLeft={4}>
+            <PetitionSignatureRequestStatusText status={signature.status} />
+          </Box>
+          <GridItem padding={2} colSpan={signature.status === "COMPLETED" ? 1 : 2}>
             <FormattedList
               value={signature.signatureConfig.signers.map((signer, index) => (
                 <SignerReference signer={signer} key={index} />
@@ -41,7 +41,7 @@ export function OlderSignatureRequestRows({
             />
           </GridItem>
           {signature.status === "COMPLETED" ? (
-            <Flex justifyContent="flex-end">
+            <Flex justifyContent="flex-end" padding={2} paddingRight={4}>
               <Button width="24" fontSize="sm" height={8} onClick={() => onDownload(signature.id)}>
                 <FormattedMessage id="generic.download" defaultMessage="Download" />
               </Button>

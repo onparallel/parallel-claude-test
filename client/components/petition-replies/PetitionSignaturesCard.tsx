@@ -266,7 +266,7 @@ export const PetitionSignaturesCard = Object.assign(
             ) : null
           }
         >
-          <HStack as="span" gridGap={2}>
+          <HStack as="span" spacing={2}>
             <SignatureIcon fontSize="20px" />
             <FormattedMessage
               id="component.petition-signatures-card.header"
@@ -278,13 +278,7 @@ export const PetitionSignaturesCard = Object.assign(
           </HStack>
         </GenericCardHeader>
         {current || older.length > 0 || petition.signatureConfig ? (
-          <Grid
-            paddingX={4}
-            paddingY={2}
-            gap={4}
-            templateColumns="auto 1fr auto"
-            alignItems="center"
-          >
+          <Grid templateColumns="auto 1fr auto" alignItems="center">
             {petition.signatureConfig && !current ? (
               <NewSignatureRequestRow
                 petition={petition}
