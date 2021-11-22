@@ -566,7 +566,7 @@
   },
   {
     "term": "component.delete-signature-error-confirmation.body",
-    "definition": "Se {count, plural, =1 {ha detectado <b>#</b> plantilla o petición que utiliza} other {han detectado <b>#</b> plantilla o peticiones que utilizan}} este token. Si lo eliminas, la configuración se borrará y todos los procesos de firma pendientes se cancelarán. ¿Estás seguro de querer eliminarlo?",
+    "definition": "Se {count, plural, =1 {ha detectado <b>#</b> plantilla o petición que utiliza} other {han detectado <b>#</b> plantillas o peticiones que utilizan}} este token. Si lo eliminas, la configuración se borrará y todos los procesos de firma pendientes se cancelarán. ¿Estás seguro de querer eliminarlo?",
     "context": "We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be reset and all pending signature processes will be cancelled. Are you sure you want to delete it?"
   },
   {
@@ -2956,8 +2956,8 @@
   },
   {
     "term": "component.test-signature-dialog.body",
-    "definition": "Si continúas, se enviará la firma utilizando el entorno de pruebas <b>{env}</b> y no tendrá ninguna validez legal.",
-    "context": "If you continue, the signature will be sent using the <b>{env}</b> test environment and will have no legal validity."
+    "definition": "Si continúas, se enviará la firma utilizando el entorno de pruebas <b>{name}</b> y no tendrá ninguna validez legal.",
+    "context": "If you continue, the signature will be sent using the <b>{name}</b> test environment and will have no legal validity."
   },
   {
     "term": "component.test-signature-dialog.dont-show-again",

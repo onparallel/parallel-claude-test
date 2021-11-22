@@ -39,8 +39,8 @@ function TestSignatureDialog({
           <Text>
             <FormattedMessage
               id="component.test-signature-dialog.body"
-              defaultMessage="If you continue, the signature will be sent using the <b>{env}</b> test environment and will have no legal validity."
-              values={{ env: integrationName }}
+              defaultMessage="If you continue, the signature will be sent using the <b>{name}</b> test environment and will have no legal validity."
+              values={{ name: integrationName }}
             />
           </Text>
           <Checkbox {...register("dontShow")}>

@@ -2956,8 +2956,8 @@
   },
   {
     "term": "component.test-signature-dialog.body",
-    "definition": "If you continue, the signature will be sent using the <b>{env}</b> test environment and will have no legal validity.",
-    "context": "If you continue, the signature will be sent using the <b>{env}</b> test environment and will have no legal validity."
+    "definition": "If you continue, the signature will be sent using the <b>{name}</b> test environment and will have no legal validity.",
+    "context": "If you continue, the signature will be sent using the <b>{name}</b> test environment and will have no legal validity."
   },
   {
     "term": "component.test-signature-dialog.dont-show-again",

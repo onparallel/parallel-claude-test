@@ -17,7 +17,7 @@ export function TestModeSignatureBadge({
   ) : (
     <FormattedMessage
       id="component.test-mode-signature-badge.popover-text-demo"
-      defaultMessage="Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
+      defaultMessage="Test mode allows you to send signatures but they will not have legal validity. To activate eSignature, <a>contact our support team.</a>"
       values={{
         a: (chunks: any) => <NormalLink href="mailto:support@onparallel.com">{chunks}</NormalLink>,
       }}
