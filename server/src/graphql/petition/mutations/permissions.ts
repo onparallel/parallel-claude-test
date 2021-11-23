@@ -18,7 +18,7 @@ import { userHasAccessToUsers } from "./authorizers";
 export const transferPetitionOwnership = mutationField("transferPetitionOwnership", {
   description:
     "Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.",
-  type: list(nonNull("Petition")),
+  type: list(nonNull("PetitionBase")),
   authorize: chain(
     authenticate(),
     and(userHasAccessToPetitions("petitionIds", ["OWNER"]), userHasAccessToUsers("userId"))
@@ -35,7 +35,7 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
 
 export const addPetitionPermission = mutationField("addPetitionPermission", {
   description: "Adds permissions on given petitions and users",
-  type: list(nonNull("Petition")),
+  type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
@@ -211,7 +211,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
 
 export const removePetitionPermission = mutationField("removePetitionPermission", {
   description: "Removes permissions on given petitions and users",
-  type: list(nonNull("Petition")),
+  type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),

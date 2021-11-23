@@ -341,7 +341,7 @@ export interface MessageSentEvent extends PetitionEvent {
 export interface Mutation {
   __typename?: "Mutation";
   /** Adds permissions on given petitions and users */
-  addPetitionPermission: Array<Petition>;
+  addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
@@ -486,7 +486,7 @@ export interface Mutation {
   /** Remove a petition field attachment */
   removePetitionFieldAttachment: Result;
   /** Removes permissions on given petitions and users */
-  removePetitionPermission: Array<Petition>;
+  removePetitionPermission: Array<PetitionBase>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
@@ -519,7 +519,7 @@ export interface Mutation {
   /** Transfers the ownership of an organization to a given user. Old owner will get ADMIN role */
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
-  transferPetitionOwnership: Array<Petition>;
+  transferPetitionOwnership: Array<PetitionBase>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   /** Updates a contact. */
@@ -5713,37 +5713,68 @@ export type PetitionSharingModal_addPetitionPermissionMutationVariables = Exact<
 
 export type PetitionSharingModal_addPetitionPermissionMutation = {
   addPetitionPermission: Array<
-    { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
-        permissions: Array<
-          | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-              PetitionUserGroupPermission,
-              "permissionType"
-            > & {
-                group: { __typename?: "UserGroup" } & Pick<
-                  UserGroup,
-                  "id" | "name" | "initials"
-                > & {
-                    members: Array<
-                      { __typename?: "UserGroupMember" } & {
-                        user: { __typename?: "User" } & Pick<
-                          User,
-                          "id" | "email" | "fullName" | "avatarUrl" | "initials"
-                        >;
-                      }
-                    >;
-                  };
-              })
-          | ({ __typename?: "PetitionUserPermission" } & Pick<
-              PetitionUserPermission,
-              "permissionType"
-            > & {
-                user: { __typename?: "User" } & Pick<
-                  User,
-                  "id" | "email" | "fullName" | "avatarUrl" | "initials"
-                >;
-              })
-        >;
-      }
+    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<
+                    UserGroup,
+                    "id" | "name" | "initials"
+                  > & {
+                      members: Array<
+                        { __typename?: "UserGroupMember" } & {
+                          user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                          >;
+                        }
+                      >;
+                    };
+                })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & {
+                  user: { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                  >;
+                })
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name"> & {
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<
+                    UserGroup,
+                    "id" | "name" | "initials"
+                  > & {
+                      members: Array<
+                        { __typename?: "UserGroupMember" } & {
+                          user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                          >;
+                        }
+                      >;
+                    };
+                })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & {
+                  user: { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                  >;
+                })
+          >;
+        })
   >;
 };
 
@@ -5755,37 +5786,68 @@ export type PetitionSharingModal_removePetitionPermissionMutationVariables = Exa
 
 export type PetitionSharingModal_removePetitionPermissionMutation = {
   removePetitionPermission: Array<
-    { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
-        permissions: Array<
-          | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-              PetitionUserGroupPermission,
-              "permissionType"
-            > & {
-                group: { __typename?: "UserGroup" } & Pick<
-                  UserGroup,
-                  "id" | "name" | "initials"
-                > & {
-                    members: Array<
-                      { __typename?: "UserGroupMember" } & {
-                        user: { __typename?: "User" } & Pick<
-                          User,
-                          "id" | "email" | "fullName" | "avatarUrl" | "initials"
-                        >;
-                      }
-                    >;
-                  };
-              })
-          | ({ __typename?: "PetitionUserPermission" } & Pick<
-              PetitionUserPermission,
-              "permissionType"
-            > & {
-                user: { __typename?: "User" } & Pick<
-                  User,
-                  "id" | "email" | "fullName" | "avatarUrl" | "initials"
-                >;
-              })
-        >;
-      }
+    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<
+                    UserGroup,
+                    "id" | "name" | "initials"
+                  > & {
+                      members: Array<
+                        { __typename?: "UserGroupMember" } & {
+                          user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                          >;
+                        }
+                      >;
+                    };
+                })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & {
+                  user: { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                  >;
+                })
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name"> & {
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<
+                    UserGroup,
+                    "id" | "name" | "initials"
+                  > & {
+                      members: Array<
+                        { __typename?: "UserGroupMember" } & {
+                          user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                          >;
+                        }
+                      >;
+                    };
+                })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & {
+                  user: { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                  >;
+                })
+          >;
+        })
   >;
 };
 
@@ -5796,37 +5858,68 @@ export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Ex
 
 export type PetitionSharingModal_transferPetitionOwnershipMutation = {
   transferPetitionOwnership: Array<
-    { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
-        permissions: Array<
-          | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-              PetitionUserGroupPermission,
-              "permissionType"
-            > & {
-                group: { __typename?: "UserGroup" } & Pick<
-                  UserGroup,
-                  "id" | "name" | "initials"
-                > & {
-                    members: Array<
-                      { __typename?: "UserGroupMember" } & {
-                        user: { __typename?: "User" } & Pick<
-                          User,
-                          "id" | "email" | "fullName" | "avatarUrl" | "initials"
-                        >;
-                      }
-                    >;
-                  };
-              })
-          | ({ __typename?: "PetitionUserPermission" } & Pick<
-              PetitionUserPermission,
-              "permissionType"
-            > & {
-                user: { __typename?: "User" } & Pick<
-                  User,
-                  "id" | "email" | "fullName" | "avatarUrl" | "initials"
-                >;
-              })
-        >;
-      }
+    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<
+                    UserGroup,
+                    "id" | "name" | "initials"
+                  > & {
+                      members: Array<
+                        { __typename?: "UserGroupMember" } & {
+                          user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                          >;
+                        }
+                      >;
+                    };
+                })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & {
+                  user: { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                  >;
+                })
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name"> & {
+          permissions: Array<
+            | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
+                PetitionUserGroupPermission,
+                "permissionType"
+              > & {
+                  group: { __typename?: "UserGroup" } & Pick<
+                    UserGroup,
+                    "id" | "name" | "initials"
+                  > & {
+                      members: Array<
+                        { __typename?: "UserGroupMember" } & {
+                          user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                          >;
+                        }
+                      >;
+                    };
+                })
+            | ({ __typename?: "PetitionUserPermission" } & Pick<
+                PetitionUserPermission,
+                "permissionType"
+              > & {
+                  user: { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "email" | "fullName" | "avatarUrl" | "initials"
+                  >;
+                })
+          >;
+        })
   >;
 };
 

@@ -842,7 +842,7 @@ export interface NexusGenFieldTypes {
   };
   Mutation: {
     // field return type
-    addPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    addPetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     autoSendTemplate: string; // String!
@@ -915,7 +915,7 @@ export interface NexusGenFieldTypes {
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionFieldAttachment: NexusGenEnums["Result"]; // Result!
-    removePetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    removePetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
@@ -932,7 +932,7 @@ export interface NexusGenFieldTypes {
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     tagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     transferOrganizationOwnership: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    transferPetitionOwnership: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
@@ -2051,7 +2051,7 @@ export interface NexusGenFieldTypeNames {
   };
   Mutation: {
     // field return type name
-    addPetitionPermission: "Petition";
+    addPetitionPermission: "PetitionBase";
     addUsersToUserGroup: "UserGroup";
     assignPetitionToUser: "SupportMethodResponse";
     autoSendTemplate: "String";
@@ -2124,7 +2124,7 @@ export interface NexusGenFieldTypeNames {
     publicUpdateSimpleReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
     removePetitionFieldAttachment: "Result";
-    removePetitionPermission: "Petition";
+    removePetitionPermission: "PetitionBase";
     removeUsersFromGroup: "UserGroup";
     reopenPetition: "Petition";
     resendVerificationCode: "Result";
@@ -2141,7 +2141,7 @@ export interface NexusGenFieldTypeNames {
     switchAutomaticReminders: "PetitionAccess";
     tagPetition: "PetitionBase";
     transferOrganizationOwnership: "SupportMethodResponse";
-    transferPetitionOwnership: "Petition";
+    transferPetitionOwnership: "PetitionBase";
     untagPetition: "PetitionBase";
     updateContact: "Contact";
     updateEventSubscription: "PetitionEventSubscription";

@@ -413,7 +413,7 @@ type Mutation {
     subscribe: Boolean = true
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): [Petition!]!
+  ): [PetitionBase!]!
 
   """
   Add users to a user group
@@ -983,7 +983,7 @@ type Mutation {
     removeAll: Boolean
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): [Petition!]!
+  ): [PetitionBase!]!
 
   """
   Removes users from a user group
@@ -1103,7 +1103,7 @@ type Mutation {
   """
   Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
   """
-  transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [Petition!]!
+  transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [PetitionBase!]!
 
   """
   Removes the given tag from the given petition

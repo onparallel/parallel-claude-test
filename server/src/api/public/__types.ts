@@ -307,7 +307,7 @@ export type MessageSentEvent = PetitionEvent & {
 
 export type Mutation = {
   /** Adds permissions on given petitions and users */
-  addPetitionPermission: Array<Petition>;
+  addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
@@ -452,7 +452,7 @@ export type Mutation = {
   /** Remove a petition field attachment */
   removePetitionFieldAttachment: Result;
   /** Removes permissions on given petitions and users */
-  removePetitionPermission: Array<Petition>;
+  removePetitionPermission: Array<PetitionBase>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
@@ -485,7 +485,7 @@ export type Mutation = {
   /** Transfers the ownership of an organization to a given user. Old owner will get ADMIN role */
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
-  transferPetitionOwnership: Array<Petition>;
+  transferPetitionOwnership: Array<PetitionBase>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   /** Updates a contact. */
@@ -3358,25 +3358,46 @@ export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
 }>;
 
 export type SharePetition_addPetitionPermissionMutation = {
-  addPetitionPermission: Array<{
-    permissions: Array<
-      | {
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          group: { id: string; name: string };
-        }
-      | {
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user: {
-            id: string;
-            fullName: string | null;
-            firstName: string | null;
-            lastName: string | null;
-          };
-        }
-    >;
-  }>;
+  addPetitionPermission: Array<
+    | {
+        permissions: Array<
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              group: { id: string; name: string };
+            }
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              user: {
+                id: string;
+                fullName: string | null;
+                firstName: string | null;
+                lastName: string | null;
+              };
+            }
+        >;
+      }
+    | {
+        permissions: Array<
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              group: { id: string; name: string };
+            }
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              user: {
+                id: string;
+                fullName: string | null;
+                firstName: string | null;
+                lastName: string | null;
+              };
+            }
+        >;
+      }
+  >;
 };
 
 export type StopSharing_removePetitionPermissionMutationVariables = Exact<{
@@ -3384,7 +3405,7 @@ export type StopSharing_removePetitionPermissionMutationVariables = Exact<{
 }>;
 
 export type StopSharing_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string }>;
+  removePetitionPermission: Array<{ id: string } | { id: string }>;
 };
 
 export type RemoveUserPermission_removePetitionPermissionMutationVariables = Exact<{
@@ -3393,7 +3414,7 @@ export type RemoveUserPermission_removePetitionPermissionMutationVariables = Exa
 }>;
 
 export type RemoveUserPermission_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string }>;
+  removePetitionPermission: Array<{ id: string } | { id: string }>;
 };
 
 export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables = Exact<{
@@ -3402,7 +3423,7 @@ export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables 
 }>;
 
 export type RemoveUserGroupPermission_removePetitionPermissionMutation = {
-  removePetitionPermission: Array<{ id: string }>;
+  removePetitionPermission: Array<{ id: string } | { id: string }>;
 };
 
 export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<{
@@ -3411,25 +3432,46 @@ export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<
 }>;
 
 export type TransferPetition_transferPetitionOwnershipMutation = {
-  transferPetitionOwnership: Array<{
-    permissions: Array<
-      | {
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          group: { id: string; name: string };
-        }
-      | {
-          permissionType: PetitionPermissionType;
-          createdAt: string;
-          user: {
-            id: string;
-            fullName: string | null;
-            firstName: string | null;
-            lastName: string | null;
-          };
-        }
-    >;
-  }>;
+  transferPetitionOwnership: Array<
+    | {
+        permissions: Array<
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              group: { id: string; name: string };
+            }
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              user: {
+                id: string;
+                fullName: string | null;
+                firstName: string | null;
+                lastName: string | null;
+              };
+            }
+        >;
+      }
+    | {
+        permissions: Array<
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              group: { id: string; name: string };
+            }
+          | {
+              permissionType: PetitionPermissionType;
+              createdAt: string;
+              user: {
+                id: string;
+                fullName: string | null;
+                firstName: string | null;
+                lastName: string | null;
+              };
+            }
+        >;
+      }
+  >;
 };
 
 export type GetTemplates_TemplatesQueryVariables = Exact<{
