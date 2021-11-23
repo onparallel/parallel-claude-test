@@ -359,10 +359,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return true;
   };
 
-  const [dontShowTestSignature, setDontShowTestSignature] = useUserPreference(
-    "dont-show-test-signature-dialog",
-    false
-  );
+  const [showTestSignatureDialogUserPreference, setShowTestSignatureDialogUserPreference] =
+    useUserPreference("show-test-signature-dialog", true);
   const showTestSignatureDialog = useTestSignatureDialog();
 
   const showErrorDialog = useErrorDialog();
@@ -379,12 +377,15 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     if (!isFieldsValid) return;
 
     try {
-      if (!dontShowTestSignature && petition.signatureConfig?.integration?.environment === "DEMO") {
+      if (
+        showTestSignatureDialogUserPreference &&
+        petition.signatureConfig?.integration?.environment === "DEMO"
+      ) {
         const { dontShow } = await showTestSignatureDialog({
           integrationName: petition.signatureConfig.integration.name,
         });
         if (dontShow) {
-          setDontShowTestSignature(true);
+          setShowTestSignatureDialogUserPreference(false);
         }
       }
 
@@ -505,7 +506,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await withError(showPetitionLimitReachedErrorDialog());
       }
     }
-  }, [petition, showPetitionLimitReachedErrorDialog]);
+  }, [petition, showPetitionLimitReachedErrorDialog, showTestSignatureDialogUserPreference]);
 
   const handleIndexFieldClick = useCallback(async (fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);

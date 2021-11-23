@@ -42,7 +42,7 @@ const email: Email<SignatureReminderProps> = {
           defaultMessage:
             "You have a pending signature request to sign a document titled {documentName}.",
         },
-        { documentName }
+        { documentName, tone }
       )}
 
       ${intl.formatMessage({

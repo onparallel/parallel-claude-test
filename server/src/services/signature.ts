@@ -135,7 +135,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     recipients: Recipient[],
     opts: SignatureOptions
   ) {
-    const locale = opts?.locale ?? "en";
+    const locale = opts.locale;
     const tone = opts.templateData.tone;
 
     const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as `${
@@ -166,7 +166,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         recipients: recipients.map((r, recipientIndex) => ({
           email: r.email,
           name: r.name,
-          require_signature_in_coordinates: opts?.signatureBoxPositions?.map(
+          require_signature_in_coordinates: opts.signatureBoxPositions?.map(
             (pageBoxes) => pageBoxes.find((pb) => pb.signerIndex === recipientIndex)?.box ?? {}
           ),
         })),

@@ -89,7 +89,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
     if (currentSignatureIntegrations.length < 2) {
       throw new WhitelistedError(
         "There are not enough integrations to be able to delete the requested integration.",
-        "INSUFICIENT_SIGNATURE_INTEGRATIONS_ERROR"
+        "INSUFFICIENT_SIGNATURE_INTEGRATIONS_ERROR"
       );
     }
 
@@ -129,6 +129,19 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
             pendingSignatures.map((s) => s.id),
             "CANCELLED_BY_USER",
             { canceller_id: ctx.user!.id }
+          ),
+          ctx.petitions.createEvent(
+            pendingSignatures.map((s) => ({
+              type: "SIGNATURE_CANCELLED",
+              petition_id: s.petition_id,
+              data: {
+                petition_signature_request_id: s.id,
+                cancel_reason: "CANCELLED_BY_USER",
+                cancel_data: {
+                  canceller_id: ctx.user!.id,
+                },
+              },
+            }))
           ),
           ctx.aws.enqueueMessages(
             "signature-worker",

@@ -9,9 +9,8 @@ export async function up(knex: Knex): Promise<void> {
   });
   await knex.raw(/* sql */ `
     update org_integration
-    set
-      "name" = INITCAP("provider"),
-      is_default = true`);
+    set "name" = INITCAP("provider")
+  `);
   await knex.raw(
     /* sql */ `
       update org_integration set "name" = 'Signaturit Sandbox'
@@ -43,6 +42,20 @@ export async function up(knex: Knex): Promise<void> {
     existing.map((as) => as.org_id)
   );
 
+  if (existing.length > 0) {
+    await knex
+      .from<OrgIntegration>("org_integration")
+      .whereIn(
+        "id",
+        existing.map((e) => e.id)
+      )
+      .update({
+        is_enabled: true,
+        updated_at: knex.raw("CURRENT_TIMESTAMP"),
+        updated_by: "Migration:20211103102614",
+      });
+  }
+
   if (orgsWithoutIntegration.length > 0) {
     await knex.from<OrgIntegration>("org_integration").insert(
       orgsWithoutIntegration.map((id) => ({
@@ -52,6 +65,7 @@ export async function up(knex: Knex): Promise<void> {
         name: "Signaturit Sandbox",
         settings: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY, ENVIRONMENT: "sandbox" },
         is_enabled: true,
+        is_default: true,
         created_by: `Migration:20211103102614`,
       }))
     );

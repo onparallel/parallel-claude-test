@@ -42,7 +42,7 @@ const email: Email<SignatureCompletedProps> = {
           defaultMessage:
             "Please find attached a copy of the document you just signed through {signatureProvider}.",
         },
-        { signatureProvider }
+        { signatureProvider, tone }
       )}
 
       ${closing({}, intl)}

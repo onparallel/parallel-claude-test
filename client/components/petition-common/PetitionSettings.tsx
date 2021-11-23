@@ -81,7 +81,11 @@ function _PetitionSettings({
   const intl = useIntl();
 
   const signatureIntegrations = user.organization.signatureIntegrations.items;
-  const hasSignature = user.hasPetitionSignature && signatureIntegrations.length > 0;
+  const hasSignature = signatureIntegrations.length > 0;
+  const hasDemoSignature =
+    signatureIntegrations.length === 1 &&
+    signatureIntegrations[0].__typename === "SignatureOrgIntegration" &&
+    signatureIntegrations[0].environment === "DEMO";
 
   const ongoingSignatureRequest =
     petition.__typename === "Petition" &&
@@ -346,7 +350,8 @@ function _PetitionSettings({
                     defaultMessage="Enable eSignature"
                   />
                 </Text>
-                {petition.signatureConfig?.integration?.environment === "DEMO" || !hasSignature ? (
+                {petition.signatureConfig?.integration?.environment === "DEMO" ||
+                hasDemoSignature ? (
                   <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
                 ) : null}
               </HStack>

@@ -9,9 +9,9 @@ export function userHasAccessToIntegrations<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argName: TArg, types?: IntegrationType[]): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_, args, ctx) => {
+  return async (_, args, ctx) => {
     try {
-      return ctx.integrations.userHasAccessToIntegration(
+      return await ctx.integrations.userHasAccessToIntegration(
         unMaybeArray(args[argName] as MaybeArray<number>),
         ctx.user!,
         types
