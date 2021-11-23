@@ -1,4 +1,4 @@
-import { DataProxy, gql } from "@apollo/client";
+import { DataProxy, gql, useMutation } from "@apollo/client";
 import {
   Box,
   Center,
@@ -25,14 +25,15 @@ import {
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
+  PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
+  PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
+  PetitionComposeField_PetitionFieldAttachmentFragment,
+  PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
   PetitionComposeField_PetitionFieldFragment,
-  PetitionComposeField_updateFieldAttachments_PetitionFieldFragment,
+  PetitionComposeField_removePetitionFieldAttachmentDocument,
+  PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDoc,
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
-  usePetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation,
-  usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation,
-  usePetitionComposeField_petitionFieldAttachmentUploadCompleteMutation,
-  usePetitionComposeField_removePetitionFieldAttachmentMutation,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
@@ -137,14 +138,18 @@ const _PetitionComposeField = chakraForwardRef<
   const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<Record<string, number>>(
     {}
   );
-  const [createPetitionFieldAttachmentUploadLink] =
-    usePetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation();
-  const [petitionFieldAttachmentUploadComplete] =
-    usePetitionComposeField_petitionFieldAttachmentUploadCompleteMutation();
-  const [removePetitionFieldAttachment] =
-    usePetitionComposeField_removePetitionFieldAttachmentMutation();
-  const [petitionFieldAttachmentDownloadLink] =
-    usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation();
+  const [createPetitionFieldAttachmentUploadLink] = useMutation(
+    PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument
+  );
+  const [petitionFieldAttachmentUploadComplete] = useMutation(
+    PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument
+  );
+  const [removePetitionFieldAttachment] = useMutation(
+    PetitionComposeField_removePetitionFieldAttachmentDocument
+  );
+  const [petitionFieldAttachmentDownloadLink] = useMutation(
+    PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument
+  );
 
   const handleRemoveAttachment = async function (attachmentId: string) {
     uploads.current[attachmentId]?.abort();
@@ -1198,23 +1203,27 @@ function updateFieldAttachments(
   proxy: DataProxy,
   fieldId: string,
   updateFn: (
-    cached: PetitionComposeField_updateFieldAttachments_PetitionFieldFragment["attachments"]
-  ) => PetitionComposeField_updateFieldAttachments_PetitionFieldFragment["attachments"]
+    cached: PetitionComposeField_PetitionFieldAttachmentFragment[]
+  ) => PetitionComposeField_PetitionFieldAttachmentFragment[]
 ) {
-  updateFragment<PetitionComposeField_updateFieldAttachments_PetitionFieldFragment>(proxy, {
+  updateFragment(proxy, {
     id: fieldId,
     fragmentName: "PetitionComposeField_updateFieldAttachments_PetitionField",
-    fragment: gql`
-      fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
-        attachments {
-          ...PetitionComposeField_PetitionFieldAttachment
-        }
-      }
-      ${fragments.PetitionFieldAttachment}
-    `,
+    fragment: PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDoc,
     data: (cached) => ({
       ...cached,
       attachments: updateFn(cached!.attachments),
     }),
   });
 }
+
+updateFieldAttachments.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
+      attachments {
+        ...PetitionComposeField_PetitionFieldAttachment
+      }
+    }
+    ${fragments.PetitionFieldAttachment}
+  `,
+};

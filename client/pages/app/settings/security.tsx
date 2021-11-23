@@ -15,13 +15,8 @@ import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import {
-  SecurityQuery,
-  Security_updatePasswordMutation,
-  Security_updatePasswordMutationVariables,
-  useSecurityQuery,
-} from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { Security_updatePasswordDocument, Security_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
@@ -38,10 +33,10 @@ function Security() {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(useSecurityQuery());
+  } = useAssertQuery(Security_userDocument);
   const sections = useSettingsSections(me);
 
-  const [updatePassword] = useUpdatePassword();
+  const [updatePassword] = useMutation(Security_updatePasswordDocument);
   const {
     handleSubmit,
     register,
@@ -218,17 +213,17 @@ function Security() {
   );
 }
 
-function useUpdatePassword() {
-  return useMutation<Security_updatePasswordMutation, Security_updatePasswordMutationVariables>(gql`
+Security.mutations = [
+  gql`
     mutation Security_updatePassword($password: String!, $newPassword: String!) {
       changePassword(password: $password, newPassword: $newPassword)
     }
-  `);
-}
+  `,
+];
 
-Security.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<SecurityQuery>(gql`
-    query Security {
+Security.queries = [
+  gql`
+    query Security_user {
       me {
         isSsoUser
         ...SettingsLayout_User
@@ -237,7 +232,11 @@ Security.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
     }
     ${SettingsLayout.fragments.User}
     ${useSettingsSections.fragments.User}
-  `);
+  `,
+];
+
+Security.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(Security_userDocument);
 };
 
 export default compose(withDialogs, withApolloData)(Security);

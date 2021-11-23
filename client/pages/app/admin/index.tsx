@@ -3,8 +3,8 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useAdminQuery, AdminQuery } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { Admin_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -13,7 +13,7 @@ function Admin() {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(useAdminQuery());
+  } = useAssertQuery(Admin_userDocument);
   const sections = useAdminSections();
 
   return (
@@ -31,25 +31,20 @@ function Admin() {
   );
 }
 
-Admin.fragments = {
-  User: gql`
-    fragment Admin_User on User {
-      ...AppLayout_User
+Admin.queries = [
+  gql`
+    query Admin_user {
+      me {
+        id
+        ...AppLayout_User
+      }
     }
     ${AppLayout.fragments.User}
   `,
-};
+];
 
 Admin.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<AdminQuery>(gql`
-    query Admin {
-      me {
-        id
-        ...Admin_User
-      }
-    }
-    ${Admin.fragments.User}
-  `);
+  await fetchQuery(Admin_userDocument);
 };
 
 export default compose(withSuperAdminAccess, withApolloData)(Admin);

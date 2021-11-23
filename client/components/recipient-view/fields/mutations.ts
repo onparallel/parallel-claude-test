@@ -1,17 +1,19 @@
-import { DataProxy, gql, useApolloClient } from "@apollo/client";
+import { DataProxy, gql, useApolloClient, useMutation } from "@apollo/client";
 import {
+  RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument,
+  RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument,
+  RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument,
+  RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument,
+  RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument,
+  RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument,
+  RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument,
+  RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument,
+  RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument,
   RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment,
-  RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment,
-  RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
-  useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
-  useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation,
-  useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation,
-  useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
-  useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
-  useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
-  useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation,
-  useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation,
-  useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
+  RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragmentDoc,
+  RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragmentDoc,
+  RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragmentDoc,
+  Scalars,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { uploadFile } from "@parallel/utils/uploadFile";
@@ -29,10 +31,10 @@ const _publicDeletePetitionReply = gql`
 `;
 
 export function useDeletePetitionReply() {
-  const [deletePetitionReply] =
-    useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation({
-      optimisticResponse: { publicDeletePetitionReply: "SUCCESS" },
-    });
+  const [deletePetitionReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument,
+    { optimisticResponse: { publicDeletePetitionReply: "SUCCESS" } }
+  );
   return useCallback(
     async function _deletePetitionReply({
       petitionId,
@@ -75,8 +77,9 @@ const _publicUpdateSimpleReply = gql`
 `;
 
 export function useUpdateSimpleReply() {
-  const [updateSimpleReply] =
-    useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation();
+  const [updateSimpleReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument
+  );
   return useCallback(
     async function _updateSimpleReply({
       petitionId,
@@ -120,8 +123,9 @@ const _publicCreateSimpleReply = gql`
 `;
 
 export function useCreateSimpleReply() {
-  const [createSimpleReply] =
-    useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation();
+  const [createSimpleReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument
+  );
   return useCallback(
     async function _createSimpleReply({
       petitionId,
@@ -170,8 +174,9 @@ const _publicCreateCheckboxReply = gql`
 `;
 
 export function useCreateCheckboxReply() {
-  const [createCheckboxReply] =
-    useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation();
+  const [createCheckboxReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument
+  );
   return useCallback(
     async function _createCheckboxReply({
       petitionId,
@@ -222,8 +227,9 @@ const _publicUpdateCheckboxReply = gql`
 `;
 
 export function useUpdateCheckboxReply() {
-  const [updateCheckboxReply] =
-    useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation();
+  const [updateCheckboxReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument
+  );
   return useCallback(
     async function _updateCheckboxReply({
       petitionId,
@@ -267,8 +273,9 @@ const _publicCreateDynamicSelectReply = gql`
 `;
 
 export function useCreateDynamicSelectReply() {
-  const [createDynamicSelectReply] =
-    useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation();
+  const [createDynamicSelectReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument
+  );
   return useCallback(
     async function _createDynamicSelectReply({
       petitionId,
@@ -319,8 +326,9 @@ const _publicUpdateDynamicSelectReply = gql`
 `;
 
 export function useUpdateDynamicSelectReply() {
-  const [updateDynamicSelectReply] =
-    useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation();
+  const [updateDynamicSelectReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument
+  );
   return useCallback(
     async function _updateDynamicSelectReply({
       petitionId,
@@ -383,11 +391,13 @@ const _publicFileUploadReplyComplete = gql`
 export function useCreateFileUploadReply(
   uploads: MutableRefObject<Record<string, XMLHttpRequest>>
 ) {
-  const [createFileUploadReply] =
-    useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation();
+  const [createFileUploadReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument
+  );
   const apollo = useApolloClient();
-  const [fileUploadReplyComplete] =
-    useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation();
+  const [fileUploadReplyComplete] = useMutation(
+    RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument
+  );
 
   return useCallback(
     async function _createFileUploadReply({
@@ -456,60 +466,61 @@ function updateFieldReplies(
     cached: RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment["replies"]
   ) => RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment["replies"]
 ) {
-  updateFragment<RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment>(
-    proxy,
-    {
-      id: fieldId,
-      fragment: gql`
-        fragment RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionField on PublicPetitionField {
-          replies {
-            id
-          }
-        }
-      `,
-      data: (cached) => ({ ...cached, replies: updateFn(cached!.replies) }),
-    }
-  );
+  updateFragment(proxy, {
+    id: fieldId,
+    fragment: RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragmentDoc,
+    data: (cached) => ({ ...cached, replies: updateFn(cached!.replies) }),
+  });
 }
 
+updateFieldReplies.fragments = {
+  PublicPetitionField: gql`
+    fragment RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionField on PublicPetitionField {
+      replies {
+        id
+      }
+    }
+  `,
+};
 function updateReplyContent(
   proxy: DataProxy,
   replyId: string,
-  updateFn: (
-    cached: RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment["content"]
-  ) => RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment["content"]
+  updateFn: (cached: Scalars["JSONObject"]) => Scalars["JSONObject"]
 ) {
-  updateFragment<RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment>(
-    proxy,
-    {
-      fragment: gql`
-        fragment RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReply on PublicPetitionFieldReply {
-          content
-        }
-      `,
-      id: replyId,
-      data: (cached) => ({
-        ...cached,
-        content: updateFn(cached!.content),
-      }),
-    }
-  );
+  updateFragment(proxy, {
+    fragment:
+      RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragmentDoc,
+    id: replyId,
+    data: (cached) => ({
+      ...cached,
+      content: updateFn(cached!.content),
+    }),
+  });
 }
 
-function updatePetitionStatus(proxy: DataProxy, petitionId: string) {
-  updateFragment<RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment>(
-    proxy,
-    {
-      fragment: gql`
-        fragment RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetition on PublicPetition {
-          status
-        }
-      `,
-      id: petitionId,
-      data: (cached) => ({
-        ...cached,
-        status: cached!.status === "COMPLETED" ? "PENDING" : cached!.status,
-      }),
+updateReplyContent.fragments = {
+  PublicPetitionFieldReply: gql`
+    fragment RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReply on PublicPetitionFieldReply {
+      content
     }
-  );
+  `,
+};
+
+function updatePetitionStatus(proxy: DataProxy, petitionId: string) {
+  updateFragment(proxy, {
+    fragment: RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragmentDoc,
+    id: petitionId,
+    data: (cached) => ({
+      ...cached,
+      status: cached!.status === "COMPLETED" ? "PENDING" : cached!.status,
+    }),
+  });
 }
+
+updatePetitionStatus.fragments = {
+  PublicPetition: gql`
+    fragment RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetition on PublicPetition {
+      status
+    }
+  `,
+};

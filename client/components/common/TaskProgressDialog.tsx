@@ -1,9 +1,9 @@
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { Button, Progress } from "@chakra-ui/react";
 import { DialogProps } from "@parallel/components/common/DialogProvider";
 import {
+  TaskProgressDialog_TaskDocument,
   TaskProgressDialog_TaskFragment,
-  useTaskProgressDialog_TaskQuery,
 } from "@parallel/graphql/__types";
 import { useInterval } from "@parallel/utils/useInterval";
 import { ReactNode, useRef } from "react";
@@ -23,7 +23,9 @@ export function TaskProgressDialog({
   task,
   ...props
 }: DialogProps<TaskProgressDialogProps, TaskProgressDialog_TaskFragment>) {
-  const { data, refetch } = useTaskProgressDialog_TaskQuery({ variables: { id: task.id } });
+  const { data, refetch } = useQuery(TaskProgressDialog_TaskDocument, {
+    variables: { id: task.id },
+  });
   const processingTask = data?.task ?? task;
 
   useInterval(

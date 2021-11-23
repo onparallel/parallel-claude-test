@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { SettingsQuery, useSettingsQuery } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { Settings_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -10,7 +10,7 @@ export function Settings() {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(useSettingsQuery());
+  } = useAssertQuery(Settings_userDocument);
   const sections = useSettingsSections(me);
 
   return (
@@ -28,27 +28,22 @@ export function Settings() {
   );
 }
 
-Settings.fragments = {
-  User: gql`
-    fragment Settings_User on User {
-      ...SettingsLayout_User
-      ...useSettingsSections_User
+Settings.queries = [
+  gql`
+    query Settings_user {
+      me {
+        id
+        ...SettingsLayout_User
+        ...useSettingsSections_User
+      }
     }
     ${SettingsLayout.fragments.User}
     ${useSettingsSections.fragments.User}
   `,
-};
+];
 
 Settings.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<SettingsQuery>(gql`
-    query Settings {
-      me {
-        id
-        ...Settings_User
-      }
-    }
-    ${Settings.fragments.User}
-  `);
+  await fetchQuery(Settings_userDocument);
 };
 
 export default withApolloData(Settings);

@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
@@ -13,8 +13,8 @@ import {
 import { EditIcon } from "@parallel/chakra/icons";
 import {
   TagEditDialog_TagFragment,
-  useTagEditDialog_tagsQuery,
-  useTagEditDialog_updateTagMutation,
+  TagEditDialog_tagsDocument,
+  TagEditDialog_updateTagDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -31,13 +31,13 @@ import { TagColorSelect } from "./TagColorSelect";
 type TagSelection = TagEditDialog_TagFragment;
 
 export function TagEditDialog({ ...props }: DialogProps) {
-  const { data } = useTagEditDialog_tagsQuery({
+  const { data } = useQuery(TagEditDialog_tagsDocument, {
     fetchPolicy: "cache-and-network",
   });
   const isDisabled = !data || data.tags.items.length === 0;
   const [tag, setTag] = useState<TagSelection | null>(null);
   const [error, setError] = useState<string | undefined>();
-  const [updateTag] = useTagEditDialog_updateTagMutation();
+  const [updateTag] = useMutation(TagEditDialog_updateTagDocument);
   useEffect(() => {
     if (data && data.tags.items.length > 0 && tag === null) {
       const selected = maxBy(data.tags.items, (t) => new Date(t.createdAt).valueOf());

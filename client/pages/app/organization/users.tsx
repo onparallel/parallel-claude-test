@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Badge, Flex, Heading, Text, Tooltip, useToast } from "@chakra-ui/react";
 import { ForbiddenIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -15,17 +15,16 @@ import { OrganizationUsersListTableHeader } from "@parallel/components/organizat
 import { UserLimitReachedAlert } from "@parallel/components/organization/UserLimitReachedAlert";
 import {
   OrganizationRole,
-  OrganizationUsersQuery,
+  OrganizationUsers_createOrganizationUserDocument,
   OrganizationUsers_OrderBy,
+  OrganizationUsers_updateOrganizationUserDocument,
+  OrganizationUsers_updateUserStatusDocument,
+  OrganizationUsers_userDocument,
   OrganizationUsers_UserFragment,
-  useOrganizationUsersQuery,
-  useOrganizationUsers_createOrganizationUserMutation,
-  useOrganizationUsers_updateOrganizationUserMutation,
-  useOrganizationUsers_updateUserStatusMutation,
   User,
   UserStatus,
 } from "@parallel/graphql/__types";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
@@ -66,16 +65,14 @@ function OrganizationUsers() {
     data: { me },
     loading,
     refetch,
-  } = useAssertQueryOrPreviousData(
-    useOrganizationUsersQuery({
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
-        sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
-      },
-    })
-  );
+  } = useAssertQueryOrPreviousData(OrganizationUsers_userDocument, {
+    variables: {
+      offset: state.items * (state.page - 1),
+      limit: state.items,
+      search: state.search,
+      sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
+    },
+  });
 
   const [showDialog, setShowDialog] = useQueryStateSlice(state, setQueryState, "dialog");
 
@@ -117,7 +114,7 @@ function OrganizationUsers() {
     [debouncedOnSearchChange]
   );
 
-  const [createOrganizationUser] = useOrganizationUsers_createOrganizationUserMutation();
+  const [createOrganizationUser] = useMutation(OrganizationUsers_createOrganizationUserDocument);
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
@@ -155,7 +152,7 @@ function OrganizationUsers() {
     }
   }, [showDialog]);
 
-  const [updateOrganizationUser] = useOrganizationUsers_updateOrganizationUserMutation();
+  const [updateOrganizationUser] = useMutation(OrganizationUsers_updateOrganizationUserDocument);
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
     try {
       const { role } = await showCreateOrUpdateUserDialog({
@@ -185,7 +182,7 @@ function OrganizationUsers() {
 
   const showConfirmActivateUserDialog = useConfirmActivateUsersDialog();
   const showConfirmDeactivateUserDialog = useConfirmDeactivateUserDialog();
-  const [updateUserStatus] = useOrganizationUsers_updateUserStatusMutation();
+  const [updateUserStatus] = useMutation(OrganizationUsers_updateUserStatusDocument);
   const handleUpdateUserStatus = async (userIds: string[], newStatus: UserStatus) => {
     try {
       let transferToUser: Maybe<UserSelectSelection> = null;
@@ -476,55 +473,56 @@ OrganizationUsers.mutations = [
   `,
 ];
 
-OrganizationUsers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContext) => {
-  const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
-  await fetchQuery<OrganizationUsersQuery>(
-    gql`
-      query OrganizationUsers(
-        $offset: Int!
-        $limit: Int!
-        $search: String
-        $sortBy: [OrganizationUsers_OrderBy!]
-      ) {
-        me {
-          organization {
-            id
-            hasSsoProvider
-            users(
-              offset: $offset
-              limit: $limit
-              search: $search
-              sortBy: $sortBy
-              includeInactive: true
-            ) {
-              totalCount
-              items {
-                ...OrganizationUsers_User
-              }
-            }
-            usageLimits {
-              users {
-                limit
-              }
+OrganizationUsers.queries = [
+  gql`
+    query OrganizationUsers_user(
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $sortBy: [OrganizationUsers_OrderBy!]
+    ) {
+      me {
+        organization {
+          id
+          hasSsoProvider
+          users(
+            offset: $offset
+            limit: $limit
+            search: $search
+            sortBy: $sortBy
+            includeInactive: true
+          ) {
+            totalCount
+            items {
+              ...OrganizationUsers_User
             }
           }
-          ...SettingsLayout_User
-          ...OrganizationUsersListTableHeader_User
+          usageLimits {
+            users {
+              limit
+            }
+          }
         }
+        ...SettingsLayout_User
+        ...OrganizationUsersListTableHeader_User
       }
-      ${SettingsLayout.fragments.User}
-      ${OrganizationUsers.fragments.User}
-      ${OrganizationUsersListTableHeader.fragments.User}
-    `,
-    {
-      variables: {
-        offset: items * (page - 1),
-        limit: items,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy],
-      },
     }
-  );
+    ${SettingsLayout.fragments.User}
+    ${OrganizationUsers.fragments.User}
+    ${OrganizationUsersListTableHeader.fragments.User}
+  `,
+];
+
+OrganizationUsers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContext) => {
+  const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
+  await fetchQuery(OrganizationUsers_userDocument, {
+    variables: {
+      offset: items * (page - 1),
+      limit: items,
+      search,
+      sortBy: [`${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy],
+    },
+  });
 };
 
 export default compose(withDialogs, withApolloData)(OrganizationUsers);

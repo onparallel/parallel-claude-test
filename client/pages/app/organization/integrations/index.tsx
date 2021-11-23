@@ -16,11 +16,8 @@ import { withAdminOrganizationRole } from "@parallel/components/common/withAdmin
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { IntegrationCard } from "@parallel/components/organization/IntegrationCard";
-import {
-  OrganizationIntegrationsQuery,
-  useOrganizationIntegrationsQuery,
-} from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { OrganizationIntegrations_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -29,7 +26,7 @@ function OrganizationIntegrations() {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(useOrganizationIntegrationsQuery());
+  } = useAssertQuery(OrganizationIntegrations_userDocument);
   const sections = useOrganizationSections(me);
 
   const integrations = [
@@ -149,12 +146,9 @@ function OrganizationIntegrations() {
   );
 }
 
-OrganizationIntegrations.getInitialProps = async ({
-  fetchQuery,
-  ...context
-}: WithApolloDataContext) => {
-  await fetchQuery<OrganizationIntegrationsQuery>(gql`
-    query OrganizationIntegrations {
+OrganizationIntegrations.queries = [
+  gql`
+    query OrganizationIntegrations_user {
       me {
         id
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
@@ -163,7 +157,11 @@ OrganizationIntegrations.getInitialProps = async ({
       }
     }
     ${SettingsLayout.fragments.User}
-  `);
+  `,
+];
+
+OrganizationIntegrations.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(OrganizationIntegrations_userDocument);
 };
 
 export default compose(

@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
@@ -15,13 +15,14 @@ import {
 } from "@chakra-ui/react";
 import { CheckIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import {
-  useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation,
-  useExportRepliesProgressDialog_PetitionRepliesQuery,
-  useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation,
-  useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation,
-  useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation,
+  ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument,
+  ExportRepliesProgressDialog_petitionDocument,
+  ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument,
+  ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument,
+  ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument,
 } from "@parallel/graphql/__types";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
+import deepmerge from "deepmerge";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { BaseDialog } from "../common/BaseDialog";
@@ -29,7 +30,6 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { useErrorDialog } from "../common/ErrorDialog";
 import { NormalLink } from "../common/Link";
-import deepmerge from "deepmerge";
 export interface ExportRepliesProgressDialogProps {
   externalClientId: string;
   petitionId: string;
@@ -90,19 +90,23 @@ export function ExportRepliesProgressDialog({
   const intl = useIntl();
   const [progress, setProgress] = useState(0);
   const [state, setState] = useState<"LOADING" | "UPLOADING" | "FINISHED">("LOADING");
-  const { data } = useExportRepliesProgressDialog_PetitionRepliesQuery({
+  const { data } = useQuery(ExportRepliesProgressDialog_petitionDocument, {
     variables: { petitionId },
   });
   const isRunning = useRef(false);
   const placeholdersRename = useFilenamePlaceholdersRename();
-  const [fileUploadReplyDownloadLink] =
-    useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation();
-  const [signedPetitionDownloadLink] =
-    useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation();
-  const [updatePetitionFieldReplyMetadata] =
-    useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation();
-  const [updateSignatureRequestMetadata] =
-    useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation();
+  const [fileUploadReplyDownloadLink] = useMutation(
+    ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument
+  );
+  const [signedPetitionDownloadLink] = useMutation(
+    ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument
+  );
+  const [updatePetitionFieldReplyMetadata] = useMutation(
+    ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument
+  );
+  const [updateSignatureRequestMetadata] = useMutation(
+    ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument
+  );
   const { current: abort } = useRef(new AbortController());
   const showAlreadyExported = useDialog(AlreadyExportedDialog);
   const showErrorDialog = useErrorDialog();
@@ -389,7 +393,7 @@ ExportRepliesProgressDialog.fragments = {
 
 ExportRepliesProgressDialog.queries = [
   gql`
-    query ExportRepliesProgressDialog_PetitionReplies($petitionId: GID!) {
+    query ExportRepliesProgressDialog_petition($petitionId: GID!) {
       petition(id: $petitionId) {
         ...ExportRepliesProgressDialog_Petition
       }

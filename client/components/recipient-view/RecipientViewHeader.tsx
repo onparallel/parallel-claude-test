@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Accordion,
   AccordionButton,
@@ -24,10 +24,10 @@ import { CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
   RecipientViewHeader_PublicContactFragment,
+  RecipientViewHeader_publicDelegateAccessToContactDocument,
   RecipientViewHeader_PublicUserFragment,
   RecipientView_PublicPetitionMessageFragment,
   Tone,
-  useRecipientViewHeader_publicDelegateAccessToContactMutation,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
@@ -88,8 +88,9 @@ export function RecipientViewHeader({
   const intl = useIntl();
   const toast = useToast();
   const showDelegateAccessDialog = useDelegateAccessDialog();
-  const [publicDelegateAccessToContact] =
-    useRecipientViewHeader_publicDelegateAccessToContactMutation();
+  const [publicDelegateAccessToContact] = useMutation(
+    RecipientViewHeader_publicDelegateAccessToContactDocument
+  );
 
   const dividerOrientation = useBreakpointValue<DividerProps["orientation"]>({
     base: "horizontal",

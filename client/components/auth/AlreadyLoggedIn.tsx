@@ -1,11 +1,12 @@
+import { gql } from "@apollo/client";
 import { Box, Button, Text } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
-import { Login_UserFragment } from "@parallel/graphql/__types";
+import { AlreadyLoggedIn_UserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { UserAvatar } from "../common/UserAvatar";
 
 interface AlreadyLoggedInProps {
-  me: Login_UserFragment;
+  me: AlreadyLoggedIn_UserFragment;
   onRelogin: () => void;
   onContinueAs: () => void;
 }
@@ -41,3 +42,14 @@ export function AlreadyLoggedIn({ me, onRelogin, onContinueAs }: AlreadyLoggedIn
     </>
   );
 }
+
+AlreadyLoggedIn.fragments = {
+  User: gql`
+    fragment AlreadyLoggedIn_User on User {
+      email
+      fullName
+      ...UserAvatar_User
+    }
+    ${UserAvatar.fragments.User}
+  `,
+};

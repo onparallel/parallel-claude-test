@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { getOperationName } from "@apollo/client/utilities";
 import {
   Box,
@@ -28,12 +28,12 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
-  PetitionActivityDocument,
+  PetitionActivity_petitionDocument,
   PetitionHeader_PetitionFragment,
+  PetitionHeader_reopenPetitionDocument,
+  PetitionHeader_updatePetitionPermissionSubscriptionDocument,
   PetitionHeader_UserFragment,
   UpdatePetitionInput,
-  usePetitionHeader_reopenPetitionMutation,
-  usePetitionHeader_updatePetitionPermissionSubscriptionMutation,
 } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
@@ -107,8 +107,9 @@ export function PetitionHeader({
 
   const isSubscribed = petition.myEffectivePermission!.isSubscribed;
 
-  const [updatePetitionPermissionSubscription] =
-    usePetitionHeader_updatePetitionPermissionSubscriptionMutation();
+  const [updatePetitionPermissionSubscription] = useMutation(
+    PetitionHeader_updatePetitionPermissionSubscriptionDocument
+  );
   const handleUpdatePetitionPermissionSubscription = async function (isSubscribed: boolean) {
     await updatePetitionPermissionSubscription({
       variables: {
@@ -187,7 +188,7 @@ export function PetitionHeader({
     [petition.status, petition.isReadOnly, intl.locale]
   );
 
-  const [reopenPetition] = usePetitionHeader_reopenPetitionMutation();
+  const [reopenPetition] = useMutation(PetitionHeader_reopenPetitionDocument);
   const confirmReopenPetitionDialog = useConfirmReopenPetitionDialog();
 
   const handleReopenPetition = useCallback(async () => {
@@ -197,7 +198,7 @@ export function PetitionHeader({
         variables: {
           petitionId: petition.id,
         },
-        refetchQueries: [getOperationName(PetitionActivityDocument)!],
+        refetchQueries: [getOperationName(PetitionActivity_petitionDocument)!],
       });
     } catch {}
   }, [petition.id]);

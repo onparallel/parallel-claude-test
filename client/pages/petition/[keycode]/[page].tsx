@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
@@ -32,15 +32,13 @@ import { RecipientViewHeader } from "@parallel/components/recipient-view/Recipie
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
-  PublicPetitionQuery,
-  PublicPetitionQueryVariables,
+  RecipientView_accessDocument,
+  RecipientView_publicCompletePetitionDocument,
   RecipientView_PublicPetitionFieldFragment,
   RecipientView_PublicUserFragment,
   Tone,
-  usePublicPetitionQuery,
-  useRecipientView_publicCompletePetitionMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
@@ -62,7 +60,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const toast = useToast();
   const {
     data: { access },
-  } = assertQuery(usePublicPetitionQuery({ variables: { keycode } }));
+  } = useAssertQuery(RecipientView_accessDocument, { variables: { keycode } });
   const petition = access!.petition!;
   const granter = access!.granter!;
   const contact = access!.contact!;
@@ -75,7 +73,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage);
 
   const [finalized, setFinalized] = useState(false);
-  const [publicCompletePetition] = useRecipientView_publicCompletePetitionMutation();
+  const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
   const showCompleteSignerInfoDialog = useCompleteSignerInfoDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
   const handleFinalize = useCallback(
@@ -554,6 +552,17 @@ function useGetPageFields(fields: RecipientView_PublicPetitionFieldFragment[], p
   }, [fields, page, visibility]);
 }
 
+RecipientView.queries = [
+  gql`
+    query RecipientView_access($keycode: ID!) {
+      access(keycode: $keycode) {
+        ...RecipientView_PublicPetitionAccess
+      }
+    }
+    ${RecipientView.fragments.PublicPetitionAccess}
+  `,
+];
+
 RecipientView.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
   const page = parseInt(query.page as string);
@@ -561,17 +570,9 @@ RecipientView.getInitialProps = async ({ query, pathname, fetchQuery }: WithApol
     throw new RedirectError(resolveUrl(pathname, { ...query, page: "1" }));
   }
 
-  const result = await fetchQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
-    gql`
-      query PublicPetition($keycode: ID!) {
-        access(keycode: $keycode) {
-          ...RecipientView_PublicPetitionAccess
-        }
-      }
-      ${RecipientView.fragments.PublicPetitionAccess}
-    `,
-    { variables: { keycode } }
-  );
+  const result = await fetchQuery(RecipientView_accessDocument, {
+    variables: { keycode },
+  });
   if (!result.data?.access?.petition) {
     throw new Error();
   }

@@ -3,6 +3,7 @@ import { Alert, AlertIcon, Box, Button, Flex, Heading, Image, Stack, Text } from
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
+  AddPetitionAccessDialog_contactsByEmailDocument,
   AddPetitionAccessDialog_contactsByEmailQuery,
   AddPetitionAccessDialog_contactsByEmailQueryVariables,
   AddPetitionAccessDialog_PetitionFragment,
@@ -325,11 +326,8 @@ export function useAddPetitionAccessDialog() {
 function useSearchContactsByEmail() {
   const apollo = useApolloClient();
   return useCallback(async function (emails: string[]) {
-    const result = await apollo.query<
-      AddPetitionAccessDialog_contactsByEmailQuery,
-      AddPetitionAccessDialog_contactsByEmailQueryVariables
-    >({
-      query: AddPetitionAccessDialog.queries.contactsByEmail,
+    const result = await apollo.query({
+      query: AddPetitionAccessDialog_contactsByEmailDocument,
       variables: { emails },
       fetchPolicy: "no-cache",
     });

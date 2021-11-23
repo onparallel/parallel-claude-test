@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -17,12 +17,11 @@ import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
-  AccountQuery,
-  useAccountQuery,
-  useAccount_setUserPreferredLocaleMutation,
-  useAccount_updateAccountMutation,
+  Account_setUserPreferredLocaleDocument,
+  Account_updateAccountDocument,
+  Account_userDocument,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
@@ -41,7 +40,7 @@ function Account() {
 
   const {
     data: { me },
-  } = assertQuery(useAccountQuery());
+  } = useAssertQuery(Account_userDocument);
   const sections = useSettingsSections(me);
 
   const {
@@ -54,8 +53,8 @@ function Account() {
       lastName: me.lastName ?? undefined,
     },
   });
-  const [updateAccount] = useAccount_updateAccountMutation();
-  const [setUserLocale] = useAccount_setUserPreferredLocaleMutation();
+  const [updateAccount] = useMutation(Account_updateAccountDocument);
+  const [setUserLocale] = useMutation(Account_setUserPreferredLocaleDocument);
   const locales = useSupportedLocales();
 
   function onSaveName({ firstName, lastName }: NameChangeFormData) {
@@ -209,16 +208,20 @@ Account.mutations = [
   `,
 ];
 
-Account.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<AccountQuery>(gql`
-    query Account {
+Account.queries = [
+  gql`
+    query Account_user {
       me {
         id
         ...Account_User
       }
     }
     ${Account.fragments.User}
-  `);
+  `,
+];
+
+Account.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(Account_userDocument);
 };
 
 export default compose(withDialogs, withApolloData)(Account);

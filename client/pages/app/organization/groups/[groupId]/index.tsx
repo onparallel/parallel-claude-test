@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Editable,
   EditableInput,
@@ -30,19 +30,16 @@ import { useAddMemberGroupDialog } from "@parallel/components/organization/AddMe
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/ConfirmRemoveMemberDialog";
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import {
-  OrganizationGroupQuery,
-  OrganizationGroupQueryVariables,
-  OrganizationGroupUserQuery,
+  OrganizationGroup_addUsersToUserGroupDocument,
+  OrganizationGroup_cloneUserGroupDocument,
+  OrganizationGroup_deleteUserGroupDocument,
+  OrganizationGroup_removeUsersFromGroupDocument,
+  OrganizationGroup_updateUserGroupDocument,
+  OrganizationGroup_userDocument,
+  OrganizationGroup_userGroupDocument,
   OrganizationGroup_UserGroupMemberFragment,
-  useOrganizationGroupQuery,
-  useOrganizationGroupUserQuery,
-  useOrganizationGroup_addUsersToUserGroupMutation,
-  useOrganizationGroup_cloneUserGroupMutation,
-  useOrganizationGroup_deleteUserGroupMutation,
-  useOrganizationGroup_removeUsersFromGroupMutation,
-  useOrganizationGroup_updateUserGroupMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
@@ -80,19 +77,17 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
 
   const {
     data: { me },
-  } = assertQuery(useOrganizationGroupUserQuery());
+  } = useAssertQuery(OrganizationGroup_userDocument);
 
   const {
     data: { userGroup },
     loading,
     refetch,
-  } = assertQuery(
-    useOrganizationGroupQuery({
-      variables: {
-        id: groupId,
-      },
-    })
-  );
+  } = useAssertQuery(OrganizationGroup_userGroupDocument, {
+    variables: {
+      id: groupId,
+    },
+  });
 
   const [userList, searchedList] = useMemo(() => {
     const {
@@ -162,7 +157,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     [debouncedOnSearchChange]
   );
 
-  const [updateUserGroup] = useOrganizationGroup_updateUserGroupMutation();
+  const [updateUserGroup] = useMutation(OrganizationGroup_updateUserGroupDocument);
   const handleChangeGroupName = async (newName: string) => {
     if (newName.trim() && name.trim() !== newName.trim()) {
       await updateUserGroup({
@@ -176,7 +171,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     }
   };
 
-  const [deleteUserGroup] = useOrganizationGroup_deleteUserGroupMutation();
+  const [deleteUserGroup] = useMutation(OrganizationGroup_deleteUserGroupDocument);
   const confirmDelete = useConfirmDeleteGroupsDialog();
   const handleDeleteGroup = async () => {
     const [error] = await withError(confirmDelete({ name }));
@@ -186,7 +181,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     }
   };
 
-  const [_cloneUserGroup] = useOrganizationGroup_cloneUserGroupMutation();
+  const [_cloneUserGroup] = useMutation(OrganizationGroup_cloneUserGroupDocument);
 
   const handleCloneGroup = async () => {
     const { data } = await _cloneUserGroup({
@@ -197,7 +192,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     router.push(`/app/organization/groups/${cloneUserGroupId}`);
   };
 
-  const [addUsersToUserGroup] = useOrganizationGroup_addUsersToUserGroupMutation();
+  const [addUsersToUserGroup] = useMutation(OrganizationGroup_addUsersToUserGroupDocument);
   const showAddMemberDialog = useAddMemberGroupDialog();
   const handleAddMember = async () => {
     try {
@@ -223,7 +218,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     } catch {}
   };
 
-  const [removeUsersFromGroup] = useOrganizationGroup_removeUsersFromGroupMutation();
+  const [removeUsersFromGroup] = useMutation(OrganizationGroup_removeUsersFromGroupDocument);
   const showConfirmRemoveMemberDialog = useConfirmRemoveMemberDialog();
 
   const handleRemoveMember = async () => {
@@ -560,39 +555,34 @@ OrganizationGroup.mutations = [
   `,
 ];
 
-OrganizationGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery<OrganizationGroupQuery, OrganizationGroupQueryVariables>(
-      gql`
-        query OrganizationGroup($id: GID!) {
-          userGroup(id: $id) {
-            ...OrganizationGroup_UserGroup
-          }
-        }
-        ${OrganizationGroup.fragments.UserGroup}
-      `,
-      {
-        variables: {
-          id: query.groupId as string,
-        },
+OrganizationGroup.queries = [
+  gql`
+    query OrganizationGroup_userGroup($id: GID!) {
+      userGroup(id: $id) {
+        ...OrganizationGroup_UserGroup
       }
-    ),
-    fetchQuery<OrganizationGroupUserQuery>(
-      gql`
-        query OrganizationGroupUser {
-          me {
-            ...OrganizationGroup_User
-            ...OrganizationGroupListTableHeader_User
-          }
-        }
-        ${OrganizationGroup.fragments.User}
-        ${OrganizationGroupListTableHeader.fragments.User}
-      `
-    ),
+    }
+    ${OrganizationGroup.fragments.UserGroup}
+  `,
+  gql`
+    query OrganizationGroup_user {
+      me {
+        ...OrganizationGroup_User
+        ...OrganizationGroupListTableHeader_User
+      }
+    }
+    ${OrganizationGroup.fragments.User}
+    ${OrganizationGroupListTableHeader.fragments.User}
+  `,
+];
+
+OrganizationGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  const groupId = query.groupId as string;
+  await Promise.all([
+    fetchQuery(OrganizationGroup_userGroupDocument, { variables: { id: groupId } }),
+    fetchQuery(OrganizationGroup_userDocument),
   ]);
-  return {
-    groupId: query.groupId as string,
-  };
+  return { groupId };
 };
 
 export default compose(withDialogs, withApolloData)(OrganizationGroup);

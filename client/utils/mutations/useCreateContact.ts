@@ -1,29 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
 import { useAskContactDetailsDialog } from "@parallel/components/common/AskContactDetailsDialog";
-import {
-  useCreateContact_createContactMutation,
-  useCreateContact_createContactMutationVariables,
-} from "@parallel/graphql/__types";
+import { useCreateContact_createContactDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 
 export function useCreateContact() {
-  const [createContact] = useMutation<
-    useCreateContact_createContactMutation,
-    useCreateContact_createContactMutationVariables
-  >(
-    gql`
-      mutation useCreateContact_createContact($data: CreateContactInput!) {
-        createContact(data: $data) {
-          id
-          email
-          firstName
-          lastName
-          fullName
-          hasBouncedEmail
-        }
-      }
-    `
-  );
+  const [createContact] = useMutation(useCreateContact_createContactDocument);
 
   const askContactDetails = useAskContactDetailsDialog();
 
@@ -38,3 +19,18 @@ export function useCreateContact() {
     return data!.createContact;
   }, []);
 }
+
+useCreateContact.mutations = [
+  gql`
+    mutation useCreateContact_createContact($data: CreateContactInput!) {
+      createContact(data: $data) {
+        id
+        email
+        firstName
+        lastName
+        fullName
+        hasBouncedEmail
+      }
+    }
+  `,
+];

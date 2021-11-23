@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Flex, SimpleGrid, Spacer, Text, useToast } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData } from "@parallel/components/common/withApolloData";
@@ -10,11 +10,10 @@ import {
 } from "@parallel/components/public/public-petitions/PublicPetitionInitialForm";
 import { PublicPetitionReminder } from "@parallel/components/public/public-petitions/PublicPetitionReminder";
 import {
+  PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument,
+  PublicPetitionLink_publicPetitionLinkBySlugDocument,
   PublicPetitionLink_PublicPublicPetitionLinkFragment,
-  PublicTemplateLink_publicPetitionLinkBySlugQuery,
-  PublicTemplateLink_publicPetitionLinkBySlugQueryVariables,
-  usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation,
-  usePublicPetitionLink_publicSendReminderMutation,
+  PublicPetitionLink_publicSendReminderDocument,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -49,11 +48,13 @@ function PublicPetitionLink({
 
   const { description, title, organization } = publicPetitionLink;
 
-  const [createPublicPetition, { loading }] =
-    usePublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation({});
+  const [createPublicPetition, { loading }] = useMutation(
+    PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument
+  );
 
-  const [sendReminder, { loading: reminderLoading }] =
-    usePublicPetitionLink_publicSendReminderMutation({});
+  const [sendReminder, { loading: reminderLoading }] = useMutation(
+    PublicPetitionLink_publicSendReminderDocument
+  );
 
   const onSubmit: SubmitHandler<PublicPetitionInitialFormInputs> = async (formData) => {
     setSubmittedData(formData);
@@ -283,6 +284,17 @@ PublicPetitionLink.mutations = [
   `,
 ];
 
+PublicPetitionLink.queries = [
+  gql`
+    query PublicPetitionLink_publicPetitionLinkBySlug($slug: ID!) {
+      publicPetitionLinkBySlug(slug: $slug) {
+        ...PublicPetitionLink_PublicPublicPetitionLink
+      }
+    }
+    ${PublicPetitionLink.fragments.PublicPublicPetitionLink}
+  `,
+];
+
 export async function getServerSideProps({
   req,
   query: { slug },
@@ -304,18 +316,8 @@ export async function getServerSideProps({
 
   try {
     const client = createApolloClient({}, { req });
-    const { data } = await client.query<
-      PublicTemplateLink_publicPetitionLinkBySlugQuery,
-      PublicTemplateLink_publicPetitionLinkBySlugQueryVariables
-    >({
-      query: gql`
-        query PublicTemplateLink_publicPetitionLinkBySlug($slug: ID!) {
-          publicPetitionLinkBySlug(slug: $slug) {
-            ...PublicPetitionLink_PublicPublicPetitionLink
-          }
-        }
-        ${PublicPetitionLink.fragments.PublicPublicPetitionLink}
-      `,
+    const { data } = await client.query({
+      query: PublicPetitionLink_publicPetitionLinkBySlugDocument,
       variables: {
         slug: slug as string,
       },

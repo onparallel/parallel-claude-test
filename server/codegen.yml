@@ -17,6 +17,8 @@ generates:
         defaultValue: false
       namingConvention: keep
       exportFragmentSpreadSubTypes: true
+      preResolveTypes: true
+      maybeValue: T | null
       enumsAsTypes: true
       scalars:
         DateTime: string

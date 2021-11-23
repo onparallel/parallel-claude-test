@@ -1,3 +1,4 @@
+import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -27,21 +28,19 @@ import { useAddSignatureApiKeyDialog } from "@parallel/components/organization/A
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/DeleteSignatureErrorConfirmationDialog";
 import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/DeleteSignatureTokenDialog";
 import {
-  IntegrationsSignatureQuery,
+  IntegrationsSignature_createSignatureIntegrationDocument,
+  IntegrationsSignature_deleteSignatureIntegrationDocument,
+  IntegrationsSignature_markSignatureIntegrationAsDefaultDocument,
   IntegrationsSignature_SignatureOrgIntegrationFragment,
-  useIntegrationsSignatureQuery,
-  useIntegrationsSignature_createSignatureIntegrationMutation,
-  useIntegrationsSignature_deleteSignatureIntegrationMutation,
-  useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation,
+  IntegrationsSignature_userDocument,
 } from "@parallel/graphql/__types";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { integer, parseQuery, useQueryState, values } from "@parallel/utils/queryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import gql from "graphql-tag";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -65,14 +64,12 @@ function IntegrationsSignature() {
     data: { me },
     loading,
     refetch,
-  } = useAssertQueryOrPreviousData(
-    useIntegrationsSignatureQuery({
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-      },
-    })
-  );
+  } = useAssertQueryOrPreviousData(IntegrationsSignature_userDocument, {
+    variables: {
+      offset: state.items * (state.page - 1),
+      limit: state.items,
+    },
+  });
   const { totalCount: numberOfIntegrations, items: integrations } =
     me.organization.signatureIntegrations;
   assertTypenameArray(integrations, "SignatureOrgIntegration");
@@ -81,8 +78,9 @@ function IntegrationsSignature() {
 
   const genericErrorToast = useGenericErrorToast();
   const addSignaturitAPIKey = useAddSignatureApiKeyDialog();
-  const [createSignatureIntegration] =
-    useIntegrationsSignature_createSignatureIntegrationMutation();
+  const [createSignatureIntegration] = useMutation(
+    IntegrationsSignature_createSignatureIntegrationDocument
+  );
   const handleAddSignatureToken = async () => {
     try {
       const data = await addSignaturitAPIKey({});
@@ -117,8 +115,9 @@ function IntegrationsSignature() {
 
   const removeSignatureToken = useDeleteSignatureTokenDialog();
   const confirmRemoveSignatureToken = useDeleteSignatureErrorConfirmationDialog();
-  const [deleteSignatureIntegration] =
-    useIntegrationsSignature_deleteSignatureIntegrationMutation();
+  const [deleteSignatureIntegration] = useMutation(
+    IntegrationsSignature_deleteSignatureIntegrationDocument
+  );
   const handleDeleteIntegration = async (id: string) => {
     if (numberOfIntegrations < 2) return;
     try {
@@ -140,8 +139,9 @@ function IntegrationsSignature() {
     refetch();
   };
 
-  const [markIntegrationAsDefault] =
-    useIntegrationsSignature_markSignatureIntegrationAsDefaultMutation();
+  const [markIntegrationAsDefault] = useMutation(
+    IntegrationsSignature_markSignatureIntegrationAsDefaultDocument
+  );
   const handleMarkIntegrationAsDefault = async (id: string) => {
     try {
       await markIntegrationAsDefault({ variables: { id } });
@@ -444,45 +444,42 @@ IntegrationsSignature.mutations = [
   `,
 ];
 
+IntegrationsSignature.queries = [
+  gql`
+    query IntegrationsSignature_user($limit: Int!, $offset: Int!) {
+      me {
+        id
+        hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+        ...SettingsLayout_User
+        organization {
+          id
+          signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
+            items {
+              ... on SignatureOrgIntegration {
+                id
+                name
+                provider
+                isDefault
+                environment
+              }
+            }
+            totalCount
+          }
+        }
+      }
+    }
+    ${SettingsLayout.fragments.User}
+  `,
+];
+
 IntegrationsSignature.getInitialProps = async ({
   fetchQuery,
   ...context
 }: WithApolloDataContext) => {
   const { items, page } = parseQuery(context.query, QUERY_STATE);
-
-  await fetchQuery<IntegrationsSignatureQuery>(
-    gql`
-      query IntegrationsSignature($limit: Int!, $offset: Int!) {
-        me {
-          id
-          hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-          ...SettingsLayout_User
-          organization {
-            id
-            signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
-              items {
-                ... on SignatureOrgIntegration {
-                  id
-                  name
-                  provider
-                  isDefault
-                  environment
-                }
-              }
-              totalCount
-            }
-          }
-        }
-      }
-      ${SettingsLayout.fragments.User}
-    `,
-    {
-      variables: {
-        offset: items * (page - 1),
-        limit: items,
-      },
-    }
-  );
+  await fetchQuery(IntegrationsSignature_userDocument, {
+    variables: { offset: items * (page - 1), limit: items },
+  });
 };
 
 export default compose(withDialogs, withApolloData)(IntegrationsSignature);

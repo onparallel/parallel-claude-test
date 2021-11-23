@@ -1,4 +1,4 @@
-import { gql, NetworkStatus, useApolloClient } from "@apollo/client";
+import { gql, NetworkStatus, useApolloClient, useLazyQuery } from "@apollo/client";
 import {
   Button,
   Drawer,
@@ -14,8 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import {
+  NotificationsDrawer_notificationsDocument,
   PetitionUserNotificationFilter,
-  useNotificationsDrawer_PetitionUserNotificationsLazyQuery,
 } from "@parallel/graphql/__types";
 import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -38,7 +38,7 @@ export function NotificationsDrawer() {
   const [
     getData,
     { data, called, loading, refetch, fetchMore, networkStatus, startPolling, stopPolling },
-  ] = useNotificationsDrawer_PetitionUserNotificationsLazyQuery({
+  ] = useLazyQuery(NotificationsDrawer_notificationsDocument, {
     pollInterval: POLL_INTERVAL,
     notifyOnNetworkStatusChange: true,
   });
@@ -208,7 +208,7 @@ NotificationsDrawer.fragments = {
 
 NotificationsDrawer.queries = [
   gql`
-    query NotificationsDrawer_PetitionUserNotifications(
+    query NotificationsDrawer_notifications(
       $limit: Int!
       $before: DateTime
       $filter: PetitionUserNotificationFilter

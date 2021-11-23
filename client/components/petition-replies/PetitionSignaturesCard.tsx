@@ -1,16 +1,16 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
 import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
+  PetitionSignaturesCard_cancelSignatureRequestDocument,
   PetitionSignaturesCard_PetitionFragment,
+  PetitionSignaturesCard_sendSignatureRequestRemindersDocument,
+  PetitionSignaturesCard_signedPetitionDownloadLinkDocument,
+  PetitionSignaturesCard_startSignatureRequestDocument,
+  PetitionSignaturesCard_updatePetitionSignatureConfigDocument,
   PetitionSignaturesCard_UserFragment,
   SignatureConfigInput,
-  usePetitionSignaturesCard_cancelSignatureRequestMutation,
-  usePetitionSignaturesCard_sendSignatureRequestRemindersMutation,
-  usePetitionSignaturesCard_signedPetitionDownloadLinkMutation,
-  usePetitionSignaturesCard_startSignatureRequestMutation,
-  usePetitionSignaturesCard_updatePetitionSignatureConfigMutation,
 } from "@parallel/graphql/__types";
 import { assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
@@ -152,13 +152,21 @@ export const PetitionSignaturesCard = Object.assign(
     const intl = useIntl();
     const toast = useToast();
 
-    const [cancelSignatureRequest] = usePetitionSignaturesCard_cancelSignatureRequestMutation();
-    const [startSignatureRequest] = usePetitionSignaturesCard_startSignatureRequestMutation();
-    const [updateSignatureConfig] =
-      usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
-    const [downloadSignedDoc] = usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
-    const [sendSignatureRequestReminders] =
-      usePetitionSignaturesCard_sendSignatureRequestRemindersMutation();
+    const [cancelSignatureRequest] = useMutation(
+      PetitionSignaturesCard_cancelSignatureRequestDocument
+    );
+    const [startSignatureRequest] = useMutation(
+      PetitionSignaturesCard_startSignatureRequestDocument
+    );
+    const [updateSignatureConfig] = useMutation(
+      PetitionSignaturesCard_updatePetitionSignatureConfigDocument
+    );
+    const [downloadSignedDoc] = useMutation(
+      PetitionSignaturesCard_signedPetitionDownloadLinkDocument
+    );
+    const [sendSignatureRequestReminders] = useMutation(
+      PetitionSignaturesCard_sendSignatureRequestRemindersDocument
+    );
     const handleCancelSignatureProcess = useCallback(
       async (petitionSignatureRequestId: string) => {
         await updateSignatureConfig({

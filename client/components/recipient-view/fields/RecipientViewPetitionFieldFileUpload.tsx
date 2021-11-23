@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   BoxProps,
@@ -22,7 +22,7 @@ import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-re
 import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
   RecipientViewPetitionField_PublicPetitionFieldFragment,
-  useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation,
+  RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -162,8 +162,9 @@ export function RecipientViewPetitionFieldReplyFileUpload({
   onRemove,
 }: RecipientViewPetitionFieldReplyFileUploadProps) {
   const intl = useIntl();
-  const [downloadFileUploadReply] =
-    useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation();
+  const [downloadFileUploadReply] = useMutation(
+    RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument
+  );
   const showFailure = useFailureGeneratingLinkDialog();
   function handleDownloadClick() {
     openNewWindow(async () => {

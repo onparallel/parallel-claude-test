@@ -1,6 +1,6 @@
+import { gql } from "@apollo/client";
 import { Badge, Text } from "@chakra-ui/react";
 import { TestModeSignatureBadge_UserFragment } from "@parallel/graphql/__types";
-import gql from "graphql-tag";
 import { FormattedMessage } from "react-intl";
 import { NormalLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";

@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { useRecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation } from "@parallel/graphql/__types";
+import { gql, useMutation } from "@apollo/client";
+import { RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import {
   RecipientViewPetitionFieldCard,
@@ -22,8 +22,9 @@ export interface RecipientViewPetitionFieldProps
 }
 
 export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
-  const [publicPetitionFieldAttachmentDownloadLink] =
-    useRecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation();
+  const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
+    RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument
+  );
   const handleDownloadAttachment = function (attachmentId: string) {
     openNewWindow(async () => {
       const { data } = await publicPetitionFieldAttachmentDownloadLink({

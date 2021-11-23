@@ -12,15 +12,16 @@ import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdmin
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
-  AdminOrganizationsQuery,
-  AdminOrganizationsUserQuery,
   AdminOrganizations_OrganizationFragment,
+  AdminOrganizations_organizationsDocument,
+  AdminOrganizations_userDocument,
   OrganizationStatus,
   QueryOrganizations_OrderBy,
-  useAdminOrganizationsQuery,
-  useAdminOrganizationsUserQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import {
+  useAssertQuery,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
@@ -56,22 +57,20 @@ function AdminOrganizations() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me },
-  } = assertQuery(useAdminOrganizationsUserQuery());
+  } = useAssertQuery(AdminOrganizations_userDocument);
   const {
     data: { organizations },
     loading,
     refetch,
-  } = useAssertQueryOrPreviousData(
-    useAdminOrganizationsQuery({
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
-        status: state.status,
-        sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryOrganizations_OrderBy],
-      },
-    })
-  );
+  } = useAssertQueryOrPreviousData(AdminOrganizations_organizationsDocument, {
+    variables: {
+      offset: state.items * (state.page - 1),
+      limit: state.items,
+      search: state.search,
+      status: state.status,
+      sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryOrganizations_OrderBy],
+    },
+  });
   const sections = useAdminSections();
 
   const columns = useOrganizationColumns();
@@ -282,51 +281,53 @@ AdminOrganizations.fragments = {
   },
 };
 
+AdminOrganizations.queries = [
+  gql`
+    query AdminOrganizations_organizations(
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $sortBy: [QueryOrganizations_OrderBy!]
+      $status: OrganizationStatus
+    ) {
+      organizations(
+        offset: $offset
+        limit: $limit
+        search: $search
+        sortBy: $sortBy
+        status: $status
+      ) {
+        totalCount
+        items {
+          ...AdminOrganizations_Organization
+        }
+      }
+    }
+    ${AdminOrganizations.fragments.Organization}
+  `,
+  gql`
+    query AdminOrganizations_user {
+      me {
+        ...AdminOrganizations_User
+      }
+    }
+    ${AdminOrganizations.fragments.User}
+  `,
+];
+
 AdminOrganizations.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const { page, items, search, status, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
-    fetchQuery<AdminOrganizationsQuery>(
-      gql`
-        query AdminOrganizations(
-          $offset: Int!
-          $limit: Int!
-          $search: String
-          $sortBy: [QueryOrganizations_OrderBy!]
-          $status: OrganizationStatus
-        ) {
-          organizations(
-            offset: $offset
-            limit: $limit
-            search: $search
-            sortBy: $sortBy
-            status: $status
-          ) {
-            totalCount
-            items {
-              ...AdminOrganizations_Organization
-            }
-          }
-        }
-        ${AdminOrganizations.fragments.Organization}
-      `,
-      {
-        variables: {
-          offset: items * (page - 1),
-          limit: items,
-          search,
-          sortBy: [`${sort.field}_${sort.direction}` as QueryOrganizations_OrderBy],
-          status,
-        },
-      }
-    ),
-    fetchQuery<AdminOrganizationsUserQuery>(gql`
-      query AdminOrganizationsUser {
-        me {
-          ...AdminOrganizations_User
-        }
-      }
-      ${AdminOrganizations.fragments.User}
-    `),
+    fetchQuery(AdminOrganizations_organizationsDocument, {
+      variables: {
+        offset: items * (page - 1),
+        limit: items,
+        search,
+        sortBy: [`${sort.field}_${sort.direction}` as QueryOrganizations_OrderBy],
+        status,
+      },
+    }),
+    fetchQuery(AdminOrganizations_userDocument),
   ]);
 };
 

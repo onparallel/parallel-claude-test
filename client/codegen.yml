@@ -13,7 +13,7 @@ generates:
     plugins:
       - typescript
       - typescript-operations
-      - typescript-react-apollo
+      - typed-document-node
     config:
       strictScalars: true
       scalars:
@@ -23,15 +23,14 @@ generates:
         Upload: File
         GID: string
       namingConvention: keep
-      preResolveTypes: false
-      declarationKind: "interface"
+      preResolveTypes: true
+      maybeValue: T | null
+      declarationKind: interface
       skipTypeNameForRoot: true
       exportFragmentSpreadSubTypes: true
       enumsAsTypes: true
-      withMutationFn: false
-      withResultType: false
-      withMutationOptionsType: false
       addDocBlocks: false
+      documentMode: graphQLTag
 
 hooks:
   afterAllFileWrite:

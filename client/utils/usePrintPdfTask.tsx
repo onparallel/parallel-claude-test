@@ -1,10 +1,10 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { useDialog } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { TaskProgressDialog } from "@parallel/components/common/TaskProgressDialog";
 import {
-  usePrintPdfTask_createPrintPdfTaskMutation,
-  usePrintPdfTask_getTaskResultFileUrlMutation,
+  usePrintPdfTask_createPrintPdfTaskDocument,
+  usePrintPdfTask_getTaskResultFileUrlDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { openNewWindow } from "./openNewWindow";
@@ -12,8 +12,8 @@ import { withError } from "./promises/withError";
 
 export function usePrintPdfTask() {
   const showError = useErrorDialog();
-  const [createTask] = usePrintPdfTask_createPrintPdfTaskMutation();
-  const [generateDownloadURL] = usePrintPdfTask_getTaskResultFileUrlMutation();
+  const [createTask] = useMutation(usePrintPdfTask_createPrintPdfTaskDocument);
+  const [generateDownloadURL] = useMutation(usePrintPdfTask_getTaskResultFileUrlDocument);
 
   const showTaskProgressDialog = useDialog(TaskProgressDialog);
   const intl = useIntl();
@@ -56,7 +56,7 @@ export function usePrintPdfTask() {
 
 usePrintPdfTask.mutations = [
   gql`
-    mutation PrintPdfTask_createPrintPdfTask($petitionId: GID!) {
+    mutation usePrintPdfTask_createPrintPdfTask($petitionId: GID!) {
       createPrintPdfTask(petitionId: $petitionId) {
         ...TaskProgressDialog_Task
       }
@@ -64,7 +64,7 @@ usePrintPdfTask.mutations = [
     ${TaskProgressDialog.fragments.Task}
   `,
   gql`
-    mutation PrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
+    mutation usePrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
       getTaskResultFileUrl(taskId: $taskId, preview: true) {
         result
         url

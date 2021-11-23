@@ -5,9 +5,8 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import {
-  ConfirmDeletePetitionsDialog_PetitionBaseFragment,
-  useDeletePetitions_deletePetitionsMutation,
-  useDeletePetitions_deletePetitionsMutationVariables,
+  ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc,
+  useDeletePetitions_deletePetitionsDocument,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -18,16 +17,7 @@ export function useDeletePetitions() {
   const showErrorDialog = useErrorDialog();
   const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
 
-  const [deletePetitions] = useMutation<
-    useDeletePetitions_deletePetitionsMutation,
-    useDeletePetitions_deletePetitionsMutationVariables
-  >(
-    gql`
-      mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {
-        deletePetitions(ids: $ids)
-      }
-    `
-  );
+  const [deletePetitions] = useMutation(useDeletePetitions_deletePetitionsDocument);
 
   const { cache } = useApolloClient();
 
@@ -47,11 +37,10 @@ export function useDeletePetitions() {
     async (petitionIds: string[]) => {
       try {
         // petition name should always be on cache at this point
-        const cachedPetition =
-          cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>({
-            fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
-            id: petitionIds[0],
-          });
+        const cachedPetition = cache.readFragment({
+          fragment: ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc,
+          id: petitionIds[0],
+        });
 
         await confirmDelete({
           petitionIds,
@@ -83,8 +72,8 @@ export function useDeletePetitions() {
 
           const cachedPetitions = conflictingPetitionIds.map(
             (id) =>
-              cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>({
-                fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
+              cache.readFragment({
+                fragment: ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc,
                 id: id,
               })!
           );
@@ -284,3 +273,11 @@ ConfirmDeletePetitionsDialog.fragments = {
     }
   `,
 };
+
+ConfirmDeletePetitionsDialog.mutations = [
+  gql`
+    mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {
+      deletePetitions(ids: $ids)
+    }
+  `,
+];

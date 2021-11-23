@@ -6,11 +6,10 @@ import { PdfFieldWithReplies } from "@parallel/components/print/PdfFieldWithRepl
 import { PdfPage } from "@parallel/components/print/PdfPage";
 import { SignatureBox } from "@parallel/components/print/SignatureBox";
 import {
-  PdfViewPetitionQuery,
+  PetitionPdf_petitionDocument,
   PetitionPdf_PetitionFieldFragment,
-  usePdfViewPetitionQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import jwtDecode from "jwt-decode";
@@ -18,11 +17,9 @@ import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 
 function PetitionPdf({ token }: { token: string }) {
-  const { data } = assertQuery(
-    usePdfViewPetitionQuery({
-      variables: { token },
-    })
-  );
+  const { data } = useAssertQuery(PetitionPdf_petitionDocument, {
+    variables: { token },
+  });
 
   const tokenPayload = jwtDecode<{
     documentTitle?: string;
@@ -189,21 +186,22 @@ function SignaturesGrid({ children, ...props }: GridProps) {
   );
 }
 
+PetitionPdf.queries = [
+  gql`
+    query PetitionPdf_petition($token: String!) {
+      petitionAuthToken(token: $token) {
+        ...PetitionPdf_Petition
+      }
+    }
+    ${PetitionPdf.fragments.Petition}
+  `,
+];
+
 PetitionPdf.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const token = decodeURIComponent(query.token as string);
-  await fetchQuery<PdfViewPetitionQuery>(
-    gql`
-      query PdfViewPetition($token: String!) {
-        petitionAuthToken(token: $token) {
-          ...PetitionPdf_Petition
-        }
-      }
-      ${PetitionPdf.fragments.Petition}
-    `,
-    {
-      variables: { token },
-    }
-  );
+  await fetchQuery(PetitionPdf_petitionDocument, {
+    variables: { token },
+  });
   return { token };
 };
 

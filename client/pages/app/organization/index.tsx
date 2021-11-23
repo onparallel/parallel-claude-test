@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { OrganizationSettingsQuery, useOrganizationSettingsQuery } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { OrganizationSettings_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -11,7 +11,7 @@ function OrganizationSettings() {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(useOrganizationSettingsQuery());
+  } = useAssertQuery(OrganizationSettings_userDocument);
   const sections = useOrganizationSections(me);
 
   return (
@@ -31,19 +31,20 @@ function OrganizationSettings() {
   );
 }
 
-OrganizationSettings.getInitialProps = async ({
-  fetchQuery,
-  ...context
-}: WithApolloDataContext) => {
-  await fetchQuery<OrganizationSettingsQuery>(gql`
-    query OrganizationSettings {
+OrganizationSettings.queries = [
+  gql`
+    query OrganizationSettings_user {
       me {
         id
         ...SettingsLayout_User
       }
     }
     ${SettingsLayout.fragments.User}
-  `);
+  `,
+];
+
+OrganizationSettings.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(OrganizationSettings_userDocument);
 };
 
 export default compose(withApolloData)(OrganizationSettings);

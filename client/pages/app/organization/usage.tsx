@@ -14,8 +14,8 @@ import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useOrganizationUsageQuery } from "@parallel/graphql/__types";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { OrganizationUsage_userDocument } from "@parallel/graphql/__types";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
@@ -25,7 +25,7 @@ function OrganizationUsage() {
 
   const {
     data: { me },
-  } = useAssertQueryOrPreviousData(useOrganizationUsageQuery());
+  } = useAssertQueryOrPreviousData(OrganizationUsage_userDocument);
 
   const sections = useOrganizationSections(me);
 
@@ -116,30 +116,32 @@ function UsageCard({ title, limit, usage }: { title: string; limit: number; usag
   );
 }
 
-OrganizationUsage.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery(
-    gql`
-      query OrganizationUsage {
-        me {
-          ...SettingsLayout_User
-          organization {
-            id
-            userCount
-            usageLimits {
-              users {
-                limit
-              }
-              petitions {
-                used
-                limit
-              }
+OrganizationUsage.queries = [
+  gql`
+    query OrganizationUsage_user {
+      me {
+        ...SettingsLayout_User
+        organization {
+          id
+          userCount
+          usageLimits {
+            users {
+              limit
+            }
+            petitions {
+              used
+              limit
             }
           }
         }
       }
-      ${SettingsLayout.fragments.User}
-    `
-  );
+    }
+    ${SettingsLayout.fragments.User}
+  `,
+];
+
+OrganizationUsage.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(OrganizationUsage_userDocument);
 };
 
 export default compose(withDialogs, withAdminOrganizationRole, withApolloData)(OrganizationUsage);

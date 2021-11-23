@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -37,7 +37,7 @@ import {
 import {
   TemplateDetailsModal_PetitionTemplateFragment,
   TemplateDetailsModal_UserFragment,
-  useTemplateDetailsModal_autoSendTemplateMutation,
+  TemplateDetailsModal_autoSendTemplateDocument,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
@@ -111,7 +111,7 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
   };
 
   const confirmPetitionName = useDialog(PetitionNameDialog);
-  const [autoSendTemplate] = useTemplateDetailsModal_autoSendTemplateMutation();
+  const [autoSendTemplate] = useMutation(TemplateDetailsModal_autoSendTemplateDocument);
   const handleAutoSendPetition = async () => {
     try {
       const name = await confirmPetitionName({ defaultValue: template.name ?? "" });

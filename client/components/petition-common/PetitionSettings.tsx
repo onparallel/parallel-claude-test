@@ -1,4 +1,4 @@
-import { DataProxy, gql } from "@apollo/client";
+import { DataProxy, gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -30,16 +30,16 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
+  PetitionSettings_cancelPetitionSignatureRequestDocument,
+  PetitionSettings_createPublicPetitionLinkDocument,
   PetitionSettings_PetitionBaseFragment,
-  PetitionSettings_updatePetitionLink_PetitionTemplateFragment,
+  PetitionSettings_startPetitionSignatureRequestDocument,
+  PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc,
+  PetitionSettings_updatePublicPetitionLinkDocument,
+  PetitionSettings_updateTemplateDefaultPermissionsDocument,
   PetitionSettings_UserFragment,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
   UpdatePetitionInput,
-  usePetitionSettings_cancelPetitionSignatureRequestMutation,
-  usePetitionSettings_createPublicPetitionLinkMutation,
-  usePetitionSettings_startPetitionSignatureRequestMutation,
-  usePetitionSettings_updatePublicPetitionLinkMutation,
-  usePetitionSettings_updateTemplateDefaultPermissionsMutation,
 } from "@parallel/graphql/__types";
 import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
@@ -104,8 +104,12 @@ function _PetitionSettings({
   const showConfirmConfigureOngoingSignature = useDialog(ConfirmConfigureOngoingSignature);
   const showConfirmSignatureConfigChanged = useDialog(ConfirmSignatureConfigChanged);
 
-  const [cancelSignatureRequest] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
-  const [startSignatureRequest] = usePetitionSettings_startPetitionSignatureRequestMutation();
+  const [cancelSignatureRequest] = useMutation(
+    PetitionSettings_cancelPetitionSignatureRequestDocument
+  );
+  const [startSignatureRequest] = useMutation(
+    PetitionSettings_startPetitionSignatureRequestDocument
+  );
 
   async function handleConfigureSignatureClick() {
     try {
@@ -187,8 +191,8 @@ function _PetitionSettings({
   });
 
   const hasActivePublicLink = publicLink?.isActive ?? false;
-  const [createPublicPetitionLink] = usePetitionSettings_createPublicPetitionLinkMutation();
-  const [updatePublicPetitionLink] = usePetitionSettings_updatePublicPetitionLinkMutation();
+  const [createPublicPetitionLink] = useMutation(PetitionSettings_createPublicPetitionLinkDocument);
+  const [updatePublicPetitionLink] = useMutation(PetitionSettings_updatePublicPetitionLinkDocument);
   const showPublicLinkSettingDialog = usePublicLinkSettingsDialog();
   const handleToggleShareByLink = async () => {
     assertTypename(petition, "PetitionTemplate");
@@ -259,8 +263,9 @@ function _PetitionSettings({
     petition.__typename === "PetitionTemplate" && petition.defaultPermissions.length > 0;
 
   const showTemplateDefaultPermissionsDialog = useTemplateDefaultPermissionsDialog();
-  const [updateTemplateDefaultPermissions] =
-    usePetitionSettings_updateTemplateDefaultPermissionsMutation();
+  const [updateTemplateDefaultPermissions] = useMutation(
+    PetitionSettings_updateTemplateDefaultPermissionsDocument
+  );
   const handleUpdateTemplateDefaultPermissions = async (enable: boolean) => {
     assertTypename(petition, "PetitionTemplate");
     if (enable) {
@@ -547,20 +552,23 @@ function updatePetitionLinkCache(
   templateId: string,
   publicLink: PublicLinkSettingsDialog_PublicPetitionLinkFragment
 ) {
-  proxy.writeFragment<PetitionSettings_updatePetitionLink_PetitionTemplateFragment>({
+  proxy.writeFragment({
     id: templateId,
-    fragment: gql`
-      fragment PetitionSettings_updatePetitionLink_PetitionTemplate on PetitionTemplate {
-        publicLink {
-          ...PublicLinkSettingsDialog_PublicPetitionLink
-        }
-      }
-      ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
-    `,
+    fragment: PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc,
     fragmentName: "PetitionSettings_updatePetitionLink_PetitionTemplate",
     data: { publicLink },
   });
 }
+updatePetitionLinkCache.fragments = {
+  PetitionTemplate: gql`
+    fragment PetitionSettings_updatePetitionLink_PetitionTemplate on PetitionTemplate {
+      publicLink {
+        ...PublicLinkSettingsDialog_PublicPetitionLink
+      }
+    }
+    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
+  `,
+};
 
 const fragments = {
   User: gql`

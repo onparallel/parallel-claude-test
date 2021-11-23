@@ -9,11 +9,8 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import {
-  AdminSupportMethodsUserQuery,
-  useAdminSupportMethodsUserQuery,
-} from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { AdminSupportMethods_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
@@ -30,7 +27,7 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(useAdminSupportMethodsUserQuery());
+  } = useAssertQuery(AdminSupportMethods_userDocument);
   const sections = useAdminSections();
 
   const [search, setSearch] = useState("");
@@ -126,17 +123,19 @@ AdminSupportMethods.fragments = {
   },
 };
 
-AdminSupportMethods.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery<AdminSupportMethodsUserQuery>(gql`
-      query AdminSupportMethodsUser {
-        me {
-          ...AdminSupportMethods_User
-        }
+AdminSupportMethods.queries = [
+  gql`
+    query AdminSupportMethods_user {
+      me {
+        ...AdminSupportMethods_User
       }
-      ${AdminSupportMethods.fragments.User}
-    `),
-  ]);
+    }
+    ${AdminSupportMethods.fragments.User}
+  `,
+];
+
+AdminSupportMethods.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(AdminSupportMethods_userDocument);
   const { supportMethods, schemaTypes } = await import("@parallel/graphql/__support-methods");
   return { supportMethods, schemaTypes };
 };

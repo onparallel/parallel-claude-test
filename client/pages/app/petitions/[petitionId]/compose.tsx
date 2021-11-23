@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Progress,
@@ -41,25 +41,22 @@ import { useReferencedFieldDialog } from "@parallel/components/petition-compose/
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import { useTestSignatureDialog } from "@parallel/components/petition-compose/TestSignatureDialog";
 import {
-  PetitionComposeQuery,
-  PetitionComposeQueryVariables,
-  PetitionComposeUserQuery,
+  PetitionCompose_batchSendPetitionDocument,
+  PetitionCompose_changePetitionFieldTypeDocument,
+  PetitionCompose_clonePetitionFieldDocument,
+  PetitionCompose_createPetitionFieldDocument,
+  PetitionCompose_deletePetitionFieldDocument,
+  PetitionCompose_petitionDocument,
   PetitionCompose_PetitionFieldFragment,
+  PetitionCompose_updateFieldPositionsDocument,
+  PetitionCompose_updatePetitionDocument,
+  PetitionCompose_updatePetitionFieldDocument,
+  PetitionCompose_userDocument,
   PetitionFieldType,
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
-  usePetitionComposeQuery,
-  usePetitionComposeUserQuery,
-  usePetitionCompose_batchSendPetitionMutation,
-  usePetitionCompose_changePetitionFieldTypeMutation,
-  usePetitionCompose_clonePetitionFieldMutation,
-  usePetitionCompose_createPetitionFieldMutation,
-  usePetitionCompose_deletePetitionFieldMutation,
-  usePetitionCompose_updateFieldPositionsMutation,
-  usePetitionCompose_updatePetitionFieldMutation,
-  usePetitionCompose_updatePetitionMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
@@ -92,14 +89,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const toast = useToast();
   const {
     data: { me },
-  } = assertQuery(usePetitionComposeUserQuery());
-  const { data } = assertQuery(
-    usePetitionComposeQuery({
-      variables: {
-        id: petitionId,
-      },
-    })
-  );
+  } = useAssertQuery(PetitionCompose_userDocument);
+  const { data } = useAssertQuery(PetitionCompose_petitionDocument, {
+    variables: { id: petitionId },
+  });
   const petition = data.petition!;
 
   const updateIsReadNotification = useUpdateIsReadNotification();
@@ -144,7 +137,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     setShowErrors(isSharedByLink);
   }, [setShowErrors, isSharedByLink]);
 
-  const [updatePetition] = usePetitionCompose_updatePetitionMutation();
+  const [updatePetition] = useMutation(PetitionCompose_updatePetitionDocument);
   const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({
@@ -157,7 +150,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [updateFieldPositions] = usePetitionCompose_updateFieldPositionsMutation();
+  const [updateFieldPositions] = useMutation(PetitionCompose_updateFieldPositionsDocument);
   const handleUpdateFieldPositions = useCallback(
     wrapper(async function (fieldIds: string[]) {
       await updateFieldPositions({ variables: { petitionId, fieldIds } });
@@ -165,7 +158,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [clonePetitionField] = usePetitionCompose_clonePetitionFieldMutation();
+  const [clonePetitionField] = useMutation(PetitionCompose_clonePetitionFieldDocument);
   const handleCloneField = useCallback(
     wrapper(async (fieldId: string) => {
       const { data } = await clonePetitionField({
@@ -177,7 +170,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [deletePetitionField] = usePetitionCompose_deletePetitionFieldMutation();
+  const [deletePetitionField] = useMutation(PetitionCompose_deletePetitionFieldDocument);
   const confirmDelete = useConfirmDeleteFieldDialog();
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
@@ -212,7 +205,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [updatePetitionField] = usePetitionCompose_updatePetitionFieldMutation();
+  const [updatePetitionField] = useMutation(PetitionCompose_updatePetitionFieldDocument);
   const _handleFieldEdit = useCallback(
     async function (fieldId: string, data: UpdatePetitionFieldInput) {
       const { fields } = petitionDataRef.current!;
@@ -281,7 +274,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const showReferencedFieldDialog = useReferencedFieldDialog();
   const confirmChangeFieldType = useConfirmChangeFieldTypeDialog();
-  const [changePetitionFieldType] = usePetitionCompose_changePetitionFieldTypeMutation();
+  const [changePetitionFieldType] = useMutation(PetitionCompose_changePetitionFieldTypeDocument);
   const handleFieldTypeChange = useCallback(
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
       const { fields, indices } = petitionDataRef.current!;
@@ -330,7 +323,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [createPetitionField] = usePetitionCompose_createPetitionFieldMutation();
+  const [createPetitionField] = useMutation(PetitionCompose_createPetitionFieldDocument);
   const handleAddField = useCallback(
     wrapper(async function (type: PetitionFieldType, position?: number) {
       const { data } = await createPetitionField({
@@ -364,7 +357,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showTestSignatureDialog = useTestSignatureDialog();
 
   const showErrorDialog = useErrorDialog();
-  const [batchSendPetition] = usePetitionCompose_batchSendPetitionMutation();
+  const [batchSendPetition] = useMutation(PetitionCompose_batchSendPetitionDocument);
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
   const showLongBatchSendDialog = useBlockingDialog();
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
@@ -923,37 +916,35 @@ PetitionCompose.mutations = [
   `,
 ];
 
-PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<PetitionComposeUserQuery>(
-    gql`
-      query PetitionComposeUser {
-        me {
-          ...PetitionCompose_User
-        }
+PetitionCompose.queries = [
+  gql`
+    query PetitionCompose_user {
+      me {
+        ...PetitionCompose_User
       }
-      ${PetitionCompose.fragments.User}
-    `
-  );
-  await fetchQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
-    gql`
-      query PetitionCompose($id: GID!) {
-        petition(id: $id) {
-          ...PetitionCompose_PetitionBase
-        }
-      }
-      ${PetitionCompose.fragments.PetitionBase}
-    `,
-    {
-      variables: {
-        id: query.petitionId as string,
-      },
-      ignoreCache: true,
     }
-  );
+    ${PetitionCompose.fragments.User}
+  `,
+  gql`
+    query PetitionCompose_petition($id: GID!) {
+      petition(id: $id) {
+        ...PetitionCompose_PetitionBase
+      }
+    }
+    ${PetitionCompose.fragments.PetitionBase}
+  `,
+];
 
-  return {
-    petitionId: query.petitionId as string,
-  };
+PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  const petitionId = query.petitionId as string;
+  await Promise.all([
+    fetchQuery(PetitionCompose_userDocument),
+    fetchQuery(PetitionCompose_petitionDocument, {
+      variables: { id: petitionId },
+      ignoreCache: true,
+    }),
+  ]);
+  return { petitionId };
 };
 
 export default compose(withPetitionState, withDialogs, withApolloData)(PetitionCompose);

@@ -6,7 +6,9 @@ import {
   useGetUsersOrGroupsQueryVariables,
   UserSelect_canCreateUsersQuery,
   UserSelect_UserFragment,
+  UserSelect_UserFragmentDoc,
   UserSelect_UserGroupFragment,
+  UserSelect_UserGroupFragmentDoc,
   useSearchUsers_searchUsersQuery,
   useSearchUsers_searchUsersQueryVariables,
 } from "@parallel/graphql/__types";
@@ -273,15 +275,15 @@ function useGetUsersOrGroups() {
     const fromCache = zip(
       _ids,
       _ids.map((id) => {
-        const user = client.readFragment<UserSelect_UserFragment>({
-          fragment: fragments.User,
+        const user = client.readFragment({
+          fragment: UserSelect_UserFragmentDoc,
           id,
         });
         if (user?.__typename === "User") {
           return user;
         }
-        const userGroup = client.readFragment<UserSelect_UserGroupFragment>({
-          fragment: fragments.UserGroup,
+        const userGroup = client.readFragment({
+          fragment: UserSelect_UserGroupFragmentDoc,
           id,
           fragmentName: "UserSelect_UserGroup",
         });

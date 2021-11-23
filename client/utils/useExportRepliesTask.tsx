@@ -1,10 +1,10 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { useDialog } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { TaskProgressDialog } from "@parallel/components/common/TaskProgressDialog";
 import {
-  useExportRepliesTask_createExportRepliesTaskMutation,
-  useExportRepliesTask_getTaskResultFileUrlMutation,
+  useExportRepliesTask_createExportRepliesTaskDocument,
+  useExportRepliesTask_getTaskResultFileUrlDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { openNewWindow } from "./openNewWindow";
@@ -13,8 +13,8 @@ import { Maybe } from "./types";
 
 export function useExportRepliesTask() {
   const showError = useErrorDialog();
-  const [createTask] = useExportRepliesTask_createExportRepliesTaskMutation();
-  const [generateDownloadURL] = useExportRepliesTask_getTaskResultFileUrlMutation();
+  const [createTask] = useMutation(useExportRepliesTask_createExportRepliesTaskDocument);
+  const [generateDownloadURL] = useMutation(useExportRepliesTask_getTaskResultFileUrlDocument);
   const showTaskProgressDialog = useDialog(TaskProgressDialog);
   const intl = useIntl();
 
@@ -56,7 +56,7 @@ export function useExportRepliesTask() {
 
 useExportRepliesTask.mutations = [
   gql`
-    mutation ExportRepliesTask_createExportRepliesTask($petitionId: GID!, $pattern: String) {
+    mutation useExportRepliesTask_createExportRepliesTask($petitionId: GID!, $pattern: String) {
       createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
         ...TaskProgressDialog_Task
       }
@@ -64,7 +64,7 @@ useExportRepliesTask.mutations = [
     ${TaskProgressDialog.fragments.Task}
   `,
   gql`
-    mutation ExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
+    mutation useExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
       getTaskResultFileUrl(taskId: $taskId, preview: false) {
         result
         url

@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Button, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -12,18 +12,18 @@ import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import {
-  OrganizationGroupsQuery,
-  OrganizationGroupsQueryVariables,
-  OrganizationGroupsUserQuery,
+  OrganizationGroups_cloneUserGroupDocument,
+  OrganizationGroups_createUserGroupDocument,
+  OrganizationGroups_deleteUserGroupDocument,
+  OrganizationGroups_userDocument,
   OrganizationGroups_UserGroupFragment,
+  OrganizationGroups_userGroupsDocument,
   QueryUserGroups_OrderBy,
-  useOrganizationGroupsQuery,
-  useOrganizationGroupsUserQuery,
-  useOrganizationGroups_cloneUserGroupMutation,
-  useOrganizationGroups_createUserGroupMutation,
-  useOrganizationGroups_deleteUserGroupMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import {
+  useAssertQuery,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
@@ -62,22 +62,20 @@ function OrganizationGroups() {
 
   const {
     data: { me },
-  } = assertQuery(useOrganizationGroupsUserQuery());
+  } = useAssertQuery(OrganizationGroups_userDocument);
 
   const {
     data: { userGroups },
     loading,
     refetch,
-  } = useAssertQueryOrPreviousData(
-    useOrganizationGroupsQuery({
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
-        sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryUserGroups_OrderBy],
-      },
-    })
-  );
+  } = useAssertQueryOrPreviousData(OrganizationGroups_userGroupsDocument, {
+    variables: {
+      offset: state.items * (state.page - 1),
+      limit: state.items,
+      search: state.search,
+      sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryUserGroups_OrderBy],
+    },
+  });
 
   const selectedGroups = useMemo(
     () =>
@@ -123,7 +121,7 @@ function OrganizationGroups() {
   },
   []);
 
-  const [cloneUserGroup] = useOrganizationGroups_cloneUserGroupMutation();
+  const [cloneUserGroup] = useMutation(OrganizationGroups_cloneUserGroupDocument);
   const handleCloneClick = useCallback(
     async function () {
       await cloneUserGroup({
@@ -160,7 +158,7 @@ function OrganizationGroups() {
     [userGroups, selected]
   );
 
-  const [deleteUserGroup] = useOrganizationGroups_deleteUserGroupMutation();
+  const [deleteUserGroup] = useMutation(OrganizationGroups_deleteUserGroupDocument);
   const handleDeleteClick = useCallback(async () => {
     const [error] = await withError(
       confirmDelete({ name: selectedGroups[0].name, groupIds: selected })
@@ -198,7 +196,7 @@ function OrganizationGroups() {
     }
   }, [userGroups, selected]);
 
-  const [createUserGroup] = useOrganizationGroups_createUserGroupMutation();
+  const [createUserGroup] = useMutation(OrganizationGroups_createUserGroupDocument);
   const showCreateGroupDialog = useCreateGroupDialog();
   const handleCreateGroup = async () => {
     try {
@@ -482,44 +480,44 @@ OrganizationGroups.mutations = [
   `,
 ];
 
+OrganizationGroups.queries = [
+  gql`
+    query OrganizationGroups_userGroups(
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $sortBy: [QueryUserGroups_OrderBy!]
+    ) {
+      userGroups(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
+        ...OrganizationGroups_UserGroupPagination
+      }
+    }
+    ${OrganizationGroups.fragments.UserGroupPagination}
+  `,
+  gql`
+    query OrganizationGroups_user {
+      me {
+        ...OrganizationGroups_User
+        ...OrganizationGroupsListTableHeader_User
+      }
+    }
+    ${OrganizationGroups.fragments.User}
+    ${OrganizationGroupsListTableHeader.fragments.User}
+  `,
+];
+
 OrganizationGroups.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const { page, items, search, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
-    fetchQuery<OrganizationGroupsQuery, OrganizationGroupsQueryVariables>(
-      gql`
-        query OrganizationGroups(
-          $offset: Int!
-          $limit: Int!
-          $search: String
-          $sortBy: [QueryUserGroups_OrderBy!]
-        ) {
-          userGroups(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
-            ...OrganizationGroups_UserGroupPagination
-          }
-        }
-        ${OrganizationGroups.fragments.UserGroupPagination}
-      `,
-      {
-        variables: {
-          offset: items * (page - 1),
-          limit: items,
-          search,
-          sortBy: [`${sort.field}_${sort.direction}` as QueryUserGroups_OrderBy],
-        },
-      }
-    ),
-    fetchQuery<OrganizationGroupsUserQuery>(
-      gql`
-        query OrganizationGroupsUser {
-          me {
-            ...OrganizationGroups_User
-            ...OrganizationGroupsListTableHeader_User
-          }
-        }
-        ${OrganizationGroups.fragments.User}
-        ${OrganizationGroupsListTableHeader.fragments.User}
-      `
-    ),
+    fetchQuery(OrganizationGroups_userGroupsDocument, {
+      variables: {
+        offset: items * (page - 1),
+        limit: items,
+        search,
+        sortBy: [`${sort.field}_${sort.direction}` as QueryUserGroups_OrderBy],
+      },
+    }),
+    fetchQuery(OrganizationGroups_userDocument),
   ]);
 };
 

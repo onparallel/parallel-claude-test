@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Box, Button, Divider, Heading, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -16,15 +16,14 @@ import { useDeleteAccessTokenDialog } from "@parallel/components/settings/Delete
 import { EventSubscriptionCard } from "@parallel/components/settings/EventSubscriptionsCard";
 import { useGenerateNewTokenDialog } from "@parallel/components/settings/GenerateNewTokenDialog";
 import {
-  DevelopersQuery,
+  Developers_createEventSubscriptionDocument,
+  Developers_revokeUserAuthTokenDocument,
+  Developers_updateEventSubscriptionDocument,
   Developers_UserAuthenticationTokenFragment,
-  useDevelopersQuery,
-  useDevelopers_CreateEventSubscriptionMutation,
-  useDevelopers_RevokeUserAuthTokenMutation,
-  useDevelopers_UpdateEventSubscriptionMutation,
+  Developers_userDocument,
   UserAuthenticationTokens_OrderBy,
 } from "@parallel/graphql/__types";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
@@ -59,16 +58,14 @@ function Developers() {
     data: { me, subscriptions },
     loading,
     refetch,
-  } = useAssertQueryOrPreviousData(
-    useDevelopersQuery({
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
-        sortBy: [`${state.sort.field}_${state.sort.direction}` as UserAuthenticationTokens_OrderBy],
-      },
-    })
-  );
+  } = useAssertQueryOrPreviousData(Developers_userDocument, {
+    variables: {
+      offset: state.items * (state.page - 1),
+      limit: state.items,
+      search: state.search,
+      sortBy: [`${state.sort.field}_${state.sort.direction}` as UserAuthenticationTokens_OrderBy],
+    },
+  });
   const eventSubscriptions = subscriptions[0];
   const sections = useSettingsSections(me);
   const authTokens = me.authenticationTokens;
@@ -104,7 +101,7 @@ function Developers() {
   };
 
   const showRevokeAccessToken = useDeleteAccessTokenDialog();
-  const [revokeTokens] = useDevelopers_RevokeUserAuthTokenMutation();
+  const [revokeTokens] = useMutation(Developers_revokeUserAuthTokenDocument);
   const handleRevokeTokens = async (tokenIds: string[]) => {
     try {
       await showRevokeAccessToken({ selectedCount: tokenIds.length });
@@ -120,8 +117,8 @@ function Developers() {
 
   const columns = useAuthTokensTableColumns();
 
-  const [createOrgSubscription] = useDevelopers_CreateEventSubscriptionMutation();
-  const [updateOrgSubscription] = useDevelopers_UpdateEventSubscriptionMutation();
+  const [createOrgSubscription] = useMutation(Developers_createEventSubscriptionDocument);
+  const [updateOrgSubscription] = useMutation(Developers_updateEventSubscriptionDocument);
   async function handleEventSubscriptionSwitchClicked(isEnabled: boolean) {
     if (eventSubscriptions) {
       await updateOrgSubscription({
@@ -335,12 +332,12 @@ Developers.fragments = {
 
 Developers.mutations = [
   gql`
-    mutation Developers_RevokeUserAuthToken($authTokenIds: [GID!]!) {
+    mutation Developers_revokeUserAuthToken($authTokenIds: [GID!]!) {
       revokeUserAuthToken(authTokenIds: $authTokenIds)
     }
   `,
   gql`
-    mutation Developers_CreateEventSubscription($eventsUrl: String!) {
+    mutation Developers_createEventSubscription($eventsUrl: String!) {
       createEventSubscription(eventsUrl: $eventsUrl) {
         ...EventSubscriptionCard_PetitionEventSubscription
       }
@@ -348,7 +345,7 @@ Developers.mutations = [
     ${EventSubscriptionCard.fragments.PetitionEventSubscription}
   `,
   gql`
-    mutation Developers_UpdateEventSubscription($id: GID!, $data: UpdateEventSubscriptionInput!) {
+    mutation Developers_updateEventSubscription($id: GID!, $data: UpdateEventSubscriptionInput!) {
       updateEventSubscription(id: $id, data: $data) {
         ...EventSubscriptionCard_PetitionEventSubscription
       }
@@ -357,46 +354,47 @@ Developers.mutations = [
   `,
 ];
 
+Developers.queries = [
+  gql`
+    query Developers_user(
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $sortBy: [UserAuthenticationTokens_OrderBy!]
+    ) {
+      me {
+        id
+        authenticationTokens(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy) {
+          totalCount
+          items {
+            ...Developers_UserAuthenticationToken
+          }
+        }
+        ...SettingsLayout_User
+        ...useSettingsSections_User
+      }
+      subscriptions {
+        ...EventSubscriptionCard_PetitionEventSubscription
+      }
+    }
+    ${Developers.fragments.UserAuthenticationToken}
+    ${SettingsLayout.fragments.User}
+    ${useSettingsSections.fragments.User}
+    ${EventSubscriptionCard.fragments.PetitionEventSubscription}
+  `,
+];
+
 Developers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContext) => {
   const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
 
-  await fetchQuery<DevelopersQuery>(
-    gql`
-      query Developers(
-        $offset: Int!
-        $limit: Int!
-        $search: String
-        $sortBy: [UserAuthenticationTokens_OrderBy!]
-      ) {
-        me {
-          id
-          authenticationTokens(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy) {
-            totalCount
-            items {
-              ...Developers_UserAuthenticationToken
-            }
-          }
-          ...SettingsLayout_User
-          ...useSettingsSections_User
-        }
-        subscriptions {
-          ...EventSubscriptionCard_PetitionEventSubscription
-        }
-      }
-      ${Developers.fragments.UserAuthenticationToken}
-      ${SettingsLayout.fragments.User}
-      ${useSettingsSections.fragments.User}
-      ${EventSubscriptionCard.fragments.PetitionEventSubscription}
-    `,
-    {
-      variables: {
-        offset: items * (page - 1),
-        limit: items,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as UserAuthenticationTokens_OrderBy],
-      },
-    }
-  );
+  await fetchQuery(Developers_userDocument, {
+    variables: {
+      offset: items * (page - 1),
+      limit: items,
+      search,
+      sortBy: [`${sort.field}_${sort.direction}` as UserAuthenticationTokens_OrderBy],
+    },
+  });
 };
 
 export default compose(

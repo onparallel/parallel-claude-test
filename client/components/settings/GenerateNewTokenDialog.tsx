@@ -1,8 +1,8 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Button, FormControl, FormErrorMessage, Input, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
-import { useGenerateNewTokenDialog_generateUserAuthTokenMutation } from "@parallel/graphql/__types";
+import { GenerateNewTokenDialog_generateUserAuthTokenDocument } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -26,8 +26,9 @@ export function GenerateNewTokenDialog(props: DialogProps) {
     },
   });
 
-  const [generateUserAuthToken, { loading }] =
-    useGenerateNewTokenDialog_generateUserAuthTokenMutation();
+  const [generateUserAuthToken, { loading }] = useMutation(
+    GenerateNewTokenDialog_generateUserAuthTokenDocument
+  );
 
   async function submit({ tokenName }: { tokenName: string }) {
     try {

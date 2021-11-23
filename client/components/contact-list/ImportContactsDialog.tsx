@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Center,
@@ -10,7 +10,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
-import { useImportContactsDialog_bulkCreateContactsMutation } from "@parallel/graphql/__types";
+import { ImportContactsDialog_bulkCreateContactsDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { withError } from "@parallel/utils/promises/withError";
 import { useState } from "react";
@@ -32,8 +32,9 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
 
   const showErrorDialog = useErrorDialog();
 
-  const [bulkCreateContacts, { loading: isUploading }] =
-    useImportContactsDialog_bulkCreateContactsMutation();
+  const [bulkCreateContacts, { loading: isUploading }] = useMutation(
+    ImportContactsDialog_bulkCreateContactsDocument
+  );
   async function handleFileDrop([file]: File[], rejected: FileRejection[]) {
     if (rejected.length > 0) {
       setFileDropError(rejected[0].errors[0].code);

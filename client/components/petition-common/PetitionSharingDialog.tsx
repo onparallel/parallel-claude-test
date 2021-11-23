@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { getOperationName } from "@apollo/client/utilities";
 import {
   Alert,
@@ -24,15 +24,15 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel/chakra/icons";
 import {
-  PetitionActivityDocument,
+  PetitionActivity_petitionDocument,
+  PetitionSharingModal_addPetitionPermissionDocument,
+  PetitionSharingModal_petitionsDocument,
   PetitionSharingModal_PetitionUserGroupPermissionFragment,
   PetitionSharingModal_PetitionUserPermissionFragment,
+  PetitionSharingModal_removePetitionPermissionDocument,
+  PetitionSharingModal_transferPetitionOwnershipDocument,
   PetitionSharingModal_UserFragment,
   PetitionSharingModal_UserGroupFragment,
-  usePetitionSharingModal_addPetitionPermissionMutation,
-  usePetitionSharingModal_PetitionsQuery,
-  usePetitionSharingModal_removePetitionPermissionMutation,
-  usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
@@ -79,7 +79,7 @@ export function PetitionSharingDialog({
   const toast = useToast();
   const [hasUsers, setHasUsers] = useState(false);
 
-  const { data, loading } = usePetitionSharingModal_PetitionsQuery({
+  const { data, loading } = useQuery(PetitionSharingModal_petitionsDocument, {
     variables: { petitionIds },
     fetchPolicy: "cache-and-network",
   });
@@ -154,7 +154,7 @@ export function PetitionSharingDialog({
   const handleRemovePetitionPermission = useRemovePetitionPermission();
   const handleTransferPetitionOwnership = useTransferPetitionOwnership();
 
-  const [addPetitionPermission] = usePetitionSharingModal_addPetitionPermissionMutation();
+  const [addPetitionPermission] = useMutation(PetitionSharingModal_addPetitionPermissionDocument);
 
   const handleAddPetitionPermissions = handleSubmit(
     async ({ selection, notify, subscribe, message }) => {
@@ -172,7 +172,7 @@ export function PetitionSharingDialog({
             subscribe: isTemplate ? false : subscribe,
             message: message || null,
           },
-          refetchQueries: [getOperationName(PetitionActivityDocument)!],
+          refetchQueries: [getOperationName(PetitionActivity_petitionDocument)!],
         });
         toast({
           title: getSuccessTitle(),
@@ -658,7 +658,7 @@ PetitionSharingDialog.mutations = [
 
 PetitionSharingDialog.queries = [
   gql`
-    query PetitionSharingModal_Petitions($petitionIds: [GID!]!) {
+    query PetitionSharingModal_petitions($petitionIds: [GID!]!) {
       petitionsById(ids: $petitionIds) {
         ...PetitionSharingModal_Petition
       }
@@ -675,7 +675,9 @@ interface RemovePetitionPermissionProps {
 
 function useRemovePetitionPermission() {
   const confirmRemovePetitionPermission = useDialog(ConfirmRemovePetitionPermissionDialog);
-  const [removePetitionPermission] = usePetitionSharingModal_removePetitionPermissionMutation();
+  const [removePetitionPermission] = useMutation(
+    PetitionSharingModal_removePetitionPermissionDocument
+  );
   return useCallback(
     async ({ petitionId, user, userGroup }: RemovePetitionPermissionProps) => {
       try {
@@ -686,7 +688,7 @@ function useRemovePetitionPermission() {
         await confirmRemovePetitionPermission({ name });
         await removePetitionPermission({
           variables: { petitionId, [prop]: [id] },
-          refetchQueries: [getOperationName(PetitionActivityDocument)!],
+          refetchQueries: [getOperationName(PetitionActivity_petitionDocument)!],
         });
       } catch {}
     },
@@ -734,14 +736,16 @@ function ConfirmRemovePetitionPermissionDialog({
 
 function useTransferPetitionOwnership() {
   const confirmTransferPetitionOwnership = useDialog(ConfirmTransferPetitionOwnershipDialog);
-  const [transferPetitionOwnership] = usePetitionSharingModal_transferPetitionOwnershipMutation();
+  const [transferPetitionOwnership] = useMutation(
+    PetitionSharingModal_transferPetitionOwnershipDocument
+  );
   return useCallback(
     async (petitionId: string, user: PetitionSharingModal_UserFragment) => {
       try {
         await confirmTransferPetitionOwnership({ user });
         await transferPetitionOwnership({
           variables: { petitionId, userId: user.id },
-          refetchQueries: [getOperationName(PetitionActivityDocument)!],
+          refetchQueries: [getOperationName(PetitionActivity_petitionDocument)!],
         });
       } catch {}
     },

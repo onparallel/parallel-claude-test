@@ -5,6 +5,7 @@ import {
   DocumentNode,
   OperationVariables,
 } from "@apollo/client";
+import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { NextComponentType, NextPageContext } from "next";
@@ -12,13 +13,13 @@ import Router from "next/router";
 
 export type WithApolloDataContext = NextPageContext & {
   apollo: ApolloClient<any>;
-  fetchQuery<T = any, TVariables = OperationVariables>(
-    query: DocumentNode,
+  fetchQuery<TData = any, TVariables = OperationVariables>(
+    query: DocumentNode | TypedDocumentNode<TData, TVariables>,
     options?: {
       variables?: TVariables;
       ignoreCache?: boolean;
     }
-  ): Promise<ApolloQueryResult<T>>;
+  ): Promise<ApolloQueryResult<TData>>;
 };
 
 export const SERVER_STATE = "__SERVER_STATE__";
@@ -70,14 +71,14 @@ export function withApolloData<P = {}>(
               (await getInitialProps?.({
                 ...context,
                 apollo,
-                async fetchQuery<T = any, TVariables = OperationVariables>(
-                  query: DocumentNode,
+                async fetchQuery<TData = any, TVariables = OperationVariables>(
+                  query: DocumentNode | TypedDocumentNode<TData, TVariables>,
                   options?: {
                     variables?: TVariables;
                     ignoreCache?: boolean;
                   }
                 ) {
-                  return await new Promise<ApolloQueryResult<T>>((resolve, reject) => {
+                  return await new Promise<ApolloQueryResult<TData>>((resolve, reject) => {
                     let resolved = false;
                     // On the browser we fetch from cache and fire a request
                     // that will update the cache when it arrives
@@ -86,7 +87,7 @@ export function withApolloData<P = {}>(
                         ? "cache-and-network"
                         : "network-only";
                     const subscription = apollo
-                      .watchQuery<T, TVariables>({
+                      .watchQuery<TData, TVariables>({
                         query,
                         variables: options?.variables,
                         fetchPolicy,

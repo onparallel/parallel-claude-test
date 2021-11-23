@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Accordion,
   AccordionButton,
@@ -24,9 +24,9 @@ import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common
 import {
   PetitionFieldReplyStatus,
   PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment,
+  PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
-  usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -71,8 +71,9 @@ export const PetitionRepliesField = Object.assign(
     ref
   ) {
     const intl = useIntl();
-    const [petitionFieldAttachmentDownloadLink] =
-      usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation();
+    const [petitionFieldAttachmentDownloadLink] = useMutation(
+      PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument
+    );
     const handleAttachmentClick = function (attachmentId: string) {
       openNewWindow(async () => {
         const { data } = await petitionFieldAttachmentDownloadLink({

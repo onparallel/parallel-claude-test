@@ -1,8 +1,8 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
-  Circle,
   Button,
   Center,
+  Circle,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -20,9 +20,8 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
-  PublicOptOutQuery,
-  PublicOptOutQueryVariables,
-  useOptOut_publicOptOutRemindersMutation,
+  OptOut_accessDocument,
+  OptOut_publicOptOutRemindersDocument,
 } from "@parallel/graphql/__types";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useReminderOptOutReasons } from "@parallel/utils/useReminderOptOutReasons";
@@ -30,6 +29,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 type OptOutProps = UnwrapPromise<ReturnType<typeof OptOut.getInitialProps>>;
 
@@ -48,7 +48,7 @@ function OptOut({ keycode, access }: OptOutProps) {
 
   const answers = useReminderOptOutReasons();
 
-  const [optOut] = useOptOut_publicOptOutRemindersMutation();
+  const [optOut] = useMutation(OptOut_publicOptOutRemindersDocument);
 
   const handleOptOut = async (event: FormEvent) => {
     event.preventDefault();
@@ -240,29 +240,24 @@ OptOut.fragments = {
   },
 };
 
+OptOut.queries = [
+  gql`
+    query OptOut_access($keycode: ID!) {
+      access(keycode: $keycode) {
+        ...OptOut_PublicPetitionAccess
+      }
+    }
+    ${OptOut.fragments.PublicPetitionAccess}
+  `,
+];
+
 OptOut.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
-
-  const result = await fetchQuery<PublicOptOutQuery, PublicOptOutQueryVariables>(
-    gql`
-      query PublicOptOut($keycode: ID!) {
-        access(keycode: $keycode) {
-          ...OptOut_PublicPetitionAccess
-        }
-      }
-      ${OptOut.fragments.PublicPetitionAccess}
-    `,
-    { variables: { keycode } }
-  );
-  if (!result.data?.access) {
+  const { data } = await fetchQuery(OptOut_accessDocument, { variables: { keycode } });
+  if (!isDefined(data?.access)) {
     throw new Error();
   }
-
-  const {
-    data: { access },
-  } = result;
-
-  return { keycode, access };
+  return { keycode, access: data.access };
 };
 
 export default withApolloData(OptOut);

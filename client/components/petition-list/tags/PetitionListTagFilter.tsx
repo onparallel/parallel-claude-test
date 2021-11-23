@@ -1,9 +1,9 @@
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { Box, Center, Checkbox, Flex, Input, useId } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { TableColumnFilterProps } from "@parallel/components/common/Table";
 import { Tag } from "@parallel/components/common/Tag";
-import { usePetitionListTagFilter_tagsQuery } from "@parallel/graphql/__types";
+import { PetitionListTagFilter_tagsDocument } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import {
@@ -24,7 +24,7 @@ export function PetitionListTagFilter({
   onChange,
 }: TableColumnFilterProps<PetitionListTagFilter>) {
   const intl = useIntl();
-  const { data, refetch } = usePetitionListTagFilter_tagsQuery();
+  const { data, refetch } = useQuery(PetitionListTagFilter_tagsDocument);
   const tags = useMemo(() => {
     // intentionally not include value so this only changes when data changes
     const selected = [];
@@ -234,8 +234,8 @@ PetitionListTagFilter.fragments = {
   `,
 };
 
-PetitionListTagFilter.queries = {
-  tags: gql`
+PetitionListTagFilter.queries = [
+  gql`
     query PetitionListTagFilter_tags($search: String) {
       tags(search: $search) {
         items {
@@ -245,4 +245,4 @@ PetitionListTagFilter.queries = {
     }
     ${PetitionListTagFilter.fragments.Tag}
   `,
-};
+];

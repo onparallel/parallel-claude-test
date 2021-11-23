@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Flex, List, ListItem, Progress, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -9,8 +9,8 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NormalLink } from "@parallel/components/common/Link";
 import {
-  useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
-  useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
+  DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument,
+  DynamicSelectSettings_uploadDynamicSelectFieldFileDocument,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -37,7 +37,9 @@ export function DynamicSelectSettings({
     onFieldEdit(field.id, { options: { labels: [], values: [], file: null } });
   }
 
-  const [downloadLink] = useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation();
+  const [downloadLink] = useMutation(
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument
+  );
 
   function handleDownloadListingsFile() {
     openNewWindow(async () => {
@@ -242,7 +244,9 @@ function DynamicSelectOptionsDropzone({
 
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
-  const [uploadFile, { loading }] = useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation();
+  const [uploadFile, { loading }] = useMutation(
+    DynamicSelectSettings_uploadDynamicSelectFieldFileDocument
+  );
 
   const showErrorDialog = useErrorDialog();
   async function handleFileDrop([file]: File[], rejected: FileRejection[]) {

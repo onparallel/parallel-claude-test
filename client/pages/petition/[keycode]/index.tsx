@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -20,11 +20,10 @@ import { Logo } from "@parallel/components/common/Logo";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import {
-  RecipientView_verifyPublicAccessMutation,
-  RecipientView_verifyPublicAccessMutationVariables,
+  RecipientViewVerify_publicCheckVerificationCodeDocument,
+  RecipientViewVerify_publicSendVerificationCodeDocument,
+  RecipientViewVerify_verifyPublicAccessDocument,
   Tone,
-  usepublicCheckVerificationCodeMutation,
-  usepublicSendVerificationCodeMutation,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isInsecureBrowser } from "@parallel/utils/isInsecureBrowser";
@@ -68,11 +67,13 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl, tone }: RecipientView
     step: "REQUEST",
   });
 
-  const [sendVerificationCode, { loading: isSendingCode }] =
-    usepublicSendVerificationCodeMutation();
+  const [sendVerificationCode, { loading: isSendingCode }] = useMutation(
+    RecipientViewVerify_publicSendVerificationCodeDocument
+  );
 
-  const [publicCheckVerificationCode, { loading: isVerifyingCode }] =
-    usepublicCheckVerificationCodeMutation({});
+  const [publicCheckVerificationCode, { loading: isVerifyingCode }] = useMutation(
+    RecipientViewVerify_publicCheckVerificationCodeDocument
+  );
 
   async function handleSendVerificationCode() {
     const { data } = await sendVerificationCode({
@@ -289,28 +290,8 @@ export async function getServerSideProps({
     };
   }
   const client = createApolloClient({}, { req });
-  const { data } = await client.mutate<
-    RecipientView_verifyPublicAccessMutation,
-    RecipientView_verifyPublicAccessMutationVariables
-  >({
-    mutation: gql`
-      mutation RecipientView_verifyPublicAccess(
-        $token: ID!
-        $keycode: ID!
-        $ip: String
-        $userAgent: String
-      ) {
-        verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
-          isAllowed
-          cookieName
-          cookieValue
-          email
-          orgName
-          orgLogoUrl
-          tone
-        }
-      }
-    `,
+  const { data } = await client.mutate({
+    mutation: RecipientViewVerify_verifyPublicAccessDocument,
     variables: {
       keycode: keycode as string,
       token: process.env.CLIENT_SERVER_TOKEN,
@@ -347,7 +328,25 @@ export async function getServerSideProps({
 
 RecipientViewVerify.mutations = [
   gql`
-    mutation publicSendVerificationCode($keycode: ID!) {
+    mutation RecipientViewVerify_verifyPublicAccess(
+      $token: ID!
+      $keycode: ID!
+      $ip: String
+      $userAgent: String
+    ) {
+      verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
+        isAllowed
+        cookieName
+        cookieValue
+        email
+        orgName
+        orgLogoUrl
+        tone
+      }
+    }
+  `,
+  gql`
+    mutation RecipientViewVerify_publicSendVerificationCode($keycode: ID!) {
       publicSendVerificationCode(keycode: $keycode) {
         token
         remainingAttempts
@@ -356,7 +355,11 @@ RecipientViewVerify.mutations = [
     }
   `,
   gql`
-    mutation publicCheckVerificationCode($keycode: ID!, $token: ID!, $code: String!) {
+    mutation RecipientViewVerify_publicCheckVerificationCode(
+      $keycode: ID!
+      $token: ID!
+      $code: String!
+    ) {
       publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
         result
         remainingAttempts

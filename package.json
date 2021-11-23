@@ -36,6 +36,7 @@
   },
   "resolutions": {
     "@apollo/client": "^3.4.16",
+    "@graphql-typed-document-node/core": "^3.1.1",
     "core-js": "^3.19.1",
     "@types/react": "^17.0.34"
   }

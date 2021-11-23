@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -24,16 +24,13 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
-  ContactQuery,
-  ContactQueryVariables,
-  ContactUserQuery,
+  Contact_contactDocument,
   Contact_PetitionAccessFragment,
+  Contact_updateContactDocument,
+  Contact_userDocument,
   Contact_UserFragment,
-  useContactQuery,
-  useContactUserQuery,
-  useContact_updateContactMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
@@ -54,18 +51,14 @@ function Contact({ contactId }: ContactProps) {
 
   const {
     data: { me },
-  } = assertQuery(useContactUserQuery());
+  } = useAssertQuery(Contact_userDocument);
   const {
     data: { contact },
-  } = assertQuery(
-    useContactQuery({
-      variables: {
-        id: contactId,
-      },
-    })
-  );
+  } = useAssertQuery(Contact_contactDocument, {
+    variables: { id: contactId },
+  });
   const [isEditing, setIsEditing] = useState(false);
-  const [updateContact, { loading }] = useContact_updateContactMutation();
+  const [updateContact, { loading }] = useMutation(Contact_updateContactDocument);
   const { register, handleSubmit, reset } = useForm<ContactDetailsFormData>({
     defaultValues: {
       firstName: contact!.firstName ?? "",
@@ -398,6 +391,25 @@ Contact.mutations = [
   `,
 ];
 
+Contact.queries = [
+  gql`
+    query Contact_user {
+      me {
+        ...Contact_User
+      }
+    }
+    ${Contact.fragments.User}
+  `,
+  gql`
+    query Contact_contact($id: GID!) {
+      contact(id: $id) {
+        ...Contact_Contact
+      }
+    }
+    ${Contact.fragments.Contact}
+  `,
+];
+
 interface ToggleInputProps extends InputProps {
   isEditing: boolean;
 }
@@ -426,29 +438,12 @@ const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(function ToggleI
 });
 
 Contact.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<ContactUserQuery>(gql`
-    query ContactUser {
-      me {
-        ...Contact_User
-      }
-    }
-    ${Contact.fragments.User}
-  `);
-  await fetchQuery<ContactQuery, ContactQueryVariables>(
-    gql`
-      query Contact($id: GID!) {
-        contact(id: $id) {
-          ...Contact_Contact
-        }
-      }
-      ${Contact.fragments.Contact}
-    `,
-    {
-      variables: {
-        id: query.contactId as string,
-      },
-    }
-  );
+  await Promise.all([
+    fetchQuery(Contact_userDocument),
+    fetchQuery(Contact_contactDocument, {
+      variables: { id: query.contactId as string },
+    }),
+  ]);
   return {
     contactId: query.contactId as string,
   };

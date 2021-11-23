@@ -15,16 +15,13 @@ import {
   PetitionBaseType,
   PetitionFilter,
   PetitionSharedWithFilter,
-  PetitionsQuery,
-  PetitionsQueryVariables,
   PetitionStatus,
-  PetitionsUserQuery,
   Petitions_PetitionBaseFragment,
-  usePetitionsQuery,
-  usePetitionsUserQuery,
+  Petitions_petitionsDocument,
+  Petitions_userDocument,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
-import { assignRef } from "@parallel/utils/assignRef";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
@@ -43,7 +40,7 @@ import {
 } from "@parallel/utils/queryState";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { MouseEvent, PropsWithChildren, useCallback, useMemo, useRef, useState } from "react";
+import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 
@@ -77,8 +74,8 @@ function Petitions() {
       : ({ field: "createdAt", direction: "DESC" } as const));
   const {
     data: { me },
-  } = assertQuery(usePetitionsUserQuery());
-  const { data, loading, refetch } = usePetitionsQuery({
+  } = useAssertQuery(Petitions_userDocument);
+  const { data, loading, refetch } = useQueryOrPreviousData(Petitions_petitionsDocument, {
     variables: {
       offset: state.items * (state.page - 1),
       limit: state.items,
@@ -92,16 +89,10 @@ function Petitions() {
       sortBy: [`${sort.field}_${sort.direction}`],
     },
   });
-  const previousRef = useRef<PetitionsQuery>();
-  if (data) {
-    assignRef(previousRef, data);
-  }
-
-  const petitions = data?.petitions ??
-    previousRef.current?.petitions ?? {
-      items: [],
-      totalCount: 0,
-    };
+  const petitions = data?.petitions ?? {
+    items: [],
+    totalCount: 0,
+  };
 
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -383,67 +374,61 @@ Petitions.fragments = {
       ${usePetitionsTableColumns.fragments.PetitionBase}
     `;
   },
-  get User() {
-    return gql`
-      fragment Petitions_User on User {
-        ...AppLayout_User
-      }
-      ${AppLayout.fragments.User}
-    `;
-  },
 };
 
-Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<PetitionsUserQuery>(gql`
-    query PetitionsUser {
+Petitions.queries = [
+  gql`
+    query Petitions_user {
       me {
-        ...Petitions_User
+        ...AppLayout_User
       }
     }
-    ${Petitions.fragments.User}
-  `);
+    ${AppLayout.fragments.User}
+  `,
+  gql`
+    query Petitions_petitions(
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $sortBy: [QueryPetitions_OrderBy!]
+      $filters: PetitionFilter
+    ) {
+      petitions(
+        offset: $offset
+        limit: $limit
+        search: $search
+        sortBy: $sortBy
+        filters: $filters
+      ) {
+        ...Petitions_PetitionBasePagination
+      }
+    }
+    ${Petitions.fragments.PetitionBasePagination}
+  `,
+];
+
+Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(Petitions_userDocument);
   const state = parseQuery(query, QUERY_STATE);
   const sort =
     state.sort ??
     (state.type === "PETITION"
       ? ({ field: "sentAt", direction: "DESC" } as const)
       : ({ field: "createdAt", direction: "DESC" } as const));
-  await fetchQuery<PetitionsQuery, PetitionsQueryVariables>(
-    gql`
-      query Petitions(
-        $offset: Int!
-        $limit: Int!
-        $search: String
-        $sortBy: [QueryPetitions_OrderBy!]
-        $filters: PetitionFilter
-      ) {
-        petitions(
-          offset: $offset
-          limit: $limit
-          search: $search
-          sortBy: $sortBy
-          filters: $filters
-        ) {
-          ...Petitions_PetitionBasePagination
-        }
-      }
-      ${Petitions.fragments.PetitionBasePagination}
-    `,
-    {
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
-        sortBy: [`${sort.field}_${sort.direction}`],
-        filters: {
-          type: state.type,
-          status: state.status,
-          tagIds: state.tags,
-          sharedWith: removeInvalidLines(state.sharedWith),
-        },
+  await fetchQuery(Petitions_petitionsDocument, {
+    variables: {
+      offset: state.items * (state.page - 1),
+      limit: state.items,
+      search: state.search,
+      sortBy: [`${sort.field}_${sort.direction}`],
+      filters: {
+        type: state.type,
+        status: state.status,
+        tagIds: state.tags,
+        sharedWith: removeInvalidLines(state.sharedWith),
       },
-    }
-  );
+    },
+  });
 };
 
 export default compose(withDialogs, withApolloData)(Petitions);

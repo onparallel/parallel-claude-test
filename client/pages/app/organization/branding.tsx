@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Button,
   Center,
@@ -22,12 +22,12 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { BrandingPreview } from "@parallel/components/organization/BrandingPreview";
 import {
+  OrganizationBranding_updateOrganizationPreferredToneDocument,
+  OrganizationBranding_updateOrgLogoDocument,
+  OrganizationBranding_userDocument,
   Tone,
-  useOrganizationBrandingQuery,
-  useOrganizationBranding_updateOrganizationPreferredToneMutation,
-  useOrganizationBranding_updateOrgLogoMutation,
 } from "@parallel/graphql/__types";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useRef, useState } from "react";
@@ -40,7 +40,7 @@ function OrganizationBranding() {
 
   const {
     data: { me },
-  } = useAssertQueryOrPreviousData(useOrganizationBrandingQuery());
+  } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
 
   const sections = useOrganizationSections(me);
   const dropzoneRef = useRef<DropzoneRef>(null);
@@ -52,7 +52,7 @@ function OrganizationBranding() {
   const tone = me.organization.preferredTone;
 
   const showErrorDialog = useErrorDialog();
-  const [updateLogo, { loading }] = useOrganizationBranding_updateOrgLogoMutation();
+  const [updateLogo, { loading }] = useMutation(OrganizationBranding_updateOrgLogoDocument);
   const handleLogoUpload = async (files: File[], rejected: FileRejection[]) => {
     if (rejected.length > 0) {
       await showErrorDialog({
@@ -76,7 +76,9 @@ function OrganizationBranding() {
     }
   };
 
-  const [changePreferredTone] = useOrganizationBranding_updateOrganizationPreferredToneMutation();
+  const [changePreferredTone] = useMutation(
+    OrganizationBranding_updateOrganizationPreferredToneDocument
+  );
 
   const handleToneChange = async (tone: Tone) => {
     changePreferredTone({
@@ -251,24 +253,26 @@ OrganizationBranding.mutations = [
   `,
 ];
 
-OrganizationBranding.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery(
-    gql`
-      query OrganizationBranding {
-        me {
-          ...SettingsLayout_User
-          fullName
-          organization {
-            id
-            logoUrl
-            name
-            preferredTone
-          }
+OrganizationBranding.queries = [
+  gql`
+    query OrganizationBranding_user {
+      me {
+        ...SettingsLayout_User
+        fullName
+        organization {
+          id
+          logoUrl
+          name
+          preferredTone
         }
       }
-      ${SettingsLayout.fragments.User}
-    `
-  );
+    }
+    ${SettingsLayout.fragments.User}
+  `,
+];
+
+OrganizationBranding.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(OrganizationBranding_userDocument);
 };
 
 export default compose(

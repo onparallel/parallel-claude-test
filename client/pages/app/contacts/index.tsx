@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -10,16 +10,16 @@ import { ContactListHeader } from "@parallel/components/contact-list/ContactList
 import { ImportContactsDialog } from "@parallel/components/contact-list/ImportContactsDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
-  ContactsQuery,
-  ContactsQueryVariables,
-  ContactsUserQuery,
+  Contacts_contactsDocument,
   Contacts_ContactsListFragment,
+  Contacts_deleteContactsDocument,
+  Contacts_userDocument,
   QueryContacts_OrderBy,
-  useContactsQuery,
-  useContactsUserQuery,
-  useContacts_deleteContactsMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import {
+  useAssertQuery,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo/useAssertQuery";
 import { clearCache } from "@parallel/utils/apollo/clearCache";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
@@ -58,24 +58,22 @@ function Contacts() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me },
-  } = assertQuery(useContactsUserQuery());
+  } = useAssertQuery(Contacts_userDocument);
   const {
     data: { contacts },
     loading,
     refetch,
-  } = useAssertQueryOrPreviousData(
-    useContactsQuery({
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
-        sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy],
-      },
-    })
-  );
+  } = useAssertQueryOrPreviousData(Contacts_contactsDocument, {
+    variables: {
+      offset: state.items * (state.page - 1),
+      limit: state.items,
+      search: state.search,
+      sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy],
+    },
+  });
   const createContact = useCreateContact();
 
-  const [deleteContact] = useContacts_deleteContactsMutation({
+  const [deleteContact] = useMutation(Contacts_deleteContactsDocument, {
     update(cache) {
       clearCache(cache, /\$ROOT_QUERY\.contacts\(/);
       refetch();
@@ -337,42 +335,42 @@ Contacts.mutations = [
   `,
 ];
 
+Contacts.queries = [
+  gql`
+    query Contacts_contacts(
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $sortBy: [QueryContacts_OrderBy!]
+    ) {
+      contacts(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
+        ...Contacts_ContactsList
+      }
+    }
+    ${Contacts.fragments.Contacts}
+  `,
+  gql`
+    query Contacts_user {
+      me {
+        ...Contacts_User
+      }
+    }
+    ${Contacts.fragments.User}
+  `,
+];
+
 Contacts.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const { page, items, search, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
-    fetchQuery<ContactsQuery, ContactsQueryVariables>(
-      gql`
-        query Contacts(
-          $offset: Int!
-          $limit: Int!
-          $search: String
-          $sortBy: [QueryContacts_OrderBy!]
-        ) {
-          contacts(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
-            ...Contacts_ContactsList
-          }
-        }
-        ${Contacts.fragments.Contacts}
-      `,
-      {
-        variables: {
-          offset: items * (page - 1),
-          limit: items,
-          search,
-          sortBy: [`${sort.field}_${sort.direction}` as QueryContacts_OrderBy],
-        },
-      }
-    ),
-    fetchQuery<ContactsUserQuery>(
-      gql`
-        query ContactsUser {
-          me {
-            ...Contacts_User
-          }
-        }
-        ${Contacts.fragments.User}
-      `
-    ),
+    fetchQuery(Contacts_contactsDocument, {
+      variables: {
+        offset: items * (page - 1),
+        limit: items,
+        search,
+        sortBy: [`${sort.field}_${sort.direction}` as QueryContacts_OrderBy],
+      },
+    }),
+    fetchQuery(Contacts_userDocument),
   ]);
 };
 

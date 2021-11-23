@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import {
   Button,
   Container,
@@ -32,18 +32,16 @@ import {
 } from "@parallel/components/petition-new/NewPetitionSharedFilter";
 import { NewPetitionTemplatesList } from "@parallel/components/petition-new/NewPetitionTemplatesList";
 import {
-  NewPetitionTemplatesQuery,
-  NewPetitionTemplatesQueryVariables,
-  NewPetitionUserQuery,
-  NewPetitionUserTemplateQuery,
-  NewPetitionUserTemplateQueryVariables,
+  NewPetition_templateDocument,
+  NewPetition_templatesDocument,
+  NewPetition_userDocument,
   PetitionBaseType,
   PetitionLocale,
-  useNewPetitionTemplatesQuery,
-  useNewPetitionUserQuery,
-  useNewPetitionUserTemplateQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import {
+  useAssertQuery,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -72,9 +70,9 @@ function NewPetition() {
 
   const {
     data: { me, hasTemplates: _hasTemplates, publicTemplateCategories },
-  } = assertQuery(useNewPetitionUserQuery());
+  } = useAssertQuery(NewPetition_userDocument);
 
-  const { data: templateData } = useNewPetitionUserTemplateQuery({
+  const { data: templateData } = useQuery(NewPetition_templateDocument, {
     variables: { templateId: state.template! },
     skip: !state.template,
     fetchPolicy: "cache-and-network",
@@ -86,19 +84,17 @@ function NewPetition() {
     },
     fetchMore,
     refetch,
-  } = useAssertQueryOrPreviousData(
-    useNewPetitionTemplatesQuery({
-      variables: {
-        offset: 0,
-        limit: PAGE_SIZE,
-        search: state.search,
-        isPublic: state.public,
-        locale: state.lang,
-        isOwner: state.owner,
-        category: state.category,
-      },
-    })
-  );
+  } = useAssertQueryOrPreviousData(NewPetition_templatesDocument, {
+    variables: {
+      offset: 0,
+      limit: PAGE_SIZE,
+      search: state.search,
+      isPublic: state.public,
+      locale: state.lang,
+      isOwner: state.owner,
+      category: state.category,
+    },
+  });
   const hasMore = templates.length < totalCount;
   const hasTemplates = _hasTemplates.totalCount > 0;
 
@@ -386,73 +382,75 @@ NewPetition.fragments = {
   `,
 };
 
+NewPetition.queries = [
+  gql`
+    query NewPetition_templates(
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $locale: PetitionLocale
+      $isPublic: Boolean!
+      $isOwner: Boolean
+      $category: String
+    ) {
+      templates(
+        offset: $offset
+        limit: $limit
+        search: $search
+        isPublic: $isPublic
+        isOwner: $isOwner
+        locale: $locale
+        category: $category
+      ) {
+        items {
+          ...NewPetition_PetitionTemplate
+        }
+        totalCount
+      }
+    }
+    ${NewPetition.fragments.PetitionTemplate}
+  `,
+  gql`
+    query NewPetition_user {
+      me {
+        ...NewPetition_User
+      }
+      hasTemplates: petitions(filters: { type: TEMPLATE }) {
+        totalCount
+      }
+      publicTemplateCategories
+    }
+    ${NewPetition.fragments.User}
+  `,
+  gql`
+    query NewPetition_template($templateId: GID!) {
+      petition(id: $templateId) {
+        ...TemplateDetailsModal_PetitionTemplate
+      }
+    }
+    ${TemplateDetailsModal.fragments.PetitionTemplate}
+  `,
+];
+
 NewPetition.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const state = parseQuery(query, QUERY_STATE);
   await Promise.all([
-    fetchQuery<NewPetitionTemplatesQuery, NewPetitionTemplatesQueryVariables>(
-      gql`
-        query NewPetitionTemplates(
-          $offset: Int!
-          $limit: Int!
-          $search: String
-          $locale: PetitionLocale
-          $isPublic: Boolean!
-          $isOwner: Boolean
-          $category: String
-        ) {
-          templates(
-            offset: $offset
-            limit: $limit
-            search: $search
-            isPublic: $isPublic
-            isOwner: $isOwner
-            locale: $locale
-            category: $category
-          ) {
-            items {
-              ...NewPetition_PetitionTemplate
-            }
-            totalCount
-          }
-        }
-        ${NewPetition.fragments.PetitionTemplate}
-      `,
-      {
-        variables: {
-          offset: 0,
-          limit: PAGE_SIZE,
-          search: state.search,
-          isPublic: state.public,
-          locale: state.lang,
-          isOwner: state.owner,
-          category: state.category,
-        },
-      }
-    ),
-    fetchQuery<NewPetitionUserQuery>(gql`
-      query NewPetitionUser {
-        me {
-          ...NewPetition_User
-        }
-        hasTemplates: petitions(filters: { type: TEMPLATE }) {
-          totalCount
-        }
-        publicTemplateCategories
-      }
-      ${NewPetition.fragments.User}
-    `),
+    fetchQuery(NewPetition_templatesDocument, {
+      variables: {
+        offset: 0,
+        limit: PAGE_SIZE,
+        search: state.search,
+        isPublic: state.public,
+        locale: state.lang,
+        isOwner: state.owner,
+        category: state.category,
+      },
+    }),
+    fetchQuery(NewPetition_userDocument),
     state.template
-      ? fetchQuery<NewPetitionUserTemplateQuery, NewPetitionUserTemplateQueryVariables>(
-          gql`
-            query NewPetitionUserTemplate($templateId: GID!) {
-              petition(id: $templateId) {
-                ...TemplateDetailsModal_PetitionTemplate
-              }
-            }
-            ${TemplateDetailsModal.fragments.PetitionTemplate}
-          `,
-          { variables: { templateId: state.template } }
-        )
+      ? fetchQuery(NewPetition_templateDocument, {
+          variables: { templateId: state.template },
+        })
       : undefined,
   ]);
 };

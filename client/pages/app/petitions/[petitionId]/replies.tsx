@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -13,6 +13,7 @@ import {
   Tooltip,
   useToast,
 } from "@chakra-ui/react";
+import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -60,27 +61,23 @@ import { RecipientViewCommentsBadge } from "@parallel/components/recipient-view/
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
-  PetitionRepliesQuery,
-  PetitionRepliesQueryVariables,
-  PetitionRepliesUserQuery,
+  PetitionReplies_createPetitionFieldCommentDocument,
+  PetitionReplies_deletePetitionFieldCommentDocument,
+  PetitionReplies_fileUploadReplyDownloadLinkDocument,
+  PetitionReplies_petitionDocument,
   PetitionReplies_PetitionFieldFragment,
   PetitionReplies_PetitionFragment,
-  PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
+  PetitionReplies_sendPetitionClosedNotificationDocument,
+  PetitionReplies_updatePetitionDocument,
+  PetitionReplies_updatePetitionFieldCommentDocument,
+  PetitionReplies_updatePetitionFieldRepliesStatusDocument,
+  PetitionReplies_userDocument,
+  PetitionReplies_validatePetitionFieldsDocument,
+  PetitionSettings_cancelPetitionSignatureRequestDocument,
   PetitionStatus,
   UpdatePetitionInput,
-  usePetitionRepliesQuery,
-  usePetitionRepliesUserQuery,
-  usePetitionReplies_createPetitionFieldCommentMutation,
-  usePetitionReplies_deletePetitionFieldCommentMutation,
-  usePetitionReplies_fileUploadReplyDownloadLinkMutation,
-  usePetitionReplies_sendPetitionClosedNotificationMutation,
-  usePetitionReplies_updatePetitionFieldCommentMutation,
-  usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
-  usePetitionReplies_updatePetitionMutation,
-  usePetitionReplies_validatePetitionFieldsMutation,
-  usePetitionSettings_cancelPetitionSignatureRequestMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
@@ -118,15 +115,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(usePetitionRepliesUserQuery());
-  const { data, refetch } = assertQuery(
-    usePetitionRepliesQuery({
-      variables: {
-        id: petitionId,
-        hasInternalComments: me.hasInternalComments,
-      },
-    })
-  );
+  } = useAssertQuery(PetitionReplies_userDocument);
+  const { data, refetch } = useAssertQuery(PetitionReplies_petitionDocument, {
+    variables: {
+      id: petitionId,
+      hasInternalComments: me.hasInternalComments,
+    },
+  });
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
@@ -181,8 +176,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, [activeFieldId]);
 
   const wrapper = usePetitionStateWrapper();
-  const [updatePetition] = usePetitionReplies_updatePetitionMutation();
-  const [validatePetitionFields] = usePetitionReplies_validatePetitionFieldsMutation();
+  const [updatePetition] = useMutation(PetitionReplies_updatePetitionDocument);
+  const [validatePetitionFields] = useMutation(PetitionReplies_validatePetitionFieldsDocument);
   const downloadReplyFile = useDownloadReplyFile();
 
   const handleValidateToggle = useCallback(
@@ -312,7 +307,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const handlePrintPdfTask = usePrintPdfTask();
 
-  const [createPetitionFieldComment] = usePetitionReplies_createPetitionFieldCommentMutation();
+  const [createPetitionFieldComment] = useMutation(
+    PetitionReplies_createPetitionFieldCommentDocument
+  );
   async function handleAddComment(content: string, isInternal?: boolean) {
     await createPetitionFieldComment({
       variables: {
@@ -325,7 +322,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
-  const [updatePetitionFieldComment] = usePetitionReplies_updatePetitionFieldCommentMutation();
+  const [updatePetitionFieldComment] = useMutation(
+    PetitionReplies_updatePetitionFieldCommentDocument
+  );
   async function handleUpdateComment(petitionFieldCommentId: string, content: string) {
     await updatePetitionFieldComment({
       variables: {
@@ -338,7 +337,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
-  const [deletePetitionFieldComment] = usePetitionReplies_deletePetitionFieldCommentMutation();
+  const [deletePetitionFieldComment] = useMutation(
+    PetitionReplies_deletePetitionFieldCommentDocument
+  );
   async function handleDeleteComment(petitionFieldCommentId: string) {
     await deletePetitionFieldComment({
       variables: {
@@ -368,8 +369,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const indices = useFieldIndices(petition.fields);
 
   const showClosePetitionDialog = useClosePetitionDialog();
-  const [sendPetitionClosedNotification] =
-    usePetitionReplies_sendPetitionClosedNotificationMutation();
+  const [sendPetitionClosedNotification] = useMutation(
+    PetitionReplies_sendPetitionClosedNotificationDocument
+  );
   const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
   const handleFinishPetition = useCallback(
     async ({ requiredMessage }: { requiredMessage: boolean }) => {
@@ -439,7 +441,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showConfirmCancelOngoingSignature = useDialog(ConfirmCancelOngoingSignature);
 
-  const [cancelSignatureRequest] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
+  const [cancelSignatureRequest] = useMutation(
+    PetitionSettings_cancelPetitionSignatureRequestDocument
+  );
 
   const handleClosePetition = useCallback(async () => {
     try {
@@ -922,7 +926,7 @@ PetitionReplies.mutations = [
 ];
 
 function useDownloadReplyFile() {
-  const [mutate] = usePetitionReplies_fileUploadReplyDownloadLinkMutation();
+  const [mutate] = useMutation(PetitionReplies_fileUploadReplyDownloadLinkDocument);
   const showFailure = useFailureGeneratingLinkDialog();
   return useCallback(
     function downloadReplyFile(
@@ -947,11 +951,12 @@ function useDownloadReplyFile() {
 }
 
 function useUpdatePetitionFieldRepliesStatus() {
-  const [updatePetitionFieldRepliesStatus] =
-    usePetitionReplies_updatePetitionFieldRepliesStatusMutation();
+  const [updatePetitionFieldRepliesStatus] = useMutation(
+    PetitionReplies_updatePetitionFieldRepliesStatusDocument
+  );
   return useCallback(
     async (
-      variables: PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
+      variables: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>,
       petitionStatus: PetitionStatus,
       optimisticValidated: boolean
     ) =>
@@ -961,7 +966,7 @@ function useUpdatePetitionFieldRepliesStatus() {
           petitionFieldId,
           petitionFieldReplyIds,
           status,
-        }: PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables) => ({
+        }: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>) => ({
           updatePetitionFieldRepliesStatus: {
             __typename: "PetitionWithFieldAndReplies",
             petition: {
@@ -1051,38 +1056,38 @@ function PetitionContentsIndicators({ field }: { field: PetitionReplies_Petition
     </>
   );
 }
+
+PetitionReplies.queries = [
+  gql`
+    query PetitionReplies_user {
+      me {
+        ...PetitionReplies_User
+      }
+    }
+    ${PetitionReplies.fragments.User}
+  `,
+  gql`
+    query PetitionReplies_petition($id: GID!, $hasInternalComments: Boolean!) {
+      petition(id: $id) {
+        ...PetitionReplies_Petition
+      }
+    }
+    ${PetitionReplies.fragments.Petition}
+  `,
+];
+
 PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  const petitionId = query.petitionId as string;
   const {
     data: { me },
-  } = await fetchQuery<PetitionRepliesUserQuery>(
-    gql`
-      query PetitionRepliesUser {
-        me {
-          ...PetitionReplies_User
-        }
-      }
-      ${PetitionReplies.fragments.User}
-    `
-  );
-  await fetchQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
-    gql`
-      query PetitionReplies($id: GID!, $hasInternalComments: Boolean!) {
-        petition(id: $id) {
-          ...PetitionReplies_Petition
-        }
-      }
-      ${PetitionReplies.fragments.Petition}
-    `,
-    {
-      variables: {
-        id: query.petitionId as string,
-        hasInternalComments: me.hasInternalComments,
-      },
-    }
-  );
-  return {
-    petitionId: query.petitionId as string,
-  };
+  } = await fetchQuery(PetitionReplies_userDocument);
+  await fetchQuery(PetitionReplies_petitionDocument, {
+    variables: {
+      id: petitionId,
+      hasInternalComments: me.hasInternalComments,
+    },
+  });
+  return { petitionId };
 };
 
 export default compose(withPetitionState, withDialogs, withApolloData)(PetitionReplies);

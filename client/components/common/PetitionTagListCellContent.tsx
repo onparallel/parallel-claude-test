@@ -1,17 +1,15 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { Box, Button, Circle, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@parallel/chakra/icons";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Tag } from "@parallel/components/common/Tag";
 import {
+  PetitionTagListCellContent_createTagDocument,
   PetitionTagListCellContent_PetitionBaseFragment,
   PetitionTagListCellContent_TagFragment,
-  PetitionTagListCellContent_tagsQuery,
-  PetitionTagListCellContent_tagsQueryVariables,
-  usePetitionTagListCellContent_createTagMutation,
-  usePetitionTagListCellContent_tagPetitionMutation,
-  usePetitionTagListCellContent_tagsQuery,
-  usePetitionTagListCellContent_untagPetitionMutation,
+  PetitionTagListCellContent_tagPetitionDocument,
+  PetitionTagListCellContent_tagsDocument,
+  PetitionTagListCellContent_untagPetitionDocument,
 } from "@parallel/graphql/__types";
 import { clearCache } from "@parallel/utils/apollo/clearCache";
 import { withError } from "@parallel/utils/promises/withError";
@@ -39,16 +37,13 @@ export function PetitionTagListCellContent({
   const selectWrapperRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<TagSelectInstance>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const { data, refetch } = usePetitionTagListCellContent_tagsQuery();
+  const { data, refetch } = useQuery(PetitionTagListCellContent_tagsDocument);
   const intl = useIntl();
   const apollo = useApolloClient();
   const loadOptions = useDebouncedAsync(
     async (search: string) => {
-      const { data } = await apollo.query<
-        PetitionTagListCellContent_tagsQuery,
-        PetitionTagListCellContent_tagsQueryVariables
-      >({
-        query: PetitionTagListCellContent.queries.tags,
+      const { data } = await apollo.query({
+        query: PetitionTagListCellContent_tagsDocument,
         variables: { search },
         fetchPolicy: "no-cache",
       });
@@ -81,7 +76,7 @@ export function PetitionTagListCellContent({
     }
   };
 
-  const [tagPetition] = usePetitionTagListCellContent_tagPetitionMutation();
+  const [tagPetition] = useMutation(PetitionTagListCellContent_tagPetitionDocument);
   async function handleAddTag(tag: TagSelection) {
     await tagPetition({
       variables: { tagId: tag.id, petitionId: petition.id },
@@ -97,7 +92,7 @@ export function PetitionTagListCellContent({
     });
   }
 
-  const [untagPetition] = usePetitionTagListCellContent_untagPetitionMutation();
+  const [untagPetition] = useMutation(PetitionTagListCellContent_untagPetitionDocument);
   async function handleRemoveTag(tag: TagSelection) {
     await untagPetition({
       variables: { tagId: tag.id, petitionId: petition.id },
@@ -119,7 +114,7 @@ export function PetitionTagListCellContent({
     await refetch();
   };
 
-  const [createTag] = usePetitionTagListCellContent_createTagMutation();
+  const [createTag] = useMutation(PetitionTagListCellContent_createTagDocument);
   const handleCreateTag = async (tag: Pick<TagSelection, "name" | "color">) => {
     const [, result] = await withError(createTag({ variables: tag }));
     if (result) {
@@ -260,8 +255,8 @@ PetitionTagListCellContent.fragments = {
   },
 };
 
-PetitionTagListCellContent.queries = {
-  tags: gql`
+PetitionTagListCellContent.queries = [
+  gql`
     query PetitionTagListCellContent_tags($search: String) {
       tags(search: $search) {
         items {
@@ -271,7 +266,7 @@ PetitionTagListCellContent.queries = {
     }
     ${PetitionTagListCellContent.fragments.Tag}
   `,
-};
+];
 
 PetitionTagListCellContent.mutations = [
   gql`

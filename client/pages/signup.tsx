@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Flex, Image, keyframes, Stack, useCounter } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
@@ -11,7 +11,7 @@ import { PublicSignupFormInbox } from "@parallel/components/public/signup/Public
 import { PublicSignupFormName } from "@parallel/components/public/signup/PublicSignupFormName";
 import { PublicSignupFormOrganization } from "@parallel/components/public/signup/PublicSignupFormOrganization";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
-import { useSignup_userSignUpMutation } from "@parallel/graphql/__types";
+import { Signup_userSignUpDocument } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useEffect, useRef } from "react";
@@ -42,7 +42,7 @@ function Signup() {
     decrement: prevStep,
   } = useCounter({ min: 0, max: 4, defaultValue: 0 });
 
-  const [userSignUp, { loading }] = useSignup_userSignUpMutation();
+  const [userSignUp, { loading }] = useMutation(Signup_userSignUpDocument);
 
   const SUBMIT_STEP = 3;
   const handleNextPage = async (data: Partial<SignupFormData>) => {

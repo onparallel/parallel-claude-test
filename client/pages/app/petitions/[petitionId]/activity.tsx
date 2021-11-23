@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Box, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { ShareButton } from "@parallel/components/common/ShareButton";
@@ -18,22 +18,19 @@ import { PetitionActivityTimeline } from "@parallel/components/petition-activity
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
 import {
   PetitionAccessTable_PetitionAccessFragment,
-  PetitionActivityQuery,
-  PetitionActivityQueryVariables,
-  PetitionActivityUserQuery,
+  PetitionActivity_cancelScheduledMessageDocument,
+  PetitionActivity_deactivateAccessesDocument,
+  PetitionActivity_petitionDocument,
   PetitionActivity_PetitionFragment,
+  PetitionActivity_reactivateAccessesDocument,
+  PetitionActivity_sendRemindersDocument,
+  PetitionActivity_switchAutomaticRemindersDocument,
+  PetitionActivity_updatePetitionDocument,
+  PetitionActivity_userDocument,
+  PetitionsActivity_sendPetitionDocument,
   UpdatePetitionInput,
-  usePetitionActivityQuery,
-  usePetitionActivityUserQuery,
-  usePetitionActivity_cancelScheduledMessageMutation,
-  usePetitionActivity_deactivateAccessesMutation,
-  usePetitionActivity_reactivateAccessesMutation,
-  usePetitionActivity_sendRemindersMutation,
-  usePetitionActivity_switchAutomaticRemindersMutation,
-  usePetitionActivity_updatePetitionMutation,
-  usePetitionsActivity_sendPetitionMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -53,10 +50,10 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const toast = useToast();
   const {
     data: { me },
-  } = assertQuery(usePetitionActivityUserQuery());
-  const { data, refetch } = assertQuery(
-    usePetitionActivityQuery({ variables: { id: petitionId } })
-  );
+  } = useAssertQuery(PetitionActivity_userDocument);
+  const { data, refetch } = useAssertQuery(PetitionActivity_petitionDocument, {
+    variables: { id: petitionId },
+  });
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
@@ -67,7 +64,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const wrapper = usePetitionStateWrapper();
 
-  const [updatePetition] = usePetitionActivity_updatePetitionMutation();
+  const [updatePetition] = useMutation(PetitionActivity_updatePetitionDocument);
   const handleOnUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
@@ -103,7 +100,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     });
   };
   const confirmSendReminder = useConfirmSendReminderDialog();
-  const [sendReminders] = usePetitionActivity_sendRemindersMutation();
+  const [sendReminders] = useMutation(PetitionActivity_sendRemindersDocument);
   const handleSendReminders = useCallback(
     async (accesses: PetitionAccessTable_PetitionAccessFragment[]) => {
       try {
@@ -147,7 +144,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const addPetitionAccessDialog = useAddPetitionAccessDialog();
   const handleSearchContacts = useSearchContacts();
-  const [sendPetition] = usePetitionsActivity_sendPetitionMutation();
+  const [sendPetition] = useMutation(PetitionsActivity_sendPetitionDocument);
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
 
   const handleAddPetitionAccess = useCallback(async () => {
@@ -189,7 +186,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   }, [petitionId, petition.accesses, showPetitionLimitReachedErrorDialog]);
 
   const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
-  const [cancelScheduledMessage] = usePetitionActivity_cancelScheduledMessageMutation();
+  const [cancelScheduledMessage] = useMutation(PetitionActivity_cancelScheduledMessageDocument);
   const handleCancelScheduledMessage = useCallback(
     async (messageId: string) => {
       try {
@@ -204,7 +201,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   );
 
   const confirmRectivateAccess = useConfirmReactivateAccessDialog();
-  const [reactivateAccess] = usePetitionActivity_reactivateAccessesMutation();
+  const [reactivateAccess] = useMutation(PetitionActivity_reactivateAccessesDocument);
   const handleReactivateAccess = useCallback(
     async (accessId: string) => {
       const { contact } = petition.accesses.find((a) => a.id === accessId)!;
@@ -224,7 +221,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   );
 
   const confirmDeactivateAccess = useConfirmDeactivateAccessDialog();
-  const [deactivateAccess] = usePetitionActivity_deactivateAccessesMutation();
+  const [deactivateAccess] = useMutation(PetitionActivity_deactivateAccessesDocument);
   const handleDeactivateAccess = useCallback(
     async (accessId) => {
       const { contact } = petition.accesses.find((a) => a.id === accessId)!;
@@ -243,7 +240,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     [petitionId, petition.accesses]
   );
 
-  const [switchReminders] = usePetitionActivity_switchAutomaticRemindersMutation();
+  const [switchReminders] = useMutation(PetitionActivity_switchAutomaticRemindersDocument);
   const configureRemindersDialog = useConfigureRemindersDialog();
   const handleConfigureReminders = useCallback(
     async (accesses: PetitionAccessTable_PetitionAccessFragment[]) => {
@@ -467,35 +464,34 @@ PetitionActivity.mutations = [
   `,
 ];
 
-PetitionActivity.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
-      gql`
-        query PetitionActivity($id: GID!) {
-          petition(id: $id) {
-            ...PetitionActivity_Petition
-          }
-        }
-        ${PetitionActivity.fragments.Petition}
-      `,
-      {
-        variables: { id: query.petitionId as string },
+PetitionActivity.queries = [
+  gql`
+    query PetitionActivity_petition($id: GID!) {
+      petition(id: $id) {
+        ...PetitionActivity_Petition
       }
-    ),
-    fetchQuery<PetitionActivityUserQuery>(
-      gql`
-        query PetitionActivityUser {
-          me {
-            ...PetitionActivity_User
-          }
-        }
-        ${PetitionActivity.fragments.User}
-      `
-    ),
+    }
+    ${PetitionActivity.fragments.Petition}
+  `,
+  gql`
+    query PetitionActivity_user {
+      me {
+        ...PetitionActivity_User
+      }
+    }
+    ${PetitionActivity.fragments.User}
+  `,
+];
+
+PetitionActivity.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  const petitionId = query.petitionId as string;
+  await Promise.all([
+    fetchQuery(PetitionActivity_petitionDocument, {
+      variables: { id: petitionId },
+    }),
+    fetchQuery(PetitionActivity_userDocument),
   ]);
-  return {
-    petitionId: query.petitionId as string,
-  };
+  return { petitionId };
 };
 
 export default compose(withPetitionState, withDialogs, withApolloData)(PetitionActivity);

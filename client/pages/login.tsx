@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
@@ -22,14 +22,13 @@ import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
 import {
-  useCurrentUserQuery,
-  useLogin_resendVerificationCodeMutation,
+  Login_currentUserDocument,
+  Login_resendVerificationCodeDocument,
 } from "@parallel/graphql/__types";
 import { postJSON } from "@parallel/utils/rest";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
@@ -40,7 +39,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 function Login() {
   const router = useRouter();
   const client = useApolloClient();
-  const { data } = useCurrentUserQuery();
+  const { data } = useQuery(Login_currentUserDocument);
   const [showContinueAs, setShowContinueAs] = useState(Boolean(data?.me));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerificationRequired, setIsVerificationRequired] = useState(false);
@@ -187,7 +186,7 @@ function Login() {
     });
   };
 
-  const [resendVerificationCode] = useLogin_resendVerificationCodeMutation();
+  const [resendVerificationCode] = useMutation(Login_resendVerificationCodeDocument);
   const handleResendVerificationEmail = async () => {
     try {
       setIsVerificationEmailSent(true);
@@ -377,26 +376,22 @@ Login.mutations = [
   `,
 ];
 
+Login.queries = [
+  gql`
+    query Login_currentUser {
+      me {
+        id
+        preferredLocale
+        ...AlreadyLoggedIn_User
+      }
+    }
+    ${AlreadyLoggedIn.fragments.User}
+  `,
+];
+
 Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   try {
-    await fetchQuery(
-      gql`
-        query CurrentUser {
-          me {
-            ...Login_User
-          }
-        }
-        fragment Login_User on User {
-          id
-          email
-          fullName
-          preferredLocale
-          ...UserAvatar_User
-        }
-        ${UserAvatar.fragments.User}
-      `,
-      { ignoreCache: true }
-    );
+    await fetchQuery(Login_currentUserDocument, { ignoreCache: true });
   } catch (error: any) {
     return {};
   }

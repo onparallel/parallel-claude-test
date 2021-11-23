@@ -1,24 +1,22 @@
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { Box, Center, Divider, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, LinkedInSimpleIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { useThanks_PetitionLogoQuery } from "@parallel/graphql/__types";
+import { Thanks_petitionLogoDocument } from "@parallel/graphql/__types";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function ThanksForSigning() {
-  const router = useRouter();
+  const { query } = useRouter();
   const intl = useIntl();
 
-  const { data } = useThanks_PetitionLogoQuery({
-    variables: {
-      id: router.query.o as string,
-    },
-    skip: !router.query.o,
+  const { data } = useQuery(Thanks_petitionLogoDocument, {
+    variables: { id: query.o as string },
+    skip: !query.o,
   });
   const logoUrl = data?.publicOrgLogoUrl;
 
@@ -123,21 +121,20 @@ function ThanksFooter() {
   );
 }
 
+ThanksForSigning.queries = [
+  gql`
+    query Thanks_petitionLogo($id: GID!) {
+      publicOrgLogoUrl(id: $id)
+    }
+  `,
+];
+
 ThanksForSigning.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   try {
     if (query.o) {
-      await fetchQuery(
-        gql`
-          query Thanks_PetitionLogo($id: GID!) {
-            publicOrgLogoUrl(id: $id)
-          }
-        `,
-        {
-          variables: {
-            id: query.o,
-          },
-        }
-      );
+      await fetchQuery(Thanks_petitionLogoDocument, {
+        variables: { id: query.o as string },
+      });
     }
   } catch (error: any) {
     return {};
