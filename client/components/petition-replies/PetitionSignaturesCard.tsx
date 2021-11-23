@@ -268,10 +268,12 @@ export const PetitionSignaturesCard = Object.assign(
         >
           <HStack as="span" spacing={2}>
             <SignatureIcon fontSize="20px" />
-            <FormattedMessage
-              id="component.petition-signatures-card.header"
-              defaultMessage="Petition eSignature"
-            />
+            <Text as="span">
+              <FormattedMessage
+                id="component.petition-signatures-card.header"
+                defaultMessage="Petition eSignature"
+              />
+            </Text>
             {signatureEnvironment === "DEMO" ? (
               <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
             ) : null}

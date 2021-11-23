@@ -90,6 +90,7 @@ import {
   filterPetitionFields,
   PetitionFieldFilter,
 } from "@parallel/utils/filterPetitionFields";
+import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -492,6 +493,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const [filter, setFilter] = useState<PetitionFieldFilter>(defaultFieldsFilter);
 
   const petitionSignatureStatus = getPetitionSignatureStatus(petition);
+  const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
 
   return (
     <PetitionLayout
@@ -647,6 +649,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       onFieldClick={handlePetitionContentsFieldClick}
                       fieldIndicators={PetitionContentsIndicators}
                       signatureStatus={petitionSignatureStatus}
+                      signatureEnvironment={petitionSignatureEnvironment}
                       onSignatureStatusClick={handlePetitionContentsSignatureClick}
                     />
                   </Box>
@@ -719,12 +722,14 @@ PetitionReplies.fragments = {
         }
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
+        ...getPetitionSignatureEnvironment_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
       ${ShareButton.fragments.PetitionBase}
       ${PetitionSignaturesCard.fragments.Petition}
       ${getPetitionSignatureStatus.fragments.Petition}
+      ${getPetitionSignatureEnvironment.fragments.Petition}
     `;
   },
   get PetitionField() {

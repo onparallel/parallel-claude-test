@@ -1,28 +1,19 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  BoxProps,
-  Button,
-  Center,
-  Circle,
-  Flex,
-  Stack,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
-import { AlertCircleIcon, EyeOffIcon, SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
+import { Box, BoxProps, Button, Center, Flex, Stack, Text } from "@chakra-ui/react";
+import { EyeOffIcon } from "@parallel/chakra/icons";
 import {
   PetitionContents_PetitionFieldFragment,
   PetitionSignatureRequestStatus,
+  SignatureOrgIntegrationEnvironment,
 } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { filterPetitionFields, PetitionFieldFilter } from "@parallel/utils/filterPetitionFields";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 import { ComponentType, createElement, memo, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { Divider } from "../common/Divider";
+import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
 
 interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
   field: T;
@@ -38,6 +29,7 @@ export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldF
   filter?: PetitionFieldFilter;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
   signatureStatus?: PetitionContentsSignatureStatus | null;
+  signatureEnvironment?: SignatureOrgIntegrationEnvironment | null;
   onSignatureStatusClick?: () => void;
 }
 
@@ -49,6 +41,7 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
   onFieldClick,
   fieldIndicators,
   signatureStatus,
+  signatureEnvironment,
   onSignatureStatusClick,
 }: PetitionContentsProps<T>) {
   const handleFieldClick = useMemoFactory(
@@ -81,7 +74,11 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
         )
       )}
       {signatureStatus ? (
-        <SignatureStatusInfo status={signatureStatus} onClick={onSignatureStatusClick} />
+        <SignatureStatusInfo
+          status={signatureStatus}
+          environment={signatureEnvironment}
+          onClick={onSignatureStatusClick}
+        />
       ) : null}
     </Stack>
   );
@@ -89,11 +86,12 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
 
 function SignatureStatusInfo({
   status,
+  environment,
   ...props
 }: BoxProps & {
   status: PetitionContentsSignatureStatus;
+  environment?: SignatureOrgIntegrationEnvironment | null;
 }) {
-  const labels = usePetitionSignatureStatusLabels();
   return (
     <Box as="li" listStyleType="none" display="flex" {...props}>
       <Stack
@@ -111,33 +109,7 @@ function SignatureStatusInfo({
             defaultMessage="Petition eSignature"
           />
         </Text>
-        <Tooltip label={labels[status]}>
-          <Flex alignItems="center">
-            {status === "START" ? (
-              <Circle boxSize={2} backgroundColor="purple.500" marginRight="2px" />
-            ) : null}
-            <SignatureIcon color={status === "COMPLETED" ? "gray.700" : "gray.400"} />
-            {status === "PROCESSING" ? (
-              <TimeIcon
-                color="yellow.600"
-                fontSize="13px"
-                position="relative"
-                bottom={2}
-                right={2}
-                marginRight={-2}
-              />
-            ) : status === "CANCELLED" ? (
-              <AlertCircleIcon
-                color="red.500"
-                fontSize="14px"
-                position="relative"
-                bottom={2}
-                right={2}
-                marginRight={-2}
-              />
-            ) : null}
-          </Flex>
-        </Tooltip>
+        <PetitionSignatureStatusIcon status={status} environment={environment} />
       </Stack>
     </Box>
   );

@@ -44,6 +44,7 @@ function AddSignatureApiKeyDialog({ ...props }: DialogProps<{}, AddSignatureApiK
   return (
     <ConfirmDialog
       hasCloseButton
+      closeOnOverlayClick={false}
       initialFocusRef={apikeyRef}
       content={{
         as: "form",
