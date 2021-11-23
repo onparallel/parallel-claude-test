@@ -130,16 +130,20 @@ export class OrganizationRepository extends BaseRepository {
       t
     );
 
-    // set default usage limits for new organizations
-    await this.createOrganizationUsageLimit(
-      org.id,
-      {
-        limit_name: "PETITION_SEND",
-        limit: this.defaultOrganizationUsageDetails["PETITION_SEND"].limit,
-        period: this.defaultOrganizationUsageDetails["PETITION_SEND"].period,
-      },
-      t
-    );
+    await Promise.all([
+      // set default usage limits for new organizations
+      this.createOrganizationUsageLimit(
+        org.id,
+        {
+          limit_name: "PETITION_SEND",
+          limit: this.defaultOrganizationUsageDetails["PETITION_SEND"].limit,
+          period: this.defaultOrganizationUsageDetails["PETITION_SEND"].period,
+        },
+        t
+      ),
+      this.createSandboxSignatureIntegration(org.id, createdBy, t),
+    ]);
+
     return org;
   }
 
@@ -251,5 +255,25 @@ export class OrganizationRepository extends BaseRepository {
         org_id: orgId,
       })
       .update({ used: this.knex.raw(`used + ?`, [creditsSpent]) });
+  }
+
+  async createSandboxSignatureIntegration(orgId: number, createdBy?: string, t?: Knex.Transaction) {
+    return await this.from("org_integration", t).insert(
+      {
+        org_id: orgId,
+        type: "SIGNATURE",
+        provider: "SIGNATURIT",
+        name: "Signaturit Sandbox",
+        settings: {
+          API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY,
+          environment: "sandbox",
+        },
+        is_default: true,
+        is_enabled: true,
+        created_at: this.now(),
+        created_by: createdBy,
+      },
+      "*"
+    );
   }
 }
