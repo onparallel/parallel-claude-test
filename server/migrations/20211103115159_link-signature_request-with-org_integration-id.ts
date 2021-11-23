@@ -87,13 +87,15 @@ export async function down(knex: Knex): Promise<void> {
         (i) => i.id === s.signature_config.orgIntegrationId
       )?.provider;
       if (!provider) {
-        throw new Error();
+        throw new Error(
+          `PetitionSignatureRequest:${s.id} missing OrgIntegration:${s.signature_config.orgIntegrationId}`
+        );
       }
 
       await knex.raw(
         /* sql */ `
         update petition_signature_request
-        set signature_config = jsonb_set(signature_config - 'orgIntegrationId', '{provider}', ?::jsonb)
+        set signature_config = jsonb_set(signature_config - 'orgIntegrationId', '{provider}', to_jsonb(?::text))
         where id = ?
       `,
         [provider, s.id]
@@ -109,12 +111,14 @@ export async function down(knex: Knex): Promise<void> {
         (i) => i.id === p.signature_config.orgIntegrationId
       )?.provider;
       if (!provider) {
-        throw new Error();
+        throw new Error(
+          `Petition:${p.id} missing OrgIntegration:${p.signature_config.orgIntegrationId}`
+        );
       }
       await knex.raw(
         /* sql */ `
         update petition
-        set signature_config = jsonb_set(signature_config - 'orgIntegrationId', '{provider}', ?::jsonb)
+        set signature_config = jsonb_set(signature_config - 'orgIntegrationId', '{provider}', to_jsonb(?::text))
         where id = ?
       `,
         [provider, p.id]
