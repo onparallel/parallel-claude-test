@@ -534,12 +534,20 @@ export const updatePetition = mutationField("updatePetition", {
       data.hide_recipient_view_contents = isRecipientViewContentsHidden;
     }
     if (signatureConfig !== undefined) {
+      const contacts = await ctx.contacts.loadContact(
+        signatureConfig?.signersInfo.map((c) => c.contactId) ?? []
+      );
       // TODO: signersInfo should be just a list of ids
       data.signature_config = signatureConfig && {
         ...signatureConfig,
         signersInfo:
           signatureConfig.signersInfo.length > 0
-            ? await ctx.contacts.loadContact(signatureConfig.signersInfo.map((c) => c.contactId))
+            ? contacts.map((c) => ({
+                contactId: c!.id,
+                email: c!.email,
+                lastName: c!.last_name,
+                firstName: c!.first_name,
+              }))
             : [],
       };
     }
