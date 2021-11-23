@@ -129,7 +129,7 @@ export interface NexusGenInputs {
   SignatureConfigInput: {
     // input type
     letRecipientsChooseSigners: boolean; // Boolean!
-    orgIntegrationId: string; // ID!
+    orgIntegrationId: NexusGenScalars["GID"]; // GID!
     review: boolean; // Boolean!
     signersInfo: NexusGenInputs["SignatureConfigInputSigner"][]; // [SignatureConfigInputSigner!]!
     timezone: string; // String!
@@ -137,7 +137,7 @@ export interface NexusGenInputs {
   };
   SignatureConfigInputSigner: {
     // input type
-    contactId: string; // ID!
+    contactId: NexusGenScalars["GID"]; // GID!
     email: string; // String!
     firstName: string; // String!
     lastName: string; // String!

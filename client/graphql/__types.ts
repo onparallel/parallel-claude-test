@@ -2714,7 +2714,7 @@ export interface SignatureConfigInput {
   /** If true, allows the recipients of the petition to select additional signers */
   letRecipientsChooseSigners: Scalars["Boolean"];
   /** The Global ID of the signature integration to be used. */
-  orgIntegrationId: Scalars["ID"];
+  orgIntegrationId: Scalars["GID"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   signersInfo: Array<SignatureConfigInputSigner>;
@@ -2726,7 +2726,7 @@ export interface SignatureConfigInput {
 
 /** The signer that need to sign the generated document. */
 export interface SignatureConfigInputSigner {
-  contactId: Scalars["ID"];
+  contactId: Scalars["GID"];
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];

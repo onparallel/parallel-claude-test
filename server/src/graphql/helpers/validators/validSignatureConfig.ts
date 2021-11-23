@@ -1,6 +1,5 @@
 import { core } from "nexus";
 import { isDefined } from "remeda";
-import { fromGlobalId } from "../../../util/globalId";
 import { isValidTimezone } from "../../../util/validators";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
@@ -18,19 +17,10 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
       const { orgIntegrationId, signersInfo, timezone, title, letRecipientsChooseSigners, review } =
         signatureConfig;
 
-      const { id: integrationId, type } = fromGlobalId(orgIntegrationId);
-      if (type !== "OrgIntegration") {
-        throw new ArgValidationError(
-          info,
-          argName,
-          `Invalid orgIntegrationId: ${orgIntegrationId}`
-        );
-      }
-
-      const integration = await ctx.integrations.loadIntegration(integrationId);
-
+      const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
       if (
-        integration?.type !== "SIGNATURE" ||
+        !isDefined(integration) ||
+        integration.type !== "SIGNATURE" ||
         !integration.is_enabled ||
         integration.org_id !== ctx.user!.org_id
       ) {
@@ -58,6 +48,14 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           `${argName}.letRecipientsChooseSigners`,
           "Invalid value with empty list of signers"
         );
+      } else {
+        const validContacts = await ctx.contacts.userHasAccessToContacts(
+          ctx.user!,
+          signersInfo.map((c) => c.contactId)
+        );
+        if (!validContacts) {
+          throw new ArgValidationError(info, `${argName}.signersInfo`, "Invalid list of signers");
+        }
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

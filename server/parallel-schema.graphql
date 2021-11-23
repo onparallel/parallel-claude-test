@@ -3715,7 +3715,7 @@ input SignatureConfigInput {
   """
   The Global ID of the signature integration to be used.
   """
-  orgIntegrationId: ID!
+  orgIntegrationId: GID!
 
   """
   If true, lets the user review the replies before starting the signature process
@@ -3738,7 +3738,7 @@ input SignatureConfigInput {
 The signer that need to sign the generated document.
 """
 input SignatureConfigInputSigner {
-  contactId: ID!
+  contactId: GID!
   email: String!
   firstName: String!
   lastName: String!

@@ -153,9 +153,8 @@ export class IntegrationRepository extends BaseRepository {
   }
 
   async setDefaultOrgIntegration(id: number, type: IntegrationType, user: User) {
-    // unset all org integrations of the same type
-    const [[defaultIntegration]] = await Promise.all([
-      this.from("org_integration")
+    return this.withTransaction(async (t) => {
+      const [integration] = await this.from("org_integration", t)
         .where({ id, org_id: user.org_id, type, deleted_at: null })
         .update(
           {
@@ -164,19 +163,17 @@ export class IntegrationRepository extends BaseRepository {
             updated_at: this.now(),
           },
           "*"
-        ),
-
-      this.from("org_integration")
-        .where({ org_id: user.org_id, type, deleted_at: null })
+        );
+      await this.from("org_integration", t)
+        .where({ org_id: user.org_id, is_default: true, type, deleted_at: null })
         .whereNot("id", id)
         .update({
           is_default: false,
           updated_by: `User:${user.id}`,
           updated_at: this.now(),
-        }),
-    ]);
-
-    return defaultIntegration;
+        });
+      return integration;
+    });
   }
 
   async createOrgIntegration<IType extends IntegrationType>(

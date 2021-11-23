@@ -398,7 +398,8 @@ export const SignatureConfigInput = inputObjectType({
   name: "SignatureConfigInput",
   description: "The signature settings for the petition",
   definition(t) {
-    t.nonNull.id("orgIntegrationId", {
+    t.nonNull.globalId("orgIntegrationId", {
+      prefixName: "OrgIntegration",
       description: "The Global ID of the signature integration to be used.",
     });
     t.nonNull.list.nonNull.field("signersInfo", {
@@ -406,7 +407,7 @@ export const SignatureConfigInput = inputObjectType({
         name: "SignatureConfigInputSigner",
         description: "The signer that need to sign the generated document.",
         definition(t) {
-          t.nonNull.id("contactId");
+          t.nonNull.globalId("contactId", { prefixName: "Contact" });
           t.nonNull.string("firstName");
           t.nonNull.string("lastName");
           t.nonNull.string("email");
@@ -466,9 +467,7 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.boolean("hasCommentsEnabled");
           t.nullable.boolean("skipForwardSecurity");
           t.nullable.boolean("isRecipientViewContentsHidden");
-          t.nullable.field("signatureConfig", {
-            type: "SignatureConfigInput",
-          });
+          t.nullable.field("signatureConfig", { type: "SignatureConfigInput" });
           t.nullable.json("description");
           t.nullable.boolean("isReadOnly");
         },
@@ -535,14 +534,7 @@ export const updatePetition = mutationField("updatePetition", {
       data.hide_recipient_view_contents = isRecipientViewContentsHidden;
     }
     if (signatureConfig !== undefined) {
-      data.signature_config = signatureConfig && {
-        ...signatureConfig,
-        signersInfo: signatureConfig.signersInfo.map((signer) => ({
-          ...signer,
-          contactId: fromGlobalId(signer.contactId, "Contact").id,
-        })),
-        orgIntegrationId: fromGlobalId(signatureConfig.orgIntegrationId, "OrgIntegration").id,
-      };
+      data.signature_config = signatureConfig;
     }
     if (description !== undefined) {
       data.template_description = description === null ? null : JSON.stringify(description);
