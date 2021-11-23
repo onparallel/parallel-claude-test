@@ -337,8 +337,48 @@ export const deletePetitions = mutationField("deletePetitions", {
             user_id: ctx.user!.id,
             status: petition.status!,
           },
-        }))
+        })),
+        t
       );
+
+      // check if there are pending signature requests on this petitions and cancel those
+      const pendingSignatureRequests = (
+        await ctx.petitions.loadPetitionSignaturesByPetitionId(deletedPetitions.map((p) => p.id))
+      ).flat();
+
+      await Promise.all([
+        ctx.petitions.cancelPetitionSignatureRequest(
+          pendingSignatureRequests.map((s) => s.id),
+          "CANCELLED_BY_USER",
+          { canceller_id: ctx.user!.id }
+        ),
+        ctx.petitions.createEvent(
+          pendingSignatureRequests.map((s) => ({
+            type: "SIGNATURE_CANCELLED",
+            petition_id: s.petition_id,
+            data: {
+              petition_signature_request_id: s.id,
+              cancel_reason: "CANCELLED_BY_USER",
+              cancel_data: {
+                canceller_id: ctx.user!.id,
+              },
+            },
+          }))
+        ),
+        ctx.aws.enqueueMessages(
+          "signature-worker",
+          pendingSignatureRequests
+            .filter((s) => s.status === "PROCESSING")
+            .map((s) => ({
+              id: `signature-${toGlobalId("Petition", s.petition_id)}`,
+              groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
+              body: {
+                type: "cancel-signature-process",
+                payload: { petitionSignatureRequestId: s.id },
+              },
+            }))
+        ),
+      ]);
     });
 
     return RESULT.SUCCESS;
