@@ -1,4 +1,4 @@
-import { arg, booleanArg, enumType, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { arg, booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { ApiContext } from "../../context";
 import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
