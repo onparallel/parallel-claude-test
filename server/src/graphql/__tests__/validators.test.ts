@@ -4,7 +4,7 @@ import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, OrgIntegration, User } from "../../db/__types";
+import { Contact, Organization, OrgIntegration, User } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { random } from "../../util/token";
@@ -181,6 +181,7 @@ describe("GraphQL custom validators", () => {
   });
 
   describe("validSignatureConfig", () => {
+    let contacts: Contact[];
     beforeAll(async () => {
       await mocks.createFeatureFlags([{ name: "PETITION_SIGNATURE", default_value: false }]);
       await knex.from("feature_flag_override").insert([
@@ -204,6 +205,7 @@ describe("GraphQL custom validators", () => {
           settings: {},
         },
       ]);
+      contacts = await mocks.createRandomContacts(organizations[0].id, 2);
     });
 
     it("validates the signature configuration", async () => {
@@ -212,14 +214,13 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
-              signersInfo: [
-                {
-                  firstName: faker.name.firstName(),
-                  lastName: faker.name.lastName(),
-                  email: faker.internet.email(),
-                },
-              ],
+              orgIntegrationId: signatureIntegration.id,
+              signersInfo: contacts.map((c) => ({
+                firstName: c.first_name,
+                lastName: c.last_name,
+                email: c.email,
+                contactId: c.id,
+              })),
               timezone: "Europe/Madrid",
               title: "sign this!",
               letRecipientsChooseSigners: false,
@@ -238,14 +239,13 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", org1SignatureIntegration.id),
-              signersInfo: [
-                {
-                  firstName: faker.name.firstName(),
-                  lastName: faker.name.lastName(),
-                  email: faker.internet.email(),
-                },
-              ],
+              orgIntegrationId: org1SignatureIntegration.id,
+              signersInfo: contacts.map((c) => ({
+                firstName: c.first_name,
+                lastName: c.last_name,
+                email: c.email,
+                contactId: c.id,
+              })),
               timezone: "Europe/Madrid",
               title: "sign this!",
               letRecipientsChooseSigners: false,
@@ -264,14 +264,13 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", ssoIntegration.id),
-              signersInfo: [
-                {
-                  firstName: faker.name.firstName(),
-                  lastName: faker.name.lastName(),
-                  email: faker.internet.email(),
-                },
-              ],
+              orgIntegrationId: ssoIntegration.id,
+              signersInfo: contacts.map((c) => ({
+                firstName: c.first_name,
+                lastName: c.last_name,
+                email: c.email,
+                contactId: c.id,
+              })),
               timezone: "Europe/Madrid",
               title: "sign this!",
               letRecipientsChooseSigners: false,
@@ -279,57 +278,6 @@ describe("GraphQL custom validators", () => {
             },
           },
           { ...ctx, user: users[0] },
-          {} as any
-        )
-      ).rejects.toThrowError();
-    });
-
-    it("throws error if some signer email is not valid", async () => {
-      await expect(
-        validSignatureConfig((args) => args.config, "config")(
-          {},
-          {
-            config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
-              signersInfo: [
-                {
-                  firstName: faker.name.firstName(),
-                  lastName: faker.name.lastName(),
-                  email: faker.internet.email(),
-                },
-                {
-                  firstName: faker.name.firstName(),
-                  lastName: faker.name.lastName(),
-                  email: "invalidemail",
-                },
-              ],
-              timezone: "Europe/Madrid",
-              title: "sign this!",
-              letRecipientsChooseSigners: false,
-              review: false,
-            },
-          },
-          { ...ctx, user: users[0] },
-          {} as any
-        )
-      ).rejects.toThrowError();
-    });
-
-    it("throws error if user does not have signature feature flag", async () => {
-      await expect(
-        validSignatureConfig((args) => args.config, "config")(
-          {},
-          {
-            config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
-              signersInfo: [],
-              timezone: "Europe/Madrid",
-              title: "sign this!",
-              letRecipientsChooseSigners: true,
-              review: false,
-            },
-          },
-          { ...ctx, user: users[1] },
           {} as any
         )
       ).rejects.toThrowError();
@@ -341,14 +289,13 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
-              signersInfo: [
-                {
-                  firstName: faker.name.firstName(),
-                  lastName: faker.name.lastName(),
-                  email: faker.internet.email(),
-                },
-              ],
+              orgIntegrationId: signatureIntegration.id,
+              signersInfo: contacts.map((c) => ({
+                firstName: c.first_name,
+                lastName: c.last_name,
+                email: c.email,
+                contactId: c.id,
+              })),
               timezone: "unknown",
               title: "sign this!",
               letRecipientsChooseSigners: false,
@@ -367,14 +314,13 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
-              signersInfo: [
-                {
-                  firstName: faker.name.firstName(),
-                  lastName: faker.name.lastName(),
-                  email: faker.internet.email(),
-                },
-              ],
+              orgIntegrationId: signatureIntegration.id,
+              signersInfo: contacts.map((c) => ({
+                firstName: c.first_name,
+                lastName: c.last_name,
+                email: c.email,
+                contactId: c.id,
+              })),
               timezone: "Europe/Madrid",
               letRecipientsChooseSigners: false,
               review: false,
@@ -392,7 +338,7 @@ describe("GraphQL custom validators", () => {
           {},
           {
             config: {
-              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
+              orgIntegrationId: signatureIntegration.id,
               signersInfo: [],
               timezone: "Europe/Madrid",
               title: "sign this!",

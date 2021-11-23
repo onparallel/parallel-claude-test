@@ -534,7 +534,14 @@ export const updatePetition = mutationField("updatePetition", {
       data.hide_recipient_view_contents = isRecipientViewContentsHidden;
     }
     if (signatureConfig !== undefined) {
-      data.signature_config = signatureConfig;
+      // TODO: signersInfo should be just a list of ids
+      data.signature_config = signatureConfig && {
+        ...signatureConfig,
+        signersInfo:
+          signatureConfig.signersInfo.length > 0
+            ? await ctx.contacts.loadContact(signatureConfig.signersInfo.map((c) => c.contactId))
+            : [],
+      };
     }
     if (description !== undefined) {
       data.template_description = description === null ? null : JSON.stringify(description);
