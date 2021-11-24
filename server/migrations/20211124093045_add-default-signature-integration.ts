@@ -9,7 +9,8 @@ export async function up(knex: Knex): Promise<void> {
   });
   await knex.raw(/* sql */ `
     update org_integration
-    set "name" = INITCAP("provider")
+    set "name" = INITCAP("provider"),
+    is_default = true
   `);
   await knex.raw(
     /* sql */ `
@@ -52,7 +53,7 @@ export async function up(knex: Knex): Promise<void> {
       .update({
         is_enabled: true,
         updated_at: knex.raw("CURRENT_TIMESTAMP"),
-        updated_by: "Migration:20211103102614",
+        updated_by: "Migration:20211124093045",
       });
   }
 
@@ -66,7 +67,7 @@ export async function up(knex: Knex): Promise<void> {
         settings: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY, ENVIRONMENT: "sandbox" },
         is_enabled: true,
         is_default: true,
-        created_by: `Migration:20211103102614`,
+        created_by: `Migration:20211124093045`,
       }))
     );
   }
