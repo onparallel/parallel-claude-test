@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { useAskContactDetailsDialog } from "@parallel/components/common/AskContactDetailsDialog";
+import { useAskContactDetailsDialog } from "@parallel/components/common/dialogs/AskContactDetailsDialog";
 import { useCreateContact_createContactDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 

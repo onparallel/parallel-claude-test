@@ -11,7 +11,7 @@ import {
   Stack,
   useToast,
 } from "@chakra-ui/react";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";

@@ -16,12 +16,12 @@ import {
   Tabs,
 } from "@chakra-ui/react";
 import { AddIcon, ChevronDownIcon, FileNewIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { TemplateDetailsModal } from "@parallel/components/petition-common/TemplateDetailsModal";
+import { TemplateDetailsModal } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
 import { NewPetitionCategoryFilter } from "@parallel/components/petition-new/NewPetitionCategoryFilter";
 import { NewPetitionEmptySearch } from "@parallel/components/petition-new/NewPetitionEmptySearch";
 import { NewPetitionEmptyTemplates } from "@parallel/components/petition-new/NewPetitionEmptyTemplates";

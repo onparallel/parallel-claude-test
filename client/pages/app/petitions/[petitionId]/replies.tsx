@@ -25,29 +25,30 @@ import {
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
 import { Card, GenericCardHeader } from "@parallel/components/common/Card";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
   isDialogError,
   useDialog,
   withDialogs,
-} from "@parallel/components/common/DialogProvider";
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
-import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
-import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
-import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
+import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
+import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
 import {
   ExportRepliesDialog,
   useExportRepliesDialog,
-} from "@parallel/components/petition-replies/ExportRepliesDialog";
-import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/ExportRepliesProgressDialog";
-import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
+} from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
+import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
+import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
+import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/dialogs/SolveUnreviewedRepliesDialog";
 import {
   PetitionRepliesField,
   PetitionRepliesFieldProps,
@@ -56,7 +57,6 @@ import { PetitionRepliesFieldComments } from "@parallel/components/petition-repl
 import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
-import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/SolveUnreviewedRepliesDialog";
 import { RecipientViewCommentsBadge } from "@parallel/components/recipient-view/RecipientViewCommentsBadge";
 import {
   PetitionFieldReply,

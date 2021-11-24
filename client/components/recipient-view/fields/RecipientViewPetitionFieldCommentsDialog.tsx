@@ -22,8 +22,8 @@ import {
 } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
-import { BaseDialog } from "@parallel/components/common/BaseDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
+import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   RecipientViewPetitionFieldCommentsDialog_commentsDocument,

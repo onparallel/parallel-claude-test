@@ -24,10 +24,10 @@ import { Link } from "../common/Link";
 import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
-} from "../petition-common/SignatureConfigDialog";
+} from "../petition-common/dialogs/SignatureConfigDialog";
 import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
-import { useConfirmRestartSignatureRequestDialog } from "./ConfirmRestartSignatureRequestDialog";
 import { CurrentSignatureRequestRow } from "./CurrentSignatureRequestRow";
+import { useConfirmRestartSignatureRequestDialog } from "./dialogs/ConfirmRestartSignatureRequestDialog";
 import { NewSignatureRequestRow } from "./NewSignatureRequestRow";
 import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
 

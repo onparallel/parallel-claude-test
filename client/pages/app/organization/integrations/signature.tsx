@@ -17,16 +17,16 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useAddSignatureApiKeyDialog } from "@parallel/components/organization/AddSignatureApiKeyDialog";
-import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/DeleteSignatureErrorConfirmationDialog";
-import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/DeleteSignatureTokenDialog";
+import { useAddSignatureApiKeyDialog } from "@parallel/components/organization/dialogs/AddSignatureApiKeyDialog";
+import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/dialogs/DeleteSignatureErrorConfirmationDialog";
+import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/dialogs/DeleteSignatureTokenDialog";
 import {
   IntegrationsSignature_createSignatureIntegrationDocument,
   IntegrationsSignature_deleteSignatureIntegrationDocument,

@@ -18,8 +18,8 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Editor, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
-import { ConfirmDialog } from "../ConfirmDialog";
-import { DialogProps, useDialog } from "../DialogProvider";
+import { ConfirmDialog } from "../dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "../dialogs/DialogProvider";
 import { ToolbarButton } from "./ToolbarButton";
 
 export interface ToolbarLinkButtonProps {

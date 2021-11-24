@@ -24,8 +24,8 @@ import AsyncCreatableSelect, {
 } from "react-select/async-creatable";
 import { omit, pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { useTagEditDialog } from "./dialogs/TagEditDialog";
 import { DEFAULT_COLORS } from "./TagColorSelect";
-import { useTagEditDialog } from "./TagEditDialog";
 
 type TagSelection = PetitionTagListCellContent_TagFragment;
 

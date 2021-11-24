@@ -50,7 +50,7 @@ import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
-import { useErrorDialog } from "../common/ErrorDialog";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";

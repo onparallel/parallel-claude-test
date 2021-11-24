@@ -3,7 +3,7 @@ import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { SupportMethodModal } from "@parallel/components/admin-support/SupportMethodModal";
 import { Card } from "@parallel/components/common/Card";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";

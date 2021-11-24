@@ -29,7 +29,7 @@ import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { LocaleBadge } from "../common/LocaleBadge";
 import { Spacer } from "../common/Spacer";
-import { usePetitionSharingDialog } from "../petition-common/PetitionSharingDialog";
+import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 
 export interface PetitionTemplateHeaderProps extends BoxProps {

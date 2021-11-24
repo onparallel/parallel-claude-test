@@ -6,7 +6,7 @@ import { SignerReference } from "@parallel/components/common/SignerReference";
 import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
-import { useDeclinedSignatureReasonDialog } from "../DeclinedSignatureReasonDialog";
+import { useDeclinedSignatureReasonDialog } from "../dialogs/DeclinedSignatureReasonDialog";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 

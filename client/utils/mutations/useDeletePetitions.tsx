@@ -1,9 +1,9 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { Button, ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
-import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc,
   useDeletePetitions_deletePetitionsDocument,

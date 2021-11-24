@@ -39,9 +39,9 @@ import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
 import { useTone } from "../common/ToneProvider";
-import { useDelegateAccessDialog } from "./DelegateAccessDialog";
+import { useDelegateAccessDialog } from "./dialogs/DelegateAccessDialog";
+import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpModal";
 import { useLastSaved } from "./LastSavedProvider";
-import { useRecipientViewHelpDialog } from "./RecipientViewHelpModal";
 function Contact({
   contact,
   isFull,

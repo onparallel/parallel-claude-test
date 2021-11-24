@@ -10,9 +10,13 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
-import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
+import {
+  DialogProps,
+  useDialog,
+  withDialogs,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import {
@@ -23,7 +27,7 @@ import {
 import {
   CompleteSignerInfoDialogResult,
   useCompleteSignerInfoDialog,
-} from "@parallel/components/recipient-view/CompleteSignerInfoDialog";
+} from "@parallel/components/recipient-view/dialogs/CompleteSignerInfoDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import { LastSavedProvider } from "@parallel/components/recipient-view/LastSavedProvider";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";

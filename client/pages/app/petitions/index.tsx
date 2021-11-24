@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, Select, Text } from "@chakra-ui/react";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
+import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import {
   flatShared,
   removeInvalidLines,

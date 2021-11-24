@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
-import { useDialog } from "@parallel/components/common/DialogProvider";
-import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
-import { TaskProgressDialog } from "@parallel/components/common/TaskProgressDialog";
+import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { TaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   usePrintPdfTask_createPrintPdfTaskDocument,
   usePrintPdfTask_getTaskResultFileUrlDocument,

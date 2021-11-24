@@ -8,7 +8,7 @@ import {
 import { FormattedList, FormattedMessage } from "react-intl";
 import { omit } from "remeda";
 import { SignerReference } from "../common/SignerReference";
-import { useSignerSelectDialog } from "./SignerSelectDialog";
+import { useSignerSelectDialog } from "./dialogs/SignerSelectDialog";
 
 interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;

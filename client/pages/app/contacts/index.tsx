@@ -1,13 +1,17 @@
 import { gql, useMutation } from "@apollo/client";
 import { Button, Flex, Text, useToast } from "@chakra-ui/react";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
+import {
+  DialogProps,
+  useDialog,
+  withDialogs,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
-import { ImportContactsDialog } from "@parallel/components/contact-list/ImportContactsDialog";
+import { ImportContactsDialog } from "@parallel/components/contact-list/dialogs/ImportContactsDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   Contacts_contactsDocument,

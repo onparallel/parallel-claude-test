@@ -51,19 +51,22 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop, pick } from "remeda";
-import { ConfirmDialog } from "../common/ConfirmDialog";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
-import { DialogProps, useDialog } from "../common/DialogProvider";
+import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
-import { useConfigureRemindersDialog } from "../petition-activity/ConfigureRemindersDialog";
-import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
+import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
+import { usePetitionDeadlineDialog } from "../petition-compose/dialogs/PetitionDeadlineDialog";
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
-import { PublicLinkSettingsDialog, usePublicLinkSettingsDialog } from "./PublicLinkSettingsDialog";
-import { SignatureConfigDialog, useSignatureConfigDialog } from "./SignatureConfigDialog";
+import {
+  PublicLinkSettingsDialog,
+  usePublicLinkSettingsDialog,
+} from "./dialogs/PublicLinkSettingsDialog";
+import { SignatureConfigDialog, useSignatureConfigDialog } from "./dialogs/SignatureConfigDialog";
 import {
   TemplateDefaultPermissionsDialog,
   useTemplateDefaultPermissionsDialog,
-} from "./TemplateDefaultPermissionsDialog";
+} from "./dialogs/TemplateDefaultPermissionsDialog";
 import { TestModeSignatureBadge } from "./TestModeSignatureBadge";
 
 export type PetitionSettingsProps = {

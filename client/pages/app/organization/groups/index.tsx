@@ -1,15 +1,19 @@
 import { gql, useMutation } from "@apollo/client";
 import { Button, Flex, Heading, Text, useToast } from "@chakra-ui/react";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
+import {
+  DialogProps,
+  useDialog,
+  withDialogs,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
+import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import {
   OrganizationGroups_cloneUserGroupDocument,

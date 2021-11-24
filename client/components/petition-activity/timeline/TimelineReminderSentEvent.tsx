@@ -9,7 +9,7 @@ import { FormattedMessage } from "react-intl";
 import {
   SentReminderMessageDialog,
   useSentReminderMessageDialog,
-} from "../SentReminderMessageDialog";
+} from "../dialogs/SentReminderMessageDialog";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 

@@ -12,10 +12,10 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon, ListIcon, SettingsIcon } from "@parallel/chakra/icons";
-import { useBlockingDialog } from "@parallel/components/common/BlockingDialog";
 import { Card } from "@parallel/components/common/Card";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { useBlockingDialog } from "@parallel/components/common/dialogs/BlockingDialog";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
@@ -25,21 +25,21 @@ import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import {
   AddPetitionAccessDialog,
   useAddPetitionAccessDialog,
-} from "@parallel/components/petition-activity/AddPetitionAccessDialog";
+} from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionSettings } from "@parallel/components/petition-common/PetitionSettings";
-import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
-import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
-import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
+import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/dialogs/CompletedPetitionDialog";
+import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
+import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
+import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
+import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
+import { useTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
-import { usePublicTemplateDialog } from "@parallel/components/petition-compose/PublicTemplateDialog";
-import { useReferencedFieldDialog } from "@parallel/components/petition-compose/ReferencedFieldDialog";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
-import { useTestSignatureDialog } from "@parallel/components/petition-compose/TestSignatureDialog";
 import {
   PetitionCompose_batchSendPetitionDocument,
   PetitionCompose_changePetitionFieldTypeDocument,

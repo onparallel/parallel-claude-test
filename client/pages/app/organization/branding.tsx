@@ -13,9 +13,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { Dropzone } from "@parallel/components/common/Dropzone";
-import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";

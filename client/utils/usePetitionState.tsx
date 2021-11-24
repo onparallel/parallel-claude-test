@@ -1,4 +1,4 @@
-import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { NextComponentType } from "next";
 import {
   ComponentType,

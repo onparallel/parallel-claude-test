@@ -2,7 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Box, Button, Divider, Heading, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NormalLink } from "@parallel/components/common/Link";
 import { SearchInput } from "@parallel/components/common/SearchInput";
@@ -12,9 +12,9 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useDeleteAccessTokenDialog } from "@parallel/components/settings/DeleteAccessTokenDialog";
+import { useDeleteAccessTokenDialog } from "@parallel/components/settings/dialogs/DeleteAccessTokenDialog";
+import { useGenerateNewTokenDialog } from "@parallel/components/settings/dialogs/GenerateNewTokenDialog";
 import { EventSubscriptionCard } from "@parallel/components/settings/EventSubscriptionsCard";
-import { useGenerateNewTokenDialog } from "@parallel/components/settings/GenerateNewTokenDialog";
 import {
   Developers_createEventSubscriptionDocument,
   Developers_revokeUserAuthTokenDocument,

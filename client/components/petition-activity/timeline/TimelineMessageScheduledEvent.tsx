@@ -9,7 +9,8 @@ import { FormattedMessage } from "react-intl";
 import {
   SentPetitionMessageDialog,
   useSentPetitionMessageDialog,
-} from "../SentPetitionMessageDialog";
+} from "../dialogs/SentPetitionMessageDialog";
+
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 

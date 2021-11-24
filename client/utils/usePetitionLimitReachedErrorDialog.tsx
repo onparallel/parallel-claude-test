@@ -1,4 +1,4 @@
-import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { NormalLink } from "@parallel/components/common/Link";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";

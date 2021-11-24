@@ -15,10 +15,10 @@ import {
 import { isAdmin } from "@parallel/utils/roles";
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useErrorDialog } from "../common/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 
 export type OrganizationUsersListTableHeaderProps = {
   me: OrganizationUsersListTableHeader_UserFragment;

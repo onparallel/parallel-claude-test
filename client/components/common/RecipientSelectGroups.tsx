@@ -24,15 +24,15 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, uniq, uniqBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { CloseableAlert } from "./CloseableAlert";
-import { ConfirmDialog } from "./ConfirmDialog";
 import {
   ContactSelect,
   ContactSelectInstance,
   ContactSelectProps,
   ContactSelectSelection,
 } from "./ContactSelect";
-import { DialogProps, useDialog } from "./DialogProvider";
-import { useErrorDialog } from "./ErrorDialog";
+import { ConfirmDialog } from "./dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "./dialogs/DialogProvider";
+import { useErrorDialog } from "./dialogs/ErrorDialog";
 import { Link } from "./Link";
 
 interface RecipientSelectGroupsProps {

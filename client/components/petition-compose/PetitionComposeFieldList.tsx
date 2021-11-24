@@ -38,8 +38,8 @@ import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick, zip } from "remeda";
-import { useErrorDialog } from "../common/ErrorDialog";
-import { ReferencedFieldDialog, useReferencedFieldDialog } from "./ReferencedFieldDialog";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { ReferencedFieldDialog, useReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
 
 type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
