@@ -150,6 +150,20 @@ export function fieldsBelongsToPetition<
   };
 }
 
+export function fieldsHaveCommentsEnabled<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argNameFieldIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const ids = unMaybeArray(args[argNameFieldIds] as MaybeArray<number>);
+      return await ctx.petitions.fieldsHaveCommentsEnabled(ids);
+    } catch {}
+    return false;
+  };
+}
+
 export function fieldAttachmentBelongsToField<
   TypeName extends string,
   FieldName extends string,

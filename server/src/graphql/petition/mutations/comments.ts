@@ -1,10 +1,10 @@
 import { booleanArg, mutationField, nonNull, stringArg } from "nexus";
-import { and, authenticate, chain, ifArgEquals } from "../../helpers/authorize";
-import { WhitelistedError } from "../../helpers/errors";
+import { and, authenticate, authenticateAnd, chain, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import {
   commentsBelongsToPetition,
   fieldsBelongsToPetition,
+  fieldsHaveCommentsEnabled,
   userHasAccessToPetitions,
   userHasFeatureFlag,
 } from "../authorizers";
@@ -13,12 +13,14 @@ import { userIsCommentAuthor } from "./authorizers";
 export const createPetitionFieldComment = mutationField("createPetitionFieldComment", {
   description: "Create a petition field comment.",
   type: "PetitionField",
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-      ifArgEquals("isInternal", true, userHasFeatureFlag("INTERNAL_COMMENTS"))
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+    ifArgEquals(
+      "isInternal",
+      true,
+      userHasFeatureFlag("INTERNAL_COMMENTS"),
+      fieldsHaveCommentsEnabled("petitionFieldId")
     )
   ),
   args: {
@@ -28,13 +30,6 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     isInternal: booleanArg(),
   },
   resolve: async (_, args, ctx) => {
-    const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
-    if (!petition.comments_enabled && !args.isInternal) {
-      throw new WhitelistedError(
-        "Comments are not enabled for this petition",
-        "COMMENTS_NOT_ENABLED"
-      );
-    }
     await ctx.petitions.createPetitionFieldCommentFromUser(
       {
         petitionId: args.petitionId,

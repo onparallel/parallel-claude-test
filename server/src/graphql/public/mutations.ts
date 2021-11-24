@@ -27,7 +27,7 @@ import { RESULT } from "../helpers/result";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
-import { fieldAttachmentBelongsToField } from "../petition/authorizers";
+import { fieldAttachmentBelongsToField, fieldsHaveCommentsEnabled } from "../petition/authorizers";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -619,7 +619,11 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
 export const publicCreatePetitionFieldComment = mutationField("publicCreatePetitionFieldComment", {
   description: "Create a petition field comment.",
   type: "PublicPetitionFieldComment",
-  authorize: chain(authenticatePublicAccess("keycode"), fieldBelongsToAccess("petitionFieldId")),
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    fieldBelongsToAccess("petitionFieldId"),
+    fieldsHaveCommentsEnabled("petitionFieldId")
+  ),
   args: {
     keycode: nonNull(idArg()),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
@@ -627,13 +631,6 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
   },
   resolve: async (_, args, ctx) => {
     const petitionId = ctx.access!.petition_id;
-    const petition = (await ctx.petitions.loadPetition(petitionId))!;
-    if (!petition.comments_enabled) {
-      throw new WhitelistedError(
-        "Comments are not enabled for this petition",
-        "COMMENTS_NOT_ENABLED"
-      );
-    }
     return await ctx.petitions.createPetitionFieldCommentFromAccess(
       {
         petitionId: petitionId,

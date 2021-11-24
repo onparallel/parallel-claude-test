@@ -182,6 +182,18 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(fieldIds).size;
   }
 
+  async fieldsHaveCommentsEnabled(fieldIds: number[]) {
+    if (fieldIds.length === 0) {
+      return true;
+    }
+    const [{ count }] = await this.from("petition_field")
+      .whereIn("id", fieldIds)
+      .whereRaw(/* sql */ `("options" ->> 'hasCommentsEnabled')::boolean = true`)
+      .select(this.count());
+
+    return count === new Set(fieldIds).size;
+  }
+
   async fieldAttachmentBelongsToField(fieldId: number, attachmentIds: number[]) {
     const [{ count }] = await this.from("petition_field_attachment")
       .where({
