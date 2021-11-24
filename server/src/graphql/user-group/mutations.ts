@@ -121,9 +121,9 @@ export const removeUsersFromGroup = mutationField("removeUsersFromGroup", {
     userHasAccessToUsers("userIds")
   ),
   resolve: async (_, args, ctx) => {
-    await ctx.userGroups.removeUsersFromGroup(
-      args.userGroupId,
+    await ctx.userGroups.removeUsersFromGroups(
       args.userIds,
+      [args.userGroupId],
       `User:${ctx.user!.id}`
     );
     return (await ctx.userGroups.loadUserGroup(args.userGroupId))!;

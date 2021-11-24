@@ -125,23 +125,33 @@ export class UserGroupRepository extends BaseRepository {
     });
   }
 
-  async removeUsersFromGroup(userGroupId: number, userIds: MaybeArray<number>, deletedBy: string) {
-    const ids = unMaybeArray(userIds);
+  async removeUsersFromGroups(
+    userIds: MaybeArray<number>,
+    userGroupIds: MaybeArray<number>,
+    deletedBy: string,
+    t?: Knex.Transaction
+  ) {
+    if (
+      (Array.isArray(userGroupIds) && userGroupIds.length === 0) ||
+      (Array.isArray(userIds) && userIds.length === 0)
+    ) {
+      return;
+    }
     await this.withTransaction(async (t) => {
+      // remove group memberships
       await this.from("user_group_member", t)
-        .where({ user_group_id: userGroupId, deleted_at: null })
-        .whereIn("user_id", ids)
-        .update(
-          {
-            deleted_by: deletedBy,
-            deleted_at: this.now(),
-          },
-          "*"
-        );
+        .whereIn("user_group_id", unMaybeArray(userGroupIds))
+        .whereIn("user_id", unMaybeArray(userIds))
+        .whereNull("deleted_at")
+        .update({ deleted_at: this.now(), deleted_by: deletedBy });
 
-      /** remove group permissions on the deleted group members */
-      await this.removeUserGroupMemberPermissions(userGroupId, ids, deletedBy, t);
-    });
+      // remove permissions coming from the group memberships
+      await this.from("petition_permission", t)
+        .whereIn("from_user_group_id", unMaybeArray(userGroupIds))
+        .whereIn("user_id", unMaybeArray(userIds))
+        .whereNull("deleted_at")
+        .update({ deleted_at: this.now(), deleted_by: deletedBy });
+    }, t);
   }
 
   async removeUsersFromAllGroups(
@@ -149,17 +159,23 @@ export class UserGroupRepository extends BaseRepository {
     deletedBy: string,
     t?: Knex.Transaction
   ) {
-    const ids = unMaybeArray(userIds);
-    await this.from("user_group_member", t)
-      .where({ deleted_at: null })
-      .whereIn("user_id", ids)
-      .update(
-        {
-          deleted_by: deletedBy,
-          deleted_at: this.now(),
-        },
-        "*"
-      );
+    if (Array.isArray(userIds) && userIds.length === 0) {
+      return;
+    }
+    await this.withTransaction(async (t) => {
+      // remove group memberships
+      await this.from("user_group_member", t)
+        .whereIn("user_id", unMaybeArray(userIds))
+        .whereNull("deleted_at")
+        .update({ deleted_at: this.now(), deleted_by: deletedBy });
+
+      // remove permissions coming from the group memberships
+      await this.from("petition_permission", t)
+        .whereIn("user_id", unMaybeArray(userIds))
+        .whereNotNull("from_user_group_id")
+        .whereNull("deleted_at")
+        .update({ deleted_at: this.now(), deleted_by: deletedBy });
+    }, t);
   }
 
   async addUsersToGroup(
@@ -216,17 +232,5 @@ export class UserGroupRepository extends BaseRepository {
         ),
       t
     );
-  }
-
-  private async removeUserGroupMemberPermissions(
-    userGroupId: number,
-    memberIds: number[],
-    deletedBy: string,
-    t?: Knex.Transaction
-  ) {
-    await this.from("petition_permission", t)
-      .where({ deleted_at: null, from_user_group_id: userGroupId })
-      .whereIn("user_id", memberIds)
-      .update({ deleted_at: this.now(), deleted_by: deletedBy });
   }
 }

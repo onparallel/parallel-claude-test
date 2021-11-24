@@ -242,12 +242,13 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     if (status === "ACTIVE") {
       return await ctx.users.updateUserById(userIds, { status }, `User:${ctx.user!.id}`);
     } else {
-      const permissionsByUserId = await ctx.petitions.loadPetitionPermissionsByUserId(userIds);
-
       return await ctx.petitions.withTransaction(async (t) => {
         await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);
+        const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
+          userIds
+        );
         return await pMap(
-          zip(userIds, permissionsByUserId),
+          zip(userIds, permissions),
           async ([userId, userPermissions]) => {
             const [ownedPermissions, notOwnedPermissions] = partition(
               userPermissions,
