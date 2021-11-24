@@ -4,10 +4,14 @@ import {
   CreateContact,
   CreateOrganization,
   CreateUser,
+  CreateUserGroup,
+  CreateUserGroupMember,
   Organization,
   OrganizationUsageLimit,
   OrgIntegration,
   User,
+  UserGroup,
+  UserGroupMember,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
 
@@ -148,4 +152,51 @@ export async function seed(knex: Knex): Promise<any> {
     created_by: `User:${userIds[0]}`,
     is_default: true,
   });
+
+  const groups: CreateUserGroup[] = [
+    {
+      org_id: orgIds[0],
+      name: "Empty",
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+    },
+    {
+      org_id: orgIds[0],
+      name: "Dev",
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+    },
+    {
+      org_id: orgIds[0],
+      name: "All",
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+    },
+  ];
+  const userGroupIds = await knex<UserGroup>("user_group").insert(groups, "id");
+
+  const userGroupMembers: CreateUserGroupMember[] = [
+    {
+      user_group_id: userGroupIds[1],
+      user_id: userIds[2],
+      created_by: `User:${userIds[2]}`,
+    },
+    {
+      user_group_id: userGroupIds[1],
+      user_id: userIds[3],
+      created_by: `User:${userIds[2]}`,
+    },
+    {
+      user_group_id: userGroupIds[1],
+      user_id: userIds[4],
+      created_by: `User:${userIds[2]}`,
+    },
+    ...userIds.map((userId) => ({
+      user_group_id: userGroupIds[2],
+      user_id: userId,
+      created_by: `User:${userIds[2]}`,
+    })),
+  ];
+
+  await knex<UserGroupMember>("user_group_member").insert(userGroupMembers);
 }
