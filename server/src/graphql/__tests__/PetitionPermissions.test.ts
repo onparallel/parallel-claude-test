@@ -345,14 +345,16 @@ describe("GraphQL/Petition Permissions", () => {
               message: "hello!"
             ) {
               id
-              events(limit: 1000, offset: 0) {
-                totalCount
-                items {
-                  __typename
-                  ... on GroupPermissionAddedEvent {
-                    permissionType
-                    permissionGroup {
-                      id
+              ... on Petition {
+                events(limit: 1000, offset: 0) {
+                  totalCount
+                  items {
+                    __typename
+                    ... on GroupPermissionAddedEvent {
+                      permissionType
+                      permissionGroup {
+                        id
+                      }
                     }
                   }
                 }
@@ -1060,20 +1062,22 @@ describe("GraphQL/Petition Permissions", () => {
               permissionType: $type
             ) {
               id
-              events(limit: 1000, offset: 0) {
-                totalCount
-                items {
-                  __typename
-                  ... on GroupPermissionAddedEvent {
-                    permissionType
-                    permissionGroup {
-                      id
+              ... on Petition {
+                events(limit: 1000, offset: 0) {
+                  totalCount
+                  items {
+                    __typename
+                    ... on GroupPermissionAddedEvent {
+                      permissionType
+                      permissionGroup {
+                        id
+                      }
                     }
-                  }
-                  ... on UserPermissionAddedEvent {
-                    permissionType
-                    permissionUser {
-                      id
+                    ... on UserPermissionAddedEvent {
+                      permissionType
+                      permissionUser {
+                        id
+                      }
                     }
                   }
                 }
@@ -1705,18 +1709,20 @@ describe("GraphQL/Petition Permissions", () => {
               userGroupIds: $userGroupIds
             ) {
               id
-              events(limit: 1000, offset: 0) {
-                totalCount
-                items {
-                  __typename
-                  ... on UserPermissionRemovedEvent {
-                    permissionUser {
-                      id
+              ... on Petition {
+                events(limit: 1000, offset: 0) {
+                  totalCount
+                  items {
+                    __typename
+                    ... on UserPermissionRemovedEvent {
+                      permissionUser {
+                        id
+                      }
                     }
-                  }
-                  ... on GroupPermissionRemovedEvent {
-                    permissionGroup {
-                      id
+                    ... on GroupPermissionRemovedEvent {
+                      permissionGroup {
+                        id
+                      }
                     }
                   }
                 }
