@@ -22,7 +22,7 @@ export async function commentsUserNotification(
     context.users.loadUser(payload.user_id),
   ]);
   if (!petition) {
-    throw new Error(`Petition not found for petition_id ${payload.petition_id}`);
+    return; // if the petition was deleted, return without throwing error
   }
   if (!user) {
     throw new Error(`User not found for user_id ${payload.user_id}`);

@@ -27,7 +27,7 @@ export async function petitionClosedNotification(
   ]);
 
   if (!petition) {
-    throw new Error(`Petition with id ${payload.petition_id} not found.`);
+    return; // if the petition was deleted, return without throwing error
   }
   if (!sender) {
     throw new Error(`User not found for user_id ${payload.user_id}`);

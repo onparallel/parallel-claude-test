@@ -50,7 +50,7 @@ export async function petitionCompleted(
   ]);
 
   if (!petition) {
-    throw new Error(`Petition not found for id ${petitionId}`);
+    return; // if the petition was deleted, return without throwing error
   }
 
   if (!permissions || permissions.length === 0) {

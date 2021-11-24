@@ -22,7 +22,7 @@ export async function petitionAccessDelegated(
     context.petitions.loadAccess(payload.original_access_id),
   ]);
   if (!petition) {
-    throw new Error(`Petition with id ${payload.petition_id} not found`);
+    return; // if the petition was deleted, return without throwing error
   }
   if (!newAccess) {
     throw new Error(`Petition access with id ${payload.new_access_id} not found`);

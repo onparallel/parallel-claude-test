@@ -19,7 +19,7 @@ export async function publicPetitionLinkAccess(
     context.petitions.loadAccess(message.petition_access_id),
   ]);
   if (!petition) {
-    throw new Error(`Petition:${message.petition_id} not found`);
+    return; // if the petition was deleted, return without throwing error
   }
   if (!petition.from_public_petition_link_id) {
     throw new Error(

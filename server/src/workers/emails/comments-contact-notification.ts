@@ -25,7 +25,7 @@ export async function commentsContactNotification(
     loadOriginalMessageByPetitionAccess(payload.petition_access_id, payload.petition_id, context),
   ]);
   if (!petition) {
-    throw new Error(`Petition not found for petition_id ${payload.petition_id}`);
+    return; // if the petition was deleted, return without throwing error
   }
   if (!contact) {
     throw new Error(`Contact not found for petition_access_id ${payload.petition_access_id}`);

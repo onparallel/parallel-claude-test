@@ -36,7 +36,7 @@ export async function petitionReminder(
       loadOriginalMessageByPetitionAccess(access.id, access.petition_id, context),
     ]);
     if (!petition) {
-      throw new Error(`Petition not found for petition_access.petition_id ${access.petition_id}`);
+      return; // if the petition was deleted, return without throwing error
     }
     if (petition.status !== "PENDING") {
       throw new Error(

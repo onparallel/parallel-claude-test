@@ -19,7 +19,7 @@ export async function developerWebhookFailed(
     context.subscriptions.loadSubscription(payload.petition_event_subscription_id),
   ]);
   if (!petition) {
-    throw new Error(`Petition not found for payload.petition_id ${payload.petition_id}`);
+    return; // if the petition was deleted, return without throwing error
   }
   if (!subscription) {
     throw new Error(

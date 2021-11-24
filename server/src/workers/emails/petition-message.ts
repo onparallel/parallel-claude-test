@@ -20,7 +20,7 @@ export async function petitionMessage(
     context.petitions.loadAccess(message.petition_access_id),
   ]);
   if (!petition) {
-    throw new Error(`Petition not found for petition_message.petition_id ${message.petition_id}`);
+    return; // if the petition was deleted, return without throwing error
   }
   if (!sender) {
     throw new Error(`User not found for petition_message.sender_id ${message.sender_id}`);
