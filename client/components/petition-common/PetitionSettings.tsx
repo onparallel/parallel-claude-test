@@ -45,6 +45,7 @@ import {
 import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
+import { withError } from "@parallel/utils/promises/withError";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
@@ -285,9 +286,7 @@ function _PetitionSettings({
     if (value) {
       handleConfigureAutomaticReminders();
     } else {
-      try {
-        await onUpdatePetition({ remindersConfig: null });
-      } catch {}
+      await withError(() => onUpdatePetition({ remindersConfig: null }));
     }
   };
 

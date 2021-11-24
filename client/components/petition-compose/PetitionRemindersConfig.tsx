@@ -17,7 +17,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useTimeInput } from "@parallel/utils/useTimeInput";
 import { addDays, addWeeks, isWeekend, parse, startOfToday, startOfWeek } from "date-fns";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
 
@@ -71,13 +71,13 @@ export function PetitionRemindersConfig({
 
   useEffect(() => {
     if (hideRemindersActiveCheckbox) {
-      onChange(previousValueRef.current ?? defaultRemindersConfig);
+      handleEnableRemindersChange(true);
     }
   }, []);
 
-  function handleEnableRemindersChange(event: ChangeEvent<HTMLInputElement>) {
-    setIsActive(event.target.checked);
-    if (event.target.checked) {
+  function handleEnableRemindersChange(isChecked: boolean) {
+    setIsActive(isChecked);
+    if (isChecked) {
       onChange(previousValueRef.current ?? defaultRemindersConfig);
     } else {
       assignRef(previousValueRef, value);
@@ -94,7 +94,7 @@ export function PetitionRemindersConfig({
             size="lg"
             marginRight={2}
             isChecked={isActive}
-            onChange={handleEnableRemindersChange}
+            onChange={(event) => handleEnableRemindersChange(event.target.checked)}
           >
             <Text fontSize="md" as="span">
               <FormattedMessage
