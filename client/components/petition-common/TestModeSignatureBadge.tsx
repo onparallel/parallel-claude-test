@@ -1,4 +1,5 @@
 import { Badge, Text } from "@chakra-ui/react";
+import { TestModeSignatureBadge_UserFragment } from "@parallel/graphql/__types";
 import gql from "graphql-tag";
 import { FormattedMessage } from "react-intl";
 import { NormalLink } from "../common/Link";
@@ -6,9 +7,7 @@ import { SmallPopover } from "../common/SmallPopover";
 
 export function TestModeSignatureBadge({
   hasPetitionSignature,
-}: {
-  hasPetitionSignature: boolean;
-}) {
+}: TestModeSignatureBadge_UserFragment) {
   const popoverText = hasPetitionSignature ? (
     <FormattedMessage
       id="component.test-mode-signature-badge.popover-text"

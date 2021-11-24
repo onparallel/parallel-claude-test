@@ -5389,9 +5389,9 @@ export type PetitionSettings_updatePetitionLink_PetitionTemplateFragment = {
 
 export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   hasApiTokens: User["hasFeatureFlag"];
-  hasPetitionSignature: User["hasFeatureFlag"];
   hasSkipForwardSecurity: User["hasFeatureFlag"];
   hasHideRecipientViewContents: User["hasFeatureFlag"];
+  hasPetitionSignature: User["hasFeatureFlag"];
 } & {
   organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
       signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
@@ -10258,10 +10258,10 @@ export type PetitionCompose_UserFragment = { __typename?: "User" } & Pick<
   | "initials"
 > & {
     hasApiTokens: User["hasFeatureFlag"];
-    hasPetitionSignature: User["hasFeatureFlag"];
     hasSkipForwardSecurity: User["hasFeatureFlag"];
     hasHideRecipientViewContents: User["hasFeatureFlag"];
     hasPetitionPdfExport: User["hasFeatureFlag"];
+    hasPetitionSignature: User["hasFeatureFlag"];
   } & {
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
@@ -10838,10 +10838,10 @@ export type PetitionComposeUserQuery = {
     | "initials"
   > & {
       hasApiTokens: User["hasFeatureFlag"];
-      hasPetitionSignature: User["hasFeatureFlag"];
       hasSkipForwardSecurity: User["hasFeatureFlag"];
       hasHideRecipientViewContents: User["hasFeatureFlag"];
       hasPetitionPdfExport: User["hasFeatureFlag"];
+      hasPetitionSignature: User["hasFeatureFlag"];
     } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           signatureIntegrations: { __typename?: "OrgIntegrationPagination" } & {
@@ -15505,7 +15505,6 @@ export const TestModeSignatureBadge_UserFragmentDoc = gql`
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
     hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
-    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     ...TestModeSignatureBadge_User
@@ -15761,12 +15760,14 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     }
     ...PetitionSignaturesCard_Petition
     ...getPetitionSignatureStatus_Petition
+    ...getPetitionSignatureEnvironment_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
   ${ShareButton_PetitionBaseFragmentDoc}
   ${PetitionSignaturesCard_PetitionFragmentDoc}
   ${getPetitionSignatureStatus_PetitionFragmentDoc}
+  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
 `;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {
