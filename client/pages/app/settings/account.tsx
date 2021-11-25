@@ -91,7 +91,7 @@ function Account() {
             <FormattedMessage id="settings.account.name-header" defaultMessage="Name" />
           </Heading>
           {me.isSsoUser ? (
-            <Alert>
+            <Alert borderRadius="md">
               <AlertIcon />
               <FormattedMessage
                 id="settings.account.sso-user-explanation"

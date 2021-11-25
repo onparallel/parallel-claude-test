@@ -107,7 +107,7 @@ function Security() {
             />
           </Heading>
           {me.isSsoUser ? (
-            <Alert>
+            <Alert borderRadius="md">
               <AlertIcon />
               <FormattedMessage
                 id="settings.security.sso-user-explanation"
