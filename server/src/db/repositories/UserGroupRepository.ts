@@ -223,12 +223,12 @@ export class UserGroupRepository extends BaseRepository {
             u as (select * from (values ${memberIds
               .map(() => "(?::int)")
               .join(", ")}) as t(user_id))
-          insert into petition_permission(type, user_id, petition_id, from_user_group_id, created_by)
-            select pp.type, u.user_id, pp.petition_id, pp.user_group_id, ?
+          insert into petition_permission(type, user_id, petition_id, from_user_group_id, created_by, updated_by)
+            select pp.type, u.user_id, pp.petition_id, pp.user_group_id, ?, ?
             from pp cross join u
           on conflict do nothing;
         `,
-          [userGroupId, ...memberIds, createdBy]
+          [userGroupId, ...memberIds, createdBy, createdBy]
         ),
       t
     );

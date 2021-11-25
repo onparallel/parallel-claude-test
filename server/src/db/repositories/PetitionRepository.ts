@@ -2630,11 +2630,11 @@ export class PetitionRepository extends BaseRepository {
           p as (select * from (values ${toPetitionIds
             .map(() => "(?::int)")
             .join(",")}) as t (petition_id))
-        insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id, created_by)
-        select p.petition_id, u.user_id, u.type, u.is_subscribed, u.user_group_id, u.from_user_group_id, ? from u cross join p
+        insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id, created_by, updated_by)
+        select p.petition_id, u.user_id, u.type, u.is_subscribed, u.user_group_id, u.from_user_group_id, ?, ? from u cross join p
         on conflict do nothing 
         `,
-      [fromPetitionId, ...toPetitionIds, createdBy],
+      [fromPetitionId, ...toPetitionIds, createdBy, createdBy],
       t
     );
   }
