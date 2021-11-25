@@ -118,7 +118,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
             defaultMessage="Is this the first time you use Parallel?"
           />
         </ModalHeader>
-        <ModalBody padding={0} position="relative">
+        <ModalBody padding={0} position="relative" aria-live="polite">
           {bodyElements[page]}
           <StepsIndicator numberOfSteps={bodyElements.length} currentStep={page} paddingTop={6} />
         </ModalBody>
