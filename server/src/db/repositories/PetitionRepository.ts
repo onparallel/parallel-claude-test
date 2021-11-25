@@ -1015,6 +1015,7 @@ export class PetitionRepository extends BaseRepository {
         "validated",
         "is_fixed",
         "from_petition_field_id",
+        "alias",
       ]),
       field.position + 1,
       user

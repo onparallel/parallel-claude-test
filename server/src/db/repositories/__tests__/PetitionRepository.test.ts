@@ -418,6 +418,21 @@ describe("repositories/PetitionRepository", () => {
         validated: false,
       });
     });
+
+    test("should not copy alias when cloning the field", async () => {
+      const [fieldWithAlias] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        alias: "field-alias",
+        position: 100,
+      }));
+
+      const { field: clonedField } = await petitions.clonePetitionField(
+        petition.id,
+        fieldWithAlias.id,
+        user
+      );
+
+      expect(clonedField.alias).toBeNull();
+    });
   });
 
   describe("Petition Sharing", () => {
