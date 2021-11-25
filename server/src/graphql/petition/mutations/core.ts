@@ -1759,7 +1759,11 @@ export const autoSendTemplate = mutationField("autoSendTemplate", {
 
     const [{ result, error, accesses, messages }] = await presendPetition(
       [[petition, [contact.id]]],
-      { subject: args.name, body: template.email_body ? JSON.parse(template.email_body) : [] },
+      {
+        subject: args.name,
+        body: template.email_body ? JSON.parse(template.email_body) : [],
+        remindersConfig: petition.reminders_config ?? null,
+      },
       ctx.user!,
       false,
       ctx

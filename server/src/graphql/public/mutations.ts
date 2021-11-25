@@ -1073,6 +1073,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           {
             subject: petition.email_subject ?? link!.title,
             body: JSON.parse(petition.email_body!),
+            remindersConfig: petition.reminders_config ?? null,
           },
           owner!,
           true,

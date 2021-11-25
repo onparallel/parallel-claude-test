@@ -41,6 +41,13 @@ describe("GraphQL/PublicPetitionLink", () => {
     templates = await mocks.createRandomPetitions(organization.id, user.id, 2, () => ({
       is_template: true,
       status: null,
+      reminders_active: true,
+      reminders_config: {
+        time: "17:30",
+        offset: 5,
+        timezone: "Europe/Madrid",
+        weekdaysOnly: true,
+      },
     }));
 
     await mocks.createRandomPetitionFields(templates[0].id, 1, () => ({ type: "TEXT" }));
@@ -325,7 +332,18 @@ describe("GraphQL/PublicPetitionLink", () => {
         .from("petition_access")
         .where({ contact_id: contacts[0].id, status: "ACTIVE" })
         .select("*");
-      expect(accesses.length).toEqual(1);
+      expect(accesses).toMatchObject([
+        {
+          // generated access should have enabled reminders
+          reminders_active: true,
+          reminders_config: {
+            time: "17:30",
+            offset: 5,
+            timezone: "Europe/Madrid",
+            weekdaysOnly: true,
+          },
+        },
+      ]);
 
       const petitionId = accesses[0].petition_id;
 
@@ -347,6 +365,13 @@ describe("GraphQL/PublicPetitionLink", () => {
         is_template: false,
         from_public_petition_link_id: publicPetitionLink.id,
         org_id: organization.id,
+        reminders_active: true,
+        reminders_config: {
+          time: "17:30",
+          offset: 5,
+          timezone: "Europe/Madrid",
+          weekdaysOnly: true,
+        },
       });
 
       // email with access to the petition should be sent to contact
