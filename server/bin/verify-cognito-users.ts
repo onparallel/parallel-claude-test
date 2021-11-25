@@ -20,7 +20,7 @@ const config = container.get<Config>(CONFIG);
     async ({ email }) => {
       try {
         console.log(`updating ${email}...`);
-        await aws.cognitoIdP
+        await (aws as any).cognitoIdP
           .adminUpdateUserAttributes({
             Username: email,
             UserPoolId: config.cognito.defaultPoolId,

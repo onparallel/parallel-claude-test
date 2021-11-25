@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { timestamps } from "./helpers/timestamps";
+import { timestamps } from "../../helpers/timestamps";
 
 export async function up(knex: Knex) {
   return knex.schema
