@@ -180,18 +180,6 @@ describe("repositories/UserGroupRepository", () => {
             from_user_group_id: null,
           },
           {
-            user_id: users[2].id,
-            petition_id: petitions[0].id,
-            type: "WRITE",
-            from_user_group_id: userGroups[1].id,
-          },
-          {
-            user_id: users[5].id,
-            petition_id: petitions[0].id,
-            type: "WRITE",
-            from_user_group_id: userGroups[1].id,
-          },
-          {
             user_id: users[1].id,
             petition_id: petitions[0].id,
             type: "WRITE",
@@ -202,6 +190,18 @@ describe("repositories/UserGroupRepository", () => {
             petition_id: petitions[0].id,
             type: "WRITE",
             from_user_group_id: userGroups[0].id,
+          },
+          {
+            user_id: users[2].id,
+            petition_id: petitions[0].id,
+            type: "WRITE",
+            from_user_group_id: userGroups[1].id,
+          },
+          {
+            user_id: users[5].id,
+            petition_id: petitions[0].id,
+            type: "WRITE",
+            from_user_group_id: userGroups[1].id,
           },
         ],
         [

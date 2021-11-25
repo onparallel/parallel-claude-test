@@ -2547,7 +2547,11 @@ export class PetitionRepository extends BaseRepository {
   readonly loadUserPermissionsByPetitionId = this.buildLoadMultipleBy(
     "petition_permission",
     "petition_id",
-    (q) => q.whereNull("deleted_at").whereNull("user_group_id").orderByRaw("type asc, created_at")
+    (q) =>
+      q
+        .whereNull("deleted_at")
+        .whereNull("user_group_id")
+        .orderByRaw("type asc, from_user_group_id asc nulls first, user_id asc, created_at")
   );
 
   readonly loadPetitionPermissionsByUserId = this.buildLoadMultipleBy(
