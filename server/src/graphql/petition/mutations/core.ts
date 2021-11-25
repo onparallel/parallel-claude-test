@@ -774,7 +774,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         ctx.user!
       );
     } catch (error: any) {
-      if (error.constraint === "petition_field__petition_id__alias__unqiue") {
+      if (error.constraint === "petition_field__petition_id__alias__unique") {
         throw new WhitelistedError(
           "The alias for this field already exists in this petition",
           "ALIAS_ALREADY_EXISTS"
