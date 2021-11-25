@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+
 import {
   Contact,
   CreateContact,
@@ -12,6 +13,12 @@ import {
   User,
   UserGroup,
   UserGroupMember,
+  CreatePetition,
+  CreatePetitionField,
+  Petition,
+  PetitionField,
+  CreatePetitionPermission,
+  PetitionPermission,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
 
@@ -199,4 +206,259 @@ export async function seed(knex: Knex): Promise<any> {
   ];
 
   await knex<UserGroupMember>("user_group_member").insert(userGroupMembers);
+
+  const petitions: CreatePetition[] = [
+    {
+      org_id: orgIds[0],
+      name: "Tu primer envío con Parallel",
+      custom_ref: null,
+      locale: "es",
+      is_template: true,
+      status: null,
+      deadline: null,
+      email_subject: "Petición de prueba",
+      email_body:
+        '[{"type":"paragraph","children":[{"text":"Hola "},{"children":[{"text":""}],"placeholder":"contact-first-name","type":"placeholder"},{"text":","}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Este es el mensaje que enviarás a tu destinatario. Muchas de nuestras plantillas vienen con mensajes configurados por defecto como este, con personalización de mensaje para que tú, "},{"children":[{"text":""}],"placeholder":"user-first-name","type":"placeholder"},{"text":", solo tengas que darle a enviar. No obstante, puedes cambiarlo siempre que quieras por tus propias palabras. "}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Un saludo,"}],"type":"paragraph"},{"children":[{"text":"Paco"}],"type":"paragraph"}]',
+      reminders_active: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      reminders_config: null,
+      template_description:
+        '[{"type":"paragraph","children":[{"text":"Esta plantilla está pensada para facilitarte lo máximo posible tus primeros pasos con Parallel."}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Te recomendamos utilizarla para"},{"bold":true,"text":" realizar un primer envío y enviártela a tu propia dirección de correo"},{"text":" de forma que puedas ver la experiencia que tendrán tus destinatarios."}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"El listado de información que aparece abajo, son los campos que luego verás como destinatario. Algunos campos están ocultos, de forma que solo se mostrarán si se cumplen las condiciones."}],"type":"paragraph"}]',
+      template_public: true,
+      from_template_id: null,
+      signature_config: null,
+      comments_enabled: true,
+      hide_recipient_view_contents: false,
+      skip_forward_security: false,
+      is_readonly: false,
+      public_metadata: null,
+      from_public_petition_link_id: null,
+    },
+  ];
+
+  const petitionsIds = await knex<Petition>("petition").insert(petitions, "id");
+
+  const petitionOwners: CreatePetitionPermission[] = [
+    {
+      petition_id: petitionsIds[0],
+      user_id: userIds[2],
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      type: "OWNER",
+      is_subscribed: true,
+    },
+  ];
+
+  await knex<PetitionPermission>("petition_permission").insert(petitionOwners);
+
+  const petitionFieldsPrimerEnvio: CreatePetitionField[] = [
+    {
+      petition_id: petitionsIds[0],
+      position: 0,
+      type: "HEADING",
+      title: "Te presentamos la vista de destinatario",
+      description:
+        "Esta pantalla, es la que verán tus destinatarios cada vez que les solicites información. Todas las respuestas se guardan y sincronizan automáticamente con tu cuenta de Parallel para que puedas ir revisando la información.",
+      optional: true,
+      multiple: false,
+      options: '{"hasPageBreak":false, "hasCommentsEnabled":false}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: true,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 1,
+      type: "CHECKBOX",
+      title: "¿Qué te gustaría saber ahora?",
+      description: null,
+      optional: false,
+      multiple: false,
+      options:
+        '{"values":["Quiero ver todos los tipos de campos","Quiero saber cómo veré las respuestas de mis destinatarios","Quiero más información acerca del funcionamiento de Parallel"],"limit":{"type":"EXACT","min":1,"max":1}, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 2,
+      type: "HEADING",
+      title: "Esto es una Sección",
+      description:
+        "Permite añadir encabezados y organizar tus preguntas en diferentes secciones. En su configuración, podrás añadir saltos de página también.",
+      optional: true,
+      multiple: false,
+      options: '{"hasPageBreak":false, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 3,
+      type: "SHORT_TEXT",
+      title: "Esto es un campo de Respuestas cortas",
+      description: "Permite al destinatario responder de forma breve. Por ejemplo: nombre, DNI...",
+      optional: false,
+      multiple: false,
+      options: '{"placeholder":null, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 4,
+      type: "TEXT",
+      title: "Esto es un campo de Respuestas largas",
+      description:
+        "Permite al destinatario escribir todo lo que necesite. Por ejemplo: descripciones, comentarios...",
+      optional: false,
+      multiple: false,
+      options: '{"placeholder":null, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 5,
+      type: "FILE_UPLOAD",
+      title: "Esto es un campo de Documentos y archivos",
+      description: "Permite al destinatario adjuntar todo tipo de archivos.",
+      optional: false,
+      multiple: true,
+      options: '{"accepts":null, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 6,
+      type: "CHECKBOX",
+      title: "Esto es un campo de Opciones",
+      description:
+        "Permite al destinatario escoger entre un listado de opciones. Puedes configurar un límite de respuestas si lo necesitas.",
+      optional: false,
+      multiple: false,
+      options:
+        '{"values":["Opción 1","Opción 2","Opción 3"],"limit":{"type":"UNLIMITED","min":1,"max":1}, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 7,
+      type: "SELECT",
+      title: "Esto es un campo de Desplegable",
+      description:
+        "Recomendamos utilizar este campo en casos con listados muy extensos, y en casos de listados cortos utilizar un campo de Opciones.",
+      optional: false,
+      multiple: false,
+      options:
+        '{"values":["Opción 1","Opción 2","Opción 3"],"placeholder":null, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 8,
+      type: "DYNAMIC_SELECT",
+      title: "Este es un campo de Desplegable condicional",
+      description:
+        "Permite anidar varios desplegables, que cambian dinámicamente sus opciones en función de la respuesta anterior.",
+      optional: false,
+      multiple: false,
+      options:
+        '{"values":[["Andalucía",["Almeria","Cadiz","Cordoba","Sevilla"]],["Aragón",["Huesca","Teruel","Zaragoza"]],["Canarias",["Fuerteventura","Gran Canaria","Lanzarote","Tenerife"]],["Cataluña",["Barcelona","Gerona","Lérida","Tarragona"]],["Galicia",["La Coruña","Lugo","Orense","Pontevedra"]]],"labels":["Comunidad autónoma","Provincia"],"file":{"id":"sgH3WRwtso7ZeNCDRNP","name":"import_model_es (2).xlsx","size":9322,"updatedAt":"2021-09-09T08:27:37.461Z"}, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 9,
+      type: "HEADING",
+      title: "Claro, te animamos a que vuelvas a tu cuenta de Parallel y te mostraremos cómo.",
+      description:
+        "Además, encontrarás todo por escrito en el siguiente enlace: https://support.onparallel.com/hc/es/articles/360016853557-Revisa-y-trabaja-con-las-respuestas-de-un-Parallel",
+      optional: true,
+      multiple: false,
+      options: '{"hasPageBreak":false, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 10,
+      type: "HEADING",
+      title: "Hemos redactado toda la información que necesitas en nuestra Guía de Parallel",
+      description:
+        "https://support.onparallel.com/hc/es/categories/360001333897-Gu%C3%ADa-de-Parallel",
+      optional: true,
+      multiple: false,
+      options: '{"hasPageBreak":false, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+    {
+      petition_id: petitionsIds[0],
+      position: 11,
+      type: "HEADING",
+      title: "Si sigues teniendo dudas",
+      description:
+        "Para cualquier problema o duda que necesites que te resolvamos puedes ponerte en contacto con nosotros a support@onparallel.com. ¡Estaremos encantados de ayudarte!",
+      optional: true,
+      multiple: false,
+      options: '{"hasPageBreak":false, "hasCommentsEnabled":true}',
+      validated: false,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+      is_fixed: false,
+      from_petition_field_id: null,
+      alias: null,
+    },
+  ];
+
+  await knex<PetitionField>("petition_field").insert([...petitionFieldsPrimerEnvio]);
 }
