@@ -8391,7 +8391,7 @@
   },
   {
     "term": "template-sharing.success-title",
-    "definition": "{count, plural, =1 {Plantilla compartida} other {Plantillas compartidas}} shared",
+    "definition": "{count, plural, =1 {Plantilla compartida} other {Plantillas compartidas}}",
     "context": "{count, plural, =1 {Template} other {Templates}} shared"
   },
   {
