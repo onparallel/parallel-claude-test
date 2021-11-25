@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { datatype, internet } from "faker";
-import { Knex } from "knex";
+import knex, { Knex } from "knex";
 import { sortBy } from "remeda";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
@@ -19,7 +19,7 @@ import {
   UserGroup,
 } from "../../db/__types";
 import { AUTH, IAuth } from "../../services/auth";
-import { toGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { fromPlainText } from "../../util/slate";
 import { initServer, TestClient } from "./server";
@@ -828,12 +828,14 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.createPetition).toEqual({ remindersConfig: {
-        time: "12:00",
-        offset: 1,
-        timezone: "Europe/Madrid",
-        weekdaysOnly: true,
-      } });
+      expect(data?.createPetition).toEqual({
+        remindersConfig: {
+          time: "12:00",
+          offset: 1,
+          timezone: "Europe/Madrid",
+          weekdaysOnly: true,
+        },
+      });
     });
 
     it("don't copy signature configuration when creating a petition from a public template of another organization", async () => {
@@ -1440,6 +1442,44 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.clonePetitions).toEqual([{ myEffectivePermission: { isSubscribed: false } }]);
+    });
+
+    it("copies default permissions when cloning a template", async () => {
+      const [templateWithDefaultPermissions] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true, status: null })
+      );
+      const [user] = await mocks.createRandomUsers(organization.id, 1);
+      await mocks.knex.from("template_default_permission").insert({
+        template_id: templateWithDefaultPermissions.id,
+        type: "WRITE",
+        user_id: user.id,
+        position: 1,
+      });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", templateWithDefaultPermissions.id)],
+        },
+      });
+
+      const { id } = fromGlobalId(data?.clonePetitions[0].id, "Petition");
+      expect(errors).toBeUndefined();
+      const newTemplateDefaultPermissions = await mocks.knex
+        .from("template_default_permission")
+        .where("template_id", id)
+        .whereNull("deleted_at");
+
+      expect(newTemplateDefaultPermissions).toHaveLength(1);
     });
   });
 
