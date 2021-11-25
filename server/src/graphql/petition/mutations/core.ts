@@ -1111,7 +1111,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
   ),
   resolve: async (_, args, ctx) => {
-    const [petition, onwer] = await Promise.all([
+    const [petition, owner] = await Promise.all([
       ctx.petitions.loadPetition(args.petitionId),
       ctx.petitions.loadPetitionOwner(args.petitionId),
     ]);
@@ -1119,7 +1119,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     if (!petition) {
       throw new Error(`Petition:${args.petitionId} not found`);
     }
-    if (!onwer) {
+    if (!owner) {
       throw new Error(`Owner of Petition:${args.petitionId} not found`);
     }
 
@@ -1128,7 +1128,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       async () =>
         await ctx.petitions.clonePetition(
           args.petitionId,
-          onwer, // set the owner of the original petition as owner of the cloned ones
+          owner, // set the owner of the original petition as owner of the cloned ones
           {},
           `User:${ctx.user!.id}`
         ),
