@@ -232,7 +232,15 @@ export async function seed(knex: Knex): Promise<any> {
       hide_recipient_view_contents: false,
       skip_forward_security: false,
       is_readonly: false,
-      public_metadata: null,
+      public_metadata: `{
+        "slug": "first-petition",
+        "categories": [
+          "legal"
+        ],
+        "description": null,
+        "background_color": "#81E6D9",
+        "image_public_file_id": null
+      }`,
       from_public_petition_link_id: null,
     },
   ];
@@ -392,24 +400,6 @@ export async function seed(knex: Knex): Promise<any> {
     {
       petition_id: petitionsIds[0],
       position: 8,
-      type: "DYNAMIC_SELECT",
-      title: "Este es un campo de Desplegable condicional",
-      description:
-        "Permite anidar varios desplegables, que cambian dinámicamente sus opciones en función de la respuesta anterior.",
-      optional: false,
-      multiple: false,
-      options:
-        '{"values":[["Andalucía",["Almeria","Cadiz","Cordoba","Sevilla"]],["Aragón",["Huesca","Teruel","Zaragoza"]],["Canarias",["Fuerteventura","Gran Canaria","Lanzarote","Tenerife"]],["Cataluña",["Barcelona","Gerona","Lérida","Tarragona"]],["Galicia",["La Coruña","Lugo","Orense","Pontevedra"]]],"labels":["Comunidad autónoma","Provincia"],"file":{"id":"sgH3WRwtso7ZeNCDRNP","name":"import_model_es (2).xlsx","size":9322,"updatedAt":"2021-09-09T08:27:37.461Z"}, "hasCommentsEnabled":true}',
-      validated: false,
-      created_by: `User:${userIds[2]}`,
-      updated_by: `User:${userIds[2]}`,
-      is_fixed: false,
-      from_petition_field_id: null,
-      alias: null,
-    },
-    {
-      petition_id: petitionsIds[0],
-      position: 9,
       type: "HEADING",
       title: "Claro, te animamos a que vuelvas a tu cuenta de Parallel y te mostraremos cómo.",
       description:
@@ -426,7 +416,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       petition_id: petitionsIds[0],
-      position: 10,
+      position: 9,
       type: "HEADING",
       title: "Hemos redactado toda la información que necesitas en nuestra Guía de Parallel",
       description:
@@ -443,7 +433,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       petition_id: petitionsIds[0],
-      position: 11,
+      position: 10,
       type: "HEADING",
       title: "Si sigues teniendo dudas",
       description:
