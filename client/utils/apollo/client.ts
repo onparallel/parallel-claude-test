@@ -1,7 +1,9 @@
 import { ApolloClient, FieldMergeFunction, from, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
+import { getOperationName } from "@apollo/client/utilities";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
+import { Login_currentUserDocument } from "@parallel/graphql/__types";
 import { createUploadLink } from "apollo-upload-client";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { IncomingMessage } from "http";
@@ -70,7 +72,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
       // CurrentUser is the operation used in the login page, if we dont
       // check for it we get into a redirect loop
       if (
-        operation.operationName !== "CurrentUser" &&
+        operation.operationName !== getOperationName(Login_currentUserDocument) &&
         graphQLErrors?.[0]?.extensions?.code === "UNAUTHENTICATED"
       ) {
         Router.push("/login");
