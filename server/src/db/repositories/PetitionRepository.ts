@@ -1592,10 +1592,23 @@ export class PetitionRepository extends BaseRepository {
         sourcePetition?.org_id === owner.org_id
           ? this.raw(
               /* sql */ `
-              insert into petition_tag (petition_id, tag_id)
-              select ?, tag_id from petition_tag where petition_id = ?
+              insert into petition_tag (petition_id, tag_id, created_by)
+              select ?, tag_id, ? from petition_tag where petition_id = ?
             `,
-              [cloned.id, petitionId],
+              [cloned.id, createdBy, petitionId],
+              t
+            )
+          : [],
+        // clone default permissions if source petition is from same org
+        sourcePetition?.org_id === owner.org_id && sourcePetition.is_template
+          ? this.raw(
+              /* sql */ `
+              insert into template_default_permission (
+                template_id, "type", user_id, user_group_id, is_subscribed, position, created_by, updated_by)
+              select ?, "type", user_id, user_group_id, is_subscribed, position, ?, ?
+                from template_default_permission where template_id = ? and deleted_at is null
+            `,
+              [cloned.id, createdBy, createdBy, petitionId],
               t
             )
           : [],
