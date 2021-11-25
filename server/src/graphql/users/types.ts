@@ -16,7 +16,7 @@ export const OrganizationRole = enumType({
 export const FeatureFlag = enumType({
   name: "FeatureFlag",
   members: [
-    "API_TOKENS",
+    "DEVELOPER_ACCESS",
     "PETITION_SIGNATURE",
     "INTERNAL_COMMENTS",
     "PETITION_PDF_EXPORT",

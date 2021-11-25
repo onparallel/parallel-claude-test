@@ -580,7 +580,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
                   isReadOnly={isReadOnly}
-                  hasApiTokens={me.hasApiTokens}
+                  hasDeveloperAccess={me.hasDeveloperAccess}
                 />
               ) : (
                 <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 6rem)`}>

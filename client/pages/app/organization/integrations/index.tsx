@@ -78,7 +78,7 @@ function OrganizationIntegrations() {
       route: "",
     },
     {
-      isDisabled: !me.hasApiTokens,
+      isDisabled: !me.hasDeveloperAccess,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
@@ -95,7 +95,7 @@ function OrganizationIntegrations() {
         id: "organization.integrations.parallel-api-description",
         defaultMessage: "Access our API to automate all your flows.",
       }),
-      showButton: me.hasApiTokens,
+      showButton: me.hasDeveloperAccess,
       route: "/app/settings/developers",
     },
   ];
@@ -158,7 +158,7 @@ OrganizationIntegrations.getInitialProps = async ({
       me {
         id
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-        hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+        hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
         ...SettingsLayout_User
       }
     }

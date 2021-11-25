@@ -185,8 +185,8 @@ export interface EffectivePetitionUserPermission {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
-  | "API_TOKENS"
   | "AUTO_SEND_TEMPLATE"
+  | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
@@ -5384,7 +5384,7 @@ export type PetitionSettings_updatePetitionLink_PetitionTemplateFragment = {
 };
 
 export type PetitionSettings_UserFragment = { __typename?: "User" } & {
-  hasApiTokens: User["hasFeatureFlag"];
+  hasDeveloperAccess: User["hasFeatureFlag"];
   hasSkipForwardSecurity: User["hasFeatureFlag"];
   hasHideRecipientViewContents: User["hasFeatureFlag"];
   hasPetitionSignature: User["hasFeatureFlag"];
@@ -8333,7 +8333,10 @@ export type OrganizationIntegrationsQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & { hasPetitionSignature: User["hasFeatureFlag"]; hasApiTokens: User["hasFeatureFlag"] } & {
+  > & {
+      hasPetitionSignature: User["hasFeatureFlag"];
+      hasDeveloperAccess: User["hasFeatureFlag"];
+    } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -10354,7 +10357,7 @@ export type PetitionCompose_UserFragment = { __typename?: "User" } & Pick<
   | "avatarUrl"
   | "initials"
 > & {
-    hasApiTokens: User["hasFeatureFlag"];
+    hasDeveloperAccess: User["hasFeatureFlag"];
     hasSkipForwardSecurity: User["hasFeatureFlag"];
     hasHideRecipientViewContents: User["hasFeatureFlag"];
     hasPetitionPdfExport: User["hasFeatureFlag"];
@@ -10938,7 +10941,7 @@ export type PetitionComposeUserQuery = {
     | "avatarUrl"
     | "initials"
   > & {
-      hasApiTokens: User["hasFeatureFlag"];
+      hasDeveloperAccess: User["hasFeatureFlag"];
       hasSkipForwardSecurity: User["hasFeatureFlag"];
       hasHideRecipientViewContents: User["hasFeatureFlag"];
       hasPetitionPdfExport: User["hasFeatureFlag"];
@@ -12241,7 +12244,7 @@ export type Account_UserFragment = { __typename?: "User" } & Pick<
   | "role"
   | "avatarUrl"
   | "initials"
-> & { hasApiTokens: User["hasFeatureFlag"] } & {
+> & { hasDeveloperAccess: User["hasFeatureFlag"] } & {
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
           petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -12284,7 +12287,7 @@ export type Account_setUserPreferredLocaleMutation = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+  > & { hasDeveloperAccess: User["hasFeatureFlag"] } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -12314,7 +12317,7 @@ export type AccountQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+  > & { hasDeveloperAccess: User["hasFeatureFlag"] } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -12380,7 +12383,7 @@ export type DevelopersQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+  > & { hasDeveloperAccess: User["hasFeatureFlag"] } & {
       authenticationTokens: { __typename?: "UserAuthenticationTokenPagination" } & Pick<
         UserAuthenticationTokenPagination,
         "totalCount"
@@ -12422,7 +12425,7 @@ export type Settings_UserFragment = { __typename?: "User" } & Pick<
   | "role"
   | "avatarUrl"
   | "initials"
-> & { hasApiTokens: User["hasFeatureFlag"] } & {
+> & { hasDeveloperAccess: User["hasFeatureFlag"] } & {
     organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
         usageLimits: { __typename?: "OrganizationUsageLimit" } & {
           petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -12449,7 +12452,7 @@ export type SettingsQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+  > & { hasDeveloperAccess: User["hasFeatureFlag"] } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -12485,7 +12488,7 @@ export type SecurityQuery = {
     | "role"
     | "avatarUrl"
     | "initials"
-  > & { hasApiTokens: User["hasFeatureFlag"] } & {
+  > & { hasDeveloperAccess: User["hasFeatureFlag"] } & {
       organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
           usageLimits: { __typename?: "OrganizationUsageLimit" } & {
             petitions: { __typename?: "OrganizationUsagePetitionLimit" } & Pick<
@@ -13599,7 +13602,7 @@ export type PetitionComposeSearchContactsQuery = {
 };
 
 export type useSettingsSections_UserFragment = { __typename?: "User" } & {
-  hasApiTokens: User["hasFeatureFlag"];
+  hasDeveloperAccess: User["hasFeatureFlag"];
 };
 
 export type validatePetitionFields_PetitionFieldFragment = { __typename?: "PetitionField" } & Pick<
@@ -15583,7 +15586,7 @@ export const TestModeSignatureBadge_UserFragmentDoc = gql`
 `;
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
-    hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+    hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     ...TestModeSignatureBadge_User
@@ -16023,7 +16026,7 @@ export const NewPetition_UserFragmentDoc = gql`
 `;
 export const useSettingsSections_UserFragmentDoc = gql`
   fragment useSettingsSections_User on User {
-    hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+    hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
   }
 `;
 export const Account_UserFragmentDoc = gql`
@@ -19345,7 +19348,7 @@ export const OrganizationIntegrationsDocument = gql`
     me {
       id
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-      hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+      hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
       ...SettingsLayout_User
     }
   }

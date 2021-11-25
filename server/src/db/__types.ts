@@ -8,8 +8,8 @@ type Maybe<T> = T | null;
 type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type FeatureFlagName =
-  | "API_TOKENS"
   | "AUTO_SEND_TEMPLATE"
+  | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"

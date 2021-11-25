@@ -399,4 +399,8 @@ Developers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataCo
   );
 };
 
-export default compose(withDialogs, withFeatureFlag("API_TOKENS"), withApolloData)(Developers);
+export default compose(
+  withDialogs,
+  withFeatureFlag("DEVELOPER_ACCESS"),
+  withApolloData
+)(Developers);

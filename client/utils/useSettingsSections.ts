@@ -23,7 +23,7 @@ export function useSettingsSections(user: useSettingsSections_UserFragment) {
       },
     ];
 
-    if (user.hasApiTokens) {
+    if (user.hasDeveloperAccess) {
       sections.push({
         title: intl.formatMessage({
           id: "settings.developers",
@@ -40,7 +40,7 @@ export function useSettingsSections(user: useSettingsSections_UserFragment) {
 useSettingsSections.fragments = {
   User: gql`
     fragment useSettingsSections_User on User {
-      hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+      hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
     }
   `,
 };

@@ -21,10 +21,10 @@ describe("GraphQL/UserAuthenticationToken", () => {
     await deleteAllData(knex);
 
     [organization] = await mocks.createRandomOrganizations(1);
-    await mocks.createFeatureFlags([{ name: "API_TOKENS", default_value: false }]);
+    await mocks.createFeatureFlags([{ name: "DEVELOPER_ACCESS", default_value: false }]);
     await knex.from<FeatureFlagOverride>("feature_flag_override").insert({
       org_id: organization.id,
-      feature_flag_name: "API_TOKENS",
+      feature_flag_name: "DEVELOPER_ACCESS",
       value: true,
     });
 

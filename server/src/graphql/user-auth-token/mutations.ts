@@ -17,7 +17,7 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
       },
     })
   ),
-  authorize: authenticateAnd(userHasFeatureFlag("API_TOKENS")),
+  authorize: authenticateAnd(userHasFeatureFlag("DEVELOPER_ACCESS")),
   args: {
     tokenName: nonNull(stringArg()),
   },
@@ -38,7 +38,7 @@ export const revokeUserAuthToken = mutationField("revokeUserAuthToken", {
   description: "Soft-deletes a given auth token, making it permanently unusable.",
   type: "Result",
   authorize: authenticateAnd(
-    userHasFeatureFlag("API_TOKENS"),
+    userHasFeatureFlag("DEVELOPER_ACCESS"),
     userHasAccessToAuthTokens("authTokenIds")
   ),
   args: {

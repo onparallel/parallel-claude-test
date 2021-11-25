@@ -166,8 +166,8 @@ export type EffectivePetitionUserPermission = {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
-  | "API_TOKENS"
   | "AUTO_SEND_TEMPLATE"
+  | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
@@ -248,7 +248,7 @@ export type LandingTemplate = {
   organizationName: Scalars["String"];
   ownerAvatarUrl: Maybe<Scalars["String"]>;
   ownerFullName: Scalars["String"];
-  publicLink: Maybe<PublicPetitionLink>;
+  publicLinkUrl: Maybe<Scalars["String"]>;
   shortDescription: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];
@@ -1533,6 +1533,8 @@ export type PetitionBase = {
   owner: User;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  /** The reminders configuration for the petition. */
+  remindersConfig: Maybe<RemindersConfig>;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -1963,7 +1965,7 @@ export type PetitionTemplate = PetitionBase & {
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
   publicLink: Maybe<PublicPetitionLink>;
-  /** The reminders configuration for the template. */
+  /** The reminders configuration for the petition. */
   remindersConfig: Maybe<RemindersConfig>;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;

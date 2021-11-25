@@ -27,7 +27,7 @@ export type PetitionComposeFieldSettingsProps = {
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
   isReadOnly?: boolean;
-  hasApiTokens?: boolean;
+  hasDeveloperAccess?: boolean;
 };
 
 export function PetitionComposeFieldSettings({
@@ -37,7 +37,7 @@ export function PetitionComposeFieldSettings({
   onFieldTypeChange,
   onClose,
   isReadOnly,
-  hasApiTokens,
+  hasDeveloperAccess,
 }: PetitionComposeFieldSettingsProps) {
   const [alias, setAlias] = useState(field.alias ?? "");
   const [aliasIsInvalid, setAliasIsInvalid] = useState(false);
@@ -175,7 +175,7 @@ export function PetitionComposeFieldSettings({
           <CheckboxSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : null}
       </Stack>
-      {hasApiTokens && field.type !== "HEADING" ? (
+      {hasDeveloperAccess && field.type !== "HEADING" ? (
         <Stack padding={4} paddingTop={2} spacing={3}>
           <Heading flex="1" as="h4" size="sm" overflowWrap="anywhere">
             <FormattedMessage id="petition.developers" defaultMessage="Developers" />
