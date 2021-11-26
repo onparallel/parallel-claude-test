@@ -16,8 +16,6 @@ import { useScheduleMessageDialog } from "@parallel/components/petition-compose/
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
   AddPetitionAccessDialog_contactsByEmailDocument,
-  AddPetitionAccessDialog_contactsByEmailQuery,
-  AddPetitionAccessDialog_contactsByEmailQueryVariables,
   AddPetitionAccessDialog_PetitionFragment,
   RemindersConfig,
   UpdatePetitionInput,

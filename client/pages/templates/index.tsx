@@ -8,8 +8,7 @@ import { PublicTemplateCategoryPreview } from "@parallel/components/public/templ
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
 import { PublicTemplatesHero } from "@parallel/components/public/templates/PublicTemplatesHero";
 import {
-  LandingTemplates_landingTemplatesSamplesQuery,
-  LandingTemplates_landingTemplatesSamplesQueryVariables,
+  LandingTemplates_categorySamplesDocument,
   PetitionLocale,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
@@ -85,41 +84,35 @@ function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSide
   );
 }
 
-export async function getServerSideProps({ locale, req }: GetServerSidePropsContext) {
-  const client = createApolloClient({}, { req });
-
-  const { data } = await client.query<
-    LandingTemplates_landingTemplatesSamplesQuery,
-    LandingTemplates_landingTemplatesSamplesQueryVariables
-  >({
-    query: gql`
-      query LandingTemplates_landingTemplatesSamples(
-        $offset: Int!
-        $limit: Int!
-        $locale: PetitionLocale!
-      ) {
-        landingTemplatesSamples {
-          category
-          templates(offset: $offset, limit: $limit, locale: $locale) {
-            items {
-              ...PublicTemplateCard_LandingTemplate
-            }
-            totalCount
+Templates.queries = [
+  gql`
+    query LandingTemplates_categorySamples($offset: Int!, $limit: Int!, $locale: PetitionLocale!) {
+      landingTemplateCategorySamples {
+        category
+        templates(offset: $offset, limit: $limit, locale: $locale) {
+          items {
+            ...PublicTemplateCard_LandingTemplate
           }
+          totalCount
         }
       }
-      ${PublicTemplateCard.fragments.LandingTemplate}
-    `,
-    variables: {
-      offset: 0,
-      limit: 3,
-      locale: locale! as PetitionLocale,
-    },
+    }
+    ${PublicTemplateCard.fragments.LandingTemplate}
+  `,
+];
+
+export async function getServerSideProps({ req, ...ctx }: GetServerSidePropsContext) {
+  const client = createApolloClient({}, { req });
+  const locale = ctx.locale as PetitionLocale;
+
+  const {
+    data: { landingTemplateCategorySamples: samples },
+  } = await client.query({
+    query: LandingTemplates_categorySamplesDocument,
+    variables: { offset: 0, limit: 3, locale },
   });
   return {
-    props: {
-      samples: data.landingTemplatesSamples,
-    },
+    props: { samples },
   };
 }
 

@@ -15,8 +15,7 @@ import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
-  CreateUserDialog_emailIsAvailableQuery,
-  CreateUserDialog_emailIsAvailableQueryVariables,
+  CreateUserDialog_emailIsAvailableDocument,
   OrganizationRole,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -56,15 +55,8 @@ function CreateOrUpdateUserDialog({
   const apollo = useApolloClient();
   const debouncedEmailIsAvailable = useDebouncedAsync(
     async (email: string) => {
-      const { data } = await apollo.query<
-        CreateUserDialog_emailIsAvailableQuery,
-        CreateUserDialog_emailIsAvailableQueryVariables
-      >({
-        query: gql`
-          query CreateUserDialog_emailIsAvailable($email: String!) {
-            emailIsAvailable(email: $email)
-          }
-        `,
+      const { data } = await apollo.query({
+        query: CreateUserDialog_emailIsAvailableDocument,
         variables: { email },
         fetchPolicy: "no-cache",
       });
@@ -227,6 +219,14 @@ function CreateOrUpdateUserDialog({
     />
   );
 }
+
+CreateOrUpdateUserDialog.queries = [
+  gql`
+    query CreateUserDialog_emailIsAvailable($email: String!) {
+      emailIsAvailable(email: $email)
+    }
+  `,
+];
 
 export function useCreateOrUpdateUserDialog() {
   return useDialog(CreateOrUpdateUserDialog);

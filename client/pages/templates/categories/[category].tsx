@@ -7,11 +7,11 @@ import { PublicTemplateCard } from "@parallel/components/public/templates/Public
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
 import { PublicTemplatesHero } from "@parallel/components/public/templates/PublicTemplatesHero";
 import {
-  LandingTemplatesCategory_landingTemplatesQuery,
-  LandingTemplatesCategory_landingTemplatesQueryVariables,
-  LandingTemplatesCategory_landingTemplatesSamplesQuery,
-  LandingTemplatesCategory_landingTemplatesSamplesQueryVariables,
+  LandingTemplatesCategory_categorySamplesDocument,
+  LandingTemplatesCategory_landingTemplatesDocument,
+  LandintTemplatesCategory_LandingTemplateCategorySampleFragment,
   PetitionLocale,
+  PublicTemplateCard_LandingTemplateFragment,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
@@ -60,7 +60,7 @@ function LandingTemplatesCategory({
             </Heading>
           </Flex>
 
-          {templates.items.length === 0 ? (
+          {templates.length === 0 ? (
             <FormattedMessage
               id="public.template-category-empty.coming-soon"
               defaultMessage="More templates coming soon"
@@ -73,7 +73,7 @@ function LandingTemplatesCategory({
             }}
             gap={6}
           >
-            {templates.items.map((t) => (
+            {templates.map((t) => (
               <PublicTemplateCard key={t.id} template={t} />
             ))}
           </Grid>
@@ -114,76 +114,72 @@ function LandingTemplatesCategory({
   );
 }
 
+LandingTemplatesCategory.fragments = {
+  LandingTemplateCategorySample: gql`
+    fragment LandintTemplatesCategory_LandingTemplateCategorySample on LandingTemplateCategorySample {
+      category
+      templates(locale: $locale) {
+        totalCount
+      }
+    }
+  `,
+};
+
+LandingTemplatesCategory.queries = [
+  gql`
+    query LandingTemplatesCategory_landingTemplates(
+      $offset: Int!
+      $limit: Int!
+      $category: String!
+      $locale: PetitionLocale!
+    ) {
+      landingTemplates(offset: $offset, limit: $limit, categories: [$category], locale: $locale) {
+        totalCount
+        items {
+          ...PublicTemplateCard_LandingTemplate
+        }
+      }
+    }
+    ${PublicTemplateCard.fragments.LandingTemplate}
+  `,
+  gql`
+    query LandingTemplatesCategory_categorySamples($locale: PetitionLocale!) {
+      landingTemplateCategorySamples {
+        ...LandintTemplatesCategory_LandingTemplateCategorySample
+      }
+    }
+    ${LandingTemplatesCategory.fragments.LandingTemplateCategorySample}
+  `,
+];
+
 export const getServerSideProps: GetServerSideProps<{
   category: string;
-  samples: LandingTemplatesCategory_landingTemplatesSamplesQuery["landingTemplatesSamples"];
-  templates: LandingTemplatesCategory_landingTemplatesQuery["landingTemplates"];
-}> = async function getServerSideProps({ query: { category }, locale, req }) {
+  samples: LandintTemplatesCategory_LandingTemplateCategorySampleFragment[];
+  templates: PublicTemplateCard_LandingTemplateFragment[];
+}> = async function getServerSideProps({ req, ...ctx }) {
   const client = createApolloClient({}, { req });
+  const category = ctx.query.category as string;
+  const locale = ctx.locale as PetitionLocale;
 
   try {
     const {
-      data: { landingTemplatesSamples },
-    } = await client.query<
-      LandingTemplatesCategory_landingTemplatesSamplesQuery,
-      LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
-    >({
-      query: gql`
-        query LandingTemplatesCategory_landingTemplatesSamples($locale: PetitionLocale!) {
-          landingTemplatesSamples {
-            category
-            templates(locale: $locale) {
-              totalCount
-            }
-          }
-        }
-      `,
-      variables: {
-        locale: locale! as PetitionLocale,
-      },
+      data: { landingTemplateCategorySamples: samples },
+    } = await client.query({
+      query: LandingTemplatesCategory_categorySamplesDocument,
+      variables: { locale },
     });
 
     const {
-      data: { landingTemplates },
-    } = await client.query<
-      LandingTemplatesCategory_landingTemplatesQuery,
-      LandingTemplatesCategory_landingTemplatesQueryVariables
-    >({
-      query: gql`
-        query LandingTemplatesCategory_landingTemplates(
-          $offset: Int!
-          $limit: Int!
-          $category: String!
-          $locale: PetitionLocale!
-        ) {
-          landingTemplates(
-            offset: $offset
-            limit: $limit
-            categories: [$category]
-            locale: $locale
-          ) {
-            totalCount
-            items {
-              ...PublicTemplateCard_LandingTemplate
-            }
-          }
-        }
-        ${PublicTemplateCard.fragments.LandingTemplate}
-      `,
-      variables: {
-        offset: 0,
-        limit: 50,
-        category: category as string,
-        locale: locale as PetitionLocale,
+      data: {
+        landingTemplates: { items: templates },
       },
+    } = await client.query({
+      query: LandingTemplatesCategory_landingTemplatesDocument,
+      variables: { offset: 0, limit: 50, category, locale },
     });
 
     return {
-      props: {
-        samples: landingTemplatesSamples,
-        templates: landingTemplates,
-        category: category as string,
-      },
+      props: { samples, templates, category },
     };
   } catch {
     return {

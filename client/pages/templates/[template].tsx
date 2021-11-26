@@ -21,17 +21,16 @@ import { PublicContainer } from "@parallel/components/public/layout/PublicContai
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
 import {
-  LandingTemplateDetails_landingTemplateBySlugQuery,
-  LandingTemplateDetails_landingTemplateBySlugQueryVariables,
-  LandingTemplateDetails_landingTemplatesQuery,
-  LandingTemplateDetails_landingTemplatesQueryVariables,
+  LandingTemplateDetails_landingTemplateBySlugDocument,
+  LandingTemplateDetails_LandingTemplateFragment,
+  LandingTemplateDetails_landingTemplatesDocument,
   PetitionLocale,
+  PublicTemplateCard_LandingTemplateFragment,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
-import { Assert } from "@parallel/utils/types";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useEffect, useState } from "react";
@@ -326,7 +325,7 @@ function LandingTemplateDetails({
               }}
               gap={6}
             >
-              {relatedTemplates.items
+              {relatedTemplates
                 .filter((t) => t.slug !== slug)
                 .slice(0, 3)
                 .map((t) => (
@@ -368,11 +367,39 @@ LandingTemplateDetails.fragments = {
   `,
 };
 
+LandingTemplateDetails.queries = [
+  gql`
+    query LandingTemplateDetails_landingTemplateBySlug($slug: String!) {
+      landingTemplateBySlug(slug: $slug) {
+        ...LandingTemplateDetails_LandingTemplate
+      }
+    }
+    ${LandingTemplateDetails.fragments.LandingTemplate}
+  `,
+  gql`
+    query LandingTemplateDetails_landingTemplates(
+      $offset: Int!
+      $limit: Int!
+      $locale: PetitionLocale!
+      $categories: [String!]
+    ) {
+      landingTemplates(offset: $offset, limit: $limit, locale: $locale, categories: $categories) {
+        items {
+          ...PublicTemplateCard_LandingTemplate
+        }
+        totalCount
+      }
+    }
+    ${PublicTemplateCard.fragments.LandingTemplate}
+  `,
+];
+
 export const getServerSideProps: GetServerSideProps<{
-  template: Assert<LandingTemplateDetails_landingTemplateBySlugQuery["landingTemplateBySlug"]>;
-  relatedTemplates: LandingTemplateDetails_landingTemplatesQuery["landingTemplates"];
-}> = async function getServerSideProps({ query, req, locale }) {
-  const slug = query.template as string;
+  template: LandingTemplateDetails_LandingTemplateFragment;
+  relatedTemplates: PublicTemplateCard_LandingTemplateFragment[];
+}> = async function getServerSideProps({ req, ...ctx }) {
+  const slug = ctx.query.template as string;
+  const locale = ctx.locale as PetitionLocale;
   if (slug.includes("_")) {
     return {
       redirect: {
@@ -386,21 +413,9 @@ export const getServerSideProps: GetServerSideProps<{
 
     const {
       data: { landingTemplateBySlug: template },
-    } = await client.query<
-      LandingTemplateDetails_landingTemplateBySlugQuery,
-      LandingTemplateDetails_landingTemplateBySlugQueryVariables
-    >({
-      query: gql`
-        query LandingTemplateDetails_landingTemplateBySlug($slug: String!) {
-          landingTemplateBySlug(slug: $slug) {
-            ...LandingTemplateDetails_LandingTemplate
-          }
-        }
-        ${LandingTemplateDetails.fragments.LandingTemplate}
-      `,
-      variables: {
-        slug: slug as string,
-      },
+    } = await client.query({
+      query: LandingTemplateDetails_landingTemplateBySlugDocument,
+      variables: { slug },
     });
     if (!template) {
       throw new Error();
@@ -409,45 +424,17 @@ export const getServerSideProps: GetServerSideProps<{
     const categories = template.categories ?? [];
 
     const {
-      data: { landingTemplates: relatedTemplates },
-    } = await client.query<
-      LandingTemplateDetails_landingTemplatesQuery,
-      LandingTemplateDetails_landingTemplatesQueryVariables
-    >({
-      query: gql`
-        query LandingTemplateDetails_landingTemplates(
-          $offset: Int!
-          $limit: Int!
-          $locale: PetitionLocale!
-          $categories: [String!]
-        ) {
-          landingTemplates(
-            offset: $offset
-            limit: $limit
-            locale: $locale
-            categories: $categories
-          ) {
-            items {
-              ...PublicTemplateCard_LandingTemplate
-            }
-            totalCount
-          }
-        }
-        ${PublicTemplateCard.fragments.LandingTemplate}
-      `,
-      variables: {
-        offset: 0,
-        limit: 4,
-        locale: locale! as PetitionLocale,
-        categories,
+      data: {
+        landingTemplates: { items: relatedTemplates },
       },
+    } = await client.query({
+      query: LandingTemplateDetails_landingTemplatesDocument,
+      variables: { offset: 0, limit: 4, locale, categories },
     });
 
     return { props: { template, relatedTemplates } };
   } catch (err) {
-    return {
-      notFound: true,
-    };
+    return { notFound: true };
   }
 };
 

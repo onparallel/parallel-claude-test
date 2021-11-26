@@ -346,13 +346,13 @@ export interface NexusGenObjects {
   GroupPermissionEditedEvent: events.GroupPermissionEditedEvent;
   GroupPermissionRemovedEvent: events.GroupPermissionRemovedEvent;
   LandingTemplate: db.Petition;
+  LandingTemplateCategorySample: string;
   LandingTemplateField: db.PetitionField;
   LandingTemplatePagination: {
     // root type
     items: NexusGenRootTypes["LandingTemplate"][]; // [LandingTemplate!]!
     totalCount: number; // Int!
   };
-  LandingTemplateSample: string;
   MessageCancelledEvent: events.MessageCancelledEvent;
   MessageEmailBouncedUserNotification: notifications.MessageEmailBouncedUserNotification;
   MessageScheduledEvent: events.MessageScheduledEvent;
@@ -797,6 +797,11 @@ export interface NexusGenFieldTypes {
     slug: string; // String!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
+  LandingTemplateCategorySample: {
+    // field return type
+    category: string; // String!
+    templates: NexusGenRootTypes["LandingTemplatePagination"]; // LandingTemplatePagination!
+  };
   LandingTemplateField: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
@@ -807,11 +812,6 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["LandingTemplate"][]; // [LandingTemplate!]!
     totalCount: number; // Int!
-  };
-  LandingTemplateSample: {
-    // field return type
-    category: string; // String!
-    templates: NexusGenRootTypes["LandingTemplatePagination"]; // LandingTemplatePagination!
   };
   MessageCancelledEvent: {
     // field return type
@@ -1464,8 +1464,8 @@ export interface NexusGenFieldTypes {
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     isValidPublicPetitionLinkSlug: boolean; // Boolean!
     landingTemplateBySlug: NexusGenRootTypes["LandingTemplate"] | null; // LandingTemplate
+    landingTemplateCategorySamples: NexusGenRootTypes["LandingTemplateCategorySample"][]; // [LandingTemplateCategorySample!]!
     landingTemplates: NexusGenRootTypes["LandingTemplatePagination"]; // LandingTemplatePagination!
-    landingTemplatesSamples: NexusGenRootTypes["LandingTemplateSample"][]; // [LandingTemplateSample!]!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
@@ -2005,6 +2005,11 @@ export interface NexusGenFieldTypeNames {
     slug: "String";
     updatedAt: "DateTime";
   };
+  LandingTemplateCategorySample: {
+    // field return type name
+    category: "String";
+    templates: "LandingTemplatePagination";
+  };
   LandingTemplateField: {
     // field return type name
     id: "GID";
@@ -2015,11 +2020,6 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "LandingTemplate";
     totalCount: "Int";
-  };
-  LandingTemplateSample: {
-    // field return type name
-    category: "String";
-    templates: "LandingTemplatePagination";
   };
   MessageCancelledEvent: {
     // field return type name
@@ -2672,8 +2672,8 @@ export interface NexusGenFieldTypeNames {
     globalIdEncode: "SupportMethodResponse";
     isValidPublicPetitionLinkSlug: "Boolean";
     landingTemplateBySlug: "LandingTemplate";
+    landingTemplateCategorySamples: "LandingTemplateCategorySample";
     landingTemplates: "LandingTemplatePagination";
-    landingTemplatesSamples: "LandingTemplateSample";
     me: "User";
     organization: "Organization";
     organizations: "OrganizationPagination";
@@ -3058,7 +3058,7 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
     };
   };
-  LandingTemplateSample: {
+  LandingTemplateCategorySample: {
     templates: {
       // args
       limit?: number | null; // Int

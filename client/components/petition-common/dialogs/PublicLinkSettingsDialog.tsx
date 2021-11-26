@@ -21,10 +21,8 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { UserSelect, useSearchUsers } from "@parallel/components/common/UserSelect";
 import {
-  PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
-  PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables,
-  PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
-  PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables,
+  PublicLinkSettingsDialog_getSlugDocument,
+  PublicLinkSettingsDialog_isValidSlugDocument,
   PublicLinkSettingsDialog_PetitionTemplateFragment,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
 } from "@parallel/graphql/__types";
@@ -73,11 +71,8 @@ export function PublicLinkSettingsDialog({
     if (!publicLink) {
       const {
         data: { getSlugForPublicPetitionLink: slug },
-      } = await apollo.query<
-        PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
-        PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables
-      >({
-        query: PublicLinkSettingsDialog.queries.getSlug,
+      } = await apollo.query({
+        query: PublicLinkSettingsDialog_getSlugDocument,
         variables: { petitionName: template.name },
         fetchPolicy: "network-only",
       });
@@ -103,11 +98,8 @@ export function PublicLinkSettingsDialog({
 
   const debouncedIsValidSlug = useDebouncedAsync(
     async (slug: string) => {
-      const { data } = await apollo.query<
-        PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
-        PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
-      >({
-        query: PublicLinkSettingsDialog.queries.slugIsValid,
+      const { data } = await apollo.query({
+        query: PublicLinkSettingsDialog_isValidSlugDocument,
         variables: { slug },
         fetchPolicy: "no-cache",
       });
@@ -364,18 +356,18 @@ export function PublicLinkSettingsDialog({
   );
 }
 
-PublicLinkSettingsDialog.queries = {
-  getSlug: gql`
-    query PublicLinkSettingsDialog_getSlugForPublicPetitionLink($petitionName: String) {
+PublicLinkSettingsDialog.queries = [
+  gql`
+    query PublicLinkSettingsDialog_getSlug($petitionName: String) {
       getSlugForPublicPetitionLink(petitionName: $petitionName)
     }
   `,
-  slugIsValid: gql`
-    query PublicLinkSettingsDialog_isValidPublicPetitionLinkSlug($slug: String!) {
+  gql`
+    query PublicLinkSettingsDialog_isValidSlug($slug: String!) {
       isValidPublicPetitionLinkSlug(slug: $slug)
     }
   `,
-};
+];
 
 PublicLinkSettingsDialog.fragments = {
   PetitionTemplate: gql`

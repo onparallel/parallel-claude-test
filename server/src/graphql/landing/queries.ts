@@ -127,9 +127,9 @@ export const landingQueries = queryField((t) => {
     },
   });
 
-  t.list.field("landingTemplatesSamples", {
+  t.list.field("landingTemplateCategorySamples", {
     type: objectType({
-      name: "LandingTemplateSample",
+      name: "LandingTemplateCategorySample",
       sourceType: "string",
       definition(t) {
         t.nonNull.string("category", {

@@ -330,6 +330,22 @@ type LandingTemplate {
   updatedAt: DateTime!
 }
 
+type LandingTemplateCategorySample {
+  category: String!
+  templates(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    locale: PetitionLocale!
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): LandingTemplatePagination!
+}
+
 """
 A public template field
 """
@@ -349,22 +365,6 @@ type LandingTemplatePagination {
   The total count of items in the list.
   """
   totalCount: Int!
-}
-
-type LandingTemplateSample {
-  category: String!
-  templates(
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-    locale: PetitionLocale!
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-  ): LandingTemplatePagination!
 }
 
 type MessageCancelledEvent implements PetitionEvent {
@@ -3285,6 +3285,7 @@ type Query {
   ): SupportMethodResponse!
   isValidPublicPetitionLinkSlug(slug: String!): Boolean!
   landingTemplateBySlug(slug: String!): LandingTemplate
+  landingTemplateCategorySamples: [LandingTemplateCategorySample!]!
   landingTemplates(
     categories: [String!]
 
@@ -3299,7 +3300,6 @@ type Query {
     """
     offset: Int
   ): LandingTemplatePagination!
-  landingTemplatesSamples: [LandingTemplateSample!]!
   me: User!
   organization(id: GID!): Organization
 

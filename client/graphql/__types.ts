@@ -280,6 +280,18 @@ export interface LandingTemplate {
   updatedAt: Scalars["DateTime"];
 }
 
+export interface LandingTemplateCategorySample {
+  __typename?: "LandingTemplateCategorySample";
+  category: Scalars["String"];
+  templates: LandingTemplatePagination;
+}
+
+export interface LandingTemplateCategorySampletemplatesArgs {
+  limit?: InputMaybe<Scalars["Int"]>;
+  locale: PetitionLocale;
+  offset?: InputMaybe<Scalars["Int"]>;
+}
+
 /** A public template field */
 export interface LandingTemplateField {
   __typename?: "LandingTemplateField";
@@ -294,18 +306,6 @@ export interface LandingTemplatePagination {
   items: Array<LandingTemplate>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-}
-
-export interface LandingTemplateSample {
-  __typename?: "LandingTemplateSample";
-  category: Scalars["String"];
-  templates: LandingTemplatePagination;
-}
-
-export interface LandingTemplateSampletemplatesArgs {
-  limit?: InputMaybe<Scalars["Int"]>;
-  locale: PetitionLocale;
-  offset?: InputMaybe<Scalars["Int"]>;
 }
 
 export interface MessageCancelledEvent extends PetitionEvent {
@@ -2350,8 +2350,8 @@ export interface Query {
   globalIdEncode: SupportMethodResponse;
   isValidPublicPetitionLinkSlug: Scalars["Boolean"];
   landingTemplateBySlug?: Maybe<LandingTemplate>;
+  landingTemplateCategorySamples: Array<LandingTemplateCategorySample>;
   landingTemplates: LandingTemplatePagination;
-  landingTemplatesSamples: Array<LandingTemplateSample>;
   me: User;
   organization?: Maybe<Organization>;
   /** The organizations registered in Parallel. */
@@ -3368,16 +3368,12 @@ export type UserSelect_canCreateUsersQuery = {
   me: { __typename?: "User"; canCreateUsers: boolean };
 };
 
-export type useSearchUsers_searchUsersQueryVariables = Exact<{
-  search: Scalars["String"];
-  excludeUsers?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  includeGroups?: InputMaybe<Scalars["Boolean"]>;
-  includeInactive?: InputMaybe<Scalars["Boolean"]>;
+export type UserSelect_useGetUsersOrGroupsQueryVariables = Exact<{
+  ids: Array<Scalars["ID"]> | Scalars["ID"];
 }>;
 
-export type useSearchUsers_searchUsersQuery = {
-  searchUsers: Array<
+export type UserSelect_useGetUsersOrGroupsQuery = {
+  getUsersOrGroups: Array<
     | { __typename?: "User"; id: string; fullName?: string | null; email: string }
     | {
         __typename?: "UserGroup";
@@ -3391,12 +3387,16 @@ export type useSearchUsers_searchUsersQuery = {
   >;
 };
 
-export type useGetUsersOrGroupsQueryVariables = Exact<{
-  ids: Array<Scalars["ID"]> | Scalars["ID"];
+export type useSearchUsers_searchUsersQueryVariables = Exact<{
+  search: Scalars["String"];
+  excludeUsers?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  includeGroups?: InputMaybe<Scalars["Boolean"]>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
-export type useGetUsersOrGroupsQuery = {
-  getUsersOrGroups: Array<
+export type useSearchUsers_searchUsersQuery = {
+  searchUsers: Array<
     | { __typename?: "User"; id: string; fullName?: string | null; email: string }
     | {
         __typename?: "UserGroup";
@@ -7058,21 +7058,17 @@ export type PetitionSharingModal_petitionsQuery = {
   >;
 };
 
-export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables = Exact<{
+export type PublicLinkSettingsDialog_getSlugQueryVariables = Exact<{
   petitionName?: InputMaybe<Scalars["String"]>;
 }>;
 
-export type PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery = {
-  getSlugForPublicPetitionLink: string;
-};
+export type PublicLinkSettingsDialog_getSlugQuery = { getSlugForPublicPetitionLink: string };
 
-export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables = Exact<{
+export type PublicLinkSettingsDialog_isValidSlugQueryVariables = Exact<{
   slug: Scalars["String"];
 }>;
 
-export type PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery = {
-  isValidPublicPetitionLinkSlug: boolean;
-};
+export type PublicLinkSettingsDialog_isValidSlugQuery = { isValidPublicPetitionLinkSlug: boolean };
 
 export type PublicLinkSettingsDialog_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
@@ -15234,16 +15230,10 @@ export type LandingTemplateDetails_landingTemplatesQuery = {
   };
 };
 
-export type LandingTemplatesCategory_landingTemplatesSamplesQueryVariables = Exact<{
-  locale: PetitionLocale;
-}>;
-
-export type LandingTemplatesCategory_landingTemplatesSamplesQuery = {
-  landingTemplatesSamples: Array<{
-    __typename?: "LandingTemplateSample";
-    category: string;
-    templates: { __typename?: "LandingTemplatePagination"; totalCount: number };
-  }>;
+export type LandintTemplatesCategory_LandingTemplateCategorySampleFragment = {
+  __typename?: "LandingTemplateCategorySample";
+  category: string;
+  templates: { __typename?: "LandingTemplatePagination"; totalCount: number };
 };
 
 export type LandingTemplatesCategory_landingTemplatesQueryVariables = Exact<{
@@ -15271,15 +15261,27 @@ export type LandingTemplatesCategory_landingTemplatesQuery = {
   };
 };
 
-export type LandingTemplates_landingTemplatesSamplesQueryVariables = Exact<{
+export type LandingTemplatesCategory_categorySamplesQueryVariables = Exact<{
+  locale: PetitionLocale;
+}>;
+
+export type LandingTemplatesCategory_categorySamplesQuery = {
+  landingTemplateCategorySamples: Array<{
+    __typename?: "LandingTemplateCategorySample";
+    category: string;
+    templates: { __typename?: "LandingTemplatePagination"; totalCount: number };
+  }>;
+};
+
+export type LandingTemplates_categorySamplesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   locale: PetitionLocale;
 }>;
 
-export type LandingTemplates_landingTemplatesSamplesQuery = {
-  landingTemplatesSamples: Array<{
-    __typename?: "LandingTemplateSample";
+export type LandingTemplates_categorySamplesQuery = {
+  landingTemplateCategorySamples: Array<{
+    __typename?: "LandingTemplateCategorySample";
     category: string;
     templates: {
       __typename?: "LandingTemplatePagination";
@@ -15646,12 +15648,12 @@ export type usePrintPdfTask_getTaskResultFileUrlMutation = {
   };
 };
 
-export type PetitionComposeSearchContactsQueryVariables = Exact<{
+export type useSearchContacts_contactsQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]>;
   exclude?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
-export type PetitionComposeSearchContactsQuery = {
+export type useSearchContacts_contactsQuery = {
   contacts: {
     __typename?: "ContactPagination";
     items: Array<{
@@ -18588,6 +18590,17 @@ export const LandingTemplateDetails_LandingTemplateFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<LandingTemplateDetails_LandingTemplateFragment, unknown>;
+export const LandintTemplatesCategory_LandingTemplateCategorySampleFragmentDoc = gql`
+  fragment LandintTemplatesCategory_LandingTemplateCategorySample on LandingTemplateCategorySample {
+    category
+    templates(locale: $locale) {
+      totalCount
+    }
+  }
+` as unknown as DocumentNode<
+  LandintTemplatesCategory_LandingTemplateCategorySampleFragment,
+  unknown
+>;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
     id
@@ -18681,6 +18694,23 @@ export const UserSelect_canCreateUsersDocument = gql`
   UserSelect_canCreateUsersQuery,
   UserSelect_canCreateUsersQueryVariables
 >;
+export const UserSelect_useGetUsersOrGroupsDocument = gql`
+  query UserSelect_useGetUsersOrGroups($ids: [ID!]!) {
+    getUsersOrGroups(ids: $ids) {
+      ... on User {
+        ...UserSelect_User
+      }
+      ... on UserGroup {
+        ...UserSelect_UserGroup
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+  ${UserSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  UserSelect_useGetUsersOrGroupsQuery,
+  UserSelect_useGetUsersOrGroupsQueryVariables
+>;
 export const useSearchUsers_searchUsersDocument = gql`
   query useSearchUsers_searchUsers(
     $search: String!
@@ -18710,20 +18740,6 @@ export const useSearchUsers_searchUsersDocument = gql`
   useSearchUsers_searchUsersQuery,
   useSearchUsers_searchUsersQueryVariables
 >;
-export const useGetUsersOrGroupsDocument = gql`
-  query useGetUsersOrGroups($ids: [ID!]!) {
-    getUsersOrGroups(ids: $ids) {
-      ... on User {
-        ...UserSelect_User
-      }
-      ... on UserGroup {
-        ...UserSelect_UserGroup
-      }
-    }
-  }
-  ${UserSelect_UserFragmentDoc}
-  ${UserSelect_UserGroupFragmentDoc}
-` as unknown as DocumentNode<useGetUsersOrGroupsQuery, useGetUsersOrGroupsQueryVariables>;
 export const TagEditDialog_tagsDocument = gql`
   query TagEditDialog_tags {
     tags {
@@ -19023,21 +19039,21 @@ export const PetitionSharingModal_petitionsDocument = gql`
   PetitionSharingModal_petitionsQuery,
   PetitionSharingModal_petitionsQueryVariables
 >;
-export const PublicLinkSettingsDialog_getSlugForPublicPetitionLinkDocument = gql`
-  query PublicLinkSettingsDialog_getSlugForPublicPetitionLink($petitionName: String) {
+export const PublicLinkSettingsDialog_getSlugDocument = gql`
+  query PublicLinkSettingsDialog_getSlug($petitionName: String) {
     getSlugForPublicPetitionLink(petitionName: $petitionName)
   }
 ` as unknown as DocumentNode<
-  PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQuery,
-  PublicLinkSettingsDialog_getSlugForPublicPetitionLinkQueryVariables
+  PublicLinkSettingsDialog_getSlugQuery,
+  PublicLinkSettingsDialog_getSlugQueryVariables
 >;
-export const PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugDocument = gql`
-  query PublicLinkSettingsDialog_isValidPublicPetitionLinkSlug($slug: String!) {
+export const PublicLinkSettingsDialog_isValidSlugDocument = gql`
+  query PublicLinkSettingsDialog_isValidSlug($slug: String!) {
     isValidPublicPetitionLinkSlug(slug: $slug)
   }
 ` as unknown as DocumentNode<
-  PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQuery,
-  PublicLinkSettingsDialog_isValidPublicPetitionLinkSlugQueryVariables
+  PublicLinkSettingsDialog_isValidSlugQuery,
+  PublicLinkSettingsDialog_isValidSlugQueryVariables
 >;
 export const TemplateDetailsModal_autoSendTemplateDocument = gql`
   mutation TemplateDetailsModal_autoSendTemplate($templateId: GID!, $name: String!) {
@@ -21045,19 +21061,6 @@ export const LandingTemplateDetails_landingTemplatesDocument = gql`
   LandingTemplateDetails_landingTemplatesQuery,
   LandingTemplateDetails_landingTemplatesQueryVariables
 >;
-export const LandingTemplatesCategory_landingTemplatesSamplesDocument = gql`
-  query LandingTemplatesCategory_landingTemplatesSamples($locale: PetitionLocale!) {
-    landingTemplatesSamples {
-      category
-      templates(locale: $locale) {
-        totalCount
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  LandingTemplatesCategory_landingTemplatesSamplesQuery,
-  LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
->;
 export const LandingTemplatesCategory_landingTemplatesDocument = gql`
   query LandingTemplatesCategory_landingTemplates(
     $offset: Int!
@@ -21077,13 +21080,20 @@ export const LandingTemplatesCategory_landingTemplatesDocument = gql`
   LandingTemplatesCategory_landingTemplatesQuery,
   LandingTemplatesCategory_landingTemplatesQueryVariables
 >;
-export const LandingTemplates_landingTemplatesSamplesDocument = gql`
-  query LandingTemplates_landingTemplatesSamples(
-    $offset: Int!
-    $limit: Int!
-    $locale: PetitionLocale!
-  ) {
-    landingTemplatesSamples {
+export const LandingTemplatesCategory_categorySamplesDocument = gql`
+  query LandingTemplatesCategory_categorySamples($locale: PetitionLocale!) {
+    landingTemplateCategorySamples {
+      ...LandintTemplatesCategory_LandingTemplateCategorySample
+    }
+  }
+  ${LandintTemplatesCategory_LandingTemplateCategorySampleFragmentDoc}
+` as unknown as DocumentNode<
+  LandingTemplatesCategory_categorySamplesQuery,
+  LandingTemplatesCategory_categorySamplesQueryVariables
+>;
+export const LandingTemplates_categorySamplesDocument = gql`
+  query LandingTemplates_categorySamples($offset: Int!, $limit: Int!, $locale: PetitionLocale!) {
+    landingTemplateCategorySamples {
       category
       templates(offset: $offset, limit: $limit, locale: $locale) {
         items {
@@ -21095,8 +21105,8 @@ export const LandingTemplates_landingTemplatesSamplesDocument = gql`
   }
   ${PublicTemplateCard_LandingTemplateFragmentDoc}
 ` as unknown as DocumentNode<
-  LandingTemplates_landingTemplatesSamplesQuery,
-  LandingTemplates_landingTemplatesSamplesQueryVariables
+  LandingTemplates_categorySamplesQuery,
+  LandingTemplates_categorySamplesQueryVariables
 >;
 export const Thanks_petitionLogoDocument = gql`
   query Thanks_petitionLogo($id: GID!) {
@@ -21230,8 +21240,8 @@ export const usePrintPdfTask_getTaskResultFileUrlDocument = gql`
   usePrintPdfTask_getTaskResultFileUrlMutation,
   usePrintPdfTask_getTaskResultFileUrlMutationVariables
 >;
-export const PetitionComposeSearchContactsDocument = gql`
-  query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {
+export const useSearchContacts_contactsDocument = gql`
+  query useSearchContacts_contacts($search: String, $exclude: [GID!]) {
     contacts(limit: 10, search: $search, exclude: $exclude) {
       items {
         ...ContactSelect_Contact
@@ -21240,6 +21250,6 @@ export const PetitionComposeSearchContactsDocument = gql`
   }
   ${ContactSelect_ContactFragmentDoc}
 ` as unknown as DocumentNode<
-  PetitionComposeSearchContactsQuery,
-  PetitionComposeSearchContactsQueryVariables
+  useSearchContacts_contactsQuery,
+  useSearchContacts_contactsQueryVariables
 >;

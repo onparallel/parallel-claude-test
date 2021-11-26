@@ -2,15 +2,13 @@ import { gql, useApolloClient } from "@apollo/client";
 import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
-  useGetUsersOrGroupsQuery,
-  useGetUsersOrGroupsQueryVariables,
-  UserSelect_canCreateUsersQuery,
+  UserSelect_canCreateUsersDocument,
+  UserSelect_useGetUsersOrGroupsDocument,
   UserSelect_UserFragment,
   UserSelect_UserFragmentDoc,
   UserSelect_UserGroupFragment,
   UserSelect_UserGroupFragmentDoc,
-  useSearchUsers_searchUsersQuery,
-  useSearchUsers_searchUsersQueryVariables,
+  useSearchUsers_searchUsersDocument,
 } from "@parallel/graphql/__types";
 import {
   ExtendComponentProps,
@@ -63,15 +61,29 @@ const fragments = {
   },
 };
 
-const queries = {
-  canCreateUsers: gql`
+const queries = [
+  gql`
     query UserSelect_canCreateUsers {
       me {
         canCreateUsers
       }
     }
   `,
-};
+  gql`
+    query UserSelect_useGetUsersOrGroups($ids: [ID!]!) {
+      getUsersOrGroups(ids: $ids) {
+        ... on User {
+          ...UserSelect_User
+        }
+        ... on UserGroup {
+          ...UserSelect_UserGroup
+        }
+      }
+    }
+    ${fragments.User}
+    ${fragments.UserGroup}
+  `,
+];
 
 interface UserSelectProps<IsMulti extends boolean = false, IncludeGroups extends boolean = false>
   extends UseReactSelectProps,
@@ -148,9 +160,7 @@ export const UserSelect = Object.assign(
 
     const apollo = useApolloClient();
 
-    const data = apollo.cache.readQuery<UserSelect_canCreateUsersQuery>({
-      query: queries.canCreateUsers,
-    })!;
+    const data = apollo.cache.readQuery({ query: UserSelect_canCreateUsersDocument })!;
 
     const reactSelectProps = useUserSelectReactSelectProps<IsMulti, IncludeGroups>({
       ...props,
@@ -223,36 +233,8 @@ export function useSearchUsers() {
       } = {}
     ): Promise<UserSelectSelection<IncludeGroups>[]> => {
       const { excludeUsers, excludeUserGroups, includeGroups, includeInactive } = options;
-      const { data } = await client.query<
-        useSearchUsers_searchUsersQuery,
-        useSearchUsers_searchUsersQueryVariables
-      >({
-        query: gql`
-          query useSearchUsers_searchUsers(
-            $search: String!
-            $excludeUsers: [GID!]
-            $excludeUserGroups: [GID!]
-            $includeGroups: Boolean
-            $includeInactive: Boolean
-          ) {
-            searchUsers(
-              search: $search
-              excludeUsers: $excludeUsers
-              excludeUserGroups: $excludeUserGroups
-              includeGroups: $includeGroups
-              includeInactive: $includeInactive
-            ) {
-              ... on User {
-                ...UserSelect_User
-              }
-              ... on UserGroup {
-                ...UserSelect_UserGroup
-              }
-            }
-          }
-          ${UserSelect.fragments.User}
-          ${UserSelect.fragments.UserGroup}
-        `,
+      const { data } = await client.query({
+        query: useSearchUsers_searchUsersDocument,
         variables: {
           search,
           excludeUsers,
@@ -267,6 +249,35 @@ export function useSearchUsers() {
     []
   );
 }
+
+useSearchUsers.queries = [
+  gql`
+    query useSearchUsers_searchUsers(
+      $search: String!
+      $excludeUsers: [GID!]
+      $excludeUserGroups: [GID!]
+      $includeGroups: Boolean
+      $includeInactive: Boolean
+    ) {
+      searchUsers(
+        search: $search
+        excludeUsers: $excludeUsers
+        excludeUserGroups: $excludeUserGroups
+        includeGroups: $includeGroups
+        includeInactive: $includeInactive
+      ) {
+        ... on User {
+          ...UserSelect_User
+        }
+        ... on UserGroup {
+          ...UserSelect_UserGroup
+        }
+      }
+    }
+    ${UserSelect.fragments.User}
+    ${UserSelect.fragments.UserGroup}
+  `,
+];
 
 function useGetUsersOrGroups() {
   const client = useApolloClient();
@@ -295,24 +306,8 @@ function useGetUsersOrGroups() {
     );
     const missing = fromCache.filter(([, value]) => value === null).map(([id]) => id);
     if (missing.length) {
-      const fromServer = await client.query<
-        useGetUsersOrGroupsQuery,
-        useGetUsersOrGroupsQueryVariables
-      >({
-        query: gql`
-          query useGetUsersOrGroups($ids: [ID!]!) {
-            getUsersOrGroups(ids: $ids) {
-              ... on User {
-                ...UserSelect_User
-              }
-              ... on UserGroup {
-                ...UserSelect_UserGroup
-              }
-            }
-          }
-          ${fragments.User}
-          ${fragments.UserGroup}
-        `,
+      const fromServer = await client.query({
+        query: UserSelect_useGetUsersOrGroupsDocument,
         variables: {
           ids: missing,
         },

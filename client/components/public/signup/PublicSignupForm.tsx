@@ -13,10 +13,7 @@ import {
 import { NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PasswordStrengthIndicator } from "@parallel/components/common/PasswordStrengthIndicator";
-import {
-  PublicSignupForm_emailIsAvailableQuery,
-  PublicSignupForm_emailIsAvailableQueryVariables,
-} from "@parallel/graphql/__types";
+import { PublicSignupForm_emailIsAvailableDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "@parallel/utils/validation";
@@ -49,15 +46,8 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
   const apollo = useApolloClient();
   const debouncedEmailIsAvailable = useDebouncedAsync(
     async (email: string) => {
-      const { data } = await apollo.query<
-        PublicSignupForm_emailIsAvailableQuery,
-        PublicSignupForm_emailIsAvailableQueryVariables
-      >({
-        query: gql`
-          query PublicSignupForm_emailIsAvailable($email: String!) {
-            emailIsAvailable(email: $email)
-          }
-        `,
+      const { data } = await apollo.query({
+        query: PublicSignupForm_emailIsAvailableDocument,
         variables: { email },
         fetchPolicy: "no-cache",
       });
@@ -213,3 +203,11 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
     </form>
   );
 }
+
+PublicSignupForm.queries = [
+  gql`
+    query PublicSignupForm_emailIsAvailable($email: String!) {
+      emailIsAvailable(email: $email)
+    }
+  `,
+];
