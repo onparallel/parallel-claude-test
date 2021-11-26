@@ -272,7 +272,7 @@ export function PetitionHeader({
           <Box>
             <Menu>
               <Tooltip
-                placement="bottom"
+                placement="bottom-end"
                 label={intl.formatMessage({
                   id: "generic.more-options",
                   defaultMessage: "More options...",

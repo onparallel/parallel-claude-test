@@ -1,4 +1,4 @@
-import { Circle, Flex, Tooltip } from "@chakra-ui/react";
+import { Circle, Flex, Tooltip, PlacementWithLogical } from "@chakra-ui/react";
 import { AlertCircleIcon, SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
 import {
   PetitionSignatureRequestStatus,
@@ -10,10 +10,12 @@ import { useIntl } from "react-intl";
 interface PetitionSignatureStatusIconProps {
   status: PetitionSignatureRequestStatus | "START" | null;
   environment?: SignatureOrgIntegrationEnvironment | null;
+  tooltipPlacement?: PlacementWithLogical;
 }
 export function PetitionSignatureStatusIcon({
   status,
   environment,
+  tooltipPlacement,
 }: PetitionSignatureStatusIconProps) {
   const intl = useIntl();
 
@@ -30,7 +32,7 @@ export function PetitionSignatureStatusIcon({
   const label = status ? labels[status] + envLabel : "";
 
   return (
-    <Tooltip label={label}>
+    <Tooltip label={label} placement={tooltipPlacement}>
       <Flex alignItems="center" gridGap={0} position="relative" paddingX={1}>
         {status === "START" ? (
           <Circle boxSize={2} backgroundColor="purple.500" marginRight="2px" />

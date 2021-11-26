@@ -337,6 +337,7 @@ function FieldComment({
         <Spacer />
         <Menu placement="bottom-end">
           <Tooltip
+            placement="bottom-end"
             label={intl.formatMessage({
               id: "generic.more-options",
               defaultMessage: "More options...",

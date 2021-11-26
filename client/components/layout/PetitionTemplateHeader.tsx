@@ -152,7 +152,7 @@ export function PetitionTemplateHeader({
         </Button>
         <Menu>
           <Tooltip
-            placement="left"
+            placement="bottom-end"
             label={intl.formatMessage({
               id: "generic.more-options",
               defaultMessage: "More options...",

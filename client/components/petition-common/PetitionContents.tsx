@@ -109,7 +109,11 @@ function SignatureStatusInfo({
             defaultMessage="Petition eSignature"
           />
         </Text>
-        <PetitionSignatureStatusIcon status={status} environment={environment} />
+        <PetitionSignatureStatusIcon
+          status={status}
+          environment={environment}
+          tooltipPlacement="bottom-end"
+        />
       </Stack>
     </Box>
   );
