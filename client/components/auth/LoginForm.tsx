@@ -167,7 +167,15 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             />
           </Button>
         ) : (
-          <>
+          <Stack spacing={10} textAlign="center">
+            <Text>
+              <Link href="/forgot">
+                <FormattedMessage
+                  id="public.login.forgot-password-link"
+                  defaultMessage="I forgot my password"
+                />
+              </Link>
+            </Text>
             {ssoUrl && forcePassword ? (
               <Button variant="link" onClick={() => setForcePassword(false)}>
                 <FormattedMessage
@@ -176,30 +184,20 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
                 />
               </Button>
             ) : null}
-            <Stack spacing={10} textAlign="center">
-              <Text>
-                <Link href="/forgot">
-                  <FormattedMessage
-                    id="public.login.forgot-password-link"
-                    defaultMessage="I forgot my password"
-                  />
-                </Link>
-              </Text>
-              <Text>
-                <FormattedMessage
-                  id="public.login.register-for-free"
-                  defaultMessage="Don't have an account? <a>Register for free</a>"
-                  values={{
-                    a: (chunks: any) => (
-                      <NormalLink role="a" href="signup">
-                        {chunks}
-                      </NormalLink>
-                    ),
-                  }}
-                />
-              </Text>
-            </Stack>
-          </>
+            <Text>
+              <FormattedMessage
+                id="public.login.register-for-free"
+                defaultMessage="Don't have an account? <a>Register for free</a>"
+                values={{
+                  a: (chunks: any) => (
+                    <NormalLink role="a" href="signup">
+                      {chunks}
+                    </NormalLink>
+                  ),
+                }}
+              />
+            </Text>
+          </Stack>
         )}
       </Flex>
     </>
