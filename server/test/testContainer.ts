@@ -6,6 +6,7 @@ import { EMAILS, IEmailsService } from "../src/services/emails";
 import { FETCH_SERVICE, IFetchService } from "../src/services/fetch";
 import { LOGGER, ILogger } from "../src/services/logger";
 import { IRedis, REDIS } from "../src/services/redis";
+import { ISignatureService, SIGNATURE } from "../src/services/signature";
 import { IStorage, StorageFactory, STORAGE_FACTORY } from "../src/services/storage";
 import {
   MockAnalyticsService,
@@ -14,6 +15,7 @@ import {
   MockEmailsService,
   MockFetchService,
   MockRedis,
+  MockSignatureService,
   MockStorage,
 } from "./mocks";
 
@@ -30,5 +32,6 @@ export function createTestContainer() {
     return (() => new MockStorage()) as StorageFactory;
   });
   container.rebind<IFetchService>(FETCH_SERVICE).to(MockFetchService).inSingletonScope();
+  container.rebind<ISignatureService>(SIGNATURE).to(MockSignatureService).inSingletonScope();
   return container;
 }

@@ -8,6 +8,7 @@ import { IAws } from "../src/services/aws";
 import { IEmailsService } from "../src/services/emails";
 import { IFetchService } from "../src/services/fetch";
 import { IRedis } from "../src/services/redis";
+import { ISignatureService } from "../src/services/signature";
 import { IStorage } from "../src/services/storage";
 
 export const USER_COGNITO_ID = "test-cognito-id";
@@ -117,5 +118,12 @@ export class MockFetchService implements IFetchService {
   }
   async fetchWithTimeout() {
     return new Response("OK", { status: 200 });
+  }
+}
+
+@injectable()
+export class MockSignatureService implements ISignatureService {
+  async checkSignaturitApiKey(): Promise<"sandbox" | "production"> {
+    return "sandbox";
   }
 }

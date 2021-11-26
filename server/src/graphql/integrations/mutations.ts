@@ -1,6 +1,6 @@
 import { arg, booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { ApiContext } from "../../context";
 import { toGlobalId } from "../../util/globalId";
+import { withError } from "../../util/promises/withError";
 import { authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -39,7 +39,14 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
     isDefault: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
-    const environment = await checkSignaturitApiKey(args.apiKey, ctx);
+    const [error, environment] = await withError(ctx.signature.checkSignaturitApiKey(args.apiKey));
+    if (error) {
+      throw new WhitelistedError(
+        `Unable to check Signaturit APIKEY environment`,
+        "INVALID_APIKEY_ERROR"
+      );
+    }
+
     const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE">(
       {
         type: "SIGNATURE",
@@ -165,33 +172,3 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
     return RESULT.FAILURE;
   },
 });
-
-async function checkSignaturitApiKey(apiKey: string, ctx: ApiContext) {
-  try {
-    return await Promise.any(
-      Object.entries({
-        sandbox: "https://api.sandbox.signaturit.com",
-        production: "https://api.signaturit.com",
-      }).map(([environment, url]) =>
-        ctx.fetch
-          .fetchWithTimeout(
-            `${url}/v3/team/users.json`,
-            { headers: { authorization: `Bearer ${apiKey}` } },
-            5000
-          )
-          .then((res) => {
-            if (res.status === 200) {
-              return environment as "sandbox" | "production";
-            } else {
-              throw new Error();
-            }
-          })
-      )
-    );
-  } catch {
-    throw new WhitelistedError(
-      `Unable to check Signaturit APIKEY environment`,
-      "INVALID_APIKEY_ERROR"
-    );
-  }
-}

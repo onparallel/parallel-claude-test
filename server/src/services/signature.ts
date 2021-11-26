@@ -25,6 +25,7 @@ import { removeNotDefined } from "../util/remedaExtensions";
 import { PageSignatureMetadata } from "../workers/helpers/calculateSignatureBoxPositions";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
+import { FetchService, FETCH_SERVICE } from "./fetch";
 
 type SignatureOptions = {
   locale: string;
@@ -74,13 +75,18 @@ export interface ISignatureClient {
   sendPendingSignatureReminder: (signatureId: string) => Promise<SignatureResponse>;
 }
 
+export interface ISignatureService {
+  checkSignaturitApiKey(apiKey: string): Promise<"sandbox" | "production">;
+}
+
 export const SIGNATURE = Symbol.for("SIGNATURE");
 @injectable()
-export class SignatureService {
+export class SignatureService implements ISignatureService {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(IntegrationRepository)
-    private integrationRepository: IntegrationRepository
+    private integrationRepository: IntegrationRepository,
+    @inject(FETCH_SERVICE) private fetch: FetchService
   ) {}
   public getClient(integration: OrgIntegration): ISignatureClient {
     switch (integration.provider.toUpperCase()) {
@@ -111,6 +117,29 @@ export class SignatureService {
       }
     );
     return client;
+  }
+
+  async checkSignaturitApiKey(apiKey: string) {
+    return await Promise.any(
+      Object.entries({
+        sandbox: "https://api.sandbox.signaturit.com",
+        production: "https://api.signaturit.com",
+      }).map(([environment, url]) =>
+        this.fetch
+          .fetchWithTimeout(
+            `${url}/v3/team/users.json`,
+            { headers: { authorization: `Bearer ${apiKey}` } },
+            5000
+          )
+          .then((res) => {
+            if (res.status === 200) {
+              return environment as "sandbox" | "production";
+            } else {
+              throw new Error();
+            }
+          })
+      )
+    );
   }
 }
 
