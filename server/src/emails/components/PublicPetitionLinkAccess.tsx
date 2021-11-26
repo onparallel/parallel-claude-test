@@ -42,7 +42,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
           id: "public-petition-link.text-1",
           defaultMessage: "We send you the requested access to {petitionTitle}.",
         },
-        { petitionTitle }
+        { petitionTitle, tone }
       )}
 
       ${intl.formatMessage(
