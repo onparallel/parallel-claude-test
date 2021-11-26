@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { datatype, internet } from "faker";
-import knex, { Knex } from "knex";
+import { datatype, internet, lorem } from "faker";
+import { Knex } from "knex";
 import { sortBy } from "remeda";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
@@ -29,6 +29,16 @@ function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
     is_template: index > 5,
     status: index > 5 ? null : "DRAFT",
     template_public: index > 7,
+    public_metadata:
+      index > 7
+        ? {
+            slug: lorem.slug(5),
+            categories: ["legal"],
+            description: null,
+            background_color: "#81E6D9",
+            image_public_file_id: null,
+          }
+        : null,
     org_id: orgId,
     created_at: new Date(),
     created_by: "User:1",
@@ -69,7 +79,7 @@ describe("GraphQL/Petitions", () => {
   let tags: Tag[];
   let privateTag: Tag;
 
-  let signatureIntegration: OrgIntegration;
+  let signatureIntegrations: OrgIntegration[];
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -101,19 +111,30 @@ describe("GraphQL/Petitions", () => {
     // user from other organization
     [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
 
-    [signatureIntegration] = await mocks.createOrgIntegration({
-      type: "SIGNATURE",
-      provider: "SIGNATURIT",
-      org_id: organization.id,
-      settings: { API_KEY: "<API_KEY>" },
-      is_enabled: true,
-    });
+    signatureIntegrations = await mocks.createOrgIntegration([
+      {
+        type: "SIGNATURE",
+        provider: "SIGNATURIT",
+        org_id: organization.id,
+        settings: { API_KEY: "<API_KEY>" },
+        is_enabled: true,
+        is_default: true,
+      },
+      {
+        type: "SIGNATURE",
+        provider: "DOCUSIGN",
+        org_id: organization.id,
+        settings: { API_KEY: "<API_KEY>" },
+        is_enabled: true,
+        is_default: false,
+      },
+    ]);
     // logged user petitions
     petitions = await mocks.createRandomPetitions(
       organization.id,
       sessionUser.id,
       10,
-      petitionsBuilder(organization.id, signatureIntegration.id)
+      petitionsBuilder(organization.id, signatureIntegrations[0].id)
     );
 
     tags = await mocks.createRandomTags(organization.id, 11);
@@ -838,65 +859,10 @@ describe("GraphQL/Petitions", () => {
       });
     });
 
-    it("don't copy signature configuration when creating a petition from a public template of another organization", async () => {
-      const [publicTemplateWithSignature] = await mocks.createRandomPetitions(
-        otherOrg.id,
-        otherUser.id,
-        1,
-        () => ({
-          template_public: true,
-          is_template: true,
-          status: null,
-          name: "KYC",
-          signature_config: {
-            title: "aaaa",
-            review: false,
-            orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegration.id),
-            timezone: "Europe/Madrid",
-            signersInfo: [
-              {
-                firstName: "Michael",
-                lastName: "Scott",
-                email: "michael@dundermifflin.com",
-                contactId: 30,
-              },
-            ],
-            letRecipientsChooseSigners: true,
-          },
-        })
-      );
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation (
-            $name: String
-            $locale: PetitionLocale!
-            $petitionId: GID
-            $type: PetitionBaseType
-          ) {
-            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
-              signatureConfig {
-                title
-              }
-            }
-          }
-        `,
-        variables: {
-          name: "Test signature",
-          locale: "es",
-          type: "PETITION",
-          petitionId: toGlobalId("Petition", publicTemplateWithSignature.id),
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.createPetition).toEqual({ signatureConfig: null });
-    });
-
-    it("copy signature configuration when creating a petition from a public template in the same organization", async () => {
+    it("copy signature configuration when creating a petition from a public template of the same organization", async () => {
       const [publicTemplateWithSignature] = await mocks.createRandomPetitions(
         organization.id,
-        sessionUser.id,
+        sameOrgUser.id,
         1,
         () => ({
           template_public: true,
@@ -906,7 +872,7 @@ describe("GraphQL/Petitions", () => {
           signature_config: {
             title: "aaaa",
             review: false,
-            orgIntegrationId: signatureIntegration.id,
+            orgIntegrationId: signatureIntegrations[1].id,
             timezone: "Europe/Madrid",
             signersInfo: [
               {
@@ -931,10 +897,17 @@ describe("GraphQL/Petitions", () => {
           ) {
             createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
               signatureConfig {
-                title
                 integration {
-                  provider
+                  id
                 }
+                signers {
+                  fullName
+                  email
+                }
+                timezone
+                title
+                review
+                letRecipientsChooseSigners
               }
             }
           }
@@ -949,8 +922,130 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.createPetition).toEqual({
-        signatureConfig: { title: "aaaa", integration: { provider: "SIGNATURIT" } },
+        signatureConfig: {
+          integration: { id: toGlobalId("OrgIntegration", signatureIntegrations[1].id) },
+          signers: [{ fullName: "Michael Scott", email: "michael@dundermifflin.com" }],
+          timezone: "Europe/Madrid",
+          title: "aaaa",
+          review: false,
+          letRecipientsChooseSigners: true,
+        },
       });
+    });
+
+    it("copies signature configuration when using a public template of another organization, and changes it to fit the new organization", async () => {
+      const [otherOrgSignatureIntegration] = await mocks.createOrgIntegration([
+        {
+          org_id: otherOrg.id,
+          provider: "DOCUSIGN",
+          type: "SIGNATURE",
+          name: "Docusign Test",
+          is_default: false,
+          is_enabled: true,
+          settings: { environment: "sandbox", API_KEY: "<APIKEY>" },
+        },
+      ]);
+
+      const [publicTemplateWithSignature] = await mocks.createRandomPetitions(
+        otherOrg.id,
+        otherUser.id,
+        1,
+        () => ({
+          template_public: true,
+          is_template: true,
+          status: null,
+          name: "KYC",
+          signature_config: {
+            title: "aaaa",
+            review: false,
+            orgIntegrationId: otherOrgSignatureIntegration.id,
+            timezone: "Europe/Madrid",
+            signersInfo: [
+              {
+                firstName: "Michael",
+                lastName: "Scott",
+                email: "michael@dundermifflin.com",
+                contactId: 30,
+              },
+            ],
+            letRecipientsChooseSigners: false,
+          },
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $name: String
+            $locale: PetitionLocale!
+            $petitionId: GID
+            $type: PetitionBaseType
+          ) {
+            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
+              signatureConfig {
+                integration {
+                  id
+                }
+                signers {
+                  fullName
+                  email
+                }
+                timezone
+                title
+                review
+                letRecipientsChooseSigners
+              }
+            }
+          }
+        `,
+        variables: {
+          name: "Test signature",
+          locale: "es",
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", publicTemplateWithSignature.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({
+        signatureConfig: {
+          integration: {
+            id: toGlobalId("OrgIntegration", signatureIntegrations.find((i) => i.is_default)!.id),
+          },
+          signers: [],
+          timezone: "Europe/Madrid",
+          title: "aaaa",
+          review: false,
+          letRecipientsChooseSigners: true,
+        },
+      });
+    });
+
+    it("empty public_metadata when creating a petition from a public template", async () => {
+      expect(petitions[8].public_metadata).not.toBeNull();
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID, $locale: PetitionLocale!) {
+            createPetition(petitionId: $petitionId, locale: $locale) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[8].id),
+          locale: "es",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+
+      //check through knex as we dont expose public_metadata on the Petition
+      const [clonedPetition] = await mocks.knex
+        .from("petition")
+        .where("id", fromGlobalId(data?.createPetition.id, "Petition").id)
+        .select("*");
+
+      expect(clonedPetition.public_metadata).toBeNull();
     });
 
     it("don't copy deadline configuration when creating a petition from a template", async () => {
@@ -1490,7 +1585,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         2,
-        petitionsBuilder(organization.id, signatureIntegration.id)
+        petitionsBuilder(organization.id, signatureIntegrations[0].id)
       );
 
       await mocks.sharePetitions([petitionsToDelete[0].id], sameOrgUser.id, "WRITE");
@@ -1559,7 +1654,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sameOrgUser.id,
         1,
-        petitionsBuilder(organization.id, signatureIntegration.id)
+        petitionsBuilder(organization.id, signatureIntegrations[0].id)
       );
 
       //share the petition with the logged user

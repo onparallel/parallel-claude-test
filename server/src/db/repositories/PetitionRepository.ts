@@ -1540,11 +1540,9 @@ export class PetitionRepository extends BaseRepository {
             (data?.is_template === undefined || data?.is_template)
               ? ([] as const)
               : (["template_description"] as const)),
-            // avoid copying signature_config if creating from a public template in another organization
-            ...(sourcePetition?.is_template &&
-            sourcePetition.template_public &&
-            sourcePetition.org_id !== owner.org_id
-              ? (["signature_config"] as const)
+            // avoid copying public_metadata if creating from a public template
+            ...(sourcePetition?.is_template && sourcePetition.template_public
+              ? (["public_metadata"] as const)
               : ([] as const)),
           ]),
           org_id: owner.org_id,
@@ -1552,6 +1550,21 @@ export class PetitionRepository extends BaseRepository {
           created_by: createdBy,
           updated_by: createdBy,
           from_template_id: fromTemplateId,
+          // if source petition is from another organization, update signatureConfig org_integration.id and empty signers array
+          signature_config:
+            sourcePetition?.is_template &&
+            sourcePetition.template_public &&
+            sourcePetition.signature_config &&
+            sourcePetition.org_id !== owner.org_id
+              ? {
+                  ...sourcePetition.signature_config,
+                  signersInfo: [],
+                  letRecipientsChooseSigners: true,
+                  orgIntegrationId: (
+                    await this.fetchDefaultSignatureOrgIntegration(owner.org_id)
+                  ).id,
+                }
+              : sourcePetition?.signature_config,
           ...data,
         },
         t
@@ -1683,6 +1696,20 @@ export class PetitionRepository extends BaseRepository {
 
       return cloned;
     }, t);
+  }
+
+  private async fetchDefaultSignatureOrgIntegration(orgId: number) {
+    const [orgIntegration] = await this.from("org_integration")
+      .where({
+        deleted_at: null,
+        org_id: orgId,
+        is_default: true,
+        is_enabled: true,
+        type: "SIGNATURE",
+      })
+      .select("*");
+
+    return orgIntegration;
   }
 
   readonly loadReminder = this.buildLoadBy("petition_reminder", "id");
