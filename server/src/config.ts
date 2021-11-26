@@ -49,6 +49,9 @@ export function buildConfig() {
     security: Object.freeze({
       jwtSecret: process.env.SECURITY_SERVICE_JWT_SECRET!,
     }),
+    signature: Object.freeze({
+      signaturitSandboxApiKey: process.env.SIGNATURIT_SANDBOX_API_KEY!,
+    }),
     queueWorkers: Object.freeze({
       "email-sender": Object.freeze({
         endpoint: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
