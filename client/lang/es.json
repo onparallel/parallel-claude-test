@@ -1085,6 +1085,21 @@
     "context": "Show"
   },
   {
+    "term": "component.password-restrict-petition.body",
+    "definition": "La edición está protegida. Introduce la contraseña para desbloquear la restricción.",
+    "context": "The edition is protected. Enter the password to unlock the restriction."
+  },
+  {
+    "term": "component.password-restrict-petition.password-error",
+    "definition": "Contraseña incorrecta",
+    "context": "Wrong password"
+  },
+  {
+    "term": "component.password-restrict-petition.title",
+    "definition": "Protección con contraseña",
+    "context": "Password protection"
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -2523,6 +2538,21 @@
     "term": "component.replies-field-comment.mark-as-unread",
     "definition": "Marcar como no leído",
     "context": "Mark as unread"
+  },
+  {
+    "term": "component.restrict-petition.optional-password-label",
+    "definition": "Contraseña (Opcional)",
+    "context": "Password (Optional)"
+  },
+  {
+    "term": "component.restrict-petition.remember-password",
+    "definition": "Recuerda la contraseña, ya que no podrás recuperarla en caso de olvido.",
+    "context": "Caution: If you lose of forget the password, it cannot be recovered."
+  },
+  {
+    "term": "component.restrict-petition.title",
+    "definition": "Restricción de la edición",
+    "context": "Restrict editing"
   },
   {
     "term": "component.rich-text-editor.add-link-header",

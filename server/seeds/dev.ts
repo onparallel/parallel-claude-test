@@ -230,7 +230,6 @@ export async function seed(knex: Knex): Promise<any> {
       signature_config: null,
       hide_recipient_view_contents: false,
       skip_forward_security: false,
-      is_readonly: false,
       public_metadata: `{
         "slug": "first-petition",
         "categories": [

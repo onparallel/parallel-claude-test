@@ -165,7 +165,6 @@ export class Mocks {
           return {
             org_id: orgId,
             is_template: false,
-            is_readonly: false,
             status: randomPetitionStatus(),
             name: faker.random.words(),
             locale: randomSupportedLocale(),

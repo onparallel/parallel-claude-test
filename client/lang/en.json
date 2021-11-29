@@ -1085,6 +1085,21 @@
     "context": "Show"
   },
   {
+    "term": "component.password-restrict-petition.body",
+    "definition": "The edition is protected. Enter the password to unlock the restriction.",
+    "context": "The edition is protected. Enter the password to unlock the restriction."
+  },
+  {
+    "term": "component.password-restrict-petition.password-error",
+    "definition": "Wrong password",
+    "context": "Wrong password"
+  },
+  {
+    "term": "component.password-restrict-petition.title",
+    "definition": "Password protection",
+    "context": "Password protection"
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -2523,6 +2538,21 @@
     "term": "component.replies-field-comment.mark-as-unread",
     "definition": "Mark as unread",
     "context": "Mark as unread"
+  },
+  {
+    "term": "component.restrict-petition.optional-password-label",
+    "definition": "Password (Optional)",
+    "context": "Password (Optional)"
+  },
+  {
+    "term": "component.restrict-petition.remember-password",
+    "definition": "Caution: If you lose of forget the password, it cannot be recovered.",
+    "context": "Caution: If you lose of forget the password, it cannot be recovered."
+  },
+  {
+    "term": "component.restrict-petition.title",
+    "definition": "Restrict editing",
+    "context": "Restrict editing"
   },
   {
     "term": "component.rich-text-editor.add-link-header",

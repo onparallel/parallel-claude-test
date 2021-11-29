@@ -29,7 +29,8 @@ export const HeaderNameEditable = Object.assign(
   ) {
     const intl = useIntl();
     const [name, setName] = useState(petition.name ?? "");
-    const isReadOnly = petition.isReadOnly;
+
+    const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
 
     return (
       <Editable
@@ -51,7 +52,7 @@ export const HeaderNameEditable = Object.assign(
         {({ isEditing }: { isEditing: boolean }) => (
           <>
             <Flex flex="1 1 auto" minWidth={0} padding={1}>
-              {isReadOnly ? (
+              {isPublic ? (
                 <Text color={name ? "default" : "gray.400"} paddingX={2} isTruncated>
                   {name || props.placeholder}
                 </Text>
@@ -154,7 +155,9 @@ export const HeaderNameEditable = Object.assign(
         fragment HeaderNameEditable_PetitionBase on PetitionBase {
           name
           updatedAt
-          isReadOnly
+          ... on PetitionTemplate {
+            isPublic
+          }
         }
       `,
     },

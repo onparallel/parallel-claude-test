@@ -566,6 +566,8 @@ export interface Mutation {
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
   updatePetitionPermissionSubscription: Petition;
+  /** Updates the restriction preferences */
+  updatePetitionRestriction: PetitionBase;
   /**
    * Updates the read status of a user's notification.
    * Must pass ONLY one of:
@@ -1204,6 +1206,12 @@ export interface MutationupdatePetitionPermissionSubscriptionArgs {
   petitionId: Scalars["GID"];
 }
 
+export interface MutationupdatePetitionRestrictionArgs {
+  isRestricted: Scalars["Boolean"];
+  petitionId: Scalars["GID"];
+  restrictedPassword?: InputMaybe<Scalars["String"]>;
+}
+
 export interface MutationupdatePetitionUserNotificationReadStatusArgs {
   filter?: InputMaybe<PetitionUserNotificationFilter>;
   isRead: Scalars["Boolean"];
@@ -1466,12 +1474,13 @@ export interface Petition extends PetitionBase {
   fromTemplateId?: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
-  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"];
+  isRestricted: Scalars["Boolean"];
+  isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
@@ -1590,12 +1599,13 @@ export interface PetitionBase {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
-  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"];
+  isRestricted: Scalars["Boolean"];
+  isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
@@ -2097,12 +2107,13 @@ export interface PetitionTemplate extends PetitionBase {
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
-  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"];
+  isRestricted: Scalars["Boolean"];
+  isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
@@ -2978,7 +2989,6 @@ export interface UpdatePetitionInput {
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;
   emailSubject?: InputMaybe<Scalars["String"]>;
-  isReadOnly?: InputMaybe<Scalars["Boolean"]>;
   isRecipientViewContentsHidden?: InputMaybe<Scalars["Boolean"]>;
   locale?: InputMaybe<PetitionLocale>;
   name?: InputMaybe<Scalars["String"]>;
@@ -3267,14 +3277,14 @@ export type PetitionTagListCellContent_TagFragment = {
 export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  isReadOnly: boolean;
+  isRestricted: boolean;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
 export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  isReadOnly: boolean;
+  isRestricted: boolean;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
@@ -3605,14 +3615,13 @@ export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   name?: string | null;
   updatedAt: string;
-  isReadOnly: boolean;
 };
 
 export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  isPublic: boolean;
   name?: string | null;
   updatedAt: string;
-  isReadOnly: boolean;
 };
 
 export type HeaderNameEditable_PetitionBaseFragment =
@@ -3625,9 +3634,9 @@ export type PetitionHeader_PetitionFragment = {
   locale: PetitionLocale;
   deadline?: string | null;
   status: PetitionStatus;
+  isRestricted: boolean;
   name?: string | null;
   updatedAt: string;
-  isReadOnly: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -3677,8 +3686,8 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   locale: PetitionLocale;
   deadline?: string | null;
   status: PetitionStatus;
+  isRestricted: boolean;
   updatedAt: string;
-  isReadOnly: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -3692,7 +3701,6 @@ export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   locale: PetitionLocale;
   isPublic: boolean;
   updatedAt: string;
-  isReadOnly: boolean;
 };
 
 export type PetitionLayout_PetitionBaseFragment =
@@ -3730,7 +3738,6 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
   isPublic: boolean;
   name?: string | null;
   updatedAt: string;
-  isReadOnly: boolean;
 };
 
 export type PetitionTemplateHeader_UserFragment = {
@@ -6441,7 +6448,8 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
-  isReadOnly: boolean;
+  isRestricted: boolean;
+  isRestrictedWithPassword: boolean;
   name?: string | null;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
@@ -6477,7 +6485,8 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
-  isReadOnly: boolean;
+  isRestricted: boolean;
+  isRestrictedWithPassword: boolean;
   name?: string | null;
   remindersConfig?: {
     __typename?: "RemindersConfig";
@@ -6545,6 +6554,28 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
   | PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionSettings_updatePetitionRestrictionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  isRestricted: Scalars["Boolean"];
+  restrictedPassword?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type PetitionSettings_updatePetitionRestrictionMutation = {
+  updatePetitionRestriction:
+    | {
+        __typename?: "Petition";
+        id: string;
+        isRestricted: boolean;
+        isRestrictedWithPassword: boolean;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        isRestricted: boolean;
+        isRestrictedWithPassword: boolean;
+      };
+};
 
 export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables = Exact<{
   petitionSignatureRequestId: Scalars["GID"];
@@ -7518,7 +7549,7 @@ export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   emailSubject?: string | null;
   emailBody?: any | null;
   description?: any | null;
-  isReadOnly: boolean;
+  isRestricted: boolean;
 };
 
 export type CopySignatureConfigDialog_PetitionSignerFragment = {
@@ -9988,8 +10019,8 @@ export type PetitionActivity_PetitionFragment = {
   emailBody?: any | null;
   locale: PetitionLocale;
   deadline?: string | null;
+  isRestricted: boolean;
   updatedAt: string;
-  isReadOnly: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -10671,8 +10702,8 @@ export type PetitionActivity_updatePetitionMutation = {
         emailBody?: any | null;
         locale: PetitionLocale;
         deadline?: string | null;
+        isRestricted: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -11434,8 +11465,8 @@ export type PetitionActivity_petitionQuery = {
         emailBody?: any | null;
         locale: PetitionLocale;
         deadline?: string | null;
+        isRestricted: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -12146,6 +12177,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   status: PetitionStatus;
   id: string;
   tone: Tone;
+  isRestricted: boolean;
   name?: string | null;
   emailSubject?: string | null;
   emailBody?: any | null;
@@ -12153,7 +12185,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
-  isReadOnly: boolean;
+  isRestrictedWithPassword: boolean;
   updatedAt: string;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -12236,14 +12268,15 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   id: string;
   tone: Tone;
+  isRestricted: boolean;
   name?: string | null;
   emailSubject?: string | null;
   emailBody?: any | null;
   description?: any | null;
-  isReadOnly: boolean;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
+  isRestrictedWithPassword: boolean;
   updatedAt: string;
   fields: Array<{
     __typename?: "PetitionField";
@@ -12438,7 +12471,8 @@ export type PetitionCompose_updatePetitionMutation = {
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
-        isReadOnly: boolean;
+        isRestricted: boolean;
+        isRestrictedWithPassword: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
         updatedAt: string;
@@ -12500,7 +12534,8 @@ export type PetitionCompose_updatePetitionMutation = {
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
-        isReadOnly: boolean;
+        isRestricted: boolean;
+        isRestrictedWithPassword: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
         description?: any | null;
@@ -12588,8 +12623,8 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         locale: PetitionLocale;
         deadline?: string | null;
         status: PetitionStatus;
+        isRestricted: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -12603,7 +12638,6 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         locale: PetitionLocale;
         isPublic: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
       };
 };
@@ -12654,8 +12688,8 @@ export type PetitionCompose_createPetitionFieldMutation = {
           locale: PetitionLocale;
           deadline?: string | null;
           status: PetitionStatus;
+          isRestricted: boolean;
           updatedAt: string;
-          isReadOnly: boolean;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -12701,7 +12735,6 @@ export type PetitionCompose_createPetitionFieldMutation = {
           locale: PetitionLocale;
           isPublic: boolean;
           updatedAt: string;
-          isReadOnly: boolean;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         };
       };
@@ -12752,8 +12785,8 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           locale: PetitionLocale;
           deadline?: string | null;
           status: PetitionStatus;
+          isRestricted: boolean;
           updatedAt: string;
-          isReadOnly: boolean;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -12799,7 +12832,6 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           locale: PetitionLocale;
           isPublic: boolean;
           updatedAt: string;
-          isReadOnly: boolean;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         };
       };
@@ -12820,8 +12852,8 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         locale: PetitionLocale;
         deadline?: string | null;
         status: PetitionStatus;
+        isRestricted: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -12835,7 +12867,6 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         locale: PetitionLocale;
         isPublic: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
       };
 };
@@ -13082,6 +13113,7 @@ export type PetitionCompose_petitionQuery = {
         status: PetitionStatus;
         id: string;
         tone: Tone;
+        isRestricted: boolean;
         name?: string | null;
         emailSubject?: string | null;
         emailBody?: any | null;
@@ -13089,7 +13121,7 @@ export type PetitionCompose_petitionQuery = {
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
-        isReadOnly: boolean;
+        isRestrictedWithPassword: boolean;
         updatedAt: string;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -13175,14 +13207,15 @@ export type PetitionCompose_petitionQuery = {
         isPublic: boolean;
         id: string;
         tone: Tone;
+        isRestricted: boolean;
         name?: string | null;
         emailSubject?: string | null;
         emailBody?: any | null;
         description?: any | null;
-        isReadOnly: boolean;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
+        isRestrictedWithPassword: boolean;
         updatedAt: string;
         fields: Array<{
           __typename?: "PetitionField";
@@ -13301,8 +13334,8 @@ export type PetitionReplies_PetitionFragment = {
   status: PetitionStatus;
   locale: PetitionLocale;
   deadline?: string | null;
+  isRestricted: boolean;
   updatedAt: string;
-  isReadOnly: boolean;
   fields: Array<{
     __typename?: "PetitionField";
     isReadOnly: boolean;
@@ -13527,8 +13560,8 @@ export type PetitionReplies_updatePetitionMutation = {
         locale: PetitionLocale;
         deadline?: string | null;
         status: PetitionStatus;
+        isRestricted: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -13541,7 +13574,6 @@ export type PetitionReplies_updatePetitionMutation = {
         locale: PetitionLocale;
         isPublic: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
       };
 };
 
@@ -13803,8 +13835,8 @@ export type PetitionReplies_petitionQuery = {
         status: PetitionStatus;
         locale: PetitionLocale;
         deadline?: string | null;
+        isRestricted: boolean;
         updatedAt: string;
-        isReadOnly: boolean;
         fields: Array<{
           __typename?: "PetitionField";
           isReadOnly: boolean;
@@ -13933,7 +13965,7 @@ export type Petitions_PetitionBasePaginationFragment = {
         name?: string | null;
         createdAt: string;
         status: PetitionStatus;
-        isReadOnly: boolean;
+        isRestricted: boolean;
         accesses: Array<{
           __typename?: "PetitionAccess";
           status: PetitionAccessStatus;
@@ -13993,7 +14025,7 @@ export type Petitions_PetitionBasePaginationFragment = {
         id: string;
         name?: string | null;
         createdAt: string;
-        isReadOnly: boolean;
+        isRestricted: boolean;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -14024,7 +14056,7 @@ export type Petitions_PetitionBase_Petition_Fragment = {
   name?: string | null;
   createdAt: string;
   status: PetitionStatus;
-  isReadOnly: boolean;
+  isRestricted: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
@@ -14085,7 +14117,7 @@ export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   name?: string | null;
   createdAt: string;
-  isReadOnly: boolean;
+  isRestricted: boolean;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -14158,7 +14190,7 @@ export type Petitions_petitionsQuery = {
           name?: string | null;
           createdAt: string;
           status: PetitionStatus;
-          isReadOnly: boolean;
+          isRestricted: boolean;
           accesses: Array<{
             __typename?: "PetitionAccess";
             status: PetitionAccessStatus;
@@ -14218,7 +14250,7 @@ export type Petitions_petitionsQuery = {
           id: string;
           name?: string | null;
           createdAt: string;
-          isReadOnly: boolean;
+          isRestricted: boolean;
           permissions: Array<
             | {
                 __typename?: "PetitionUserGroupPermission";
@@ -15705,7 +15737,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   name?: string | null;
   createdAt: string;
   status: PetitionStatus;
-  isReadOnly: boolean;
+  isRestricted: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
@@ -15765,7 +15797,7 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   name?: string | null;
   createdAt: string;
-  isReadOnly: boolean;
+  isRestricted: boolean;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -16814,7 +16846,9 @@ export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
     name
     updatedAt
-    isReadOnly
+    ... on PetitionTemplate {
+      isPublic
+    }
   }
 ` as unknown as DocumentNode<HeaderNameEditable_PetitionBaseFragment, unknown>;
 export const PetitionHeader_PetitionFragmentDoc = gql`
@@ -16823,6 +16857,7 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     locale
     deadline
     status
+    isRestricted
     myEffectivePermission {
       isSubscribed
     }
@@ -17740,7 +17775,7 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
     emailSubject
     emailBody
     description
-    isReadOnly
+    isRestricted
   }
 ` as unknown as DocumentNode<PetitionTemplateComposeMessageEditor_PetitionFragment, unknown>;
 export const SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc = gql`
@@ -17826,7 +17861,8 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     locale
     skipForwardSecurity
     isRecipientViewContentsHidden
-    isReadOnly
+    isRestricted
+    isRestrictedWithPassword
     ...SignatureConfigDialog_PetitionBase
     ... on Petition {
       status
@@ -17916,6 +17952,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     ...PetitionTemplateComposeMessageEditor_Petition
     ...PetitionSettings_PetitionBase
     tone
+    isRestricted
     fields {
       ...PetitionCompose_PetitionField
     }
@@ -18265,7 +18302,7 @@ export const PetitionTagListCellContent_TagFragmentDoc = gql`
 export const PetitionTagListCellContent_PetitionBaseFragmentDoc = gql`
   fragment PetitionTagListCellContent_PetitionBase on PetitionBase {
     id
-    isReadOnly
+    isRestricted
     tags {
       ...PetitionTagListCellContent_Tag
     }
@@ -19088,6 +19125,26 @@ export const AddPetitionAccessDialog_contactsByEmailDocument = gql`
 ` as unknown as DocumentNode<
   AddPetitionAccessDialog_contactsByEmailQuery,
   AddPetitionAccessDialog_contactsByEmailQueryVariables
+>;
+export const PetitionSettings_updatePetitionRestrictionDocument = gql`
+  mutation PetitionSettings_updatePetitionRestriction(
+    $petitionId: GID!
+    $isRestricted: Boolean!
+    $restrictedPassword: String
+  ) {
+    updatePetitionRestriction(
+      petitionId: $petitionId
+      isRestricted: $isRestricted
+      restrictedPassword: $restrictedPassword
+    ) {
+      id
+      isRestricted
+      isRestrictedWithPassword
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionSettings_updatePetitionRestrictionMutation,
+  PetitionSettings_updatePetitionRestrictionMutationVariables
 >;
 export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {

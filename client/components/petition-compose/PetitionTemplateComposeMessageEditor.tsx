@@ -26,8 +26,6 @@ export function PetitionTemplateComposeMessageEditor({
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorValue>(petition.emailBody ?? emptyRTEValue());
 
-  const isReadOnly = petition.isReadOnly;
-
   const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [onUpdatePetition]);
 
   const handleSubjectChange = useCallback(
@@ -63,7 +61,7 @@ export function PetitionTemplateComposeMessageEditor({
           body={body}
           onSubjectChange={handleSubjectChange}
           onBodyChange={handleBodyChange}
-          isReadOnly={isReadOnly}
+          isReadOnly={petition.isRestricted}
         />
       </Stack>
     </Card>
@@ -77,7 +75,7 @@ PetitionTemplateComposeMessageEditor.fragments = {
       emailSubject
       emailBody
       description
-      isReadOnly
+      isRestricted
     }
   `,
 };

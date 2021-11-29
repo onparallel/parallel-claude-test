@@ -132,7 +132,7 @@ export function PetitionHeader({
   const sections = useMemo(
     () => [
       {
-        rightIcon: petition.isReadOnly ? (
+        rightIcon: petition.isRestricted ? (
           <SmallPopover
             content={
               <Text fontSize="sm">
@@ -185,7 +185,7 @@ export function PetitionHeader({
         ),
       },
     ],
-    [petition.status, petition.isReadOnly, intl.locale]
+    [petition.status, petition.isRestricted, intl.locale]
   );
 
   const [reopenPetition] = useMutation(PetitionHeader_reopenPetitionDocument);
@@ -431,7 +431,7 @@ PetitionHeader.fragments = {
       locale
       deadline
       status
-
+      isRestricted
       myEffectivePermission {
         isSubscribed
       }

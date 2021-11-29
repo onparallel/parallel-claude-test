@@ -322,7 +322,7 @@ export function petitionsAreEditable<
       const petitions = await ctx.petitions.loadPetition(
         unMaybeArray(args[argNamePetitionIds] as MaybeArray<number>)
       );
-      return petitions.every((p) => isDefined(p) && !p.is_readonly);
+      return petitions.every((p) => isDefined(p) && !p.restricted_by_user_id);
     } catch {}
     return false;
   };

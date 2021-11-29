@@ -534,6 +534,8 @@ export type Mutation = {
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
   updatePetitionPermissionSubscription: Petition;
+  /** Updates the restriction preferences */
+  updatePetitionRestriction: PetitionBase;
   /**
    * Updates the read status of a user's notification.
    * Must pass ONLY one of:
@@ -1172,6 +1174,12 @@ export type MutationupdatePetitionPermissionSubscriptionArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationupdatePetitionRestrictionArgs = {
+  isRestricted: Scalars["Boolean"];
+  petitionId: Scalars["GID"];
+  restrictedPassword?: Maybe<Scalars["String"]>;
+};
+
 export type MutationupdatePetitionUserNotificationReadStatusArgs = {
   filter?: Maybe<PetitionUserNotificationFilter>;
   isRead: Scalars["Boolean"];
@@ -1426,12 +1434,13 @@ export type Petition = PetitionBase & {
   fromTemplateId: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
-  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"];
+  isRestricted: Scalars["Boolean"];
+  isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
@@ -1546,12 +1555,13 @@ export type PetitionBase = {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
-  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"];
+  isRestricted: Scalars["Boolean"];
+  isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
@@ -2028,12 +2038,13 @@ export type PetitionTemplate = PetitionBase & {
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
-  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"];
+  isRestricted: Scalars["Boolean"];
+  isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
@@ -2868,7 +2879,6 @@ export type UpdatePetitionInput = {
   description?: Maybe<Scalars["JSON"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
-  isReadOnly?: Maybe<Scalars["Boolean"]>;
   isRecipientViewContentsHidden?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;

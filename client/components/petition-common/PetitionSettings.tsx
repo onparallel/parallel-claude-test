@@ -35,6 +35,8 @@ import {
   PetitionSettings_PetitionBaseFragment,
   PetitionSettings_startPetitionSignatureRequestDocument,
   PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc,
+  PetitionSettings_updatePetitionRestrictionDocument,
+  PetitionSettings_updatePetitionRestrictionMutationVariables,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
   PetitionSettings_UserFragment,
@@ -42,11 +44,13 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -56,7 +60,9 @@ import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
+import { usePasswordRestrictPetitionDialog } from "../petition-compose/dialogs/PasswordRestrictPetitionDialog";
 import { usePetitionDeadlineDialog } from "../petition-compose/dialogs/PetitionDeadlineDialog";
+import { useRestrictPetitionDialog } from "../petition-compose/dialogs/RestrictPetitionDialog";
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
 import {
   PublicLinkSettingsDialog,
@@ -99,8 +105,6 @@ function _PetitionSettings({
       ? petition.currentSignatureRequest
       : null;
 
-  const isReadOnly = petition.isReadOnly;
-
   const publicLink = petition.__typename === "PetitionTemplate" ? petition.publicLink : null;
 
   const showSignatureConfigDialog = useSignatureConfigDialog();
@@ -112,6 +116,10 @@ function _PetitionSettings({
   );
   const [startSignatureRequest] = useMutation(
     PetitionSettings_startPetitionSignatureRequestDocument
+  );
+
+  const [updatePetitionRestriction] = useMutation(
+    PetitionSettings_updatePetitionRestrictionDocument
   );
 
   async function handleConfigureSignatureClick() {
@@ -312,9 +320,60 @@ function _PetitionSettings({
     } catch {}
   };
 
+  const configRestrictPetitionDialog = useRestrictPetitionDialog();
+  const passwordRestrictPetitionDialog = usePasswordRestrictPetitionDialog();
+  const genericErrorToast = useGenericErrorToast();
+
+  const handleRestrictPetition = async (value: boolean) => {
+    try {
+      if (petition.isRestrictedWithPassword) {
+        const unrestrictProtectedPetition = async (password: string) => {
+          try {
+            await updatePetitionRestriction({
+              variables: {
+                petitionId: petition.id,
+                isRestricted: false,
+                restrictedPassword: password,
+              },
+            });
+
+            return true;
+          } catch (error) {
+            if (
+              isApolloError(error) &&
+              error.graphQLErrors[0]?.extensions?.code === "INVALID_PETITION_RESTRICTION_PASSWORD"
+            ) {
+              return false;
+            }
+            genericErrorToast();
+            return true;
+          }
+        };
+
+        await passwordRestrictPetitionDialog({
+          unrestrictProtectedPetition,
+        });
+      } else {
+        const variables: PetitionSettings_updatePetitionRestrictionMutationVariables = {
+          petitionId: petition.id,
+          isRestricted: value,
+        };
+
+        if (value) {
+          const { password } = await configRestrictPetitionDialog({});
+          variables.restrictedPassword = password;
+        }
+
+        await updatePetitionRestriction({
+          variables,
+        });
+      }
+    } catch {}
+  };
+
   return (
     <Stack padding={4} spacing={4}>
-      <FormControl id="petition-locale" isDisabled={isReadOnly}>
+      <FormControl id="petition-locale" isDisabled={petition.isRestricted}>
         <FormLabel display="flex" alignItems="center">
           {petition.__typename === "Petition" ? (
             <FormattedMessage
@@ -332,7 +391,7 @@ function _PetitionSettings({
           name="petition-locale"
           value={petition.locale}
           onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-          isDisabled={isReadOnly}
+          isDisabled={petition.isRestricted}
         >
           {locales.map((locale) => (
             <option key={locale.key} value={locale.key}>
@@ -397,7 +456,7 @@ function _PetitionSettings({
         ) : null}
         <SwitchSetting
           isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}
-          icon={petition.isReadOnly ? <LockClosedIcon /> : <LockOpenIcon />}
+          icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
           label={
             <FormattedMessage
               id="component.petition-settings.restrict-editing"
@@ -410,12 +469,11 @@ function _PetitionSettings({
               defaultMessage="Enable this option to prevent users from accidentally making changes to this petition."
             />
           }
-          isChecked={petition.isReadOnly}
-          onChange={async (value) => {
-            await onUpdatePetition({ isReadOnly: value });
-          }}
+          isChecked={petition.isRestricted}
+          onChange={handleRestrictPetition}
           controlId="restrict-editing"
         />
+
         {petition.__typename === "PetitionTemplate" ? (
           <SwitchSetting
             icon={<UserArrowIcon />}
@@ -600,7 +658,8 @@ const fragments = {
       locale
       skipForwardSecurity
       isRecipientViewContentsHidden
-      isReadOnly
+      isRestricted
+      isRestrictedWithPassword
       ...SignatureConfigDialog_PetitionBase
       ... on Petition {
         status
@@ -637,6 +696,23 @@ const fragments = {
   `,
 };
 const mutations = [
+  gql`
+    mutation PetitionSettings_updatePetitionRestriction(
+      $petitionId: GID!
+      $isRestricted: Boolean!
+      $restrictedPassword: String
+    ) {
+      updatePetitionRestriction(
+        petitionId: $petitionId
+        isRestricted: $isRestricted
+        restrictedPassword: $restrictedPassword
+      ) {
+        id
+        isRestricted
+        isRestrictedWithPassword
+      }
+    }
+  `,
   gql`
     mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {
       cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {

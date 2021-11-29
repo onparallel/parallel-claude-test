@@ -148,8 +148,11 @@ export const PetitionBase = interfaceType({
         return await ctx.tags.loadTagsByPetitionId(root.id);
       },
     });
-    t.nonNull.boolean("isReadOnly", {
-      resolve: (o) => o.is_readonly || o.template_public,
+    t.nonNull.boolean("isRestricted", {
+      resolve: (o) => o.restricted_by_user_id !== null || o.template_public,
+    });
+    t.nonNull.boolean("isRestrictedWithPassword", {
+      resolve: (o) => o.restricted_password !== null,
     });
     t.nullable.field("signatureConfig", {
       type: "SignatureConfig",

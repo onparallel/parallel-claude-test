@@ -1247,6 +1247,15 @@ type Mutation {
   updatePetitionPermissionSubscription(isSubscribed: Boolean!, petitionId: GID!): Petition!
 
   """
+  Updates the restriction preferences
+  """
+  updatePetitionRestriction(
+    isRestricted: Boolean!
+    petitionId: GID!
+    restrictedPassword: String
+  ): PetitionBase!
+
+  """
   Updates the read status of a user's notification.
   Must pass ONLY one of:
     - petitionUserNotificationIds
@@ -1682,12 +1691,13 @@ type Petition implements PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
-  isReadOnly: Boolean!
 
   """
   Whether the contents card is hidden in the recipient view.
   """
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
+  isRestricted: Boolean!
+  isRestrictedWithPassword: Boolean!
 
   """
   The locale of the petition.
@@ -1908,12 +1918,13 @@ interface PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
-  isReadOnly: Boolean!
 
   """
   Whether the contents card is hidden in the recipient view.
   """
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
+  isRestricted: Boolean!
+  isRestrictedWithPassword: Boolean!
 
   """
   The locale of the petition.
@@ -2758,12 +2769,13 @@ type PetitionTemplate implements PetitionBase {
   Whether the template is publicly available or not
   """
   isPublic: Boolean!
-  isReadOnly: Boolean!
 
   """
   Whether the contents card is hidden in the recipient view.
   """
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
+  isRestricted: Boolean!
+  isRestrictedWithPassword: Boolean!
 
   """
   The locale of the petition.
@@ -4078,7 +4090,6 @@ input UpdatePetitionInput {
   description: JSON
   emailBody: JSON
   emailSubject: String
-  isReadOnly: Boolean
   isRecipientViewContentsHidden: Boolean
   locale: PetitionLocale
   name: String

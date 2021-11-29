@@ -100,7 +100,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     updateIsReadNotification({ isRead: true, filter: "SHARED" });
   }, []);
 
-  const isReadOnly = petition.isReadOnly;
   const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
 
   const isSharedByLink =
@@ -572,7 +571,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   onFieldEdit={handleFieldEdit}
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
-                  isReadOnly={isReadOnly}
+                  isReadOnly={petition.isRestricted}
                   hasDeveloperAccess={me.hasDeveloperAccess}
                 />
               ) : (
@@ -631,7 +630,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onUpdateFieldPositions={handleUpdateFieldPositions}
               onFieldEdit={handleFieldEdit}
               onFieldSettingsClick={handleFieldSettingsClick}
-              isReadOnly={isReadOnly}
+              isReadOnly={petition.isRestricted}
               isPublicTemplate={isPublicTemplate}
             />
             {petition?.__typename === "PetitionTemplate" ? (
@@ -639,7 +638,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 marginTop="4"
                 description={petition.description}
                 onUpdatePetition={handleUpdatePetition}
-                isReadOnly={isReadOnly}
+                isReadOnly={petition.isRestricted}
               />
             ) : null}
             {petition && petition.__typename === "Petition" ? (
@@ -688,6 +687,7 @@ PetitionCompose.fragments = {
         ...PetitionTemplateComposeMessageEditor_Petition
         ...PetitionSettings_PetitionBase
         tone
+        isRestricted
         fields {
           ...PetitionCompose_PetitionField
         }

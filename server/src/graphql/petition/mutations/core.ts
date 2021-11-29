@@ -26,7 +26,7 @@ import { unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
-import { random } from "../../../util/token";
+import { random, hash } from "../../../util/token";
 import { userHasAccessToContactGroups, userHasAccessToContacts } from "../../contact/authorizers";
 import {
   and,
@@ -470,6 +470,55 @@ export const SignatureConfigInput = inputObjectType({
   },
 });
 
+export const updatePetitionRestriction = mutationField("updatePetitionRestriction", {
+  description: "Updates the restriction preferences",
+  type: "PetitionBase",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    isRestricted: nonNull(booleanArg()),
+    restrictedPassword: nullable(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    const data: Partial<CreatePetition> = {};
+
+    const { petitionId, isRestricted, restrictedPassword } = args;
+
+    const p = await ctx.petitions.loadPetition(petitionId);
+
+    if (p?.restricted_password) {
+      const hashedPassword = restrictedPassword ? await hash(restrictedPassword, "") : null;
+
+      if (p?.restricted_password !== hashedPassword) {
+        throw new WhitelistedError(
+          "The petition is restricted with a password.",
+          "INVALID_PETITION_RESTRICTION_PASSWORD"
+        );
+      }
+    }
+
+    if (isRestricted) {
+      data.restricted_by_user_id = ctx.user!.id;
+      data.restricted_at = new Date();
+      data.restricted_password = restrictedPassword ? await hash(restrictedPassword, "") : null;
+    } else {
+      data.restricted_by_user_id = null;
+      data.restricted_at = null;
+      data.restricted_password = null;
+    }
+
+    const [petition] = await ctx.petitions.updatePetition(
+      args.petitionId,
+      data,
+      `User:${ctx.user!.id}`
+    );
+    return petition;
+  },
+});
+
 export const updatePetition = mutationField("updatePetition", {
   description: "Updates a petition.",
   type: "PetitionBase",
@@ -477,7 +526,7 @@ export const updatePetition = mutationField("updatePetition", {
     userHasAccessToPetitions("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     ifSomeDefined(
-      (args) => [args.data.name, args.data.locale, args.data.description],
+      (args) => [args.data.locale, args.data.description],
       petitionsAreEditable("petitionId")
     ),
     ifSomeDefined(
@@ -503,7 +552,6 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.boolean("isRecipientViewContentsHidden");
           t.nullable.field("signatureConfig", { type: "SignatureConfigInput" });
           t.nullable.json("description");
-          t.nullable.boolean("isReadOnly");
         },
       }).asArg()
     ),
@@ -530,7 +578,6 @@ export const updatePetition = mutationField("updatePetition", {
       isRecipientViewContentsHidden,
       signatureConfig,
       description,
-      isReadOnly,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -583,10 +630,6 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (description !== undefined) {
       data.template_description = description === null ? null : JSON.stringify(description);
-    }
-
-    if (isDefined(isReadOnly)) {
-      data.is_readonly = isReadOnly;
     }
 
     const [petition] = await ctx.petitions.updatePetition(

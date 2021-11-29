@@ -169,7 +169,6 @@ export interface NexusGenInputs {
     description?: NexusGenScalars["JSON"] | null; // JSON
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
-    isReadOnly?: boolean | null; // Boolean
     isRecipientViewContentsHidden?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
@@ -953,6 +952,7 @@ export interface NexusGenFieldTypes {
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
+    updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionUserNotificationReadStatus: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
     updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
@@ -1032,8 +1032,9 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     fromTemplateId: NexusGenScalars["GID"] | null; // GID
     id: NexusGenScalars["GID"]; // GID!
-    isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
+    isRestricted: boolean; // Boolean!
+    isRestrictedWithPassword: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
@@ -1299,8 +1300,9 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
     isPublic: boolean; // Boolean!
-    isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
+    isRestricted: boolean; // Boolean!
+    isRestrictedWithPassword: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
@@ -1822,8 +1824,9 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
-    isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
+    isRestricted: boolean; // Boolean!
+    isRestrictedWithPassword: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
@@ -2205,6 +2208,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionPermissionSubscription: "Petition";
+    updatePetitionRestriction: "PetitionBase";
     updatePetitionUserNotificationReadStatus: "PetitionUserNotification";
     updatePublicPetitionLink: "PublicPetitionLink";
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
@@ -2284,8 +2288,9 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     fromTemplateId: "GID";
     id: "GID";
-    isReadOnly: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
+    isRestricted: "Boolean";
+    isRestrictedWithPassword: "Boolean";
     locale: "PetitionLocale";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
@@ -2551,8 +2556,9 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     id: "GID";
     isPublic: "Boolean";
-    isReadOnly: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
+    isRestricted: "Boolean";
+    isRestrictedWithPassword: "Boolean";
     locale: "PetitionLocale";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
@@ -3074,8 +3080,9 @@ export interface NexusGenFieldTypeNames {
     fieldCount: "Int";
     fields: "PetitionField";
     id: "GID";
-    isReadOnly: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
+    isRestricted: "Boolean";
+    isRestrictedWithPassword: "Boolean";
     locale: "PetitionLocale";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
@@ -3748,6 +3755,12 @@ export interface NexusGenArgTypes {
       // args
       isSubscribed: boolean; // Boolean!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    updatePetitionRestriction: {
+      // args
+      isRestricted: boolean; // Boolean!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      restrictedPassword?: string | null; // String
     };
     updatePetitionUserNotificationReadStatus: {
       // args
