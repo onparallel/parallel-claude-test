@@ -1560,9 +1560,7 @@ export class PetitionRepository extends BaseRepository {
                   ...sourcePetition.signature_config,
                   signersInfo: [],
                   letRecipientsChooseSigners: true,
-                  orgIntegrationId: (
-                    await this.fetchDefaultSignatureOrgIntegration(owner.org_id)
-                  ).id,
+                  orgIntegrationId: (await this.getDefaultSignatureOrgIntegration(owner.org_id)).id,
                 }
               : sourcePetition?.signature_config,
           ...data,
@@ -1698,7 +1696,7 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  private async fetchDefaultSignatureOrgIntegration(orgId: number) {
+  private async getDefaultSignatureOrgIntegration(orgId: number) {
     const [orgIntegration] = await this.from("org_integration")
       .where({
         deleted_at: null,
