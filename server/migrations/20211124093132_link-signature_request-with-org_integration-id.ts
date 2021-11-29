@@ -20,12 +20,10 @@ export async function up(knex: Knex): Promise<void> {
     )
   `);
   const orgIdsbyPetitionId = Object.fromEntries(_petitions.map((x) => [x.id, x.org_id]));
-  let processed = 0;
 
   await pMap(
     signatureRequests,
     async (s) => {
-      console.log(`processing ${processed++}/${signatureRequests.length}`);
       const orgId = orgIdsbyPetitionId[s.petition_id];
       if (!orgId) {
         throw new Error();
@@ -53,11 +51,9 @@ export async function up(knex: Knex): Promise<void> {
     .from<Petition>("petition")
     .whereNotNull("signature_config")
     .select("id", "org_id", "signature_config");
-  processed = 0;
   await pMap(
     petitions,
     async (p) => {
-      console.log(`processing ${processed++}/${petitions.length}`);
       const orgIntegrationId = signatureIntegrations.find(
         (i) => i.org_id === p.org_id && i.provider === p.signature_config.provider
       )?.id;
