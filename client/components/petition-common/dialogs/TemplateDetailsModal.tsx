@@ -65,7 +65,7 @@ export interface TemplateDetailsModalProps extends Omit<ModalProps, "children"> 
 export function TemplateDetailsModal({ me, template, ...props }: TemplateDetailsModalProps) {
   const intl = useIntl();
 
-  const canEdit = Boolean(
+  const hasAccess = Boolean(
     template.myEffectivePermission &&
       ["OWNER", "WRITE"].includes(template.myEffectivePermission.permissionType)
   );
@@ -246,7 +246,7 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                           defaultMessage="Clone template"
                         />
                       </MenuItem>
-                      {canEdit && (
+                      {hasAccess ? (
                         <MenuItem
                           justifyContent="left"
                           type="submit"
@@ -258,16 +258,18 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                             defaultMessage="Edit template"
                           />
                         </MenuItem>
-                      )}
-                      <MenuItem
-                        onClick={handlePetitionSharingClick}
-                        icon={<UserArrowIcon display="block" boxSize={4} />}
-                      >
-                        <FormattedMessage
-                          id="component.template-header.share-label"
-                          defaultMessage="Share template"
-                        />
-                      </MenuItem>
+                      ) : null}
+                      {hasAccess ? (
+                        <MenuItem
+                          onClick={handlePetitionSharingClick}
+                          icon={<UserArrowIcon display="block" boxSize={4} />}
+                        >
+                          <FormattedMessage
+                            id="component.template-header.share-label"
+                            defaultMessage="Share template"
+                          />
+                        </MenuItem>
+                      ) : null}
                     </MenuList>
                   </Portal>
                 </Menu>
