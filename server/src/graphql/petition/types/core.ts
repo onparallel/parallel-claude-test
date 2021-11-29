@@ -167,6 +167,11 @@ export const PetitionBase = interfaceType({
         return org.preferred_tone;
       },
     });
+    t.nonNull.field("customProperties", {
+      type: "JSONObject",
+      description: "Custom user properties",
+      resolve: (o) => o.custom_properties,
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

@@ -768,6 +768,11 @@ type Mutation {
   markSignatureIntegrationAsDefault(id: GID!): OrgIntegration!
 
   """
+  Adds, edits or deletes a custom property on the petition
+  """
+  modifyPetitionCustomProperty(key: String!, petitionId: GID!, value: String): PetitionBase!
+
+  """
   Generates a download link for a field attachment
   """
   petitionFieldAttachmentDownloadLink(
@@ -1606,6 +1611,11 @@ type Petition implements PetitionBase {
   currentSignatureRequest(token: String): PetitionSignatureRequest
 
   """
+  Custom user properties
+  """
+  customProperties: JSONObject!
+
+  """
   The deadline of the petition.
   """
   deadline: DateTime
@@ -1850,6 +1860,11 @@ interface PetitionBase {
   Time when the resource was created.
   """
   createdAt: DateTime!
+
+  """
+  Custom user properties
+  """
+  customProperties: JSONObject!
 
   """
   The body of the petition.
@@ -2623,6 +2638,11 @@ type PetitionTemplate implements PetitionBase {
   Time when the resource was created.
   """
   createdAt: DateTime!
+
+  """
+  Custom user properties
+  """
+  customProperties: JSONObject!
   defaultPermissions: [TemplateDefaultPermission!]!
 
   """

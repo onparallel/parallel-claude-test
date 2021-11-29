@@ -497,6 +497,7 @@ export interface Petition {
   is_readonly: boolean; // bool
   public_metadata: Maybe<any>; // jsonb
   from_public_petition_link_id: Maybe<number>; // int4
+  custom_properties: any; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -525,6 +526,7 @@ export type CreatePetition = PartialProps<
   | "is_readonly"
   | "public_metadata"
   | "from_public_petition_link_id"
+  | "custom_properties"
 >;
 
 export interface PetitionAccess {

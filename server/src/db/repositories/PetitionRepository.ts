@@ -3676,4 +3676,25 @@ export class PetitionRepository extends BaseRepository {
           .select("contact.id")
       );
   }
+
+  async modifyPetitionCustomProperty(
+    petitionId: number,
+    key: string,
+    value: Maybe<string>,
+    updatedBy: string
+  ) {
+    await this.raw(
+      /* sql */ `
+      update petition p set custom_properties = 
+        (case 
+          when (?::text) is null then (p.custom_properties - ?) 
+          else jsonb_set(p.custom_properties, array_append('{}', ?::text), to_jsonb(?::text))
+        end),
+        updated_at = NOW(),
+        updated_by = ? 
+      where id = ?;
+    `,
+      [value, key, key, value, updatedBy, petitionId]
+    );
+  }
 }

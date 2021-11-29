@@ -1796,3 +1796,41 @@ export const autoSendTemplate = mutationField("autoSendTemplate", {
     return `${url}/${petition!.locale}/petition/${accesses![0].keycode}`;
   },
 });
+
+export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomProperty", {
+  description: "Adds, edits or deletes a custom property on the petition",
+  type: "PetitionBase",
+  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    key: nonNull(stringArg()),
+    value: stringArg(),
+  },
+  validateArgs: validateAnd(
+    maxLength((args) => args.key, "key", 100),
+    validateIfDefined(
+      (args) => args.value,
+      maxLength((args) => args.value!, "value", 1000)
+    )
+  ),
+  resolve: async (_, { petitionId, key, value }, ctx) => {
+    const petition = (await ctx.petitions.loadPetition(petitionId))!;
+
+    if (
+      Object.keys(petition.custom_properties).length >= 20 &&
+      !isDefined(petition.custom_properties[key])
+    ) {
+      throw new WhitelistedError(
+        "Max limit of properties reached",
+        "CUSTOM_PROPERTIES_LIMIT_ERROR"
+      );
+    }
+    await ctx.petitions.modifyPetitionCustomProperty(
+      petitionId,
+      key,
+      value ?? null,
+      `User:${ctx.user!.id}`
+    );
+    return (await ctx.petitions.loadPetition(petitionId, { refresh: true }))!;
+  },
+});

@@ -889,6 +889,7 @@ export interface NexusGenFieldTypes {
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getTaskResultFileUrl: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
+    modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
@@ -1017,6 +1018,7 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
+    customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
@@ -1271,6 +1273,7 @@ export interface NexusGenFieldTypes {
   PetitionTemplate: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
     description: NexusGenScalars["JSON"] | null; // JSON
     descriptionExcerpt: string | null; // String
@@ -1783,6 +1786,7 @@ export interface NexusGenFieldTypes {
   PetitionBase: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
@@ -2097,6 +2101,7 @@ export interface NexusGenFieldTypeNames {
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getTaskResultFileUrl: "FileUploadDownloadLinkResult";
     markSignatureIntegrationAsDefault: "OrgIntegration";
+    modifyPetitionCustomProperty: "PetitionBase";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     publicCheckVerificationCode: "VerificationCodeCheck";
@@ -2225,6 +2230,7 @@ export interface NexusGenFieldTypeNames {
     accesses: "PetitionAccess";
     createdAt: "DateTime";
     currentSignatureRequest: "PetitionSignatureRequest";
+    customProperties: "JSONObject";
     deadline: "DateTime";
     emailBody: "JSON";
     emailSubject: "String";
@@ -2479,6 +2485,7 @@ export interface NexusGenFieldTypeNames {
   PetitionTemplate: {
     // field return type name
     createdAt: "DateTime";
+    customProperties: "JSONObject";
     defaultPermissions: "TemplateDefaultPermission";
     description: "JSON";
     descriptionExcerpt: "String";
@@ -2991,6 +2998,7 @@ export interface NexusGenFieldTypeNames {
   PetitionBase: {
     // field return type name
     createdAt: "DateTime";
+    customProperties: "JSONObject";
     emailBody: "JSON";
     emailSubject: "String";
     fieldCount: "Int";
@@ -3326,6 +3334,12 @@ export interface NexusGenArgTypes {
     markSignatureIntegrationAsDefault: {
       // args
       id: NexusGenScalars["GID"]; // GID!
+    };
+    modifyPetitionCustomProperty: {
+      // args
+      key: string; // String!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      value?: string | null; // String
     };
     petitionFieldAttachmentDownloadLink: {
       // args

@@ -2732,4 +2732,177 @@ describe("GraphQL/Petitions", () => {
       expect(organizationCurrentUsageLimit).toEqual([{ id: usageLimit.id, used: 10, limit: 10 }]);
     });
   });
+
+  describe("modifyPetitionCustomProperty", () => {
+    let petition: Petition;
+    beforeAll(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1, () => ({
+        custom_properties: {
+          "my-property": "12345",
+        },
+      }));
+    });
+
+    it("queries the petition custom properties", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($petitionId: GID!) {
+            petition(id: $petitionId) {
+              customProperties
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.petition).toEqual({
+        customProperties: {
+          "my-property": "12345",
+        },
+      });
+    });
+
+    it("throws error if passing a key with more than 100 chars", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $key: String!, $value: String) {
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          key: "x".repeat(101),
+          value: "abcd",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("throws error if passing a value with more than 1000 chars", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $key: String!, $value: String) {
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          key: "x",
+          value: "x".repeat(1001),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("throws error if trying to add more than 20 distinct properties", async () => {
+      const customProperties: any = {};
+      for (let i = 0; i < 20; i++) {
+        customProperties[i] = ".";
+      }
+      await mocks
+        .knex("petition")
+        .where("id", petition.id)
+        .update("custom_properties", customProperties);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $key: String!, $value: String) {
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          key: "x",
+          value: "x",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("CUSTOM_PROPERTIES_LIMIT_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("edits an already setted property", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $key: String!, $value: String) {
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+              customProperties
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          key: "15",
+          value: "abcd",
+        },
+      });
+
+      const newProperties: any = {};
+      for (let i = 0; i < 20; i++) {
+        newProperties[i] = i === 15 ? "abcd" : ".";
+      }
+
+      expect(errors).toBeUndefined();
+      expect(data?.modifyPetitionCustomProperty.customProperties).toEqual(newProperties);
+    });
+
+    it("deletes a property", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $key: String!, $value: String) {
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+              customProperties
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          key: "15",
+          value: null,
+        },
+      });
+
+      const newProperties: any = {};
+      for (let i = 0; i < 20; i++) {
+        if (i !== 15) {
+          newProperties[i] = ".";
+        }
+      }
+      expect(errors).toBeUndefined();
+      expect(data?.modifyPetitionCustomProperty.customProperties).toEqual(newProperties);
+    });
+
+    it("throws error if trying to modify properties on a private petition", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $key: String!, $value: String) {
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", otherPetition.id),
+          key: "15",
+          value: "123",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
 });
