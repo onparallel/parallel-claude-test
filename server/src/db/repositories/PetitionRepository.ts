@@ -32,6 +32,7 @@ import {
   CreatePetitionReminder,
   CreatePublicPetitionLink,
   FileUpload,
+  OrgIntegration,
   Petition,
   PetitionAccess,
   PetitionContactNotification,
@@ -1522,6 +1523,11 @@ export class PetitionRepository extends BaseRepository {
         fromTemplateId = sourcePetition!.is_template ? null : sourcePetition!.from_template_id;
       }
 
+      const defaultSignatureOrgIntegration = await this.getDefaultSignatureOrgIntegration(
+        owner.org_id,
+        t
+      );
+
       const [cloned] = await this.insert(
         "petition",
         {
@@ -1555,12 +1561,13 @@ export class PetitionRepository extends BaseRepository {
             sourcePetition?.is_template &&
             sourcePetition.template_public &&
             sourcePetition.signature_config &&
-            sourcePetition.org_id !== owner.org_id
+            sourcePetition.org_id !== owner.org_id &&
+            defaultSignatureOrgIntegration
               ? {
                   ...sourcePetition.signature_config,
                   signersInfo: [],
                   letRecipientsChooseSigners: true,
-                  orgIntegrationId: (await this.getDefaultSignatureOrgIntegration(owner.org_id)).id,
+                  orgIntegrationId: defaultSignatureOrgIntegration.id,
                 }
               : sourcePetition?.signature_config,
           ...data,
@@ -1696,8 +1703,11 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  private async getDefaultSignatureOrgIntegration(orgId: number) {
-    const [orgIntegration] = await this.from("org_integration")
+  private async getDefaultSignatureOrgIntegration(
+    orgId: number,
+    t?: Knex.Transaction
+  ): Promise<OrgIntegration | null> {
+    const [orgIntegration] = await this.from("org_integration", t)
       .where({
         deleted_at: null,
         org_id: orgId,
