@@ -131,7 +131,7 @@ export const createPetition = mutationField("createPetition", {
         name: original.is_template && !isTemplate ? name : original.name,
       });
 
-      if (original.is_template) {
+      if (original.is_template && original.org_id === ctx.user!.org_id) {
         await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
           petition.id,
           original.id,
@@ -1722,11 +1722,13 @@ export const autoSendTemplate = mutationField("autoSendTemplate", {
       name: args.name,
     });
 
-    await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
-      petition.id,
-      template.id,
-      `User:${ctx.user!.id}`
-    );
+    if (template.org_id === ctx.user!.org_id) {
+      await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
+        petition.id,
+        template.id,
+        `User:${ctx.user!.id}`
+      );
+    }
 
     await ctx.petitions.createEvent([
       {
