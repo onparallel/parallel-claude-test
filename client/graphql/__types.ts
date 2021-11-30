@@ -434,6 +434,8 @@ export interface Mutation {
   getTaskResultFileUrl: FileUploadDownloadLinkResult;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
+  /** Adds, edits or deletes a custom property on the petition */
+  modifyPetitionCustomProperty: PetitionBase;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -844,6 +846,12 @@ export interface MutationgetTaskResultFileUrlArgs {
 
 export interface MutationmarkSignatureIntegrationAsDefaultArgs {
   id: Scalars["GID"];
+}
+
+export interface MutationmodifyPetitionCustomPropertyArgs {
+  key: Scalars["String"];
+  petitionId: Scalars["GID"];
+  value?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationpetitionFieldAttachmentDownloadLinkArgs {
@@ -1425,6 +1433,8 @@ export interface Petition extends PetitionBase {
   createdAt: Scalars["DateTime"];
   /** The current signature request. */
   currentSignatureRequest?: Maybe<PetitionSignatureRequest>;
+  /** Custom user properties */
+  customProperties: Scalars["JSONObject"];
   /** The deadline of the petition. */
   deadline?: Maybe<Scalars["DateTime"]>;
   /** The body of the petition. */
@@ -1553,6 +1563,8 @@ export interface PetitionAndPartialFields {
 export interface PetitionBase {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Custom user properties */
+  customProperties: Scalars["JSONObject"];
   /** The body of the petition. */
   emailBody?: Maybe<Scalars["JSON"]>;
   /** The subject of the petition. */
@@ -1999,6 +2011,8 @@ export interface PetitionTemplate extends PetitionBase {
   __typename?: "PetitionTemplate";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Custom user properties */
+  customProperties: Scalars["JSONObject"];
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
   description?: Maybe<Scalars["JSON"]>;

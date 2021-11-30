@@ -29,6 +29,12 @@ function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
     is_template: index > 5,
     status: index > 5 ? null : "DRAFT",
     template_public: index > 7,
+    custom_properties:
+      index > 6
+        ? {
+            "client id": "12345",
+          }
+        : {},
     public_metadata:
       index > 7
         ? {
@@ -1177,6 +1183,79 @@ describe("GraphQL/Petitions", () => {
       });
     });
 
+    it("copies custom properties when creating a petition from a template", async () => {
+      expect(petitions[7]).toMatchObject({
+        custom_properties: { "client id": "12345" },
+        is_template: true,
+        template_public: false,
+      });
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $name: String
+            $locale: PetitionLocale!
+            $petitionId: GID
+            $type: PetitionBaseType
+          ) {
+            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
+              customProperties
+            }
+          }
+        `,
+        variables: {
+          locale: "en",
+          petitionId: toGlobalId("Petition", petitions[7].id),
+          type: "PETITION",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({
+        customProperties: {
+          "client id": "12345",
+        },
+      });
+    });
+
+    it("don't copy custom properties when creating a petition from a public template of another organization", async () => {
+      const [publicTemplate] = await mocks.createRandomPetitions(
+        otherOrg.id,
+        otherUser.id,
+        1,
+        () => ({
+          is_template: true,
+          template_public: true,
+          status: null,
+          custom_properties: {
+            "private org prop": "abcd",
+          },
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $name: String
+            $locale: PetitionLocale!
+            $petitionId: GID
+            $type: PetitionBaseType
+          ) {
+            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
+              customProperties
+            }
+          }
+        `,
+        variables: {
+          locale: "en",
+          petitionId: toGlobalId("Petition", publicTemplate.id),
+          type: "PETITION",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({ customProperties: {} });
+    });
+
     it("ignores name and locale parameters when creating a petition from a valid petitionId", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -1575,6 +1654,35 @@ describe("GraphQL/Petitions", () => {
         .whereNull("deleted_at");
 
       expect(newTemplateDefaultPermissions).toHaveLength(1);
+    });
+
+    it("copies custom properties when cloning a template", async () => {
+      expect(petitions[7]).toMatchObject({
+        is_template: true,
+        template_public: false,
+        custom_properties: { "client id": "12345" },
+      });
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              customProperties
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", petitions[7].id)],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitions).toEqual([
+        {
+          customProperties: {
+            "client id": "12345",
+          },
+        },
+      ]);
     });
   });
 

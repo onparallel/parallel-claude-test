@@ -1546,9 +1546,9 @@ export class PetitionRepository extends BaseRepository {
             (data?.is_template === undefined || data?.is_template)
               ? ([] as const)
               : (["template_description"] as const)),
-            // avoid copying public_metadata if creating from a public template
+            // avoid copying public_metadata and custom_properties if creating from a public template
             ...(sourcePetition?.is_template && sourcePetition.template_public
-              ? (["public_metadata"] as const)
+              ? (["public_metadata", "custom_properties"] as const)
               : ([] as const)),
           ]),
           org_id: owner.org_id,

@@ -6,7 +6,7 @@ import { toGlobalId } from "../../util/globalId";
 import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
 import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";
-import { booleanParam, enumParam } from "../rest/params";
+import { booleanParam, enumParam, stringParam } from "../rest/params";
 import {
   Created,
   ErrorResponse,
@@ -30,8 +30,10 @@ import {
 } from "./fragments";
 import { containsGraphQLError, idParam, paginationParams, sortByParam } from "./helpers";
 import {
+  AnyPetitionEvent,
   Contact,
   CreateContact,
+  CreateOrUpdateCustomProperty,
   CreatePetition,
   CreateSubscription,
   ListOfPermissions,
@@ -43,16 +45,18 @@ import {
   PaginatedTemplates,
   PaginatedUsers,
   Petition,
+  PetitionCustomProperties,
   SendPetition,
   SharePetition,
   Subscription,
   Template,
   UpdatePetition,
-  AnyPetitionEvent,
 } from "./schemas";
 import {
   CreateContact_ContactMutation,
   CreateContact_ContactMutationVariables,
+  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutation,
+  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutationVariables,
   CreatePetitionRecipients_ContactQuery,
   CreatePetitionRecipients_ContactQueryVariables,
   CreatePetitionRecipients_createContactMutation,
@@ -63,12 +67,19 @@ import {
   CreatePetitionRecipients_updateContactMutationVariables,
   CreatePetition_PetitionMutation,
   CreatePetition_PetitionMutationVariables,
+  DeleteCustomProperty_modifyPetitionCustomPropertyMutation,
+  DeleteCustomProperty_modifyPetitionCustomPropertyMutationVariables,
   DeletePetition_deletePetitionsMutation,
   DeletePetition_deletePetitionsMutationVariables,
   DeleteTemplate_deletePetitionsMutation,
   DeleteTemplate_deletePetitionsMutationVariables,
   DownloadFileReply_fileUploadReplyDownloadLinkMutation,
   DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables,
+  EventSubscriptions_CreateSubscriptionMutation,
+  EventSubscriptions_CreateSubscriptionMutationVariables,
+  EventSubscriptions_DeleteSubscriptionMutation,
+  EventSubscriptions_DeleteSubscriptionMutationVariables,
+  EventSubscriptions_GetSubscriptionsQuery,
   GetContacts_ContactsQuery,
   GetContacts_ContactsQueryVariables,
   GetContact_ContactQuery,
@@ -87,14 +98,11 @@ import {
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
-  EventSubscriptions_CreateSubscriptionMutation,
-  EventSubscriptions_CreateSubscriptionMutationVariables,
-  EventSubscriptions_DeleteSubscriptionMutation,
-  EventSubscriptions_DeleteSubscriptionMutationVariables,
-  EventSubscriptions_GetSubscriptionsQuery,
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
+  ReadPetitionCustomPropertiesQuery,
+  ReadPetitionCustomPropertiesQueryVariables,
   RemoveUserGroupPermission_removePetitionPermissionMutation,
   RemoveUserGroupPermission_removePetitionPermissionMutationVariables,
   RemoveUserPermission_removePetitionPermissionMutation,
@@ -414,6 +422,129 @@ api
         }
         throw error;
       }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/properties", {
+    params: { petitionId },
+  })
+  .get(
+    {
+      operationId: "ReadPetitionCustomProperties",
+      summary: "Returns a key-value object with the custom properties of the petition",
+      responses: {
+        200: SuccessResponse(PetitionCustomProperties),
+      },
+      tags: ["Petitions"],
+    },
+    async ({ client, params }) => {
+      const result = await client.request<
+        ReadPetitionCustomPropertiesQuery,
+        ReadPetitionCustomPropertiesQueryVariables
+      >(
+        gql`
+          query ReadPetitionCustomProperties($petitionId: GID!) {
+            petition(id: $petitionId) {
+              id
+              customProperties
+            }
+          }
+        `,
+        { petitionId: params.petitionId }
+      );
+
+      return Ok(result.petition!.customProperties);
+    }
+  )
+  .post(
+    {
+      operationId: "CreateOrUpdateCustomProperty",
+      summary: "Create or update a custom property",
+      description: outdent`
+        Creates or updates a custom property on the petition.
+
+        If the provided key already exists as a property, its value is overwritten.
+        If the provided key doesn't exist, it's added.
+
+        The petition can have up to 20 different properties.
+      `,
+      body: JsonBody(CreateOrUpdateCustomProperty),
+      responses: {
+        200: SuccessResponse(PetitionCustomProperties),
+        409: ErrorResponse({
+          description: "You reached the maximum limit of custom properties on the petition",
+        }),
+      },
+      tags: ["Petitions"],
+    },
+    async ({ client, body, params }) => {
+      try {
+        const result = await client.request<
+          CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutation,
+          CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutationVariables
+        >(
+          gql`
+            mutation CreateOrUpdateCustomProperty_modifyPetitionCustomProperty(
+              $petitionId: GID!
+              $key: String!
+              $value: String
+            ) {
+              modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+                customProperties
+              }
+            }
+          `,
+          { petitionId: params.petitionId, key: body.key, value: body.value }
+        );
+        return Ok(result.modifyPetitionCustomProperty.customProperties);
+      } catch (error: any) {
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")
+        ) {
+          throw new ConflictError(
+            "You reached the maximum limit of custom properties on the petition."
+          );
+        }
+        throw error;
+      }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/properties/:key", {
+    params: { petitionId, key: stringParam({ required: true, maxLength: 100 }) },
+  })
+  .delete(
+    {
+      operationId: "DeleteCustomProperty",
+      summary: "Deletes a custom property",
+      description: outdent`
+      Removes the provided key from the custom properties of the petition.
+    `,
+      responses: { 204: SuccessResponse() },
+      tags: ["Petitions"],
+    },
+    async ({ client, params }) => {
+      await client.request<
+        DeleteCustomProperty_modifyPetitionCustomPropertyMutation,
+        DeleteCustomProperty_modifyPetitionCustomPropertyMutationVariables
+      >(
+        gql`
+          mutation DeleteCustomProperty_modifyPetitionCustomProperty(
+            $petitionId: GID!
+            $key: String!
+          ) {
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
+              id
+            }
+          }
+        `,
+        params
+      );
+
+      return NoContent();
     }
   );
 

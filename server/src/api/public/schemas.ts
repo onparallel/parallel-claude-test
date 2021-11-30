@@ -8,7 +8,7 @@ const _Petition = {
   title: "Petition",
   type: "object",
   additionalProperties: false,
-  required: ["id", "name", "status", "deadline", "locale", "createdAt"],
+  required: ["id", "name", "status", "deadline", "locale", "createdAt", "customProperties"],
   properties: {
     id: {
       description: "The ID of the petition",
@@ -48,6 +48,11 @@ const _Petition = {
       type: ["string", "null"],
       example: toGlobalId("Petition", 1),
     },
+    customProperties: {
+      description: "The custom properties of the petition",
+      type: "object",
+      example: { clientId: "1234" },
+    },
   },
 } as const;
 
@@ -55,7 +60,7 @@ const _Template = {
   title: "Template",
   type: "object",
   additionalProperties: false,
-  required: ["id", "name", "description", "locale", "createdAt"],
+  required: ["id", "name", "description", "locale", "createdAt", "customProperties"],
   properties: {
     id: {
       description: "The ID of the template",
@@ -84,6 +89,11 @@ const _Template = {
       type: "string",
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
+    },
+    customProperties: {
+      description: "The custom properties of the template",
+      type: "object",
+      example: { clientId: "1234" },
     },
   },
 } as const;
@@ -1423,3 +1433,26 @@ export const AnyPetitionEvent = {
 } as any;
 
 export const PetitionEvent = schema(AnyPetitionEvent);
+
+export const PetitionCustomProperties = schema({
+  type: "object",
+} as const);
+
+export const CreateOrUpdateCustomProperty = schema({
+  title: "CreateOrUpdateCustomProperty",
+  type: "object",
+  required: ["key", "value"],
+  additionalProperties: false,
+  properties: {
+    key: {
+      description: "Key of the property",
+      example: "Client Id",
+      type: "string",
+    },
+    value: {
+      description: "The value of the property",
+      type: "string",
+      example: "12345",
+    },
+  },
+} as const);

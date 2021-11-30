@@ -254,6 +254,17 @@ export type LandingTemplate = {
   updatedAt: Scalars["DateTime"];
 };
 
+export type LandingTemplateCategorySample = {
+  category: Scalars["String"];
+  templates: LandingTemplatePagination;
+};
+
+export type LandingTemplateCategorySampletemplatesArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  locale: PetitionLocale;
+  offset?: Maybe<Scalars["Int"]>;
+};
+
 /** A public template field */
 export type LandingTemplateField = {
   id: Scalars["GID"];
@@ -266,17 +277,6 @@ export type LandingTemplatePagination = {
   items: Array<LandingTemplate>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
-
-export type LandingTemplateSample = {
-  category: Scalars["String"];
-  templates: LandingTemplatePagination;
-};
-
-export type LandingTemplateSampletemplatesArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  locale: PetitionLocale;
-  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type MessageCancelledEvent = PetitionEvent & {
@@ -400,6 +400,8 @@ export type Mutation = {
   getTaskResultFileUrl: FileUploadDownloadLinkResult;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
+  /** Adds, edits or deletes a custom property on the petition */
+  modifyPetitionCustomProperty: PetitionBase;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -810,6 +812,12 @@ export type MutationgetTaskResultFileUrlArgs = {
 
 export type MutationmarkSignatureIntegrationAsDefaultArgs = {
   id: Scalars["GID"];
+};
+
+export type MutationmodifyPetitionCustomPropertyArgs = {
+  key: Scalars["String"];
+  petitionId: Scalars["GID"];
+  value?: Maybe<Scalars["String"]>;
 };
 
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
@@ -1383,6 +1391,8 @@ export type Petition = PetitionBase & {
   createdAt: Scalars["DateTime"];
   /** The current signature request. */
   currentSignatureRequest: Maybe<PetitionSignatureRequest>;
+  /** Custom user properties */
+  customProperties: Scalars["JSONObject"];
   /** The deadline of the petition. */
   deadline: Maybe<Scalars["DateTime"]>;
   /** The body of the petition. */
@@ -1507,6 +1517,8 @@ export type PetitionAndPartialFields = {
 export type PetitionBase = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Custom user properties */
+  customProperties: Scalars["JSONObject"];
   /** The body of the petition. */
   emailBody: Maybe<Scalars["JSON"]>;
   /** The subject of the petition. */
@@ -1928,6 +1940,8 @@ export type PetitionStatus =
 export type PetitionTemplate = PetitionBase & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Custom user properties */
+  customProperties: Scalars["JSONObject"];
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
   description: Maybe<Scalars["JSON"]>;
@@ -2262,8 +2276,8 @@ export type Query = {
   globalIdEncode: SupportMethodResponse;
   isValidPublicPetitionLinkSlug: Scalars["Boolean"];
   landingTemplateBySlug: Maybe<LandingTemplate>;
+  landingTemplateCategorySamples: Array<LandingTemplateCategorySample>;
   landingTemplates: LandingTemplatePagination;
-  landingTemplatesSamples: Array<LandingTemplateSample>;
   me: User;
   organization: Maybe<Organization>;
   /** The organizations registered in Parallel. */
@@ -2981,6 +2995,7 @@ export type PetitionFragment = {
   locale: PetitionLocale;
   createdAt: string;
   fromTemplateId: string | null;
+  customProperties: { [key: string]: any };
 };
 
 export type TemplateFragment = {
@@ -2989,6 +3004,7 @@ export type TemplateFragment = {
   description: any | null;
   locale: PetitionLocale;
   createdAt: string;
+  customProperties: { [key: string]: any };
 };
 
 export type UserFragment = {
@@ -3087,6 +3103,7 @@ export type GetPetitions_PetitionsQuery = {
           locale: PetitionLocale;
           createdAt: string;
           fromTemplateId: string | null;
+          customProperties: { [key: string]: any };
         }
       | {}
     >;
@@ -3108,6 +3125,7 @@ export type CreatePetition_PetitionMutation = {
         locale: PetitionLocale;
         createdAt: string;
         fromTemplateId: string | null;
+        customProperties: { [key: string]: any };
       }
     | {};
 };
@@ -3126,6 +3144,7 @@ export type GetPetition_PetitionQuery = {
         locale: PetitionLocale;
         createdAt: string;
         fromTemplateId: string | null;
+        customProperties: { [key: string]: any };
       }
     | {}
     | null;
@@ -3146,6 +3165,7 @@ export type UpdatePetition_PetitionMutation = {
         locale: PetitionLocale;
         createdAt: string;
         fromTemplateId: string | null;
+        customProperties: { [key: string]: any };
       }
     | {};
 };
@@ -3156,6 +3176,38 @@ export type DeletePetition_deletePetitionsMutationVariables = Exact<{
 }>;
 
 export type DeletePetition_deletePetitionsMutation = { deletePetitions: Result };
+
+export type ReadPetitionCustomPropertiesQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type ReadPetitionCustomPropertiesQuery = {
+  petition:
+    | { id: string; customProperties: { [key: string]: any } }
+    | { id: string; customProperties: { [key: string]: any } }
+    | null;
+};
+
+export type CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  key: Scalars["String"];
+  value?: Maybe<Scalars["String"]>;
+}>;
+
+export type CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutation = {
+  modifyPetitionCustomProperty:
+    | { customProperties: { [key: string]: any } }
+    | { customProperties: { [key: string]: any } };
+};
+
+export type DeleteCustomProperty_modifyPetitionCustomPropertyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  key: Scalars["String"];
+}>;
+
+export type DeleteCustomProperty_modifyPetitionCustomPropertyMutation = {
+  modifyPetitionCustomProperty: { id: string } | { id: string };
+};
 
 export type GetPetitionRecipients_PetitionAccessesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -3486,6 +3538,7 @@ export type GetTemplates_TemplatesQuery = {
           description: any | null;
           locale: PetitionLocale;
           createdAt: string;
+          customProperties: { [key: string]: any };
         }
       | {}
     >;
@@ -3504,6 +3557,7 @@ export type GetTemplate_TemplateQuery = {
         description: any | null;
         locale: PetitionLocale;
         createdAt: string;
+        customProperties: { [key: string]: any };
       }
     | {}
     | null;

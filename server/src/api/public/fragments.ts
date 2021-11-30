@@ -9,6 +9,7 @@ export const PetitionFragment = gql`
     locale
     createdAt
     fromTemplateId
+    customProperties
   }
 `;
 
@@ -19,6 +20,7 @@ export const TemplateFragment = gql`
     description
     locale
     createdAt
+    customProperties
   }
 `;
 
