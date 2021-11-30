@@ -3683,7 +3683,7 @@ export class PetitionRepository extends BaseRepository {
     value: Maybe<string>,
     updatedBy: string
   ) {
-    await this.raw(
+    const [petition] = await this.raw<Petition>(
       /* sql */ `
       update petition p set custom_properties = 
         (case 
@@ -3692,9 +3692,11 @@ export class PetitionRepository extends BaseRepository {
         end),
         updated_at = NOW(),
         updated_by = ? 
-      where id = ?;
+      where id = ?
+      returning *;
     `,
       [value, key, key, value, updatedBy, petitionId]
     );
+    return petition;
   }
 }

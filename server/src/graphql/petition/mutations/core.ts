@@ -1825,12 +1825,11 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
         "CUSTOM_PROPERTIES_LIMIT_ERROR"
       );
     }
-    await ctx.petitions.modifyPetitionCustomProperty(
+    return await ctx.petitions.modifyPetitionCustomProperty(
       petitionId,
       key,
       value ?? null,
       `User:${ctx.user!.id}`
     );
-    return (await ctx.petitions.loadPetition(petitionId, { refresh: true }))!;
   },
 });
