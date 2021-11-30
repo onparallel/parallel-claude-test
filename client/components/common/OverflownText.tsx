@@ -1,12 +1,13 @@
 import { assignRef, Box, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import useMergedRef from "@react-hook/merged-ref";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import ResizeObserver from "react-resize-observer";
 
 export interface OverflownTextProps {
   children: ReactNode;
 }
+
 export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(function OverflownText(
   { children, ...props },
   ref
