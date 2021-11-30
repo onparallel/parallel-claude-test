@@ -619,7 +619,7 @@ export interface PetitionField {
   description: Maybe<string>; // text
   optional: boolean; // bool
   multiple: boolean; // bool
-  options: Maybe<any>; // json
+  options: Maybe<any>; // jsonb
   validated: boolean; // bool
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
@@ -701,7 +701,7 @@ export interface PetitionFieldReply {
   id: number; // int4
   petition_field_id: number; // int4
   type: PetitionFieldType; // petition_field_type
-  content: any; // json
+  content: any; // jsonb
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
