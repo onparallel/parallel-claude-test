@@ -228,7 +228,6 @@ export async function seed(knex: Knex): Promise<any> {
       template_public: true,
       from_template_id: null,
       signature_config: null,
-      comments_enabled: true,
       hide_recipient_view_contents: false,
       skip_forward_security: false,
       is_readonly: false,

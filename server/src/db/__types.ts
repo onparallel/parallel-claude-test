@@ -492,7 +492,6 @@ export interface Petition {
   template_public: boolean; // bool
   from_template_id: Maybe<number>; // int4
   signature_config: Maybe<any>; // jsonb
-  comments_enabled: boolean; // bool
   hide_recipient_view_contents: boolean; // bool
   skip_forward_security: boolean; // bool
   is_readonly: boolean; // bool
@@ -521,7 +520,6 @@ export type CreatePetition = PartialProps<
   | "template_public"
   | "from_template_id"
   | "signature_config"
-  | "comments_enabled"
   | "hide_recipient_view_contents"
   | "skip_forward_security"
   | "is_readonly"
