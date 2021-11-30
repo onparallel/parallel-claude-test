@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import ResizeObserver from "react-resize-observer";
 
 export interface OverflownTextProps {
-  children: string;
+  children: ReactNode;
 }
 export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(function OverflownText(
   { children, ...props },

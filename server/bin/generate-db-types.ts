@@ -59,7 +59,12 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K
 export type ${name} = ${values
         .sort((a, b) => a.localeCompare(b))
         .map((value) => `"${value}"`)
-        .join(" | ")};`
+        .join(" | ")};
+        
+export const ${name}Values = [${values
+        .sort((a, b) => a.localeCompare(b))
+        .map((value) => `"${value}"`)
+        .join(", ")}] as ${name}[];`
     )
     .join("\n")}
 
@@ -91,9 +96,7 @@ export interface TablePrimaryKeys {
 export interface ${table.name} {
   ${table.columns
     .sort((a, b) => a.position - b.position)
-    .map((c) => {
-      return `${c.name}: ${c.isNullable ? `Maybe<${c.type}>` : c.type}; // ${c.realType}`;
-    })
+    .map((c) => `${c.name}: ${c.isNullable ? `Maybe<${c.type}>` : c.type}; // ${c.realType}`)
     .join("\n  ")}
 }
 
@@ -204,16 +207,25 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
         tableName: tableName,
         columns: columns.map((column) => ({
           name: column.column_name,
-          realType: column.udt_name,
+          realType: getColumnRealType(column.udt_name),
           type: getColumnType(column.udt_name, enums),
           isNullable: column.is_nullable === "YES",
           hasDefault: !!column.column_default,
           position: column.ordinal_position,
+          _: column,
         })),
         primaryKey: primaryKeys[tableName].column_name,
       },
     ])
   );
+}
+
+function getColumnRealType(type: string): string {
+  if (type.startsWith("_")) {
+    return `${getColumnRealType(type.slice(1))}[]`;
+  } else {
+    return type;
+  }
 }
 
 function getColumnType(type: string, enums: Map<string, DbEnum>): string {

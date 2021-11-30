@@ -415,7 +415,7 @@ function ConfirmDeleteGroupsDialog({
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage id="view.groups.confirm-delete-button" defaultMessage="Yes, delete" />
+          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
       {...props}

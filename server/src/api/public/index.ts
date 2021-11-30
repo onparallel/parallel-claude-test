@@ -1500,11 +1500,11 @@ api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delet
       EventSubscriptions_DeleteSubscriptionMutationVariables
     >(
       gql`
-        mutation EventSubscriptions_DeleteSubscription($id: GID!) {
-          deleteEventSubscription(id: $id)
+        mutation EventSubscriptions_DeleteSubscription($ids: [GID!]!) {
+          deleteEventSubscriptions(ids: $ids)
         }
       `,
-      { id: params.subscriptionId }
+      { ids: [params.subscriptionId] }
     );
     return NoContent();
   }

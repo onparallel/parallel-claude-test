@@ -35,6 +35,7 @@ export interface AccessActivatedEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -43,6 +44,7 @@ export interface AccessActivatedFromPublicPetitionLinkEvent extends PetitionEven
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface AccessActivatedFromPublicPetitionLinkUserNotification
@@ -60,6 +62,7 @@ export interface AccessDeactivatedEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -69,6 +72,7 @@ export interface AccessDelegatedEvent extends PetitionEvent {
   id: Scalars["GID"];
   newAccess: PetitionAccess;
   originalAccess: PetitionAccess;
+  type: PetitionEventType;
 }
 
 export interface AccessOpenedEvent extends PetitionEvent {
@@ -76,6 +80,7 @@ export interface AccessOpenedEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export type BatchSendSigningMode =
@@ -104,6 +109,7 @@ export interface CommentDeletedEvent extends PetitionEvent {
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface CommentPublishedEvent extends PetitionEvent {
@@ -112,6 +118,7 @@ export interface CommentPublishedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 /** A contact in the system. */
@@ -235,6 +242,7 @@ export interface GroupPermissionAddedEvent extends PetitionEvent {
   id: Scalars["GID"];
   permissionGroup: UserGroup;
   permissionType: PetitionPermissionType;
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -244,6 +252,7 @@ export interface GroupPermissionEditedEvent extends PetitionEvent {
   id: Scalars["GID"];
   permissionGroup: UserGroup;
   permissionType: PetitionPermissionType;
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -252,6 +261,7 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -313,6 +323,7 @@ export interface MessageCancelledEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -330,6 +341,7 @@ export interface MessageScheduledEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  type: PetitionEventType;
 }
 
 export interface MessageSentEvent extends PetitionEvent {
@@ -337,6 +349,7 @@ export interface MessageSentEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  type: PetitionEventType;
 }
 
 export interface Mutation {
@@ -404,8 +417,8 @@ export interface Mutation {
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
   deleteContacts: Result;
-  /** Deletes a subscription */
-  deleteEventSubscription: Result;
+  /** Deletes event subscriptions */
+  deleteEventSubscriptions: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Deletes a petition field. */
@@ -667,6 +680,7 @@ export interface MutationcreateContactArgs {
 }
 
 export interface MutationcreateEventSubscriptionArgs {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
 }
 
@@ -774,8 +788,8 @@ export interface MutationdeleteContactsArgs {
   ids: Array<Scalars["GID"]>;
 }
 
-export interface MutationdeleteEventSubscriptionArgs {
-  id: Scalars["GID"];
+export interface MutationdeleteEventSubscriptionsArgs {
+  ids: Array<Scalars["GID"]>;
 }
 
 export interface MutationdeletePetitionArgs {
@@ -1421,6 +1435,7 @@ export interface OwnershipTransferredEvent extends PetitionEvent {
   id: Scalars["GID"];
   owner?: Maybe<User>;
   previousOwner?: Maybe<User>;
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -1624,6 +1639,7 @@ export interface PetitionClonedEvent extends PetitionEvent {
   __typename?: "PetitionClonedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -1631,6 +1647,7 @@ export interface PetitionClosedEvent extends PetitionEvent {
   __typename?: "PetitionClosedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -1639,6 +1656,7 @@ export interface PetitionClosedNotifiedEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -1647,6 +1665,7 @@ export interface PetitionCompletedEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface PetitionCompletedUserNotification extends PetitionUserNotification {
@@ -1662,6 +1681,7 @@ export interface PetitionCreatedEvent extends PetitionEvent {
   __typename?: "PetitionCreatedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -1669,11 +1689,13 @@ export interface PetitionDeletedEvent extends PetitionEvent {
   __typename?: "PetitionDeletedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface PetitionEventPagination {
@@ -1686,10 +1708,49 @@ export interface PetitionEventPagination {
 
 export interface PetitionEventSubscription {
   __typename?: "PetitionEventSubscription";
+  eventTypes?: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
 }
+
+export type PetitionEventType =
+  | "ACCESS_ACTIVATED"
+  | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
+  | "ACCESS_DEACTIVATED"
+  | "ACCESS_DELEGATED"
+  | "ACCESS_OPENED"
+  | "COMMENT_DELETED"
+  | "COMMENT_PUBLISHED"
+  | "GROUP_PERMISSION_ADDED"
+  | "GROUP_PERMISSION_EDITED"
+  | "GROUP_PERMISSION_REMOVED"
+  | "MESSAGE_CANCELLED"
+  | "MESSAGE_SCHEDULED"
+  | "MESSAGE_SENT"
+  | "OWNERSHIP_TRANSFERRED"
+  | "PETITION_CLONED"
+  | "PETITION_CLOSED"
+  | "PETITION_CLOSED_NOTIFIED"
+  | "PETITION_COMPLETED"
+  | "PETITION_CREATED"
+  | "PETITION_DELETED"
+  | "PETITION_MESSAGE_BOUNCED"
+  | "PETITION_REMINDER_BOUNCED"
+  | "PETITION_REOPENED"
+  | "RECIPIENT_SIGNED"
+  | "REMINDERS_OPT_OUT"
+  | "REMINDER_SENT"
+  | "REPLY_CREATED"
+  | "REPLY_DELETED"
+  | "REPLY_UPDATED"
+  | "SIGNATURE_CANCELLED"
+  | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_STARTED"
+  | "TEMPLATE_USED"
+  | "USER_PERMISSION_ADDED"
+  | "USER_PERMISSION_EDITED"
+  | "USER_PERMISSION_REMOVED";
 
 /** A field within a petition. */
 export interface PetitionField {
@@ -1847,6 +1908,7 @@ export interface PetitionMessageBouncedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  type: PetitionEventType;
 }
 
 /** The status of a petition message. */
@@ -1912,6 +1974,7 @@ export interface PetitionReminderBouncedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   reminder: PetitionReminder;
+  type: PetitionEventType;
 }
 
 /** The type of a petition reminder. */
@@ -1925,6 +1988,7 @@ export interface PetitionReopenedEvent extends PetitionEvent {
   __typename?: "PetitionReopenedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -2572,6 +2636,7 @@ export interface RecipientSignedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   signer?: Maybe<PetitionSigner>;
+  type: PetitionEventType;
 }
 
 export interface ReminderEmailBouncedUserNotification extends PetitionUserNotification {
@@ -2588,6 +2653,7 @@ export interface ReminderSentEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   reminder: PetitionReminder;
+  type: PetitionEventType;
 }
 
 /** The reminder settings of a petition */
@@ -2622,6 +2688,7 @@ export interface RemindersOptOutEvent extends PetitionEvent {
   id: Scalars["GID"];
   other?: Maybe<Scalars["String"]>;
   reason: Scalars["String"];
+  type: PetitionEventType;
 }
 
 export interface RemindersOptOutNotification extends PetitionUserNotification {
@@ -2642,6 +2709,7 @@ export interface ReplyCreatedEvent extends PetitionEvent {
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply?: Maybe<PetitionFieldReply>;
+  type: PetitionEventType;
 }
 
 export interface ReplyDeletedEvent extends PetitionEvent {
@@ -2650,6 +2718,7 @@ export interface ReplyDeletedEvent extends PetitionEvent {
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface ReplyUpdatedEvent extends PetitionEvent {
@@ -2658,6 +2727,7 @@ export interface ReplyUpdatedEvent extends PetitionEvent {
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply?: Maybe<PetitionFieldReply>;
+  type: PetitionEventType;
   updatedBy?: Maybe<UserOrPetitionAccess>;
 }
 
@@ -2678,6 +2748,7 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   cancellerReason?: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -2693,6 +2764,7 @@ export interface SignatureCompletedEvent extends PetitionEvent {
   __typename?: "SignatureCompletedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface SignatureCompletedUserNotification extends PetitionUserNotification {
@@ -2765,6 +2837,7 @@ export interface SignatureStartedEvent extends PetitionEvent {
   __typename?: "SignatureStartedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface SsoOrgIntegration extends OrgIntegration {
@@ -2857,6 +2930,7 @@ export interface TemplateUsedEvent extends PetitionEvent {
   __typename?: "TemplateUsedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 }
 
 export interface Timestamps {
@@ -2875,6 +2949,7 @@ export interface UpdateContactInput {
 }
 
 export interface UpdateEventSubscriptionInput {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl?: InputMaybe<Scalars["String"]>;
   isEnabled?: InputMaybe<Scalars["Boolean"]>;
 }
@@ -2921,8 +2996,6 @@ export interface UpdateUserInput {
 /** A user in the system. */
 export interface User extends Timestamps {
   __typename?: "User";
-  /** Lists every auth token of the user */
-  authenticationTokens: UserAuthenticationTokenPagination;
   /** URL to the user avatar */
   avatarUrl?: Maybe<Scalars["String"]>;
   canCreateUsers: Scalars["Boolean"];
@@ -2952,17 +3025,11 @@ export interface User extends Timestamps {
   preferredLocale?: Maybe<Scalars["String"]>;
   role: OrganizationRole;
   status: UserStatus;
+  /** Lists the API tokens this user has. */
+  tokens: Array<UserAuthenticationToken>;
   unreadNotificationIds: Array<Scalars["ID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-}
-
-/** A user in the system. */
-export interface UserauthenticationTokensArgs {
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
-  sortBy?: InputMaybe<Array<UserAuthenticationTokens_OrderBy>>;
 }
 
 /** A user in the system. */
@@ -2985,23 +3052,6 @@ export interface UserAuthenticationToken extends CreatedAt {
   lastUsedAt?: Maybe<Scalars["DateTime"]>;
   tokenName: Scalars["String"];
 }
-
-export interface UserAuthenticationTokenPagination {
-  __typename?: "UserAuthenticationTokenPagination";
-  /** The requested slice of items. */
-  items: Array<UserAuthenticationToken>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
-}
-
-/** Order to use on User.authenticationTokens */
-export type UserAuthenticationTokens_OrderBy =
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "lastUsedAt_ASC"
-  | "lastUsedAt_DESC"
-  | "tokenName_ASC"
-  | "tokenName_DESC";
 
 export interface UserGroup extends Timestamps {
   __typename?: "UserGroup";
@@ -3066,6 +3116,7 @@ export interface UserPermissionAddedEvent extends PetitionEvent {
   id: Scalars["GID"];
   permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -3075,6 +3126,7 @@ export interface UserPermissionEditedEvent extends PetitionEvent {
   id: Scalars["GID"];
   permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -3083,6 +3135,7 @@ export interface UserPermissionRemovedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionUser?: Maybe<User>;
+  type: PetitionEventType;
   user?: Maybe<User>;
 }
 
@@ -8588,11 +8641,10 @@ export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetit
   status: PetitionStatus;
 };
 
-export type EventSubscriptionCard_PetitionEventSubscriptionFragment = {
+export type CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment = {
   __typename?: "PetitionEventSubscription";
-  id: string;
   eventsUrl: string;
-  isEnabled: boolean;
+  eventTypes?: Array<PetitionEventType> | null;
 };
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
@@ -14367,6 +14419,14 @@ export type Developers_UserAuthenticationTokenFragment = {
   lastUsedAt?: string | null;
 };
 
+export type Developers_PetitionEventSubscriptionFragment = {
+  __typename?: "PetitionEventSubscription";
+  id: string;
+  eventsUrl: string;
+  eventTypes?: Array<PetitionEventType> | null;
+  isEnabled: boolean;
+};
+
 export type Developers_revokeUserAuthTokenMutationVariables = Exact<{
   authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
@@ -14375,6 +14435,7 @@ export type Developers_revokeUserAuthTokenMutation = { revokeUserAuthToken: Resu
 
 export type Developers_createEventSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"];
+  eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
 }>;
 
 export type Developers_createEventSubscriptionMutation = {
@@ -14382,6 +14443,7 @@ export type Developers_createEventSubscriptionMutation = {
     __typename?: "PetitionEventSubscription";
     id: string;
     eventsUrl: string;
+    eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
   };
 };
@@ -14396,16 +14458,46 @@ export type Developers_updateEventSubscriptionMutation = {
     __typename?: "PetitionEventSubscription";
     id: string;
     eventsUrl: string;
+    eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
   };
 };
 
-export type Developers_userQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  search?: InputMaybe<Scalars["String"]>;
-  sortBy?: InputMaybe<Array<UserAuthenticationTokens_OrderBy> | UserAuthenticationTokens_OrderBy>;
+export type Developers_deleteEventSubscriptionsMutationVariables = Exact<{
+  ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
+
+export type Developers_deleteEventSubscriptionsMutation = { deleteEventSubscriptions: Result };
+
+export type Developers_tokensQueryVariables = Exact<{ [key: string]: never }>;
+
+export type Developers_tokensQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    tokens: Array<{
+      __typename?: "UserAuthenticationToken";
+      id: string;
+      tokenName: string;
+      createdAt: string;
+      lastUsedAt?: string | null;
+    }>;
+  };
+};
+
+export type Developers_subscriptionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type Developers_subscriptionsQuery = {
+  subscriptions: Array<{
+    __typename?: "PetitionEventSubscription";
+    id: string;
+    eventsUrl: string;
+    eventTypes?: Array<PetitionEventType> | null;
+    isEnabled: boolean;
+  }>;
+};
+
+export type Developers_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Developers_userQuery = {
   me: {
@@ -14422,17 +14514,6 @@ export type Developers_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
-    authenticationTokens: {
-      __typename?: "UserAuthenticationTokenPagination";
-      totalCount: number;
-      items: Array<{
-        __typename?: "UserAuthenticationToken";
-        id: string;
-        tokenName: string;
-        createdAt: string;
-        lastUsedAt?: string | null;
-      }>;
-    };
     organization: {
       __typename?: "Organization";
       id: string;
@@ -14442,12 +14523,6 @@ export type Developers_userQuery = {
       };
     };
   };
-  subscriptions: Array<{
-    __typename?: "PetitionEventSubscription";
-    id: string;
-    eventsUrl: string;
-    isEnabled: boolean;
-  }>;
 };
 
 export type Settings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -16341,13 +16416,6 @@ export const RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPeti
     RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment,
     unknown
   >;
-export const EventSubscriptionCard_PetitionEventSubscriptionFragmentDoc = gql`
-  fragment EventSubscriptionCard_PetitionEventSubscription on PetitionEventSubscription {
-    id
-    eventsUrl
-    isEnabled
-  }
-` as unknown as DocumentNode<EventSubscriptionCard_PetitionEventSubscriptionFragment, unknown>;
 export const AdminOrganizations_OrganizationFragmentDoc = gql`
   fragment AdminOrganizations_Organization on Organization {
     id
@@ -18235,6 +18303,25 @@ export const Developers_UserAuthenticationTokenFragmentDoc = gql`
     lastUsedAt
   }
 ` as unknown as DocumentNode<Developers_UserAuthenticationTokenFragment, unknown>;
+export const CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc = gql`
+  fragment CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
+    eventsUrl
+    eventTypes
+  }
+` as unknown as DocumentNode<
+  CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment,
+  unknown
+>;
+export const Developers_PetitionEventSubscriptionFragmentDoc = gql`
+  fragment Developers_PetitionEventSubscription on PetitionEventSubscription {
+    id
+    eventsUrl
+    eventTypes
+    isEnabled
+    ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
+  }
+  ${CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<Developers_PetitionEventSubscriptionFragment, unknown>;
 export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCard_PublicPetitionFieldReply on PublicPetitionFieldReply {
     id
@@ -20769,12 +20856,15 @@ export const Developers_revokeUserAuthTokenDocument = gql`
   Developers_revokeUserAuthTokenMutationVariables
 >;
 export const Developers_createEventSubscriptionDocument = gql`
-  mutation Developers_createEventSubscription($eventsUrl: String!) {
-    createEventSubscription(eventsUrl: $eventsUrl) {
-      ...EventSubscriptionCard_PetitionEventSubscription
+  mutation Developers_createEventSubscription(
+    $eventsUrl: String!
+    $eventTypes: [PetitionEventType!]
+  ) {
+    createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes) {
+      ...Developers_PetitionEventSubscription
     }
   }
-  ${EventSubscriptionCard_PetitionEventSubscriptionFragmentDoc}
+  ${Developers_PetitionEventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
   Developers_createEventSubscriptionMutation,
   Developers_createEventSubscriptionMutationVariables
@@ -20782,40 +20872,51 @@ export const Developers_createEventSubscriptionDocument = gql`
 export const Developers_updateEventSubscriptionDocument = gql`
   mutation Developers_updateEventSubscription($id: GID!, $data: UpdateEventSubscriptionInput!) {
     updateEventSubscription(id: $id, data: $data) {
-      ...EventSubscriptionCard_PetitionEventSubscription
+      ...Developers_PetitionEventSubscription
     }
   }
-  ${EventSubscriptionCard_PetitionEventSubscriptionFragmentDoc}
+  ${Developers_PetitionEventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
   Developers_updateEventSubscriptionMutation,
   Developers_updateEventSubscriptionMutationVariables
 >;
-export const Developers_userDocument = gql`
-  query Developers_user(
-    $offset: Int!
-    $limit: Int!
-    $search: String
-    $sortBy: [UserAuthenticationTokens_OrderBy!]
-  ) {
+export const Developers_deleteEventSubscriptionsDocument = gql`
+  mutation Developers_deleteEventSubscriptions($ids: [GID!]!) {
+    deleteEventSubscriptions(ids: $ids)
+  }
+` as unknown as DocumentNode<
+  Developers_deleteEventSubscriptionsMutation,
+  Developers_deleteEventSubscriptionsMutationVariables
+>;
+export const Developers_tokensDocument = gql`
+  query Developers_tokens {
     me {
       id
-      authenticationTokens(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy) {
-        totalCount
-        items {
-          ...Developers_UserAuthenticationToken
-        }
+      tokens {
+        ...Developers_UserAuthenticationToken
       }
-      ...SettingsLayout_User
-      ...useSettingsSections_User
-    }
-    subscriptions {
-      ...EventSubscriptionCard_PetitionEventSubscription
     }
   }
   ${Developers_UserAuthenticationTokenFragmentDoc}
+` as unknown as DocumentNode<Developers_tokensQuery, Developers_tokensQueryVariables>;
+export const Developers_subscriptionsDocument = gql`
+  query Developers_subscriptions {
+    subscriptions {
+      ...Developers_PetitionEventSubscription
+    }
+  }
+  ${Developers_PetitionEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<Developers_subscriptionsQuery, Developers_subscriptionsQueryVariables>;
+export const Developers_userDocument = gql`
+  query Developers_user {
+    me {
+      id
+      ...SettingsLayout_User
+      ...useSettingsSections_User
+    }
+  }
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
-  ${EventSubscriptionCard_PetitionEventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<Developers_userQuery, Developers_userQueryVariables>;
 export const Settings_userDocument = gql`
   query Settings_user {

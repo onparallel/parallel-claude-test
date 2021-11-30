@@ -118,24 +118,6 @@ describe("GraphQL/PetitionEventSubscription", () => {
         expect.anything()
       );
     });
-
-    it("throws error if trying to create a second subscription", async () => {
-      const { data, errors } = await testClient.mutate({
-        mutation: gql`
-          mutation ($eventsUrl: String!) {
-            createEventSubscription(eventsUrl: $eventsUrl) {
-              id
-            }
-          }
-        `,
-        variables: {
-          eventsUrl: "https://www.example.com/api",
-        },
-      });
-
-      expect(data).toBeNull();
-      expect(errors).toContainGraphQLError("EXISTING_SUBSCRIPTION_ERROR");
-    });
   });
 
   describe("updateEventSubscription", () => {
@@ -265,28 +247,28 @@ describe("GraphQL/PetitionEventSubscription", () => {
     it("deletes an user's subscription", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!) {
-            deleteEventSubscription(id: $id)
+          mutation ($ids: [GID!]!) {
+            deleteEventSubscriptions(ids: $ids)
           }
         `,
         variables: {
-          id: subscriptionId,
+          ids: [subscriptionId],
         },
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.deleteEventSubscription).toEqual("SUCCESS");
+      expect(data?.deleteEventSubscriptions).toEqual("SUCCESS");
     });
 
     it("throws error if the trying to delete a subscription of another user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!) {
-            deleteEventSubscription(id: $id)
+          mutation ($ids: [GID!]!) {
+            deleteEventSubscriptions(ids: $ids)
           }
         `,
         variables: {
-          id: toGlobalId("PetitionEventSubscription", subscriptions[0].id),
+          ids: [toGlobalId("PetitionEventSubscription", subscriptions[0].id)],
         },
       });
 

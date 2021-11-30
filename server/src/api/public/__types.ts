@@ -30,6 +30,7 @@ export type AccessActivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -37,6 +38,7 @@ export type AccessActivatedFromPublicPetitionLinkEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type AccessActivatedFromPublicPetitionLinkUserNotification = PetitionUserNotification & {
@@ -51,6 +53,7 @@ export type AccessDeactivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -59,12 +62,14 @@ export type AccessDelegatedEvent = PetitionEvent & {
   id: Scalars["GID"];
   newAccess: PetitionAccess;
   originalAccess: PetitionAccess;
+  type: PetitionEventType;
 };
 
 export type AccessOpenedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type BatchSendSigningMode =
@@ -91,6 +96,7 @@ export type CommentDeletedEvent = PetitionEvent & {
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type CommentPublishedEvent = PetitionEvent & {
@@ -98,6 +104,7 @@ export type CommentPublishedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 /** A contact in the system. */
@@ -212,6 +219,7 @@ export type GroupPermissionAddedEvent = PetitionEvent & {
   id: Scalars["GID"];
   permissionGroup: UserGroup;
   permissionType: PetitionPermissionType;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -220,6 +228,7 @@ export type GroupPermissionEditedEvent = PetitionEvent & {
   id: Scalars["GID"];
   permissionGroup: UserGroup;
   permissionType: PetitionPermissionType;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -227,6 +236,7 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -283,6 +293,7 @@ export type MessageCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -298,12 +309,14 @@ export type MessageScheduledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  type: PetitionEventType;
 };
 
 export type MessageSentEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  type: PetitionEventType;
 };
 
 export type Mutation = {
@@ -370,8 +383,8 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
   deleteContacts: Result;
-  /** Deletes a subscription */
-  deleteEventSubscription: Result;
+  /** Deletes event subscriptions */
+  deleteEventSubscriptions: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Deletes a petition field. */
@@ -633,6 +646,7 @@ export type MutationcreateContactArgs = {
 };
 
 export type MutationcreateEventSubscriptionArgs = {
+  eventTypes?: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
 };
 
@@ -740,8 +754,8 @@ export type MutationdeleteContactsArgs = {
   ids: Array<Scalars["GID"]>;
 };
 
-export type MutationdeleteEventSubscriptionArgs = {
-  id: Scalars["GID"];
+export type MutationdeleteEventSubscriptionsArgs = {
+  ids: Array<Scalars["GID"]>;
 };
 
 export type MutationdeletePetitionArgs = {
@@ -1380,6 +1394,7 @@ export type OwnershipTransferredEvent = PetitionEvent & {
   id: Scalars["GID"];
   owner: Maybe<User>;
   previousOwner: Maybe<User>;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -1576,12 +1591,14 @@ export type PetitionBaseType = "PETITION" | "TEMPLATE";
 export type PetitionClonedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type PetitionClosedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -1589,6 +1606,7 @@ export type PetitionClosedNotifiedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -1596,6 +1614,7 @@ export type PetitionCompletedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type PetitionCompletedUserNotification = PetitionUserNotification & {
@@ -1609,17 +1628,20 @@ export type PetitionCompletedUserNotification = PetitionUserNotification & {
 export type PetitionCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type PetitionDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type PetitionEvent = {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type PetitionEventPagination = {
@@ -1630,10 +1652,49 @@ export type PetitionEventPagination = {
 };
 
 export type PetitionEventSubscription = {
+  eventTypes: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
 };
+
+export type PetitionEventType =
+  | "ACCESS_ACTIVATED"
+  | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
+  | "ACCESS_DEACTIVATED"
+  | "ACCESS_DELEGATED"
+  | "ACCESS_OPENED"
+  | "COMMENT_DELETED"
+  | "COMMENT_PUBLISHED"
+  | "GROUP_PERMISSION_ADDED"
+  | "GROUP_PERMISSION_EDITED"
+  | "GROUP_PERMISSION_REMOVED"
+  | "MESSAGE_CANCELLED"
+  | "MESSAGE_SCHEDULED"
+  | "MESSAGE_SENT"
+  | "OWNERSHIP_TRANSFERRED"
+  | "PETITION_CLONED"
+  | "PETITION_CLOSED"
+  | "PETITION_CLOSED_NOTIFIED"
+  | "PETITION_COMPLETED"
+  | "PETITION_CREATED"
+  | "PETITION_DELETED"
+  | "PETITION_MESSAGE_BOUNCED"
+  | "PETITION_REMINDER_BOUNCED"
+  | "PETITION_REOPENED"
+  | "RECIPIENT_SIGNED"
+  | "REMINDERS_OPT_OUT"
+  | "REMINDER_SENT"
+  | "REPLY_CREATED"
+  | "REPLY_DELETED"
+  | "REPLY_UPDATED"
+  | "SIGNATURE_CANCELLED"
+  | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_STARTED"
+  | "TEMPLATE_USED"
+  | "USER_PERMISSION_ADDED"
+  | "USER_PERMISSION_EDITED"
+  | "USER_PERMISSION_REMOVED";
 
 /** A field within a petition. */
 export type PetitionField = {
@@ -1785,6 +1846,7 @@ export type PetitionMessageBouncedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  type: PetitionEventType;
 };
 
 /** The status of a petition message. */
@@ -1847,6 +1909,7 @@ export type PetitionReminderBouncedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   reminder: PetitionReminder;
+  type: PetitionEventType;
 };
 
 /** The type of a petition reminder. */
@@ -1859,6 +1922,7 @@ export type PetitionReminderType =
 export type PetitionReopenedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -2483,6 +2547,7 @@ export type RecipientSignedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   signer: Maybe<PetitionSigner>;
+  type: PetitionEventType;
 };
 
 export type ReminderEmailBouncedUserNotification = PetitionUserNotification & {
@@ -2497,6 +2562,7 @@ export type ReminderSentEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   reminder: PetitionReminder;
+  type: PetitionEventType;
 };
 
 /** The reminder settings of a petition */
@@ -2529,6 +2595,7 @@ export type RemindersOptOutEvent = PetitionEvent & {
   id: Scalars["GID"];
   other: Maybe<Scalars["String"]>;
   reason: Scalars["String"];
+  type: PetitionEventType;
 };
 
 export type RemindersOptOutNotification = PetitionUserNotification & {
@@ -2547,6 +2614,7 @@ export type ReplyCreatedEvent = PetitionEvent & {
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply: Maybe<PetitionFieldReply>;
+  type: PetitionEventType;
 };
 
 export type ReplyDeletedEvent = PetitionEvent & {
@@ -2554,6 +2622,7 @@ export type ReplyDeletedEvent = PetitionEvent & {
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type ReplyUpdatedEvent = PetitionEvent & {
@@ -2561,6 +2630,7 @@ export type ReplyUpdatedEvent = PetitionEvent & {
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply: Maybe<PetitionFieldReply>;
+  type: PetitionEventType;
   updatedBy: Maybe<UserOrPetitionAccess>;
 };
 
@@ -2579,6 +2649,7 @@ export type SignatureCancelledEvent = PetitionEvent & {
   cancellerReason: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -2592,6 +2663,7 @@ export type SignatureCancelledUserNotification = PetitionUserNotification & {
 export type SignatureCompletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type SignatureCompletedUserNotification = PetitionUserNotification & {
@@ -2660,6 +2732,7 @@ export type SignatureOrgIntegrationProvider = "SIGNATURIT";
 export type SignatureStartedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type SsoOrgIntegration = OrgIntegration & {
@@ -2746,6 +2819,7 @@ export type TemplateDefaultUserPermission = TemplateDefaultPermission &
 export type TemplateUsedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  type: PetitionEventType;
 };
 
 export type Timestamps = {
@@ -2764,6 +2838,7 @@ export type UpdateContactInput = {
 };
 
 export type UpdateEventSubscriptionInput = {
+  eventTypes?: Maybe<Array<PetitionEventType>>;
   eventsUrl?: Maybe<Scalars["String"]>;
   isEnabled?: Maybe<Scalars["Boolean"]>;
 };
@@ -2809,8 +2884,6 @@ export type UpdateUserInput = {
 
 /** A user in the system. */
 export type User = Timestamps & {
-  /** Lists every auth token of the user */
-  authenticationTokens: UserAuthenticationTokenPagination;
   /** URL to the user avatar */
   avatarUrl: Maybe<Scalars["String"]>;
   canCreateUsers: Scalars["Boolean"];
@@ -2840,17 +2913,11 @@ export type User = Timestamps & {
   preferredLocale: Maybe<Scalars["String"]>;
   role: OrganizationRole;
   status: UserStatus;
+  /** Lists the API tokens this user has. */
+  tokens: Array<UserAuthenticationToken>;
   unreadNotificationIds: Array<Scalars["ID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
-
-/** A user in the system. */
-export type UserauthenticationTokensArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy>>;
 };
 
 /** A user in the system. */
@@ -2872,22 +2939,6 @@ export type UserAuthenticationToken = CreatedAt & {
   lastUsedAt: Maybe<Scalars["DateTime"]>;
   tokenName: Scalars["String"];
 };
-
-export type UserAuthenticationTokenPagination = {
-  /** The requested slice of items. */
-  items: Array<UserAuthenticationToken>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
-};
-
-/** Order to use on User.authenticationTokens */
-export type UserAuthenticationTokens_OrderBy =
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "lastUsedAt_ASC"
-  | "lastUsedAt_DESC"
-  | "tokenName_ASC"
-  | "tokenName_DESC";
 
 export type UserGroup = Timestamps & {
   /** Time when the resource was created. */
@@ -2946,6 +2997,7 @@ export type UserPermissionAddedEvent = PetitionEvent & {
   id: Scalars["GID"];
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -2954,6 +3006,7 @@ export type UserPermissionEditedEvent = PetitionEvent & {
   id: Scalars["GID"];
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -2961,6 +3014,7 @@ export type UserPermissionRemovedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionUser: Maybe<User>;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -3660,7 +3714,7 @@ export type EventSubscriptions_CreateSubscriptionMutation = {
 };
 
 export type EventSubscriptions_DeleteSubscriptionMutationVariables = Exact<{
-  id: Scalars["GID"];
+  ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type EventSubscriptions_DeleteSubscriptionMutation = { deleteEventSubscription: Result };
+export type EventSubscriptions_DeleteSubscriptionMutation = { deleteEventSubscriptions: Result };

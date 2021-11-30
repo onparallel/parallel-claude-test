@@ -226,7 +226,15 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         key: "selection-checkbox",
         header: "",
         Header: ({ anySelected, allSelected, onToggleAll }) => (
-          <Box as="th" width="1px" paddingLeft={5} paddingRight={2} height="38px" userSelect="none">
+          <Box
+            as="th"
+            width="1px"
+            height="38px"
+            userSelect="none"
+            paddingY={0}
+            paddingRight={0}
+            _first={{ paddingLeft: 3 }}
+          >
             <Box height="16px">
               <Checkbox
                 isChecked={anySelected && allSelected}
@@ -265,10 +273,10 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   return (
     <Box
       as="table"
-      style={{ tableLayout: "auto", width: "100%" }}
       borderBottom="1px solid"
       borderBottomColor={colors.border}
       {...props}
+      sx={{ tableLayout: "auto", width: "100%", ...props.sx }}
     >
       <Box as="thead" position="sticky" top="0" zIndex="10">
         <Box

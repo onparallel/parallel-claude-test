@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField, nonNull } from "nexus";
+import { inputObjectType, list, mutationField, nonNull } from "nexus";
 import { isDefined } from "remeda";
 import { RESULT } from "..";
 import { PetitionEventSubscription } from "../../db/__types";
@@ -25,27 +25,23 @@ export const createEventSubscription = mutationField("createEventSubscription", 
   authorize: authenticate(),
   args: {
     eventsUrl: nonNull("String"),
+    eventTypes: list(nonNull("PetitionEventType")),
   },
   validateArgs: validUrl((args) => args.eventsUrl, "eventsUrl"),
-  resolve: async (_, { eventsUrl }, ctx) => {
-    const userSubscriptions = await ctx.subscriptions.loadSubscriptionsByUserId(ctx.user!.id);
-    if (userSubscriptions.length > 0) {
-      throw new WhitelistedError(`You already have a subscription`, "EXISTING_SUBSCRIPTION_ERROR");
-    }
-
-    const challengePassed = await challengeWebhookUrl(eventsUrl, ctx.fetch);
+  resolve: async (_, args, ctx) => {
+    const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch);
     if (!challengePassed) {
       throw new WhitelistedError(
         "Your URL does not seem to accept POST requests.",
         "WEBHOOK_CHALLENGE_FAILED"
       );
     }
-
     return await ctx.subscriptions.createSubscription(
       {
         user_id: ctx.user!.id,
         is_enabled: true,
-        endpoint: eventsUrl,
+        endpoint: args.eventsUrl,
+        event_types: args.eventTypes,
       },
       `User:${ctx.user!.id}`
     );
@@ -64,6 +60,7 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
         definition(t) {
           t.nullable.boolean("isEnabled");
           t.nullable.string("eventsUrl");
+          t.nullable.list.nonNull.field("eventTypes", { type: "PetitionEventType" });
         },
       }).asArg()
     ),
@@ -91,27 +88,23 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
     if (isDefined(args.data.isEnabled)) {
       data.is_enabled = args.data.isEnabled;
     }
+    if (args.data.eventTypes !== undefined) {
+      data.event_types = args.data.eventTypes;
+    }
     return await ctx.subscriptions.updateSubscription(args.id, data, `User:${ctx.user!.id}`);
   },
 });
 
-export const deleteEventSubscription = mutationField("deleteEventSubscription", {
+export const deleteEventSubscriptions = mutationField("deleteEventSubscriptions", {
   type: "Result",
-  description: "Deletes a subscription",
-  authorize: authenticateAnd(userHasAccessToEventSubscription("id")),
+  description: "Deletes event subscriptions",
+  authorize: authenticateAnd(userHasAccessToEventSubscription("ids")),
   args: {
-    id: nonNull(globalIdArg("PetitionEventSubscription")),
+    ids: nonNull(list(nonNull(globalIdArg("PetitionEventSubscription")))),
   },
-  resolve: async (_, { id }, ctx) => {
+  resolve: async (_, { ids }, ctx) => {
     try {
-      await ctx.subscriptions.updateSubscription(
-        id,
-        {
-          deleted_at: new Date(),
-          deleted_by: `User:${ctx.user!.id}`,
-        },
-        `User:${ctx.user!.id}`
-      );
+      await ctx.subscriptions.deleteSubscriptions(ids, `User:${ctx.user!.id}`);
       return RESULT.SUCCESS;
     } catch {}
     return RESULT.FAILURE;

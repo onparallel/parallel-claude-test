@@ -1,11 +1,12 @@
 import { WorkerContext } from "../../context";
-import { EventType, EventListener, Event } from "../event-processor";
+import { PetitionEventTypeValues } from "../../db/__types";
+import { Event, EventListener, EventType } from "../event-processor";
 
 export class EventProcessor {
   private listeners = new Map<EventType, EventListener[]>();
 
-  register(types: EventType[], listener: EventListener<any>) {
-    for (const type of types) {
+  register(types: EventType[] | "*", listener: EventListener<any>) {
+    for (const type of types === "*" ? PetitionEventTypeValues : types) {
       if (this.listeners.has(type)) {
         this.listeners.get(type)!.push(listener);
       } else {

@@ -1,5 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { unMaybeArray } from "../../util/arrays";
+import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreatePetitionEventSubscription, PetitionEventSubscription } from "../__types";
@@ -20,9 +22,13 @@ export class SubscriptionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
   );
 
-  async createSubscription(data: CreatePetitionEventSubscription, createdBy: string) {
+  async createSubscription(
+    { event_types: eventTypes, ...data }: CreatePetitionEventSubscription,
+    createdBy: string
+  ) {
     const [row] = await this.insert("petition_event_subscription", {
       ...data,
+      event_types: eventTypes && JSON.stringify(eventTypes),
       created_by: createdBy,
     });
 
@@ -31,7 +37,7 @@ export class SubscriptionRepository extends BaseRepository {
 
   async updateSubscription(
     id: number,
-    data: Partial<PetitionEventSubscription>,
+    { event_types: eventTypes, ...data }: Partial<PetitionEventSubscription>,
     updatedBy: string
   ) {
     const [row] = await this.from("petition_event_subscription")
@@ -39,6 +45,9 @@ export class SubscriptionRepository extends BaseRepository {
       .update(
         {
           ...data,
+          ...(eventTypes !== undefined
+            ? { event_types: eventTypes && JSON.stringify(eventTypes) }
+            : {}),
           updated_by: updatedBy,
           updated_at: this.now(),
         },
@@ -46,5 +55,15 @@ export class SubscriptionRepository extends BaseRepository {
       );
 
     return row;
+  }
+
+  async deleteSubscriptions(ids: MaybeArray<number>, deletedBy: string) {
+    await this.from("petition_event_subscription")
+      .whereIn("id", unMaybeArray(ids))
+      .whereNull("deleted_at")
+      .update({
+        deleted_by: deletedBy,
+        deleted_at: this.now(),
+      });
   }
 }

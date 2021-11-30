@@ -111,9 +111,9 @@ export function SettingsLayout({
                 </NakedLink>
                 {header}
               </Flex>
-              <Flex flex="1" minHeight={0} overflow="auto" backgroundColor="gray.50">
+              <Box flex="1" minHeight={0} overflow="auto" backgroundColor="gray.50">
                 {children}
-              </Flex>
+              </Box>
             </>
           )}
         </Flex>

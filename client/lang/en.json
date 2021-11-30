@@ -480,6 +480,41 @@
     "context": "New user group"
   },
   {
+    "term": "component.create-or-edit-event-subscription-dialog.challenge-explanation",
+    "definition": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200.",
+    "context": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200."
+  },
+  {
+    "term": "component.create-or-edit-event-subscription-dialog.events-documentation",
+    "definition": "For a complete list of events visit our <a>API documentation</a>",
+    "context": "For a complete list of events visit our <a>API documentation</a>"
+  },
+  {
+    "term": "component.create-or-edit-event-subscription-dialog.explanation",
+    "definition": "Events URL where you want to be notified.",
+    "context": "Events URL where you want to be notified."
+  },
+  {
+    "term": "component.create-or-edit-event-subscription-dialog.failed-challenge",
+    "definition": "Your URL does not seem to accept POST requests.",
+    "context": "Your URL does not seem to accept POST requests."
+  },
+  {
+    "term": "component.create-or-edit-event-subscription-dialog.invalid-url",
+    "definition": "Please, provide a valid URL.",
+    "context": "Please, provide a valid URL."
+  },
+  {
+    "term": "component.create-or-edit-event-subscription-dialog.specific-events",
+    "definition": "Specific events",
+    "context": "Specific events"
+  },
+  {
+    "term": "component.create-or-edit-event-subscription-dialog.title",
+    "definition": "Event subscription",
+    "context": "Event subscription"
+  },
+  {
     "term": "component.date-picker.next-month",
     "definition": "Next month",
     "context": "Next month"
@@ -503,6 +538,26 @@
     "term": "component.delete-access-token-dialog.header",
     "definition": "Revoke access {count, plural, =1 {token} other {tokens}}",
     "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
+  },
+  {
+    "term": "component.delete-access-token-dialog.warning",
+    "definition": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>.",
+    "context": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>."
+  },
+  {
+    "term": "component.delete-event-subscription-dialog.body",
+    "definition": "Are you sure you want to delete the {count, plural, =1 {selected event subscription} other {# selected event subscriptions}}?",
+    "context": "Are you sure you want to delete the {count, plural, =1 {selected event subscription} other {# selected event subscriptions}}?"
+  },
+  {
+    "term": "component.delete-event-subscription-dialog.header",
+    "definition": "Delete event {count, plural, =1 {subscription} other {subscriptions}}",
+    "context": "Delete event {count, plural, =1 {subscription} other {subscriptions}}"
+  },
+  {
+    "term": "component.delete-event-subscription-dialog.warning",
+    "definition": "Any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel.",
+    "context": "Any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
   },
   {
     "term": "component.delete-petitions.confirm-delete-petition.body",
@@ -2961,8 +3016,8 @@
   },
   {
     "term": "component.test-mode-signature-badge.popover-text-demo",
-    "definition": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>",
-    "context": "Test mode allows you to send signatures but it will not have any legal validity. To activate eSignature, <a>contact our support team.</a>"
+    "definition": "Test mode allows you to send signatures but they will not have legal validity. To activate eSignature, <a>contact our support team.</a>",
+    "context": "Test mode allows you to send signatures but they will not have legal validity. To activate eSignature, <a>contact our support team.</a>"
   },
   {
     "term": "component.test-signature-dialog.body",
@@ -3485,6 +3540,11 @@
     "context": "All"
   },
   {
+    "term": "generic.all-event-types",
+    "definition": "All events",
+    "context": "All events"
+  },
+  {
     "term": "generic.attached-file",
     "definition": "Attached file: {filename}",
     "context": "Attached file: {filename}"
@@ -3875,6 +3935,11 @@
     "context": "Your account uses SSO. To reset your password, please contact your team admin."
   },
   {
+    "term": "generic.forms.url-placeholder",
+    "definition": "https://www.example.com",
+    "context": "https://www.example.com"
+  },
+  {
     "term": "generic.forms.valid-password-error",
     "definition": "Please, enter a valid password",
     "context": "Please, enter a valid password"
@@ -4178,11 +4243,6 @@
     "term": "generic.template-type-plural",
     "definition": "Templates",
     "context": "Templates"
-  },
-  {
-    "term": "generic.test",
-    "definition": "Test",
-    "context": "Test"
   },
   {
     "term": "generic.test-mode",
@@ -8265,11 +8325,6 @@
     "context": "Save changes"
   },
   {
-    "term": "settings.api-tokens.confirm-delete-tokens-dialog.warning",
-    "definition": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>.",
-    "context": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>."
-  },
-  {
     "term": "settings.api-tokens.generate-new-token",
     "definition": "Create token",
     "context": "Create token"
@@ -8280,14 +8335,14 @@
     "context": "Developers"
   },
   {
-    "term": "settings.developers.api-tokens.explainer",
+    "term": "settings.developers.api-tokens-explanation",
     "definition": "Personal Access Tokens can be used to access the <a>Parallel API</a>.",
     "context": "Personal Access Tokens can be used to access the <a>Parallel API</a>."
   },
   {
-    "term": "settings.developers.api-tokens.generate-new-token",
-    "definition": "Create token",
-    "context": "Create token"
+    "term": "settings.developers.api-tokens-title",
+    "definition": "API Tokens",
+    "context": "API Tokens"
   },
   {
     "term": "settings.developers.api-tokens.header.token-name",
@@ -8295,49 +8350,54 @@
     "context": "Name"
   },
   {
-    "term": "settings.developers.api-tokens.title",
-    "definition": "API Tokens",
-    "context": "API Tokens"
+    "term": "settings.developers.create-subscription",
+    "definition": "Create subscription",
+    "context": "Create subscription"
   },
   {
-    "term": "settings.developers.subscriptions.card-body-explainer",
-    "definition": "You can subscribe to be notified of events in any of the petitions your organization sends (for example, when a contact writes a comment or submits a reply) at a URL you choose.",
-    "context": "You can subscribe to be notified of events in any of the petitions your organization sends (for example, when a contact writes a comment or submits a reply) at a URL you choose."
+    "term": "settings.developers.create-token",
+    "definition": "Create token",
+    "context": "Create token"
   },
   {
-    "term": "settings.developers.subscriptions.card-header",
-    "definition": "Events subscriptions",
-    "context": "Events subscriptions"
+    "term": "settings.developers.no-subscriptions-message",
+    "definition": "You haven't created any subscriptions yet",
+    "context": "You haven't created any subscriptions yet"
   },
   {
-    "term": "settings.developers.subscriptions.input-error.failed-challenge",
-    "definition": "Your URL does not seem to accept POST requests.",
-    "context": "Your URL does not seem to accept POST requests."
+    "term": "settings.developers.no-tokens-message",
+    "definition": "You haven't created any API tokens yet",
+    "context": "You haven't created any API tokens yet"
   },
   {
-    "term": "settings.developers.subscriptions.input-error.invalid-url",
-    "definition": "Please, provide a valid URL.",
-    "context": "Please, provide a valid URL."
+    "term": "settings.developers.subscriptions-explanation",
+    "definition": "Here you can register webhooks to get notified when anything happens in one of your petitions (e.g. when a recipients adds a comment or when the petition is completed)",
+    "context": "Here you can register webhooks to get notified when anything happens in one of your petitions (e.g. when a recipients adds a comment or when the petition is completed)"
   },
   {
-    "term": "settings.developers.subscriptions.input-explainer",
-    "definition": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. As soon as you click the `Test` button, we will send a POST request with an empty body, and your endpoint must respond with a status code 200. <a>Click here</a> to learn more about our events.",
-    "context": "We will send an HTTP POST request to this URL when events ocurr on any of the petitions sent by your organization. As soon as you click the `Test` button, we will send a POST request with an empty body, and your endpoint must respond with a status code 200. <a>Click here</a> to learn more about our events."
-  },
-  {
-    "term": "settings.developers.subscriptions.input-saved",
-    "definition": "Saved!",
-    "context": "Saved!"
-  },
-  {
-    "term": "settings.developers.subscriptions.input-title",
-    "definition": "Request URL",
-    "context": "Request URL"
-  },
-  {
-    "term": "settings.developers.subscriptions.title",
+    "term": "settings.developers.subscriptions-title",
     "definition": "Subscriptions",
     "context": "Subscriptions"
+  },
+  {
+    "term": "settings.developers.subscriptions.header.event-types",
+    "definition": "Event types",
+    "context": "Event types"
+  },
+  {
+    "term": "settings.developers.subscriptions.header.events-url",
+    "definition": "Events URL",
+    "context": "Events URL"
+  },
+  {
+    "term": "settings.developers.subscriptions.header.is-enabled",
+    "definition": "Enabled",
+    "context": "Enabled"
+  },
+  {
+    "term": "settings.developers.subscriptions.n-events",
+    "definition": "{count} events",
+    "context": "{count} events"
   },
   {
     "term": "settings.security",
@@ -8658,11 +8718,6 @@
     "term": "view.groups.confirm-delete-body",
     "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {group} other {groups}}.",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {group} other {groups}}."
-  },
-  {
-    "term": "view.groups.confirm-delete-button",
-    "definition": "Yes, delete",
-    "context": "Yes, delete"
   },
   {
     "term": "view.groups.confirm-delete-header",

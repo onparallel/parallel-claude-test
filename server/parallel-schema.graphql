@@ -13,6 +13,7 @@ type AccessActivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
   user: User
 }
 
@@ -20,6 +21,7 @@ type AccessActivatedFromPublicPetitionLinkEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
 }
 
 type AccessActivatedFromPublicPetitionLinkUserNotification implements PetitionUserNotification {
@@ -34,6 +36,7 @@ type AccessDeactivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
   user: User
 }
 
@@ -42,12 +45,14 @@ type AccessDelegatedEvent implements PetitionEvent {
   id: GID!
   newAccess: PetitionAccess!
   originalAccess: PetitionAccess!
+  type: PetitionEventType!
 }
 
 type AccessOpenedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
 }
 
 enum BatchSendSigningMode {
@@ -87,6 +92,7 @@ type CommentDeletedEvent implements PetitionEvent {
   deletedBy: UserOrPetitionAccess
   field: PetitionField
   id: GID!
+  type: PetitionEventType!
 }
 
 type CommentPublishedEvent implements PetitionEvent {
@@ -94,6 +100,7 @@ type CommentPublishedEvent implements PetitionEvent {
   createdAt: DateTime!
   field: PetitionField
   id: GID!
+  type: PetitionEventType!
 }
 
 """
@@ -218,7 +225,7 @@ enum FeatureFlag {
   AUTO_SEND_TEMPLATE
   DEVELOPER_ACCESS
   EXPORT_CUATRECASAS
-  HIDE_RECIPIENT_VIEW_CONTENTS @deprecated(reason: "Don't use this")
+  HIDE_RECIPIENT_VIEW_CONTENTS
   INTERNAL_COMMENTS
   PETITION_PDF_EXPORT
   PETITION_SIGNATURE
@@ -268,6 +275,7 @@ type GroupPermissionAddedEvent implements PetitionEvent {
   id: GID!
   permissionGroup: UserGroup!
   permissionType: PetitionPermissionType!
+  type: PetitionEventType!
   user: User
 }
 
@@ -276,6 +284,7 @@ type GroupPermissionEditedEvent implements PetitionEvent {
   id: GID!
   permissionGroup: UserGroup!
   permissionType: PetitionPermissionType!
+  type: PetitionEventType!
   user: User
 }
 
@@ -283,6 +292,7 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   permissionGroup: UserGroup!
+  type: PetitionEventType!
   user: User
 }
 
@@ -371,6 +381,7 @@ type MessageCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   message: PetitionMessage!
+  type: PetitionEventType!
   user: User
 }
 
@@ -386,12 +397,14 @@ type MessageScheduledEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   message: PetitionMessage!
+  type: PetitionEventType!
 }
 
 type MessageSentEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   message: PetitionMessage!
+  type: PetitionEventType!
 }
 
 type Mutation {
@@ -503,7 +516,10 @@ type Mutation {
   """
   Creates an event subscription for the user's petitions
   """
-  createEventSubscription(eventsUrl: String!): PetitionEventSubscription!
+  createEventSubscription(
+    eventTypes: [PetitionEventType!]
+    eventsUrl: String!
+  ): PetitionEventSubscription!
 
   """
   Creates a task for exporting a ZIP file with petition replies and sends it to the queue
@@ -671,9 +687,9 @@ type Mutation {
   deleteContacts(ids: [GID!]!): Result!
 
   """
-  Deletes a subscription
+  Deletes event subscriptions
   """
-  deleteEventSubscription(id: GID!): Result!
+  deleteEventSubscriptions(ids: [GID!]!): Result!
 
   """
   Soft-deletes any given petition on the database.
@@ -1588,6 +1604,7 @@ type OwnershipTransferredEvent implements PetitionEvent {
   id: GID!
   owner: User
   previousOwner: User
+  type: PetitionEventType!
   user: User
 }
 
@@ -1975,12 +1992,14 @@ enum PetitionBaseType {
 type PetitionClonedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
   user: User
 }
 
 type PetitionClosedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
   user: User
 }
 
@@ -1988,6 +2007,7 @@ type PetitionClosedNotifiedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
   user: User
 }
 
@@ -1995,6 +2015,7 @@ type PetitionCompletedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
 }
 
 type PetitionCompletedUserNotification implements PetitionUserNotification {
@@ -2008,17 +2029,20 @@ type PetitionCompletedUserNotification implements PetitionUserNotification {
 type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
   user: User
 }
 
 type PetitionDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
 }
 
 interface PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
 }
 
 type PetitionEventPagination {
@@ -2034,9 +2058,49 @@ type PetitionEventPagination {
 }
 
 type PetitionEventSubscription {
+  eventTypes: [PetitionEventType!]
   eventsUrl: String!
   id: GID!
   isEnabled: Boolean!
+}
+
+enum PetitionEventType {
+  ACCESS_ACTIVATED
+  ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK
+  ACCESS_DEACTIVATED
+  ACCESS_DELEGATED
+  ACCESS_OPENED
+  COMMENT_DELETED
+  COMMENT_PUBLISHED
+  GROUP_PERMISSION_ADDED
+  GROUP_PERMISSION_EDITED
+  GROUP_PERMISSION_REMOVED
+  MESSAGE_CANCELLED
+  MESSAGE_SCHEDULED
+  MESSAGE_SENT
+  OWNERSHIP_TRANSFERRED
+  PETITION_CLONED
+  PETITION_CLOSED
+  PETITION_CLOSED_NOTIFIED
+  PETITION_COMPLETED
+  PETITION_CREATED
+  PETITION_DELETED
+  PETITION_MESSAGE_BOUNCED
+  PETITION_REMINDER_BOUNCED
+  PETITION_REOPENED
+  RECIPIENT_SIGNED
+  REMINDERS_OPT_OUT
+  REMINDER_SENT
+  REPLY_CREATED
+  REPLY_DELETED
+  REPLY_UPDATED
+  SIGNATURE_CANCELLED
+  SIGNATURE_COMPLETED
+  SIGNATURE_STARTED
+  TEMPLATE_USED
+  USER_PERMISSION_ADDED
+  USER_PERMISSION_EDITED
+  USER_PERMISSION_REMOVED
 }
 
 """
@@ -2362,6 +2426,7 @@ type PetitionMessageBouncedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   message: PetitionMessage!
+  type: PetitionEventType!
 }
 
 """
@@ -2490,6 +2555,7 @@ type PetitionReminderBouncedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   reminder: PetitionReminder!
+  type: PetitionEventType!
 }
 
 """
@@ -2510,6 +2576,7 @@ enum PetitionReminderType {
 type PetitionReopenedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
   user: User
 }
 
@@ -3530,6 +3597,7 @@ type RecipientSignedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   signer: PetitionSigner
+  type: PetitionEventType!
 }
 
 type ReminderEmailBouncedUserNotification implements PetitionUserNotification {
@@ -3544,6 +3612,7 @@ type ReminderSentEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   reminder: PetitionReminder!
+  type: PetitionEventType!
 }
 
 """
@@ -3602,6 +3671,7 @@ type RemindersOptOutEvent implements PetitionEvent {
   id: GID!
   other: String
   reason: String!
+  type: PetitionEventType!
 }
 
 type RemindersOptOutNotification implements PetitionUserNotification {
@@ -3620,6 +3690,7 @@ type ReplyCreatedEvent implements PetitionEvent {
   field: PetitionField
   id: GID!
   reply: PetitionFieldReply
+  type: PetitionEventType!
 }
 
 type ReplyDeletedEvent implements PetitionEvent {
@@ -3627,6 +3698,7 @@ type ReplyDeletedEvent implements PetitionEvent {
   deletedBy: UserOrPetitionAccess
   field: PetitionField
   id: GID!
+  type: PetitionEventType!
 }
 
 type ReplyUpdatedEvent implements PetitionEvent {
@@ -3634,6 +3706,7 @@ type ReplyUpdatedEvent implements PetitionEvent {
   field: PetitionField
   id: GID!
   reply: PetitionFieldReply
+  type: PetitionEventType!
   updatedBy: UserOrPetitionAccess
 }
 
@@ -3657,6 +3730,7 @@ type SignatureCancelledEvent implements PetitionEvent {
   cancellerReason: String
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
   user: User
 }
 
@@ -3670,6 +3744,7 @@ type SignatureCancelledUserNotification implements PetitionUserNotification {
 type SignatureCompletedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
 }
 
 type SignatureCompletedUserNotification implements PetitionUserNotification {
@@ -3791,6 +3866,7 @@ enum SignatureOrgIntegrationProvider {
 type SignatureStartedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
 }
 
 type SsoOrgIntegration implements OrgIntegration {
@@ -3944,6 +4020,7 @@ type TemplateDefaultUserPermission implements TemplateDefaultPermission & Timest
 type TemplateUsedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  type: PetitionEventType!
 }
 
 interface Timestamps {
@@ -3972,6 +4049,7 @@ input UpdateContactInput {
 }
 
 input UpdateEventSubscriptionInput {
+  eventTypes: [PetitionEventType!]
   eventsUrl: String
   isEnabled: Boolean
 }
@@ -4024,31 +4102,6 @@ scalar Upload
 A user in the system.
 """
 type User implements Timestamps {
-  """
-  Lists every auth token of the user
-  """
-  authenticationTokens(
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-
-    """
-    Optional text to search in the collection.
-    """
-    search: String
-
-    """
-    Sorting to use on the collection
-    """
-    sortBy: [UserAuthenticationTokens_OrderBy!]
-  ): UserAuthenticationTokenPagination!
-
   """
   URL to the user avatar
   """
@@ -4118,6 +4171,11 @@ type User implements Timestamps {
   preferredLocale: String
   role: OrganizationRole!
   status: UserStatus!
+
+  """
+  Lists the API tokens this user has.
+  """
+  tokens: [UserAuthenticationToken!]!
   unreadNotificationIds: [ID!]!
 
   """
@@ -4134,30 +4192,6 @@ type UserAuthenticationToken implements CreatedAt {
   id: GID!
   lastUsedAt: DateTime
   tokenName: String!
-}
-
-type UserAuthenticationTokenPagination {
-  """
-  The requested slice of items.
-  """
-  items: [UserAuthenticationToken!]!
-
-  """
-  The total count of items in the list.
-  """
-  totalCount: Int!
-}
-
-"""
-Order to use on User.authenticationTokens
-"""
-enum UserAuthenticationTokens_OrderBy {
-  createdAt_ASC
-  createdAt_DESC
-  lastUsedAt_ASC
-  lastUsedAt_DESC
-  tokenName_ASC
-  tokenName_DESC
 }
 
 type UserGroup implements Timestamps {
@@ -4239,6 +4273,7 @@ type UserPermissionAddedEvent implements PetitionEvent {
   id: GID!
   permissionType: PetitionPermissionType!
   permissionUser: User
+  type: PetitionEventType!
   user: User
 }
 
@@ -4247,6 +4282,7 @@ type UserPermissionEditedEvent implements PetitionEvent {
   id: GID!
   permissionType: PetitionPermissionType!
   permissionUser: User
+  type: PetitionEventType!
   user: User
 }
 
@@ -4254,6 +4290,7 @@ type UserPermissionRemovedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   permissionUser: User
+  type: PetitionEventType!
   user: User
 }
 

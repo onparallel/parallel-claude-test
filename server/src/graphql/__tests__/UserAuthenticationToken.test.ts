@@ -57,11 +57,8 @@ describe("GraphQL/UserAuthenticationToken", () => {
         query: gql`
           query me {
             me {
-              authenticationTokens(limit: 10, offset: 0, sortBy: createdAt_DESC) {
-                totalCount
-                items {
-                  tokenName
-                }
+              tokens {
+                tokenName
               }
             }
           }
@@ -70,14 +67,11 @@ describe("GraphQL/UserAuthenticationToken", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.me).toEqual({
-        authenticationTokens: {
-          totalCount: 3,
-          items: [
-            { tokenName: "My Third Token" },
-            { tokenName: "My Second Token" },
-            { tokenName: "My First Token" },
-          ],
-        },
+        tokens: [
+          { tokenName: "My First Token" },
+          { tokenName: "My Second Token" },
+          { tokenName: "My Third Token" },
+        ],
       });
     });
 
@@ -97,11 +91,8 @@ describe("GraphQL/UserAuthenticationToken", () => {
         query: gql`
           query me {
             me {
-              authenticationTokens(limit: 10, offset: 0, sortBy: createdAt_DESC) {
-                totalCount
-                items {
-                  tokenName
-                }
+              tokens {
+                tokenName
               }
             }
           }
@@ -110,10 +101,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.me).toEqual({
-        authenticationTokens: {
-          totalCount: 2,
-          items: [{ tokenName: "My Third Token" }, { tokenName: "My First Token" }],
-        },
+        tokens: [{ tokenName: "My First Token" }, { tokenName: "My Third Token" }],
       });
     });
   });

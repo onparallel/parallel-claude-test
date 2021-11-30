@@ -1,7 +1,7 @@
-import { core, interfaceType, objectType } from "nexus";
+import { core, enumType, interfaceType, objectType } from "nexus";
 import { isDefined } from "remeda";
 import { ApiContext } from "../../../context";
-import { PetitionAccess, User } from "../../../db/__types";
+import { PetitionAccess, PetitionEventTypeValues, User } from "../../../db/__types";
 
 async function userOrPetitionAccessResolver(
   root: { data: { user_id?: number; petition_access_id?: number } },
@@ -22,6 +22,12 @@ export const PetitionEvent = interfaceType({
   name: "PetitionEvent",
   definition(t) {
     t.globalId("id");
+    t.field("type", {
+      type: enumType({
+        name: "PetitionEventType",
+        members: PetitionEventTypeValues,
+      }),
+    });
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,
     });

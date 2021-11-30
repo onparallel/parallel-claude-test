@@ -18,6 +18,7 @@ export type EventListener<TEvent extends Event = Event> = (
 createQueueWorker(
   "event-processor",
   new EventProcessor()
+    .register("*", eventSubscriptionsListener)
     .register(
       [
         "PETITION_CREATED",
@@ -40,41 +41,6 @@ createQueueWorker(
         "EMAIL_OPENED",
       ],
       analyticsEventListener
-    )
-    .register(
-      [
-        "ACCESS_ACTIVATED",
-        "ACCESS_DEACTIVATED",
-        "ACCESS_DELEGATED",
-        "ACCESS_OPENED",
-        "COMMENT_DELETED",
-        "COMMENT_PUBLISHED",
-        "GROUP_PERMISSION_ADDED",
-        "GROUP_PERMISSION_EDITED",
-        "GROUP_PERMISSION_REMOVED",
-        "MESSAGE_CANCELLED",
-        "MESSAGE_SCHEDULED",
-        "MESSAGE_SENT",
-        "OWNERSHIP_TRANSFERRED",
-        "PETITION_CLOSED",
-        "PETITION_CLOSED_NOTIFIED",
-        "PETITION_COMPLETED",
-        "PETITION_CREATED",
-        "PETITION_REOPENED",
-        "PETITION_DELETED",
-        "REMINDER_SENT",
-        "REPLY_CREATED",
-        "REPLY_DELETED",
-        "REPLY_UPDATED",
-        "SIGNATURE_CANCELLED",
-        "SIGNATURE_COMPLETED",
-        "SIGNATURE_STARTED",
-        "USER_PERMISSION_ADDED",
-        "USER_PERMISSION_EDITED",
-        "USER_PERMISSION_REMOVED",
-        "REMINDERS_OPT_OUT",
-      ],
-      eventSubscriptionsListener
     )
     .register(
       [

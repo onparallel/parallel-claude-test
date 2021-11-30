@@ -2,10 +2,9 @@ import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { hash, random } from "../../util/token";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike, SortBy } from "../helpers/utils";
+import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { User, UserAuthenticationToken } from "../__types";
+import { User } from "../__types";
 
 @injectable()
 export class UserAuthenticationRepository extends BaseRepository {
@@ -61,44 +60,11 @@ export class UserAuthenticationRepository extends BaseRepository {
     return count === new Set(ids).size;
   }
 
-  async loadUserAuthenticationTokens(
-    userId: number,
-    opts: {
-      search?: string | null;
-      sortBy?: SortBy<keyof UserAuthenticationToken>[];
-    } & PageOpts
-  ) {
-    return await this.loadPageAndCount(
-      this.from("user_authentication_token")
-        .where({
-          user_id: userId,
-          deleted_at: null,
-        })
-        .mmodify((q) => {
-          const { search, sortBy } = opts;
-          if (search) {
-            q.whereIlike("token_name", `%${escapeLike(search, "\\")}%`, "\\");
-          }
-          if (sortBy) {
-            q.orderByRaw(
-              sortBy
-                .map((s) => {
-                  // nullable column
-                  if (["last_used_at"].includes(s.column)) {
-                    return `${s.column} ${s.order} NULLS ${s.order === "asc" ? "FIRST" : "LAST"}`;
-                  } else {
-                    return `${s.column} ${s.order}`;
-                  }
-                })
-                .join(", ")
-            );
-          }
-        })
-        .orderBy("id")
-        .select("*"),
-      opts
-    );
-  }
+  readonly loadUserAuthenticationTokens = this.buildLoadMultipleBy(
+    "user_authentication_token",
+    "user_id",
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "asc")
+  );
 
   async createUserAuthenticationToken(tokenName: string, user: User) {
     const apiKey = random(32);

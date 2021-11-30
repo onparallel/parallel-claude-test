@@ -19,14 +19,16 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
 
   const userSubscriptions = (await ctx.subscriptions.loadSubscriptionsByUserId(userIds))
     .flat()
-    .filter((s) => s.is_enabled);
+    .filter((s) => {
+      return s.is_enabled && (s.event_types === null || s.event_types.includes(event.type));
+    });
 
   if (userSubscriptions.length === 0) {
     return;
   }
 
+  const mappedEvent = mapEvent(event);
   for (const subscription of userSubscriptions) {
-    const mappedEvent = mapEvent(event);
     try {
       const { status, statusText } = await fetch(subscription.endpoint, {
         method: "POST",

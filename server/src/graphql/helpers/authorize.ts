@@ -16,7 +16,8 @@ export function authenticate<
     try {
       await authenticateFromRequest(ctx.req, ctx);
       return true;
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new AuthenticationError("Invalid session");
     }
   };

@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 export function DeleteAccessTokenDialog({
   selectedCount,
   ...props
-}: DialogProps & { selectedCount: number }) {
+}: DialogProps<{ selectedCount: number }>) {
   const intl = useIntl();
   const confirmation = intl
     .formatMessage({
@@ -40,7 +40,7 @@ export function DeleteAccessTokenDialog({
           </Text>
           <Text>
             <FormattedMessage
-              id="settings.api-tokens.confirm-delete-tokens-dialog.warning"
+              id="component.delete-access-token-dialog.warning"
               defaultMessage="Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>."
               values={{ count: selectedCount }}
             />

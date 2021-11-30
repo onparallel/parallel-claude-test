@@ -17,15 +17,44 @@ export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
+export const FeatureFlagNameValues = [
+  "AUTO_SEND_TEMPLATE",
+  "DEVELOPER_ACCESS",
+  "EXPORT_CUATRECASAS",
+  "HIDE_RECIPIENT_VIEW_CONTENTS",
+  "INTERNAL_COMMENTS",
+  "PETITION_PDF_EXPORT",
+  "PETITION_SIGNATURE",
+  "SKIP_FORWARD_SECURITY",
+] as FeatureFlagName[];
+
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+
+export const IntegrationTypeValues = ["SIGNATURE", "SSO", "USER_PROVISIONING"] as IntegrationType[];
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV" | "ROOT";
 
+export const OrganizationStatusValues = [
+  "ACTIVE",
+  "CHURNED",
+  "DEMO",
+  "DEV",
+  "ROOT",
+] as OrganizationStatus[];
+
 export type OrganizationUsageLimitName = "PETITION_SEND";
+
+export const OrganizationUsageLimitNameValues = ["PETITION_SEND"] as OrganizationUsageLimitName[];
 
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
+export const PetitionAccessStatusValues = ["ACTIVE", "INACTIVE"] as PetitionAccessStatus[];
+
 export type PetitionContactNotificationType = "COMMENT_CREATED";
+
+export const PetitionContactNotificationTypeValues = [
+  "COMMENT_CREATED",
+] as PetitionContactNotificationType[];
 
 export type PetitionEventType =
   | "ACCESS_ACTIVATED"
@@ -65,7 +94,52 @@ export type PetitionEventType =
   | "USER_PERMISSION_EDITED"
   | "USER_PERMISSION_REMOVED";
 
+export const PetitionEventTypeValues = [
+  "ACCESS_ACTIVATED",
+  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+  "ACCESS_DEACTIVATED",
+  "ACCESS_DELEGATED",
+  "ACCESS_OPENED",
+  "COMMENT_DELETED",
+  "COMMENT_PUBLISHED",
+  "GROUP_PERMISSION_ADDED",
+  "GROUP_PERMISSION_EDITED",
+  "GROUP_PERMISSION_REMOVED",
+  "MESSAGE_CANCELLED",
+  "MESSAGE_SCHEDULED",
+  "MESSAGE_SENT",
+  "OWNERSHIP_TRANSFERRED",
+  "PETITION_CLONED",
+  "PETITION_CLOSED",
+  "PETITION_CLOSED_NOTIFIED",
+  "PETITION_COMPLETED",
+  "PETITION_CREATED",
+  "PETITION_DELETED",
+  "PETITION_MESSAGE_BOUNCED",
+  "PETITION_REMINDER_BOUNCED",
+  "PETITION_REOPENED",
+  "RECIPIENT_SIGNED",
+  "REMINDER_SENT",
+  "REMINDERS_OPT_OUT",
+  "REPLY_CREATED",
+  "REPLY_DELETED",
+  "REPLY_UPDATED",
+  "SIGNATURE_CANCELLED",
+  "SIGNATURE_COMPLETED",
+  "SIGNATURE_STARTED",
+  "TEMPLATE_USED",
+  "USER_PERMISSION_ADDED",
+  "USER_PERMISSION_EDITED",
+  "USER_PERMISSION_REMOVED",
+] as PetitionEventType[];
+
 export type PetitionFieldReplyStatus = "APPROVED" | "PENDING" | "REJECTED";
+
+export const PetitionFieldReplyStatusValues = [
+  "APPROVED",
+  "PENDING",
+  "REJECTED",
+] as PetitionFieldReplyStatus[];
 
 export type PetitionFieldType =
   | "CHECKBOX"
@@ -76,13 +150,40 @@ export type PetitionFieldType =
   | "SHORT_TEXT"
   | "TEXT";
 
+export const PetitionFieldTypeValues = [
+  "CHECKBOX",
+  "DYNAMIC_SELECT",
+  "FILE_UPLOAD",
+  "HEADING",
+  "SELECT",
+  "SHORT_TEXT",
+  "TEXT",
+] as PetitionFieldType[];
+
 export type PetitionMessageStatus = "CANCELLED" | "PROCESSED" | "PROCESSING" | "SCHEDULED";
+
+export const PetitionMessageStatusValues = [
+  "CANCELLED",
+  "PROCESSED",
+  "PROCESSING",
+  "SCHEDULED",
+] as PetitionMessageStatus[];
 
 export type PetitionPermissionType = "OWNER" | "READ" | "WRITE";
 
+export const PetitionPermissionTypeValues = ["OWNER", "READ", "WRITE"] as PetitionPermissionType[];
+
 export type PetitionReminderStatus = "ERROR" | "PROCESSED" | "PROCESSING";
 
+export const PetitionReminderStatusValues = [
+  "ERROR",
+  "PROCESSED",
+  "PROCESSING",
+] as PetitionReminderStatus[];
+
 export type PetitionReminderType = "AUTOMATIC" | "MANUAL";
+
+export const PetitionReminderTypeValues = ["AUTOMATIC", "MANUAL"] as PetitionReminderType[];
 
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
@@ -90,9 +191,25 @@ export type PetitionSignatureCancelReason =
   | "REQUEST_ERROR"
   | "REQUEST_RESTARTED";
 
+export const PetitionSignatureCancelReasonValues = [
+  "CANCELLED_BY_USER",
+  "DECLINED_BY_SIGNER",
+  "REQUEST_ERROR",
+  "REQUEST_RESTARTED",
+] as PetitionSignatureCancelReason[];
+
 export type PetitionSignatureStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
 
+export const PetitionSignatureStatusValues = [
+  "CANCELLED",
+  "COMPLETED",
+  "ENQUEUED",
+  "PROCESSING",
+] as PetitionSignatureStatus[];
+
 export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
+
+export const PetitionStatusValues = ["CLOSED", "COMPLETED", "DRAFT", "PENDING"] as PetitionStatus[];
 
 export type PetitionUserNotificationType =
   | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
@@ -105,6 +222,18 @@ export type PetitionUserNotificationType =
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED";
 
+export const PetitionUserNotificationTypeValues = [
+  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+  "COMMENT_CREATED",
+  "MESSAGE_EMAIL_BOUNCED",
+  "PETITION_COMPLETED",
+  "PETITION_SHARED",
+  "REMINDER_EMAIL_BOUNCED",
+  "REMINDERS_OPT_OUT",
+  "SIGNATURE_CANCELLED",
+  "SIGNATURE_COMPLETED",
+] as PetitionUserNotificationType[];
+
 export type SystemEventType =
   | "EMAIL_OPENED"
   | "EMAIL_VERIFIED"
@@ -112,15 +241,33 @@ export type SystemEventType =
   | "USER_CREATED"
   | "USER_LOGGED_IN";
 
+export const SystemEventTypeValues = [
+  "EMAIL_OPENED",
+  "EMAIL_VERIFIED",
+  "INVITE_SENT",
+  "USER_CREATED",
+  "USER_LOGGED_IN",
+] as SystemEventType[];
+
 export type TaskName = "EXPORT_REPLIES" | "PRINT_PDF";
+
+export const TaskNameValues = ["EXPORT_REPLIES", "PRINT_PDF"] as TaskName[];
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
+export const TaskStatusValues = ["COMPLETED", "ENQUEUED", "FAILED", "PROCESSING"] as TaskStatus[];
+
 export type Tone = "FORMAL" | "INFORMAL";
+
+export const ToneValues = ["FORMAL", "INFORMAL"] as Tone[];
 
 export type UserOrganizationRole = "ADMIN" | "NORMAL" | "OWNER";
 
+export const UserOrganizationRoleValues = ["ADMIN", "NORMAL", "OWNER"] as UserOrganizationRole[];
+
 export type UserStatus = "ACTIVE" | "INACTIVE";
+
+export const UserStatusValues = ["ACTIVE", "INACTIVE"] as UserStatus[];
 
 export interface TableTypes {
   contact: Contact;
@@ -599,6 +746,7 @@ export interface PetitionEventSubscription {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   is_enabled: boolean; // bool
+  event_types: Maybe<any>; // jsonb
 }
 
 export type CreatePetitionEventSubscription = PartialProps<
@@ -610,6 +758,7 @@ export type CreatePetitionEventSubscription = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "is_enabled"
+  | "event_types"
 >;
 
 export interface PetitionField {

@@ -1,39 +1,31 @@
 import { arg, enumType, list, nonNull, objectType, unionType } from "nexus";
 import { omit } from "remeda";
+import {
+  FeatureFlagNameValues,
+  UserOrganizationRoleValues,
+  UserStatusValues,
+} from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
 import { datetimeArg } from "../helpers/date";
-import { parseSortBy } from "../helpers/paginationPlugin";
 import { rootIsContextUser } from "./authorizers";
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
-  members: ["NORMAL", "ADMIN", "OWNER"],
+  members: UserOrganizationRoleValues,
   description: "The roles of a user within an organization.",
 });
 
 export const FeatureFlag = enumType({
   name: "FeatureFlag",
-  members: [
-    "DEVELOPER_ACCESS",
-    "PETITION_SIGNATURE",
-    "INTERNAL_COMMENTS",
-    "PETITION_PDF_EXPORT",
-    {
-      name: "HIDE_RECIPIENT_VIEW_CONTENTS",
-      deprecation: "Don't use this",
-    },
-    "SKIP_FORWARD_SECURITY",
-    "EXPORT_CUATRECASAS",
-    "AUTO_SEND_TEMPLATE",
-  ],
+  members: FeatureFlagNameValues,
   sourceType: "db.FeatureFlagName",
 });
 
 export const UserStatus = enumType({
   name: "UserStatus",
-  members: ["ACTIVE", "INACTIVE"],
+  members: UserStatusValues,
   sourceType: "db.UserStatus",
 });
 
@@ -111,27 +103,12 @@ export const User = objectType({
       type: "UserStatus",
       resolve: (o) => o.status,
     });
-    t.paginationField("authenticationTokens", {
-      authorize: rootIsContextUser(),
-      description: "Lists every auth token of the user",
+    t.nonNull.list.nonNull.field("tokens", {
       type: "UserAuthenticationToken",
-      searchable: true,
-      sortableBy: ["createdAt", "tokenName", "lastUsedAt"],
-      resolve: async (root, { offset, limit, search, sortBy }, ctx) => {
-        const columnMap = {
-          tokenName: "token_name",
-          createdAt: "created_at",
-          lastUsedAt: "last_used_at",
-        } as const;
-        return await ctx.userAuthentication.loadUserAuthenticationTokens(root.id, {
-          offset,
-          limit,
-          search,
-          sortBy: sortBy?.map((value) => {
-            const [field, order] = parseSortBy(value);
-            return { column: columnMap[field], order };
-          }),
-        });
+      authorize: rootIsContextUser(),
+      description: "Lists the API tokens this user has.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.userAuthentication.loadUserAuthenticationTokens(root.id);
       },
     });
     t.field("unreadNotificationIds", {

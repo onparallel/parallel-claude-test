@@ -35,6 +35,7 @@ describe("repositories/UserAuthenticationRepository", () => {
       (await userAuth.createUserAuthenticationToken("My Token 1", user)).userAuthToken,
       (await userAuth.createUserAuthenticationToken("My Token 2", user)).userAuthToken,
     ];
+    userAuth.loadUserAuthenticationTokens.dataloader.clearAll();
   });
 
   afterEach(async () => {
@@ -54,23 +55,17 @@ describe("repositories/UserAuthenticationRepository", () => {
   });
 
   it("loads all available user auth tokens", async () => {
-    const userTokens = await userAuth.loadUserAuthenticationTokens(user.id, {
-      limit: 10,
-      offset: 0,
-    });
-    expect(userTokens.items).toEqual(authTokens);
+    const userTokens = await userAuth.loadUserAuthenticationTokens(user.id);
+    expect(userTokens).toEqual(authTokens);
   });
 
   it("deletes an user auth token by its id", async () => {
     const [deletedToken] = await userAuth.deleteUserAuthenticationTokens([authTokens[0].id], user);
 
-    const availableTokens = await userAuth.loadUserAuthenticationTokens(user.id, {
-      limit: 10,
-      offset: 0,
-    });
+    const availableTokens = await userAuth.loadUserAuthenticationTokens(user.id);
 
     expect(deletedToken.id).toEqual(authTokens[0].id);
-    expect(availableTokens.items).toEqual([authTokens[1]]);
+    expect(availableTokens).toEqual([authTokens[1]]);
   });
 
   it("should throw error when trying to create a token with a taken name", async () => {

@@ -178,7 +178,6 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         },
         User: {
           fields: {
-            authenticationTokens: { merge: false },
             unreadNotificationIds: { merge: false },
             notifications: {
               keyArgs: ["filter"],
