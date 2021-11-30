@@ -3136,7 +3136,12 @@ export type PetitionFieldReplyFragment = {
   updatedAt: string;
 };
 
-export type SubscriptionFragment = { id: string; eventsUrl: string; isEnabled: boolean };
+export type SubscriptionFragment = {
+  id: string;
+  eventsUrl: string;
+  isEnabled: boolean;
+  eventTypes: Array<PetitionEventType> | null;
+};
 
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -3702,7 +3707,12 @@ export type GetOrganizationUsers_UsersQuery = {
 export type EventSubscriptions_GetSubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type EventSubscriptions_GetSubscriptionsQuery = {
-  subscriptions: Array<{ id: string; eventsUrl: string; isEnabled: boolean }>;
+  subscriptions: Array<{
+    id: string;
+    eventsUrl: string;
+    isEnabled: boolean;
+    eventTypes: Array<PetitionEventType> | null;
+  }>;
 };
 
 export type EventSubscriptions_CreateSubscriptionMutationVariables = Exact<{
@@ -3710,7 +3720,12 @@ export type EventSubscriptions_CreateSubscriptionMutationVariables = Exact<{
 }>;
 
 export type EventSubscriptions_CreateSubscriptionMutation = {
-  createEventSubscription: { id: string; eventsUrl: string; isEnabled: boolean };
+  createEventSubscription: {
+    id: string;
+    eventsUrl: string;
+    isEnabled: boolean;
+    eventTypes: Array<PetitionEventType> | null;
+  };
 };
 
 export type EventSubscriptions_DeleteSubscriptionMutationVariables = Exact<{

@@ -115,5 +115,6 @@ export const SubscriptionFragment = gql`
     id
     eventsUrl
     isEnabled
+    eventTypes
   }
 `;

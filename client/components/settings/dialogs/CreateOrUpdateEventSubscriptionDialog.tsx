@@ -100,27 +100,27 @@ export function CreateOrUpdateEventSubscriptionDialog(
         as: "form",
         onSubmit: handleSubmit(async (data) => {
           const isEditing = "eventSubscription" in props && isDefined(props.eventSubscription);
-          if (isEditing) {
-            await props.onUpdateEventSubscription!({
-              eventsUrl: data.eventsUrl,
-              eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
-            });
-            clearErrors("eventsUrl");
-            props.onResolve();
-          } else {
-            try {
+          try {
+            if (isEditing) {
+              await props.onUpdateEventSubscription!({
+                eventsUrl: data.eventsUrl,
+                eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
+              });
+              clearErrors("eventsUrl");
+              props.onResolve();
+            } else {
               await props.onCreateEventSubscription!({
                 eventsUrl: data.eventsUrl,
                 eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
               });
               clearErrors("eventsUrl");
               props.onResolve();
-            } catch (error) {
-              if (error instanceof ApolloError) {
-                const code = error.graphQLErrors[0]?.extensions?.code;
-                if (code === "WEBHOOK_CHALLENGE_FAILED") {
-                  setError("eventsUrl", { type: "challengeFailed" }, { shouldFocus: true });
-                }
+            }
+          } catch (error) {
+            if (error instanceof ApolloError) {
+              const code = error.graphQLErrors[0]?.extensions?.code;
+              if (code === "WEBHOOK_CHALLENGE_FAILED") {
+                setError("eventsUrl", { type: "challengeFailed" }, { shouldFocus: true });
               }
             }
           }

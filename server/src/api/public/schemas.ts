@@ -693,7 +693,7 @@ const _Subscription = {
   title: "Subscription",
   type: "object",
   additionalProperties: false,
-  required: ["id", "eventsUrl", "isEnabled"],
+  required: ["id", "eventsUrl", "isEnabled", "eventTypes"],
   properties: {
     id: {
       type: "string",
@@ -709,6 +709,12 @@ const _Subscription = {
       type: "boolean",
       description: "Wether this subscription is currently enabled or not",
       example: true,
+    },
+    eventTypes: {
+      type: ["array", "null"],
+      description: "The events linked with the subscription. If null, every event will be sent.",
+      example: ["PETITION_COMPLETED", "MESSAGE_SENT"],
+      items: { type: "string" },
     },
   },
 } as const;

@@ -89,6 +89,7 @@ function Developers() {
       await showRevokeAccessTokenDialog({ selectedCount: selectedTokens.length });
       await revokeTokens({ variables: { authTokenIds: selectedTokens } });
       await refetchTokens();
+      setSelectedTokens([]);
     } catch {}
   };
 
@@ -119,6 +120,7 @@ function Developers() {
         },
       });
       await refetchSubscriptions();
+      setSelectedSubscriptions([]);
     } catch {}
   };
 
