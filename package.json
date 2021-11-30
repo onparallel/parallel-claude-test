@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint --config .eslintrc.js .",
     "update-deps": "yarn ncux && yarn ncux --packageFile bin/package.json && yarn ncux --packageFile client/package.json && yarn ncux --packageFile server/package.json  && yarn ncux --packageFile e2e/package.json",
-    "ncux": "ncu -u -x escape-string-regexp,p-all,p-map,p-props,redoc,node-fetch,@types/node-fetch",
+    "ncux": "ncu -u -x escape-string-regexp,p-all,p-map,p-props,node-fetch,@types/node-fetch",
     "postinstall": "patch-package",
     "postpull": "yarn && cd server && yarn migrate"
   },
