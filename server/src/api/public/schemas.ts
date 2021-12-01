@@ -1442,6 +1442,8 @@ export const PetitionEvent = schema(AnyPetitionEvent);
 
 export const PetitionCustomProperties = schema({
   type: "object",
+  additionalProperties: true,
+  example: { "Client Id": "1234" },
 } as const);
 
 export const CreateOrUpdateCustomProperty = schema({
@@ -1454,11 +1456,13 @@ export const CreateOrUpdateCustomProperty = schema({
       description: "Key of the property",
       example: "Client Id",
       type: "string",
+      maxLength: 100,
     },
     value: {
       description: "The value of the property",
       type: "string",
       example: "12345",
+      maxLength: 1000,
     },
   },
 } as const);

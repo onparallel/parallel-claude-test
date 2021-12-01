@@ -385,7 +385,8 @@ api
   .get(
     {
       operationId: "ReadPetitionCustomProperties",
-      summary: "Returns a key-value object with the custom properties of the petition",
+      summary: "Get custom properties",
+      description: "Returns a key-value object with the custom properties of the petition",
       responses: {
         200: SuccessResponse(PetitionCustomProperties),
       },
