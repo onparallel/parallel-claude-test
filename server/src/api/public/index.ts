@@ -359,7 +359,7 @@ api
             deletePetitions(ids: [$petitionId], force: $force)
           }
         `;
-        const result = await client.request(DeletePetition_deletePetitionsDocument, {
+        await client.request(DeletePetition_deletePetitionsDocument, {
           petitionId: params.petitionId,
           force: query.force ?? false,
         });
@@ -485,10 +485,7 @@ api
           }
         }
       `;
-      const result = await client.request(
-        DeleteCustomProperty_modifyPetitionCustomPropertyDocument,
-        params
-      );
+      await client.request(DeleteCustomProperty_modifyPetitionCustomPropertyDocument, params);
 
       return NoContent();
     }
@@ -610,10 +607,10 @@ api
                     }
                   }
                 `;
-                const result = await client.request(
-                  CreatePetitionRecipients_updateContactDocument,
-                  { contactId: contact.id, data }
-                );
+                await client.request(CreatePetitionRecipients_updateContactDocument, {
+                  contactId: contact.id,
+                  data,
+                });
               }
               return contact.id;
             } else {
@@ -887,7 +884,7 @@ api
           }
         }
       `;
-      const result = await client.request(StopSharing_removePetitionPermissionDocument, {
+      await client.request(StopSharing_removePetitionPermissionDocument, {
         petitionId: params.petitionId,
       });
       return NoContent();
@@ -921,7 +918,7 @@ api
           }
         }
       `;
-      const result = await client.request(RemoveUserPermission_removePetitionPermissionDocument, {
+      await client.request(RemoveUserPermission_removePetitionPermissionDocument, {
         petitionId: params.petitionId,
         userId: params.userId,
       });
@@ -959,13 +956,10 @@ api
           }
         }
       `;
-      const result = await client.request(
-        RemoveUserGroupPermission_removePetitionPermissionDocument,
-        {
-          petitionId: params.petitionId,
-          userGroupId: params.userGroupId,
-        }
-      );
+      await client.request(RemoveUserGroupPermission_removePetitionPermissionDocument, {
+        petitionId: params.petitionId,
+        userGroupId: params.userGroupId,
+      });
       return NoContent();
     }
   );
@@ -1112,7 +1106,7 @@ api
             deletePetitions(ids: [$templateId], force: $force)
           }
         `;
-        const result = await client.request(DeleteTemplate_deletePetitionsDocument, {
+        await client.request(DeleteTemplate_deletePetitionsDocument, {
           templateId: params.templateId,
           force: query.force ?? false,
         });
@@ -1361,7 +1355,7 @@ api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delet
         deleteEventSubscriptions(ids: $ids)
       }
     `;
-    const result = await client.request(EventSubscriptions_DeleteSubscriptionDocument, {
+    await client.request(EventSubscriptions_DeleteSubscriptionDocument, {
       ids: [params.subscriptionId],
     });
     return NoContent();
