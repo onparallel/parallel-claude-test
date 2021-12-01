@@ -3043,26 +3043,6 @@ export type VerificationCodeRequest = {
   token: Scalars["ID"];
 };
 
-export type PetitionFragment = {
-  id: string;
-  name: string | null;
-  status: PetitionStatus;
-  deadline: string | null;
-  locale: PetitionLocale;
-  createdAt: string;
-  fromTemplateId: string | null;
-  customProperties: { [key: string]: any };
-};
-
-export type TemplateFragment = {
-  id: string;
-  name: string | null;
-  description: any | null;
-  locale: PetitionLocale;
-  createdAt: string;
-  customProperties: { [key: string]: any };
-};
-
 export type UserFragment = {
   id: string;
   fullName: string | null;
@@ -3107,6 +3087,99 @@ export type PetitionAccessFragment = {
   } | null;
 };
 
+export type PetitionFieldFragment = {
+  id: string;
+  title: string | null;
+  type: PetitionFieldType;
+  fromPetitionFieldId: string | null;
+  alias: string | null;
+};
+
+export type PetitionFieldReplyFragment = {
+  id: string;
+  content: { [key: string]: any };
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PetitionFieldWithRepliesFragment = {
+  id: string;
+  title: string | null;
+  type: PetitionFieldType;
+  fromPetitionFieldId: string | null;
+  alias: string | null;
+  replies: Array<{
+    id: string;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+  }>;
+};
+
+export type PetitionFragment = {
+  id: string;
+  name: string | null;
+  status: PetitionStatus;
+  deadline: string | null;
+  locale: PetitionLocale;
+  createdAt: string;
+  fromTemplateId: string | null;
+  customProperties: { [key: string]: any };
+  recipients: Array<{
+    id: string;
+    status: PetitionAccessStatus;
+    reminderCount: number;
+    remindersLeft: number;
+    remindersActive: boolean;
+    nextReminderAt: string | null;
+    createdAt: string;
+    contact: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+      createdAt: string;
+      updatedAt: string;
+    } | null;
+    granter: {
+      id: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    } | null;
+  }>;
+  fields?: Array<{
+    id: string;
+    title: string | null;
+    type: PetitionFieldType;
+    fromPetitionFieldId: string | null;
+    alias: string | null;
+    replies: Array<{
+      id: string;
+      content: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+    }>;
+  }>;
+};
+
+export type TemplateFragment = {
+  id: string;
+  name: string | null;
+  description: any | null;
+  locale: PetitionLocale;
+  createdAt: string;
+  customProperties: { [key: string]: any };
+  fields?: Array<{
+    id: string;
+    title: string | null;
+    type: PetitionFieldType;
+    fromPetitionFieldId: string | null;
+    alias: string | null;
+  }>;
+};
+
 export type Permission_PetitionUserGroupPermission_Fragment = {
   permissionType: PetitionPermissionType;
   createdAt: string;
@@ -3123,21 +3196,6 @@ export type PermissionFragment =
   | Permission_PetitionUserGroupPermission_Fragment
   | Permission_PetitionUserPermission_Fragment;
 
-export type PetitionFieldFragment = {
-  id: string;
-  title: string | null;
-  type: PetitionFieldType;
-  fromPetitionFieldId: string | null;
-  alias: string | null;
-};
-
-export type PetitionFieldReplyFragment = {
-  id: string;
-  content: { [key: string]: any };
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type SubscriptionFragment = {
   id: string;
   eventsUrl: string;
@@ -3150,6 +3208,8 @@ export type GetPetitions_PetitionsQueryVariables = Exact<{
   limit: Scalars["Int"];
   status?: Maybe<Array<PetitionStatus> | PetitionStatus>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  includeRecipients: Scalars["Boolean"];
+  includeFields: Scalars["Boolean"];
 }>;
 
 export type GetPetitions_PetitionsQuery = {
@@ -3165,6 +3225,43 @@ export type GetPetitions_PetitionsQuery = {
           createdAt: string;
           fromTemplateId: string | null;
           customProperties: { [key: string]: any };
+          recipients: Array<{
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+            }>;
+          }>;
         }
       | {}
     >;
@@ -3174,6 +3271,8 @@ export type GetPetitions_PetitionsQuery = {
 export type CreatePetition_PetitionMutationVariables = Exact<{
   name?: Maybe<Scalars["String"]>;
   templateId?: Maybe<Scalars["GID"]>;
+  includeRecipients: Scalars["Boolean"];
+  includeFields: Scalars["Boolean"];
 }>;
 
 export type CreatePetition_PetitionMutation = {
@@ -3187,12 +3286,51 @@ export type CreatePetition_PetitionMutation = {
         createdAt: string;
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
+        recipients: Array<{
+          id: string;
+          status: PetitionAccessStatus;
+          reminderCount: number;
+          remindersLeft: number;
+          remindersActive: boolean;
+          nextReminderAt: string | null;
+          createdAt: string;
+          contact: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+            createdAt: string;
+            updatedAt: string;
+          } | null;
+          granter: {
+            id: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          } | null;
+        }>;
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+        }>;
       }
     | {};
 };
 
 export type GetPetition_PetitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
+  includeRecipients: Scalars["Boolean"];
+  includeFields: Scalars["Boolean"];
 }>;
 
 export type GetPetition_PetitionQuery = {
@@ -3206,6 +3344,43 @@ export type GetPetition_PetitionQuery = {
         createdAt: string;
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
+        recipients: Array<{
+          id: string;
+          status: PetitionAccessStatus;
+          reminderCount: number;
+          remindersLeft: number;
+          remindersActive: boolean;
+          nextReminderAt: string | null;
+          createdAt: string;
+          contact: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+            createdAt: string;
+            updatedAt: string;
+          } | null;
+          granter: {
+            id: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          } | null;
+        }>;
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+        }>;
       }
     | {}
     | null;
@@ -3214,6 +3389,8 @@ export type GetPetition_PetitionQuery = {
 export type UpdatePetition_PetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
+  includeRecipients: Scalars["Boolean"];
+  includeFields: Scalars["Boolean"];
 }>;
 
 export type UpdatePetition_PetitionMutation = {
@@ -3227,6 +3404,43 @@ export type UpdatePetition_PetitionMutation = {
         createdAt: string;
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
+        recipients: Array<{
+          id: string;
+          status: PetitionAccessStatus;
+          reminderCount: number;
+          remindersLeft: number;
+          remindersActive: boolean;
+          nextReminderAt: string | null;
+          createdAt: string;
+          contact: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+            createdAt: string;
+            updatedAt: string;
+          } | null;
+          granter: {
+            id: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          } | null;
+        }>;
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+        }>;
       }
     | {};
 };
@@ -3587,6 +3801,7 @@ export type GetTemplates_TemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  includeFields: Scalars["Boolean"];
 }>;
 
 export type GetTemplates_TemplatesQuery = {
@@ -3600,6 +3815,13 @@ export type GetTemplates_TemplatesQuery = {
           locale: PetitionLocale;
           createdAt: string;
           customProperties: { [key: string]: any };
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+          }>;
         }
       | {}
     >;
@@ -3608,6 +3830,7 @@ export type GetTemplates_TemplatesQuery = {
 
 export type GetTemplate_TemplateQueryVariables = Exact<{
   templateId: Scalars["GID"];
+  includeFields: Scalars["Boolean"];
 }>;
 
 export type GetTemplate_TemplateQuery = {
@@ -3619,6 +3842,13 @@ export type GetTemplate_TemplateQuery = {
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+        }>;
       }
     | {}
     | null;
@@ -3736,28 +3966,6 @@ export type EventSubscriptions_DeleteSubscriptionMutationVariables = Exact<{
 
 export type EventSubscriptions_DeleteSubscriptionMutation = { deleteEventSubscriptions: Result };
 
-export const PetitionFragmentDoc = gql`
-  fragment Petition on Petition {
-    id
-    name
-    status
-    deadline
-    locale
-    createdAt
-    fromTemplateId
-    customProperties
-  }
-` as unknown as DocumentNode<PetitionFragment, unknown>;
-export const TemplateFragmentDoc = gql`
-  fragment Template on PetitionTemplate {
-    id
-    name
-    description
-    locale
-    createdAt
-    customProperties
-  }
-` as unknown as DocumentNode<TemplateFragment, unknown>;
 export const ContactFragmentDoc = gql`
   fragment Contact on Contact {
     id
@@ -3796,6 +4004,67 @@ export const PetitionAccessFragmentDoc = gql`
   ${ContactFragmentDoc}
   ${UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionAccessFragment, unknown>;
+export const PetitionFieldFragmentDoc = gql`
+  fragment PetitionField on PetitionField {
+    id
+    title
+    type
+    fromPetitionFieldId
+    alias
+  }
+` as unknown as DocumentNode<PetitionFieldFragment, unknown>;
+export const PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    createdAt
+    updatedAt
+  }
+` as unknown as DocumentNode<PetitionFieldReplyFragment, unknown>;
+export const PetitionFieldWithRepliesFragmentDoc = gql`
+  fragment PetitionFieldWithReplies on PetitionField {
+    ...PetitionField
+    replies {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldFragmentDoc}
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<PetitionFieldWithRepliesFragment, unknown>;
+export const PetitionFragmentDoc = gql`
+  fragment Petition on Petition {
+    id
+    name
+    status
+    deadline
+    locale
+    createdAt
+    fromTemplateId
+    customProperties
+    recipients: accesses @include(if: $includeRecipients) {
+      ...PetitionAccess
+    }
+    fields @include(if: $includeFields) {
+      ...PetitionFieldWithReplies
+    }
+  }
+  ${PetitionAccessFragmentDoc}
+  ${PetitionFieldWithRepliesFragmentDoc}
+` as unknown as DocumentNode<PetitionFragment, unknown>;
+export const TemplateFragmentDoc = gql`
+  fragment Template on PetitionTemplate {
+    id
+    name
+    description
+    locale
+    createdAt
+    customProperties
+    fields @include(if: $includeFields) {
+      ...PetitionField
+    }
+  }
+  ${PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<TemplateFragment, unknown>;
 export const UserGroupFragmentDoc = gql`
   fragment UserGroup on UserGroup {
     id
@@ -3820,23 +4089,6 @@ export const PermissionFragmentDoc = gql`
   ${UserFragmentDoc}
   ${UserGroupFragmentDoc}
 ` as unknown as DocumentNode<PermissionFragment, unknown>;
-export const PetitionFieldFragmentDoc = gql`
-  fragment PetitionField on PetitionField {
-    id
-    title
-    type
-    fromPetitionFieldId
-    alias
-  }
-` as unknown as DocumentNode<PetitionFieldFragment, unknown>;
-export const PetitionFieldReplyFragmentDoc = gql`
-  fragment PetitionFieldReply on PetitionFieldReply {
-    id
-    content
-    createdAt
-    updatedAt
-  }
-` as unknown as DocumentNode<PetitionFieldReplyFragment, unknown>;
 export const SubscriptionFragmentDoc = gql`
   fragment Subscription on PetitionEventSubscription {
     id
@@ -3851,6 +4103,8 @@ export const GetPetitions_PetitionsDocument = gql`
     $limit: Int!
     $status: [PetitionStatus!]
     $sortBy: [QueryPetitions_OrderBy!]
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
   ) {
     petitions(
       offset: $offset
@@ -3867,7 +4121,12 @@ export const GetPetitions_PetitionsDocument = gql`
   ${PetitionFragmentDoc}
 ` as unknown as DocumentNode<GetPetitions_PetitionsQuery, GetPetitions_PetitionsQueryVariables>;
 export const CreatePetition_PetitionDocument = gql`
-  mutation CreatePetition_Petition($name: String, $templateId: GID) {
+  mutation CreatePetition_Petition(
+    $name: String
+    $templateId: GID
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+  ) {
     createPetition(name: $name, petitionId: $templateId) {
       ...Petition
     }
@@ -3878,7 +4137,11 @@ export const CreatePetition_PetitionDocument = gql`
   CreatePetition_PetitionMutationVariables
 >;
 export const GetPetition_PetitionDocument = gql`
-  query GetPetition_Petition($petitionId: GID!) {
+  query GetPetition_Petition(
+    $petitionId: GID!
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+  ) {
     petition(id: $petitionId) {
       ...Petition
     }
@@ -3886,7 +4149,12 @@ export const GetPetition_PetitionDocument = gql`
   ${PetitionFragmentDoc}
 ` as unknown as DocumentNode<GetPetition_PetitionQuery, GetPetition_PetitionQueryVariables>;
 export const UpdatePetition_PetitionDocument = gql`
-  mutation UpdatePetition_Petition($petitionId: GID!, $data: UpdatePetitionInput!) {
+  mutation UpdatePetition_Petition(
+    $petitionId: GID!
+    $data: UpdatePetitionInput!
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+  ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...Petition
     }
@@ -4017,15 +4285,11 @@ export const PetitionReplies_RepliesDocument = gql`
   query PetitionReplies_Replies($petitionId: GID!) {
     petition(id: $petitionId) {
       fields {
-        ...PetitionField
-        replies {
-          ...PetitionFieldReply
-        }
+        ...PetitionFieldWithReplies
       }
     }
   }
-  ${PetitionFieldFragmentDoc}
-  ${PetitionFieldReplyFragmentDoc}
+  ${PetitionFieldWithRepliesFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_RepliesQuery, PetitionReplies_RepliesQueryVariables>;
 export const DownloadFileReply_fileUploadReplyDownloadLinkDocument = gql`
   mutation DownloadFileReply_fileUploadReplyDownloadLink($petitionId: GID!, $replyId: GID!) {
@@ -4119,7 +4383,12 @@ export const TransferPetition_transferPetitionOwnershipDocument = gql`
   TransferPetition_transferPetitionOwnershipMutationVariables
 >;
 export const GetTemplates_TemplatesDocument = gql`
-  query GetTemplates_Templates($offset: Int!, $limit: Int!, $sortBy: [QueryPetitions_OrderBy!]) {
+  query GetTemplates_Templates(
+    $offset: Int!
+    $limit: Int!
+    $sortBy: [QueryPetitions_OrderBy!]
+    $includeFields: Boolean!
+  ) {
     templates: petitions(
       offset: $offset
       limit: $limit
@@ -4135,7 +4404,7 @@ export const GetTemplates_TemplatesDocument = gql`
   ${TemplateFragmentDoc}
 ` as unknown as DocumentNode<GetTemplates_TemplatesQuery, GetTemplates_TemplatesQueryVariables>;
 export const GetTemplate_TemplateDocument = gql`
-  query GetTemplate_Template($templateId: GID!) {
+  query GetTemplate_Template($templateId: GID!, $includeFields: Boolean!) {
     template: petition(id: $templateId) {
       ...Template
     }

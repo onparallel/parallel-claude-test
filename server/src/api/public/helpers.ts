@@ -10,6 +10,7 @@ import {
   intParam,
   ParseError,
 } from "../rest/params";
+import { PetitionFieldType, PetitionFieldWithRepliesFragment } from "./__types";
 
 export function paginationParams() {
   return {
@@ -73,4 +74,36 @@ export function idParam<
 
 export function containsGraphQLError(error: ClientError, errorCode: string) {
   return ((error.response.errors![0] as any).extensions.code as string) === errorCode;
+}
+
+export function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
+  switch (fieldType) {
+    case "FILE_UPLOAD":
+      return content as {
+        filename: string;
+        contentType: string;
+        size: number;
+      };
+    case "DYNAMIC_SELECT":
+      return content.columns as [string, string][];
+    case "CHECKBOX":
+      return content.choices as string[];
+    default:
+      return content.text as string;
+  }
+}
+
+export function mapPetitionFieldRepliesContent<
+  T extends { fields?: PetitionFieldWithRepliesFragment[] }
+>(petition: T) {
+  return {
+    ...petition,
+    fields: petition.fields?.map((field) => ({
+      ...field,
+      replies: field.replies.map((reply) => ({
+        ...reply,
+        content: mapFieldReplyContent(field.type, reply.content),
+      })),
+    })),
+  };
 }

@@ -316,7 +316,7 @@ export class RestApi<TContext = {}> {
     };
   }
 
-  @Memoize()
+  @(process.env.NODE_ENV === "production" ? Memoize() : () => {})
   private generateSpec(): OpenAPIV3.Document {
     return {
       ...this._spec,

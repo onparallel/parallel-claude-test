@@ -1,29 +1,5 @@
 import { gql } from "graphql-request";
 
-export const PetitionFragment = gql`
-  fragment Petition on Petition {
-    id
-    name
-    status
-    deadline
-    locale
-    createdAt
-    fromTemplateId
-    customProperties
-  }
-`;
-
-export const TemplateFragment = gql`
-  fragment Template on PetitionTemplate {
-    id
-    name
-    description
-    locale
-    createdAt
-    customProperties
-  }
-`;
-
 export const UserFragment = gql`
   fragment User on User {
     id
@@ -72,6 +48,72 @@ export const PetitionAccessFragment = gql`
   ${UserFragment}
 `;
 
+export const PetitionFieldFragment = gql`
+  fragment PetitionField on PetitionField {
+    id
+    title
+    type
+    fromPetitionFieldId
+    alias
+  }
+`;
+
+export const PetitionFieldReplyFragment = gql`
+  fragment PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    createdAt
+    updatedAt
+  }
+`;
+
+export const PetitionFieldWithRepliesFragment = gql`
+  fragment PetitionFieldWithReplies on PetitionField {
+    ...PetitionField
+    replies {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldFragment}
+  ${PetitionFieldReplyFragment}
+`;
+
+export const PetitionFragment = gql`
+  fragment Petition on Petition {
+    id
+    name
+    status
+    deadline
+    locale
+    createdAt
+    fromTemplateId
+    customProperties
+    recipients: accesses @include(if: $includeRecipients) {
+      ...PetitionAccess
+    }
+    fields @include(if: $includeFields) {
+      ...PetitionFieldWithReplies
+    }
+  }
+  ${PetitionAccessFragment}
+  ${PetitionFieldWithRepliesFragment}
+`;
+
+export const TemplateFragment = gql`
+  fragment Template on PetitionTemplate {
+    id
+    name
+    description
+    locale
+    createdAt
+    customProperties
+    fields @include(if: $includeFields) {
+      ...PetitionField
+    }
+  }
+  ${PetitionFieldFragment}
+`;
+
 export const PermissionFragment = gql`
   fragment Permission on PetitionPermission {
     permissionType
@@ -89,25 +131,6 @@ export const PermissionFragment = gql`
   }
   ${UserFragment}
   ${UserGroupFragment}
-`;
-
-export const PetitionFieldFragment = gql`
-  fragment PetitionField on PetitionField {
-    id
-    title
-    type
-    fromPetitionFieldId
-    alias
-  }
-`;
-
-export const PetitionReplyFragment = gql`
-  fragment PetitionFieldReply on PetitionFieldReply {
-    id
-    content
-    createdAt
-    updatedAt
-  }
 `;
 
 export const SubscriptionFragment = gql`

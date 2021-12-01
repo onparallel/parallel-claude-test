@@ -21,14 +21,19 @@ import {
   ContactFragment,
   PermissionFragment,
   PetitionAccessFragment,
-  PetitionFieldFragment,
+  PetitionFieldWithRepliesFragment,
   PetitionFragment,
-  PetitionReplyFragment,
   SubscriptionFragment,
   TemplateFragment,
   UserFragment,
 } from "./fragments";
-import { containsGraphQLError, idParam, paginationParams, sortByParam } from "./helpers";
+import {
+  containsGraphQLError,
+  idParam,
+  mapPetitionFieldRepliesContent,
+  paginationParams,
+  sortByParam,
+} from "./helpers";
 import {
   AnyPetitionEvent,
   Contact,
@@ -191,6 +196,15 @@ export const api = new RestApi({
   },
 });
 
+const petitionIncludeParam = {
+  include: enumParam({
+    description: "Include optional fields in the response",
+    array: true,
+    required: false,
+    values: ["recipients", "fields"],
+  }),
+};
+
 api
   .path("/petitions")
   .get(
@@ -208,6 +222,7 @@ api
           required: false,
           values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
         }),
+        ...petitionIncludeParam,
       },
       responses: { 200: SuccessResponse(PaginatedPetitions) },
       tags: ["Petitions"],
@@ -219,6 +234,8 @@ api
           $limit: Int!
           $status: [PetitionStatus!]
           $sortBy: [QueryPetitions_OrderBy!]
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
         ) {
           petitions(
             offset: $offset
@@ -234,10 +251,14 @@ api
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(GetPetitions_PetitionsDocument, query);
+      const result = await client.request(GetPetitions_PetitionsDocument, {
+        ...pick(query, ["offset", "limit", "status", "sortBy"]),
+        includeFields: query.include?.includes("fields") ?? false,
+        includeRecipients: query.include?.includes("recipients") ?? false,
+      });
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
-      return Ok({ items, totalCount });
+      return Ok({ items: items.map((p) => mapPetitionFieldRepliesContent(p)), totalCount });
     }
   )
   .post(
@@ -246,21 +267,33 @@ api
       summary: "Create petition",
       description: outdent`Create a new petition based on a template.`,
       body: JsonBody(CreatePetition),
+      query: {
+        ...petitionIncludeParam,
+      },
       responses: { 201: SuccessResponse(Petition) },
       tags: ["Petitions"],
     },
-    async ({ client, body }) => {
+    async ({ client, body, query }) => {
       const _mutation = gql`
-        mutation CreatePetition_Petition($name: String, $templateId: GID) {
+        mutation CreatePetition_Petition(
+          $name: String
+          $templateId: GID
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+        ) {
           createPetition(name: $name, petitionId: $templateId) {
             ...Petition
           }
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(CreatePetition_PetitionDocument, body);
+      const result = await client.request(CreatePetition_PetitionDocument, {
+        ...body,
+        includeFields: query.include?.includes("fields") ?? false,
+        includeRecipients: query.include?.includes("recipients") ?? false,
+      });
       assert("id" in result.createPetition);
-      return Created(result.createPetition);
+      return Created(mapPetitionFieldRepliesContent(result.createPetition));
     }
   );
 
@@ -278,12 +311,19 @@ api
       description: outdent`
         Returns the specified petition.
       `,
+      query: {
+        ...petitionIncludeParam,
+      },
       responses: { 200: SuccessResponse(Petition) },
       tags: ["Petitions"],
     },
-    async ({ client, params }) => {
+    async ({ client, params, query }) => {
       const _query = gql`
-        query GetPetition_Petition($petitionId: GID!) {
+        query GetPetition_Petition(
+          $petitionId: GID!
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+        ) {
           petition(id: $petitionId) {
             ...Petition
           }
@@ -292,9 +332,11 @@ api
       `;
       const result = await client.request(GetPetition_PetitionDocument, {
         petitionId: params.petitionId,
+        includeFields: query.include?.includes("fields") ?? false,
+        includeRecipients: query.include?.includes("recipients") ?? false,
       });
       assert("id" in result.petition!);
-      return Ok(result.petition!);
+      return Ok(mapPetitionFieldRepliesContent(result.petition!));
     }
   )
   .put(
@@ -305,12 +347,20 @@ api
         Update the specified petition.
       `,
       body: JsonBody(UpdatePetition),
+      query: {
+        ...petitionIncludeParam,
+      },
       responses: { 200: SuccessResponse(Petition) },
       tags: ["Petitions"],
     },
-    async ({ client, params, body }) => {
+    async ({ client, params, body, query }) => {
       const _mutation = gql`
-        mutation UpdatePetition_Petition($petitionId: GID!, $data: UpdatePetitionInput!) {
+        mutation UpdatePetition_Petition(
+          $petitionId: GID!
+          $data: UpdatePetitionInput!
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+        ) {
           updatePetition(petitionId: $petitionId, data: $data) {
             ...Petition
           }
@@ -320,9 +370,11 @@ api
       const result = await client.request(UpdatePetition_PetitionDocument, {
         petitionId: params.petitionId,
         data: body,
+        includeFields: query.include?.includes("fields") ?? false,
+        includeRecipients: query.include?.includes("recipients") ?? false,
       });
       assert("id" in result.updatePetition!);
-      return Ok(result.updatePetition!);
+      return Ok(mapPetitionFieldRepliesContent(result.updatePetition!));
     }
   )
   .delete(
@@ -696,40 +748,17 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
       query PetitionReplies_Replies($petitionId: GID!) {
         petition(id: $petitionId) {
           fields {
-            ...PetitionField
-            replies {
-              ...PetitionFieldReply
-            }
+            ...PetitionFieldWithReplies
           }
         }
       }
-      ${PetitionFieldFragment}
-      ${PetitionReplyFragment}
+      ${PetitionFieldWithRepliesFragment}
     `;
     const result = await client.request(PetitionReplies_RepliesDocument, {
       petitionId: params.petitionId,
     });
 
-    return Ok(
-      result.petition!.fields.map((field) => ({
-        ...field,
-        replies: field.replies.map((reply) => ({
-          ...reply,
-          content:
-            field.type === "FILE_UPLOAD"
-              ? (reply.content as {
-                  filename: string;
-                  contentType: string;
-                  size: number;
-                })
-              : field.type === "DYNAMIC_SELECT"
-              ? (reply.content.columns as [string, string][])
-              : field.type === "CHECKBOX"
-              ? (reply.content.choices as string[])
-              : (reply.content.text as string),
-        })),
-      }))
-    );
+    return Ok(mapPetitionFieldRepliesContent(result.petition!).fields);
   }
 );
 
@@ -1004,6 +1033,15 @@ api
     }
   );
 
+const templateIncludeParam = {
+  include: enumParam({
+    description: "Include optional fields in the response",
+    array: true,
+    required: false,
+    values: ["fields"],
+  }),
+};
+
 api.path("/templates").get(
   {
     operationId: "GetTemplates",
@@ -1014,6 +1052,7 @@ api.path("/templates").get(
     query: {
       ...paginationParams(),
       ...sortByParam(["createdAt", "name", "lastUsedAt"]),
+      ...templateIncludeParam,
     },
     responses: { 200: SuccessResponse(PaginatedTemplates) },
     tags: ["Templates"],
@@ -1024,6 +1063,7 @@ api.path("/templates").get(
         $offset: Int!
         $limit: Int!
         $sortBy: [QueryPetitions_OrderBy!]
+        $includeFields: Boolean!
       ) {
         templates: petitions(
           offset: $offset
@@ -1039,7 +1079,10 @@ api.path("/templates").get(
       }
       ${TemplateFragment}
     `;
-    const result = await client.request(GetTemplates_TemplatesDocument, query);
+    const result = await client.request(GetTemplates_TemplatesDocument, {
+      ...pick(query, ["offset", "limit", "sortBy"]),
+      includeFields: query.include?.includes("fields") ?? false,
+    });
     const { items, totalCount } = result.templates;
     assertType<TemplateFragmentType[]>(items);
     return Ok({ items, totalCount });
@@ -1062,12 +1105,15 @@ api
       description: outdent`
         Returns the specified template.
       `,
+      query: {
+        ...templateIncludeParam,
+      },
       responses: { 200: SuccessResponse(Template) },
       tags: ["Templates"],
     },
-    async ({ client, params }) => {
+    async ({ client, params, query }) => {
       const _query = gql`
-        query GetTemplate_Template($templateId: GID!) {
+        query GetTemplate_Template($templateId: GID!, $includeFields: Boolean!) {
           template: petition(id: $templateId) {
             ...Template
           }
@@ -1076,6 +1122,7 @@ api
       `;
       const result = await client.request(GetTemplate_TemplateDocument, {
         templateId: params.templateId,
+        includeFields: query.include?.includes("fields") ?? false,
       });
       assert("id" in result.template!);
       return Ok(result.template!);

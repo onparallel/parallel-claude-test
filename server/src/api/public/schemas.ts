@@ -1,102 +1,30 @@
+import { JSONSchema6TypeName } from "json-schema";
 import { outdent } from "outdent";
 import { PetitionEventType } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { titleize } from "../../util/strings";
 import { JsonSchema, schema } from "../rest/schemas";
 
-const _Petition = {
-  title: "Petition",
-  type: "object",
-  additionalProperties: false,
-  required: ["id", "name", "status", "deadline", "locale", "createdAt", "customProperties"],
-  properties: {
-    id: {
-      description: "The ID of the petition",
-      type: "string",
-      example: toGlobalId("Petition", 42),
-    },
-    name: {
-      description: "The name of the petition",
-      example: "My petition",
-      type: ["string", "null"],
-    },
-    status: {
-      description: "The status of the petition",
-      type: "string",
-      enum: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
-    },
-    deadline: {
-      description: "The deadline of the petition for informative purposes",
-      type: ["string", "null"],
-      format: "date-time",
-      example: new Date(2020, 2, 15).toISOString(),
-    },
-    locale: {
-      description: "The locale of the petition",
-      type: "string",
-      enum: ["en", "es"],
-      example: "en",
-    },
-    createdAt: {
-      description: "Creation date of the petition",
-      type: "string",
-      format: "date-time",
-      example: new Date(2020, 2, 15).toISOString(),
-    },
-    fromTemplateId: {
-      description: "ID of the template used to create the petition",
-      type: ["string", "null"],
-      example: toGlobalId("Petition", 1),
-    },
-    customProperties: {
-      description: "The custom properties of the petition",
-      type: "object",
-      example: { clientId: "1234" },
-    },
-  },
-} as const;
+function _ListOf<T extends JsonSchema>(item: T) {
+  return {
+    title: `${item.title ?? "any"}[]`,
+    type: "array",
+    items: item,
+  } as const;
+}
 
-const _Template = {
-  title: "Template",
-  type: "object",
-  additionalProperties: false,
-  required: ["id", "name", "description", "locale", "createdAt", "customProperties"],
-  properties: {
-    id: {
-      description: "The ID of the template",
-      type: "string",
-      example: toGlobalId("Petition", 42),
-    },
-    name: {
-      description: "The name of the template",
-      type: ["string", "null"],
-      example: "My petition",
-    },
-    description: {
-      description: "The description of the template",
-      type: ["string", "null"],
-      example:
-        "Lorem ipsum dolor sit amet consectetur adipiscing elit magnis porttitor tempor, imperdiet class neque purus ornare justo aptent orci sed pellentesque, natoque laoreet tincidunt volutpat ultricies suscipit iaculis hendrerit inceptos.",
-    },
-    locale: {
-      description: "The locale of the template",
-      type: "string",
-      enum: ["en", "es"],
-      example: "en",
-    },
-    createdAt: {
-      description: "Creation date of the template",
-      type: "string",
-      format: "date-time",
-      example: new Date(2020, 2, 15).toISOString(),
-    },
-    customProperties: {
-      description: "The custom properties of the template",
-      type: "object",
-      example: { clientId: "1234" },
-    },
-  },
-} as const;
+function _OrNull<T extends JsonSchema>(
+  item: T
+): Omit<T, "type"> & {
+  type: T["type"] extends string[] ? [...T["type"], "null"] : [T["type"], "null"];
+} {
+  return {
+    ...item,
+    type: (Array.isArray(item.type)
+      ? [...item.type, "null"]
+      : [item.type as JSONSchema6TypeName, "null"]) as any,
+  };
+}
 
 const _User = {
   title: "User",
@@ -266,6 +194,249 @@ const _PetitionAccess = {
   },
 } as const;
 
+const _PetitionField = {
+  title: "PetitionFieldWithReply",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "title", "type"],
+  properties: {
+    id: {
+      type: "string",
+      description: "The ID of the petition field",
+      example: toGlobalId("PetitionField", 100),
+    },
+    title: {
+      type: ["string", "null"],
+      description: "Title of the field",
+      example: "Please, tell us your name",
+    },
+    type: {
+      type: "string",
+      enum: [
+        "HEADING",
+        "TEXT",
+        "SHORT_TEXT",
+        "FILE_UPLOAD",
+        "SELECT",
+        "DYNAMIC_SELECT",
+        "CHECKBOX",
+      ],
+      description: "The type of the field",
+      example: "TEXT",
+    },
+    fromPetitionFieldId: {
+      type: ["string", "null"],
+      description: "The field ID from where this field was cloned",
+      example: toGlobalId("PetitionField", 30),
+    },
+    alias: {
+      type: ["string", "null"],
+      description: "The field alias specified within the request / template",
+      example: "first-name",
+    },
+  },
+} as const;
+
+const _PetitionFieldWithReplies = {
+  ..._PetitionField,
+  required: [..._PetitionField.required, "replies"],
+  properties: {
+    ..._PetitionField.properties,
+    replies: {
+      type: "array",
+      items: {
+        type: "object",
+        required: ["id", "content", "createdAt", "updatedAt"],
+        properties: {
+          id: {
+            type: "string",
+            description: "The ID of the petition field reply",
+            example: toGlobalId("PetitionFieldReply", 100),
+          },
+          content: {
+            oneOf: [
+              {
+                title: "Text reply",
+                type: "string",
+                description: "The text content of the reply",
+                example: "Robert Baratheon",
+              },
+              {
+                title: "File reply",
+                type: "object",
+                required: ["filename", "size", "contentType"],
+                additionalProperties: false,
+                properties: {
+                  filename: {
+                    type: "string",
+                    description: "The name of the submitted file",
+                    example: "Photo_ID.jpeg",
+                  },
+                  size: {
+                    type: "integer",
+                    description: "The size of the file in bytes",
+                    example: 1928824,
+                  },
+                  contentType: {
+                    type: "string",
+                    description: "The content-type of the file",
+                    example: "image/jpeg",
+                  },
+                },
+              },
+              {
+                title: "Dynamic select reply",
+                description:
+                  "An array of tuples where the first element is the name of the field and the second element is the reply",
+                type: "array",
+                minItems: 2,
+                items: {
+                  type: "array",
+                  items: [{ type: "string" }, { type: "string" }],
+                },
+                example: [
+                  ["Comunidad autónoma", "Andalucía"],
+                  ["Provincia", "Cádiz"],
+                ],
+              },
+              {
+                title: "Checkbox reply",
+                description: "An array with the selected choices.",
+                type: "array",
+                items: {
+                  type: "string",
+                },
+                example: ["Option 1", "Option 3"],
+              },
+            ],
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            description: "Creation date of the reply",
+            example: new Date(2020, 2, 15).toISOString(),
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            description: "Last time update of the reply",
+            example: new Date(2020, 2, 20).toISOString(),
+          },
+        },
+      },
+    },
+  },
+} as const;
+
+const _Petition = {
+  title: "Petition",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "name", "status", "deadline", "locale", "createdAt", "customProperties"],
+  properties: {
+    id: {
+      description: "The ID of the petition",
+      type: "string",
+      example: toGlobalId("Petition", 42),
+    },
+    name: {
+      description: "The name of the petition",
+      example: "My petition",
+      type: ["string", "null"],
+    },
+    status: {
+      description: "The status of the petition",
+      type: "string",
+      enum: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
+    },
+    deadline: {
+      description: "The deadline of the petition for informative purposes",
+      type: ["string", "null"],
+      format: "date-time",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+    locale: {
+      description: "The locale of the petition",
+      type: "string",
+      enum: ["en", "es"],
+      example: "en",
+    },
+    createdAt: {
+      description: "Creation date of the petition",
+      type: "string",
+      format: "date-time",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+    fromTemplateId: {
+      description: "ID of the template used to create the petition",
+      type: ["string", "null"],
+      example: toGlobalId("Petition", 1),
+    },
+    customProperties: {
+      description: "The custom properties of the petition",
+      type: "object",
+      example: { clientId: "1234" },
+    },
+    recipients: {
+      description:
+        "If parameter `include` contains `recipients`, this will be the list of recipients this petition has been sent to.",
+      ..._OrNull(_ListOf(_PetitionAccess)),
+    },
+    fields: {
+      description:
+        "If parameter `include` contains `fields`, this will be the list of the petition fields with their submitted replies.",
+      ..._OrNull(_ListOf(_PetitionFieldWithReplies)),
+    },
+  },
+} as const;
+
+const _Template = {
+  title: "Template",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "name", "description", "locale", "createdAt", "customProperties"],
+  properties: {
+    id: {
+      description: "The ID of the template",
+      type: "string",
+      example: toGlobalId("Petition", 42),
+    },
+    name: {
+      description: "The name of the template",
+      type: ["string", "null"],
+      example: "My petition",
+    },
+    description: {
+      description: "The description of the template",
+      type: ["string", "null"],
+      example:
+        "Lorem ipsum dolor sit amet consectetur adipiscing elit magnis porttitor tempor, imperdiet class neque purus ornare justo aptent orci sed pellentesque, natoque laoreet tincidunt volutpat ultricies suscipit iaculis hendrerit inceptos.",
+    },
+    locale: {
+      description: "The locale of the template",
+      type: "string",
+      enum: ["en", "es"],
+      example: "en",
+    },
+    createdAt: {
+      description: "Creation date of the template",
+      type: "string",
+      format: "date-time",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+    customProperties: {
+      description: "The custom properties of the template",
+      type: "object",
+      example: { clientId: "1234" },
+    },
+    fields: {
+      description:
+        "If parameter `include` contains `fields`, this will be the list of the petition fields.",
+      ..._OrNull(_ListOf(_PetitionField)),
+    },
+  },
+} as const;
+
 const _RemindersConfig = {
   title: "RemindersConfig",
   description: "The configuration on when the reminders should be sent",
@@ -371,132 +542,6 @@ const _Permission = {
       },
     },
   ],
-} as const;
-
-const _PetitionFieldWithReply = {
-  title: "PetitionFieldWithReply",
-  type: "object",
-  additionalProperties: false,
-  required: ["id", "title", "type", "replies"],
-  properties: {
-    id: {
-      type: "string",
-      description: "The ID of the petition field",
-      example: toGlobalId("PetitionField", 100),
-    },
-    title: {
-      type: ["string", "null"],
-      description: "Title of the field",
-      example: "Please, tell us your name",
-    },
-    type: {
-      type: "string",
-      enum: [
-        "HEADING",
-        "TEXT",
-        "SHORT_TEXT",
-        "FILE_UPLOAD",
-        "SELECT",
-        "DYNAMIC_SELECT",
-        "CHECKBOX",
-      ],
-      description: "The type of the field",
-      example: "TEXT",
-    },
-    fromPetitionFieldId: {
-      type: ["string", "null"],
-      description: "The field ID from where this field was cloned",
-      example: toGlobalId("PetitionField", 30),
-    },
-    alias: {
-      type: ["string", "null"],
-      description: "The field alias specified within the request / template",
-      example: "first-name",
-    },
-    replies: {
-      type: "array",
-      items: {
-        type: "object",
-        required: ["id", "content", "createdAt", "updatedAt"],
-        properties: {
-          id: {
-            type: "string",
-            description: "The ID of the petition field reply",
-            example: toGlobalId("PetitionFieldReply", 100),
-          },
-          content: {
-            oneOf: [
-              {
-                title: "Text reply",
-                type: "string",
-                description: "The text content of the reply",
-                example: "Robert Baratheon",
-              },
-              {
-                title: "File reply",
-                type: "object",
-                required: ["filename", "size", "contentType"],
-                additionalProperties: false,
-                properties: {
-                  filename: {
-                    type: "string",
-                    description: "The name of the submitted file",
-                    example: "Photo_ID.jpeg",
-                  },
-                  size: {
-                    type: "integer",
-                    description: "The size of the file in bytes",
-                    example: 1928824,
-                  },
-                  contentType: {
-                    type: "string",
-                    description: "The content-type of the file",
-                    example: "image/jpeg",
-                  },
-                },
-              },
-              {
-                title: "Dynamic select reply",
-                description:
-                  "An array of tuples where the first element is the name of the field and the second element is the reply",
-                type: "array",
-                minItems: 2,
-                items: {
-                  type: "array",
-                  items: [{ type: "string" }, { type: "string" }],
-                },
-                example: [
-                  ["Comunidad autónoma", "Andalucía"],
-                  ["Provincia", "Cádiz"],
-                ],
-              },
-              {
-                title: "Checkbox reply",
-                description: "An array with the selected choices.",
-                type: "array",
-                items: {
-                  type: "string",
-                },
-                example: ["Option 1", "Option 3"],
-              },
-            ],
-          },
-          createdAt: {
-            type: "string",
-            format: "date-time",
-            description: "Creation date of the reply",
-            example: new Date(2020, 2, 15).toISOString(),
-          },
-          updatedAt: {
-            type: "string",
-            format: "date-time",
-            description: "Last time update of the reply",
-            example: new Date(2020, 2, 20).toISOString(),
-          },
-        },
-      },
-    },
-  },
 } as const;
 
 export const Petition = schema(_Petition);
@@ -681,7 +726,7 @@ export const SharePetition = schema({
 
 export const ListOfPermissions = ListOf(_Permission);
 
-export const ListOfPetitionFieldsWithReplies = ListOf(_PetitionFieldWithReply);
+export const ListOfPetitionFieldsWithReplies = ListOf(_PetitionFieldWithReplies);
 
 export const FieldReplyDownloadContent = schema({
   type: "string",
@@ -758,11 +803,7 @@ function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
 }
 
 function ListOf<T extends JsonSchema>(item: T) {
-  return schema({
-    title: `${item.title ?? "any"}[]`,
-    type: "array",
-    items: item,
-  } as const);
+  return schema(_ListOf(item));
 }
 
 export const AnyPetitionEvent = {
