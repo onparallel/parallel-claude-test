@@ -1,3 +1,5 @@
+import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+import gql from "graphql-tag";
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -3733,3 +3735,497 @@ export type EventSubscriptions_DeleteSubscriptionMutationVariables = Exact<{
 }>;
 
 export type EventSubscriptions_DeleteSubscriptionMutation = { deleteEventSubscriptions: Result };
+
+export const PetitionFragmentDoc = gql`
+  fragment Petition on Petition {
+    id
+    name
+    status
+    deadline
+    locale
+    createdAt
+    fromTemplateId
+    customProperties
+  }
+` as unknown as DocumentNode<PetitionFragment, unknown>;
+export const TemplateFragmentDoc = gql`
+  fragment Template on PetitionTemplate {
+    id
+    name
+    description
+    locale
+    createdAt
+    customProperties
+  }
+` as unknown as DocumentNode<TemplateFragment, unknown>;
+export const ContactFragmentDoc = gql`
+  fragment Contact on Contact {
+    id
+    email
+    fullName
+    firstName
+    lastName
+    createdAt
+    updatedAt
+  }
+` as unknown as DocumentNode<ContactFragment, unknown>;
+export const UserFragmentDoc = gql`
+  fragment User on User {
+    id
+    fullName
+    firstName
+    lastName
+  }
+` as unknown as DocumentNode<UserFragment, unknown>;
+export const PetitionAccessFragmentDoc = gql`
+  fragment PetitionAccess on PetitionAccess {
+    id
+    contact {
+      ...Contact
+    }
+    granter {
+      ...User
+    }
+    status
+    reminderCount
+    remindersLeft
+    remindersActive
+    nextReminderAt
+    createdAt
+  }
+  ${ContactFragmentDoc}
+  ${UserFragmentDoc}
+` as unknown as DocumentNode<PetitionAccessFragment, unknown>;
+export const UserGroupFragmentDoc = gql`
+  fragment UserGroup on UserGroup {
+    id
+    name
+  }
+` as unknown as DocumentNode<UserGroupFragment, unknown>;
+export const PermissionFragmentDoc = gql`
+  fragment Permission on PetitionPermission {
+    permissionType
+    createdAt
+    ... on PetitionUserPermission {
+      user {
+        ...User
+      }
+    }
+    ... on PetitionUserGroupPermission {
+      group {
+        ...UserGroup
+      }
+    }
+  }
+  ${UserFragmentDoc}
+  ${UserGroupFragmentDoc}
+` as unknown as DocumentNode<PermissionFragment, unknown>;
+export const PetitionFieldFragmentDoc = gql`
+  fragment PetitionField on PetitionField {
+    id
+    title
+    type
+    fromPetitionFieldId
+    alias
+  }
+` as unknown as DocumentNode<PetitionFieldFragment, unknown>;
+export const PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    createdAt
+    updatedAt
+  }
+` as unknown as DocumentNode<PetitionFieldReplyFragment, unknown>;
+export const SubscriptionFragmentDoc = gql`
+  fragment Subscription on PetitionEventSubscription {
+    id
+    eventsUrl
+    isEnabled
+    eventTypes
+  }
+` as unknown as DocumentNode<SubscriptionFragment, unknown>;
+export const GetPetitions_PetitionsDocument = gql`
+  query GetPetitions_Petitions(
+    $offset: Int!
+    $limit: Int!
+    $status: [PetitionStatus!]
+    $sortBy: [QueryPetitions_OrderBy!]
+  ) {
+    petitions(
+      offset: $offset
+      limit: $limit
+      sortBy: $sortBy
+      filters: { status: $status, type: PETITION }
+    ) {
+      items {
+        ...Petition
+      }
+      totalCount
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<GetPetitions_PetitionsQuery, GetPetitions_PetitionsQueryVariables>;
+export const CreatePetition_PetitionDocument = gql`
+  mutation CreatePetition_Petition($name: String, $templateId: GID) {
+    createPetition(name: $name, petitionId: $templateId) {
+      ...Petition
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  CreatePetition_PetitionMutation,
+  CreatePetition_PetitionMutationVariables
+>;
+export const GetPetition_PetitionDocument = gql`
+  query GetPetition_Petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...Petition
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<GetPetition_PetitionQuery, GetPetition_PetitionQueryVariables>;
+export const UpdatePetition_PetitionDocument = gql`
+  mutation UpdatePetition_Petition($petitionId: GID!, $data: UpdatePetitionInput!) {
+    updatePetition(petitionId: $petitionId, data: $data) {
+      ...Petition
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  UpdatePetition_PetitionMutation,
+  UpdatePetition_PetitionMutationVariables
+>;
+export const DeletePetition_deletePetitionsDocument = gql`
+  mutation DeletePetition_deletePetitions($petitionId: GID!, $force: Boolean!) {
+    deletePetitions(ids: [$petitionId], force: $force)
+  }
+` as unknown as DocumentNode<
+  DeletePetition_deletePetitionsMutation,
+  DeletePetition_deletePetitionsMutationVariables
+>;
+export const ReadPetitionCustomPropertiesDocument = gql`
+  query ReadPetitionCustomProperties($petitionId: GID!) {
+    petition(id: $petitionId) {
+      id
+      customProperties
+    }
+  }
+` as unknown as DocumentNode<
+  ReadPetitionCustomPropertiesQuery,
+  ReadPetitionCustomPropertiesQueryVariables
+>;
+export const CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyDocument = gql`
+  mutation CreateOrUpdateCustomProperty_modifyPetitionCustomProperty(
+    $petitionId: GID!
+    $key: String!
+    $value: String
+  ) {
+    modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+      customProperties
+    }
+  }
+` as unknown as DocumentNode<
+  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutation,
+  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutationVariables
+>;
+export const DeleteCustomProperty_modifyPetitionCustomPropertyDocument = gql`
+  mutation DeleteCustomProperty_modifyPetitionCustomProperty($petitionId: GID!, $key: String!) {
+    modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  DeleteCustomProperty_modifyPetitionCustomPropertyMutation,
+  DeleteCustomProperty_modifyPetitionCustomPropertyMutationVariables
+>;
+export const GetPetitionRecipients_PetitionAccessesDocument = gql`
+  query GetPetitionRecipients_PetitionAccesses($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ... on Petition {
+        accesses {
+          ...PetitionAccess
+        }
+      }
+    }
+  }
+  ${PetitionAccessFragmentDoc}
+` as unknown as DocumentNode<
+  GetPetitionRecipients_PetitionAccessesQuery,
+  GetPetitionRecipients_PetitionAccessesQueryVariables
+>;
+export const CreatePetitionRecipients_ContactDocument = gql`
+  query CreatePetitionRecipients_Contact($email: String!) {
+    contacts: contactsByEmail(emails: [$email]) {
+      id
+      firstName
+      lastName
+    }
+  }
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_ContactQuery,
+  CreatePetitionRecipients_ContactQueryVariables
+>;
+export const CreatePetitionRecipients_updateContactDocument = gql`
+  mutation CreatePetitionRecipients_updateContact($contactId: GID!, $data: UpdateContactInput!) {
+    updateContact(id: $contactId, data: $data) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_updateContactMutation,
+  CreatePetitionRecipients_updateContactMutationVariables
+>;
+export const CreatePetitionRecipients_createContactDocument = gql`
+  mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
+    createContact(data: $data) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_createContactMutation,
+  CreatePetitionRecipients_createContactMutationVariables
+>;
+export const CreatePetitionRecipients_sendPetitionDocument = gql`
+  mutation CreatePetitionRecipients_sendPetition(
+    $petitionId: GID!
+    $contactIds: [GID!]!
+    $subject: String!
+    $body: JSON!
+    $scheduledAt: DateTime
+    $remindersConfig: RemindersConfigInput
+  ) {
+    sendPetition(
+      petitionId: $petitionId
+      contactIds: $contactIds
+      subject: $subject
+      body: $body
+      scheduledAt: $scheduledAt
+      remindersConfig: $remindersConfig
+    ) {
+      accesses {
+        ...PetitionAccess
+      }
+    }
+  }
+  ${PetitionAccessFragmentDoc}
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_sendPetitionMutation,
+  CreatePetitionRecipients_sendPetitionMutationVariables
+>;
+export const PetitionReplies_RepliesDocument = gql`
+  query PetitionReplies_Replies($petitionId: GID!) {
+    petition(id: $petitionId) {
+      fields {
+        ...PetitionField
+        replies {
+          ...PetitionFieldReply
+        }
+      }
+    }
+  }
+  ${PetitionFieldFragmentDoc}
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<PetitionReplies_RepliesQuery, PetitionReplies_RepliesQueryVariables>;
+export const DownloadFileReply_fileUploadReplyDownloadLinkDocument = gql`
+  mutation DownloadFileReply_fileUploadReplyDownloadLink($petitionId: GID!, $replyId: GID!) {
+    fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  DownloadFileReply_fileUploadReplyDownloadLinkMutation,
+  DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables
+>;
+export const GetPermissions_PermissionsDocument = gql`
+  query GetPermissions_Permissions($petitionId: GID!) {
+    petition(id: $petitionId) {
+      permissions {
+        ...Permission
+      }
+    }
+  }
+  ${PermissionFragmentDoc}
+` as unknown as DocumentNode<
+  GetPermissions_PermissionsQuery,
+  GetPermissions_PermissionsQueryVariables
+>;
+export const SharePetition_addPetitionPermissionDocument = gql`
+  mutation SharePetition_addPetitionPermission(
+    $petitionId: GID!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
+  ) {
+    addPetitionPermission(
+      petitionIds: [$petitionId]
+      userIds: $userIds
+      userGroupIds: $userGroupIds
+      permissionType: WRITE
+    ) {
+      permissions {
+        ...Permission
+      }
+    }
+  }
+  ${PermissionFragmentDoc}
+` as unknown as DocumentNode<
+  SharePetition_addPetitionPermissionMutation,
+  SharePetition_addPetitionPermissionMutationVariables
+>;
+export const StopSharing_removePetitionPermissionDocument = gql`
+  mutation StopSharing_removePetitionPermission($petitionId: GID!) {
+    removePetitionPermission(petitionIds: [$petitionId], removeAll: true) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  StopSharing_removePetitionPermissionMutation,
+  StopSharing_removePetitionPermissionMutationVariables
+>;
+export const RemoveUserPermission_removePetitionPermissionDocument = gql`
+  mutation RemoveUserPermission_removePetitionPermission($petitionId: GID!, $userId: GID!) {
+    removePetitionPermission(petitionIds: [$petitionId], userIds: [$userId]) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  RemoveUserPermission_removePetitionPermissionMutation,
+  RemoveUserPermission_removePetitionPermissionMutationVariables
+>;
+export const RemoveUserGroupPermission_removePetitionPermissionDocument = gql`
+  mutation RemoveUserGroupPermission_removePetitionPermission(
+    $petitionId: GID!
+    $userGroupId: GID!
+  ) {
+    removePetitionPermission(petitionIds: [$petitionId], userGroupIds: [$userGroupId]) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  RemoveUserGroupPermission_removePetitionPermissionMutation,
+  RemoveUserGroupPermission_removePetitionPermissionMutationVariables
+>;
+export const TransferPetition_transferPetitionOwnershipDocument = gql`
+  mutation TransferPetition_transferPetitionOwnership($userId: GID!, $petitionId: GID!) {
+    transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
+      permissions {
+        ...Permission
+      }
+    }
+  }
+  ${PermissionFragmentDoc}
+` as unknown as DocumentNode<
+  TransferPetition_transferPetitionOwnershipMutation,
+  TransferPetition_transferPetitionOwnershipMutationVariables
+>;
+export const GetTemplates_TemplatesDocument = gql`
+  query GetTemplates_Templates($offset: Int!, $limit: Int!, $sortBy: [QueryPetitions_OrderBy!]) {
+    templates: petitions(
+      offset: $offset
+      limit: $limit
+      sortBy: $sortBy
+      filters: { type: TEMPLATE }
+    ) {
+      items {
+        ...Template
+      }
+      totalCount
+    }
+  }
+  ${TemplateFragmentDoc}
+` as unknown as DocumentNode<GetTemplates_TemplatesQuery, GetTemplates_TemplatesQueryVariables>;
+export const GetTemplate_TemplateDocument = gql`
+  query GetTemplate_Template($templateId: GID!) {
+    template: petition(id: $templateId) {
+      ...Template
+    }
+  }
+  ${TemplateFragmentDoc}
+` as unknown as DocumentNode<GetTemplate_TemplateQuery, GetTemplate_TemplateQueryVariables>;
+export const DeleteTemplate_deletePetitionsDocument = gql`
+  mutation DeleteTemplate_deletePetitions($templateId: GID!, $force: Boolean!) {
+    deletePetitions(ids: [$templateId], force: $force)
+  }
+` as unknown as DocumentNode<
+  DeleteTemplate_deletePetitionsMutation,
+  DeleteTemplate_deletePetitionsMutationVariables
+>;
+export const GetContacts_ContactsDocument = gql`
+  query GetContacts_Contacts($offset: Int!, $limit: Int!, $sortBy: [QueryContacts_OrderBy!]) {
+    contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
+      items {
+        ...Contact
+      }
+      totalCount
+    }
+  }
+  ${ContactFragmentDoc}
+` as unknown as DocumentNode<GetContacts_ContactsQuery, GetContacts_ContactsQueryVariables>;
+export const CreateContact_ContactDocument = gql`
+  mutation CreateContact_Contact($data: CreateContactInput!) {
+    createContact(data: $data) {
+      ...Contact
+    }
+  }
+  ${ContactFragmentDoc}
+` as unknown as DocumentNode<CreateContact_ContactMutation, CreateContact_ContactMutationVariables>;
+export const GetContact_ContactDocument = gql`
+  query GetContact_Contact($contactId: GID!) {
+    contact(id: $contactId) {
+      ...Contact
+    }
+  }
+  ${ContactFragmentDoc}
+` as unknown as DocumentNode<GetContact_ContactQuery, GetContact_ContactQueryVariables>;
+export const GetOrganizationUsers_UsersDocument = gql`
+  query GetOrganizationUsers_Users(
+    $offset: Int!
+    $limit: Int!
+    $sortBy: [OrganizationUsers_OrderBy!]
+  ) {
+    me {
+      organization {
+        users(limit: $limit, offset: $offset, sortBy: $sortBy) {
+          totalCount
+          items {
+            ...User
+          }
+        }
+      }
+    }
+  }
+  ${UserFragmentDoc}
+` as unknown as DocumentNode<
+  GetOrganizationUsers_UsersQuery,
+  GetOrganizationUsers_UsersQueryVariables
+>;
+export const EventSubscriptions_GetSubscriptionsDocument = gql`
+  query EventSubscriptions_GetSubscriptions {
+    subscriptions {
+      ...Subscription
+    }
+  }
+  ${SubscriptionFragmentDoc}
+` as unknown as DocumentNode<
+  EventSubscriptions_GetSubscriptionsQuery,
+  EventSubscriptions_GetSubscriptionsQueryVariables
+>;
+export const EventSubscriptions_CreateSubscriptionDocument = gql`
+  mutation EventSubscriptions_CreateSubscription($eventsUrl: String!) {
+    createEventSubscription(eventsUrl: $eventsUrl) {
+      ...Subscription
+    }
+  }
+  ${SubscriptionFragmentDoc}
+` as unknown as DocumentNode<
+  EventSubscriptions_CreateSubscriptionMutation,
+  EventSubscriptions_CreateSubscriptionMutationVariables
+>;
+export const EventSubscriptions_DeleteSubscriptionDocument = gql`
+  mutation EventSubscriptions_DeleteSubscription($ids: [GID!]!) {
+    deleteEventSubscriptions(ids: $ids)
+  }
+` as unknown as DocumentNode<
+  EventSubscriptions_DeleteSubscriptionMutation,
+  EventSubscriptions_DeleteSubscriptionMutationVariables
+>;

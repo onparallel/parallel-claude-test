@@ -53,69 +53,39 @@ import {
   UpdatePetition,
 } from "./schemas";
 import {
-  CreateContact_ContactMutation,
-  CreateContact_ContactMutationVariables,
-  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutation,
-  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutationVariables,
-  CreatePetitionRecipients_ContactQuery,
-  CreatePetitionRecipients_ContactQueryVariables,
-  CreatePetitionRecipients_createContactMutation,
-  CreatePetitionRecipients_createContactMutationVariables,
-  CreatePetitionRecipients_sendPetitionMutation,
-  CreatePetitionRecipients_sendPetitionMutationVariables,
-  CreatePetitionRecipients_updateContactMutation,
-  CreatePetitionRecipients_updateContactMutationVariables,
-  CreatePetition_PetitionMutation,
-  CreatePetition_PetitionMutationVariables,
-  DeleteCustomProperty_modifyPetitionCustomPropertyMutation,
-  DeleteCustomProperty_modifyPetitionCustomPropertyMutationVariables,
-  DeletePetition_deletePetitionsMutation,
-  DeletePetition_deletePetitionsMutationVariables,
-  DeleteTemplate_deletePetitionsMutation,
-  DeleteTemplate_deletePetitionsMutationVariables,
-  DownloadFileReply_fileUploadReplyDownloadLinkMutation,
-  DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables,
-  EventSubscriptions_CreateSubscriptionMutation,
-  EventSubscriptions_CreateSubscriptionMutationVariables,
-  EventSubscriptions_DeleteSubscriptionMutation,
-  EventSubscriptions_DeleteSubscriptionMutationVariables,
-  EventSubscriptions_GetSubscriptionsQuery,
-  GetContacts_ContactsQuery,
-  GetContacts_ContactsQueryVariables,
-  GetContact_ContactQuery,
-  GetContact_ContactQueryVariables,
-  GetOrganizationUsers_UsersQuery,
-  GetOrganizationUsers_UsersQueryVariables,
-  GetPermissions_PermissionsQuery,
-  GetPermissions_PermissionsQueryVariables,
-  GetPetitionRecipients_PetitionAccessesQuery,
-  GetPetitionRecipients_PetitionAccessesQueryVariables,
-  GetPetitions_PetitionsQuery,
-  GetPetitions_PetitionsQueryVariables,
-  GetPetition_PetitionQuery,
-  GetPetition_PetitionQueryVariables,
-  GetTemplates_TemplatesQuery,
-  GetTemplates_TemplatesQueryVariables,
-  GetTemplate_TemplateQuery,
-  GetTemplate_TemplateQueryVariables,
+  CreateContact_ContactDocument,
+  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyDocument,
+  CreatePetitionRecipients_ContactDocument,
+  CreatePetitionRecipients_createContactDocument,
+  CreatePetitionRecipients_sendPetitionDocument,
+  CreatePetitionRecipients_updateContactDocument,
+  CreatePetition_PetitionDocument,
+  DeleteCustomProperty_modifyPetitionCustomPropertyDocument,
+  DeletePetition_deletePetitionsDocument,
+  DeleteTemplate_deletePetitionsDocument,
+  DownloadFileReply_fileUploadReplyDownloadLinkDocument,
+  EventSubscriptions_CreateSubscriptionDocument,
+  EventSubscriptions_DeleteSubscriptionDocument,
+  EventSubscriptions_GetSubscriptionsDocument,
+  GetContacts_ContactsDocument,
+  GetContact_ContactDocument,
+  GetOrganizationUsers_UsersDocument,
+  GetPermissions_PermissionsDocument,
+  GetPetitionRecipients_PetitionAccessesDocument,
+  GetPetitions_PetitionsDocument,
+  GetPetition_PetitionDocument,
+  GetTemplates_TemplatesDocument,
+  GetTemplate_TemplateDocument,
   PetitionFragment as PetitionFragmentType,
-  PetitionReplies_RepliesQuery,
-  PetitionReplies_RepliesQueryVariables,
-  ReadPetitionCustomPropertiesQuery,
-  ReadPetitionCustomPropertiesQueryVariables,
-  RemoveUserGroupPermission_removePetitionPermissionMutation,
-  RemoveUserGroupPermission_removePetitionPermissionMutationVariables,
-  RemoveUserPermission_removePetitionPermissionMutation,
-  RemoveUserPermission_removePetitionPermissionMutationVariables,
-  SharePetition_addPetitionPermissionMutation,
-  SharePetition_addPetitionPermissionMutationVariables,
-  StopSharing_removePetitionPermissionMutation,
-  StopSharing_removePetitionPermissionMutationVariables,
+  PetitionReplies_RepliesDocument,
+  ReadPetitionCustomPropertiesDocument,
+  RemoveUserGroupPermission_removePetitionPermissionDocument,
+  RemoveUserPermission_removePetitionPermissionDocument,
+  SharePetition_addPetitionPermissionDocument,
+  StopSharing_removePetitionPermissionDocument,
   TemplateFragment as TemplateFragmentType,
-  TransferPetition_transferPetitionOwnershipMutation,
-  TransferPetition_transferPetitionOwnershipMutationVariables,
-  UpdatePetition_PetitionMutation,
-  UpdatePetition_PetitionMutationVariables,
+  TransferPetition_transferPetitionOwnershipDocument,
+  UpdatePetition_PetitionDocument,
 } from "./__types";
 
 function assert(condition: any): asserts condition {}
@@ -243,33 +213,28 @@ api
       tags: ["Petitions"],
     },
     async ({ client, query }) => {
-      const result = await client.request<
-        GetPetitions_PetitionsQuery,
-        GetPetitions_PetitionsQueryVariables
-      >(
-        gql`
-          query GetPetitions_Petitions(
-            $offset: Int!
-            $limit: Int!
-            $status: [PetitionStatus!]
-            $sortBy: [QueryPetitions_OrderBy!]
+      const _query = gql`
+        query GetPetitions_Petitions(
+          $offset: Int!
+          $limit: Int!
+          $status: [PetitionStatus!]
+          $sortBy: [QueryPetitions_OrderBy!]
+        ) {
+          petitions(
+            offset: $offset
+            limit: $limit
+            sortBy: $sortBy
+            filters: { status: $status, type: PETITION }
           ) {
-            petitions(
-              offset: $offset
-              limit: $limit
-              sortBy: $sortBy
-              filters: { status: $status, type: PETITION }
-            ) {
-              items {
-                ...Petition
-              }
-              totalCount
+            items {
+              ...Petition
             }
+            totalCount
           }
-          ${PetitionFragment}
-        `,
-        query
-      );
+        }
+        ${PetitionFragment}
+      `;
+      const result = await client.request(GetPetitions_PetitionsDocument, query);
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
       return Ok({ items, totalCount });
@@ -285,20 +250,15 @@ api
       tags: ["Petitions"],
     },
     async ({ client, body }) => {
-      const result = await client.request<
-        CreatePetition_PetitionMutation,
-        CreatePetition_PetitionMutationVariables
-      >(
-        gql`
-          mutation CreatePetition_Petition($name: String, $templateId: GID) {
-            createPetition(name: $name, petitionId: $templateId) {
-              ...Petition
-            }
+      const _mutation = gql`
+        mutation CreatePetition_Petition($name: String, $templateId: GID) {
+          createPetition(name: $name, petitionId: $templateId) {
+            ...Petition
           }
-          ${PetitionFragment}
-        `,
-        body
-      );
+        }
+        ${PetitionFragment}
+      `;
+      const result = await client.request(CreatePetition_PetitionDocument, body);
       assert("id" in result.createPetition);
       return Created(result.createPetition);
     }
@@ -322,20 +282,17 @@ api
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
-      const result = await client.request<
-        GetPetition_PetitionQuery,
-        GetPetition_PetitionQueryVariables
-      >(
-        gql`
-          query GetPetition_Petition($petitionId: GID!) {
-            petition(id: $petitionId) {
-              ...Petition
-            }
+      const _query = gql`
+        query GetPetition_Petition($petitionId: GID!) {
+          petition(id: $petitionId) {
+            ...Petition
           }
-          ${PetitionFragment}
-        `,
-        { petitionId: params.petitionId }
-      );
+        }
+        ${PetitionFragment}
+      `;
+      const result = await client.request(GetPetition_PetitionDocument, {
+        petitionId: params.petitionId,
+      });
       assert("id" in result.petition!);
       return Ok(result.petition!);
     }
@@ -352,20 +309,18 @@ api
       tags: ["Petitions"],
     },
     async ({ client, params, body }) => {
-      const result = await client.request<
-        UpdatePetition_PetitionMutation,
-        UpdatePetition_PetitionMutationVariables
-      >(
-        gql`
-          mutation UpdatePetition_Petition($petitionId: GID!, $data: UpdatePetitionInput!) {
-            updatePetition(petitionId: $petitionId, data: $data) {
-              ...Petition
-            }
+      const _mutation = gql`
+        mutation UpdatePetition_Petition($petitionId: GID!, $data: UpdatePetitionInput!) {
+          updatePetition(petitionId: $petitionId, data: $data) {
+            ...Petition
           }
-          ${PetitionFragment}
-        `,
-        { petitionId: params.petitionId, data: body }
-      );
+        }
+        ${PetitionFragment}
+      `;
+      const result = await client.request(UpdatePetition_PetitionDocument, {
+        petitionId: params.petitionId,
+        data: body,
+      });
       assert("id" in result.updatePetition!);
       return Ok(result.updatePetition!);
     }
@@ -399,17 +354,15 @@ api
     },
     async ({ client, params, query }) => {
       try {
-        await client.request<
-          DeletePetition_deletePetitionsMutation,
-          DeletePetition_deletePetitionsMutationVariables
-        >(
-          gql`
-            mutation DeletePetition_deletePetitions($petitionId: GID!, $force: Boolean!) {
-              deletePetitions(ids: [$petitionId], force: $force)
-            }
-          `,
-          { petitionId: params.petitionId, force: query.force ?? false }
-        );
+        const _mutation = gql`
+          mutation DeletePetition_deletePetitions($petitionId: GID!, $force: Boolean!) {
+            deletePetitions(ids: [$petitionId], force: $force)
+          }
+        `;
+        const result = await client.request(DeletePetition_deletePetitionsDocument, {
+          petitionId: params.petitionId,
+          force: query.force ?? false,
+        });
         return NoContent();
       } catch (error: any) {
         if (
@@ -439,20 +392,17 @@ api
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
-      const result = await client.request<
-        ReadPetitionCustomPropertiesQuery,
-        ReadPetitionCustomPropertiesQueryVariables
-      >(
-        gql`
-          query ReadPetitionCustomProperties($petitionId: GID!) {
-            petition(id: $petitionId) {
-              id
-              customProperties
-            }
+      const _query = gql`
+        query ReadPetitionCustomProperties($petitionId: GID!) {
+          petition(id: $petitionId) {
+            id
+            customProperties
           }
-        `,
-        { petitionId: params.petitionId }
-      );
+        }
+      `;
+      const result = await client.request(ReadPetitionCustomPropertiesDocument, {
+        petitionId: params.petitionId,
+      });
 
       return Ok(result.petition!.customProperties);
     }
@@ -480,21 +430,19 @@ api
     },
     async ({ client, body, params }) => {
       try {
-        const result = await client.request<
-          CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutation,
-          CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutationVariables
-        >(
-          gql`
-            mutation CreateOrUpdateCustomProperty_modifyPetitionCustomProperty(
-              $petitionId: GID!
-              $key: String!
-              $value: String
-            ) {
-              modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-                customProperties
-              }
+        const _mutation = gql`
+          mutation CreateOrUpdateCustomProperty_modifyPetitionCustomProperty(
+            $petitionId: GID!
+            $key: String!
+            $value: String
+          ) {
+            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+              customProperties
             }
-          `,
+          }
+        `;
+        const result = await client.request(
+          CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyDocument,
           { petitionId: params.petitionId, key: body.key, value: body.value }
         );
         return Ok(result.modifyPetitionCustomProperty.customProperties);
@@ -527,20 +475,18 @@ api
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
-      await client.request<
-        DeleteCustomProperty_modifyPetitionCustomPropertyMutation,
-        DeleteCustomProperty_modifyPetitionCustomPropertyMutationVariables
-      >(
-        gql`
-          mutation DeleteCustomProperty_modifyPetitionCustomProperty(
-            $petitionId: GID!
-            $key: String!
-          ) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
-              id
-            }
+      const _mutation = gql`
+        mutation DeleteCustomProperty_modifyPetitionCustomProperty(
+          $petitionId: GID!
+          $key: String!
+        ) {
+          modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
+            id
           }
-        `,
+        }
+      `;
+      const result = await client.request(
+        DeleteCustomProperty_modifyPetitionCustomPropertyDocument,
         params
       );
 
@@ -561,24 +507,21 @@ api
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
-      const result = await client.request<
-        GetPetitionRecipients_PetitionAccessesQuery,
-        GetPetitionRecipients_PetitionAccessesQueryVariables
-      >(
-        gql`
-          query GetPetitionRecipients_PetitionAccesses($petitionId: GID!) {
-            petition(id: $petitionId) {
-              ... on Petition {
-                accesses {
-                  ...PetitionAccess
-                }
+      const _query = gql`
+        query GetPetitionRecipients_PetitionAccesses($petitionId: GID!) {
+          petition(id: $petitionId) {
+            ... on Petition {
+              accesses {
+                ...PetitionAccess
               }
             }
           }
-          ${PetitionAccessFragment}
-        `,
-        { petitionId: params.petitionId }
-      );
+        }
+        ${PetitionAccessFragment}
+      `;
+      const result = await client.request(GetPetitionRecipients_PetitionAccessesDocument, {
+        petitionId: params.petitionId,
+      });
       assert("accesses" in result.petition!);
       return Ok(result.petition!.accesses);
     }
@@ -639,60 +582,51 @@ api
             return item;
           } else {
             const { email, ...data } = item;
-            const {
-              contacts: [contact],
-            } = await client.request<
-              CreatePetitionRecipients_ContactQuery,
-              CreatePetitionRecipients_ContactQueryVariables
-            >(
-              gql`
-                query CreatePetitionRecipients_Contact($email: String!) {
-                  contacts: contactsByEmail(emails: [$email]) {
-                    id
-                    firstName
-                    lastName
-                  }
+            const _query = gql`
+              query CreatePetitionRecipients_Contact($email: String!) {
+                contacts: contactsByEmail(emails: [$email]) {
+                  id
+                  firstName
+                  lastName
                 }
-              `,
-              { email }
-            );
+              }
+            `;
+            const result = await client.request(CreatePetitionRecipients_ContactDocument, {
+              email,
+            });
+            const contact = result.contacts[0];
             if (contact) {
               if (
                 (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
                 (contact.lastName !== data.lastName && isDefined(data.lastName))
               ) {
-                await client.request<
-                  CreatePetitionRecipients_updateContactMutation,
-                  CreatePetitionRecipients_updateContactMutationVariables
-                >(
-                  gql`
-                    mutation CreatePetitionRecipients_updateContact(
-                      $contactId: GID!
-                      $data: UpdateContactInput!
-                    ) {
-                      updateContact(id: $contactId, data: $data) {
-                        id
-                      }
+                const _mutation = gql`
+                  mutation CreatePetitionRecipients_updateContact(
+                    $contactId: GID!
+                    $data: UpdateContactInput!
+                  ) {
+                    updateContact(id: $contactId, data: $data) {
+                      id
                     }
-                  `,
+                  }
+                `;
+                const result = await client.request(
+                  CreatePetitionRecipients_updateContactDocument,
                   { contactId: contact.id, data }
                 );
               }
               return contact.id;
             } else {
-              const result = await client.request<
-                CreatePetitionRecipients_createContactMutation,
-                CreatePetitionRecipients_createContactMutationVariables
-              >(
-                gql`
-                  mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
-                    createContact(data: $data) {
-                      id
-                    }
+              const _mutation = gql`
+                mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
+                  createContact(data: $data) {
+                    id
                   }
-                `,
-                { data: item }
-              );
+                }
+              `;
+              const result = await client.request(CreatePetitionRecipients_createContactDocument, {
+                data: item,
+              });
               return result.createContact.id;
             }
           }
@@ -704,41 +638,36 @@ api
           ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
           : [{ children: [{ text: "" }] }];
       try {
-        const result = await client.request<
-          CreatePetitionRecipients_sendPetitionMutation,
-          CreatePetitionRecipients_sendPetitionMutationVariables
-        >(
-          gql`
-            mutation CreatePetitionRecipients_sendPetition(
-              $petitionId: GID!
-              $contactIds: [GID!]!
-              $subject: String!
-              $body: JSON!
-              $scheduledAt: DateTime
-              $remindersConfig: RemindersConfigInput
+        const _mutation = gql`
+          mutation CreatePetitionRecipients_sendPetition(
+            $petitionId: GID!
+            $contactIds: [GID!]!
+            $subject: String!
+            $body: JSON!
+            $scheduledAt: DateTime
+            $remindersConfig: RemindersConfigInput
+          ) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+              scheduledAt: $scheduledAt
+              remindersConfig: $remindersConfig
             ) {
-              sendPetition(
-                petitionId: $petitionId
-                contactIds: $contactIds
-                subject: $subject
-                body: $body
-                scheduledAt: $scheduledAt
-                remindersConfig: $remindersConfig
-              ) {
-                accesses {
-                  ...PetitionAccess
-                }
+              accesses {
+                ...PetitionAccess
               }
             }
-            ${PetitionAccessFragment}
-          `,
-          {
-            petitionId: params.petitionId,
-            contactIds,
-            body: message,
-            ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
           }
-        );
+          ${PetitionAccessFragment}
+        `;
+        const result = await client.request(CreatePetitionRecipients_sendPetitionDocument, {
+          petitionId: params.petitionId,
+          contactIds,
+          body: message,
+          ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
+        });
         return Ok(result.sendPetition.accesses!);
       } catch (error: any) {
         if (
@@ -765,31 +694,26 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
     },
   },
   async ({ client, params }) => {
-    const response = await client.request<
-      PetitionReplies_RepliesQuery,
-      PetitionReplies_RepliesQueryVariables
-    >(
-      gql`
-        query PetitionReplies_Replies($petitionId: GID!) {
-          petition(id: $petitionId) {
-            fields {
-              ...PetitionField
-              replies {
-                ...PetitionFieldReply
-              }
+    const _query = gql`
+      query PetitionReplies_Replies($petitionId: GID!) {
+        petition(id: $petitionId) {
+          fields {
+            ...PetitionField
+            replies {
+              ...PetitionFieldReply
             }
           }
         }
-        ${PetitionFieldFragment}
-        ${PetitionReplyFragment}
-      `,
-      {
-        petitionId: params.petitionId,
       }
-    );
+      ${PetitionFieldFragment}
+      ${PetitionReplyFragment}
+    `;
+    const result = await client.request(PetitionReplies_RepliesDocument, {
+      petitionId: params.petitionId,
+    });
 
     return Ok(
-      response.petition!.fields.map((field) => ({
+      result.petition!.fields.map((field) => ({
         ...field,
         replies: field.replies.map((reply) => ({
           ...reply,
@@ -851,23 +775,21 @@ api
     },
     async ({ client, params }) => {
       try {
-        const response = await client.request<
-          DownloadFileReply_fileUploadReplyDownloadLinkMutation,
-          DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables
-        >(
-          gql`
-            mutation DownloadFileReply_fileUploadReplyDownloadLink(
-              $petitionId: GID!
-              $replyId: GID!
-            ) {
-              fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
-                url
-              }
+        const _mutation = gql`
+          mutation DownloadFileReply_fileUploadReplyDownloadLink(
+            $petitionId: GID!
+            $replyId: GID!
+          ) {
+            fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
+              url
             }
-          `,
+          }
+        `;
+        const result = await client.request(
+          DownloadFileReply_fileUploadReplyDownloadLinkDocument,
           params
         );
-        return Redirect(response.fileUploadReplyDownloadLink.url!);
+        return Redirect(result.fileUploadReplyDownloadLink.url!);
       } catch (error: any) {
         if (error instanceof ClientError && containsGraphQLError(error, "INVALID_FIELD_TYPE")) {
           throw new BadRequestError(`Reply "${params.replyId}" is not of "FILE" type`);
@@ -890,22 +812,17 @@ api
       tags: ["Petition Sharing"],
     },
     async ({ client, params }) => {
-      const result = await client.request<
-        GetPermissions_PermissionsQuery,
-        GetPermissions_PermissionsQueryVariables
-      >(
-        gql`
-          query GetPermissions_Permissions($petitionId: GID!) {
-            petition(id: $petitionId) {
-              permissions {
-                ...Permission
-              }
+      const _query = gql`
+        query GetPermissions_Permissions($petitionId: GID!) {
+          petition(id: $petitionId) {
+            permissions {
+              ...Permission
             }
           }
-          ${PermissionFragment}
-        `,
-        params
-      );
+        }
+        ${PermissionFragment}
+      `;
+      const result = await client.request(GetPermissions_PermissionsDocument, params);
 
       return Ok(result.petition!.permissions);
     }
@@ -924,35 +841,30 @@ api
       tags: ["Petition Sharing"],
     },
     async ({ client, params, body }) => {
-      const result = await client.request<
-        SharePetition_addPetitionPermissionMutation,
-        SharePetition_addPetitionPermissionMutationVariables
-      >(
-        gql`
-          mutation SharePetition_addPetitionPermission(
-            $petitionId: GID!
-            $userIds: [GID!]
-            $userGroupIds: [GID!]
+      const _mutation = gql`
+        mutation SharePetition_addPetitionPermission(
+          $petitionId: GID!
+          $userIds: [GID!]
+          $userGroupIds: [GID!]
+        ) {
+          addPetitionPermission(
+            petitionIds: [$petitionId]
+            userIds: $userIds
+            userGroupIds: $userGroupIds
+            permissionType: WRITE
           ) {
-            addPetitionPermission(
-              petitionIds: [$petitionId]
-              userIds: $userIds
-              userGroupIds: $userGroupIds
-              permissionType: WRITE
-            ) {
-              permissions {
-                ...Permission
-              }
+            permissions {
+              ...Permission
             }
           }
-          ${PermissionFragment}
-        `,
-        {
-          petitionId: params.petitionId,
-          userIds: body.userIds,
-          userGroupIds: body.userGroupIds,
         }
-      );
+        ${PermissionFragment}
+      `;
+      const result = await client.request(SharePetition_addPetitionPermissionDocument, {
+        petitionId: params.petitionId,
+        userIds: body.userIds,
+        userGroupIds: body.userGroupIds,
+      });
 
       return Ok(result.addPetitionPermission[0].permissions);
     }
@@ -968,19 +880,16 @@ api
       responses: { 204: SuccessResponse() },
     },
     async ({ client, params }) => {
-      await client.request<
-        StopSharing_removePetitionPermissionMutation,
-        StopSharing_removePetitionPermissionMutationVariables
-      >(
-        gql`
-          mutation StopSharing_removePetitionPermission($petitionId: GID!) {
-            removePetitionPermission(petitionIds: [$petitionId], removeAll: true) {
-              id
-            }
+      const _mutation = gql`
+        mutation StopSharing_removePetitionPermission($petitionId: GID!) {
+          removePetitionPermission(petitionIds: [$petitionId], removeAll: true) {
+            id
           }
-        `,
-        { petitionId: params.petitionId }
-      );
+        }
+      `;
+      const result = await client.request(StopSharing_removePetitionPermissionDocument, {
+        petitionId: params.petitionId,
+      });
       return NoContent();
     }
   );
@@ -1005,22 +914,17 @@ api
       responses: { 204: SuccessResponse() },
     },
     async ({ client, params }) => {
-      await client.request<
-        RemoveUserPermission_removePetitionPermissionMutation,
-        RemoveUserPermission_removePetitionPermissionMutationVariables
-      >(
-        gql`
-          mutation RemoveUserPermission_removePetitionPermission($petitionId: GID!, $userId: GID!) {
-            removePetitionPermission(petitionIds: [$petitionId], userIds: [$userId]) {
-              id
-            }
+      const _mutation = gql`
+        mutation RemoveUserPermission_removePetitionPermission($petitionId: GID!, $userId: GID!) {
+          removePetitionPermission(petitionIds: [$petitionId], userIds: [$userId]) {
+            id
           }
-        `,
-        {
-          petitionId: params.petitionId,
-          userId: params.userId,
         }
-      );
+      `;
+      const result = await client.request(RemoveUserPermission_removePetitionPermissionDocument, {
+        petitionId: params.petitionId,
+        userId: params.userId,
+      });
       return NoContent();
     }
   );
@@ -1045,20 +949,18 @@ api
       responses: { 204: SuccessResponse() },
     },
     async ({ client, params }) => {
-      await client.request<
-        RemoveUserGroupPermission_removePetitionPermissionMutation,
-        RemoveUserGroupPermission_removePetitionPermissionMutationVariables
-      >(
-        gql`
-          mutation RemoveUserGroupPermission_removePetitionPermission(
-            $petitionId: GID!
-            $userGroupId: GID!
-          ) {
-            removePetitionPermission(petitionIds: [$petitionId], userGroupIds: [$userGroupId]) {
-              id
-            }
+      const _mutation = gql`
+        mutation RemoveUserGroupPermission_removePetitionPermission(
+          $petitionId: GID!
+          $userGroupId: GID!
+        ) {
+          removePetitionPermission(petitionIds: [$petitionId], userGroupIds: [$userGroupId]) {
+            id
           }
-        `,
+        }
+      `;
+      const result = await client.request(
+        RemoveUserGroupPermission_removePetitionPermissionDocument,
         {
           petitionId: params.petitionId,
           userGroupId: params.userGroupId,
@@ -1088,27 +990,22 @@ api
       tags: ["Petition Sharing"],
     },
     async ({ client, params, query }) => {
-      const response = await client.request<
-        TransferPetition_transferPetitionOwnershipMutation,
-        TransferPetition_transferPetitionOwnershipMutationVariables
-      >(
-        gql`
-          mutation TransferPetition_transferPetitionOwnership($userId: GID!, $petitionId: GID!) {
-            transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
-              permissions {
-                ...Permission
-              }
+      const _mutation = gql`
+        mutation TransferPetition_transferPetitionOwnership($userId: GID!, $petitionId: GID!) {
+          transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
+            permissions {
+              ...Permission
             }
           }
-          ${PermissionFragment}
-        `,
-        {
-          petitionId: params.petitionId,
-          userId: query.userId,
         }
-      );
+        ${PermissionFragment}
+      `;
+      const result = await client.request(TransferPetition_transferPetitionOwnershipDocument, {
+        petitionId: params.petitionId,
+        userId: query.userId,
+      });
 
-      return Ok(response.transferPetitionOwnership[0].permissions);
+      return Ok(result.transferPetitionOwnership[0].permissions);
     }
   );
 
@@ -1127,32 +1024,27 @@ api.path("/templates").get(
     tags: ["Templates"],
   },
   async ({ client, query }) => {
-    const result = await client.request<
-      GetTemplates_TemplatesQuery,
-      GetTemplates_TemplatesQueryVariables
-    >(
-      gql`
-        query GetTemplates_Templates(
-          $offset: Int!
-          $limit: Int!
-          $sortBy: [QueryPetitions_OrderBy!]
+    const _query = gql`
+      query GetTemplates_Templates(
+        $offset: Int!
+        $limit: Int!
+        $sortBy: [QueryPetitions_OrderBy!]
+      ) {
+        templates: petitions(
+          offset: $offset
+          limit: $limit
+          sortBy: $sortBy
+          filters: { type: TEMPLATE }
         ) {
-          templates: petitions(
-            offset: $offset
-            limit: $limit
-            sortBy: $sortBy
-            filters: { type: TEMPLATE }
-          ) {
-            items {
-              ...Template
-            }
-            totalCount
+          items {
+            ...Template
           }
+          totalCount
         }
-        ${TemplateFragment}
-      `,
-      query
-    );
+      }
+      ${TemplateFragment}
+    `;
+    const result = await client.request(GetTemplates_TemplatesDocument, query);
     const { items, totalCount } = result.templates;
     assertType<TemplateFragmentType[]>(items);
     return Ok({ items, totalCount });
@@ -1179,20 +1071,17 @@ api
       tags: ["Templates"],
     },
     async ({ client, params }) => {
-      const result = await client.request<
-        GetTemplate_TemplateQuery,
-        GetTemplate_TemplateQueryVariables
-      >(
-        gql`
-          query GetTemplate_Template($templateId: GID!) {
-            template: petition(id: $templateId) {
-              ...Template
-            }
+      const _query = gql`
+        query GetTemplate_Template($templateId: GID!) {
+          template: petition(id: $templateId) {
+            ...Template
           }
-          ${TemplateFragment}
-        `,
-        { templateId: params.templateId }
-      );
+        }
+        ${TemplateFragment}
+      `;
+      const result = await client.request(GetTemplate_TemplateDocument, {
+        templateId: params.templateId,
+      });
       assert("id" in result.template!);
       return Ok(result.template!);
     }
@@ -1218,17 +1107,15 @@ api
     },
     async ({ client, params, query }) => {
       try {
-        await client.request<
-          DeleteTemplate_deletePetitionsMutation,
-          DeleteTemplate_deletePetitionsMutationVariables
-        >(
-          gql`
-            mutation DeleteTemplate_deletePetitions($templateId: GID!, $force: Boolean!) {
-              deletePetitions(ids: [$templateId], force: $force)
-            }
-          `,
-          { templateId: params.templateId, force: query.force ?? false }
-        );
+        const _mutation = gql`
+          mutation DeleteTemplate_deletePetitions($templateId: GID!, $force: Boolean!) {
+            deletePetitions(ids: [$templateId], force: $force)
+          }
+        `;
+        const result = await client.request(DeleteTemplate_deletePetitionsDocument, {
+          templateId: params.templateId,
+          force: query.force ?? false,
+        });
         return NoContent();
       } catch (error: any) {
         if (
@@ -1261,27 +1148,18 @@ api
       tags: ["Contacts"],
     },
     async ({ client, query }) => {
-      const result = await client.request<
-        GetContacts_ContactsQuery,
-        GetContacts_ContactsQueryVariables
-      >(
-        gql`
-          query GetContacts_Contacts(
-            $offset: Int!
-            $limit: Int!
-            $sortBy: [QueryContacts_OrderBy!]
-          ) {
-            contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
-              items {
-                ...Contact
-              }
-              totalCount
+      const _query = gql`
+        query GetContacts_Contacts($offset: Int!, $limit: Int!, $sortBy: [QueryContacts_OrderBy!]) {
+          contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
+            items {
+              ...Contact
             }
+            totalCount
           }
-          ${ContactFragment}
-        `,
-        query
-      );
+        }
+        ${ContactFragment}
+      `;
+      const result = await client.request(GetContacts_ContactsDocument, query);
       return Ok(result.contacts);
     }
   )
@@ -1303,20 +1181,15 @@ api
     },
     async ({ client, body }) => {
       try {
-        const result = await client.request<
-          CreateContact_ContactMutation,
-          CreateContact_ContactMutationVariables
-        >(
-          gql`
-            mutation CreateContact_Contact($data: CreateContactInput!) {
-              createContact(data: $data) {
-                ...Contact
-              }
+        const _mutation = gql`
+          mutation CreateContact_Contact($data: CreateContactInput!) {
+            createContact(data: $data) {
+              ...Contact
             }
-            ${ContactFragment}
-          `,
-          { data: body }
-        );
+          }
+          ${ContactFragment}
+        `;
+        const result = await client.request(CreateContact_ContactDocument, { data: body });
         return Created(result.createContact!);
       } catch (error: any) {
         if (error instanceof ClientError && containsGraphQLError(error, "EXISTING_CONTACT")) {
@@ -1347,20 +1220,17 @@ api
       tags: ["Contacts"],
     },
     async ({ client, params }) => {
-      const result = await client.request<
-        GetContact_ContactQuery,
-        GetContact_ContactQueryVariables
-      >(
-        gql`
-          query GetContact_Contact($contactId: GID!) {
-            contact(id: $contactId) {
-              ...Contact
-            }
+      const _query = gql`
+        query GetContact_Contact($contactId: GID!) {
+          contact(id: $contactId) {
+            ...Contact
           }
-          ${ContactFragment}
-        `,
-        { contactId: params.contactId }
-      );
+        }
+        ${ContactFragment}
+      `;
+      const result = await client.request(GetContact_ContactDocument, {
+        contactId: params.contactId,
+      });
       return Ok(result.contact!);
     }
   );
@@ -1380,31 +1250,26 @@ api.path("/users").get(
     tags: ["Users"],
   },
   async ({ client, query }) => {
-    const result = await client.request<
-      GetOrganizationUsers_UsersQuery,
-      GetOrganizationUsers_UsersQueryVariables
-    >(
-      gql`
-        query GetOrganizationUsers_Users(
-          $offset: Int!
-          $limit: Int!
-          $sortBy: [OrganizationUsers_OrderBy!]
-        ) {
-          me {
-            organization {
-              users(limit: $limit, offset: $offset, sortBy: $sortBy) {
-                totalCount
-                items {
-                  ...User
-                }
+    const _query = gql`
+      query GetOrganizationUsers_Users(
+        $offset: Int!
+        $limit: Int!
+        $sortBy: [OrganizationUsers_OrderBy!]
+      ) {
+        me {
+          organization {
+            users(limit: $limit, offset: $offset, sortBy: $sortBy) {
+              totalCount
+              items {
+                ...User
               }
             }
           }
         }
-        ${UserFragment}
-      `,
-      query
-    );
+      }
+      ${UserFragment}
+    `;
+    const result = await client.request(GetOrganizationUsers_UsersDocument, query);
     return Ok(result.me.organization.users);
   }
 );
@@ -1425,14 +1290,15 @@ api
       tags: ["Subscriptions"],
     },
     async ({ client }) => {
-      const result = await client.request<EventSubscriptions_GetSubscriptionsQuery>(gql`
+      const _query = gql`
         query EventSubscriptions_GetSubscriptions {
           subscriptions {
             ...Subscription
           }
         }
         ${SubscriptionFragment}
-      `);
+      `;
+      const result = await client.request(EventSubscriptions_GetSubscriptionsDocument);
 
       return Ok(result.subscriptions);
     }
@@ -1452,20 +1318,15 @@ api
     },
     async ({ client, body }) => {
       try {
-        const result = await client.request<
-          EventSubscriptions_CreateSubscriptionMutation,
-          EventSubscriptions_CreateSubscriptionMutationVariables
-        >(
-          gql`
-            mutation EventSubscriptions_CreateSubscription($eventsUrl: String!) {
-              createEventSubscription(eventsUrl: $eventsUrl) {
-                ...Subscription
-              }
+        const _mutation = gql`
+          mutation EventSubscriptions_CreateSubscription($eventsUrl: String!) {
+            createEventSubscription(eventsUrl: $eventsUrl) {
+              ...Subscription
             }
-            ${SubscriptionFragment}
-          `,
-          body
-        );
+          }
+          ${SubscriptionFragment}
+        `;
+        const result = await client.request(EventSubscriptions_CreateSubscriptionDocument, body);
 
         assert("id" in result.createEventSubscription);
         return Created(result.createEventSubscription);
@@ -1495,17 +1356,14 @@ api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delet
     tags: ["Subscriptions"],
   },
   async ({ client, params }) => {
-    await client.request<
-      EventSubscriptions_DeleteSubscriptionMutation,
-      EventSubscriptions_DeleteSubscriptionMutationVariables
-    >(
-      gql`
-        mutation EventSubscriptions_DeleteSubscription($ids: [GID!]!) {
-          deleteEventSubscriptions(ids: $ids)
-        }
-      `,
-      { ids: [params.subscriptionId] }
-    );
+    const _mutation = gql`
+      mutation EventSubscriptions_DeleteSubscription($ids: [GID!]!) {
+        deleteEventSubscriptions(ids: $ids)
+      }
+    `;
+    const result = await client.request(EventSubscriptions_DeleteSubscriptionDocument, {
+      ids: [params.subscriptionId],
+    });
     return NoContent();
   }
 );

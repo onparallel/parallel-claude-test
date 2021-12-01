@@ -7,8 +7,15 @@ generates:
     plugins:
       - typescript
       - typescript-operations
+      - typed-document-node
     config:
       strictScalars: true
+      scalars:
+        DateTime: string
+        JSON: any
+        JSONObject: "{ [key: string]: any }"
+        Upload: any
+        GID: string
       skipTypename: true
       avoidOptionals:
         field: true
@@ -20,12 +27,8 @@ generates:
       preResolveTypes: true
       maybeValue: T | null
       enumsAsTypes: true
-      scalars:
-        DateTime: string
-        JSON: any
-        JSONObject: "{ [key: string]: any }"
-        Upload: any
-        GID: string
+      addDocBlocks: false
+      documentMode: graphQLTag
 hooks:
   afterAllFileWrite:
     - yarn prettier --write

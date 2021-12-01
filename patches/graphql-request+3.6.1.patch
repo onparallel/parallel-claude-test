@@ -1,0 +1,19 @@
+diff --git a/node_modules/graphql-request/dist/index.d.ts b/node_modules/graphql-request/dist/index.d.ts
+index b1ee883..01d4c93 100644
+--- a/node_modules/graphql-request/dist/index.d.ts
++++ b/node_modules/graphql-request/dist/index.d.ts
+@@ -1,4 +1,5 @@
+ import { BatchRequestDocument, RequestDocument, Variables } from './types';
++import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+ import * as Dom from './types.dom';
+ export { ClientError } from './types';
+ /**
+@@ -17,7 +18,7 @@ export declare class GraphQLClient {
+     /**
+      * Send a GraphQL document to the server.
+      */
+-    request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: Dom.RequestInit['headers']): Promise<T>;
++    request<T = any, V = Variables>(document: RequestDocument | TypedDocumentNode<T, V>, variables?: V, requestHeaders?: Dom.RequestInit['headers']): Promise<T>;
+     /**
+      * Send a GraphQL document to the server.
+      */
