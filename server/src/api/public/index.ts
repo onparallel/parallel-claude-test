@@ -1093,14 +1093,14 @@ api.path("/templates").get(
   }
 );
 
+const templateId = idParam({
+  type: "Petition",
+  description: "The ID of the template",
+});
+
 api
   .path("/templates/:templateId", {
-    params: {
-      templateId: idParam({
-        type: "Petition",
-        description: "The ID of the template",
-      }),
-    },
+    params: { templateId },
   })
   .get(
     {
@@ -1178,8 +1178,8 @@ api
   );
 
 api
-  .path("/templates/:petitionId/properties", {
-    params: { petitionId },
+  .path("/templates/:templateId/properties", {
+    params: { templateId },
   })
   .get(
     {
@@ -1193,7 +1193,7 @@ api
     },
     async ({ client, params }) => {
       const result = await client.request(ReadPetitionCustomPropertiesDocument, {
-        petitionId: params.petitionId,
+        petitionId: params.templateId,
       });
 
       return Ok(result.petition!.customProperties);
@@ -1218,13 +1218,13 @@ api
           description: "You reached the maximum limit of custom properties on the template",
         }),
       },
-      tags: ["Petitions"],
+      tags: ["Templates"],
     },
     async ({ client, body, params }) => {
       try {
         const result = await client.request(
           CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-          { petitionId: params.petitionId, key: body.key, value: body.value }
+          { petitionId: params.templateId, key: body.key, value: body.value }
         );
         return Ok(result.modifyPetitionCustomProperty.customProperties);
       } catch (error: any) {
@@ -1242,8 +1242,8 @@ api
   );
 
 api
-  .path("/templates/:petitionId/properties/:key", {
-    params: { petitionId, key: stringParam({ required: true, maxLength: 100 }) },
+  .path("/templates/:templateId/properties/:key", {
+    params: { templateId, key: stringParam({ required: true, maxLength: 100 }) },
   })
   .delete(
     {
@@ -1253,13 +1253,13 @@ api
         Removes the provided key from the custom properties of the template.
     `,
       responses: { 204: SuccessResponse() },
-      tags: ["Petitions"],
+      tags: ["Templates"],
     },
     async ({ client, params }) => {
-      await client.request(
-        DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-        params
-      );
+      await client.request(DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument, {
+        petitionId: params.templateId,
+        key: params.key,
+      });
 
       return NoContent();
     }
