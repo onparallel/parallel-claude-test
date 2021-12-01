@@ -621,6 +621,9 @@ api
       body: JsonBody(SendPetition),
       responses: {
         200: SuccessResponse(ListOfPetitionAccesses),
+        400: ErrorResponse({
+          description: "Invalid parameter",
+        }),
         409: ErrorResponse({
           description: "The petition was already sent to some of the provided contacts",
         }),
@@ -729,6 +732,13 @@ api
           containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
         ) {
           throw new ConflictError("The petition was already sent to some of the provided contacts");
+        } else if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "MISSING_SUBJECT_OR_BODY")
+        ) {
+          throw new BadRequestError(
+            "The subject or the message are missing and not defined on the petition"
+          );
         }
         throw error;
       }
