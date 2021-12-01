@@ -3590,12 +3590,12 @@ export interface NexusGenArgTypes {
     };
     sendPetition: {
       // args
-      body: NexusGenScalars["JSON"]; // JSON!
+      body?: NexusGenScalars["JSON"] | null; // JSON
       contactIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
-      subject: string; // String!
+      subject?: string | null; // String
     };
     sendPetitionClosedNotification: {
       // args

@@ -90,7 +90,7 @@ import {
   StopSharing_removePetitionPermissionDocument,
   TemplateFragment as TemplateFragmentType,
   TransferPetition_transferPetitionOwnershipDocument,
-  UpdatePetition_PetitionDocument,
+  UpdatePetition_updatePetitionDocument,
 } from "./__types";
 
 function assert(condition: any): asserts condition {}
@@ -355,7 +355,7 @@ api
     },
     async ({ client, params, body, query }) => {
       const _mutation = gql`
-        mutation UpdatePetition_Petition(
+        mutation UpdatePetition_updatePetition(
           $petitionId: GID!
           $data: UpdatePetitionInput!
           $includeRecipients: Boolean!
@@ -367,7 +367,7 @@ api
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(UpdatePetition_PetitionDocument, {
+      const result = await client.request(UpdatePetition_updatePetitionDocument, {
         petitionId: params.petitionId,
         data: body,
         includeFields: query.include?.includes("fields") ?? false,
@@ -683,17 +683,18 @@ api
         },
         { concurrency: 3 }
       );
-      const message =
-        body.message.format === "PLAIN_TEXT"
+      const message = isDefined(body.message)
+        ? body.message.format === "PLAIN_TEXT"
           ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
-          : [{ children: [{ text: "" }] }];
+          : [{ children: [{ text: "" }] }]
+        : null;
       try {
         const _mutation = gql`
           mutation CreatePetitionRecipients_sendPetition(
             $petitionId: GID!
             $contactIds: [GID!]!
-            $subject: String!
-            $body: JSON!
+            $subject: String
+            $body: JSON
             $scheduledAt: DateTime
             $remindersConfig: RemindersConfigInput
           ) {

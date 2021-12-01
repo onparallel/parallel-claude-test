@@ -627,7 +627,7 @@ export const PaginatedContacts = PaginatedListOf(_Contact);
 export const SendPetition = schema({
   title: "SendPetition",
   type: "object",
-  required: ["contacts", "message", "subject"],
+  required: ["contacts"],
   additionalProperties: false,
   properties: {
     contacts: {
@@ -671,16 +671,16 @@ export const SendPetition = schema({
         ],
       },
     },
-    message: {
+    message: _OrNull({
       ..._MessageBody,
       description: "The message to include in the email",
-    },
-    subject: {
+    }),
+    subject: _OrNull({
       description: "The subject of the email that will be sent to the contacts",
       type: "string",
       maxLength: 255,
       example: "Please fill this petition",
-    },
+    }),
     remindersConfig: {
       ..._RemindersConfig,
       type: [_RemindersConfig.type, "null"],

@@ -1027,12 +1027,12 @@ export type MutationrevokeUserAuthTokenArgs = {
 };
 
 export type MutationsendPetitionArgs = {
-  body: Scalars["JSON"];
+  body?: Maybe<Scalars["JSON"]>;
   contactIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
-  subject: Scalars["String"];
+  subject?: Maybe<Scalars["String"]>;
 };
 
 export type MutationsendPetitionClosedNotificationArgs = {
@@ -3386,14 +3386,14 @@ export type GetPetition_PetitionQuery = {
     | null;
 };
 
-export type UpdatePetition_PetitionMutationVariables = Exact<{
+export type UpdatePetition_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
 }>;
 
-export type UpdatePetition_PetitionMutation = {
+export type UpdatePetition_updatePetitionMutation = {
   updatePetition:
     | {
         id: string;
@@ -3544,8 +3544,8 @@ export type CreatePetitionRecipients_createContactMutation = { createContact: { 
 export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   contactIds: Array<Scalars["GID"]> | Scalars["GID"];
-  subject: Scalars["String"];
-  body: Scalars["JSON"];
+  subject?: Maybe<Scalars["String"]>;
+  body?: Maybe<Scalars["JSON"]>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
 }>;
@@ -4148,8 +4148,8 @@ export const GetPetition_PetitionDocument = gql`
   }
   ${PetitionFragmentDoc}
 ` as unknown as DocumentNode<GetPetition_PetitionQuery, GetPetition_PetitionQueryVariables>;
-export const UpdatePetition_PetitionDocument = gql`
-  mutation UpdatePetition_Petition(
+export const UpdatePetition_updatePetitionDocument = gql`
+  mutation UpdatePetition_updatePetition(
     $petitionId: GID!
     $data: UpdatePetitionInput!
     $includeRecipients: Boolean!
@@ -4161,8 +4161,8 @@ export const UpdatePetition_PetitionDocument = gql`
   }
   ${PetitionFragmentDoc}
 ` as unknown as DocumentNode<
-  UpdatePetition_PetitionMutation,
-  UpdatePetition_PetitionMutationVariables
+  UpdatePetition_updatePetitionMutation,
+  UpdatePetition_updatePetitionMutationVariables
 >;
 export const DeletePetition_deletePetitionsDocument = gql`
   mutation DeletePetition_deletePetitions($petitionId: GID!, $force: Boolean!) {
@@ -4258,8 +4258,8 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
   mutation CreatePetitionRecipients_sendPetition(
     $petitionId: GID!
     $contactIds: [GID!]!
-    $subject: String!
-    $body: JSON!
+    $subject: String
+    $body: JSON
     $scheduledAt: DateTime
     $remindersConfig: RemindersConfigInput
   ) {

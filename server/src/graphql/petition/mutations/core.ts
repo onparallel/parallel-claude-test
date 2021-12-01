@@ -1225,15 +1225,18 @@ export const sendPetition = mutationField("sendPetition", {
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     contactIds: nonNull(list(nonNull(globalIdArg("Contact")))),
-    subject: nonNull(stringArg()),
-    body: nonNull(jsonArg()),
+    subject: stringArg(),
+    body: jsonArg(),
     scheduledAt: datetimeArg(),
     remindersConfig: arg({ type: "RemindersConfigInput" }),
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.contactIds, "contactIds"),
     maxLength((args) => args.subject, "subject", 255),
-    notEmptyString((args) => args.subject, "subject"),
+    validateIfDefined(
+      (args) => args.subject,
+      notEmptyString((args) => args.subject, "subject")
+    ),
     validRichTextContent((args) => args.body, "body"),
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
   ),
@@ -1242,8 +1245,24 @@ export const sendPetition = mutationField("sendPetition", {
     if (!petition) {
       throw new Error("Petition not available");
     }
+    const subject = args.subject ?? petition.email_subject;
+    const body =
+      args.body ?? (isDefined(petition.email_body) ? JSON.parse(petition.email_body) : null);
+    if (!isDefined(subject) || !isDefined(body)) {
+      throw new WhitelistedError("Missing email subject or email body", "MISSING_SUBJECT_OR_BODY");
+    }
     const [{ result, error, accesses, messages, petition: updatedPetition }] =
-      await presendPetition([[petition, args.contactIds]], args, ctx.user!, false, ctx);
+      await presendPetition(
+        [[petition, args.contactIds]],
+        {
+          ...omit(args, ["subject", "body"]),
+          subject,
+          body,
+        },
+        ctx.user!,
+        false,
+        ctx
+      );
 
     if (result === "FAILURE" && error.constraint === "petition_access__petition_id_contact_id") {
       throw new WhitelistedError(

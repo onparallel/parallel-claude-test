@@ -1041,12 +1041,12 @@ type Mutation {
   Sends the petition and creates the corresponding accesses and messages.
   """
   sendPetition(
-    body: JSON!
+    body: JSON
     contactIds: [GID!]!
     petitionId: GID!
     remindersConfig: RemindersConfigInput
     scheduledAt: DateTime
-    subject: String!
+    subject: String
   ): SendPetitionResult!
 
   """
