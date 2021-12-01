@@ -3463,24 +3463,25 @@ export type ReadPetitionCustomPropertiesQuery = {
     | null;
 };
 
-export type CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  key: Scalars["String"];
-  value?: Maybe<Scalars["String"]>;
-}>;
+export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"];
+    key: Scalars["String"];
+    value?: Maybe<Scalars["String"]>;
+  }>;
 
-export type CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutation = {
+export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutation = {
   modifyPetitionCustomProperty:
     | { customProperties: { [key: string]: any } }
     | { customProperties: { [key: string]: any } };
 };
 
-export type DeleteCustomProperty_modifyPetitionCustomPropertyMutationVariables = Exact<{
+export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   key: Scalars["String"];
 }>;
 
-export type DeleteCustomProperty_modifyPetitionCustomPropertyMutation = {
+export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation = {
   modifyPetitionCustomProperty: { id: string } | { id: string };
 };
 
@@ -4183,8 +4184,8 @@ export const ReadPetitionCustomPropertiesDocument = gql`
   ReadPetitionCustomPropertiesQuery,
   ReadPetitionCustomPropertiesQueryVariables
 >;
-export const CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyDocument = gql`
-  mutation CreateOrUpdateCustomProperty_modifyPetitionCustomProperty(
+export const CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument = gql`
+  mutation CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomProperty(
     $petitionId: GID!
     $key: String!
     $value: String
@@ -4194,18 +4195,21 @@ export const CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyDocument =
     }
   }
 ` as unknown as DocumentNode<
-  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutation,
-  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyMutationVariables
+  CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutation,
+  CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables
 >;
-export const DeleteCustomProperty_modifyPetitionCustomPropertyDocument = gql`
-  mutation DeleteCustomProperty_modifyPetitionCustomProperty($petitionId: GID!, $key: String!) {
+export const DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument = gql`
+  mutation DeletePetitionCustomProperty_modifyPetitionCustomProperty(
+    $petitionId: GID!
+    $key: String!
+  ) {
     modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
       id
     }
   }
 ` as unknown as DocumentNode<
-  DeleteCustomProperty_modifyPetitionCustomPropertyMutation,
-  DeleteCustomProperty_modifyPetitionCustomPropertyMutationVariables
+  DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation,
+  DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables
 >;
 export const GetPetitionRecipients_PetitionAccessesDocument = gql`
   query GetPetitionRecipients_PetitionAccesses($petitionId: GID!) {

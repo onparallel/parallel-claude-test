@@ -38,7 +38,7 @@ import {
   AnyPetitionEvent,
   Contact,
   CreateContact,
-  CreateOrUpdateCustomProperty,
+  CreateOrUpdatePetitionCustomProperty,
   CreatePetition,
   CreateSubscription,
   ListOfPermissions,
@@ -59,13 +59,13 @@ import {
 } from "./schemas";
 import {
   CreateContact_ContactDocument,
-  CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyDocument,
+  CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   CreatePetitionRecipients_ContactDocument,
   CreatePetitionRecipients_createContactDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_updateContactDocument,
   CreatePetition_PetitionDocument,
-  DeleteCustomProperty_modifyPetitionCustomPropertyDocument,
+  DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
   DeleteTemplate_deletePetitionsDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
@@ -437,7 +437,7 @@ api
   .get(
     {
       operationId: "ReadPetitionCustomProperties",
-      summary: "Get custom properties",
+      summary: "Get petition custom properties",
       description: "Returns a key-value object with the custom properties of the petition",
       responses: {
         200: SuccessResponse(PetitionCustomProperties),
@@ -462,8 +462,8 @@ api
   )
   .post(
     {
-      operationId: "CreateOrUpdateCustomProperty",
-      summary: "Create or update a custom property",
+      operationId: "CreateOrUpdatePetitionCustomProperty",
+      summary: "Create or update petition custom property",
       description: outdent`
         Creates or updates a custom property on the petition.
 
@@ -472,7 +472,7 @@ api
 
         The petition can have up to 20 different properties.
       `,
-      body: JsonBody(CreateOrUpdateCustomProperty),
+      body: JsonBody(CreateOrUpdatePetitionCustomProperty),
       responses: {
         200: SuccessResponse(PetitionCustomProperties),
         409: ErrorResponse({
@@ -484,7 +484,7 @@ api
     async ({ client, body, params }) => {
       try {
         const _mutation = gql`
-          mutation CreateOrUpdateCustomProperty_modifyPetitionCustomProperty(
+          mutation CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomProperty(
             $petitionId: GID!
             $key: String!
             $value: String
@@ -495,7 +495,7 @@ api
           }
         `;
         const result = await client.request(
-          CreateOrUpdateCustomProperty_modifyPetitionCustomPropertyDocument,
+          CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
           { petitionId: params.petitionId, key: body.key, value: body.value }
         );
         return Ok(result.modifyPetitionCustomProperty.customProperties);
@@ -519,17 +519,17 @@ api
   })
   .delete(
     {
-      operationId: "DeleteCustomProperty",
-      summary: "Deletes a custom property",
+      operationId: "DeletePetitionCustomProperty",
+      summary: "Deletes petition custom property",
       description: outdent`
-      Removes the provided key from the custom properties of the petition.
-    `,
+        Removes the provided key from the custom properties of the petition.
+      `,
       responses: { 204: SuccessResponse() },
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
       const _mutation = gql`
-        mutation DeleteCustomProperty_modifyPetitionCustomProperty(
+        mutation DeletePetitionCustomProperty_modifyPetitionCustomProperty(
           $petitionId: GID!
           $key: String!
         ) {
@@ -538,7 +538,10 @@ api
           }
         }
       `;
-      await client.request(DeleteCustomProperty_modifyPetitionCustomPropertyDocument, params);
+      await client.request(
+        DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+        params
+      );
 
       return NoContent();
     }
@@ -1171,6 +1174,94 @@ api
         }
         throw error;
       }
+    }
+  );
+
+api
+  .path("/templates/:petitionId/properties", {
+    params: { petitionId },
+  })
+  .get(
+    {
+      operationId: "ReadTemplateCustomProperties",
+      summary: "Get template custom properties",
+      description: "Returns a key-value object with the custom properties of the template",
+      responses: {
+        200: SuccessResponse(PetitionCustomProperties),
+      },
+      tags: ["Templates"],
+    },
+    async ({ client, params }) => {
+      const result = await client.request(ReadPetitionCustomPropertiesDocument, {
+        petitionId: params.petitionId,
+      });
+
+      return Ok(result.petition!.customProperties);
+    }
+  )
+  .post(
+    {
+      operationId: "CreateOrUpdateTemplateCustomProperty",
+      summary: "Create or update template custom property",
+      description: outdent`
+        Creates or updates a custom property on the template.
+
+        If the provided key already exists as a property, its value is overwritten.
+        If the provided key doesn't exist, it's added.
+
+        The petition can have up to 20 different properties.
+      `,
+      body: JsonBody(CreateOrUpdatePetitionCustomProperty),
+      responses: {
+        200: SuccessResponse(PetitionCustomProperties),
+        409: ErrorResponse({
+          description: "You reached the maximum limit of custom properties on the template",
+        }),
+      },
+      tags: ["Petitions"],
+    },
+    async ({ client, body, params }) => {
+      try {
+        const result = await client.request(
+          CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+          { petitionId: params.petitionId, key: body.key, value: body.value }
+        );
+        return Ok(result.modifyPetitionCustomProperty.customProperties);
+      } catch (error: any) {
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")
+        ) {
+          throw new ConflictError(
+            "You reached the maximum limit of custom properties on the template."
+          );
+        }
+        throw error;
+      }
+    }
+  );
+
+api
+  .path("/templates/:petitionId/properties/:key", {
+    params: { petitionId, key: stringParam({ required: true, maxLength: 100 }) },
+  })
+  .delete(
+    {
+      operationId: "DeleteTemplateCustomProperty",
+      summary: "Delete template custom property",
+      description: outdent`
+        Removes the provided key from the custom properties of the template.
+    `,
+      responses: { 204: SuccessResponse() },
+      tags: ["Petitions"],
+    },
+    async ({ client, params }) => {
+      await client.request(
+        DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+        params
+      );
+
+      return NoContent();
     }
   );
 

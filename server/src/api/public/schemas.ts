@@ -1487,7 +1487,7 @@ export const PetitionCustomProperties = schema({
   example: { "Client Id": "1234" },
 } as const);
 
-export const CreateOrUpdateCustomProperty = schema({
+export const CreateOrUpdatePetitionCustomProperty = schema({
   title: "CreateOrUpdateCustomProperty",
   type: "object",
   required: ["key", "value"],
