@@ -584,7 +584,7 @@ describe("GraphQL/Users", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 

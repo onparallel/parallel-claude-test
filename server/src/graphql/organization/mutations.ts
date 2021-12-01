@@ -5,7 +5,7 @@ import { uploadArg } from "../helpers/upload";
 import { validateAnd } from "../helpers/validateArgs";
 import { contentType } from "../helpers/validators/contentType";
 import { maxFileSize } from "../helpers/validators/maxFileSize";
-import { contextUserIsAdmin } from "../users/authorizers";
+import { contextUserHasRole } from "../users/authorizers";
 
 export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   description: "Updates the logo of an organization",
@@ -13,7 +13,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   args: {
     file: nonNull(uploadArg()),
   },
-  authorize: authenticateAnd(contextUserIsAdmin()),
+  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
   validateArgs: validateAnd(
     contentType((args) => args.file, "image/png", "file"),
     maxFileSize((args) => args.file, 50 * 1024, "file")
@@ -49,7 +49,7 @@ export const updateOrganizationPreferredTone = mutationField("updateOrganization
   args: {
     tone: nonNull(arg({ type: "Tone" })),
   },
-  authorize: authenticateAnd(contextUserIsAdmin()),
+  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
   resolve: async (root, args, ctx) => {
     return await ctx.organizations.updateOrganization(
       ctx.user!.org_id,

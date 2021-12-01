@@ -56,15 +56,9 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K
   ${Array.from(enums.values())
     .map(
       ({ name, values }) => `
-export type ${name} = ${values
-        .sort((a, b) => a.localeCompare(b))
-        .map((value) => `"${value}"`)
-        .join(" | ")};
+export type ${name} = ${values.map((value) => `"${value}"`).join(" | ")};
         
-export const ${name}Values = [${values
-        .sort((a, b) => a.localeCompare(b))
-        .map((value) => `"${value}"`)
-        .join(", ")}] as ${name}[];`
+export const ${name}Values = [${values.map((value) => `"${value}"`).join(", ")}] as ${name}[];`
     )
     .join("\n")}
 

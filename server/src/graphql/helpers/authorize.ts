@@ -1,12 +1,11 @@
+import { AuthenticationError } from "apollo-server-express";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { AuthenticationError } from "apollo-server-express";
 import pAll from "p-all";
 import { isDefined } from "remeda";
-import { ApiContext } from "../../context";
-import { UserOrganizationRole } from "../../db/__types";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
-import { KeysOfType, MaybeArray } from "../../util/types";
+import { KeysOfType } from "../../util/types";
+import { userHasRole } from "../../util/userHasRole";
 
 export function authenticate<
   TypeName extends string,
@@ -54,16 +53,6 @@ export function argIsContextUserId<
       return ctx.user!.id === (args[argName] as unknown as number);
     } catch {}
     return false;
-  };
-}
-
-export function hasOrgRole<TypeName extends string, FieldName extends string>(
-  role: MaybeArray<UserOrganizationRole>
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_root, _, ctx: ApiContext) => {
-    return Array.isArray(role)
-      ? role.includes(ctx.user!.organization_role)
-      : role === ctx.user!.organization_role;
   };
 }
 
@@ -193,7 +182,7 @@ export function userIsSuperAdmin<
     try {
       const user = ctx.user!;
       const org = await ctx.organizations.loadOrg(user.org_id);
-      return org?.status === "ROOT" && ["OWNER", "ADMIN"].includes(user.organization_role);
+      return org?.status === "ROOT" && userHasRole(user, "ADMIN");
     } catch {}
     return false;
   };

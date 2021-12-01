@@ -2,6 +2,7 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { UserOrganizationRole } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
+import { userHasRole } from "../../util/userHasRole";
 import { Arg } from "../helpers/authorize";
 
 export function rootIsContextUser<FieldName extends string>(): FieldAuthorizeResolver<
@@ -13,11 +14,10 @@ export function rootIsContextUser<FieldName extends string>(): FieldAuthorizeRes
   };
 }
 
-export function contextUserIsAdmin<
-  TypeName extends string,
-  FieldName extends string
->(): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (root, _, ctx) => ["OWNER", "ADMIN"].includes(ctx.user!.organization_role);
+export function contextUserHasRole<TypeName extends string, FieldName extends string>(
+  minRole: UserOrganizationRole
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (root, _, ctx) => userHasRole(ctx.user!, minRole);
 }
 
 export function contextUserIsNotSso<
@@ -38,21 +38,6 @@ export function userIsNotSSO<
     const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
     const users = await ctx.users.loadUser(userIds);
     return users.every((u) => u && !u.is_sso_user);
-  };
-}
-
-export function userHasRole<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
->(
-  argName: TArg,
-  role: MaybeArray<UserOrganizationRole>
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const roles = unMaybeArray(role);
-    const user = await ctx.users.loadUser(args[argName] as number);
-    return !!user && roles.includes(user.organization_role);
   };
 }
 

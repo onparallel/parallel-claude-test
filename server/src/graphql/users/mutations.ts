@@ -32,9 +32,8 @@ import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import {
-  contextUserIsAdmin,
+  contextUserHasRole,
   contextUserIsNotSso,
-  userHasRole,
   userIsNotContextUser,
   userIsNotSSO,
 } from "./authorizers";
@@ -135,7 +134,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   description: "Creates a new user in the same organization as the context user",
   type: "User",
   authorize: authenticateAnd(
-    contextUserIsAdmin(),
+    contextUserHasRole("ADMIN"),
     orgDoesNotHaveSsoProvider(),
     orgCanCreateNewUser()
   ),
@@ -203,7 +202,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     "Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org.",
   type: list("User"),
   authorize: authenticateAnd(
-    contextUserIsAdmin(),
+    contextUserHasRole("ADMIN"),
     userHasAccessToUsers("userIds"),
     userIsNotSSO("userIds"),
     ifArgDefined(
@@ -290,18 +289,21 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   description: "Updates the role of another user in the organization.",
   type: "User",
   authorize: authenticateAnd(
-    contextUserIsAdmin(),
+    contextUserHasRole("ADMIN"),
     userIsNotContextUser("userId"),
-    userHasAccessToUsers("userId"),
-    userHasRole("userId", ["ADMIN", "NORMAL"])
+    userHasAccessToUsers("userId")
   ),
   args: {
     userId: nonNull(globalIdArg("User")),
     role: nonNull("OrganizationRole"),
   },
-  validateArgs: (_, { role }, ctx, info) => {
+  validateArgs: async (_, { role, userId }, ctx, info) => {
+    const user = (await ctx.users.loadUser(userId))!;
     if (role === "OWNER") {
       throw new ArgValidationError(info, "role", "Can't update the role of a user to OWNER.");
+    }
+    if (user.organization_role === "OWNER") {
+      throw new ArgValidationError(info, "role", "'Can't update the role of an OWNER");
     }
   },
   resolve: async (_, { userId, role }, ctx) => {

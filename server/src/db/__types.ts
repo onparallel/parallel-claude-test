@@ -8,37 +8,37 @@ type Maybe<T> = T | null;
 type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type FeatureFlagName =
-  | "AUTO_SEND_TEMPLATE"
-  | "DEVELOPER_ACCESS"
-  | "EXPORT_CUATRECASAS"
-  | "HIDE_RECIPIENT_VIEW_CONTENTS"
+  | "PETITION_SIGNATURE"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
-  | "PETITION_SIGNATURE"
-  | "SKIP_FORWARD_SECURITY";
+  | "HIDE_RECIPIENT_VIEW_CONTENTS"
+  | "SKIP_FORWARD_SECURITY"
+  | "EXPORT_CUATRECASAS"
+  | "AUTO_SEND_TEMPLATE"
+  | "DEVELOPER_ACCESS";
 
 export const FeatureFlagNameValues = [
-  "AUTO_SEND_TEMPLATE",
-  "DEVELOPER_ACCESS",
-  "EXPORT_CUATRECASAS",
-  "HIDE_RECIPIENT_VIEW_CONTENTS",
+  "PETITION_SIGNATURE",
   "INTERNAL_COMMENTS",
   "PETITION_PDF_EXPORT",
-  "PETITION_SIGNATURE",
+  "HIDE_RECIPIENT_VIEW_CONTENTS",
   "SKIP_FORWARD_SECURITY",
+  "EXPORT_CUATRECASAS",
+  "AUTO_SEND_TEMPLATE",
+  "DEVELOPER_ACCESS",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export const IntegrationTypeValues = ["SIGNATURE", "SSO", "USER_PROVISIONING"] as IntegrationType[];
 
-export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV" | "ROOT";
+export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED" | "ROOT";
 
 export const OrganizationStatusValues = [
+  "DEV",
+  "DEMO",
   "ACTIVE",
   "CHURNED",
-  "DEMO",
-  "DEV",
   "ROOT",
 ] as OrganizationStatus[];
 
@@ -57,133 +57,133 @@ export const PetitionContactNotificationTypeValues = [
 ] as PetitionContactNotificationType[];
 
 export type PetitionEventType =
+  | "PETITION_CREATED"
+  | "PETITION_COMPLETED"
   | "ACCESS_ACTIVATED"
-  | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
   | "ACCESS_DEACTIVATED"
-  | "ACCESS_DELEGATED"
   | "ACCESS_OPENED"
-  | "COMMENT_DELETED"
+  | "MESSAGE_SCHEDULED"
+  | "MESSAGE_CANCELLED"
+  | "MESSAGE_SENT"
+  | "REMINDER_SENT"
+  | "REPLY_CREATED"
+  | "REPLY_DELETED"
   | "COMMENT_PUBLISHED"
+  | "COMMENT_DELETED"
+  | "USER_PERMISSION_ADDED"
+  | "USER_PERMISSION_REMOVED"
+  | "USER_PERMISSION_EDITED"
+  | "OWNERSHIP_TRANSFERRED"
+  | "PETITION_CLOSED"
+  | "PETITION_CLOSED_NOTIFIED"
+  | "PETITION_REOPENED"
+  | "SIGNATURE_STARTED"
+  | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_CANCELLED"
+  | "ACCESS_DELEGATED"
+  | "REPLY_UPDATED"
   | "GROUP_PERMISSION_ADDED"
   | "GROUP_PERMISSION_EDITED"
   | "GROUP_PERMISSION_REMOVED"
-  | "MESSAGE_CANCELLED"
-  | "MESSAGE_SCHEDULED"
-  | "MESSAGE_SENT"
-  | "OWNERSHIP_TRANSFERRED"
-  | "PETITION_CLONED"
-  | "PETITION_CLOSED"
-  | "PETITION_CLOSED_NOTIFIED"
-  | "PETITION_COMPLETED"
-  | "PETITION_CREATED"
-  | "PETITION_DELETED"
-  | "PETITION_MESSAGE_BOUNCED"
-  | "PETITION_REMINDER_BOUNCED"
-  | "PETITION_REOPENED"
-  | "RECIPIENT_SIGNED"
-  | "REMINDER_SENT"
-  | "REMINDERS_OPT_OUT"
-  | "REPLY_CREATED"
-  | "REPLY_DELETED"
-  | "REPLY_UPDATED"
-  | "SIGNATURE_CANCELLED"
-  | "SIGNATURE_COMPLETED"
-  | "SIGNATURE_STARTED"
   | "TEMPLATE_USED"
-  | "USER_PERMISSION_ADDED"
-  | "USER_PERMISSION_EDITED"
-  | "USER_PERMISSION_REMOVED";
+  | "PETITION_CLONED"
+  | "PETITION_DELETED"
+  | "REMINDERS_OPT_OUT"
+  | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
+  | "RECIPIENT_SIGNED"
+  | "PETITION_MESSAGE_BOUNCED"
+  | "PETITION_REMINDER_BOUNCED";
 
 export const PetitionEventTypeValues = [
+  "PETITION_CREATED",
+  "PETITION_COMPLETED",
   "ACCESS_ACTIVATED",
-  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
   "ACCESS_DEACTIVATED",
-  "ACCESS_DELEGATED",
   "ACCESS_OPENED",
-  "COMMENT_DELETED",
+  "MESSAGE_SCHEDULED",
+  "MESSAGE_CANCELLED",
+  "MESSAGE_SENT",
+  "REMINDER_SENT",
+  "REPLY_CREATED",
+  "REPLY_DELETED",
   "COMMENT_PUBLISHED",
+  "COMMENT_DELETED",
+  "USER_PERMISSION_ADDED",
+  "USER_PERMISSION_REMOVED",
+  "USER_PERMISSION_EDITED",
+  "OWNERSHIP_TRANSFERRED",
+  "PETITION_CLOSED",
+  "PETITION_CLOSED_NOTIFIED",
+  "PETITION_REOPENED",
+  "SIGNATURE_STARTED",
+  "SIGNATURE_COMPLETED",
+  "SIGNATURE_CANCELLED",
+  "ACCESS_DELEGATED",
+  "REPLY_UPDATED",
   "GROUP_PERMISSION_ADDED",
   "GROUP_PERMISSION_EDITED",
   "GROUP_PERMISSION_REMOVED",
-  "MESSAGE_CANCELLED",
-  "MESSAGE_SCHEDULED",
-  "MESSAGE_SENT",
-  "OWNERSHIP_TRANSFERRED",
+  "TEMPLATE_USED",
   "PETITION_CLONED",
-  "PETITION_CLOSED",
-  "PETITION_CLOSED_NOTIFIED",
-  "PETITION_COMPLETED",
-  "PETITION_CREATED",
   "PETITION_DELETED",
+  "REMINDERS_OPT_OUT",
+  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+  "RECIPIENT_SIGNED",
   "PETITION_MESSAGE_BOUNCED",
   "PETITION_REMINDER_BOUNCED",
-  "PETITION_REOPENED",
-  "RECIPIENT_SIGNED",
-  "REMINDER_SENT",
-  "REMINDERS_OPT_OUT",
-  "REPLY_CREATED",
-  "REPLY_DELETED",
-  "REPLY_UPDATED",
-  "SIGNATURE_CANCELLED",
-  "SIGNATURE_COMPLETED",
-  "SIGNATURE_STARTED",
-  "TEMPLATE_USED",
-  "USER_PERMISSION_ADDED",
-  "USER_PERMISSION_EDITED",
-  "USER_PERMISSION_REMOVED",
 ] as PetitionEventType[];
 
-export type PetitionFieldReplyStatus = "APPROVED" | "PENDING" | "REJECTED";
+export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
 
 export const PetitionFieldReplyStatusValues = [
-  "APPROVED",
   "PENDING",
   "REJECTED",
+  "APPROVED",
 ] as PetitionFieldReplyStatus[];
 
 export type PetitionFieldType =
-  | "CHECKBOX"
-  | "DYNAMIC_SELECT"
+  | "TEXT"
   | "FILE_UPLOAD"
   | "HEADING"
   | "SELECT"
+  | "DYNAMIC_SELECT"
   | "SHORT_TEXT"
-  | "TEXT";
+  | "CHECKBOX";
 
 export const PetitionFieldTypeValues = [
-  "CHECKBOX",
-  "DYNAMIC_SELECT",
+  "TEXT",
   "FILE_UPLOAD",
   "HEADING",
   "SELECT",
+  "DYNAMIC_SELECT",
   "SHORT_TEXT",
-  "TEXT",
+  "CHECKBOX",
 ] as PetitionFieldType[];
 
-export type PetitionMessageStatus = "CANCELLED" | "PROCESSED" | "PROCESSING" | "SCHEDULED";
+export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
 
 export const PetitionMessageStatusValues = [
-  "CANCELLED",
-  "PROCESSED",
-  "PROCESSING",
   "SCHEDULED",
+  "CANCELLED",
+  "PROCESSING",
+  "PROCESSED",
 ] as PetitionMessageStatus[];
 
-export type PetitionPermissionType = "OWNER" | "READ" | "WRITE";
+export type PetitionPermissionType = "OWNER" | "WRITE" | "READ";
 
-export const PetitionPermissionTypeValues = ["OWNER", "READ", "WRITE"] as PetitionPermissionType[];
+export const PetitionPermissionTypeValues = ["OWNER", "WRITE", "READ"] as PetitionPermissionType[];
 
-export type PetitionReminderStatus = "ERROR" | "PROCESSED" | "PROCESSING";
+export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 
 export const PetitionReminderStatusValues = [
-  "ERROR",
-  "PROCESSED",
   "PROCESSING",
+  "PROCESSED",
+  "ERROR",
 ] as PetitionReminderStatus[];
 
-export type PetitionReminderType = "AUTOMATIC" | "MANUAL";
+export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
-export const PetitionReminderTypeValues = ["AUTOMATIC", "MANUAL"] as PetitionReminderType[];
+export const PetitionReminderTypeValues = ["MANUAL", "AUTOMATIC"] as PetitionReminderType[];
 
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
@@ -198,72 +198,77 @@ export const PetitionSignatureCancelReasonValues = [
   "REQUEST_RESTARTED",
 ] as PetitionSignatureCancelReason[];
 
-export type PetitionSignatureStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+export type PetitionSignatureStatus = "ENQUEUED" | "PROCESSING" | "CANCELLED" | "COMPLETED";
 
 export const PetitionSignatureStatusValues = [
-  "CANCELLED",
-  "COMPLETED",
   "ENQUEUED",
   "PROCESSING",
+  "CANCELLED",
+  "COMPLETED",
 ] as PetitionSignatureStatus[];
 
-export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
+export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED" | "CLOSED";
 
-export const PetitionStatusValues = ["CLOSED", "COMPLETED", "DRAFT", "PENDING"] as PetitionStatus[];
+export const PetitionStatusValues = ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] as PetitionStatus[];
 
 export type PetitionUserNotificationType =
-  | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK"
   | "COMMENT_CREATED"
-  | "MESSAGE_EMAIL_BOUNCED"
   | "PETITION_COMPLETED"
-  | "PETITION_SHARED"
-  | "REMINDER_EMAIL_BOUNCED"
-  | "REMINDERS_OPT_OUT"
+  | "SIGNATURE_COMPLETED"
   | "SIGNATURE_CANCELLED"
-  | "SIGNATURE_COMPLETED";
+  | "PETITION_SHARED"
+  | "MESSAGE_EMAIL_BOUNCED"
+  | "REMINDERS_OPT_OUT"
+  | "REMINDER_EMAIL_BOUNCED"
+  | "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK";
 
 export const PetitionUserNotificationTypeValues = [
-  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
   "COMMENT_CREATED",
-  "MESSAGE_EMAIL_BOUNCED",
   "PETITION_COMPLETED",
-  "PETITION_SHARED",
-  "REMINDER_EMAIL_BOUNCED",
-  "REMINDERS_OPT_OUT",
-  "SIGNATURE_CANCELLED",
   "SIGNATURE_COMPLETED",
+  "SIGNATURE_CANCELLED",
+  "PETITION_SHARED",
+  "MESSAGE_EMAIL_BOUNCED",
+  "REMINDERS_OPT_OUT",
+  "REMINDER_EMAIL_BOUNCED",
+  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
 ] as PetitionUserNotificationType[];
 
 export type SystemEventType =
+  | "USER_CREATED"
+  | "USER_LOGGED_IN"
   | "EMAIL_OPENED"
   | "EMAIL_VERIFIED"
-  | "INVITE_SENT"
-  | "USER_CREATED"
-  | "USER_LOGGED_IN";
+  | "INVITE_SENT";
 
 export const SystemEventTypeValues = [
+  "USER_CREATED",
+  "USER_LOGGED_IN",
   "EMAIL_OPENED",
   "EMAIL_VERIFIED",
   "INVITE_SENT",
-  "USER_CREATED",
-  "USER_LOGGED_IN",
 ] as SystemEventType[];
 
-export type TaskName = "EXPORT_REPLIES" | "PRINT_PDF";
+export type TaskName = "PRINT_PDF" | "EXPORT_REPLIES";
 
-export const TaskNameValues = ["EXPORT_REPLIES", "PRINT_PDF"] as TaskName[];
+export const TaskNameValues = ["PRINT_PDF", "EXPORT_REPLIES"] as TaskName[];
 
-export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
+export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
 
-export const TaskStatusValues = ["COMPLETED", "ENQUEUED", "FAILED", "PROCESSING"] as TaskStatus[];
+export const TaskStatusValues = ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"] as TaskStatus[];
 
 export type Tone = "FORMAL" | "INFORMAL";
 
 export const ToneValues = ["FORMAL", "INFORMAL"] as Tone[];
 
-export type UserOrganizationRole = "ADMIN" | "NORMAL" | "OWNER";
+export type UserOrganizationRole = "COLLABORATOR" | "NORMAL" | "ADMIN" | "OWNER";
 
-export const UserOrganizationRoleValues = ["ADMIN", "NORMAL", "OWNER"] as UserOrganizationRole[];
+export const UserOrganizationRoleValues = [
+  "COLLABORATOR",
+  "NORMAL",
+  "ADMIN",
+  "OWNER",
+] as UserOrganizationRole[];
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
 

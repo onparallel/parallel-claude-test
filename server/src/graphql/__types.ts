@@ -217,7 +217,7 @@ export interface NexusGenEnums {
     | "PETITION_COMPOSE"
     | "PETITION_REVIEW";
   OnboardingStatus: "FINISHED" | "SKIPPED";
-  OrganizationRole: "ADMIN" | "NORMAL" | "OWNER";
+  OrganizationRole: "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
   OrganizationUsers_OrderBy:
     | "createdAt_ASC"

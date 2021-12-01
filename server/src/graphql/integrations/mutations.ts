@@ -6,7 +6,7 @@ import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { userHasFeatureFlag } from "../petition/authorizers";
-import { contextUserIsAdmin } from "../users/authorizers";
+import { contextUserHasRole } from "../users/authorizers";
 import { userHasAccessToIntegrations } from "./authorizers";
 
 export const markSignatureIntegrationAsDefault = mutationField(
@@ -15,7 +15,7 @@ export const markSignatureIntegrationAsDefault = mutationField(
     type: "OrgIntegration",
     description: "marks a Signature integration as default",
     authorize: authenticateAnd(
-      contextUserIsAdmin(),
+      contextUserHasRole("ADMIN"),
       userHasFeatureFlag("PETITION_SIGNATURE"),
       userHasAccessToIntegrations("id", ["SIGNATURE"])
     ),
@@ -31,7 +31,7 @@ export const markSignatureIntegrationAsDefault = mutationField(
 export const createSignatureIntegration = mutationField("createSignatureIntegration", {
   description: "Creates a new signature integration on the user's organization",
   type: nonNull("SignatureOrgIntegration"),
-  authorize: authenticateAnd(contextUserIsAdmin(), userHasFeatureFlag("PETITION_SIGNATURE")),
+  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
   args: {
     name: nonNull(stringArg()),
     provider: nonNull(arg({ type: "SignatureOrgIntegrationProvider" })),
@@ -79,7 +79,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
     "Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests",
   type: "Result",
   authorize: authenticateAnd(
-    contextUserIsAdmin(),
+    contextUserHasRole("ADMIN"),
     userHasFeatureFlag("PETITION_SIGNATURE"),
     userHasAccessToIntegrations("id", ["SIGNATURE"])
   ),

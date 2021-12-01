@@ -8,6 +8,7 @@ import {
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
+import { userHasRole } from "../../util/userHasRole";
 import { datetimeArg } from "../helpers/date";
 import { rootIsContextUser } from "./authorizers";
 
@@ -44,14 +45,14 @@ export const User = objectType({
     t.boolean("isSuperAdmin", {
       resolve: async (o, _, ctx) => {
         const org = await ctx.organizations.loadOrg(o.org_id);
-        return org?.status === "ROOT" && ["OWNER", "ADMIN"].includes(o.organization_role);
+        return org?.status === "ROOT" && userHasRole(o, "ADMIN");
       },
     });
     t.boolean("canCreateUsers", {
       resolve: async (o, _, ctx) => {
         const ssoIntegrations = await ctx.integrations.loadIntegrationsByOrgId(o.org_id, "SSO");
         const hasSsoProvider = ssoIntegrations.length > 0;
-        return ["OWNER", "ADMIN"].includes(o.organization_role) && !hasSsoProvider;
+        return userHasRole(o, "ADMIN") && !hasSsoProvider;
       },
     });
     t.boolean("isSsoUser", {
