@@ -181,7 +181,11 @@ export function PetitionTemplateHeader({
                   defaultMessage="Share template"
                 />
               </MenuItem>
-              <MenuItem onClick={handleCloneClick} icon={<CopyIcon display="block" boxSize={4} />}>
+              <MenuItem
+                onClick={handleCloneClick}
+                icon={<CopyIcon display="block" boxSize={4} />}
+                isDisabled={user.role === "COLLABORATOR"}
+              >
                 <FormattedMessage
                   id="component.template-header.clone-label"
                   defaultMessage="Clone template"
@@ -223,6 +227,7 @@ PetitionTemplateHeader.fragments = {
   User: gql`
     fragment PetitionTemplateHeader_User on User {
       id
+      role
     }
   `,
 };

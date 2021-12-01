@@ -1,6 +1,12 @@
+import { UserOrganizationRoleValues } from "../../db/__types";
 import { userHasRole } from "../userHasRole";
 
 describe("userHasRole", () => {
+  it("roles on this test should be in sync with roles on DB", () => {
+    // if this fails, please also update the next test for checking correct role order
+    expect(UserOrganizationRoleValues).toHaveLength(4);
+  });
+
   it("ensures correct role order", () => {
     expect(userHasRole({ organization_role: "COLLABORATOR" }, "COLLABORATOR")).toEqual(true);
     expect(userHasRole({ organization_role: "COLLABORATOR" }, "NORMAL")).toEqual(false);

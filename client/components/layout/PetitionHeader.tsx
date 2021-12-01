@@ -303,6 +303,7 @@ export function PetitionHeader({
                   <MenuItem
                     onClick={handleCloneClick}
                     icon={<CopyIcon display="block" boxSize={4} />}
+                    isDisabled={user.role === "COLLABORATOR"}
                   >
                     <FormattedMessage
                       id="component.petition-header.clone-label"
@@ -441,6 +442,7 @@ PetitionHeader.fragments = {
   User: gql`
     fragment PetitionHeader_User on User {
       id
+      role
       hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
     }
   `,

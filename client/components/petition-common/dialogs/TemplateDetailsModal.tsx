@@ -240,6 +240,7 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                       <MenuItem
                         onClick={handleCloneTemplate}
                         icon={<CopyIcon display="block" boxSize={4} />}
+                        isDisabled={me.role === "COLLABORATOR"}
                       >
                         <FormattedMessage
                           id="component.template-details-modal.clone-template"
@@ -349,6 +350,7 @@ TemplateDetailsModal.fragments = {
   User: gql`
     fragment TemplateDetailsModal_User on User {
       id
+      role
       hasAutoSendTemplate: hasFeatureFlag(featureFlag: AUTO_SEND_TEMPLATE)
     }
   `,

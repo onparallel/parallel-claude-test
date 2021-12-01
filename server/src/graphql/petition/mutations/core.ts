@@ -62,6 +62,7 @@ import { validRichTextContent } from "../../helpers/validators/validRichTextCont
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
 import { orgHasAvailablePetitionSendCredits } from "../../organization/authorizers";
 import { fieldHasType } from "../../public/authorizers";
+import { contextUserHasRole } from "../../users/authorizers";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
@@ -97,15 +98,14 @@ import {
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
   type: "PetitionBase",
-  authorize: chain(
-    authenticate(),
+  authorize: authenticateAnd(
     ifArgDefined(
       "petitionId",
       or(
         userHasAccessToPetitions("petitionId" as never),
         petitionsArePublicTemplates("petitionId" as never)
       ),
-      argIsDefined("locale")
+      and(argIsDefined("locale"), contextUserHasRole("NORMAL"))
     )
   ),
   args: {
@@ -187,8 +187,8 @@ export const createPetition = mutationField("createPetition", {
 export const clonePetitions = mutationField("clonePetitions", {
   description: "Clone petition.",
   type: list(nonNull("PetitionBase")),
-  authorize: chain(
-    authenticate(),
+  authorize: authenticateAnd(
+    contextUserHasRole("NORMAL"),
     or(userHasAccessToPetitions("petitionIds"), petitionsArePublicTemplates("petitionIds"))
   ),
   args: {

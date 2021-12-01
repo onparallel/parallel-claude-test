@@ -1382,7 +1382,7 @@ export interface OrganizationPagination {
 }
 
 /** The roles of a user within an organization. */
-export type OrganizationRole = "ADMIN" | "NORMAL" | "OWNER";
+export type OrganizationRole = "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
 
 /** The status of the organization. */
 export type OrganizationStatus =
@@ -3628,6 +3628,7 @@ export type PetitionHeader_PetitionFragment = {
 export type PetitionHeader_UserFragment = {
   __typename?: "User";
   id: string;
+  role: OrganizationRole;
   hasPetitionPdfExport: boolean;
 };
 
@@ -3698,8 +3699,8 @@ export type PetitionLayout_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   hasPetitionPdfExport: boolean;
@@ -3723,7 +3724,11 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
   isReadOnly: boolean;
 };
 
-export type PetitionTemplateHeader_UserFragment = { __typename?: "User"; id: string };
+export type PetitionTemplateHeader_UserFragment = {
+  __typename?: "User";
+  id: string;
+  role: OrganizationRole;
+};
 
 export type SettingsLayout_UserFragment = {
   __typename?: "User";
@@ -7256,6 +7261,7 @@ export type TemplateDetailsModal_autoSendTemplateMutation = { autoSendTemplate: 
 export type TemplateDetailsModal_UserFragment = {
   __typename?: "User";
   id: string;
+  role: OrganizationRole;
   hasAutoSendTemplate: boolean;
 };
 
@@ -7533,6 +7539,12 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   position: number;
   visibility?: { [key: string]: any } | null;
   alias?: string | null;
+};
+
+export type PetitionListHeader_UserFragment = {
+  __typename?: "User";
+  id: string;
+  role: OrganizationRole;
 };
 
 export type PetitionListTagFilter_TagFragment = {
@@ -10583,8 +10595,8 @@ export type PetitionActivity_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   hasPetitionPdfExport: boolean;
@@ -12046,8 +12058,8 @@ export type PetitionActivity_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionPdfExport: boolean;
@@ -12302,8 +12314,8 @@ export type PetitionCompose_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   hasDeveloperAccess: boolean;
@@ -12958,8 +12970,8 @@ export type PetitionCompose_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
@@ -13402,8 +13414,8 @@ export type PetitionReplies_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   hasPetitionSignature: boolean;
@@ -13677,8 +13689,8 @@ export type PetitionReplies_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
@@ -14044,8 +14056,8 @@ export type Petitions_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -14189,8 +14201,8 @@ export type NewPetition_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   hasAutoSendTemplate: boolean;
@@ -14249,8 +14261,8 @@ export type NewPetition_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasAutoSendTemplate: boolean;
@@ -15843,6 +15855,7 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
 export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
+    role
   }
 ` as unknown as DocumentNode<PetitionTemplateHeader_UserFragment, unknown>;
 export const PetitionUserNotification_PetitionUserNotificationFragmentDoc = gql`
@@ -16301,6 +16314,12 @@ export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${ReferencedFieldDialogDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldList_PetitionFragment, unknown>;
+export const PetitionListHeader_UserFragmentDoc = gql`
+  fragment PetitionListHeader_User on User {
+    id
+    role
+  }
+` as unknown as DocumentNode<PetitionListHeader_UserFragment, unknown>;
 export const PetitionListTagFilter_TagFragmentDoc = gql`
   fragment PetitionListTagFilter_Tag on Tag {
     id
@@ -17606,6 +17625,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
 export const PetitionHeader_UserFragmentDoc = gql`
   fragment PetitionHeader_User on User {
     id
+    role
     hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
   }
 ` as unknown as DocumentNode<PetitionHeader_UserFragment, unknown>;
@@ -18266,6 +18286,7 @@ export const NewPetition_PetitionTemplateFragmentDoc = gql`
 export const TemplateDetailsModal_UserFragmentDoc = gql`
   fragment TemplateDetailsModal_User on User {
     id
+    role
     hasAutoSendTemplate: hasFeatureFlag(featureFlag: AUTO_SEND_TEMPLATE)
   }
 ` as unknown as DocumentNode<TemplateDetailsModal_UserFragment, unknown>;
@@ -20750,9 +20771,11 @@ export const Petitions_userDocument = gql`
   query Petitions_user {
     me {
       ...AppLayout_User
+      ...PetitionListHeader_User
     }
   }
   ${AppLayout_UserFragmentDoc}
+  ${PetitionListHeader_UserFragmentDoc}
 ` as unknown as DocumentNode<Petitions_userQuery, Petitions_userQueryVariables>;
 export const Petitions_petitionsDocument = gql`
   query Petitions_petitions(

@@ -67,6 +67,7 @@ describe("GraphQL/Petitions", () => {
 
   let organization: Organization;
   let sessionUser: User;
+  let collaboratorUser: User;
   let petitions: Petition[];
   let sameOrgUser: User;
 
@@ -85,6 +86,8 @@ describe("GraphQL/Petitions", () => {
 
   let signatureIntegrations: OrgIntegration[];
 
+  let collaboratorApiKey: string;
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
@@ -95,8 +98,18 @@ describe("GraphQL/Petitions", () => {
     // secondary org
     [otherOrg] = await mocks.createRandomOrganizations(1);
 
+    [collaboratorUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
+      organization_role: "COLLABORATOR",
+    }));
+
+    [{ apiKey: collaboratorApiKey }] = await Promise.all([
+      mocks.createUserAuthToken("collaborator-token", collaboratorUser.id),
+    ]);
+
     // user from the same organization as logged
-    [sameOrgUser] = await mocks.createRandomUsers(organization.id, 1);
+    [sameOrgUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
+      organization_role: "NORMAL",
+    }));
 
     // user from other organization
     [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
@@ -1289,6 +1302,42 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("collaborators should not be able to create a blank petition", async () => {
+      const { errors, data } = await testClient.withApiKey(collaboratorApiKey).mutate({
+        mutation: gql`
+          mutation ($locale: PetitionLocale!) {
+            createPetition(locale: $locale) {
+              id
+            }
+          }
+        `,
+        variables: {
+          locale: "en",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("collaborators should be able to create a petition from a template", async () => {
+      const { errors, data } = await testClient.withApiKey(collaboratorApiKey).mutate({
+        mutation: gql`
+          mutation ($locale: PetitionLocale!, $petitionId: GID) {
+            createPetition(locale: $locale, petitionId: $petitionId) {
+              id
+            }
+          }
+        `,
+        variables: {
+          locale: "es",
+          petitionId: toGlobalId("Petition", publicTemplate.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+    });
   });
 
   describe("clonePetition", () => {
@@ -1667,6 +1716,50 @@ describe("GraphQL/Petitions", () => {
           },
         },
       ]);
+    });
+
+    it("collaborators should not be able to clone petitions", async () => {
+      expect(petitions[0]).toMatchObject({
+        is_template: false,
+      });
+
+      const { errors, data } = await testClient.withApiKey(collaboratorApiKey).mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", petitions[0].id)],
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("collaborators should not be able to clone templates", async () => {
+      expect(petitions[7]).toMatchObject({
+        is_template: true,
+      });
+
+      const { errors, data } = await testClient.withApiKey(collaboratorApiKey).mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", petitions[7].id)],
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 

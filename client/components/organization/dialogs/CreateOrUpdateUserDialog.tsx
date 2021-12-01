@@ -190,6 +190,12 @@ function CreateOrUpdateUserDialog({
               />
             </FormLabel>
             <Select {...register("role", { required: true })}>
+              <option value="COLLABORATOR">
+                {intl.formatMessage({
+                  id: "organization.role.collaborator",
+                  defaultMessage: "Collaborator",
+                })}
+              </option>
               <option value="NORMAL">
                 {intl.formatMessage({
                   id: "organization.role.normal",

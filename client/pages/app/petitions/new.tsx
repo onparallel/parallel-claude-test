@@ -215,6 +215,7 @@ function NewPetition() {
                 colorScheme="purple"
                 display={{ base: "none", md: "flex" }}
                 marginBottom={2}
+                disabled={me.role === "COLLABORATOR"}
               >
                 <FormattedMessage id="new-petition.create" defaultMessage="Create" />
               </MenuButton>

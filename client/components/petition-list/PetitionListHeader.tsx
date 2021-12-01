@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -16,7 +17,7 @@ import {
   PaperPlaneIcon,
   RepeatIcon,
 } from "@parallel/chakra/icons";
-import { PetitionFilter } from "@parallel/graphql/__types";
+import { PetitionFilter, PetitionListHeader_UserFragment } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -26,6 +27,7 @@ import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
 export type PetitionListHeaderProps = {
+  user: PetitionListHeader_UserFragment;
   search: string | null;
   filter: PetitionFilter;
   selectedCount: number;
@@ -40,6 +42,7 @@ export type PetitionListHeaderProps = {
 };
 
 export function PetitionListHeader({
+  user,
   search: _search,
   filter,
   selectedCount,
@@ -109,7 +112,7 @@ export function PetitionListHeader({
               </MenuItem>
               <MenuItem
                 onClick={onCloneClick}
-                isDisabled={selectedCount === 0}
+                isDisabled={selectedCount === 0 || user.role === "COLLABORATOR"}
                 icon={<CopyIcon display="block" boxSize={4} />}
               >
                 {filter.type === "PETITION" ? (
@@ -177,3 +180,12 @@ export function PetitionListHeader({
     </Stack>
   );
 }
+
+PetitionListHeader.fragments = {
+  User: gql`
+    fragment PetitionListHeader_User on User {
+      id
+      role
+    }
+  `,
+};

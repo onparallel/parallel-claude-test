@@ -590,6 +590,7 @@ export const schemaTypes: IntrospectionType[] = [
     interfaces: null,
     enumValues: [
       { name: "ADMIN", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "COLLABORATOR", description: null, isDeprecated: false, deprecationReason: null },
       { name: "NORMAL", description: null, isDeprecated: false, deprecationReason: null },
       { name: "OWNER", description: null, isDeprecated: false, deprecationReason: null },
     ],

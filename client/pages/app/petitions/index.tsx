@@ -254,6 +254,7 @@ function Petitions() {
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <PetitionListHeader
+              user={me}
               filter={{
                 status: state.status,
                 type: state.type,
@@ -381,9 +382,11 @@ Petitions.queries = [
     query Petitions_user {
       me {
         ...AppLayout_User
+        ...PetitionListHeader_User
       }
     }
     ${AppLayout.fragments.User}
+    ${PetitionListHeader.fragments.User}
   `,
   gql`
     query Petitions_petitions(
