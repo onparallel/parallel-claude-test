@@ -6,4 +6,5 @@ module.exports = {
   globalSetup: "./test/setup.ts",
   globalTeardown: "./test/teardown.ts",
   testMatch: ["**/__tests__/**/*.test.ts?(x)"],
+  testTimeout: 8000,
 };
