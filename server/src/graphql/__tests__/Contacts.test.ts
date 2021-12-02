@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import faker from "faker";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Contact, Organization, User } from "../../db/__types";
@@ -15,28 +14,22 @@ describe("GraphQL/Contacts", () => {
   let userContacts: Contact[];
   let mocks: Mocks;
 
+  let otherOrg: Organization;
+  let otherContact: Contact;
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    // main organization
-    [organization] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
-
-    // logged user
-    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-      org_id: organization.id,
-    }));
+    ({ user, organization } = await mocks.createSessionUserAndOrganization());
 
     userContacts = await mocks.createRandomContacts(organization.id, 5, (n) => ({
       email: n === 4 ? "email.search@onparallel.com" : faker.internet.email().toLowerCase(),
     }));
+
+    [otherOrg] = await mocks.createRandomOrganizations(1);
+    [otherContact] = await mocks.createRandomContacts(otherOrg.id, 1);
   });
 
   afterAll(async () => {
@@ -187,9 +180,6 @@ describe("GraphQL/Contacts", () => {
   });
 
   it("sends error when user tries to fetch a contact from another organization", async () => {
-    const [otherOrg] = await mocks.createRandomOrganizations(1);
-    const [otherContact] = await mocks.createRandomContacts(otherOrg.id, 1);
-
     const { data, errors } = await testClient.query({
       query: gql`
         query ($id: GID!) {
@@ -295,9 +285,6 @@ describe("GraphQL/Contacts", () => {
   });
 
   it("sends error when trying to update a contact from another org", async () => {
-    const [otherOrg] = await mocks.createRandomOrganizations(1);
-    const [otherContact] = await mocks.createRandomContacts(otherOrg.id, 1);
-
     const { data, errors } = await testClient.mutate({
       mutation: gql`
         mutation ($id: GID!, $firstName: String) {
@@ -316,9 +303,6 @@ describe("GraphQL/Contacts", () => {
   });
 
   it("sends error when trying to delete a contact from another org", async () => {
-    const [otherOrg] = await mocks.createRandomOrganizations(1);
-    const [otherContact] = await mocks.createRandomContacts(otherOrg.id, 1);
-
     const { data, errors } = await testClient.mutate({
       mutation: gql`
         mutation ($ids: [GID!]!) {

@@ -1,7 +1,6 @@
 import { addMinutes } from "date-fns";
 import { toDate } from "date-fns-tz";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";
@@ -30,18 +29,7 @@ describe("presendPetition", () => {
     mocks = new Mocks(knex);
     apiContext = container.get<ApiContext>(ApiContext);
 
-    await deleteAllData(knex);
-
-    [organization] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
-
-    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-    }));
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
     contacts = await mocks.createRandomContacts(organization.id, 21);
     contactIds = contacts.map((c) => c.id);
@@ -50,6 +38,7 @@ describe("presendPetition", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 

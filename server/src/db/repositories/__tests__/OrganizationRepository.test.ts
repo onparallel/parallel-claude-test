@@ -1,13 +1,13 @@
+import * as faker from "faker";
 import { Container } from "inversify";
 import { Knex } from "knex";
+import { pick } from "remeda";
+import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
 import { KNEX } from "../../knex";
 import { Organization, User } from "../../__types";
 import { OrganizationRepository } from "../OrganizationRepository";
 import { Mocks } from "./mocks";
-import { pick } from "remeda";
-import * as faker from "faker";
-import { createTestContainer } from "../../../../test/testContainer";
 
 describe("repositories/OrganizationRepository", () => {
   let container: Container;
@@ -15,7 +15,7 @@ describe("repositories/OrganizationRepository", () => {
   let mocks: Mocks;
   let organizations: OrganizationRepository;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     container = createTestContainer();
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
@@ -23,6 +23,7 @@ describe("repositories/OrganizationRepository", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 
@@ -66,7 +67,6 @@ describe("repositories/OrganizationRepository", () => {
     }
 
     beforeAll(async () => {
-      await deleteAllData(knex);
       [org1, org2, org3] = await mocks.createRandomOrganizations(3);
       org1Users = await mocks.createRandomUsers(org1.id, 42);
       org2Users = await mocks.createRandomUsers(org2.id, 10, (i) => ({

@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { datatype, internet, lorem } from "faker";
 import { Knex } from "knex";
 import { sortBy } from "remeda";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
@@ -20,7 +19,6 @@ import {
 } from "../../db/__types";
 import { AUTH, IAuth } from "../../services/auth";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { deleteAllData } from "../../util/knexUtils";
 import { fromPlainText } from "../../util/slate";
 import { initServer, TestClient } from "./server";
 
@@ -92,24 +90,10 @@ describe("GraphQL/Petitions", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    await deleteAllData(knex);
-
-    // main organization
-    [organization] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
 
     // secondary org
     [otherOrg] = await mocks.createRandomOrganizations(1);
-
-    // logged user
-    [sessionUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-      org_id: organization.id,
-    }));
 
     // user from the same organization as logged
     [sameOrgUser] = await mocks.createRandomUsers(organization.id, 1);

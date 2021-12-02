@@ -1,6 +1,7 @@
 import faker from "faker";
 import { Knex } from "knex";
 import { range } from "remeda";
+import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { unMaybeArray } from "../../../util/arrays";
 import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
@@ -68,6 +69,21 @@ export class Mocks {
       [id]
     );
     return petition;
+  }
+
+  async createSessionUserAndOrganization(userData?: Partial<CreateUser>) {
+    const [organization] = await this.createRandomOrganizations(1, () => ({
+      name: "Parallel",
+      status: "DEV",
+    }));
+    const [user] = await this.createRandomUsers(organization.id, 1, () => ({
+      cognito_id: USER_COGNITO_ID,
+      first_name: "Harvey",
+      last_name: "Specter",
+      ...userData,
+    }));
+
+    return { user, organization };
   }
 
   async createRandomOrganizations(

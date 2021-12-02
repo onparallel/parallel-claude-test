@@ -21,24 +21,25 @@ describe("repositories/ContactRepository", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 
-  describe("loadContactByEmail", () => {
-    beforeAll(async () => {
-      await deleteAllData(knex);
-      const mocks = new Mocks(knex);
-      orgs = await mocks.createRandomOrganizations(2);
-      await mocks.createRandomContacts(orgs[0].id, 3, (index) => ({
-        email: `contact.${index}@onparallel.com`,
-        deleted_at: index === 1 ? new Date() : null,
-      }));
-      await mocks.createRandomContacts(orgs[1].id, 3, (index) => ({
-        email: `contact.${index}@onparallel.com`,
-        deleted_at: index === 2 ? new Date() : null,
-      }));
-    });
+  beforeAll(async () => {
+    await deleteAllData(knex);
+    const mocks = new Mocks(knex);
+    orgs = await mocks.createRandomOrganizations(2);
+    await mocks.createRandomContacts(orgs[0].id, 3, (index) => ({
+      email: `contact.${index}@onparallel.com`,
+      deleted_at: index === 1 ? new Date() : null,
+    }));
+    await mocks.createRandomContacts(orgs[1].id, 3, (index) => ({
+      email: `contact.${index}@onparallel.com`,
+      deleted_at: index === 2 ? new Date() : null,
+    }));
+  });
 
+  describe("loadContactByEmail", () => {
     test("gets the contact from the right org", async () => {
       const result = await c.loadContactByEmail(
         { orgId: orgs[0].id, email: "contact.0@onparallel.com" },

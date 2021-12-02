@@ -1,12 +1,10 @@
 import { gql } from "@apollo/client";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, PetitionPermission, User, UserGroup } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
-import { deleteAllData } from "../../util/knexUtils";
 import { Maybe, MaybeArray } from "../../util/types";
 import { initServer, TestClient } from "./server";
 
@@ -28,21 +26,9 @@ describe("GraphQL/Petition Permissions", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    await deleteAllData(knex);
-
-    [organization] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
+    ({ organization, user: loggedUser } = await mocks.createSessionUserAndOrganization());
 
     const [otherOrg] = await mocks.createRandomOrganizations(1);
-
-    [loggedUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-      org_id: organization.id,
-    }));
 
     orgUsers = await mocks.createRandomUsers(organization.id, 3);
     [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1);

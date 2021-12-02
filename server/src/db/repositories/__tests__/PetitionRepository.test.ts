@@ -22,35 +22,38 @@ describe("repositories/PetitionRepository", () => {
   let mocks: Mocks;
   let petitions: PetitionRepository;
 
-  beforeAll(() => {
+  let organization: Organization;
+  let user: User;
+  let contact: Contact;
+
+  beforeAll(async () => {
     container = createTestContainer();
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
+
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
+
+    [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
+      email: "jesse.pinkman@gmail.com",
+      first_name: "Jesse",
+      last_name: "Pinkman",
+    }));
+
     petitions = container.get(PetitionRepository);
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 
   describe("loadPetitionsForUser", () => {
-    let org: Organization;
-    let user: User;
     let _petitions: Petition[];
 
     beforeAll(async () => {
-      await deleteAllData(knex);
-      [org] = await mocks.createRandomOrganizations(1);
-      [user] = await mocks.createRandomUsers(org.id, 2);
-      _petitions = await mocks.createRandomPetitions(org.id, user.id, 15, (i) => ({
+      _petitions = await mocks.createRandomPetitions(organization.id, user.id, 15, (i) => ({
         name: i % 3 === 0 ? "good petition" : "bad petition",
       }));
-      const [contact] = await mocks.createRandomContacts(org.id, 1, () => ({
-        email: "jesse.pinkman@gmail.com",
-        first_name: "Jesse",
-        last_name: "Pinkman",
-      }));
-
       await mocks.createPetitionAccess(_petitions[0].id, user.id, [contact.id], user.id);
     });
 
@@ -103,16 +106,11 @@ describe("repositories/PetitionRepository", () => {
   });
 
   describe("loadFieldsForPetition & loadFieldCountForPetition", () => {
-    let org: Organization;
-    let user: User;
     let petition1: Petition, petition2: Petition;
     let fields: PetitionField[];
 
     beforeAll(async () => {
-      await deleteAllData(knex);
-      [org] = await mocks.createRandomOrganizations(1);
-      [user] = await mocks.createRandomUsers(org.id, 2);
-      [petition1, petition2] = await mocks.createRandomPetitions(org.id, user.id, 2);
+      [petition1, petition2] = await mocks.createRandomPetitions(organization.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6, (i) => ({
         deleted_at: i === 5 ? new Date() : null,
       }));
@@ -139,16 +137,11 @@ describe("repositories/PetitionRepository", () => {
   });
 
   describe("updateFieldPositions", () => {
-    let org: Organization;
-    let user: User;
     let petition1: Petition, petition2: Petition;
     let fields: PetitionField[], deleted: PetitionField[], foreignField: PetitionField;
 
     beforeAll(async () => {
-      await deleteAllData(knex);
-      [org] = await mocks.createRandomOrganizations(1);
-      [user] = await mocks.createRandomUsers(org.id, 2);
-      [petition1, petition2] = await mocks.createRandomPetitions(org.id, user.id, 2);
+      [petition1, petition2] = await mocks.createRandomPetitions(organization.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6);
       // add some random deleted fields
       deleted = await mocks.createRandomPetitionFields(petition1.id, 10, (index) => ({
@@ -218,16 +211,11 @@ describe("repositories/PetitionRepository", () => {
   });
 
   describe("deletePetitionField", () => {
-    let org: Organization;
-    let user: User;
     let petition1: Petition, petition2: Petition;
     let fields: PetitionField[], deleted: PetitionField[], foreignField: PetitionField;
 
     beforeAll(async () => {
-      await deleteAllData(knex);
-      [org] = await mocks.createRandomOrganizations(1);
-      [user] = await mocks.createRandomUsers(org.id, 2);
-      [petition1, petition2] = await mocks.createRandomPetitions(org.id, user.id, 2);
+      [petition1, petition2] = await mocks.createRandomPetitions(organization.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6);
       // add some random deleted fields
       deleted = await mocks.createRandomPetitionFields(petition1.id, 10, (index) => ({
@@ -291,19 +279,11 @@ describe("repositories/PetitionRepository", () => {
   });
 
   describe("PetitionAccess Reminders", () => {
-    let org: Organization;
-    let user: User;
-    let contact: Contact;
     let petition: Petition;
     let fields: PetitionField;
     let petitionAccess: PetitionAccess;
-
     beforeAll(async () => {
-      await deleteAllData(knex);
-      [org] = await mocks.createRandomOrganizations(1);
-      [user] = await mocks.createRandomUsers(org.id, 1);
-      [contact] = await mocks.createRandomContacts(org.id, 1);
-      [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
       [fields] = await mocks.createRandomPetitionFields(petition.id, 1);
       [petitionAccess] = await mocks.createPetitionAccess(
         petition.id,
@@ -362,16 +342,11 @@ describe("repositories/PetitionRepository", () => {
   });
 
   describe("clonePetitionField", () => {
-    let org: Organization;
-    let user: User;
     let petition: Petition;
     let fields: PetitionField[];
 
     beforeAll(async () => {
-      await deleteAllData(knex);
-      [org] = await mocks.createRandomOrganizations(1);
-      [user] = await mocks.createRandomUsers(org.id, 1);
-      [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
       fields = await mocks.createRandomPetitionFields(petition.id, 5);
     });
 
@@ -441,7 +416,6 @@ describe("repositories/PetitionRepository", () => {
     let user0Petitions: Petition[];
 
     beforeAll(async () => {
-      await deleteAllData(knex);
       [org] = await mocks.createRandomOrganizations(1);
       users = await mocks.createRandomUsers(org.id, 5);
     });

@@ -31,8 +31,6 @@ describe("GraphQL custom validators", () => {
     ctx = container.get<ApiContext>(ApiContext);
     mocks = new Mocks(knex);
 
-    await deleteAllData(knex);
-
     organizations = await mocks.createRandomOrganizations(2);
     users = [
       ...(await mocks.createRandomUsers(organizations[0].id, 1)),
@@ -63,6 +61,7 @@ describe("GraphQL custom validators", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 

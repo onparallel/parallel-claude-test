@@ -1,11 +1,12 @@
 import { Container } from "inversify";
 import { Knex } from "knex";
-import { KNEX } from "../../knex";
-import { Mocks } from "./mocks";
-import { UserAuthenticationRepository } from "../UserAuthenticationRepository";
-import { User, UserAuthenticationToken } from "../../__types";
-import { hash } from "../../../util/token";
 import { createTestContainer } from "../../../../test/testContainer";
+import { deleteAllData } from "../../../util/knexUtils";
+import { hash } from "../../../util/token";
+import { KNEX } from "../../knex";
+import { User, UserAuthenticationToken } from "../../__types";
+import { UserAuthenticationRepository } from "../UserAuthenticationRepository";
+import { Mocks } from "./mocks";
 
 describe("repositories/UserAuthenticationRepository", () => {
   let container: Container;
@@ -21,11 +22,11 @@ describe("repositories/UserAuthenticationRepository", () => {
     mocks = new Mocks(knex);
     userAuth = container.get(UserAuthenticationRepository);
 
-    const [organization] = await mocks.createRandomOrganizations(1);
-    [user] = await mocks.createRandomUsers(organization.id, 1);
+    ({ user } = await mocks.createSessionUserAndOrganization());
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 

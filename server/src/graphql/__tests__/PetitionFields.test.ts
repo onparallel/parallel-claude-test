@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import faker from "faker";
 import { Knex } from "knex";
 import { pick } from "remeda";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { defaultFieldOptions } from "../../db/helpers/fieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -35,16 +34,7 @@ describe("GraphQL/Petition Fields", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    [organization] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
-
-    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-    }));
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
     const [otherOrg] = await mocks.createRandomOrganizations(1);
     const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);

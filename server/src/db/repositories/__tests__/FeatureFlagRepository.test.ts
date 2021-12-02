@@ -21,7 +21,6 @@ describe("repositories/FeatureFlagRepository", () => {
     knex = container.get<Knex>(KNEX);
     ff = container.get(FeatureFlagRepository);
 
-    await deleteAllData(knex);
     const mocks = new Mocks(knex);
     await mocks.createFeatureFlags([{ name: "PETITION_SIGNATURE", default_value: false }]);
     [org] = await mocks.createRandomOrganizations(1);
@@ -33,6 +32,7 @@ describe("repositories/FeatureFlagRepository", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 

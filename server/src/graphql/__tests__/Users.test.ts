@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, PetitionPermission, User } from "../../db/__types";
@@ -19,16 +18,7 @@ describe("GraphQL/Users", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    [organization] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
-
-    [sessionUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-      org_id: organization.id,
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization({
       organization_role: "ADMIN",
     }));
 

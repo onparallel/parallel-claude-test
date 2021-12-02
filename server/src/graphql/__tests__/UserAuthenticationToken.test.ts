@@ -1,11 +1,9 @@
 import { gql } from "@apollo/client";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { FeatureFlagOverride, Organization, User, UserAuthenticationToken } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { deleteAllData } from "../../util/knexUtils";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/UserAuthenticationToken", () => {
@@ -18,20 +16,15 @@ describe("GraphQL/UserAuthenticationToken", () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
-    await deleteAllData(knex);
 
-    [organization] = await mocks.createRandomOrganizations(1);
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
+
     await mocks.createFeatureFlags([{ name: "DEVELOPER_ACCESS", default_value: false }]);
     await knex.from<FeatureFlagOverride>("feature_flag_override").insert({
       org_id: organization.id,
       feature_flag_name: "DEVELOPER_ACCESS",
       value: true,
     });
-
-    // logged user
-    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-    }));
   });
 
   afterAll(async () => {
@@ -108,11 +101,8 @@ describe("GraphQL/UserAuthenticationToken", () => {
 
   describe("generateUserAuthToken", () => {
     beforeEach(async () => {
-      await mocks.createUserAuthToken("My First Token", user.id);
-    });
-
-    afterEach(async () => {
       await mocks.clearUserAuthTokens();
+      await mocks.createUserAuthToken("My First Token", user.id);
     });
 
     it("generates a new auth token and returns its API key", async () => {
@@ -163,11 +153,11 @@ describe("GraphQL/UserAuthenticationToken", () => {
 
   describe("revokeUserAuthToken", () => {
     let userAuthToken: UserAuthenticationToken;
-
     let anotherUser: User;
     let anotherUserToken: UserAuthenticationToken;
 
     beforeEach(async () => {
+      await mocks.clearUserAuthTokens();
       ({ auth: userAuthToken } = await mocks.createUserAuthToken("My First Token", user.id));
 
       [anotherUser] = await mocks.createRandomUsers(organization.id, 1);
@@ -175,10 +165,6 @@ describe("GraphQL/UserAuthenticationToken", () => {
         "Another Token",
         anotherUser.id
       ));
-    });
-
-    afterEach(async () => {
-      await mocks.clearUserAuthTokens();
     });
 
     it("revokes a token by its id", async () => {

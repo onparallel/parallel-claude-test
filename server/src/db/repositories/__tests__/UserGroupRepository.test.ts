@@ -22,7 +22,6 @@ describe("repositories/UserGroupRepository", () => {
   beforeAll(async () => {
     container = createTestContainer();
     knex = container.get<Knex>(KNEX);
-    await deleteAllData(knex);
     userGroupsRepo = container.get(UserGroupRepository);
     petitionsRepo = container.get(PetitionRepository);
     mocks = new Mocks(knex);
@@ -33,6 +32,7 @@ describe("repositories/UserGroupRepository", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 

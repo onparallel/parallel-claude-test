@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { PetitionAccess, PetitionField, PetitionFieldReply } from "../../db/__types";
-import { initServer, TestClient } from "./server";
+import { serialize as serializeCookie } from "cookie";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
-import { serialize as serializeCookie } from "cookie";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { PetitionAccess, PetitionField, PetitionFieldReply } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
+import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Public", () => {
   let testClient: TestClient;

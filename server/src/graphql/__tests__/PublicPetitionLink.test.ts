@@ -1,6 +1,5 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
@@ -31,12 +30,9 @@ describe("GraphQL/PublicPetitionLink", () => {
     knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    [organization] = await mocks.createRandomOrganizations(1, () => ({ name: "Parallel" }));
-    [contact] = await mocks.createRandomContacts(organization.id, 1);
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
-    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-    }));
+    [contact] = await mocks.createRandomContacts(organization.id, 1);
 
     templates = await mocks.createRandomPetitions(organization.id, user.id, 2, () => ({
       is_template: true,

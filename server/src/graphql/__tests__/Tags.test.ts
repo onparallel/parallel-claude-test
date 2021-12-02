@@ -6,7 +6,6 @@ import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, Tag } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { deleteAllData } from "../../util/knexUtils";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Tags", () => {
@@ -25,8 +24,6 @@ describe("GraphQL/Tags", () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
-
-    await deleteAllData(knex);
 
     [organization] = await mocks.createRandomOrganizations(1, () => ({
       name: "Parallel",

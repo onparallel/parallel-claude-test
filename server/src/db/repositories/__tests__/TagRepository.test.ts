@@ -26,8 +26,6 @@ describe("repositories/TagRepository", () => {
     repo = container.get(TagRepository);
     mocks = new Mocks(knex);
 
-    await deleteAllData(knex);
-
     orgs = await mocks.createRandomOrganizations(2);
     [user] = await mocks.createRandomUsers(orgs[0].id, 1);
     [otherUser] = await mocks.createRandomUsers(orgs[1].id, 1);
@@ -47,6 +45,7 @@ describe("repositories/TagRepository", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 

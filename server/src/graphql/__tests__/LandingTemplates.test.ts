@@ -19,17 +19,12 @@ describe("GraphQL/LandingTemplates", () => {
     testClient = await initServer();
     knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
-    const [org] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
-    const [sessionUser] = await mocks.createRandomUsers(org.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-    }));
+
+    const { organization, user } = await mocks.createSessionUserAndOrganization();
 
     [templateWithSlug, templateWithoutSlug] = await mocks.createRandomPetitions(
-      org.id,
-      sessionUser.id,
+      organization.id,
+      user.id,
       2,
       (i) => ({
         status: null,

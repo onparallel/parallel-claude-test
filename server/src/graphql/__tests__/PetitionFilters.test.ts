@@ -1,9 +1,8 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Petition, User, UserGroup } from "../../db/__types";
+import { Organization, Petition, User, UserGroup } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -21,10 +20,9 @@ describe("Petition Filters", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    const [organization] = await mocks.createRandomOrganizations(1);
-    [sessionUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-    }));
+    let organization: Organization;
+
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
 
     users = await mocks.createRandomUsers(organization.id, 3);
     [userGroup] = await mocks.createUserGroups(1, organization.id);

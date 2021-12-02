@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { Knex } from "knex";
 import { omit } from "remeda";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
@@ -33,16 +32,7 @@ describe("GraphQL/Petition Field Replies", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    [organization] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
-
-    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-    }));
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
     [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
     fields = await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
@@ -67,8 +57,8 @@ describe("GraphQL/Petition Field Replies", () => {
 
   describe("createSimpleReply", () => {
     afterEach(async () => {
-      await mocks.knex.raw("DELETE from petition_field_reply WHERE id > 0");
-      await mocks.knex.raw("DELETE from petition_event WHERE id > 0");
+      await mocks.knex("petition_field_reply").delete();
+      await mocks.knex("petition_event").delete();
     });
 
     it("creates a simple reply as an User", async () => {
@@ -237,9 +227,7 @@ describe("GraphQL/Petition Field Replies", () => {
     });
 
     afterEach(async () => {
-      await mocks.knex.raw(/* sql */ `
-        DELETE FROM petition_event where id > 0
-      `);
+      await mocks.knex("petition_event").delete();
     });
 
     it("updates a simple reply as an User, previously created by a Contact", async () => {

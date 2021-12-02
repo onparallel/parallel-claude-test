@@ -31,7 +31,6 @@ export const initServer = async () => {
   });
 
   const knex = container.get<Knex>(KNEX);
-  await deleteAllData(knex);
 
   return {
     async query({
@@ -65,6 +64,7 @@ export const initServer = async () => {
     },
     container,
     async stop() {
+      await deleteAllData(knex);
       await knex.destroy();
       await server.stop();
     },

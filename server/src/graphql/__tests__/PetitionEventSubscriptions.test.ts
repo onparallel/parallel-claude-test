@@ -1,10 +1,9 @@
 import { addDays } from "date-fns";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { PetitionEventSubscription, User } from "../../db/__types";
+import { Organization, PetitionEventSubscription, User } from "../../db/__types";
 import { FETCH_SERVICE, IFetchService } from "../../services/fetch";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
@@ -22,16 +21,14 @@ describe("GraphQL/PetitionEventSubscription", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    const [organization] = await mocks.createRandomOrganizations(1, () => ({
-      name: "Parallel",
-      status: "DEV",
-    }));
+    let organization: Organization;
 
-    [sessionUser, otherUser] = await mocks.createRandomUsers(organization.id, 2, (i) => ({
-      cognito_id: i === 0 ? USER_COGNITO_ID : "1234",
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
+
+    [otherUser] = await mocks.createRandomUsers(organization.id, 1, (i) => ({
+      cognito_id: "1234",
       first_name: "Harvey",
       last_name: "Specter",
-      org_id: organization.id,
     }));
 
     subscriptions = await mocks.createEventSubscription([

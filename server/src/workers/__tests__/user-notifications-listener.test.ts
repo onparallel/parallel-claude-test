@@ -11,6 +11,7 @@ import {
   PetitionUserNotification,
   User,
 } from "../../db/__types";
+import { deleteAllData } from "../../util/knexUtils";
 import { userNotificationsListener } from "../event-listeners/user-notifications-listener";
 
 describe("Worker - User Notifications Listener", () => {
@@ -54,6 +55,7 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 

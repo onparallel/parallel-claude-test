@@ -6,6 +6,7 @@ import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, PetitionField, User } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
+import { deleteAllData } from "../../util/knexUtils";
 import { validateFieldVisibilityConditions } from "../helpers/validators/validFieldVisibility";
 
 describe("Field Visibility Conditions", () => {
@@ -32,8 +33,7 @@ describe("Field Visibility Conditions", () => {
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
 
-    [organization] = await mocks.createRandomOrganizations(1);
-    [user] = await mocks.createRandomUsers(organization.id, 1);
+    ({ user, organization } = await mocks.createSessionUserAndOrganization());
     petition = await mocks.createRandomPetitions(organization.id, user.id, 2);
 
     [textField, fileUploadField, selectField, headingField, finalTextField, deletedField] =
@@ -56,6 +56,7 @@ describe("Field Visibility Conditions", () => {
   });
 
   afterAll(async () => {
+    await deleteAllData(knex);
     await knex.destroy();
   });
 

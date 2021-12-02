@@ -1,9 +1,14 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Petition, PetitionField, PetitionFieldAttachment, User } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  PetitionField,
+  PetitionFieldAttachment,
+  User,
+} from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -20,13 +25,8 @@ describe("GraphQL/PetitionFieldAttachments", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    const [organization] = await mocks.createRandomOrganizations(1);
-    [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-      org_id: organization.id,
-    }));
+    let organization: Organization;
+    ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
     [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
     [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
