@@ -5,7 +5,7 @@ import { ValueProps } from "@parallel/utils/ValueProps";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-export interface NewPetitionCategoryFilterProps extends ValueProps<string> {
+interface NewPetitionCategoryFilterProps extends ValueProps<string> {
   categories: string[];
 }
 

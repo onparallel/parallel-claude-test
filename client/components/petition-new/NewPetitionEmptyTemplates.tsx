@@ -11,8 +11,8 @@ export const NewPetitionEmptyTemplates = ({
 }) => {
   return (
     <Center>
-      <Stack justifyContent="center" alignItems="center" minHeight="300px">
-        <EmptyTemplatesIcon width="282px" height="77px" />
+      <Stack justifyContent="center" alignItems="center" minHeight="300px" paddingX={4}>
+        <EmptyTemplatesIcon maxWidth="282px" height="77px" width="100%" />
         <Text paddingTop={6}>
           <FormattedMessage
             id="new-petition.no-templates"

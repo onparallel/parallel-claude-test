@@ -2,7 +2,8 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Button,
   Container,
-  HStack,
+  Grid,
+  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -18,11 +19,11 @@ import {
 import { AddIcon, ChevronDownIcon, FileNewIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { SearchInput } from "@parallel/components/common/SearchInput";
-import { Spacer } from "@parallel/components/common/Spacer";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { TemplateDetailsModal } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
 import { NewPetitionCategoryFilter } from "@parallel/components/petition-new/NewPetitionCategoryFilter";
+import { NewPetitionCategoryMenuFilter } from "@parallel/components/petition-new/NewPetitionCategoryMenuFilter";
 import { NewPetitionEmptySearch } from "@parallel/components/petition-new/NewPetitionEmptySearch";
 import { NewPetitionEmptyTemplates } from "@parallel/components/petition-new/NewPetitionEmptyTemplates";
 import { NewPetitionLanguageFilter } from "@parallel/components/petition-new/NewPetitionLanguageFilter";
@@ -186,26 +187,33 @@ function NewPetition() {
       })}
       user={me}
     >
-      <Container maxWidth="container.xl" paddingY={4}>
+      <Container
+        maxWidth="container.xl"
+        paddingY={{ base: 0, md: 4 }}
+        paddingX={{ base: 0, md: 4 }}
+      >
         <Tabs index={state.public ? 1 : 0} onChange={handleTabChange} isLazy>
-          <TabList
-            marginX={4}
+          <Stack
+            direction="row"
             position="sticky"
             top={0}
             paddingTop={6}
             backgroundColor="gray.50"
+            spacing={4}
+            paddingX={6}
             zIndex={1}
           >
-            <Tab borderTopRadius="md" height="50px" _selected={selectTabStyles}>
-              <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
-            </Tab>
-            <Tab borderTopRadius="md" height="50px" _selected={selectTabStyles}>
-              <FormattedMessage
-                id="new-petition.public-templates"
-                defaultMessage="Public templates"
-              />
-            </Tab>
-            <Spacer />
+            <TabList flex="1">
+              <Tab borderTopRadius="md" height="40px" _selected={selectTabStyles}>
+                <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
+              </Tab>
+              <Tab borderTopRadius="md" height="40px" _selected={selectTabStyles}>
+                <FormattedMessage
+                  id="new-petition.public-templates"
+                  defaultMessage="Public templates"
+                />
+              </Tab>
+            </TabList>
             <Menu placement="bottom-end">
               <MenuButton
                 as={Button}
@@ -214,11 +222,17 @@ function NewPetition() {
                 rightIcon={<ChevronDownIcon />}
                 colorScheme="purple"
                 display={{ base: "none", md: "flex" }}
-                marginBottom={2}
                 isDisabled={me.role === "COLLABORATOR"}
               >
                 <FormattedMessage id="new-petition.create" defaultMessage="Create" />
               </MenuButton>
+              <MenuButton
+                as={IconButton}
+                alignSelf="flex-end"
+                icon={<AddIcon fontSize="12px" />}
+                colorScheme="purple"
+                display={{ base: "flex", md: "none" }}
+              />
               <Portal>
                 <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
                   <MenuItem
@@ -242,15 +256,15 @@ function NewPetition() {
                 </MenuList>
               </Portal>
             </Menu>
-          </TabList>
+          </Stack>
           <TabPanels>
             <TabPanel paddingX={0} paddingY={0}>
               <Stack
                 direction={{ base: "column", md: "row" }}
                 spacing={2}
                 paddingX={6}
-                paddingTop={8}
-                paddingBottom={6}
+                paddingTop={{ base: 4, md: 8 }}
+                paddingBottom={{ base: 4, md: 6 }}
                 position="sticky"
                 backgroundColor="gray.50"
                 top="74px"
@@ -265,7 +279,7 @@ function NewPetition() {
                     defaultMessage: "What are you looking for?",
                   })}
                 />
-                <HStack>
+                <Stack direction={{ base: "column", md: "row" }}>
                   <NewPetitionSharedFilter
                     value={
                       state.owner === true
@@ -284,7 +298,7 @@ function NewPetition() {
                     backgroundColor="white"
                     flex="1 0 auto"
                   />
-                </HStack>
+                </Stack>
               </Stack>
               {templates.length > 0 ? (
                 <NewPetitionTemplatesList
@@ -306,38 +320,48 @@ function NewPetition() {
               )}
             </TabPanel>
             <TabPanel paddingX={0} paddingY={0}>
-              <Stack
+              <Grid
                 paddingX={6}
-                paddingTop={8}
-                paddingBottom={6}
+                paddingTop={{ base: 4, md: 8 }}
+                paddingBottom={{ base: 4, md: 6 }}
                 position="sticky"
                 backgroundColor="gray.50"
                 top="74px"
                 zIndex={1}
+                gridTemplateColumns={{ base: "auto", md: "1fr auto" }}
+                gridGap={2}
               >
-                <Stack direction={{ base: "column", md: "row" }}>
-                  <SearchInput
-                    value={search ?? ""}
-                    onChange={(event) => handleSearchChange(event?.target.value)}
-                    backgroundColor="white"
-                    placeholder={intl.formatMessage({
-                      id: "new-petition.search-placeholder",
-                      defaultMessage: "What are you looking for?",
-                    })}
-                  />
-                  <NewPetitionLanguageFilter
-                    value={state.lang}
-                    onChange={handleLocaleChange}
-                    backgroundColor="white"
-                    flex="1 0 auto"
-                  />
-                </Stack>
+                <SearchInput
+                  value={search ?? ""}
+                  onChange={(event) => handleSearchChange(event?.target.value)}
+                  backgroundColor="white"
+                  placeholder={intl.formatMessage({
+                    id: "new-petition.search-placeholder",
+                    defaultMessage: "What are you looking for?",
+                  })}
+                  gridColumn={{ base: "1", md: "1" }}
+                />
+                <NewPetitionLanguageFilter
+                  value={state.lang}
+                  onChange={handleLocaleChange}
+                  backgroundColor="white"
+                  flex="1 0 auto"
+                />
                 <NewPetitionCategoryFilter
                   value={state.category}
                   onChange={handleCategoryChange}
                   categories={publicTemplateCategories}
+                  display={{ base: "none", md: "flex" }}
+                  gridColumn="1 / 3"
                 />
-              </Stack>
+                <NewPetitionCategoryMenuFilter
+                  value={state.category}
+                  onChange={handleCategoryChange}
+                  categories={publicTemplateCategories}
+                  backgroundColor="white"
+                  display={{ base: "flex", md: "none" }}
+                />
+              </Grid>
               {templates.length > 0 ? (
                 <NewPetitionTemplatesList
                   items={templates}

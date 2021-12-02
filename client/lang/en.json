@@ -3535,6 +3535,11 @@
     "context": "Added at"
   },
   {
+    "term": "generic.all-categories",
+    "definition": "All categories",
+    "context": "All categories"
+  },
+  {
     "term": "generic.all-categories-short",
     "definition": "All",
     "context": "All"

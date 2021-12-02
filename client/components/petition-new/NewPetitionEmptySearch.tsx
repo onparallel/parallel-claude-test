@@ -11,8 +11,8 @@ export const NewPetitionEmptySearch = ({
 }) => {
   return (
     <Center>
-      <Stack justifyContent="center" alignItems="center" minHeight="300px">
-        <EmptySearchTemplatesIcon width="166px" height="77px" />
+      <Stack justifyContent="center" alignItems="center" minHeight="300px" paddingX={4}>
+        <EmptySearchTemplatesIcon maxWidth="166px" height="77px" width="100%" />
         <Text paddingTop={6}>
           <FormattedMessage
             id="component.new-petition-empty-search.no-results"

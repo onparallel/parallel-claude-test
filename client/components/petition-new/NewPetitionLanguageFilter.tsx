@@ -14,14 +14,14 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { FormattedMessage } from "react-intl";
 
-export interface NewPetitionLanguageFilterProps extends ValueProps<PetitionLocale> {}
+interface NewPetitionLanguageFilterProps extends ValueProps<PetitionLocale> {}
 
 export const NewPetitionLanguageFilter = chakraForwardRef<"button", NewPetitionLanguageFilterProps>(
   function NewPetitionLanguageFilter({ value, onChange, ...props }, ref) {
     const locales = useSupportedLocales();
 
     return (
-      <Menu>
+      <Menu matchWidth={true}>
         <MenuButton
           ref={ref}
           as={Button}
@@ -37,7 +37,7 @@ export const NewPetitionLanguageFilter = chakraForwardRef<"button", NewPetitionL
           )}
         </MenuButton>
         <Portal>
-          <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
+          <MenuList minWidth="154px">
             <MenuOptionGroup
               value={value ?? "all"}
               onChange={(value) => onChange(value === "all" ? null : (value as PetitionLocale))}

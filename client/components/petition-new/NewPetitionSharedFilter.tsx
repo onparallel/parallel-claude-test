@@ -15,7 +15,7 @@ import { useIntl } from "react-intl";
 
 export type NewPetitionSharedFilterValues = "IS_OWNER" | "NOT_IS_OWNER";
 
-export interface NewPetitionSharedFilterProps extends ValueProps<NewPetitionSharedFilterValues> {}
+interface NewPetitionSharedFilterProps extends ValueProps<NewPetitionSharedFilterValues> {}
 
 export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSharedFilterProps>(
   function NewPetitionSharedFilter({ value, onChange, ...props }, ref) {
@@ -48,7 +48,7 @@ export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSha
     );
 
     return (
-      <Menu>
+      <Menu matchWidth={true}>
         <MenuButton
           ref={ref}
           as={Button}
@@ -59,7 +59,7 @@ export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSha
           {options.find((opt) => opt.key === value)?.label ?? options[0].label}
         </MenuButton>
         <Portal>
-          <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
+          <MenuList minWidth="154px">
             <MenuOptionGroup
               value={value ?? "ALL"}
               onChange={(value) =>

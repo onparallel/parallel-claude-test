@@ -4,7 +4,7 @@ import { NewPetitionTemplatesList_PetitionTemplateFragment } from "@parallel/gra
 import InfiniteScroll from "react-infinite-scroll-component";
 import { TemplateCard } from "./TemplateCard";
 
-export interface NewPetitionTemplatesListProps {
+interface NewPetitionTemplatesListProps {
   items: NewPetitionTemplatesList_PetitionTemplateFragment[];
   onLoadMore: () => void;
   hasMore: boolean;
