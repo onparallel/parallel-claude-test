@@ -911,13 +911,22 @@ async function publicStartSignatureRequest(
     message,
   });
 
-  await ctx.aws.enqueueMessages("signature-worker", {
-    groupId: `signature-${toGlobalId("Petition", petition.id)}`,
-    body: {
-      type: "start-signature-process",
-      payload: { petitionSignatureRequestId: signatureRequest.id },
-    },
-  });
+  await Promise.all([
+    ctx.aws.enqueueMessages("signature-worker", {
+      groupId: `signature-${toGlobalId("Petition", petition.id)}`,
+      body: {
+        type: "start-signature-process",
+        payload: { petitionSignatureRequestId: signatureRequest.id },
+      },
+    }),
+    ctx.petitions.createEvent({
+      type: "SIGNATURE_STARTED",
+      petition_id: petition.id,
+      data: {
+        petition_signature_request_id: signatureRequest.id,
+      },
+    }),
+  ]);
 
   return updatedPetition;
 }

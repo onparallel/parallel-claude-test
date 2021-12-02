@@ -29,6 +29,7 @@ import { TimelineReplyUpdatedEvent } from "./timeline/TimelineReplyUpdatedEvent"
 import { TimelineSignatureCancelledEvent } from "./timeline/TimelineSignatureCancelledEvent";
 import { TimelineSignatureCompletedEvent } from "./timeline/TimelineSignatureCompletedEvent";
 import { TimelineSignatureStartedEvent } from "./timeline/TimelineSignatureStartedEvent";
+import { TimelineSignatureReminderEvent } from "./timeline/TimelineSignatureReminderEvent";
 import { TimelineUserPermissionAddedEvent } from "./timeline/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermissionRemovedEvent";
@@ -110,6 +111,8 @@ export function PetitionActivityTimeline({
               <TimelineSignatureCompletedEvent event={event} />
             ) : event.__typename === "SignatureCancelledEvent" ? (
               <TimelineSignatureCancelledEvent event={event} userId={userId} />
+            ) : event.__typename === "SignatureReminderEvent" ? (
+              <TimelineSignatureReminderEvent event={event} userId={userId} />
             ) : event.__typename === "AccessDelegatedEvent" ? (
               <TimelineAccessDelegatedEvent event={event} />
             ) : event.__typename === "GroupPermissionAddedEvent" ? (
@@ -226,6 +229,9 @@ PetitionActivityTimeline.fragments = {
       ... on SignatureCancelledEvent {
         ...TimelineSignatureCancelledEvent_SignatureCancelledEvent
       }
+      ... on SignatureReminderEvent {
+        ...TimelineSignatureReminderEvent_SignatureReminderEvent
+      }
       ... on AccessDelegatedEvent {
         ...TimelineAccessDelegatedEvent_AccessDelegatedEvent
       }
@@ -281,6 +287,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelineSignatureStartedEvent.fragments.SignatureStartedEvent}
     ${TimelineSignatureCompletedEvent.fragments.SignatureCompletedEvent}
     ${TimelineSignatureCancelledEvent.fragments.SignatureCancelledEvent}
+    ${TimelineSignatureReminderEvent.fragments.SignatureReminderEvent}
     ${TimelineAccessDelegatedEvent.fragments.AccessDelegatedEvent}
     ${TimelineGroupPermissionAddedEvent.fragments.GroupPermissionAddedEvent}
     ${TimelineGroupPermissionEditedEvent.fragments.GroupPermissionEditedEvent}

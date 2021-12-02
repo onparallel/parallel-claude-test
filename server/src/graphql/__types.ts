@@ -532,6 +532,7 @@ export interface NexusGenObjects {
     letRecipientsChooseSigners?: boolean;
   };
   SignatureOrgIntegration: db.OrgIntegration;
+  SignatureReminderEvent: events.SignatureReminderEvent;
   SignatureStartedEvent: events.SignatureStartedEvent;
   SsoOrgIntegration: db.OrgIntegration;
   SupportMethodResponse: {
@@ -1629,6 +1630,13 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
+  };
+  SignatureReminderEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   SignatureStartedEvent: {
     // field return type
@@ -2875,6 +2883,13 @@ export interface NexusGenFieldTypeNames {
     provider: "SignatureOrgIntegrationProvider";
     type: "IntegrationType";
   };
+  SignatureReminderEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    type: "PetitionEventType";
+    user: "User";
+  };
   SignatureStartedEvent: {
     // field return type name
     createdAt: "DateTime";
@@ -4059,6 +4074,7 @@ export interface NexusGenAbstractTypeMembers {
     | "ReplyUpdatedEvent"
     | "SignatureCancelledEvent"
     | "SignatureCompletedEvent"
+    | "SignatureReminderEvent"
     | "SignatureStartedEvent"
     | "TemplateUsedEvent"
     | "UserPermissionAddedEvent"
@@ -4150,6 +4166,7 @@ export interface NexusGenTypeInterfaces {
   SignatureCompletedEvent: "PetitionEvent";
   SignatureCompletedUserNotification: "PetitionUserNotification";
   SignatureOrgIntegration: "OrgIntegration";
+  SignatureReminderEvent: "PetitionEvent";
   SignatureStartedEvent: "PetitionEvent";
   SsoOrgIntegration: "OrgIntegration";
   TemplateDefaultUserGroupPermission: "TemplateDefaultPermission" | "Timestamps";

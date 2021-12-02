@@ -90,6 +90,8 @@ export const PetitionEvent = interfaceType({
         return "SignatureCompletedEvent";
       case "SIGNATURE_CANCELLED":
         return "SignatureCancelledEvent";
+      case "SIGNATURE_REMINDER":
+        return "SignatureReminderEvent";
       case "PETITION_CLONED":
         return "PetitionClonedEvent";
       case "PETITION_DELETED":
@@ -534,6 +536,13 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
     resolve: ({ data }) => {
       return data.cancel_reason;
     },
+  });
+});
+
+export const SignatureReminderEvent = createPetitionEvent("SignatureReminderEvent", (t) => {
+  t.nullable.field("user", {
+    type: "User",
+    resolve: async ({ data }, _, ctx) => await ctx.users.loadUser(data.user_id),
   });
 });
 

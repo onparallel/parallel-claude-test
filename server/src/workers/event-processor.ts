@@ -39,6 +39,10 @@ createQueueWorker(
         "REPLY_CREATED",
         "COMMENT_PUBLISHED",
         "EMAIL_OPENED",
+        "SIGNATURE_CANCELLED",
+        "SIGNATURE_STARTED",
+        "SIGNATURE_COMPLETED",
+        "SIGNATURE_REMINDER",
       ],
       analyticsEventListener
     )

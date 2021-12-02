@@ -8680,6 +8680,11 @@
     "context": "See reason"
   },
   {
+    "term": "timeline.signature-reminder.description",
+    "definition": "{same, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}"
+  },
+  {
     "term": "timeline.signature-restarted.description",
     "definition": "The eSignature process has been restarted {timeAgo}",
     "context": "The eSignature process has been restarted {timeAgo}"

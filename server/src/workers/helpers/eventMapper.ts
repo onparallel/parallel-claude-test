@@ -194,6 +194,15 @@ function mapEventPayload(event: PetitionEvent) {
         ),
       };
     }
+    case "SIGNATURE_REMINDER": {
+      return {
+        petitionSignatureRequestId: toGlobalId(
+          "PetitionSignatureRequest",
+          event.data.petition_signature_request_id
+        ),
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
     case "USER_PERMISSION_ADDED": {
       return {
         userId: toGlobalId("User", event.data.user_id),

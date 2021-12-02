@@ -16,6 +16,10 @@ import {
   ReminderSentEvent,
   RemindersOptOutEvent,
   ReplyCreatedEvent,
+  SignatureCancelledEvent,
+  SignatureCompletedEvent,
+  SignatureReminderEvent,
+  SignatureStartedEvent,
   TemplateUsedEvent,
   UserCreatedEvent,
   UserLoggedInEvent,
@@ -395,6 +399,99 @@ async function trackEmailOpenedEvent(event: EmailOpenedSystemEvent, ctx: WorkerC
   });
 }
 
+async function trackSignatureStartedEvent(event: SignatureStartedEvent, ctx: WorkerContext) {
+  const [petition, petitionSignatureRequest] = await Promise.all([
+    ctx.petitions.loadPetition(event.petition_id),
+    ctx.petitions.loadPetitionSignatureById(event.data.petition_signature_request_id),
+  ]);
+  if (!petition || !petitionSignatureRequest) return;
+
+  const user = await loadPetitionOwner(event.petition_id, ctx);
+  const orgIntegration = await ctx.integrations.loadIntegration(
+    petitionSignatureRequest.signature_config.orgIntegrationId
+  );
+
+  await ctx.analytics.trackEvent({
+    type: "SIGNATURE_SENT",
+    user_id: user.id,
+    data: {
+      petition_id: petition.id,
+      petition_signature_request_id: petitionSignatureRequest.id,
+      test_mode: orgIntegration?.settings["ENVIRONMENT"] === "sandbox",
+    },
+  });
+}
+
+async function trackSignatureCompletedEvent(event: SignatureCompletedEvent, ctx: WorkerContext) {
+  const [petition, petitionSignatureRequest] = await Promise.all([
+    ctx.petitions.loadPetition(event.petition_id),
+    ctx.petitions.loadPetitionSignatureById(event.data.petition_signature_request_id),
+  ]);
+  if (!petition || !petitionSignatureRequest) return;
+
+  const user = await loadPetitionOwner(event.petition_id, ctx);
+  const orgIntegration = await ctx.integrations.loadIntegration(
+    petitionSignatureRequest.signature_config.orgIntegrationId
+  );
+
+  await ctx.analytics.trackEvent({
+    type: "SIGNATURE_COMPLETED",
+    user_id: user.id,
+    data: {
+      petition_id: petition.id,
+      petition_signature_request_id: petitionSignatureRequest.id,
+      test_mode: orgIntegration?.settings["ENVIRONMENT"] === "sandbox",
+    },
+  });
+}
+
+async function trackSignatureReminderEvent(event: SignatureReminderEvent, ctx: WorkerContext) {
+  const [petition, petitionSignatureRequest] = await Promise.all([
+    ctx.petitions.loadPetition(event.petition_id),
+    ctx.petitions.loadPetitionSignatureById(event.data.petition_signature_request_id),
+  ]);
+  if (!petition || !petitionSignatureRequest) return;
+
+  const orgIntegration = await ctx.integrations.loadIntegration(
+    petitionSignatureRequest.signature_config.orgIntegrationId
+  );
+
+  await ctx.analytics.trackEvent({
+    type: "SIGNATURE_REMINDER",
+    user_id: event.data.user_id,
+    data: {
+      petition_id: petition.id,
+      petition_signature_request_id: petitionSignatureRequest.id,
+      test_mode: orgIntegration?.settings["ENVIRONMENT"] === "sandbox",
+    },
+  });
+}
+
+async function trackSignatureCancelledEvent(event: SignatureCancelledEvent, ctx: WorkerContext) {
+  const [petition, petitionSignatureRequest] = await Promise.all([
+    ctx.petitions.loadPetition(event.petition_id),
+    ctx.petitions.loadPetitionSignatureById(event.data.petition_signature_request_id),
+  ]);
+  if (!petition || !petitionSignatureRequest) return;
+
+  const user = await loadPetitionOwner(petition.id, ctx);
+
+  const orgIntegration = await ctx.integrations.loadIntegration(
+    petitionSignatureRequest.signature_config.orgIntegrationId
+  );
+
+  await ctx.analytics.trackEvent({
+    type: "SIGNATURE_CANCELLED",
+    user_id: user.id,
+    data: {
+      petition_id: petition.id,
+      petition_signature_request_id: petitionSignatureRequest.id,
+      cancel_reason: event.data.cancel_reason,
+      test_mode: orgIntegration?.settings["ENVIRONMENT"] === "sandbox",
+    },
+  });
+}
+
 export const analyticsEventListener: EventListener = async (event, ctx) => {
   switch (event.type) {
     case "PETITION_CREATED":
@@ -450,6 +547,18 @@ export const analyticsEventListener: EventListener = async (event, ctx) => {
       break;
     case "EMAIL_OPENED":
       await trackEmailOpenedEvent(event, ctx);
+      break;
+    case "SIGNATURE_STARTED":
+      await trackSignatureStartedEvent(event, ctx);
+      break;
+    case "SIGNATURE_COMPLETED":
+      await trackSignatureCompletedEvent(event, ctx);
+      break;
+    case "SIGNATURE_REMINDER":
+      await trackSignatureReminderEvent(event, ctx);
+      break;
+    case "SIGNATURE_CANCELLED":
+      await trackSignatureCancelledEvent(event, ctx);
       break;
     default:
       throw new Error(`Tracking to analytics not implemented for event ${JSON.stringify(event)}`);

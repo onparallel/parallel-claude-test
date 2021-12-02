@@ -1692,6 +1692,7 @@ export type PetitionEventType =
   | "REPLY_UPDATED"
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_REMINDER"
   | "SIGNATURE_STARTED"
   | "TEMPLATE_USED"
   | "USER_PERMISSION_ADDED"
@@ -2730,6 +2731,13 @@ export type SignatureOrgIntegration = OrgIntegration & {
 export type SignatureOrgIntegrationEnvironment = "DEMO" | "PRODUCTION";
 
 export type SignatureOrgIntegrationProvider = "SIGNATURIT";
+
+export type SignatureReminderEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
 
 export type SignatureStartedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];

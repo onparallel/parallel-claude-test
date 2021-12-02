@@ -2,7 +2,7 @@ import Analytics from "analytics-node";
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
-import { PetitionStatus, User } from "../db/__types";
+import { PetitionSignatureCancelReason, PetitionStatus, User } from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { titleize } from "../util/strings";
@@ -25,7 +25,11 @@ export type AnalyticsEventType =
   | "REMINDER_OPTED_OUT"
   | "FIRST_REPLY_CREATED"
   | "COMMENT_PUBLISHED"
-  | "EMAIL_OPENED";
+  | "EMAIL_OPENED"
+  | "SIGNATURE_SENT"
+  | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_REMINDER"
+  | "SIGNATURE_CANCELLED";
 
 export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User creates a petition/template from scratch */
@@ -148,6 +152,27 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     petition_id: number;
     user_agent: string;
   };
+  SIGNATURE_SENT: {
+    petition_id: number;
+    petition_signature_request_id: number;
+    test_mode: boolean;
+  };
+  SIGNATURE_COMPLETED: {
+    petition_id: number;
+    petition_signature_request_id: number;
+    test_mode: boolean;
+  };
+  SIGNATURE_REMINDER: {
+    petition_id: number;
+    petition_signature_request_id: number;
+    test_mode: boolean;
+  };
+  SIGNATURE_CANCELLED: {
+    petition_id: number;
+    petition_signature_request_id: number;
+    cancel_reason: PetitionSignatureCancelReason;
+    test_mode: boolean;
+  };
 }[TType];
 
 export type GenericAnalyticsEvent<TType extends AnalyticsEventType> = {
@@ -174,7 +199,11 @@ export type AnalyticsEvent =
   | GenericAnalyticsEvent<"REMINDER_OPTED_OUT">
   | GenericAnalyticsEvent<"FIRST_REPLY_CREATED">
   | GenericAnalyticsEvent<"COMMENT_PUBLISHED">
-  | GenericAnalyticsEvent<"EMAIL_OPENED">;
+  | GenericAnalyticsEvent<"EMAIL_OPENED">
+  | GenericAnalyticsEvent<"SIGNATURE_SENT">
+  | GenericAnalyticsEvent<"SIGNATURE_COMPLETED">
+  | GenericAnalyticsEvent<"SIGNATURE_REMINDER">
+  | GenericAnalyticsEvent<"SIGNATURE_CANCELLED">;
 
 export const ANALYTICS = Symbol.for("ANALYTICS");
 

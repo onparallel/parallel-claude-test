@@ -231,13 +231,23 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
     }
     // make sure to only send reminders on pending signatures
     if (signature.status === "PROCESSING") {
-      await ctx.aws.enqueueMessages("signature-worker", {
-        groupId: `signature-${toGlobalId("Petition", petition.id)}`,
-        body: {
-          type: "send-signature-reminder",
-          payload: { petitionSignatureRequestId },
-        },
-      });
+      await Promise.all([
+        ctx.aws.enqueueMessages("signature-worker", {
+          groupId: `signature-${toGlobalId("Petition", petition.id)}`,
+          body: {
+            type: "send-signature-reminder",
+            payload: { petitionSignatureRequestId },
+          },
+        }),
+        ctx.petitions.createEvent({
+          type: "SIGNATURE_REMINDER",
+          petition_id: petition.id,
+          data: {
+            user_id: ctx.user!.id,
+            petition_signature_request_id: petitionSignatureRequestId,
+          },
+        }),
+      ]);
     }
     return RESULT.SUCCESS;
   },

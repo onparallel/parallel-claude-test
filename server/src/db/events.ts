@@ -106,6 +106,10 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_signature_request_id: number;
     file_upload_id: number;
   };
+  SIGNATURE_REMINDER: {
+    user_id: number; // id of the user that triggered the reminders
+    petition_signature_request_id: number;
+  };
   RECIPIENT_SIGNED: {
     petition_signature_request_id: number;
     signer: {
@@ -268,6 +272,10 @@ export type SignatureCancelledEvent<IsCreate extends boolean = false> = GenericP
   "SIGNATURE_CANCELLED",
   IsCreate
 >;
+export type SignatureReminderEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "SIGNATURE_REMINDER",
+  IsCreate
+>;
 export type TemplateUsedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
   "TEMPLATE_USED",
   IsCreate
@@ -332,6 +340,7 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | SignatureStartedEvent<IsCreate>
   | SignatureCompletedEvent<IsCreate>
   | SignatureCancelledEvent<IsCreate>
+  | SignatureReminderEvent<IsCreate>
   | TemplateUsedEvent<IsCreate>
   | PetitionClonedEvent<IsCreate>
   | PetitionDeletedEvent<IsCreate>
