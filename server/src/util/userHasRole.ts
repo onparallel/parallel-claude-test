@@ -1,7 +1,5 @@
-import { User, UserOrganizationRole, UserOrganizationRoleValues } from "../db/__types";
+import { User, UserOrganizationRole, UserOrganizationRoleValues as roles } from "../db/__types";
 
 export function userHasRole(user: Pick<User, "organization_role">, role: UserOrganizationRole) {
-  const roleIndex = UserOrganizationRoleValues.findIndex((r) => r === role);
-  const userRoleIndex = UserOrganizationRoleValues.findIndex((r) => r === user.organization_role);
-  return userRoleIndex >= roleIndex;
+  return roles.indexOf(user.organization_role) >= roles.indexOf(role);
 }
