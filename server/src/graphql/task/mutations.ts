@@ -35,8 +35,15 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
     petitionId: nonNull(globalIdArg("Petition")),
     pattern: nullable("String"),
   },
-  resolve: async (_, args, ctx) =>
-    await ctx.tasks.createTask(
+  resolve: async (_, args, ctx) => {
+    const petition = await ctx.petitions.loadPetition(args.petitionId);
+    if (petition?.status === "DRAFT") {
+      throw new WhitelistedError(
+        "You can't export the replies of a draft petition",
+        "EXPORT_DRAFT_PETITION_ERROR"
+      );
+    }
+    return await ctx.tasks.createTask(
       {
         name: "EXPORT_REPLIES",
         input: {
@@ -45,7 +52,8 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
         },
       },
       ctx.user!.id
-    ),
+    );
+  },
 });
 
 export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {

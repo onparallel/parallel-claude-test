@@ -5,7 +5,7 @@ import { isDefined, pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
 import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
-import { BadRequestError, ConflictError, HttpError, UnauthorizedError } from "../rest/errors";
+import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam, stringParam } from "../rest/params";
 import {
   Created,
@@ -935,7 +935,7 @@ api
   .get(
     {
       operationId: "ExportPetitionReplies",
-      summary: "Export the replies in the specified format",
+      summary: "Export the petition replies",
       description: outdent`
         Export the replies to a petition in the specified format.
 
@@ -963,6 +963,7 @@ api
       tags: ["Petitions"],
       responses: {
         302: RedirectResponse("Redirect to the resource on AWS S3"),
+        409: ErrorResponse({ description: "You can't export the replies of a draft petition" }),
         500: ErrorResponse({ description: "Error generating the file" }),
       },
     },
@@ -979,12 +980,25 @@ api
           }
           ${TaskFragment}
         `;
-        const result = await client.request(ExportPetitionReplies_createExportRepliesTaskDocument, {
-          petitionId: params.petitionId,
-        });
-        await waitForTask(client, result.createExportRepliesTask);
-        const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
-        return Redirect(url);
+        try {
+          const result = await client.request(
+            ExportPetitionReplies_createExportRepliesTaskDocument,
+            {
+              petitionId: params.petitionId,
+            }
+          );
+          await waitForTask(client, result.createExportRepliesTask);
+          const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
+          return Redirect(url);
+        } catch (error: any) {
+          if (
+            error instanceof ClientError &&
+            containsGraphQLError(error, "EXPORT_DRAFT_PETITION_ERROR")
+          ) {
+            throw new BadRequestError("You can't export the replies of a draft petition.");
+          }
+          throw error;
+        }
       } else if (query.format === "pdf") {
         const _mutation = gql`
           mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!) {

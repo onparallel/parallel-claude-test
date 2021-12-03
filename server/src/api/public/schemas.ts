@@ -393,6 +393,7 @@ const _Petition = {
       items: {
         type: "string",
       },
+      example: ["priority", "kyc"],
     },
   },
 } as const;
@@ -447,6 +448,7 @@ const _Template = {
       items: {
         type: "string",
       },
+      example: ["priority", "kyc"],
     },
   },
 } as const;
@@ -602,7 +604,7 @@ export const CreatePetition = schema({
     },
   },
 } as const);
-export const PaginatedTags = PaginatedListOf({ type: "string" });
+export const PaginatedTags = PaginatedListOf({ type: "string", example: ["kyc", "priority"] });
 export const PaginatedPetitions = PaginatedListOf(_Petition);
 export const PaginatedUsers = PaginatedListOf(_User);
 export const PetitionAccess = schema(_PetitionAccess);
