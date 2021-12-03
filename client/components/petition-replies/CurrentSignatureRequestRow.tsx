@@ -82,7 +82,7 @@ export function CurrentSignatureRequestRow({
         </Box>
       </Box>
       <Box padding={2} paddingRight={4}>
-        {isAwaitingSignature ? (
+        {status === "PROCESSING" ? (
           <>
             <IconButtonWithTooltip
               marginRight={2}

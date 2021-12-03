@@ -206,8 +206,8 @@
   },
   {
     "term": "greeting-reminder.informal",
-    "definition": "{name, select, null {🔔 ¡Hola!} other {🔔 ¡Hola, {name}!}}",
-    "context": "{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}"
+    "definition": "{name, select, null {¡Hola!} other {¡Hola, {name}!}}",
+    "context": "{name, select, null {Hello!} other {Hello {name}!}}"
   },
   {
     "term": "greeting-user",

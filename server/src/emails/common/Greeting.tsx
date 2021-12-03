@@ -68,7 +68,7 @@ export function GreetingReminder({
       {tone === "INFORMAL" ? (
         <FormattedMessage
           id="greeting-reminder.informal"
-          defaultMessage="{name, select, null {🔔 Hello!} other {🔔 Hello {name}!}}"
+          defaultMessage="{name, select, null {Hello!} other {Hello {name}!}}"
           values={{ name }}
         />
       ) : (
