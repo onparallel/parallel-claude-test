@@ -44,6 +44,13 @@ export class UnauthorizedError extends HttpError {
   }
 }
 
+export class InternalError extends HttpError {
+  static readonly code = "InternalError";
+  constructor(public message: string) {
+    super(500, InternalError.code, message);
+  }
+}
+
 export class UnknownError extends HttpError {
   static readonly code = "Unknown";
   constructor(public originalError: Error) {

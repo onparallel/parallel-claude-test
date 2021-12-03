@@ -37,7 +37,7 @@ export class UserAuthenticationRepository extends BaseRepository {
 
       if (!userId) return null;
 
-      const [user] = await this.from("user").where({ deleted_at: null, id: userId }).select();
+      const [user] = await this.from("user", t).where({ deleted_at: null, id: userId }).select();
 
       if (!user) {
         await t.rollback();

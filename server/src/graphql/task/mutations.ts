@@ -67,6 +67,7 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
 
       const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
       if (!file) {
+        // TODO: no tiene mucho sentido tirar un WhitelistedError aqui
         throw new WhitelistedError(
           `Temporary file not found for Task:${task.id} output`,
           "FILE_NOT_FOUND_ERROR"

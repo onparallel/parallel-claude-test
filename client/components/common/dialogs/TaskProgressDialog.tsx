@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { Button, Progress } from "@chakra-ui/react";
-import { DialogProps } from "@parallel/components/common/dialogs/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   TaskProgressDialog_TaskDocument,
   TaskProgressDialog_TaskFragment,
@@ -89,6 +89,7 @@ export function TaskProgressDialog({
     />
   );
 }
+
 TaskProgressDialog.fragments = {
   Task: gql`
     fragment TaskProgressDialog_Task on Task {
@@ -109,3 +110,7 @@ TaskProgressDialog.queries = [
     ${TaskProgressDialog.fragments.Task}
   `,
 ];
+
+export function useTaskProgressDialog() {
+  return useDialog(TaskProgressDialog);
+}

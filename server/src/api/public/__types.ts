@@ -1809,7 +1809,7 @@ export type PetitionFilter = {
   locale?: Maybe<PetitionLocale>;
   sharedWith?: Maybe<PetitionSharedWithFilter>;
   status?: Maybe<Array<PetitionStatus>>;
-  tagIds?: Maybe<Array<Scalars["ID"]>>;
+  tagIds?: Maybe<Array<Scalars["GID"]>>;
   type?: Maybe<PetitionBaseType>;
 };
 
@@ -3116,6 +3116,8 @@ export type PetitionFieldWithRepliesFragment = {
   }>;
 };
 
+export type TagFragment = { id: string; name: string };
+
 export type PetitionFragment = {
   id: string;
   name: string | null;
@@ -3162,6 +3164,7 @@ export type PetitionFragment = {
       updatedAt: string;
     }>;
   }>;
+  tags?: Array<{ id: string; name: string }>;
 };
 
 export type TemplateFragment = {
@@ -3178,6 +3181,7 @@ export type TemplateFragment = {
     fromPetitionFieldId: string | null;
     alias: string | null;
   }>;
+  tags?: Array<{ id: string; name: string }>;
 };
 
 export type Permission_PetitionUserGroupPermission_Fragment = {
@@ -3203,16 +3207,55 @@ export type SubscriptionFragment = {
   eventTypes: Array<PetitionEventType> | null;
 };
 
-export type GetPetitions_PetitionsQueryVariables = Exact<{
+export type TaskFragment = { id: string; progress: number | null; status: TaskStatus };
+
+export type getTags_tagsQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+}>;
+
+export type getTags_tagsQuery = {
+  tags: { totalCount: number; items: Array<{ id: string; name: string }> };
+};
+
+export type waitForTask_TaskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type waitForTask_TaskQuery = {
+  task: { id: string; progress: number | null; status: TaskStatus };
+};
+
+export type getTaskResultFileUrl_getTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type getTaskResultFileUrl_getTaskResultFileUrlMutation = {
+  getTaskResultFileUrl: { result: Result; url: string | null };
+};
+
+export type GetTags_tagsQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+}>;
+
+export type GetTags_tagsQuery = {
+  tags: { totalCount: number; items: Array<{ id: string; name: string }> };
+};
+
+export type GetPetitions_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   status?: Maybe<Array<PetitionStatus> | PetitionStatus>;
+  tagIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
+  includeTags: Scalars["Boolean"];
 }>;
 
-export type GetPetitions_PetitionsQuery = {
+export type GetPetitions_petitionsQuery = {
   petitions: {
     totalCount: number;
     items: Array<
@@ -3262,20 +3305,22 @@ export type GetPetitions_PetitionsQuery = {
               updatedAt: string;
             }>;
           }>;
+          tags?: Array<{ id: string; name: string }>;
         }
       | {}
     >;
   };
 };
 
-export type CreatePetition_PetitionMutationVariables = Exact<{
+export type CreatePetition_petitionMutationVariables = Exact<{
   name?: Maybe<Scalars["String"]>;
   templateId?: Maybe<Scalars["GID"]>;
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
+  includeTags: Scalars["Boolean"];
 }>;
 
-export type CreatePetition_PetitionMutation = {
+export type CreatePetition_petitionMutation = {
   createPetition:
     | {
         id: string;
@@ -3323,17 +3368,19 @@ export type CreatePetition_PetitionMutation = {
             updatedAt: string;
           }>;
         }>;
+        tags?: Array<{ id: string; name: string }>;
       }
     | {};
 };
 
-export type GetPetition_PetitionQueryVariables = Exact<{
+export type GetPetition_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
+  includeTags: Scalars["Boolean"];
 }>;
 
-export type GetPetition_PetitionQuery = {
+export type GetPetition_petitionQuery = {
   petition:
     | {
         id: string;
@@ -3381,6 +3428,7 @@ export type GetPetition_PetitionQuery = {
             updatedAt: string;
           }>;
         }>;
+        tags?: Array<{ id: string; name: string }>;
       }
     | {}
     | null;
@@ -3391,6 +3439,7 @@ export type UpdatePetition_updatePetitionMutationVariables = Exact<{
   data: UpdatePetitionInput;
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
+  includeTags: Scalars["Boolean"];
 }>;
 
 export type UpdatePetition_updatePetitionMutation = {
@@ -3441,6 +3490,7 @@ export type UpdatePetition_updatePetitionMutation = {
             updatedAt: string;
           }>;
         }>;
+        tags?: Array<{ id: string; name: string }>;
       }
     | {};
 };
@@ -3485,11 +3535,11 @@ export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation = 
   modifyPetitionCustomProperty: { id: string } | { id: string };
 };
 
-export type GetPetitionRecipients_PetitionAccessesQueryVariables = Exact<{
+export type GetPetitionRecipients_petitionAccessesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
-export type GetPetitionRecipients_PetitionAccessesQuery = {
+export type GetPetitionRecipients_petitionAccessesQuery = {
   petition:
     | {
         accesses: Array<{
@@ -3521,11 +3571,11 @@ export type GetPetitionRecipients_PetitionAccessesQuery = {
     | null;
 };
 
-export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
+export type CreatePetitionRecipients_contactQueryVariables = Exact<{
   email: Scalars["String"];
 }>;
 
-export type CreatePetitionRecipients_ContactQuery = {
+export type CreatePetitionRecipients_contactQuery = {
   contacts: Array<{ id: string; firstName: string | null; lastName: string | null } | null>;
 };
 
@@ -3580,11 +3630,11 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
   };
 };
 
-export type PetitionReplies_RepliesQueryVariables = Exact<{
+export type PetitionReplies_repliesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
-export type PetitionReplies_RepliesQuery = {
+export type PetitionReplies_repliesQuery = {
   petition:
     | {
         fields: Array<{
@@ -3628,11 +3678,28 @@ export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: { url: string | null };
 };
 
-export type GetPermissions_PermissionsQueryVariables = Exact<{
+export type ExportPetitionReplies_createExportRepliesTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  pattern?: Maybe<Scalars["String"]>;
+}>;
+
+export type ExportPetitionReplies_createExportRepliesTaskMutation = {
+  createExportRepliesTask: { id: string; progress: number | null; status: TaskStatus };
+};
+
+export type ExportPetitionReplies_createPrintPdfTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
-export type GetPermissions_PermissionsQuery = {
+export type ExportPetitionReplies_createPrintPdfTaskMutation = {
+  createPrintPdfTask: { id: string; progress: number | null; status: TaskStatus };
+};
+
+export type GetPermissions_permissionsQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type GetPermissions_permissionsQuery = {
   petition:
     | {
         permissions: Array<
@@ -3798,14 +3865,16 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
   >;
 };
 
-export type GetTemplates_TemplatesQueryVariables = Exact<{
+export type GetTemplates_templatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
+  tagIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   includeFields: Scalars["Boolean"];
+  includeTags: Scalars["Boolean"];
 }>;
 
-export type GetTemplates_TemplatesQuery = {
+export type GetTemplates_templatesQuery = {
   templates: {
     totalCount: number;
     items: Array<
@@ -3823,18 +3892,20 @@ export type GetTemplates_TemplatesQuery = {
             fromPetitionFieldId: string | null;
             alias: string | null;
           }>;
+          tags?: Array<{ id: string; name: string }>;
         }
       | {}
     >;
   };
 };
 
-export type GetTemplate_TemplateQueryVariables = Exact<{
+export type GetTemplate_templateQueryVariables = Exact<{
   templateId: Scalars["GID"];
   includeFields: Scalars["Boolean"];
+  includeTags: Scalars["Boolean"];
 }>;
 
-export type GetTemplate_TemplateQuery = {
+export type GetTemplate_templateQuery = {
   template:
     | {
         id: string;
@@ -3850,6 +3921,7 @@ export type GetTemplate_TemplateQuery = {
           fromPetitionFieldId: string | null;
           alias: string | null;
         }>;
+        tags?: Array<{ id: string; name: string }>;
       }
     | {}
     | null;
@@ -3862,13 +3934,13 @@ export type DeleteTemplate_deletePetitionsMutationVariables = Exact<{
 
 export type DeleteTemplate_deletePetitionsMutation = { deletePetitions: Result };
 
-export type GetContacts_ContactsQueryVariables = Exact<{
+export type GetContacts_contactsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   sortBy?: Maybe<Array<QueryContacts_OrderBy> | QueryContacts_OrderBy>;
 }>;
 
-export type GetContacts_ContactsQuery = {
+export type GetContacts_contactsQuery = {
   contacts: {
     totalCount: number;
     items: Array<{
@@ -3883,11 +3955,11 @@ export type GetContacts_ContactsQuery = {
   };
 };
 
-export type CreateContact_ContactMutationVariables = Exact<{
+export type CreateContact_contactMutationVariables = Exact<{
   data: CreateContactInput;
 }>;
 
-export type CreateContact_ContactMutation = {
+export type CreateContact_contactMutation = {
   createContact: {
     id: string;
     email: string;
@@ -3899,11 +3971,11 @@ export type CreateContact_ContactMutation = {
   };
 };
 
-export type GetContact_ContactQueryVariables = Exact<{
+export type GetContact_contactQueryVariables = Exact<{
   contactId: Scalars["GID"];
 }>;
 
-export type GetContact_ContactQuery = {
+export type GetContact_contactQuery = {
   contact: {
     id: string;
     email: string;
@@ -3915,13 +3987,13 @@ export type GetContact_ContactQuery = {
   } | null;
 };
 
-export type GetOrganizationUsers_UsersQueryVariables = Exact<{
+export type GetOrganizationUsers_usersQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   sortBy?: Maybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
 }>;
 
-export type GetOrganizationUsers_UsersQuery = {
+export type GetOrganizationUsers_usersQuery = {
   me: {
     organization: {
       users: {
@@ -3937,9 +4009,9 @@ export type GetOrganizationUsers_UsersQuery = {
   };
 };
 
-export type EventSubscriptions_GetSubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
+export type EventSubscriptions_getSubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type EventSubscriptions_GetSubscriptionsQuery = {
+export type EventSubscriptions_getSubscriptionsQuery = {
   subscriptions: Array<{
     id: string;
     eventsUrl: string;
@@ -3948,11 +4020,11 @@ export type EventSubscriptions_GetSubscriptionsQuery = {
   }>;
 };
 
-export type EventSubscriptions_CreateSubscriptionMutationVariables = Exact<{
+export type EventSubscriptions_createSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"];
 }>;
 
-export type EventSubscriptions_CreateSubscriptionMutation = {
+export type EventSubscriptions_createSubscriptionMutation = {
   createEventSubscription: {
     id: string;
     eventsUrl: string;
@@ -3961,11 +4033,11 @@ export type EventSubscriptions_CreateSubscriptionMutation = {
   };
 };
 
-export type EventSubscriptions_DeleteSubscriptionMutationVariables = Exact<{
+export type EventSubscriptions_deleteSubscriptionMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type EventSubscriptions_DeleteSubscriptionMutation = { deleteEventSubscriptions: Result };
+export type EventSubscriptions_deleteSubscriptionMutation = { deleteEventSubscriptions: Result };
 
 export const ContactFragmentDoc = gql`
   fragment Contact on Contact {
@@ -4032,6 +4104,12 @@ export const PetitionFieldWithRepliesFragmentDoc = gql`
   ${PetitionFieldFragmentDoc}
   ${PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionFieldWithRepliesFragment, unknown>;
+export const TagFragmentDoc = gql`
+  fragment Tag on Tag {
+    id
+    name
+  }
+` as unknown as DocumentNode<TagFragment, unknown>;
 export const PetitionFragmentDoc = gql`
   fragment Petition on Petition {
     id
@@ -4048,9 +4126,13 @@ export const PetitionFragmentDoc = gql`
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
     }
+    tags @include(if: $includeTags) {
+      ...Tag
+    }
   }
   ${PetitionAccessFragmentDoc}
   ${PetitionFieldWithRepliesFragmentDoc}
+  ${TagFragmentDoc}
 ` as unknown as DocumentNode<PetitionFragment, unknown>;
 export const TemplateFragmentDoc = gql`
   fragment Template on PetitionTemplate {
@@ -4063,8 +4145,12 @@ export const TemplateFragmentDoc = gql`
     fields @include(if: $includeFields) {
       ...PetitionField
     }
+    tags @include(if: $includeTags) {
+      ...Tag
+    }
   }
   ${PetitionFieldFragmentDoc}
+  ${TagFragmentDoc}
 ` as unknown as DocumentNode<TemplateFragment, unknown>;
 export const UserGroupFragmentDoc = gql`
   fragment UserGroup on UserGroup {
@@ -4098,20 +4184,70 @@ export const SubscriptionFragmentDoc = gql`
     eventTypes
   }
 ` as unknown as DocumentNode<SubscriptionFragment, unknown>;
-export const GetPetitions_PetitionsDocument = gql`
-  query GetPetitions_Petitions(
+export const TaskFragmentDoc = gql`
+  fragment Task on Task {
+    id
+    progress
+    status
+  }
+` as unknown as DocumentNode<TaskFragment, unknown>;
+export const getTags_tagsDocument = gql`
+  query getTags_tags($offset: Int!, $limit: Int!) {
+    tags(offset: $offset, limit: $limit) {
+      items {
+        ...Tag
+      }
+      totalCount
+    }
+  }
+  ${TagFragmentDoc}
+` as unknown as DocumentNode<getTags_tagsQuery, getTags_tagsQueryVariables>;
+export const waitForTask_TaskDocument = gql`
+  query waitForTask_Task($id: GID!) {
+    task(id: $id) {
+      ...Task
+    }
+  }
+  ${TaskFragmentDoc}
+` as unknown as DocumentNode<waitForTask_TaskQuery, waitForTask_TaskQueryVariables>;
+export const getTaskResultFileUrl_getTaskResultFileUrlDocument = gql`
+  mutation getTaskResultFileUrl_getTaskResultFileUrl($taskId: GID!) {
+    getTaskResultFileUrl(taskId: $taskId) {
+      result
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  getTaskResultFileUrl_getTaskResultFileUrlMutation,
+  getTaskResultFileUrl_getTaskResultFileUrlMutationVariables
+>;
+export const GetTags_tagsDocument = gql`
+  query GetTags_tags($offset: Int!, $limit: Int!, $search: String) {
+    tags(offset: $offset, limit: $limit, search: $search) {
+      items {
+        ...Tag
+      }
+      totalCount
+    }
+  }
+  ${TagFragmentDoc}
+` as unknown as DocumentNode<GetTags_tagsQuery, GetTags_tagsQueryVariables>;
+export const GetPetitions_petitionsDocument = gql`
+  query GetPetitions_petitions(
     $offset: Int!
     $limit: Int!
     $status: [PetitionStatus!]
+    $tagIds: [GID!]
     $sortBy: [QueryPetitions_OrderBy!]
     $includeRecipients: Boolean!
     $includeFields: Boolean!
+    $includeTags: Boolean!
   ) {
     petitions(
       offset: $offset
       limit: $limit
       sortBy: $sortBy
-      filters: { status: $status, type: PETITION }
+      filters: { status: $status, type: PETITION, tagIds: $tagIds }
     ) {
       items {
         ...Petition
@@ -4120,13 +4256,14 @@ export const GetPetitions_PetitionsDocument = gql`
     }
   }
   ${PetitionFragmentDoc}
-` as unknown as DocumentNode<GetPetitions_PetitionsQuery, GetPetitions_PetitionsQueryVariables>;
-export const CreatePetition_PetitionDocument = gql`
-  mutation CreatePetition_Petition(
+` as unknown as DocumentNode<GetPetitions_petitionsQuery, GetPetitions_petitionsQueryVariables>;
+export const CreatePetition_petitionDocument = gql`
+  mutation CreatePetition_petition(
     $name: String
     $templateId: GID
     $includeRecipients: Boolean!
     $includeFields: Boolean!
+    $includeTags: Boolean!
   ) {
     createPetition(name: $name, petitionId: $templateId) {
       ...Petition
@@ -4134,27 +4271,29 @@ export const CreatePetition_PetitionDocument = gql`
   }
   ${PetitionFragmentDoc}
 ` as unknown as DocumentNode<
-  CreatePetition_PetitionMutation,
-  CreatePetition_PetitionMutationVariables
+  CreatePetition_petitionMutation,
+  CreatePetition_petitionMutationVariables
 >;
-export const GetPetition_PetitionDocument = gql`
-  query GetPetition_Petition(
+export const GetPetition_petitionDocument = gql`
+  query GetPetition_petition(
     $petitionId: GID!
     $includeRecipients: Boolean!
     $includeFields: Boolean!
+    $includeTags: Boolean!
   ) {
     petition(id: $petitionId) {
       ...Petition
     }
   }
   ${PetitionFragmentDoc}
-` as unknown as DocumentNode<GetPetition_PetitionQuery, GetPetition_PetitionQueryVariables>;
+` as unknown as DocumentNode<GetPetition_petitionQuery, GetPetition_petitionQueryVariables>;
 export const UpdatePetition_updatePetitionDocument = gql`
   mutation UpdatePetition_updatePetition(
     $petitionId: GID!
     $data: UpdatePetitionInput!
     $includeRecipients: Boolean!
     $includeFields: Boolean!
+    $includeTags: Boolean!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...Petition
@@ -4211,8 +4350,8 @@ export const DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument =
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables
 >;
-export const GetPetitionRecipients_PetitionAccessesDocument = gql`
-  query GetPetitionRecipients_PetitionAccesses($petitionId: GID!) {
+export const GetPetitionRecipients_petitionAccessesDocument = gql`
+  query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
     petition(id: $petitionId) {
       ... on Petition {
         accesses {
@@ -4223,11 +4362,11 @@ export const GetPetitionRecipients_PetitionAccessesDocument = gql`
   }
   ${PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<
-  GetPetitionRecipients_PetitionAccessesQuery,
-  GetPetitionRecipients_PetitionAccessesQueryVariables
+  GetPetitionRecipients_petitionAccessesQuery,
+  GetPetitionRecipients_petitionAccessesQueryVariables
 >;
-export const CreatePetitionRecipients_ContactDocument = gql`
-  query CreatePetitionRecipients_Contact($email: String!) {
+export const CreatePetitionRecipients_contactDocument = gql`
+  query CreatePetitionRecipients_contact($email: String!) {
     contacts: contactsByEmail(emails: [$email]) {
       id
       firstName
@@ -4235,8 +4374,8 @@ export const CreatePetitionRecipients_ContactDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  CreatePetitionRecipients_ContactQuery,
-  CreatePetitionRecipients_ContactQueryVariables
+  CreatePetitionRecipients_contactQuery,
+  CreatePetitionRecipients_contactQueryVariables
 >;
 export const CreatePetitionRecipients_updateContactDocument = gql`
   mutation CreatePetitionRecipients_updateContact($contactId: GID!, $data: UpdateContactInput!) {
@@ -4285,8 +4424,8 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
   CreatePetitionRecipients_sendPetitionMutation,
   CreatePetitionRecipients_sendPetitionMutationVariables
 >;
-export const PetitionReplies_RepliesDocument = gql`
-  query PetitionReplies_Replies($petitionId: GID!) {
+export const PetitionReplies_repliesDocument = gql`
+  query PetitionReplies_replies($petitionId: GID!) {
     petition(id: $petitionId) {
       fields {
         ...PetitionFieldWithReplies
@@ -4294,7 +4433,7 @@ export const PetitionReplies_RepliesDocument = gql`
     }
   }
   ${PetitionFieldWithRepliesFragmentDoc}
-` as unknown as DocumentNode<PetitionReplies_RepliesQuery, PetitionReplies_RepliesQueryVariables>;
+` as unknown as DocumentNode<PetitionReplies_repliesQuery, PetitionReplies_repliesQueryVariables>;
 export const DownloadFileReply_fileUploadReplyDownloadLinkDocument = gql`
   mutation DownloadFileReply_fileUploadReplyDownloadLink($petitionId: GID!, $replyId: GID!) {
     fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
@@ -4305,8 +4444,30 @@ export const DownloadFileReply_fileUploadReplyDownloadLinkDocument = gql`
   DownloadFileReply_fileUploadReplyDownloadLinkMutation,
   DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables
 >;
-export const GetPermissions_PermissionsDocument = gql`
-  query GetPermissions_Permissions($petitionId: GID!) {
+export const ExportPetitionReplies_createExportRepliesTaskDocument = gql`
+  mutation ExportPetitionReplies_createExportRepliesTask($petitionId: GID!, $pattern: String) {
+    createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
+      ...Task
+    }
+  }
+  ${TaskFragmentDoc}
+` as unknown as DocumentNode<
+  ExportPetitionReplies_createExportRepliesTaskMutation,
+  ExportPetitionReplies_createExportRepliesTaskMutationVariables
+>;
+export const ExportPetitionReplies_createPrintPdfTaskDocument = gql`
+  mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!) {
+    createPrintPdfTask(petitionId: $petitionId) {
+      ...Task
+    }
+  }
+  ${TaskFragmentDoc}
+` as unknown as DocumentNode<
+  ExportPetitionReplies_createPrintPdfTaskMutation,
+  ExportPetitionReplies_createPrintPdfTaskMutationVariables
+>;
+export const GetPermissions_permissionsDocument = gql`
+  query GetPermissions_permissions($petitionId: GID!) {
     petition(id: $petitionId) {
       permissions {
         ...Permission
@@ -4315,8 +4476,8 @@ export const GetPermissions_PermissionsDocument = gql`
   }
   ${PermissionFragmentDoc}
 ` as unknown as DocumentNode<
-  GetPermissions_PermissionsQuery,
-  GetPermissions_PermissionsQueryVariables
+  GetPermissions_permissionsQuery,
+  GetPermissions_permissionsQueryVariables
 >;
 export const SharePetition_addPetitionPermissionDocument = gql`
   mutation SharePetition_addPetitionPermission(
@@ -4386,18 +4547,20 @@ export const TransferPetition_transferPetitionOwnershipDocument = gql`
   TransferPetition_transferPetitionOwnershipMutation,
   TransferPetition_transferPetitionOwnershipMutationVariables
 >;
-export const GetTemplates_TemplatesDocument = gql`
-  query GetTemplates_Templates(
+export const GetTemplates_templatesDocument = gql`
+  query GetTemplates_templates(
     $offset: Int!
     $limit: Int!
+    $tagIds: [GID!]
     $sortBy: [QueryPetitions_OrderBy!]
     $includeFields: Boolean!
+    $includeTags: Boolean!
   ) {
     templates: petitions(
       offset: $offset
       limit: $limit
       sortBy: $sortBy
-      filters: { type: TEMPLATE }
+      filters: { type: TEMPLATE, tagIds: $tagIds }
     ) {
       items {
         ...Template
@@ -4406,15 +4569,15 @@ export const GetTemplates_TemplatesDocument = gql`
     }
   }
   ${TemplateFragmentDoc}
-` as unknown as DocumentNode<GetTemplates_TemplatesQuery, GetTemplates_TemplatesQueryVariables>;
-export const GetTemplate_TemplateDocument = gql`
-  query GetTemplate_Template($templateId: GID!, $includeFields: Boolean!) {
+` as unknown as DocumentNode<GetTemplates_templatesQuery, GetTemplates_templatesQueryVariables>;
+export const GetTemplate_templateDocument = gql`
+  query GetTemplate_template($templateId: GID!, $includeFields: Boolean!, $includeTags: Boolean!) {
     template: petition(id: $templateId) {
       ...Template
     }
   }
   ${TemplateFragmentDoc}
-` as unknown as DocumentNode<GetTemplate_TemplateQuery, GetTemplate_TemplateQueryVariables>;
+` as unknown as DocumentNode<GetTemplate_templateQuery, GetTemplate_templateQueryVariables>;
 export const DeleteTemplate_deletePetitionsDocument = gql`
   mutation DeleteTemplate_deletePetitions($templateId: GID!, $force: Boolean!) {
     deletePetitions(ids: [$templateId], force: $force)
@@ -4423,8 +4586,8 @@ export const DeleteTemplate_deletePetitionsDocument = gql`
   DeleteTemplate_deletePetitionsMutation,
   DeleteTemplate_deletePetitionsMutationVariables
 >;
-export const GetContacts_ContactsDocument = gql`
-  query GetContacts_Contacts($offset: Int!, $limit: Int!, $sortBy: [QueryContacts_OrderBy!]) {
+export const GetContacts_contactsDocument = gql`
+  query GetContacts_contacts($offset: Int!, $limit: Int!, $sortBy: [QueryContacts_OrderBy!]) {
     contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
       items {
         ...Contact
@@ -4433,25 +4596,25 @@ export const GetContacts_ContactsDocument = gql`
     }
   }
   ${ContactFragmentDoc}
-` as unknown as DocumentNode<GetContacts_ContactsQuery, GetContacts_ContactsQueryVariables>;
-export const CreateContact_ContactDocument = gql`
-  mutation CreateContact_Contact($data: CreateContactInput!) {
+` as unknown as DocumentNode<GetContacts_contactsQuery, GetContacts_contactsQueryVariables>;
+export const CreateContact_contactDocument = gql`
+  mutation CreateContact_contact($data: CreateContactInput!) {
     createContact(data: $data) {
       ...Contact
     }
   }
   ${ContactFragmentDoc}
-` as unknown as DocumentNode<CreateContact_ContactMutation, CreateContact_ContactMutationVariables>;
-export const GetContact_ContactDocument = gql`
-  query GetContact_Contact($contactId: GID!) {
+` as unknown as DocumentNode<CreateContact_contactMutation, CreateContact_contactMutationVariables>;
+export const GetContact_contactDocument = gql`
+  query GetContact_contact($contactId: GID!) {
     contact(id: $contactId) {
       ...Contact
     }
   }
   ${ContactFragmentDoc}
-` as unknown as DocumentNode<GetContact_ContactQuery, GetContact_ContactQueryVariables>;
-export const GetOrganizationUsers_UsersDocument = gql`
-  query GetOrganizationUsers_Users(
+` as unknown as DocumentNode<GetContact_contactQuery, GetContact_contactQueryVariables>;
+export const GetOrganizationUsers_usersDocument = gql`
+  query GetOrganizationUsers_users(
     $offset: Int!
     $limit: Int!
     $sortBy: [OrganizationUsers_OrderBy!]
@@ -4469,36 +4632,36 @@ export const GetOrganizationUsers_UsersDocument = gql`
   }
   ${UserFragmentDoc}
 ` as unknown as DocumentNode<
-  GetOrganizationUsers_UsersQuery,
-  GetOrganizationUsers_UsersQueryVariables
+  GetOrganizationUsers_usersQuery,
+  GetOrganizationUsers_usersQueryVariables
 >;
-export const EventSubscriptions_GetSubscriptionsDocument = gql`
-  query EventSubscriptions_GetSubscriptions {
+export const EventSubscriptions_getSubscriptionsDocument = gql`
+  query EventSubscriptions_getSubscriptions {
     subscriptions {
       ...Subscription
     }
   }
   ${SubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
-  EventSubscriptions_GetSubscriptionsQuery,
-  EventSubscriptions_GetSubscriptionsQueryVariables
+  EventSubscriptions_getSubscriptionsQuery,
+  EventSubscriptions_getSubscriptionsQueryVariables
 >;
-export const EventSubscriptions_CreateSubscriptionDocument = gql`
-  mutation EventSubscriptions_CreateSubscription($eventsUrl: String!) {
+export const EventSubscriptions_createSubscriptionDocument = gql`
+  mutation EventSubscriptions_createSubscription($eventsUrl: String!) {
     createEventSubscription(eventsUrl: $eventsUrl) {
       ...Subscription
     }
   }
   ${SubscriptionFragmentDoc}
 ` as unknown as DocumentNode<
-  EventSubscriptions_CreateSubscriptionMutation,
-  EventSubscriptions_CreateSubscriptionMutationVariables
+  EventSubscriptions_createSubscriptionMutation,
+  EventSubscriptions_createSubscriptionMutationVariables
 >;
-export const EventSubscriptions_DeleteSubscriptionDocument = gql`
-  mutation EventSubscriptions_DeleteSubscription($ids: [GID!]!) {
+export const EventSubscriptions_deleteSubscriptionDocument = gql`
+  mutation EventSubscriptions_deleteSubscription($ids: [GID!]!) {
     deleteEventSubscriptions(ids: $ids)
   }
 ` as unknown as DocumentNode<
-  EventSubscriptions_DeleteSubscriptionMutation,
-  EventSubscriptions_DeleteSubscriptionMutationVariables
+  EventSubscriptions_deleteSubscriptionMutation,
+  EventSubscriptions_deleteSubscriptionMutationVariables
 >;

@@ -66,7 +66,7 @@ type PetitionFilter = {
   status?: PetitionStatus[] | null;
   locale?: PetitionLocale | null;
   type?: PetitionType | null;
-  tagIds?: string[] | null;
+  tagIds?: number[] | null;
   sharedWith?: PetitionSharedWithFilter | null;
 };
 
@@ -323,7 +323,7 @@ export class PetitionRepository extends BaseRepository {
               array_agg(distinct pt.tag_id) @>
                 array[${filters.tagIds.map(() => "?").join(", ")}]::int[]
             `,
-              filters.tagIds.map((id) => fromGlobalId(id, "Tag").id)
+              filters.tagIds
             );
           } else {
             q.havingRaw(/* sql */ `

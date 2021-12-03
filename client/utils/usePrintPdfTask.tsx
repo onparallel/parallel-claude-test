@@ -1,7 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
-import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { TaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
+import {
+  TaskProgressDialog,
+  useTaskProgressDialog,
+} from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   usePrintPdfTask_createPrintPdfTaskDocument,
   usePrintPdfTask_getTaskResultFileUrlDocument,
@@ -13,9 +15,9 @@ import { withError } from "./promises/withError";
 export function usePrintPdfTask() {
   const showError = useErrorDialog();
   const [createTask] = useMutation(usePrintPdfTask_createPrintPdfTaskDocument);
-  const [generateDownloadURL] = useMutation(usePrintPdfTask_getTaskResultFileUrlDocument);
+  const [generateDownloadUrl] = useMutation(usePrintPdfTask_getTaskResultFileUrlDocument);
 
-  const showTaskProgressDialog = useDialog(TaskProgressDialog);
+  const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
 
   return async (petitionId: string) => {
@@ -44,7 +46,7 @@ export function usePrintPdfTask() {
       });
     } else {
       openNewWindow(async () => {
-        const { data } = await generateDownloadURL({ variables: { taskId: finishedTask!.id } });
+        const { data } = await generateDownloadUrl({ variables: { taskId: finishedTask!.id } });
         if (data?.getTaskResultFileUrl.result !== "SUCCESS") {
           throw new Error();
         }

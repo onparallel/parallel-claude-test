@@ -380,12 +380,19 @@ const _Petition = {
     recipients: {
       description:
         "If parameter `include` contains `recipients`, this will be the list of recipients this petition has been sent to.",
-      ..._OrNull(_ListOf(_PetitionAccess)),
+      ..._ListOf(_PetitionAccess),
     },
     fields: {
       description:
         "If parameter `include` contains `fields`, this will be the list of the petition fields with their submitted replies.",
-      ..._OrNull(_ListOf(_PetitionFieldWithReplies)),
+      ..._ListOf(_PetitionFieldWithReplies),
+    },
+    tags: {
+      type: "array",
+      description: "List of tags of the petition",
+      items: {
+        type: "string",
+      },
     },
   },
 } as const;
@@ -432,7 +439,14 @@ const _Template = {
     fields: {
       description:
         "If parameter `include` contains `fields`, this will be the list of the petition fields.",
-      ..._OrNull(_ListOf(_PetitionField)),
+      ..._ListOf(_PetitionField),
+    },
+    tags: {
+      type: "array",
+      description: "List of tags of the template",
+      items: {
+        type: "string",
+      },
     },
   },
 } as const;
@@ -588,6 +602,7 @@ export const CreatePetition = schema({
     },
   },
 } as const);
+export const PaginatedTags = PaginatedListOf({ type: "string" });
 export const PaginatedPetitions = PaginatedListOf(_Petition);
 export const PaginatedUsers = PaginatedListOf(_User);
 export const PetitionAccess = schema(_PetitionAccess);

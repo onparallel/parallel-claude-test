@@ -5,7 +5,7 @@ import { isDefined, pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
 import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
-import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";
+import { BadRequestError, ConflictError, HttpError, UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam, stringParam } from "../rest/params";
 import {
   Created,
@@ -24,15 +24,20 @@ import {
   PetitionFieldWithRepliesFragment,
   PetitionFragment,
   SubscriptionFragment,
+  TaskFragment,
   TemplateFragment,
   UserFragment,
 } from "./fragments";
 import {
   containsGraphQLError,
+  getTags,
+  getTaskResultFileUrl,
   idParam,
-  mapPetitionFieldRepliesContent,
+  mapPetition,
+  mapTemplate,
   paginationParams,
   sortByParam,
+  waitForTask,
 } from "./helpers";
 import {
   AnyPetitionEvent,
@@ -47,6 +52,7 @@ import {
   ListOfSubscriptions,
   PaginatedContacts,
   PaginatedPetitions,
+  PaginatedTags,
   PaginatedTemplates,
   PaginatedUsers,
   Petition,
@@ -58,36 +64,40 @@ import {
   UpdatePetition,
 } from "./schemas";
 import {
-  CreateContact_ContactDocument,
+  CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-  CreatePetitionRecipients_ContactDocument,
+  CreatePetitionRecipients_contactDocument,
   CreatePetitionRecipients_createContactDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_updateContactDocument,
-  CreatePetition_PetitionDocument,
+  CreatePetition_petitionDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
   DeleteTemplate_deletePetitionsDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
-  EventSubscriptions_CreateSubscriptionDocument,
-  EventSubscriptions_DeleteSubscriptionDocument,
-  EventSubscriptions_GetSubscriptionsDocument,
-  GetContacts_ContactsDocument,
-  GetContact_ContactDocument,
-  GetOrganizationUsers_UsersDocument,
-  GetPermissions_PermissionsDocument,
-  GetPetitionRecipients_PetitionAccessesDocument,
-  GetPetitions_PetitionsDocument,
-  GetPetition_PetitionDocument,
-  GetTemplates_TemplatesDocument,
-  GetTemplate_TemplateDocument,
+  EventSubscriptions_createSubscriptionDocument,
+  EventSubscriptions_deleteSubscriptionDocument,
+  EventSubscriptions_getSubscriptionsDocument,
+  ExportPetitionReplies_createExportRepliesTaskDocument,
+  ExportPetitionReplies_createPrintPdfTaskDocument,
+  GetContacts_contactsDocument,
+  GetContact_contactDocument,
+  GetOrganizationUsers_usersDocument,
+  GetPermissions_permissionsDocument,
+  GetPetitionRecipients_petitionAccessesDocument,
+  GetPetitions_petitionsDocument,
+  GetPetition_petitionDocument,
+  GetTags_tagsDocument,
+  GetTemplates_templatesDocument,
+  GetTemplate_templateDocument,
   PetitionFragment as PetitionFragmentType,
-  PetitionReplies_RepliesDocument,
+  PetitionReplies_repliesDocument,
   ReadPetitionCustomPropertiesDocument,
   RemoveUserGroupPermission_removePetitionPermissionDocument,
   RemoveUserPermission_removePetitionPermissionDocument,
   SharePetition_addPetitionPermissionDocument,
   StopSharing_removePetitionPermissionDocument,
+  TagFragmentDoc,
   TemplateFragment as TemplateFragmentType,
   TransferPetition_transferPetitionOwnershipDocument,
   UpdatePetition_updatePetitionDocument,
@@ -134,7 +144,15 @@ export const api = new RestApi({
   "x-tagGroups": [
     {
       name: "Endpoints",
-      tags: ["Petitions", "Petition Sharing", "Templates", "Contacts", "Users", "Subscriptions"],
+      tags: [
+        "Petitions",
+        "Petition Sharing",
+        "Templates",
+        "Tags",
+        "Contacts",
+        "Users",
+        "Subscriptions",
+      ],
     },
     { name: "Events", tags: ["Petition Event"] },
   ],
@@ -150,6 +168,10 @@ export const api = new RestApi({
     {
       name: "Templates",
       description: "Use templates to quickly create new petitions for repetitive workflows",
+    },
+    {
+      name: "Tags",
+      description: "Use tags to organize your templates and petitions so you can find them faster",
     },
     {
       name: "Contacts",
@@ -201,9 +223,46 @@ const petitionIncludeParam = {
     description: "Include optional fields in the response",
     array: true,
     required: false,
-    values: ["recipients", "fields"],
+    values: ["recipients", "fields", "tags"],
   }),
 };
+
+api.path("/tags").get(
+  {
+    operationId: "GetTags",
+    summary: "Get tags list",
+    description: outdent`
+      Returns a paginated list of all tags in the organization.
+    `,
+    responses: {
+      200: SuccessResponse(PaginatedTags),
+    },
+    query: {
+      ...paginationParams(),
+      search: stringParam({
+        description: "Search tags by name",
+        required: false,
+      }),
+    },
+    tags: ["Tags"],
+  },
+  async ({ client, query }) => {
+    const _query = gql`
+      query GetTags_tags($offset: Int!, $limit: Int!, $search: String) {
+        tags(offset: $offset, limit: $limit, search: $search) {
+          items {
+            ...Tag
+          }
+          totalCount
+        }
+      }
+      ${TagFragmentDoc}
+    `;
+    const result = await client.request(GetTags_tagsDocument, query);
+    const { items, totalCount } = result.tags;
+    return Ok({ items: items.map((t) => t.name), totalCount });
+  }
+);
 
 api
   .path("/petitions")
@@ -222,26 +281,47 @@ api
           required: false,
           values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
         }),
+        tags: stringParam({
+          description: "List of tags to filter by",
+          example: "todo,assigned",
+          required: false,
+          array: true,
+        }),
         ...petitionIncludeParam,
       },
       responses: { 200: SuccessResponse(PaginatedPetitions) },
       tags: ["Petitions"],
     },
     async ({ client, query }) => {
+      let tagIds: string[] | undefined = undefined;
+      if (isDefined(query.tags)) {
+        if (query.tags.length > 0) {
+          const allTags = await getTags(client);
+          const tags = query.tags.map((tagName) => allTags.find((t) => t.name === tagName));
+          if (tags.some((t) => !isDefined(t))) {
+            return Ok({ totalCount: 0, items: [] });
+          }
+          tagIds = tags.map((t) => t!.id);
+        } else {
+          tagIds = [];
+        }
+      }
       const _query = gql`
-        query GetPetitions_Petitions(
+        query GetPetitions_petitions(
           $offset: Int!
           $limit: Int!
           $status: [PetitionStatus!]
+          $tagIds: [GID!]
           $sortBy: [QueryPetitions_OrderBy!]
           $includeRecipients: Boolean!
           $includeFields: Boolean!
+          $includeTags: Boolean!
         ) {
           petitions(
             offset: $offset
             limit: $limit
             sortBy: $sortBy
-            filters: { status: $status, type: PETITION }
+            filters: { status: $status, type: PETITION, tagIds: $tagIds }
           ) {
             items {
               ...Petition
@@ -251,14 +331,16 @@ api
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(GetPetitions_PetitionsDocument, {
+      const result = await client.request(GetPetitions_petitionsDocument, {
         ...pick(query, ["offset", "limit", "status", "sortBy"]),
+        tagIds,
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
+        includeTags: query.include?.includes("tags") ?? false,
       });
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
-      return Ok({ items: items.map((p) => mapPetitionFieldRepliesContent(p)), totalCount });
+      return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
     }
   )
   .post(
@@ -275,11 +357,12 @@ api
     },
     async ({ client, body, query }) => {
       const _mutation = gql`
-        mutation CreatePetition_Petition(
+        mutation CreatePetition_petition(
           $name: String
           $templateId: GID
           $includeRecipients: Boolean!
           $includeFields: Boolean!
+          $includeTags: Boolean!
         ) {
           createPetition(name: $name, petitionId: $templateId) {
             ...Petition
@@ -287,13 +370,14 @@ api
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(CreatePetition_PetitionDocument, {
+      const result = await client.request(CreatePetition_petitionDocument, {
         ...body,
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
+        includeTags: query.include?.includes("tags") ?? false,
       });
       assert("id" in result.createPetition);
-      return Created(mapPetitionFieldRepliesContent(result.createPetition));
+      return Created(mapPetition(result.createPetition));
     }
   );
 
@@ -319,10 +403,11 @@ api
     },
     async ({ client, params, query }) => {
       const _query = gql`
-        query GetPetition_Petition(
+        query GetPetition_petition(
           $petitionId: GID!
           $includeRecipients: Boolean!
           $includeFields: Boolean!
+          $includeTags: Boolean!
         ) {
           petition(id: $petitionId) {
             ...Petition
@@ -330,13 +415,14 @@ api
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(GetPetition_PetitionDocument, {
+      const result = await client.request(GetPetition_petitionDocument, {
         petitionId: params.petitionId,
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
+        includeTags: query.include?.includes("tags") ?? false,
       });
       assert("id" in result.petition!);
-      return Ok(mapPetitionFieldRepliesContent(result.petition!));
+      return Ok(mapPetition(result.petition!));
     }
   )
   .put(
@@ -360,6 +446,7 @@ api
           $data: UpdatePetitionInput!
           $includeRecipients: Boolean!
           $includeFields: Boolean!
+          $includeTags: Boolean!
         ) {
           updatePetition(petitionId: $petitionId, data: $data) {
             ...Petition
@@ -372,9 +459,10 @@ api
         data: body,
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
+        includeTags: query.include?.includes("tags") ?? false,
       });
       assert("id" in result.updatePetition!);
-      return Ok(mapPetitionFieldRepliesContent(result.updatePetition!));
+      return Ok(mapPetition(result.updatePetition!));
     }
   )
   .delete(
@@ -561,7 +649,7 @@ api
     },
     async ({ client, params }) => {
       const _query = gql`
-        query GetPetitionRecipients_PetitionAccesses($petitionId: GID!) {
+        query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
           petition(id: $petitionId) {
             ... on Petition {
               accesses {
@@ -572,7 +660,7 @@ api
         }
         ${PetitionAccessFragment}
       `;
-      const result = await client.request(GetPetitionRecipients_PetitionAccessesDocument, {
+      const result = await client.request(GetPetitionRecipients_petitionAccessesDocument, {
         petitionId: params.petitionId,
       });
       assert("accesses" in result.petition!);
@@ -639,7 +727,7 @@ api
           } else {
             const { email, ...data } = item;
             const _query = gql`
-              query CreatePetitionRecipients_Contact($email: String!) {
+              query CreatePetitionRecipients_contact($email: String!) {
                 contacts: contactsByEmail(emails: [$email]) {
                   id
                   firstName
@@ -647,7 +735,7 @@ api
                 }
               }
             `;
-            const result = await client.request(CreatePetitionRecipients_ContactDocument, {
+            const result = await client.request(CreatePetitionRecipients_contactDocument, {
               email,
             });
             const contact = result.contacts[0];
@@ -759,7 +847,7 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
   },
   async ({ client, params }) => {
     const _query = gql`
-      query PetitionReplies_Replies($petitionId: GID!) {
+      query PetitionReplies_replies($petitionId: GID!) {
         petition(id: $petitionId) {
           fields {
             ...PetitionFieldWithReplies
@@ -768,11 +856,11 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
       }
       ${PetitionFieldWithRepliesFragment}
     `;
-    const result = await client.request(PetitionReplies_RepliesDocument, {
+    const result = await client.request(PetitionReplies_repliesDocument, {
       petitionId: params.petitionId,
     });
 
-    return Ok(mapPetitionFieldRepliesContent(result.petition!).fields);
+    return Ok(mapPetition(result.petition!).fields);
   }
 );
 
@@ -841,6 +929,84 @@ api
   );
 
 api
+  .path("/petitions/:petitionId/export", {
+    params: { petitionId },
+  })
+  .get(
+    {
+      operationId: "ExportPetitionReplies",
+      summary: "Export the replies in the specified format",
+      description: outdent`
+        Export the replies to a petition in the specified format.
+
+        ### Important
+        Note that *there will be a redirect* to a temporary download endpoint on
+        AWS S3 so make sure to configure your HTTP client to follow redirects.
+
+        For example if you were to use curl you would need to provide the
+        \`-L\` flag, e.g.:
+
+        ~~~bash
+        curl -s -L -XGET \\
+          -H 'Authorization: Bearer <your API token>' \\
+          'http://www.onparallel.com/api/v1/petitions/{petitionId}/export?format=pdf' \\
+          > image.png
+        ~~~
+      `,
+      query: {
+        format: enumParam({
+          values: ["pdf", "zip"],
+          required: true,
+          description: "The format of the export.",
+        }),
+      },
+      tags: ["Petitions"],
+      responses: {
+        302: RedirectResponse("Redirect to the resource on AWS S3"),
+        500: ErrorResponse({ description: "Error generating the file" }),
+      },
+    },
+    async ({ client, params, query }) => {
+      if (query.format === "zip") {
+        const _mutation = gql`
+          mutation ExportPetitionReplies_createExportRepliesTask(
+            $petitionId: GID!
+            $pattern: String
+          ) {
+            createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
+              ...Task
+            }
+          }
+          ${TaskFragment}
+        `;
+        const result = await client.request(ExportPetitionReplies_createExportRepliesTaskDocument, {
+          petitionId: params.petitionId,
+        });
+        await waitForTask(client, result.createExportRepliesTask);
+        const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
+        return Redirect(url);
+      } else if (query.format === "pdf") {
+        const _mutation = gql`
+          mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!) {
+            createPrintPdfTask(petitionId: $petitionId) {
+              ...Task
+            }
+          }
+          ${TaskFragment}
+        `;
+        const result = await client.request(ExportPetitionReplies_createPrintPdfTaskDocument, {
+          petitionId: params.petitionId,
+        });
+        await waitForTask(client, result.createPrintPdfTask);
+        const url = await getTaskResultFileUrl(client, result.createPrintPdfTask);
+        return Redirect(url);
+      } else {
+        return null as never;
+      }
+    }
+  );
+
+api
   .path("/petitions/:petitionId/permissions", { params: { petitionId } })
   .get(
     {
@@ -854,7 +1020,7 @@ api
     },
     async ({ client, params }) => {
       const _query = gql`
-        query GetPermissions_Permissions($petitionId: GID!) {
+        query GetPermissions_permissions($petitionId: GID!) {
           petition(id: $petitionId) {
             permissions {
               ...Permission
@@ -863,7 +1029,7 @@ api
         }
         ${PermissionFragment}
       `;
-      const result = await client.request(GetPermissions_PermissionsDocument, params);
+      const result = await client.request(GetPermissions_permissionsDocument, params);
 
       return Ok(result.petition!.permissions);
     }
@@ -1052,7 +1218,7 @@ const templateIncludeParam = {
     description: "Include optional fields in the response",
     array: true,
     required: false,
-    values: ["fields"],
+    values: ["fields", "tags"],
   }),
 };
 
@@ -1067,23 +1233,44 @@ api.path("/templates").get(
       ...paginationParams(),
       ...sortByParam(["createdAt", "name", "lastUsedAt"]),
       ...templateIncludeParam,
+      tags: stringParam({
+        description: "List of tags to filter by",
+        example: "todo,assigned",
+        required: false,
+        array: true,
+      }),
     },
     responses: { 200: SuccessResponse(PaginatedTemplates) },
     tags: ["Templates"],
   },
   async ({ client, query }) => {
+    let tagIds: string[] | undefined = undefined;
+    if (isDefined(query.tags)) {
+      if (query.tags.length > 0) {
+        const allTags = await getTags(client);
+        const tags = query.tags.map((tagName) => allTags.find((t) => t.name === tagName));
+        if (tags.some((t) => !isDefined(t))) {
+          return Ok({ totalCount: 0, items: [] });
+        }
+        tagIds = tags.map((t) => t!.id);
+      } else {
+        tagIds = [];
+      }
+    }
     const _query = gql`
-      query GetTemplates_Templates(
+      query GetTemplates_templates(
         $offset: Int!
         $limit: Int!
+        $tagIds: [GID!]
         $sortBy: [QueryPetitions_OrderBy!]
         $includeFields: Boolean!
+        $includeTags: Boolean!
       ) {
         templates: petitions(
           offset: $offset
           limit: $limit
           sortBy: $sortBy
-          filters: { type: TEMPLATE }
+          filters: { type: TEMPLATE, tagIds: $tagIds }
         ) {
           items {
             ...Template
@@ -1093,13 +1280,15 @@ api.path("/templates").get(
       }
       ${TemplateFragment}
     `;
-    const result = await client.request(GetTemplates_TemplatesDocument, {
+    const result = await client.request(GetTemplates_templatesDocument, {
       ...pick(query, ["offset", "limit", "sortBy"]),
+      tagIds,
       includeFields: query.include?.includes("fields") ?? false,
+      includeTags: query.include?.includes("tags") ?? false,
     });
     const { items, totalCount } = result.templates;
     assertType<TemplateFragmentType[]>(items);
-    return Ok({ items, totalCount });
+    return Ok({ items: items.map((t) => mapTemplate(t)), totalCount });
   }
 );
 
@@ -1127,19 +1316,24 @@ api
     },
     async ({ client, params, query }) => {
       const _query = gql`
-        query GetTemplate_Template($templateId: GID!, $includeFields: Boolean!) {
+        query GetTemplate_template(
+          $templateId: GID!
+          $includeFields: Boolean!
+          $includeTags: Boolean!
+        ) {
           template: petition(id: $templateId) {
             ...Template
           }
         }
         ${TemplateFragment}
       `;
-      const result = await client.request(GetTemplate_TemplateDocument, {
+      const result = await client.request(GetTemplate_templateDocument, {
         templateId: params.templateId,
         includeFields: query.include?.includes("fields") ?? false,
+        includeTags: query.include?.includes("tags") ?? false,
       });
       assert("id" in result.template!);
-      return Ok(result.template!);
+      return Ok(mapTemplate(result.template!));
     }
   )
   .delete(
@@ -1293,7 +1487,7 @@ api
     },
     async ({ client, query }) => {
       const _query = gql`
-        query GetContacts_Contacts($offset: Int!, $limit: Int!, $sortBy: [QueryContacts_OrderBy!]) {
+        query GetContacts_contacts($offset: Int!, $limit: Int!, $sortBy: [QueryContacts_OrderBy!]) {
           contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
             items {
               ...Contact
@@ -1303,7 +1497,7 @@ api
         }
         ${ContactFragment}
       `;
-      const result = await client.request(GetContacts_ContactsDocument, query);
+      const result = await client.request(GetContacts_contactsDocument, query);
       return Ok(result.contacts);
     }
   )
@@ -1326,14 +1520,14 @@ api
     async ({ client, body }) => {
       try {
         const _mutation = gql`
-          mutation CreateContact_Contact($data: CreateContactInput!) {
+          mutation CreateContact_contact($data: CreateContactInput!) {
             createContact(data: $data) {
               ...Contact
             }
           }
           ${ContactFragment}
         `;
-        const result = await client.request(CreateContact_ContactDocument, { data: body });
+        const result = await client.request(CreateContact_contactDocument, { data: body });
         return Created(result.createContact!);
       } catch (error: any) {
         if (error instanceof ClientError && containsGraphQLError(error, "EXISTING_CONTACT")) {
@@ -1365,14 +1559,14 @@ api
     },
     async ({ client, params }) => {
       const _query = gql`
-        query GetContact_Contact($contactId: GID!) {
+        query GetContact_contact($contactId: GID!) {
           contact(id: $contactId) {
             ...Contact
           }
         }
         ${ContactFragment}
       `;
-      const result = await client.request(GetContact_ContactDocument, {
+      const result = await client.request(GetContact_contactDocument, {
         contactId: params.contactId,
       });
       return Ok(result.contact!);
@@ -1395,7 +1589,7 @@ api.path("/users").get(
   },
   async ({ client, query }) => {
     const _query = gql`
-      query GetOrganizationUsers_Users(
+      query GetOrganizationUsers_users(
         $offset: Int!
         $limit: Int!
         $sortBy: [OrganizationUsers_OrderBy!]
@@ -1413,7 +1607,7 @@ api.path("/users").get(
       }
       ${UserFragment}
     `;
-    const result = await client.request(GetOrganizationUsers_UsersDocument, query);
+    const result = await client.request(GetOrganizationUsers_usersDocument, query);
     return Ok(result.me.organization.users);
   }
 );
@@ -1435,14 +1629,14 @@ api
     },
     async ({ client }) => {
       const _query = gql`
-        query EventSubscriptions_GetSubscriptions {
+        query EventSubscriptions_getSubscriptions {
           subscriptions {
             ...Subscription
           }
         }
         ${SubscriptionFragment}
       `;
-      const result = await client.request(EventSubscriptions_GetSubscriptionsDocument);
+      const result = await client.request(EventSubscriptions_getSubscriptionsDocument);
 
       return Ok(result.subscriptions);
     }
@@ -1463,14 +1657,14 @@ api
     async ({ client, body }) => {
       try {
         const _mutation = gql`
-          mutation EventSubscriptions_CreateSubscription($eventsUrl: String!) {
+          mutation EventSubscriptions_createSubscription($eventsUrl: String!) {
             createEventSubscription(eventsUrl: $eventsUrl) {
               ...Subscription
             }
           }
           ${SubscriptionFragment}
         `;
-        const result = await client.request(EventSubscriptions_CreateSubscriptionDocument, body);
+        const result = await client.request(EventSubscriptions_createSubscriptionDocument, body);
 
         assert("id" in result.createEventSubscription);
         return Created(result.createEventSubscription);
@@ -1501,11 +1695,11 @@ api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delet
   },
   async ({ client, params }) => {
     const _mutation = gql`
-      mutation EventSubscriptions_DeleteSubscription($ids: [GID!]!) {
+      mutation EventSubscriptions_deleteSubscription($ids: [GID!]!) {
         deleteEventSubscriptions(ids: $ids)
       }
     `;
-    await client.request(EventSubscriptions_DeleteSubscriptionDocument, {
+    await client.request(EventSubscriptions_deleteSubscriptionDocument, {
       ids: [params.subscriptionId],
     });
     return NoContent();

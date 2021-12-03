@@ -1059,12 +1059,12 @@ export interface MutationrevokeUserAuthTokenArgs {
 }
 
 export interface MutationsendPetitionArgs {
-  body: Scalars["JSON"];
+  body?: InputMaybe<Scalars["JSON"]>;
   contactIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-  subject: Scalars["String"];
+  subject?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationsendPetitionClosedNotificationArgs {
@@ -1867,7 +1867,7 @@ export interface PetitionFilter {
   locale?: InputMaybe<PetitionLocale>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   status?: InputMaybe<Array<PetitionStatus>>;
-  tagIds?: InputMaybe<Array<Scalars["ID"]>>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
   type?: InputMaybe<PetitionBaseType>;
 }
 

@@ -1,7 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
-import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { TaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
+import {
+  TaskProgressDialog,
+  useTaskProgressDialog,
+} from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   useExportRepliesTask_createExportRepliesTaskDocument,
   useExportRepliesTask_getTaskResultFileUrlDocument,
@@ -15,7 +17,7 @@ export function useExportRepliesTask() {
   const showError = useErrorDialog();
   const [createTask] = useMutation(useExportRepliesTask_createExportRepliesTaskDocument);
   const [generateDownloadURL] = useMutation(useExportRepliesTask_getTaskResultFileUrlDocument);
-  const showTaskProgressDialog = useDialog(TaskProgressDialog);
+  const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
 
   return async (petitionId: string, pattern?: Maybe<string>) => {

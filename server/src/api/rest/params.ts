@@ -77,11 +77,15 @@ export function buildParse<
       return defaultValue;
     } else {
       if (array) {
-        return await Promise.all(
-          value.split(/(?<!\\),/).map(async (part) => {
-            return await parser(part.replace(/\\,/g, ","));
-          })
-        );
+        if (value === "") {
+          return [];
+        } else {
+          return await Promise.all(
+            value.split(/(?<!\\),/).map(async (part) => {
+              return await parser(part.replace(/\\,/g, ","));
+            })
+          );
+        }
       } else {
         return await parser(value);
       }

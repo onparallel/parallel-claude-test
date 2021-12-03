@@ -1,3 +1,4 @@
+import ASCIIFolder from "fold-to-ascii";
 import { decode } from "jsonwebtoken";
 import {
   arg,
@@ -10,8 +11,7 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { isDefined } from "remeda";
-import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
@@ -19,7 +19,6 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { petitionsArePublicTemplates, userHasAccessToPetitions } from "./authorizers";
 import { validateAuthTokenPayload, validatePublicPetitionLinkSlug } from "./validations";
-import ASCIIFolder from "fold-to-ascii";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -39,7 +38,7 @@ export const petitionsQuery = queryField((t) => {
           t.nullable.field("type", {
             type: "PetitionBaseType",
           });
-          t.nullable.list.nonNull.id("tagIds");
+          t.nullable.list.nonNull.globalId("tagIds", { prefixName: "Tag" });
           t.nullable.field("sharedWith", {
             type: inputObjectType({
               name: "PetitionSharedWithFilter",
@@ -78,11 +77,7 @@ export const petitionsQuery = queryField((t) => {
         if (filters.tagIds.length > 10) {
           throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
         }
-        const tagIds = fromGlobalIds(filters.tagIds, "Tag").ids;
-        if (tagIds.some((id) => !isDefined(id))) {
-          throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
-        }
-        const tags = await ctx.tags.loadTag(tagIds);
+        const tags = await ctx.tags.loadTag(filters.tagIds);
         if (!tags.every((tag) => tag?.organization_id === ctx.user!.org_id)) {
           throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
         }

@@ -78,6 +78,13 @@ export const PetitionFieldWithRepliesFragment = gql`
   ${PetitionFieldReplyFragment}
 `;
 
+export const PetitionTagFragment = gql`
+  fragment Tag on Tag {
+    id
+    name
+  }
+`;
+
 export const PetitionFragment = gql`
   fragment Petition on Petition {
     id
@@ -94,9 +101,13 @@ export const PetitionFragment = gql`
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
     }
+    tags @include(if: $includeTags) {
+      ...Tag
+    }
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}
+  ${PetitionTagFragment}
 `;
 
 export const TemplateFragment = gql`
@@ -110,8 +121,12 @@ export const TemplateFragment = gql`
     fields @include(if: $includeFields) {
       ...PetitionField
     }
+    tags @include(if: $includeTags) {
+      ...Tag
+    }
   }
   ${PetitionFieldFragment}
+  ${PetitionTagFragment}
 `;
 
 export const PermissionFragment = gql`
@@ -139,5 +154,13 @@ export const SubscriptionFragment = gql`
     eventsUrl
     isEnabled
     eventTypes
+  }
+`;
+
+export const TaskFragment = gql`
+  fragment Task on Task {
+    id
+    progress
+    status
   }
 `;

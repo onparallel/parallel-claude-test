@@ -100,7 +100,7 @@ export interface NexusGenInputs {
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     sharedWith?: NexusGenInputs["PetitionSharedWithFilter"] | null; // PetitionSharedWithFilter
     status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
-    tagIds?: string[] | null; // [ID!]
+    tagIds?: NexusGenScalars["GID"][] | null; // [GID!]
     type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
   };
   PetitionSharedWithFilter: {
