@@ -28,6 +28,8 @@ export function PetitionTemplateComposeMessageEditor({
 
   const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [onUpdatePetition]);
 
+  const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
+
   const handleSubjectChange = useCallback(
     (value: string) => {
       setSubject(value);
@@ -61,7 +63,7 @@ export function PetitionTemplateComposeMessageEditor({
           body={body}
           onSubjectChange={handleSubjectChange}
           onBodyChange={handleBodyChange}
-          isReadOnly={petition.isRestricted}
+          isReadOnly={petition.isRestricted || isPublicTemplate}
         />
       </Stack>
     </Card>
@@ -76,6 +78,7 @@ PetitionTemplateComposeMessageEditor.fragments = {
       emailBody
       description
       isRestricted
+      isPublic
     }
   `,
 };

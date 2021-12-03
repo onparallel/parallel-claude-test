@@ -571,7 +571,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   onFieldEdit={handleFieldEdit}
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
-                  isReadOnly={petition.isRestricted}
+                  isReadOnly={petition.isRestricted || isPublicTemplate}
                   hasDeveloperAccess={me.hasDeveloperAccess}
                 />
               ) : (
@@ -630,7 +630,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onUpdateFieldPositions={handleUpdateFieldPositions}
               onFieldEdit={handleFieldEdit}
               onFieldSettingsClick={handleFieldSettingsClick}
-              isReadOnly={petition.isRestricted}
+              isReadOnly={petition.isRestricted || isPublicTemplate}
               isPublicTemplate={isPublicTemplate}
             />
             {petition?.__typename === "PetitionTemplate" ? (
@@ -638,7 +638,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 marginTop="4"
                 description={petition.description}
                 onUpdatePetition={handleUpdatePetition}
-                isReadOnly={petition.isRestricted}
+                isReadOnly={petition.isRestricted || isPublicTemplate}
               />
             ) : null}
             {petition && petition.__typename === "Petition" ? (

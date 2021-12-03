@@ -107,6 +107,8 @@ function _PetitionSettings({
 
   const publicLink = petition.__typename === "PetitionTemplate" ? petition.publicLink : null;
 
+  const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
+
   const showSignatureConfigDialog = useSignatureConfigDialog();
   const showConfirmConfigureOngoingSignature = useDialog(ConfirmConfigureOngoingSignature);
   const showConfirmSignatureConfigChanged = useDialog(ConfirmSignatureConfigChanged);
@@ -391,7 +393,7 @@ function _PetitionSettings({
           name="petition-locale"
           value={petition.locale}
           onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-          isDisabled={petition.isRestricted}
+          isDisabled={petition.isRestricted || isPublicTemplate}
         >
           {locales.map((locale) => (
             <option key={locale.key} value={locale.key}>
@@ -422,6 +424,7 @@ function _PetitionSettings({
       <Stack spacing={2}>
         {petition.signatureConfig || hasSignature ? (
           <SwitchSetting
+            isDisabled={!hasSignature || isPublicTemplate}
             icon={<SignatureIcon />}
             label={
               <HStack>
@@ -439,7 +442,6 @@ function _PetitionSettings({
             }
             onChange={handleSignatureChange}
             isChecked={Boolean(petition.signatureConfig)}
-            isDisabled={!hasSignature}
             controlId="enable-esignature"
           >
             <Center>
@@ -455,7 +457,7 @@ function _PetitionSettings({
           </SwitchSetting>
         ) : null}
         <SwitchSetting
-          isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}
+          isDisabled={isPublicTemplate}
           icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
           label={
             <FormattedMessage
@@ -476,6 +478,7 @@ function _PetitionSettings({
 
         {petition.__typename === "PetitionTemplate" ? (
           <SwitchSetting
+            isDisabled={isPublicTemplate || petition.isRestricted}
             icon={<UserArrowIcon />}
             label={
               <FormattedMessage
@@ -505,6 +508,7 @@ function _PetitionSettings({
         ) : null}
         {petition.__typename === "PetitionTemplate" ? (
           <SwitchSetting
+            isDisabled={isPublicTemplate || petition.isRestricted}
             icon={<LinkIcon />}
             label={
               <FormattedMessage
@@ -530,13 +534,14 @@ function _PetitionSettings({
                 aria-label="public link settings"
                 onClick={handleEditPublicPetitionLink}
                 icon={<SettingsIcon boxSize={"1.125rem"} />}
+                isDisabled={isPublicTemplate || petition.isRestricted}
               />
             </HStack>
           </SwitchSetting>
         ) : null}
         {user.hasSkipForwardSecurity ? (
           <SwitchSetting
-            isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}
+            isDisabled={isPublicTemplate}
             icon={<ShieldIcon />}
             label={
               <FormattedMessage
@@ -557,7 +562,7 @@ function _PetitionSettings({
         ) : null}
         {user.hasHideRecipientViewContents ? (
           <SwitchSetting
-            isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}
+            isDisabled={isPublicTemplate}
             icon={<ListIcon />}
             label={
               <FormattedMessage
@@ -580,6 +585,7 @@ function _PetitionSettings({
         ) : null}
         {petition.__typename === "PetitionTemplate" ? (
           <SwitchSetting
+            isDisabled={isPublicTemplate}
             icon={<BellSettingsIcon />}
             label={
               <FormattedMessage
@@ -824,7 +830,11 @@ function SwitchSetting({
         }
         {...props}
       >
-        <Switch isChecked={isChecked} onChange={(e) => onChange(e.target.checked)} />
+        <Switch
+          isChecked={isChecked}
+          onChange={(e) => onChange(e.target.checked)}
+          isDisabled={props.isDisabled}
+        />
       </SettingsRow>
       {children ? (
         <Collapse in={isChecked}>

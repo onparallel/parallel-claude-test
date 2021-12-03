@@ -7550,6 +7550,7 @@ export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   emailBody?: any | null;
   description?: any | null;
   isRestricted: boolean;
+  isPublic: boolean;
 };
 
 export type CopySignatureConfigDialog_PetitionSignerFragment = {
@@ -17776,6 +17777,7 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
     emailBody
     description
     isRestricted
+    isPublic
   }
 ` as unknown as DocumentNode<PetitionTemplateComposeMessageEditor_PetitionFragment, unknown>;
 export const SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc = gql`
