@@ -4006,7 +4006,7 @@
   },
   {
     "term": "generic.incorrect-password",
-    "definition": "La constraseña no es correcta",
+    "definition": "La contraseña no es correcta",
     "context": "The password is incorrect"
   },
   {

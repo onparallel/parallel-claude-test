@@ -341,8 +341,9 @@ function _PetitionSettings({
         error.graphQLErrors[0]?.extensions?.code === "INVALID_PETITION_RESTRICTION_PASSWORD"
       ) {
         return false;
+      } else {
+        genericErrorToast();
       }
-      genericErrorToast();
       return false;
     }
   };
