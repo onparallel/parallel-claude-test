@@ -1087,7 +1087,7 @@
   {
     "term": "component.password-restrict-petition.body",
     "definition": "La edición está protegida. Introduce la contraseña para desbloquear la restricción.",
-    "context": "The edition is protected. Enter the password to unlock the restriction."
+    "context": "This petition is protected. Enter the password to unlock it."
   },
   {
     "term": "component.password-restrict-petition.title",

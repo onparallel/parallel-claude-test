@@ -37,6 +37,7 @@ import {
   PetitionSettings_updatePetitionRestrictionDocument,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
+  PetitionSettings_UserFragment,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
