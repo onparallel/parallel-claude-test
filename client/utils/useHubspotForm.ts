@@ -23,8 +23,11 @@ export function useHubspotForm(data: HubspotFormProps | null) {
     } else {
       const script = document.createElement("script");
       script.async = true;
-      script.src = "https://js.hsforms.net/forms/shell.js";
-      script.onload = () => hbspt!.forms.create(data);
+      script.src = "https://js.hsforms.net/forms/v2.js";
+      script.onload = () => {
+        hbspt!.forms.create(data);
+        console.log("create");
+      };
       document.head.appendChild(script);
     }
     // Hubspot expects jQuery when using onFormSubmit so we fake it out here

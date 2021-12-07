@@ -5,12 +5,13 @@ import { PublicContainer } from "@parallel/components/public/layout/PublicContai
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { useHubspotForm } from "@parallel/utils/useHubspotForm";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export default function BookDemo() {
   const intl = useIntl();
   const { locale } = useRouter();
-  useHubspotForm(
+  const launchForm = useHubspotForm(
     locale
       ? {
           target: "#form-container",
@@ -27,6 +28,9 @@ export default function BookDemo() {
         }
       : null
   );
+  useEffect(() => {
+    launchForm();
+  }, [launchForm]);
   return (
     <PublicLayout
       title={intl.formatMessage({

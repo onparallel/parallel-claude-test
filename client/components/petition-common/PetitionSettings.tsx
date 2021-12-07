@@ -32,13 +32,11 @@ import {
 import {
   PetitionSettings_cancelPetitionSignatureRequestDocument,
   PetitionSettings_createPublicPetitionLinkDocument,
-  PetitionSettings_PetitionBaseFragment,
   PetitionSettings_startPetitionSignatureRequestDocument,
   PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc,
   PetitionSettings_updatePetitionRestrictionDocument,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
-  PetitionSettings_UserFragment,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
@@ -59,9 +57,9 @@ import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
-import { usePasswordRestrictPetitionDialog } from "../petition-compose/dialogs/UnrestrictPetitionDialog";
 import { usePetitionDeadlineDialog } from "../petition-compose/dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "../petition-compose/dialogs/RestrictPetitionDialog";
+import { usePasswordRestrictPetitionDialog } from "../petition-compose/dialogs/UnrestrictPetitionDialog";
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
 import {
   PublicLinkSettingsDialog,
@@ -74,12 +72,12 @@ import {
 } from "./dialogs/TemplateDefaultPermissionsDialog";
 import { TestModeSignatureBadge } from "./TestModeSignatureBadge";
 
-export type PetitionSettingsProps = {
+export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
   petition: PetitionSettings_PetitionBaseFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   validPetitionFields: () => Promise<boolean>;
-};
+}
 
 function _PetitionSettings({
   user,
