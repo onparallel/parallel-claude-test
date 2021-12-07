@@ -2,8 +2,8 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Button,
   Container,
+  Flex,
   Grid,
-  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -15,6 +15,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  Text,
 } from "@chakra-ui/react";
 import { AddIcon, ChevronDownIcon, FileNewIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -196,18 +197,29 @@ function NewPetition() {
           <Stack
             direction="row"
             position="sticky"
-            top={0}
+            top={{ base: 0, md: 4 }}
             paddingTop={6}
             backgroundColor="gray.50"
-            spacing={4}
+            spacing={2}
             paddingX={6}
+            paddingBottom={1}
             zIndex={1}
           >
             <TabList flex="1">
-              <Tab borderTopRadius="md" height="40px" _selected={selectTabStyles}>
+              <Tab
+                borderTopRadius="md"
+                _selected={selectTabStyles}
+                whiteSpace="nowrap"
+                paddingX={3}
+              >
                 <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
               </Tab>
-              <Tab borderTopRadius="md" height="40px" _selected={selectTabStyles}>
+              <Tab
+                borderTopRadius="md"
+                _selected={selectTabStyles}
+                whiteSpace="nowrap"
+                paddingX={3}
+              >
                 <FormattedMessage
                   id="new-petition.public-templates"
                   defaultMessage="Public templates"
@@ -217,22 +229,25 @@ function NewPetition() {
             <Menu placement="bottom-end">
               <MenuButton
                 as={Button}
+                aria-label={intl.formatMessage({
+                  id: "new-petition.create",
+                  defaultMessage: "Create",
+                })}
+                padding={{ base: 0, md: 4 }}
                 alignSelf="flex-end"
-                leftIcon={<AddIcon fontSize="12px" />}
-                rightIcon={<ChevronDownIcon />}
                 colorScheme="purple"
-                display={{ base: "none", md: "flex" }}
                 isDisabled={me.role === "COLLABORATOR"}
               >
-                <FormattedMessage id="new-petition.create" defaultMessage="Create" />
+                <Flex alignItems="center" justifyContent="center">
+                  <AddIcon fontSize={{ base: "16px", md: "12px" }} />
+                  <Flex alignItems="center" marginLeft={2} display={{ base: "none", md: "flex" }}>
+                    <Text as="span">
+                      <FormattedMessage id="new-petition.create" defaultMessage="Create" />
+                    </Text>
+                    <ChevronDownIcon marginLeft={2} />
+                  </Flex>
+                </Flex>
               </MenuButton>
-              <MenuButton
-                as={IconButton}
-                alignSelf="flex-end"
-                icon={<AddIcon fontSize="12px" />}
-                colorScheme="purple"
-                display={{ base: "flex", md: "none" }}
-              />
               <Portal>
                 <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
                   <MenuItem
@@ -263,11 +278,10 @@ function NewPetition() {
                 direction={{ base: "column", md: "row" }}
                 spacing={2}
                 paddingX={6}
-                paddingTop={{ base: 4, md: 8 }}
-                paddingBottom={{ base: 4, md: 6 }}
+                paddingY={{ base: 4, md: 6 }}
                 position="sticky"
                 backgroundColor="gray.50"
-                top="74px"
+                top={{ base: "70px", md: "86px" }}
                 zIndex={1}
               >
                 <SearchInput
