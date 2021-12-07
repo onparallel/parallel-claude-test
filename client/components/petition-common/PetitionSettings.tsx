@@ -32,6 +32,7 @@ import {
 import {
   PetitionSettings_cancelPetitionSignatureRequestDocument,
   PetitionSettings_createPublicPetitionLinkDocument,
+  PetitionSettings_PetitionBaseFragment,
   PetitionSettings_startPetitionSignatureRequestDocument,
   PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc,
   PetitionSettings_updatePetitionRestrictionDocument,
