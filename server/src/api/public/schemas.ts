@@ -1213,6 +1213,21 @@ export const AnyPetitionEvent = {
         },
       },
     },
+    SIGNATURE_REMINDER: {
+      description: "A user sent a reminder email to the pending signers",
+      properties: {
+        userId: {
+          description: "The ID of the user that sent the reminder",
+          type: "string",
+          example: toGlobalId("User", 1),
+        },
+        petitionSignatureRequestId: {
+          description: "The ID of the eSignature request",
+          type: "string",
+          example: toGlobalId("PetitionSignatureRequest", 11),
+        },
+      },
+    },
     USER_PERMISSION_ADDED: {
       description: "The user shared their petition with another user",
       properties: {
