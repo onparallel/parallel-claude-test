@@ -26,7 +26,7 @@ import { unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
-import { random, hash } from "../../../util/token";
+import { hash, random } from "../../../util/token";
 import { userHasAccessToContactGroups, userHasAccessToContacts } from "../../contact/authorizers";
 import {
   and,
@@ -480,41 +480,40 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     isRestricted: nonNull(booleanArg()),
-    restrictedPassword: nullable(stringArg()),
+    password: nullable(stringArg()),
   },
-  resolve: async (_, args, ctx) => {
-    const data: Partial<CreatePetition> = {};
+  resolve: async (_, { petitionId, isRestricted, password }, ctx) => {
+    const { restricted_password_hash: passwordHash, restricted_password_salt: passwordSalt } =
+      (await ctx.petitions.loadPetition(petitionId))!;
 
-    const { petitionId, isRestricted, restrictedPassword } = args;
-
-    const p = await ctx.petitions.loadPetition(petitionId);
-
-    if (p?.restricted_password) {
-      const hashedPassword = restrictedPassword ? await hash(restrictedPassword, "") : null;
-
-      if (p?.restricted_password !== hashedPassword) {
-        throw new WhitelistedError(
-          "The petition is restricted with a password.",
-          "INVALID_PETITION_RESTRICTION_PASSWORD"
-        );
-      }
+    if (
+      isDefined(passwordHash) &&
+      (!isDefined(password) || passwordHash !== (await hash(password, passwordSalt!)))
+    ) {
+      throw new WhitelistedError(
+        "The petition is restricted with a password.",
+        "INVALID_PETITION_RESTRICTION_PASSWORD"
+      );
     }
 
+    let data: Partial<CreatePetition>;
     if (isRestricted) {
-      data.restricted_by_user_id = ctx.user!.id;
-      data.restricted_at = new Date();
-      data.restricted_password = restrictedPassword ? await hash(restrictedPassword, "") : null;
+      const salt = isDefined(password) ? random(10) : null;
+      data = {
+        restricted_by_user_id: ctx.user!.id,
+        restricted_at: new Date(),
+        restricted_password_hash: isDefined(password) ? await hash(password, salt!) : null,
+        restricted_password_salt: salt,
+      };
     } else {
-      data.restricted_by_user_id = null;
-      data.restricted_at = null;
-      data.restricted_password = null;
+      data = {
+        restricted_by_user_id: null,
+        restricted_at: null,
+        restricted_password_hash: null,
+        restricted_password_salt: null,
+      };
     }
-
-    const [petition] = await ctx.petitions.updatePetition(
-      args.petitionId,
-      data,
-      `User:${ctx.user!.id}`
-    );
+    const [petition] = await ctx.petitions.updatePetition(petitionId, data, `User:${ctx.user!.id}`);
     return petition;
   },
 });

@@ -1090,11 +1090,6 @@
     "context": "The edition is protected. Enter the password to unlock the restriction."
   },
   {
-    "term": "component.password-restrict-petition.password-error",
-    "definition": "Wrong password",
-    "context": "Wrong password"
-  },
-  {
     "term": "component.password-restrict-petition.title",
     "definition": "Password protection",
     "context": "Password protection"
@@ -4008,6 +4003,11 @@
     "term": "generic.inactive-user.tooltip",
     "definition": "This user is inactive",
     "context": "This user is inactive"
+  },
+  {
+    "term": "generic.incorrect-password",
+    "definition": "The password is incorrect",
+    "context": "The password is incorrect"
   },
   {
     "term": "generic.integration-name",

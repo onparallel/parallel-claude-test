@@ -1209,7 +1209,7 @@ export interface MutationupdatePetitionPermissionSubscriptionArgs {
 export interface MutationupdatePetitionRestrictionArgs {
   isRestricted: Scalars["Boolean"];
   petitionId: Scalars["GID"];
-  restrictedPassword?: InputMaybe<Scalars["String"]>;
+  password?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationupdatePetitionUserNotificationReadStatusArgs {
@@ -6558,7 +6558,7 @@ export type PetitionSettings_PetitionBaseFragment =
 export type PetitionSettings_updatePetitionRestrictionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   isRestricted: Scalars["Boolean"];
-  restrictedPassword?: InputMaybe<Scalars["String"]>;
+  password?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type PetitionSettings_updatePetitionRestrictionMutation = {
@@ -19132,12 +19132,12 @@ export const PetitionSettings_updatePetitionRestrictionDocument = gql`
   mutation PetitionSettings_updatePetitionRestriction(
     $petitionId: GID!
     $isRestricted: Boolean!
-    $restrictedPassword: String
+    $password: String
   ) {
     updatePetitionRestriction(
       petitionId: $petitionId
       isRestricted: $isRestricted
-      restrictedPassword: $restrictedPassword
+      password: $password
     ) {
       id
       isRestricted

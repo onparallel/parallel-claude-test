@@ -36,7 +36,6 @@ import {
   PetitionSettings_startPetitionSignatureRequestDocument,
   PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc,
   PetitionSettings_updatePetitionRestrictionDocument,
-  PetitionSettings_updatePetitionRestrictionMutationVariables,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
   PetitionSettings_UserFragment,
@@ -60,7 +59,7 @@ import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
-import { usePasswordRestrictPetitionDialog } from "../petition-compose/dialogs/PasswordRestrictPetitionDialog";
+import { usePasswordRestrictPetitionDialog } from "../petition-compose/dialogs/UnrestrictPetitionDialog";
 import { usePetitionDeadlineDialog } from "../petition-compose/dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "../petition-compose/dialogs/RestrictPetitionDialog";
 import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
@@ -326,49 +325,46 @@ function _PetitionSettings({
   const passwordRestrictPetitionDialog = usePasswordRestrictPetitionDialog();
   const genericErrorToast = useGenericErrorToast();
 
+  const handleUnrestrictPetition = async (password: string | null) => {
+    try {
+      await updatePetitionRestriction({
+        variables: {
+          petitionId: petition.id,
+          isRestricted: false,
+          password: password,
+        },
+      });
+      return true;
+    } catch (error) {
+      if (
+        isApolloError(error) &&
+        error.graphQLErrors[0]?.extensions?.code === "INVALID_PETITION_RESTRICTION_PASSWORD"
+      ) {
+        return false;
+      }
+      genericErrorToast();
+      return false;
+    }
+  };
   const handleRestrictPetition = async (value: boolean) => {
     try {
-      if (petition.isRestrictedWithPassword) {
-        const unrestrictProtectedPetition = async (password: string) => {
-          try {
-            await updatePetitionRestriction({
-              variables: {
-                petitionId: petition.id,
-                isRestricted: false,
-                restrictedPassword: password,
-              },
-            });
-
-            return true;
-          } catch (error) {
-            if (
-              isApolloError(error) &&
-              error.graphQLErrors[0]?.extensions?.code === "INVALID_PETITION_RESTRICTION_PASSWORD"
-            ) {
-              return false;
-            }
-            genericErrorToast();
-            return true;
-          }
-        };
-
-        await passwordRestrictPetitionDialog({
-          unrestrictProtectedPetition,
+      if (value) {
+        const { password } = await configRestrictPetitionDialog({});
+        await updatePetitionRestriction({
+          variables: {
+            petitionId: petition.id,
+            isRestricted: true,
+            password: password,
+          },
         });
       } else {
-        const variables: PetitionSettings_updatePetitionRestrictionMutationVariables = {
-          petitionId: petition.id,
-          isRestricted: value,
-        };
-
-        if (value) {
-          const { password } = await configRestrictPetitionDialog({});
-          variables.restrictedPassword = password;
+        if (petition.isRestrictedWithPassword) {
+          await passwordRestrictPetitionDialog({
+            onUnrestrictPetition: handleUnrestrictPetition,
+          });
+        } else {
+          await handleUnrestrictPetition(null);
         }
-
-        await updatePetitionRestriction({
-          variables,
-        });
       }
     } catch {}
   };
@@ -706,12 +702,12 @@ const mutations = [
     mutation PetitionSettings_updatePetitionRestriction(
       $petitionId: GID!
       $isRestricted: Boolean!
-      $restrictedPassword: String
+      $password: String
     ) {
       updatePetitionRestriction(
         petitionId: $petitionId
         isRestricted: $isRestricted
-        restrictedPassword: $restrictedPassword
+        password: $password
       ) {
         id
         isRestricted

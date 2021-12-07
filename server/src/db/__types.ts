@@ -651,10 +651,11 @@ export interface Petition {
   is_readonly: boolean; // bool
   public_metadata: Maybe<any>; // jsonb
   from_public_petition_link_id: Maybe<number>; // int4
+  custom_properties: any; // jsonb
   restricted_by_user_id: Maybe<number>; // int4
   restricted_at: Maybe<Date>; // timestamptz
-  restricted_password: Maybe<string>; // varchar
-  custom_properties: any; // jsonb
+  restricted_password_hash: Maybe<string>; // varchar
+  restricted_password_salt: Maybe<string>; // varchar
 }
 
 export type CreatePetition = PartialProps<
@@ -683,10 +684,11 @@ export type CreatePetition = PartialProps<
   | "is_readonly"
   | "public_metadata"
   | "from_public_petition_link_id"
+  | "custom_properties"
   | "restricted_by_user_id"
   | "restricted_at"
-  | "restricted_password"
-  | "custom_properties"
+  | "restricted_password_hash"
+  | "restricted_password_salt"
 >;
 
 export interface PetitionAccess {

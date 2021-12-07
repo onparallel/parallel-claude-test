@@ -152,7 +152,7 @@ export const PetitionBase = interfaceType({
       resolve: (o) => o.restricted_by_user_id !== null,
     });
     t.nonNull.boolean("isRestrictedWithPassword", {
-      resolve: (o) => o.restricted_password !== null,
+      resolve: (o) => o.restricted_password_hash !== null,
     });
     t.nullable.field("signatureConfig", {
       type: "SignatureConfig",

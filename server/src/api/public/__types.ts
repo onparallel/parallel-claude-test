@@ -1177,7 +1177,7 @@ export type MutationupdatePetitionPermissionSubscriptionArgs = {
 export type MutationupdatePetitionRestrictionArgs = {
   isRestricted: Scalars["Boolean"];
   petitionId: Scalars["GID"];
-  restrictedPassword?: Maybe<Scalars["String"]>;
+  password?: Maybe<Scalars["String"]>;
 };
 
 export type MutationupdatePetitionUserNotificationReadStatusArgs = {

@@ -3759,8 +3759,8 @@ export interface NexusGenArgTypes {
     updatePetitionRestriction: {
       // args
       isRestricted: boolean; // Boolean!
+      password?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
-      restrictedPassword?: string | null; // String
     };
     updatePetitionUserNotificationReadStatus: {
       // args

@@ -2557,11 +2557,11 @@ describe("GraphQL/Petitions", () => {
     it("should allow unrestrict petition without password", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $isRestricted: Boolean!, $restrictedPassword: String) {
+          mutation ($petitionId: GID!, $isRestricted: Boolean!, $password: String) {
             updatePetitionRestriction(
               petitionId: $petitionId
               isRestricted: $isRestricted
-              restrictedPassword: $restrictedPassword
+              password: $password
             ) {
               id
               isRestricted
@@ -2586,11 +2586,11 @@ describe("GraphQL/Petitions", () => {
     it("should allow restrict petition with password", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $isRestricted: Boolean!, $restrictedPassword: String) {
+          mutation ($petitionId: GID!, $isRestricted: Boolean!, $password: String) {
             updatePetitionRestriction(
               petitionId: $petitionId
               isRestricted: $isRestricted
-              restrictedPassword: $restrictedPassword
+              password: $password
             ) {
               id
               isRestricted
@@ -2602,7 +2602,7 @@ describe("GraphQL/Petitions", () => {
         variables: {
           petitionId: toGlobalId("Petition", readonlyPetition.id),
           isRestricted: true,
-          restrictedPassword: "password",
+          password: "password",
         },
       });
       expect(errors).toBeUndefined();
@@ -2616,11 +2616,11 @@ describe("GraphQL/Petitions", () => {
     it("should not allow unrestrict with wrong password", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $isRestricted: Boolean!, $restrictedPassword: String) {
+          mutation ($petitionId: GID!, $isRestricted: Boolean!, $password: String) {
             updatePetitionRestriction(
               petitionId: $petitionId
               isRestricted: $isRestricted
-              restrictedPassword: $restrictedPassword
+              password: $password
             ) {
               id
               isRestricted
@@ -2632,7 +2632,7 @@ describe("GraphQL/Petitions", () => {
         variables: {
           petitionId: toGlobalId("Petition", readonlyPetition.id),
           isRestricted: false,
-          restrictedPassword: "wrongPassword",
+          password: "wrongPassword",
         },
       });
       expect(errors).toContainGraphQLError("INVALID_PETITION_RESTRICTION_PASSWORD");
@@ -2642,11 +2642,11 @@ describe("GraphQL/Petitions", () => {
     it("should allow unrestrict with correct password", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $isRestricted: Boolean!, $restrictedPassword: String) {
+          mutation ($petitionId: GID!, $isRestricted: Boolean!, $password: String) {
             updatePetitionRestriction(
               petitionId: $petitionId
               isRestricted: $isRestricted
-              restrictedPassword: $restrictedPassword
+              password: $password
             ) {
               id
               isRestricted
@@ -2658,7 +2658,7 @@ describe("GraphQL/Petitions", () => {
         variables: {
           petitionId: toGlobalId("Petition", readonlyPetition.id),
           isRestricted: false,
-          restrictedPassword: "password",
+          password: "password",
         },
       });
       expect(errors).toBeUndefined();

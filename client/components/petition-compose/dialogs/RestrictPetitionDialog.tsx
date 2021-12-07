@@ -33,12 +33,10 @@ export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPet
     <ConfirmDialog
       initialFocusRef={passwordRef}
       header={
-        <Text>
-          <FormattedMessage
-            id="component.restrict-petition.title"
-            defaultMessage="Restrict editing"
-          />
-        </Text>
+        <FormattedMessage
+          id="component.restrict-petition.title"
+          defaultMessage="Restrict editing"
+        />
       }
       content={{
         as: "form",

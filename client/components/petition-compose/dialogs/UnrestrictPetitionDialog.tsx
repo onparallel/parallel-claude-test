@@ -9,14 +9,14 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
-export interface PasswordRestrictPetitionDialogProps {
-  unrestrictProtectedPetition: (args: string) => Promise<boolean>;
+interface UnrestrictPetitionDialogProps {
+  onUnrestrictPetition: (password: string) => Promise<boolean>;
 }
 
-export function PasswordRestrictPetitionDialog({
-  unrestrictProtectedPetition,
+export function UnrestrictPetitionDialog({
+  onUnrestrictPetition,
   ...props
-}: DialogProps<PasswordRestrictPetitionDialogProps, void>) {
+}: DialogProps<UnrestrictPetitionDialogProps>) {
   const {
     handleSubmit,
     register,
@@ -38,17 +38,15 @@ export function PasswordRestrictPetitionDialog({
     <ConfirmDialog
       initialFocusRef={passwordRef}
       header={
-        <Text>
-          <FormattedMessage
-            id="component.password-restrict-petition.title"
-            defaultMessage="Password protection"
-          />
-        </Text>
+        <FormattedMessage
+          id="component.password-restrict-petition.title"
+          defaultMessage="Password protection"
+        />
       }
       content={{
         as: "form",
         onSubmit: handleSubmit(async ({ password }) => {
-          if (await unrestrictProtectedPetition(password)) {
+          if (await onUnrestrictPetition(password)) {
             props.onResolve();
           } else {
             setError("password", { type: "invalid" });
@@ -60,7 +58,7 @@ export function PasswordRestrictPetitionDialog({
           <Text>
             <FormattedMessage
               id="component.password-restrict-petition.body"
-              defaultMessage="The edition is protected. Enter the password to unlock the restriction."
+              defaultMessage="This petition is protected. Enter the password to unlock it."
             />
           </Text>
           <FormControl id="password" isInvalid={!!errors.password}>
@@ -70,15 +68,15 @@ export function PasswordRestrictPetitionDialog({
             <PasswordInput {...passwordRegister} />
             <FormErrorMessage>
               <FormattedMessage
-                id="component.password-restrict-petition.password-error"
-                defaultMessage="Wrong password"
+                id="generic.incorrect-password"
+                defaultMessage="The password is incorrect"
               />
             </FormErrorMessage>
           </FormControl>
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
+        <Button type="submit" colorScheme="purple">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
@@ -88,5 +86,5 @@ export function PasswordRestrictPetitionDialog({
 }
 
 export function usePasswordRestrictPetitionDialog() {
-  return useDialog(PasswordRestrictPetitionDialog);
+  return useDialog(UnrestrictPetitionDialog);
 }
