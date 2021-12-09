@@ -5,12 +5,13 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { Maybe } from "@parallel/utils/types";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
 export interface RestrictPetitionDialogData {
-  password: string;
+  password: Maybe<string>;
 }
 
 export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPetitionDialogData>) {
@@ -42,7 +43,7 @@ export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPet
         as: "form",
         onSubmit: handleSubmit(({ password }) => {
           props.onResolve({
-            password,
+            password: password.length > 0 ? password : null,
           });
         }),
       }}
