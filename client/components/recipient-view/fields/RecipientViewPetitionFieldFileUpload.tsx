@@ -33,6 +33,7 @@ import { useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useLastSaved } from "../LastSavedProvider";
 import { useCreateFileUploadReply, useDeletePetitionReply } from "./mutations";
+import { RecipientViewPetitionFieldProps } from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -40,9 +41,10 @@ import {
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply"
-  > {
+      RecipientViewPetitionFieldCardProps,
+      "children" | "showAddNewReply" | "onAddNewReply"
+    >,
+    RecipientViewPetitionFieldProps {
   petitionId: string;
   isDisabled: boolean;
 }
@@ -50,12 +52,12 @@ export interface RecipientViewPetitionFieldFileUploadProps
 export function RecipientViewPetitionFieldFileUpload({
   petitionId,
   keycode,
-  access,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onCommentsButtonClick,
 }: RecipientViewPetitionFieldFileUploadProps) {
   const uploads = useRef<Record<string, XMLHttpRequest>>({});
 
@@ -100,11 +102,10 @@ export function RecipientViewPetitionFieldFileUpload({
 
   return (
     <RecipientViewPetitionFieldCard
-      keycode={keycode}
-      access={access}
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
     >
       {field.replies.length ? (

@@ -1,38 +1,21 @@
-import { Box, Flex, Heading, Stack, Text, HStack } from "@chakra-ui/react";
+import { Box, Flex, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { BreakLines } from "@parallel/components/common/BreakLines";
 import { Linkify } from "@parallel/components/common/Linkify";
-import {
-  RecipientViewPetitionFieldCard_PublicPetitionAccessFragment,
-  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
-} from "@parallel/graphql/__types";
+import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewFieldAttachment } from "./RecipientViewFieldAttachment";
-import { usePetitionFieldCommentsDialog } from "./RecipientViewPetitionFieldCommentsDialog";
 
 export interface RecipientViewPetitionFieldHeadingProps {
-  keycode: string;
-  access: RecipientViewPetitionFieldCard_PublicPetitionAccessFragment;
   field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
   onDownloadAttachment: (attachmentId: string) => void;
+  onCommentsButtonClick: () => Promise<void>;
 }
 
 export function RecipientViewPetitionFieldHeading({
-  keycode,
-  access,
   field,
   onDownloadAttachment,
+  onCommentsButtonClick,
 }: RecipientViewPetitionFieldHeadingProps) {
-  const showFieldComments = usePetitionFieldCommentsDialog();
-  async function handleCommentsButtonClick() {
-    try {
-      await showFieldComments({
-        keycode,
-        access,
-        field,
-      });
-    } catch {}
-  }
-
   return (
     <Stack as="header" id={`field-${field.id}`} spacing={1} paddingX={2} paddingY={2}>
       <HStack alignItems="flex-start">
@@ -42,7 +25,7 @@ export function RecipientViewPetitionFieldHeading({
             <CommentsButton
               commentCount={field.commentCount}
               hasUnreadComments={field.unreadCommentCount > 0}
-              onClick={handleCommentsButtonClick}
+              onClick={onCommentsButtonClick}
             />
           </Box>
         ) : null}

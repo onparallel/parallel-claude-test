@@ -23,6 +23,7 @@ import {
   useDeletePetitionReply,
   useUpdateDynamicSelectReply,
 } from "./mutations";
+import { RecipientViewPetitionFieldProps } from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -31,9 +32,10 @@ import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewP
 
 export interface RecipientViewPetitionFieldDynamicSelectProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply"
-  > {
+      RecipientViewPetitionFieldCardProps,
+      "children" | "showAddNewReply" | "onAddNewReply"
+    >,
+    RecipientViewPetitionFieldProps {
   petitionId: string;
   isDisabled: boolean;
 }
@@ -43,12 +45,12 @@ type SelectInstance = Select<{ label: string; value: string }, false, never>;
 export function RecipientViewPetitionFieldDynamicSelect({
   petitionId,
   keycode,
-  access,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onCommentsButtonClick,
 }: RecipientViewPetitionFieldDynamicSelectProps) {
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
@@ -109,11 +111,10 @@ export function RecipientViewPetitionFieldDynamicSelect({
 
   return (
     <RecipientViewPetitionFieldCard
-      keycode={keycode}
-      access={access}
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={showAddNewReply}
       addNewReplyIsDisabled={
         showNewReply || completedFieldReplies(field).length !== field.replies.length

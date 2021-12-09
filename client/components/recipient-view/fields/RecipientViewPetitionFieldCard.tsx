@@ -4,24 +4,16 @@ import { AddIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Linkify } from "@parallel/components/common/Linkify";
-import {
-  RecipientViewPetitionFieldCard_PublicPetitionAccessFragment,
-  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
-} from "@parallel/graphql/__types";
+import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewFieldAttachment } from "./RecipientViewFieldAttachment";
-import {
-  RecipientViewPetitionFieldCommentsDialog,
-  usePetitionFieldCommentsDialog,
-} from "./RecipientViewPetitionFieldCommentsDialog";
+import { RecipientViewPetitionFieldCommentsDialog } from "./RecipientViewPetitionFieldCommentsDialog";
 
 export interface RecipientViewPetitionFieldCardProps {
-  keycode: string;
-  access: RecipientViewPetitionFieldCard_PublicPetitionAccessFragment;
   field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
   isInvalid: boolean;
   hasCommentsEnabled: boolean;
@@ -30,12 +22,11 @@ export interface RecipientViewPetitionFieldCardProps {
   children: ReactNode;
   onAddNewReply?: () => void;
   onDownloadAttachment: (attachmentId: string) => void;
+  onCommentsButtonClick?: () => void;
 }
 
 export function RecipientViewPetitionFieldCard({
-  keycode,
   field,
-  access,
   isInvalid,
   hasCommentsEnabled,
   showAddNewReply,
@@ -43,19 +34,9 @@ export function RecipientViewPetitionFieldCard({
   onAddNewReply,
   onDownloadAttachment,
   children,
+  onCommentsButtonClick,
 }: RecipientViewPetitionFieldCardProps) {
   const intl = useIntl();
-
-  const showFieldComments = usePetitionFieldCommentsDialog();
-  async function handleCommentsButtonClick() {
-    try {
-      await showFieldComments({
-        keycode,
-        access,
-        field,
-      });
-    } catch {}
-  }
 
   const fieldReplies = completedFieldReplies(field);
 
@@ -98,7 +79,7 @@ export function RecipientViewPetitionFieldCard({
           <CommentsButton
             commentCount={field.commentCount}
             hasUnreadComments={field.unreadCommentCount > 0}
-            onClick={handleCommentsButtonClick}
+            onClick={onCommentsButtonClick}
           />
         ) : null}
       </Flex>
@@ -160,14 +141,6 @@ export function RecipientViewPetitionFieldCard({
 }
 
 RecipientViewPetitionFieldCard.fragments = {
-  get PublicPetitionAccess() {
-    return gql`
-      fragment RecipientViewPetitionFieldCard_PublicPetitionAccess on PublicPetitionAccess {
-        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess
-      }
-      ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionAccess}
-    `;
-  },
   get PublicPetitionField() {
     return gql`
       fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {

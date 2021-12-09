@@ -1,11 +1,20 @@
 import { gql, useMutation } from "@apollo/client";
-import { RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument } from "@parallel/graphql/__types";
+import {
+  RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
+  RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
+} from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { useLastSaved } from "../LastSavedProvider";
+import { useCreateSimpleReply, useDeletePetitionReply, useUpdateSimpleReply } from "./mutations";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "./RecipientViewPetitionFieldCheckbox";
+import {
+  RecipientViewPetitionFieldCommentsDialog,
+  usePetitionFieldCommentsDialog,
+} from "./RecipientViewPetitionFieldCommentsDialog";
 import { RecipientViewPetitionFieldDynamicSelect } from "./RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldHeading";
@@ -17,9 +26,24 @@ export interface RecipientViewPetitionFieldProps
     RecipientViewPetitionFieldCardProps,
     "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment"
   > {
+  keycode: string;
+  access: RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment;
   petitionId: string;
   isDisabled: boolean;
 }
+
+export type handleUpdateFieldTextReplyProps = {
+  replyId: string;
+  value: string;
+};
+
+export type handleDeleteFieldTextReplyProps = {
+  replyId: string;
+};
+
+export type handleCreateFieldTextReplyProps = {
+  value: string;
+};
 
 export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
@@ -38,36 +62,97 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
       return url!;
     });
   };
+
+  const { updateLastSaved } = useLastSaved();
+
+  const showFieldComments = usePetitionFieldCommentsDialog();
+  async function handleCommentsButtonClick() {
+    try {
+      await showFieldComments({
+        keycode: props.keycode,
+        access: props.access,
+        field: props.field,
+      });
+    } catch {}
+  }
+
+  const updateFieldTextReply = useUpdateSimpleReply();
+  const handleUpdateFieldTextReply = async ({
+    replyId,
+    value,
+  }: handleUpdateFieldTextReplyProps) => {
+    try {
+      await updateFieldTextReply({
+        petitionId: props.petitionId,
+        replyId,
+        keycode: props.keycode,
+        value,
+      });
+      updateLastSaved();
+    } catch {}
+  };
+
+  const deleteFieldTextReply = useDeletePetitionReply();
+  const handleDeleteFieldTextReply = async ({ replyId }: handleDeleteFieldTextReplyProps) => {
+    try {
+      await deleteFieldTextReply({
+        petitionId: props.petitionId,
+        replyId,
+        fieldId: props.field.id,
+        keycode: props.keycode,
+      });
+      updateLastSaved();
+    } catch {}
+  };
+
+  const createFieldTextReply = useCreateSimpleReply();
+  const handleCreateFieldTextReply = async ({ value }: handleCreateFieldTextReplyProps) => {
+    try {
+      const reply = await createFieldTextReply({
+        petitionId: props.petitionId,
+        value,
+        fieldId: props.field.id,
+        keycode: props.keycode,
+      });
+      updateLastSaved();
+      return reply?.id;
+    } catch {}
+
+    return;
+  };
+
+  const commonProps = {
+    onCommentsButtonClick: handleCommentsButtonClick,
+    onDownloadAttachment: handleDownloadAttachment,
+  };
+
   return props.field.type === "HEADING" ? (
-    <RecipientViewPetitionFieldHeading {...props} onDownloadAttachment={handleDownloadAttachment} />
+    <RecipientViewPetitionFieldHeading {...props} {...commonProps} />
   ) : props.field.type === "TEXT" || props.field.type === "SHORT_TEXT" ? (
-    <RecipientViewPetitionFieldText {...props} onDownloadAttachment={handleDownloadAttachment} />
+    <RecipientViewPetitionFieldText
+      {...props}
+      {...commonProps}
+      onDeleteReply={handleDeleteFieldTextReply}
+      onUpdateReply={handleUpdateFieldTextReply}
+      onCreateReply={handleCreateFieldTextReply}
+    />
   ) : props.field.type === "SELECT" ? (
-    <RecipientViewPetitionFieldSelect {...props} onDownloadAttachment={handleDownloadAttachment} />
+    <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
   ) : props.field.type === "FILE_UPLOAD" ? (
-    <RecipientViewPetitionFieldFileUpload
-      {...props}
-      onDownloadAttachment={handleDownloadAttachment}
-    />
+    <RecipientViewPetitionFieldFileUpload {...props} {...commonProps} />
   ) : props.field.type === "DYNAMIC_SELECT" ? (
-    <RecipientViewPetitionFieldDynamicSelect
-      {...props}
-      onDownloadAttachment={handleDownloadAttachment}
-    />
+    <RecipientViewPetitionFieldDynamicSelect {...props} {...commonProps} />
   ) : props.field.type === "CHECKBOX" ? (
-    <RecipientViewPetitionFieldCheckbox
-      {...props}
-      onDownloadAttachment={handleDownloadAttachment}
-    />
+    <RecipientViewPetitionFieldCheckbox {...props} {...commonProps} />
   ) : null;
 }
 
 RecipientViewPetitionField.fragments = {
   PublicPetitionAccess: gql`
     fragment RecipientViewPetitionField_PublicPetitionAccess on PublicPetitionAccess {
-      ...RecipientViewPetitionFieldCard_PublicPetitionAccess
+      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess
     }
-    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionAccess}
+    ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionAccess}
   `,
   PublicPetitionField: gql`
     fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {

@@ -8373,12 +8373,6 @@ export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink
   };
 };
 
-export type RecipientViewPetitionFieldCard_PublicPetitionAccessFragment = {
-  __typename?: "PublicPetitionAccess";
-  granter?: { __typename?: "PublicUser"; fullName?: string | null } | null;
-  contact?: { __typename?: "PublicContact"; id: string } | null;
-};
-
 export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
@@ -18705,17 +18699,11 @@ export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragme
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
   unknown
 >;
-export const RecipientViewPetitionFieldCard_PublicPetitionAccessFragmentDoc = gql`
-  fragment RecipientViewPetitionFieldCard_PublicPetitionAccess on PublicPetitionAccess {
+export const RecipientViewPetitionField_PublicPetitionAccessFragmentDoc = gql`
+  fragment RecipientViewPetitionField_PublicPetitionAccess on PublicPetitionAccess {
     ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragmentDoc}
-` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PublicPetitionAccessFragment, unknown>;
-export const RecipientViewPetitionField_PublicPetitionAccessFragmentDoc = gql`
-  fragment RecipientViewPetitionField_PublicPetitionAccess on PublicPetitionAccess {
-    ...RecipientViewPetitionFieldCard_PublicPetitionAccess
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionField_PublicPetitionAccessFragment, unknown>;
 export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {

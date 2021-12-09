@@ -13,6 +13,7 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useLastSaved } from "../LastSavedProvider";
 import { useCreateSimpleReply, useDeletePetitionReply, useUpdateSimpleReply } from "./mutations";
+import { RecipientViewPetitionFieldProps } from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -21,9 +22,10 @@ import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewP
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply"
-  > {
+      RecipientViewPetitionFieldCardProps,
+      "children" | "showAddNewReply" | "onAddNewReply"
+    >,
+    RecipientViewPetitionFieldProps {
   petitionId: string;
   isDisabled: boolean;
 }
@@ -33,12 +35,12 @@ type SelectInstance = Select<{ label: string; value: string }, false, never>;
 export function RecipientViewPetitionFieldSelect({
   petitionId,
   keycode,
-  access,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onCommentsButtonClick,
 }: RecipientViewPetitionFieldSelectProps) {
   const intl = useIntl();
 
@@ -115,11 +117,10 @@ export function RecipientViewPetitionFieldSelect({
 
   return (
     <RecipientViewPetitionFieldCard
-      keycode={keycode}
-      access={access}
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
       addNewReplyIsDisabled={showNewReply}
       onAddNewReply={handleAddNewReply}

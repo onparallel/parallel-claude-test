@@ -12,8 +12,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { pick } from "remeda";
-import { useLastSaved } from "../LastSavedProvider";
-import { useCreateSimpleReply, useDeletePetitionReply, useUpdateSimpleReply } from "./mutations";
+import {
+  handleCreateFieldTextReplyProps,
+  handleDeleteFieldTextReplyProps,
+  handleUpdateFieldTextReplyProps,
+  RecipientViewPetitionFieldProps,
+} from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -24,26 +28,28 @@ type AnyInputElement = HTMLInputElement | HTMLTextAreaElement;
 
 export interface RecipientViewPetitionFieldTextProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply"
-  > {
-  petitionId: string;
+      RecipientViewPetitionFieldCardProps,
+      "children" | "showAddNewReply" | "onAddNewReply"
+    >,
+    RecipientViewPetitionFieldProps {
   isDisabled: boolean;
+  onUpdateReply: ({ replyId, value }: handleUpdateFieldTextReplyProps) => Promise<void>;
+  onDeleteReply: ({ replyId }: handleDeleteFieldTextReplyProps) => Promise<void>;
+  onCreateReply: ({ value }: handleCreateFieldTextReplyProps) => Promise<string | undefined>;
 }
 
 export function RecipientViewPetitionFieldText({
-  petitionId,
-  keycode,
-  access,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onUpdateReply,
+  onDeleteReply,
+  onCreateReply,
+  onCommentsButtonClick,
 }: RecipientViewPetitionFieldTextProps) {
   const intl = useIntl();
-
-  const { updateLastSaved } = useLastSaved();
 
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState("");
@@ -59,15 +65,17 @@ export function RecipientViewPetitionFieldText({
       ? (field.options as FieldOptions["TEXT"])
       : (field.options as FieldOptions["SHORT_TEXT"]);
 
-  const updateSimpleReply = useUpdateSimpleReply();
+  function handleAddNewReply() {
+    setShowNewReply(true);
+    setTimeout(() => newReplyRef.current?.focus());
+  }
+
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
-      await updateSimpleReply({ petitionId, replyId, keycode, value });
-      updateLastSaved();
+      onUpdateReply({ replyId, value });
     },
-    [keycode, updateSimpleReply]
+    [onUpdateReply]
   );
-  const deleteReply = useDeletePetitionReply();
 
   const handleDelete = useMemoFactory(
     (replyId: string) => async (focusPrev?: boolean) => {
@@ -85,8 +93,7 @@ export function RecipientViewPetitionFieldText({
           replyRefs[prevId].current!.focus();
         }
       }
-      await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
-      updateLastSaved();
+      await onDeleteReply({ replyId });
 
       delete isDeletingReplyRef.current[replyId];
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
@@ -94,30 +101,26 @@ export function RecipientViewPetitionFieldText({
         handleAddNewReply();
       }
     },
-    [keycode, field.id, field.replies, deleteReply]
+    [field.replies, onDeleteReply]
   );
 
-  const createSimpleReply = useCreateSimpleReply();
-  const debouncedOnChange = useDebouncedCallback(
+  const handleCreate = useDebouncedCallback(
     async (value: string, focusCreatedReply: boolean) => {
       if (!value) {
         return;
       }
       setIsSaving(true);
       try {
-        const reply = await createSimpleReply({
-          petitionId,
-          keycode,
-          fieldId: field.id,
+        const replyId = await onCreateReply({
           value,
         });
-        if (reply) {
+        if (replyId) {
           const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
           setValue("");
           if (focusCreatedReply) {
             setShowNewReply(false);
             setTimeout(() => {
-              const newReplyElement = replyRefs[reply.id].current!;
+              const newReplyElement = replyRefs[replyId].current!;
               if (newReplyElement) {
                 Object.assign(newReplyElement, selection);
                 newReplyElement.focus();
@@ -131,16 +134,10 @@ export function RecipientViewPetitionFieldText({
         }
       } catch {}
       setIsSaving(false);
-      updateLastSaved();
     },
     1000,
-    [keycode, field.id, createSimpleReply]
+    [onCreateReply]
   );
-
-  function handleAddNewReply() {
-    setShowNewReply(true);
-    setTimeout(() => newReplyRef.current?.focus());
-  }
 
   const inputProps = {
     id: `reply-${field.id}-new`,
@@ -150,7 +147,7 @@ export function RecipientViewPetitionFieldText({
     value,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
-        await debouncedOnChange.immediateIfPending(value, false);
+        await handleCreate.immediateIfPending(value, false);
       } else if (event.key === "Backspace" && value === "") {
         if (field.replies.length > 0) {
           event.preventDefault();
@@ -162,7 +159,7 @@ export function RecipientViewPetitionFieldText({
     },
     onBlur: async () => {
       if (value) {
-        await debouncedOnChange.immediateIfPending(value, false);
+        await handleCreate.immediateIfPending(value, false);
         setShowNewReply(false);
       } else if (!value && field.replies.length > 0) {
         setShowNewReply(false);
@@ -174,7 +171,7 @@ export function RecipientViewPetitionFieldText({
         return;
       }
       setValue(event.target.value);
-      debouncedOnChange(event.target.value, true);
+      handleCreate(event.target.value, true);
     },
     placeholder:
       options.placeholder ??
@@ -185,11 +182,10 @@ export function RecipientViewPetitionFieldText({
   };
   return (
     <RecipientViewPetitionFieldCard
-      keycode={keycode}
-      access={access}
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
       addNewReplyIsDisabled={showNewReply}
       onAddNewReply={handleAddNewReply}

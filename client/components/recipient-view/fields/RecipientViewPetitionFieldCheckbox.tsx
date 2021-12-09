@@ -9,6 +9,7 @@ import {
   useDeletePetitionReply,
   useUpdateCheckboxReply,
 } from "./mutations";
+import { RecipientViewPetitionFieldProps } from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -17,9 +18,10 @@ import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewP
 
 export interface RecipientViewPetitionFieldCheckboxProps
   extends Omit<
-    RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply"
-  > {
+      RecipientViewPetitionFieldCardProps,
+      "children" | "showAddNewReply" | "onAddNewReply"
+    >,
+    RecipientViewPetitionFieldProps {
   petitionId: string;
   isDisabled: boolean;
 }
@@ -43,12 +45,12 @@ function CustomIcon() {
 export function RecipientViewPetitionFieldCheckbox({
   petitionId,
   keycode,
-  access,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onCommentsButtonClick,
 }: RecipientViewPetitionFieldCheckboxProps) {
   const { values, limit } = field.options;
 
@@ -137,11 +139,10 @@ export function RecipientViewPetitionFieldCheckbox({
 
   return (
     <RecipientViewPetitionFieldCard
-      keycode={keycode}
-      access={access}
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={false}
       onDownloadAttachment={onDownloadAttachment}
     >
