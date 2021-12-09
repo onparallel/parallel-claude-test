@@ -178,7 +178,7 @@ function IntegrationsSignature() {
       }
       showBackButton={true}
     >
-      <Stack padding={4} spacing={5} flex="1">
+      <Stack padding={4} spacing={5} flex="1" paddingBottom={16}>
         <TablePage
           flex="0 1 auto"
           minHeight={0}

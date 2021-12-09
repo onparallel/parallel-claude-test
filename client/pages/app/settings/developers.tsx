@@ -164,7 +164,7 @@ function Developers() {
         </Heading>
       }
     >
-      <Stack padding={6} spacing={4} width="100%">
+      <Stack padding={6} spacing={4} width="100%" paddingBottom={16}>
         <Stack>
           <Heading as="h4" size="md">
             <FormattedMessage

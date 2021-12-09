@@ -115,7 +115,7 @@ function OrganizationIntegrations() {
         </Heading>
       }
     >
-      <Stack padding={4} spacing={5} maxWidth="container.sm" w="100%">
+      <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
         {integrations.map((integration, index) => (
           <IntegrationCard key={index} {...integration} />
         ))}

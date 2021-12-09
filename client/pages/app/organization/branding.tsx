@@ -110,7 +110,7 @@ function OrganizationBranding() {
         padding={6}
         flexDirection={{ base: "column", xl: "row" }}
         gridGap={{ base: 8, xl: 16 }}
-        w="100%"
+        paddingBottom={16}
       >
         <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
           <Stack spacing={4}>

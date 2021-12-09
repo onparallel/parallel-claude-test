@@ -59,7 +59,7 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
         </Heading>
       }
     >
-      <Box marginX="auto" width="100%" maxWidth="container.md" paddingX={4}>
+      <Box marginX="auto" width="100%" maxWidth="container.md" paddingX={4} paddingBottom={16}>
         <Box paddingY={4}>
           <SearchInput value={search} onChange={(e) => setSearch(e.target.value)} />
         </Box>

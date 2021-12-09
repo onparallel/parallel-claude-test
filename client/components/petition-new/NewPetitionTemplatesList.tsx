@@ -37,7 +37,7 @@ export const NewPetitionTemplatesList = ({
         gap={4}
         paddingTop={2}
         paddingX={6}
-        paddingBottom={8}
+        paddingBottom={16}
       >
         {items.map((template) => (
           <TemplateCard

@@ -85,7 +85,7 @@ function Account() {
         </Heading>
       }
     >
-      <Stack padding={6} spacing={8} maxWidth="container.2xs" width="100%">
+      <Stack padding={6} spacing={8} maxWidth="container.2xs" width="100%" paddingBottom={16}>
         <Stack>
           <Heading as="h4" size="md" marginBottom={2}>
             <FormattedMessage id="settings.account.name-header" defaultMessage="Name" />

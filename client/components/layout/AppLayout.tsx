@@ -1,5 +1,13 @@
 import { gql } from "@apollo/client";
-import { AlertDescription, AlertIcon, Button, Center, Flex, Spinner } from "@chakra-ui/react";
+import {
+  AlertDescription,
+  AlertIcon,
+  Button,
+  Center,
+  Circle,
+  Flex,
+  Spinner,
+} from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
@@ -208,6 +216,17 @@ export const AppLayout = Object.assign(
               </Flex>
             </Flex>
           </Flex>
+          {/* Intercom placeholder */}
+          {process.env.NODE_ENV === "development" ? (
+            <Circle
+              backgroundColor="black"
+              opacity={0.5}
+              position="fixed"
+              boxSize="60px"
+              bottom="20px"
+              right="20px"
+            />
+          ) : null}
           <NotificationsDrawer />
         </DndProvider>
       </>

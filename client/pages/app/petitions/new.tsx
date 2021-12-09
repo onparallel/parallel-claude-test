@@ -188,8 +188,15 @@ function NewPetition() {
       })}
       user={me}
     >
-      <Container maxWidth="container.xl">
-        <Tabs index={state.public ? 1 : 0} onChange={handleTabChange} isLazy>
+      <Container maxWidth="container.xl" flex="1" display="flex" flexDirection="column">
+        <Tabs
+          index={state.public ? 1 : 0}
+          onChange={handleTabChange}
+          isLazy
+          flex="1"
+          display="flex"
+          flexDirection="column"
+        >
           <Stack
             direction="row"
             position="sticky"
@@ -268,8 +275,8 @@ function NewPetition() {
               </Portal>
             </Menu>
           </Stack>
-          <TabPanels>
-            <TabPanel padding={0}>
+          <TabPanels flex="1" display="flex" flexDirection="column">
+            <TabPanel padding={0} flex="1" display="flex" flexDirection="column">
               <Stack
                 direction={{ base: "column", md: "row" }}
                 spacing={2}
@@ -319,17 +326,21 @@ function NewPetition() {
                 />
               ) : hasTemplates ? (
                 <NewPetitionEmptySearch
+                  flex="1"
+                  marginBottom={16}
                   onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
                   onClickPublicTemplates={() => handleTabChange(1)}
                 />
               ) : (
                 <NewPetitionEmptyTemplates
+                  flex="1"
+                  marginBottom={16}
                   onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
                   onClickPublicTemplates={() => handleTabChange(1)}
                 />
               )}
             </TabPanel>
-            <TabPanel padding={0}>
+            <TabPanel padding={0} flex="1" display="flex" flexDirection="column">
               <Grid
                 gridTemplateColumns={{ base: "auto", md: "1fr auto" }}
                 gridGap={2}
@@ -380,6 +391,8 @@ function NewPetition() {
                 />
               ) : (
                 <NewPetitionEmptySearch
+                  flex="1"
+                  marginBottom={16}
                   onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
                 />
               )}
