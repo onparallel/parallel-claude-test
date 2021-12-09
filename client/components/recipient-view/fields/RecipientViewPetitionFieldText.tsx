@@ -72,7 +72,7 @@ export function RecipientViewPetitionFieldText({
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
-      onUpdateReply({ replyId, value });
+      await onUpdateReply({ replyId, value });
     },
     [onUpdateReply]
   );
