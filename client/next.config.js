@@ -2,6 +2,7 @@
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const { createSecureHeaders } = require("next-secure-headers");
 
+/** @type {import('next').NextConfig} */
 const config = {
   env: {
     ROOT: __dirname,
