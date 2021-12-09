@@ -1208,8 +1208,8 @@ export interface MutationupdatePetitionPermissionSubscriptionArgs {
 
 export interface MutationupdatePetitionRestrictionArgs {
   isRestricted: Scalars["Boolean"];
-  petitionId: Scalars["GID"];
   password?: InputMaybe<Scalars["String"]>;
+  petitionId: Scalars["GID"];
 }
 
 export interface MutationupdatePetitionUserNotificationReadStatusArgs {

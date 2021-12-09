@@ -1176,8 +1176,8 @@ export type MutationupdatePetitionPermissionSubscriptionArgs = {
 
 export type MutationupdatePetitionRestrictionArgs = {
   isRestricted: Scalars["Boolean"];
-  petitionId: Scalars["GID"];
   password?: Maybe<Scalars["String"]>;
+  petitionId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionUserNotificationReadStatusArgs = {
@@ -1355,7 +1355,7 @@ export type OrganizationPagination = {
 };
 
 /** The roles of a user within an organization. */
-export type OrganizationRole = "ADMIN" | "NORMAL" | "OWNER";
+export type OrganizationRole = "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
 
 /** The status of the organization. */
 export type OrganizationStatus =
@@ -3061,6 +3061,15 @@ export type VerificationCodeRequest = {
   token: Scalars["ID"];
 };
 
+export type UserFragment = {
+  id: string;
+  fullName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+export type UserGroupFragment = { id: string; name: string };
+
 export type ContactFragment = {
   id: string;
   email: string;
@@ -3069,13 +3078,6 @@ export type ContactFragment = {
   lastName: string | null;
   createdAt: string;
   updatedAt: string;
-};
-
-export type UserFragment = {
-  id: string;
-  fullName: string | null;
-  firstName: string | null;
-  lastName: string | null;
 };
 
 export type PetitionAccessFragment = {
@@ -3199,8 +3201,6 @@ export type TemplateFragment = {
   }>;
   tags?: Array<{ id: string; name: string }>;
 };
-
-export type UserGroupFragment = { id: string; name: string };
 
 export type Permission_PetitionUserGroupPermission_Fragment = {
   permissionType: PetitionPermissionType;

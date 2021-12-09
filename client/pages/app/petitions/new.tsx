@@ -188,19 +188,15 @@ function NewPetition() {
       })}
       user={me}
     >
-      <Container
-        maxWidth="container.xl"
-        paddingY={{ base: 0, md: 4 }}
-        paddingX={{ base: 0, md: 4 }}
-      >
+      <Container maxWidth="container.xl" padding={{ base: 0, md: 4 }}>
         <Tabs index={state.public ? 1 : 0} onChange={handleTabChange} isLazy>
           <Stack
             direction="row"
             position="sticky"
             top={{ base: 0, md: 4 }}
-            paddingTop={6}
             backgroundColor="gray.50"
             spacing={2}
+            paddingTop={6}
             paddingX={6}
             paddingBottom={1}
             zIndex={1}
@@ -273,7 +269,7 @@ function NewPetition() {
             </Menu>
           </Stack>
           <TabPanels>
-            <TabPanel paddingX={0} paddingY={0}>
+            <TabPanel padding={0}>
               <Stack
                 direction={{ base: "column", md: "row" }}
                 spacing={2}
@@ -333,17 +329,16 @@ function NewPetition() {
                 />
               )}
             </TabPanel>
-            <TabPanel paddingX={0} paddingY={0}>
+            <TabPanel padding={0}>
               <Grid
-                paddingX={6}
-                paddingTop={{ base: 4, md: 8 }}
-                paddingBottom={{ base: 4, md: 6 }}
-                position="sticky"
-                backgroundColor="gray.50"
-                top="74px"
-                zIndex={1}
                 gridTemplateColumns={{ base: "auto", md: "1fr auto" }}
                 gridGap={2}
+                paddingX={6}
+                paddingY={{ base: 4, md: 6 }}
+                position="sticky"
+                backgroundColor="gray.50"
+                top={{ base: "70px", md: "86px" }}
+                zIndex={1}
               >
                 <SearchInput
                   value={search ?? ""}
@@ -353,7 +348,7 @@ function NewPetition() {
                     id: "new-petition.search-placeholder",
                     defaultMessage: "What are you looking for?",
                   })}
-                  gridColumn={{ base: "1", md: "1" }}
+                  gridColumn="1"
                 />
                 <NewPetitionLanguageFilter
                   value={state.lang}
