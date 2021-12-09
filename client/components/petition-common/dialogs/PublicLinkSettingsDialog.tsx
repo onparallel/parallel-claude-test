@@ -233,10 +233,7 @@ export function PublicLinkSettingsDialog({
           <FormControl id="owner">
             <FormLabel>
               <Text as="span">
-                <FormattedMessage
-                  id="component.settings-public-link-dialog.owner-label"
-                  defaultMessage="Owner"
-                />
+                <FormattedMessage id="petition-permission-type.owner" defaultMessage="Owner" />
               </Text>
               <Text as="span" marginLeft={0.5}>
                 *

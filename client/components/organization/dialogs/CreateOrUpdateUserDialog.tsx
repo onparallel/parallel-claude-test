@@ -21,6 +21,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -65,6 +66,8 @@ function CreateOrUpdateUserDialog({
     300,
     []
   );
+
+  const roles = useOrganizationRoles();
 
   const emailIsAvailable = async (value: string) => {
     try {
@@ -190,24 +193,13 @@ function CreateOrUpdateUserDialog({
               />
             </FormLabel>
             <Select {...register("role", { required: true })}>
-              <option value="COLLABORATOR">
-                {intl.formatMessage({
-                  id: "organization.role.collaborator",
-                  defaultMessage: "Collaborator",
-                })}
-              </option>
-              <option value="NORMAL">
-                {intl.formatMessage({
-                  id: "organization.role.normal",
-                  defaultMessage: "Normal",
-                })}
-              </option>
-              <option value="ADMIN">
-                {intl.formatMessage({
-                  id: "organization.role.admin",
-                  defaultMessage: "Administrator",
-                })}
-              </option>
+              {roles
+                .filter((r) => r.role !== "OWNER")
+                .map((r) => (
+                  <option key={r.role} value={r.role}>
+                    {r.label}
+                  </option>
+                ))}
             </Select>
           </FormControl>
         </Stack>

@@ -1580,21 +1580,6 @@
     "context": "Without tags"
   },
   {
-    "term": "component.petition-permission-type.owner",
-    "definition": "Propietario",
-    "context": "Owner"
-  },
-  {
-    "term": "component.petition-permission-type.read",
-    "definition": "Lector",
-    "context": "Reader"
-  },
-  {
-    "term": "component.petition-permission-type.write",
-    "definition": "Editor",
-    "context": "Editor"
-  },
-  {
     "term": "component.petition-progress-bar.all-pending",
     "definition": "El destinatario no ha rellenado ninguno de los campos.",
     "context": "The recipient has not replied to any of the fields."
@@ -2703,11 +2688,6 @@
     "term": "component.settings-public-link-dialog.link-popover",
     "definition": "Personaliza tu enlace público. Añade entre 8 y 30 caracteres, solamente se permiten alfanuméricos y guiones.",
     "context": "Customize your public link. Add between 8 and 30 characters, only alphanumeric and hyphens are allowed."
-  },
-  {
-    "term": "component.settings-public-link-dialog.owner-label",
-    "definition": "Propietario",
-    "context": "Owner"
   },
   {
     "term": "component.settings-public-link-dialog.owner-placeholder",
@@ -4480,6 +4460,31 @@
     "context": "Remove from group"
   },
   {
+    "term": "organization-role.admin",
+    "definition": "Administrador",
+    "context": "Admin"
+  },
+  {
+    "term": "organization-role.collaborator",
+    "definition": "Colaborador",
+    "context": "Collaborator"
+  },
+  {
+    "term": "organization-role.header.user",
+    "definition": "Rol",
+    "context": "Role"
+  },
+  {
+    "term": "organization-role.normal",
+    "definition": "Normal",
+    "context": "Normal"
+  },
+  {
+    "term": "organization-role.owner",
+    "definition": "Propietario",
+    "context": "Owner"
+  },
+  {
     "term": "organization-usage.visually-hidden.out-of",
     "definition": "de",
     "context": "out of"
@@ -4488,11 +4493,6 @@
     "term": "organization-users.activate",
     "definition": "Activar {count, plural, =1{usuario} other {usuarios}}",
     "context": "Activate {count, plural, =1{user} other {users}}"
-  },
-  {
-    "term": "organization-users.admin-role",
-    "definition": "Administrador",
-    "context": "Admin"
   },
   {
     "term": "organization-users.create-user",
@@ -4520,24 +4520,9 @@
     "context": "Email"
   },
   {
-    "term": "organization-users.header.user-role",
-    "definition": "Rol",
-    "context": "Role"
-  },
-  {
     "term": "organization-users.max-limit-reached",
     "definition": "Haz alcanzado la cantidad máxima de usuarios que puedes crear, <a>contacta con nosotros para mejorar tu plan.</a>",
     "context": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
-  },
-  {
-    "term": "organization-users.normal-role",
-    "definition": "Normal",
-    "context": "Normal"
-  },
-  {
-    "term": "organization-users.owner-role",
-    "definition": "Propietario",
-    "context": "Owner"
   },
   {
     "term": "organization-users.update-user",
@@ -4648,21 +4633,6 @@
     "term": "organization.integrations.zapier-description",
     "definition": "Automatiza tus flujos de trabajo utilizando sus +400 servicios.",
     "context": "Automate your workflows using its +400 services."
-  },
-  {
-    "term": "organization.role.admin",
-    "definition": "Administrador",
-    "context": "Administrator"
-  },
-  {
-    "term": "organization.role.collaborator",
-    "definition": "Colaborador",
-    "context": "Collaborator"
-  },
-  {
-    "term": "organization.role.normal",
-    "definition": "Normal",
-    "context": "Normal"
   },
   {
     "term": "organization.signature-integrations.title",
@@ -5083,6 +5053,21 @@
     "term": "petition-message.placeholder-option.user-last-name",
     "definition": "Mi apellido",
     "context": "My last name"
+  },
+  {
+    "term": "petition-permission-type.owner",
+    "definition": "Propietario",
+    "context": "Owner"
+  },
+  {
+    "term": "petition-permission-type.read",
+    "definition": "Lector",
+    "context": "Reader"
+  },
+  {
+    "term": "petition-permission-type.write",
+    "definition": "Editor",
+    "context": "Editor"
   },
   {
     "term": "petition-replies.export-replies",

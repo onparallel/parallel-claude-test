@@ -40,6 +40,7 @@ import {
 import { isAdmin } from "@parallel/utils/roles";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -285,6 +286,7 @@ function OrganizationUsers() {
 function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
   const userIsAdmin = isAdmin(user);
   const intl = useIntl();
+  const roles = useOrganizationRoles();
   return useMemo<TableColumn<OrganizationUsers_UserFragment>[]>(
     () => [
       {
@@ -333,7 +335,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
       {
         key: "role",
         header: intl.formatMessage({
-          id: "organization-users.header.user-role",
+          id: "organization-role.header.user",
           defaultMessage: "Role",
         }),
         cellProps: {
@@ -347,18 +349,11 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
                 {
                   OWNER: "purple",
                   ADMIN: "green",
-                  NORMAL: "gray",
                 } as Record<OrganizationRole, string>
-              )[row.role]
+              )[row.role] ?? "gray"
             }
           >
-            {row.role === "OWNER" ? (
-              <FormattedMessage id="organization-users.owner-role" defaultMessage="Owner" />
-            ) : row.role === "ADMIN" ? (
-              <FormattedMessage id="organization-users.admin-role" defaultMessage="Admin" />
-            ) : (
-              <FormattedMessage id="organization-users.normal-role" defaultMessage="Normal" />
-            )}
+            {roles.find((r) => r.role === row.role)?.label ?? (null as never)}
           </Badge>
         ),
       },
