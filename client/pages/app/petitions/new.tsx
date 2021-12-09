@@ -188,15 +188,15 @@ function NewPetition() {
       })}
       user={me}
     >
-      <Container maxWidth="container.xl" padding={{ base: 0, md: 4 }}>
+      <Container maxWidth="container.xl">
         <Tabs index={state.public ? 1 : 0} onChange={handleTabChange} isLazy>
           <Stack
             direction="row"
             position="sticky"
-            top={{ base: 0, md: 4 }}
+            top={0}
             backgroundColor="gray.50"
             spacing={2}
-            paddingTop={6}
+            paddingTop={10}
             paddingX={6}
             paddingBottom={1}
             zIndex={1}
@@ -277,7 +277,7 @@ function NewPetition() {
                 paddingY={{ base: 4, md: 6 }}
                 position="sticky"
                 backgroundColor="gray.50"
-                top={{ base: "70px", md: "86px" }}
+                top="86px"
                 zIndex={1}
               >
                 <SearchInput
@@ -337,7 +337,7 @@ function NewPetition() {
                 paddingY={{ base: 4, md: 6 }}
                 position="sticky"
                 backgroundColor="gray.50"
-                top={{ base: "70px", md: "86px" }}
+                top="86px"
                 zIndex={1}
               >
                 <SearchInput
