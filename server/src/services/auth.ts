@@ -24,7 +24,7 @@ import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
 import { random } from "../util/token";
 import { Aws, AWS_SERVICE } from "./aws";
-import { REDIS, Redis } from "./redis";
+import { REDIS, IRedis } from "./redis";
 
 export interface IAuth {
   guessLogin: RequestHandler;
@@ -55,7 +55,7 @@ export class Auth implements IAuth {
 
   constructor(
     @inject(CONFIG) private config: Config,
-    @inject(REDIS) private redis: Redis,
+    @inject(REDIS) private redis: IRedis,
     @inject(AWS_SERVICE) public readonly aws: Aws,
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,

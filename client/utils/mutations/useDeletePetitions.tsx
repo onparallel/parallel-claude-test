@@ -65,10 +65,10 @@ export function useDeletePetitions() {
         });
       } catch (error) {
         if (isApolloError(error)) {
-          const conflictingPetitionIds: string[] =
-            error.graphQLErrors[0]?.extensions?.petitionIds ?? [];
+          const conflictingPetitionIds =
+            (error.graphQLErrors[0]?.extensions?.petitionIds as string[]) ?? [];
 
-          const errorCode: string | undefined = error.graphQLErrors[0]?.extensions?.code;
+          const errorCode = error.graphQLErrors[0]?.extensions?.code as string | undefined;
 
           const cachedPetitions = conflictingPetitionIds.map(
             (id) =>

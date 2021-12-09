@@ -148,7 +148,7 @@ export function commentsBelongsToAccess<
     try {
       return await ctx.petitions.commentsBelongToPetition(
         ctx.access!.petition_id,
-        unMaybeArray(args[argCommentId] as MaybeArray<number>)
+        unMaybeArray(args[argCommentId] as unknown as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -161,7 +161,7 @@ export function validPublicPetitionLinkSlug<
   TArg extends Arg<TypeName, FieldName, string>
 >(argSlug: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const slug = args[argSlug] as string;
+    const slug = args[argSlug] as unknown as string;
     const publicPetitionLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
     if (!isDefined(publicPetitionLink) || !publicPetitionLink.is_active) {
       return false;
@@ -176,7 +176,7 @@ export function validPublicPetitionLink<
   TArg extends Arg<TypeName, FieldName, number>
 >(argPublicPetitionLinkId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const id = args[argPublicPetitionLinkId] as number;
+    const id = args[argPublicPetitionLinkId] as unknown as number;
 
     const publicPetitionLink = await ctx.petitions.loadPublicPetitionLink(id);
 

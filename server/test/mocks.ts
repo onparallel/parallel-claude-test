@@ -38,7 +38,7 @@ export class MockAuth implements IAuth {
 
 @injectable()
 export class MockRedis implements IRedis {
-  async waitUntilConnected() {
+  async connect() {
     return;
   }
   async get(): Promise<string | null> {

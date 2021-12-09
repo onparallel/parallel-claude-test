@@ -1,10 +1,10 @@
-import { injectable, inject } from "inversify";
+import { inject, injectable } from "inversify";
+import * as redis from "redis";
+import { isDefined } from "remeda";
 import { CONFIG, Config } from "../config";
-import redis, { RedisClient } from "redis";
-import { promisify } from "util";
 
 export interface IRedis {
-  waitUntilConnected(): Promise<void>;
+  connect(): Promise<void>;
   get(key: string): Promise<string | null>;
   set(key: string, value: string, duration?: number): Promise<void>;
   delete(...keys: string[]): Promise<number>;
@@ -14,30 +14,25 @@ export const REDIS = Symbol.for("REDIS");
 
 @injectable()
 export class Redis implements IRedis {
-  public readonly client: RedisClient;
+  private readonly client: ReturnType<typeof redis.createClient>;
 
   constructor(@inject(CONFIG) config: Config) {
-    this.client = redis.createClient(config.redis);
+    this.client = redis.createClient({ socket: { ...config.redis } });
   }
 
   /**
-   * Wait until the connection is stablished.
+   * Connect to redis
    */
-  async waitUntilConnected() {
-    if (this.client.connected) {
-      return;
-    } else {
-      await new Promise((r) => this.client.on("ready", r));
-    }
+  async connect() {
+    await this.client.connect();
   }
 
   /**
    * Get the value with the speicified key.
    * @param key The key to use
    */
-  async get(key: string): Promise<string | null> {
-    const get = promisify(this.client.get.bind(this.client));
-    return await get(key);
+  async get(key: string) {
+    return await this.client.get(key);
   }
 
   /**
@@ -47,11 +42,10 @@ export class Redis implements IRedis {
    * @param duration Duration in seconds
    */
   async set(key: string, value: string, duration?: number) {
-    const set: any = promisify(this.client.set.bind(this.client));
-    if (duration) {
-      await set(key, value, "EX", duration);
+    if (isDefined(duration)) {
+      await this.client.set(key, value, { EX: duration });
     } else {
-      await set(key, value);
+      await this.client.set(key, value);
     }
   }
 
@@ -60,7 +54,6 @@ export class Redis implements IRedis {
    * @param keys The keys to delete
    */
   async delete(...keys: string[]): Promise<number> {
-    const del: any = promisify(this.client.del.bind(this.client));
-    return await del(...keys);
+    return await this.client.del(keys);
   }
 }

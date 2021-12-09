@@ -1,5 +1,5 @@
-import AWS from "aws-sdk";
 import "reflect-metadata";
+import AWS from "aws-sdk";
 import { Consumer } from "sqs-consumer";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";

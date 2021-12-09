@@ -59,7 +59,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
           });
         } catch (e) {
           if (isApolloError(e)) {
-            setError(e.graphQLErrors[0]?.extensions?.code);
+            setError(e.graphQLErrors[0]?.extensions?.code as string);
           }
         }
       }

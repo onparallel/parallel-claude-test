@@ -46,5 +46,5 @@ export function userIsNotContextUser<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, number>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_, args, ctx) => ctx.user!.id !== (args[argName] as number);
+  return (_, args, ctx) => ctx.user!.id !== (args[argName] as unknown as number);
 }

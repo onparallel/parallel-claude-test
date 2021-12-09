@@ -21,7 +21,7 @@ expect.extend({
       promise: this.promise,
     };
     if (errors) {
-      const errorCode = errors[0]?.extensions?.code;
+      const errorCode = errors[0]?.extensions?.code as string;
       return {
         message: () => outdent`
           ${this.utils.matcherHint(`.toContainGraphQLError`, errorCode, expectedErrorCode, options)}

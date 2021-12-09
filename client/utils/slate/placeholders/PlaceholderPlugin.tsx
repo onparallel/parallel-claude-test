@@ -2,9 +2,9 @@ import { Box } from "@chakra-ui/react";
 import { normalizeEventKey } from "@parallel/utils/keys";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { getNodeDeserializer, getText } from "@udecode/plate-common";
-import { getPlatePluginTypes, PlatePlugin, TRenderElementProps } from "@udecode/plate-core";
-import { KeyboardEvent, ReactNode, useMemo, useState } from "react";
+import { getText } from "@udecode/plate-common";
+import { createPluginFactory, PlatePlugin, TRenderElementProps } from "@udecode/plate-core";
+import { ReactNode, useCallback, useState } from "react";
 import { clamp, isDefined } from "remeda";
 import { Editor, Range, Transforms } from "slate";
 import { useFocused, useSelected } from "slate-react";
@@ -37,117 +37,120 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
       ? options.filter((c) => c.label.toLowerCase().includes(state.search!.toLowerCase()))
       : options
   );
+  const onAddPlaceholder = useCallback((editor: Editor, placeholder: PlaceholderOption) => {
+    const { target } = stateRef.current;
+    if (target !== null) {
+      Transforms.select(editor, target);
+      insertPlaceholder(editor, placeholder);
+      setState((state) => ({ ...state, index: 0, target: null }));
+    }
+  }, []);
+
+  const onHighlightOption = useCallback((index: number) => {
+    setState((s) => ({ ...s, index }));
+  }, []);
 
   return {
     ...state,
     values: filteredValuesRef.current,
-    ...useMemo(() => {
-      const onAddPlaceholder = (editor: Editor, placeholder: PlaceholderOption) => {
-        const { target } = stateRef.current;
-        if (target !== null) {
-          Transforms.select(editor, target);
-          insertPlaceholder(editor, placeholder);
-          setState((state) => ({ ...state, index: 0, target: null }));
-        }
-      };
-      const onKeyDownPlaceholder = (e: KeyboardEvent, editor: Editor) => {
-        const values = filteredValuesRef.current;
-        const { index, target } = stateRef.current!;
-        if (target && values.length > 0) {
-          const eventKey = normalizeEventKey(e);
-          if (eventKey === "ArrowDown") {
-            e.preventDefault();
-            setState((s) => ({
-              ...s,
-              index: clamp(index + 1, { max: values.length - 1, min: 0 }),
-            }));
-          }
-          if (eventKey === "ArrowUp") {
-            e.preventDefault();
-            setState((s) => ({
-              ...s,
-              index: clamp(index - 1, { max: values.length - 1, min: 0 }),
-            }));
-          }
-          if (eventKey === "Escape") {
-            e.preventDefault();
-            setState((state) => ({ ...state, index: 0, target: null }));
-          }
-          if (["Tab", "Enter"].includes(eventKey)) {
-            const value = values[index];
-            if (value) {
-              e.preventDefault();
-              return onAddPlaceholder(editor, value);
+    onAddPlaceholder,
+    onHighlightOption,
+    plugin: useConstant<PlatePlugin>(() =>
+      createPluginFactory({
+        key: PLACEHOLDER_TYPE,
+        isElement: true,
+        isInline: true,
+        isVoid: true,
+        handlers: {
+          onKeyDown: (editor) => (event) => {
+            const values = filteredValuesRef.current;
+            const { index, target } = stateRef.current!;
+            if (target && values.length > 0) {
+              const eventKey = normalizeEventKey(event);
+              if (eventKey === "ArrowDown") {
+                event.preventDefault();
+                setState((s) => ({
+                  ...s,
+                  index: clamp(index + 1, { max: values.length - 1, min: 0 }),
+                }));
+              }
+              if (eventKey === "ArrowUp") {
+                event.preventDefault();
+                setState((s) => ({
+                  ...s,
+                  index: clamp(index - 1, { max: values.length - 1, min: 0 }),
+                }));
+              }
+              if (eventKey === "Escape") {
+                event.preventDefault();
+                setState((state) => ({ ...state, index: 0, target: null }));
+              }
+              if (["Tab", "Enter"].includes(eventKey)) {
+                const value = values[index];
+                if (value) {
+                  event.preventDefault();
+                  return onAddPlaceholder(editor, value);
+                }
+              }
             }
-          }
-        }
-      };
-      const onChangePlaceholder = (editor: Editor) => {
-        const { selection } = editor;
+          },
+          onChange: (editor) => (value) => {
+            const { selection } = editor;
 
-        if (selection && Range.isCollapsed(selection)) {
-          const cursor = Range.start(selection);
-          const before = Editor.before(editor, cursor, { unit: "block" });
-          const beforeRange = before && Editor.range(editor, before, cursor);
-          const beforeText = beforeRange && Editor.string(editor, beforeRange);
-          const match = !!beforeText && beforeText.match(/#([a-z-]*)$/);
-          const after = Editor.after(editor, cursor);
-          const afterRange = Editor.range(editor, cursor, after);
-          const afterText = getText(editor, afterRange);
-          if (match && afterText.match(/^([^a-z]|$)/)) {
-            // Get the range for the #xxx
-            const beforeHash = Editor.before(editor, cursor, {
-              unit: "character",
-              distance: match ? match[0].length : 0,
-            });
-            const target = beforeHash && Editor.range(editor, beforeHash, cursor);
-            const [, search] = match;
-            setState(() => ({ target: target ?? null, search, index: 0 }));
-            return;
-          }
-        }
-        setState((s) => ({ ...s, target: null, search: null }));
-      };
-      const onHighlightOption = (index: number) => {
-        setState((s) => ({ ...s, index }));
-      };
-      return {
-        onAddPlaceholder,
-        onKeyDownPlaceholder,
-        onChangePlaceholder,
-        onHighlightOption,
-      };
-    }, []),
-    plugin: useConstant<PlatePlugin>(() => ({
-      inlineTypes: getPlatePluginTypes(PLACEHOLDER_TYPE),
-      voidTypes: getPlatePluginTypes(PLACEHOLDER_TYPE),
-      renderElement: () => (props: TRenderElementProps) => {
-        const { children, attributes } = props;
-        const element = props.element as PlaceholderElement;
-        const placeholder = placeholderOptionsRef.current.find(
-          (p) => p.value === element.placeholder
-        );
-        return placeholder ? (
-          <PlaceholderToken
-            value={element.placeholder}
-            label={placeholder.label}
-            attributes={attributes}
-          >
-            {children}
-          </PlaceholderToken>
-        ) : undefined;
-      },
-      deserialize: () => ({
-        element: getNodeDeserializer({
-          type: PLACEHOLDER_TYPE,
-          getNode: (el) => ({
-            type: PLACEHOLDER_TYPE,
-            value: el.getAttribute("data-placeholder"),
-          }),
-          rules: [{ className: "slate-placeholder" }],
+            if (selection && Range.isCollapsed(selection)) {
+              const cursor = Range.start(selection);
+              const before = Editor.before(editor, cursor, { unit: "block" });
+              const beforeRange = before && Editor.range(editor, before, cursor);
+              const beforeText = beforeRange && Editor.string(editor, beforeRange);
+              const match = !!beforeText && beforeText.match(/#([a-z-]*)$/);
+              const after = Editor.after(editor, cursor);
+              const afterRange = Editor.range(editor, cursor, after);
+              const afterText = getText(editor, afterRange);
+              if (match && afterText.match(/^([^a-z]|$)/)) {
+                // Get the range for the #xxx
+                const beforeHash = Editor.before(editor, cursor, {
+                  unit: "character",
+                  distance: match ? match[0].length : 0,
+                });
+                const target = beforeHash && Editor.range(editor, beforeHash, cursor);
+                const [, search] = match;
+                setState(() => ({ target: target ?? null, search, index: 0 }));
+                return;
+              }
+            }
+            setState((s) => ({ ...s, target: null, search: null }));
+          },
+        },
+        then: (editor, { key }) => ({
+          options: {
+            id: key,
+          },
+          component: (props: TRenderElementProps) => {
+            const { children, attributes } = props;
+            const element = props.element as PlaceholderElement;
+            const placeholder = placeholderOptionsRef.current.find(
+              (p) => p.value === element.placeholder
+            );
+            return placeholder ? (
+              <PlaceholderToken
+                value={element.placeholder}
+                label={placeholder.label}
+                attributes={attributes}
+              >
+                {children}
+              </PlaceholderToken>
+            ) : null;
+          },
+          deserializeHtml: {
+            validAttribute: "data-placeholder",
+            getNode: (el) => ({
+              type: PLACEHOLDER_TYPE,
+              value: el.getAttribute("data-placeholder"),
+            }),
+          },
         }),
-      }),
-    })),
+      })()
+    ),
   };
 }
 

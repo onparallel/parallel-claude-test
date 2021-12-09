@@ -50,13 +50,13 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
           (error.graphQLErrors[0]?.extensions?.code === "INVALID_FORMAT_ERROR" ||
             error.graphQLErrors[0]?.extensions?.code === "NO_CONTACTS_FOUND_ERROR")
         ) {
-          const rows = error.graphQLErrors[0]?.extensions?.rows;
+          const rows = (error.graphQLErrors[0]?.extensions?.rows ?? []) as number[];
           await withError(
             showErrorDialog({
               header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
               message: (
                 <>
-                  {rows && rows.length && rows.length < 16 ? (
+                  {rows.length && rows.length < 16 ? (
                     <Text marginBottom={2}>
                       <FormattedMessage
                         id="contacts.import-from-excel.import-error.details"

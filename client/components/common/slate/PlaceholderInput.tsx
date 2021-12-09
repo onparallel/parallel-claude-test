@@ -16,21 +16,19 @@ import {
   usePlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
-import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
-import { createSingleLinePlugin, useSingleLine } from "@parallel/utils/slate/SingleLinePlugin";
+import { createSingleLinePlugin } from "@parallel/utils/slate/SingleLinePlugin";
 import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/types";
-import { createHistoryPlugin, createReactPlugin, Plate, withPlate } from "@udecode/plate-core";
-import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
+import { useConstant } from "@parallel/utils/useConstant";
 import {
-  CSSProperties,
-  KeyboardEvent,
-  MouseEvent,
-  useCallback,
-  useImperativeHandle,
-  useMemo,
-} from "react";
+  createHistoryPlugin,
+  createPlugins,
+  createReactPlugin,
+  Plate,
+  withPlate,
+} from "@udecode/plate-core";
+import { createParagraphPlugin } from "@udecode/plate-paragraph";
+import { CSSProperties, MouseEvent, useImperativeHandle, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
 
@@ -55,42 +53,21 @@ function RenderElement({ attributes, nodeProps, styles, element, ...props }: any
   return <Text {...attributes} {...props} />;
 }
 
-const components = {
-  [ELEMENT_PARAGRAPH]: RenderElement,
-};
-
-const options = {
-  [ELEMENT_PARAGRAPH]: { type: "paragraph" },
-};
-
 export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, PlaceholderInputRef>(
-  ({ id, placeholder, placeholders, value, isDisabled, onChange, onKeyDown, ...props }, ref) => {
+  ({ id, placeholder, placeholders, value, isDisabled, onChange, ...props }, ref) => {
     const intl = useIntl();
-    const {
-      plugin,
-      onAddPlaceholder,
-      onChangePlaceholder,
-      onKeyDownPlaceholder,
-      onHighlightOption,
-      index,
-      search,
-      target,
-      values,
-    } = usePlaceholderPlugin(placeholders);
-    const plugins = useMemo(
-      () => [
+    const { plugin, onAddPlaceholder, onHighlightOption, index, search, target, values } =
+      usePlaceholderPlugin(placeholders);
+    const plugins = useConstant(() =>
+      createPlugins([
         createReactPlugin(),
         createHistoryPlugin(),
-        createParagraphPlugin(),
+        createParagraphPlugin({ type: "paragraph", component: RenderElement }),
         createSingleLinePlugin(),
         plugin,
-      ],
-      [plugin]
+      ])
     );
-    const editor = useMemo<CustomEditor>(
-      () => pipe(createEditor(), withPlate({ id, plugins, options, components })),
-      []
-    );
+    const editor = useMemo<CustomEditor>(() => withPlate(createEditor(), { id, plugins }), []);
 
     useImperativeHandle(
       ref,
@@ -101,28 +78,6 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
         },
       }),
       [editor]
-    );
-
-    const { onChangeSelection } = useSingleLine(editor);
-
-    const { onKeyDown: onKeyDownFixDeleteAll } = useFixDeleteAll();
-
-    const handleChange = useCallback(
-      (value: PlaceholderInputValue) => {
-        onChangePlaceholder(editor);
-        onChangeSelection(editor.selection);
-        onChange(slateNodesToTextWithPlaceholders(value));
-      },
-      [onChange, onChangePlaceholder, onChangeSelection, editor]
-    );
-
-    const handleKeyDown = useCallback(
-      (event: KeyboardEvent<HTMLDivElement>) => {
-        onKeyDownPlaceholder(event, editor);
-        onKeyDownFixDeleteAll(event, editor);
-        onKeyDown?.(event);
-      },
-      [onKeyDownPlaceholder, onKeyDownFixDeleteAll, onKeyDown]
     );
 
     const placeholderMenuId = useId(undefined, "placeholder-menu");
@@ -183,15 +138,14 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
             id={id}
             editor={editor}
             plugins={plugins}
-            options={options}
-            components={components}
             value={slateValue}
-            onChange={handleChange as any}
+            onChange={(value: PlaceholderInputValue) =>
+              onChange(slateNodesToTextWithPlaceholders(value))
+            }
             editableProps={{
               readOnly: isDisabled,
               placeholder,
               style,
-              onKeyDown: handleKeyDown,
               "aria-controls": placeholderMenuId,
               "aria-autocomplete": "list",
               "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,

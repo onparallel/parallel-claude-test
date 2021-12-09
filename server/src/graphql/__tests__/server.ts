@@ -16,7 +16,8 @@ export const initServer = async () => {
   const container = createTestContainer();
   const stack: any[] = [];
   const server = new ApolloServer({
-    schema,
+    // https://github.com/graphql-nexus/nexus/issues/1019
+    schema: schema as any,
     context: () => {
       const context = container.get<ApiContext>(ApiContext);
       context.req = stack.length

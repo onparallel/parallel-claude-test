@@ -156,7 +156,7 @@ export function globalIdPlugin() {
           } else if (config.wrapping?.includes("List") && Array.isArray(result)) {
             return result.map((x) => (isDefined(x) ? toGlobalId(prefixName, x) : null));
           } else {
-            return toGlobalId(prefixName, result);
+            return toGlobalId(prefixName, result as number);
           }
         } else {
           return result;

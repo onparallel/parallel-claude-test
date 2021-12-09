@@ -12,7 +12,7 @@ export function userHasAccessToIntegrations<
   return async (_, args, ctx) => {
     try {
       return await ctx.integrations.userHasAccessToIntegration(
-        unMaybeArray(args[argName] as MaybeArray<number>),
+        unMaybeArray(args[argName] as unknown as MaybeArray<number>),
         ctx.user!,
         types
       );

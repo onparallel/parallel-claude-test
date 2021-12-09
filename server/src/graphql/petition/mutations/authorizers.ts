@@ -25,7 +25,7 @@ export function userHasAccessToUsers<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const userIds = unMaybeArray(args[argName] as MaybeArray<number>);
+    const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
     return contextUserHasAccessToUsers(userIds, ctx);
   };
 }
@@ -39,7 +39,10 @@ export function userHasAccessToUserOrUserGroupPermissions<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const permissions = args[argName] as UserOrUserGroupPermissionInput[] | null | undefined;
+      const permissions = args[argName] as unknown as
+        | UserOrUserGroupPermissionInput[]
+        | null
+        | undefined;
       if (!isDefined(permissions)) {
         return true;
       }
@@ -73,7 +76,7 @@ export function argUserHasActiveStatus<
 >(argNameUserId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const userIds = unMaybeArray(args[argNameUserId] as MaybeArray<number>);
+      const userIds = unMaybeArray(args[argNameUserId] as unknown as MaybeArray<number>);
       if (userIds.length === 0) {
         return true;
       }
@@ -106,7 +109,7 @@ export function userHasAccessToPublicPetitionLink<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const publicPetitionLinkIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      const publicPetitionLinkIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
       const publicPetitionLinks = (
         await ctx.petitions.loadPublicPetitionLink(publicPetitionLinkIds)
       ).filter(isDefined);

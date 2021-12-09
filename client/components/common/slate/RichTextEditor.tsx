@@ -1,6 +1,6 @@
 import { Box, Portal, Text, useFormControl, useId, useMultiStyleConfig } from "@chakra-ui/react";
-import { formatList } from "@parallel/utils/slate/formatList";
 import { PlaceholderMenu } from "@parallel/components/common/slate/PlaceholderMenu";
+import { formatList } from "@parallel/utils/slate/formatList";
 import {
   PlaceholderOption,
   usePlaceholderPlugin,
@@ -16,9 +16,6 @@ import {
   createBoldPlugin,
   createItalicPlugin,
   createUnderlinePlugin,
-  DEFAULTS_BOLD,
-  DEFAULTS_ITALIC,
-  DEFAULTS_UNDERLINE,
   MARK_BOLD,
   MARK_ITALIC,
   MARK_UNDERLINE,
@@ -27,10 +24,10 @@ import { createExitBreakPlugin } from "@udecode/plate-break";
 import { withProps } from "@udecode/plate-common";
 import {
   createHistoryPlugin,
+  createPlugins,
   createReactPlugin,
   Plate,
-  PlatePluginOptions,
-  useStoreEditorState,
+  usePlateEditorState,
 } from "@udecode/plate-core";
 import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
 import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";
@@ -43,15 +40,7 @@ import {
   unwrapList,
 } from "@udecode/plate-list";
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import {
-  CSSProperties,
-  forwardRef,
-  KeyboardEvent,
-  ReactNode,
-  useCallback,
-  useImperativeHandle,
-  useMemo,
-} from "react";
+import { CSSProperties, forwardRef, ReactNode, useImperativeHandle, useMemo } from "react";
 import { omit, pick } from "remeda";
 import { ReactEditor } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
@@ -78,23 +67,6 @@ const components = {
   [MARK_ITALIC]: withProps(RenderElement, { as: "em" }),
   [MARK_UNDERLINE]: withProps(RenderElement, { as: "u" }),
 };
-
-const options = {
-  [ELEMENT_H1]: { type: "heading", hotkey: ["mod+opt+1", "mod+shift+1"] },
-  [ELEMENT_H2]: { type: "subheading", hotkey: ["mod+opt+2", "mod+shift+2"] },
-  [ELEMENT_PARAGRAPH]: {
-    type: "paragraph",
-    hotkey: ["mod+opt+0", "mod+shift+0"],
-  },
-  [ELEMENT_OL]: { type: "numbered-list" },
-  [ELEMENT_UL]: { type: "bulleted-list" },
-  [ELEMENT_LI]: { type: "list-item" },
-  [ELEMENT_LIC]: { type: "list-item-child" },
-  [MARK_BOLD]: DEFAULTS_BOLD,
-  [MARK_ITALIC]: DEFAULTS_ITALIC,
-  [MARK_UNDERLINE]: DEFAULTS_UNDERLINE,
-  [ELEMENT_LINK]: { type: "link" },
-} as Record<string, PlatePluginOptions>;
 
 export interface RichTextEditorProps
   extends ValueProps<RichTextEditorValue, false>,
@@ -123,7 +95,6 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       isInvalid,
       isRequired,
       isReadOnly,
-      onKeyDown,
       placeholder,
       placeholderOptions = [],
       ...props
@@ -133,56 +104,71 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     const {
       plugin: placholderPlugin,
       onAddPlaceholder,
-      onChangePlaceholder,
-      onKeyDownPlaceholder,
       onHighlightOption,
       index,
       search,
       target,
       values,
     } = usePlaceholderPlugin(placeholderOptions);
-    const plugins = useConstant(() => [
-      createReactPlugin(),
-      createHistoryPlugin(),
-      createParagraphPlugin(),
-      createBoldPlugin(),
-      createItalicPlugin(),
-      createUnderlinePlugin(),
-      createListPlugin(),
-      createAutoformatPlugin({
-        rules: [
-          {
-            mode: "block",
-            type: "list-item",
-            match: ["* ", "- "],
-            preFormat: (editor: CustomEditor) => unwrapList(editor),
-            format: (editor) => formatList(editor, "bulleted-list"),
-          },
-          {
-            mode: "block",
-            type: "list-item",
-            match: ["1. ", "1) "],
-            preFormat: (editor: CustomEditor) => unwrapList(editor),
-            format: (editor) => formatList(editor, "numbered-list"),
-          },
-        ],
-      }),
-      placholderPlugin,
-      createHeadingPlugin({ levels: 2 }),
-      createLinkPlugin(),
-      createExitBreakPlugin({
-        rules: [
-          {
-            hotkey: "enter",
-            query: {
-              start: true,
-              end: true,
-              allow: ["heading", "subheading"],
+    const plugins = useConstant(() =>
+      createPlugins(
+        [
+          createReactPlugin(),
+          createHistoryPlugin(),
+          createParagraphPlugin(),
+          createBoldPlugin(),
+          createItalicPlugin(),
+          createUnderlinePlugin(),
+          createListPlugin(),
+          createAutoformatPlugin({
+            options: {
+              rules: [
+                {
+                  mode: "block",
+                  type: "list-item",
+                  match: ["* ", "- "],
+                  preFormat: (editor: CustomEditor) => unwrapList(editor),
+                  format: (editor) => formatList(editor, "bulleted-list"),
+                },
+                {
+                  mode: "block",
+                  type: "list-item",
+                  match: ["1. ", "1) "],
+                  preFormat: (editor: CustomEditor) => unwrapList(editor),
+                  format: (editor) => formatList(editor, "numbered-list"),
+                },
+              ],
             },
-          },
+          }),
+          placholderPlugin,
+          createHeadingPlugin({ options: { levels: 2 } }),
+          createLinkPlugin(),
+          createExitBreakPlugin({
+            options: {
+              rules: [
+                {
+                  hotkey: "enter",
+                  query: { start: true, end: true, allow: ["heading", "subheading"] },
+                },
+              ],
+            },
+          }),
         ],
-      }),
-    ]);
+        {
+          components,
+          overrideByKey: {
+            [ELEMENT_PARAGRAPH]: { type: "paragraph" },
+            [ELEMENT_H1]: { type: "heading" },
+            [ELEMENT_H2]: { type: "subheading" },
+            [ELEMENT_OL]: { type: "numbered-list" },
+            [ELEMENT_UL]: { type: "bulleted-list" },
+            [ELEMENT_LI]: { type: "list-item" },
+            [ELEMENT_LIC]: { type: "list-item-child" },
+            [ELEMENT_LINK]: { type: "link" },
+          },
+        }
+      )
+    );
     const formControl = useFormControl({
       id,
       isDisabled,
@@ -190,7 +176,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       isRequired,
       isReadOnly,
     });
-    const editorRef = useUpdatingRef(useStoreEditorState(id));
+    const editorRef = useUpdatingRef(usePlateEditorState(id));
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -220,22 +206,6 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     const isMenuOpen = Boolean(target && values.length > 0);
     const selected = isMenuOpen ? values[index] : undefined;
 
-    const handleChange = useCallback(
-      (value: RichTextEditorValue) => {
-        onChangePlaceholder(editorRef.current!);
-        onChange(value);
-      },
-      [onChange, onChangePlaceholder]
-    );
-
-    const handleKeyDown = useCallback(
-      (event: KeyboardEvent<HTMLDivElement>) => {
-        onKeyDownPlaceholder(event, editorRef.current!);
-        onKeyDown?.(event);
-      },
-      [onKeyDown, onKeyDownPlaceholder]
-    );
-
     const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
     const itemIdPrefix = useId(undefined, "rte-placeholder-menu-item");
 
@@ -248,12 +218,11 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           maxHeight: "250px",
           overflow: "auto",
         } as CSSProperties,
-        onKeyDown: handleKeyDown,
         "aria-controls": placeholderMenuId,
         "aria-autocomplete": "list" as const,
         "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
       }),
-      [isDisabled, placeholder, handleKeyDown, placeholderMenuId, itemIdPrefix, selected?.value]
+      [isDisabled, placeholder, placeholderMenuId, itemIdPrefix, selected?.value]
     );
 
     const { popperRef } = useEditorPopper(editorRef.current!, target, {
@@ -282,10 +251,8 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
         <Plate
           id={id}
           plugins={plugins}
-          options={options}
-          components={components}
           initialValue={initialValue}
-          onChange={handleChange}
+          onChange={onChange}
           editableProps={editableProps}
           renderEditable={renderEditable}
         >
@@ -315,11 +282,11 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
   }
 );
 
-function RenderElement({ attributes, nodeProps, styles, element, ...props }: any) {
+function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {
   return <Text {...attributes} {...props} />;
 }
 
-function RenderLink({ attributes, nodeProps, styles, element, ...props }: any) {
+function RenderLink({ attributes, nodeProps, styles, element, editor, ...props }: any) {
   return (
     <Text
       as="a"

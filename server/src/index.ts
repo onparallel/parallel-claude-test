@@ -14,7 +14,8 @@ import { createContainer } from "./container";
 import { ApiContext } from "./context";
 import { UnknownError } from "./graphql/helpers/errors";
 import { schema } from "./schema";
-import { LOGGER, ILogger } from "./services/logger";
+import { ILogger, LOGGER } from "./services/logger";
+import { IRedis, REDIS } from "./services/redis";
 import { stopwatchEnd } from "./util/stopwatch";
 
 const app = express();
@@ -29,7 +30,8 @@ app.use("/api", json(), cors(), cookieParser(), api(container));
 app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({
   debug: true,
-  schema,
+  // https://github.com/graphql-nexus/nexus/issues/1019
+  schema: schema as any,
   plugins: [
     process.env.NODE_ENV === "production"
       ? ApolloServerPluginLandingPageDisabled()
@@ -43,12 +45,12 @@ const server = new ApolloServer({
               response.errors = response.errors.map((error) => {
                 switch (error.extensions?.code) {
                   case "INTERNAL_SERVER_ERROR": {
-                    const stack = error.extensions?.exception.stacktrace;
+                    const stack = (error.extensions?.exception as any).stacktrace;
                     context.logger.error(error.message, stack && { stack });
                     return new UnknownError("Internal server error");
                   }
                   default:
-                    const stack = error.extensions?.exception.stacktrace;
+                    const stack = (error.extensions?.exception as any).stacktrace;
                     context.logger.warn(error.message, stack && { stack });
                     if (error.extensions?.exception) {
                       delete error.extensions.exception;
@@ -81,11 +83,12 @@ if (process.env.TS_NODE_DEV) {
   });
 }
 
-server.start().then(() => {
+(async function start() {
+  const redis = container.get<IRedis>(REDIS);
+  await redis.connect();
+  await server.start();
   server.applyMiddleware({ app });
-
   const port = process.env.PORT || 4000;
-
   app.listen(port, () => {
     const host = `http://localhost:${port}`;
     const logger = container.get<ILogger>(LOGGER);
@@ -94,4 +97,4 @@ server.start().then(() => {
       logger.info(`GraphQL playground available on ${host}${server.graphqlPath}`);
     }
   });
-});
+})().then();

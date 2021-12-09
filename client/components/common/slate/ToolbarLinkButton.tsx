@@ -4,7 +4,6 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/types";
-import { Maybe } from "@parallel/utils/types";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import {
   getAbove,
@@ -39,20 +38,15 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
       getPreventDefaultHandler(async () => {
         const selection = editorRef.current.selection;
         const endOfEditor = Editor.range(editorRef.current, Editor.end(editor, []));
-        const linkNode: Maybe<LinkNode[]> = editorRef.current.selection
-          ? (getAbove(editorRef.current, {
-              match: { type: "link" },
-            }) as any) ?? null
-          : null;
-        let defaultValues: RTELink | undefined;
-        if (linkNode) {
-          const url = linkNode[0].url;
-          const text = linkNode[0].children.map((c) => c.text).join("");
-          defaultValues = { text, url };
-        }
+        const linkNode = editorRef.current.selection
+          ? getAbove<LinkNode>(editorRef.current, { match: { type: "link" } })
+          : undefined;
         const [_, link] = await withError(
           showAddLinkDialog({
-            defaultValues,
+            defaultValues: linkNode && {
+              url: linkNode[0].url,
+              text: linkNode[0].children.map((c) => c.text).join(""),
+            },
             showTextInput: !linkNode && (!selection || isCollapsed(selection)),
           })
         );

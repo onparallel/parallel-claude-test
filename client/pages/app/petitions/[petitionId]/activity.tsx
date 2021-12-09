@@ -112,7 +112,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           });
         } catch (error) {
           if (isApolloError(error)) {
-            const extra = error.graphQLErrors[0]?.extensions?.extra;
+            const extra = error.graphQLErrors[0]?.extensions?.extra as any;
             switch (extra?.errorCode) {
               case "NO_REMINDERS_LEFT": {
                 showNoRemindersLeftToast(extra.petitionAccessId);
@@ -287,7 +287,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         });
       } catch (e) {
         if (isApolloError(e)) {
-          const extra = e.graphQLErrors[0]?.extensions?.extra;
+          const extra = e.graphQLErrors[0]?.extensions?.extra as any;
           switch (extra?.errorCode) {
             case "NO_REMINDERS_LEFT":
               showNoRemindersLeftToast();

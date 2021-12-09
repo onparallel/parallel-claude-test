@@ -141,7 +141,7 @@ export class BaseRepository {
           .whereIn(column as any, values as TableKey<TName>[])
           .modify((q) => builder?.(q))
           .select("*")) as TableTypes[TName][];
-        const byValue = groupBy(rows, (r) => r[column]);
+        const byValue = groupBy(rows, (r) => (r as any)[column as string]);
         return values.map((value) => byValue[value as any] ?? []);
       })
     );

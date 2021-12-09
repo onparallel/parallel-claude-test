@@ -15,7 +15,7 @@ export function userHasAccessToPetitions<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
       if (petitionIds.length === 0) {
         return true;
       }
@@ -39,7 +39,7 @@ export function userHasAccessToSignatureRequest<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const signatureRequestIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      const signatureRequestIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
       if (signatureRequestIds.length === 0) {
         return true;
       }
@@ -65,7 +65,7 @@ export function userHasAccessToPetitionFieldComments<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const commentIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      const commentIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
       if (commentIds.length === 0) {
         return true;
       }
@@ -82,7 +82,7 @@ export function petitionsArePublicTemplates<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const templateIds = args[argName];
+      const templateIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
       return await ctx.petitions.arePublicTemplates(templateIds);
     } catch {}
     return false;
@@ -96,7 +96,7 @@ export function petitionsAreOfTypePetition<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
       const petitions = await ctx.petitions.loadPetition(petitionIds);
       return petitions.every((p) => p && !p.is_template);
     } catch {}
@@ -111,7 +111,7 @@ export function petitionsAreOfTypeTemplate<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
       const petitions = await ctx.petitions.loadPetition(petitionIds);
       return petitions.every((p) => p && p.is_template);
     } catch {}
@@ -143,7 +143,7 @@ export function fieldsBelongsToPetition<
     try {
       return await ctx.petitions.fieldsBelongToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameFieldIds] as MaybeArray<number>)
+        unMaybeArray(args[argNameFieldIds] as unknown as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -157,7 +157,7 @@ export function fieldsHaveCommentsEnabled<
 >(argNameFieldIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = unMaybeArray(args[argNameFieldIds] as MaybeArray<number>);
+      const ids = unMaybeArray(args[argNameFieldIds] as unknown as MaybeArray<number>);
       return await ctx.petitions.fieldsHaveCommentsEnabled(ids);
     } catch {}
     return false;
@@ -174,7 +174,7 @@ export function fieldAttachmentBelongsToField<
     try {
       return await ctx.petitions.fieldAttachmentBelongsToField(
         args[argNameFieldId] as unknown as number,
-        unMaybeArray(args[argNameAttachmentId] as MaybeArray<number>)
+        unMaybeArray(args[argNameAttachmentId] as unknown as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -191,7 +191,7 @@ export function repliesBelongsToPetition<
     try {
       return await ctx.petitions.repliesBelongsToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameReplyIds] as MaybeArray<number>)
+        unMaybeArray(args[argNameReplyIds] as unknown as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -208,7 +208,7 @@ export function repliesBelongsToField<
     try {
       return await ctx.petitions.repliesBelongsToField(
         args[argNameFieldId] as unknown as number,
-        unMaybeArray(args[argNameReplyIds] as MaybeArray<number>)
+        unMaybeArray(args[argNameReplyIds] as unknown as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -225,7 +225,7 @@ export function accessesBelongToPetition<
     try {
       return await ctx.petitions.accessesBelongToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameAccessIds] as MaybeArray<number>)
+        unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -259,7 +259,7 @@ export function commentsBelongsToPetition<
     try {
       return await ctx.petitions.commentsBelongToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameCommentIds] as MaybeArray<number>)
+        unMaybeArray(args[argNameCommentIds] as unknown as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -274,7 +274,7 @@ export function accessesBelongToValidContacts<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accessesBelongToValidContacts(
-        unMaybeArray(args[argNameAccessIds] as MaybeArray<number>)
+        unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -320,7 +320,7 @@ export function petitionsAreEditable<
   return async (_, args, ctx) => {
     try {
       const petitions = await ctx.petitions.loadPetition(
-        unMaybeArray(args[argNamePetitionIds] as MaybeArray<number>)
+        unMaybeArray(args[argNamePetitionIds] as unknown as MaybeArray<number>)
       );
       return petitions.every((p) => isDefined(p) && !p.restricted_by_user_id);
     } catch {}
@@ -336,7 +336,7 @@ export function petitionsAreNotPublicTemplates<
   return async (_, args, ctx) => {
     try {
       const petitions = await ctx.petitions.loadPetition(
-        unMaybeArray(args[argNamePetitionIds] as MaybeArray<number>)
+        unMaybeArray(args[argNamePetitionIds] as unknown as MaybeArray<number>)
       );
       return petitions.every((p) => isDefined(p) && !p.template_public);
     } catch {}
@@ -351,7 +351,9 @@ export function templateDoesNotHavePublicPetitionLink<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const publicLinks = await ctx.petitions.loadPublicPetitionLinksByTemplateId(args[argName]);
+      const publicLinks = await ctx.petitions.loadPublicPetitionLinksByTemplateId(
+        args[argName] as unknown as number
+      );
       return publicLinks.length === 0;
     } catch {}
     return false;
