@@ -24,7 +24,7 @@ export function PetitionSignatureStatusIcon({
   const envLabel =
     environment === "DEMO"
       ? ` - ${intl.formatMessage({
-          id: "petition-signature-cell-content.test-environment",
+          id: "generic.signature-demo-environment-long",
           defaultMessage: "Test environment",
         })}`
       : "";

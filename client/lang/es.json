@@ -4215,6 +4215,11 @@
     "context": "Test"
   },
   {
+    "term": "generic.signature-demo-environment-long",
+    "definition": "Entorno de pruebas",
+    "context": "Test environment"
+  },
+  {
     "term": "generic.signature-environment",
     "definition": "Entorno",
     "context": "Environment"
@@ -5218,11 +5223,6 @@
     "term": "petition-sharing.success-title",
     "definition": "{count, plural, =1 {Petición compartida} other {Peticiones compartidas}}",
     "context": "{count, plural, =1 {Petition} other {Petitions}} shared"
-  },
-  {
-    "term": "petition-signature-cell-content.test-environment",
-    "definition": "Entorno de pruebas",
-    "context": "Test environment"
   },
   {
     "term": "petition-signature-status-label.e-signature-cancelled",
