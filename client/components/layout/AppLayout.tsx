@@ -90,6 +90,7 @@ export const AppLayout = Object.assign(
         firstName: user.firstName,
         lastName: user.lastName,
         orgId: user.organization.id,
+        createdAt: user.createdAt,
       });
     }, [user.id]);
 
