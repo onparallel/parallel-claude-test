@@ -194,8 +194,8 @@ export function SignatureConfigDialog({
                   getOptionLabel={(p) =>
                     p.environment === "DEMO"
                       ? `${p.name} (${intl.formatMessage({
-                          id: "generic.signature-demo-environment",
-                          defaultMessage: "Demo",
+                          id: "petition-signature-cell-content.test-environment",
+                          defaultMessage: "Test environment",
                         })})`
                       : p.name
                   }
