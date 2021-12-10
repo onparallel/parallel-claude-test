@@ -11,7 +11,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewFieldAttachment } from "./RecipientViewFieldAttachment";
-import { RecipientViewPetitionFieldCommentsDialog } from "./RecipientViewPetitionFieldCommentsDialog";
+import { RecipientViewPetitionFieldCommentsDialog } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
 
 export interface RecipientViewPetitionFieldCardProps {
   field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;

@@ -13,9 +13,9 @@ import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react"
 import { useIntl } from "react-intl";
 import { pick } from "remeda";
 import {
-  handleCreateFieldTextReplyProps,
-  handleDeleteFieldTextReplyProps,
-  handleUpdateFieldTextReplyProps,
+  handleCreateSimpleReplyProps,
+  handleDeletePetitionReplyProps,
+  handleUpdateSimpleReplyProps,
   RecipientViewPetitionFieldProps,
 } from "./RecipientViewPetitionField";
 import {
@@ -33,9 +33,9 @@ export interface RecipientViewPetitionFieldTextProps
     >,
     RecipientViewPetitionFieldProps {
   isDisabled: boolean;
-  onUpdateReply: ({ replyId, value }: handleUpdateFieldTextReplyProps) => Promise<void>;
-  onDeleteReply: ({ replyId }: handleDeleteFieldTextReplyProps) => Promise<void>;
-  onCreateReply: ({ value }: handleCreateFieldTextReplyProps) => Promise<string | undefined>;
+  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
+  onUpdateReply: ({ replyId, value }: handleUpdateSimpleReplyProps) => void;
+  onCreateReply: ({ value }: handleCreateSimpleReplyProps) => Promise<string | undefined>;
 }
 
 export function RecipientViewPetitionFieldText({
@@ -44,8 +44,8 @@ export function RecipientViewPetitionFieldText({
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
-  onUpdateReply,
   onDeleteReply,
+  onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldTextProps) {

@@ -11,9 +11,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
-import { useLastSaved } from "../LastSavedProvider";
-import { useCreateSimpleReply, useDeletePetitionReply, useUpdateSimpleReply } from "./mutations";
-import { RecipientViewPetitionFieldProps } from "./RecipientViewPetitionField";
+import {
+  handleCreateSimpleReplyProps,
+  handleDeletePetitionReplyProps,
+  handleUpdateSimpleReplyProps,
+  RecipientViewPetitionFieldProps,
+} from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -26,25 +29,26 @@ export interface RecipientViewPetitionFieldSelectProps
       "children" | "showAddNewReply" | "onAddNewReply"
     >,
     RecipientViewPetitionFieldProps {
-  petitionId: string;
   isDisabled: boolean;
+  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
+  onUpdateReply: ({ replyId, value }: handleUpdateSimpleReplyProps) => void;
+  onCreateReply: ({ value }: handleCreateSimpleReplyProps) => Promise<string | undefined>;
 }
 
 type SelectInstance = Select<{ label: string; value: string }, false, never>;
 
 export function RecipientViewPetitionFieldSelect({
-  petitionId,
-  keycode,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onDeleteReply,
+  onUpdateReply,
+  onCreateReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldSelectProps) {
   const intl = useIntl();
-
-  const { updateLastSaved } = useLastSaved();
 
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState(toSelectOption(null));
@@ -56,51 +60,41 @@ export function RecipientViewPetitionFieldSelect({
 
   const options = field.options as FieldOptions["SELECT"];
 
-  const updateSimpleReply = useUpdateSimpleReply();
-
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
-      await updateSimpleReply({ petitionId, replyId, keycode, value });
-      updateLastSaved();
+      await onUpdateReply({ replyId, value });
     },
-    [keycode, updateSimpleReply]
+    [onUpdateReply]
   );
-  const deleteReply = useDeletePetitionReply();
+
   const handleDelete = useMemoFactory(
     (replyId: string) => async () => {
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
-      await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
+      await onDeleteReply({ replyId });
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       if (field.replies.length === 1) {
         setShowNewReply(true);
       }
-      updateLastSaved();
     },
-    [keycode, field.id, field.replies, deleteReply]
+    [field.replies, onDeleteReply]
   );
-
-  const createSimpleReply = useCreateSimpleReply();
 
   async function handleOnChange(value: any) {
     setValue(value);
     setIsSaving(true);
     try {
-      const reply = await createSimpleReply({
-        petitionId,
-        keycode,
-        fieldId: field.id,
+      const replyId = await onCreateReply({
         value: value.value,
       });
-      if (reply) {
+      if (replyId) {
         setShowNewReply(false);
         setValue(null);
         setTimeout(() => {
-          replyRefs[reply.id].current?.focus();
+          replyRefs[replyId].current?.focus();
         });
       }
     } catch {}
     setIsSaving(false);
-    updateLastSaved();
   }
 
   function handleAddNewReply() {

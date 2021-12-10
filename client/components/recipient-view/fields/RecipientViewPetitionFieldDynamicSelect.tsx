@@ -17,13 +17,12 @@ import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "reac
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import { countBy } from "remeda";
-import { useLastSaved } from "../LastSavedProvider";
 import {
-  useCreateDynamicSelectReply,
-  useDeletePetitionReply,
-  useUpdateDynamicSelectReply,
-} from "./mutations";
-import { RecipientViewPetitionFieldProps } from "./RecipientViewPetitionField";
+  handleCreateDynamicSelectReplyProps,
+  handleDeletePetitionReplyProps,
+  handleUpdateDynamicSelectReplyProps,
+  RecipientViewPetitionFieldProps,
+} from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -36,20 +35,23 @@ export interface RecipientViewPetitionFieldDynamicSelectProps
       "children" | "showAddNewReply" | "onAddNewReply"
     >,
     RecipientViewPetitionFieldProps {
-  petitionId: string;
   isDisabled: boolean;
+  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
+  onUpdateReply: ({ replyId, value }: handleUpdateDynamicSelectReplyProps) => void;
+  onCreateReply: ({ value }: handleCreateDynamicSelectReplyProps) => Promise<string | undefined>;
 }
 
 type SelectInstance = Select<{ label: string; value: string }, false, never>;
 
 export function RecipientViewPetitionFieldDynamicSelect({
-  petitionId,
-  keycode,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onDeleteReply,
+  onUpdateReply,
+  onCreateReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldDynamicSelectProps) {
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
@@ -57,49 +59,42 @@ export function RecipientViewPetitionFieldDynamicSelect({
   const newReplyRef = useRef<SelectInstance>(null);
   const replyRefs = useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
 
-  const { updateLastSaved } = useLastSaved();
-
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
 
-  const updateDynamicSelectReply = useUpdateDynamicSelectReply();
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: [string, string | null][]) => {
-      await updateDynamicSelectReply({ petitionId, replyId, keycode, value });
-      updateLastSaved();
+      await onUpdateReply({ replyId, value });
     },
-    [petitionId, keycode, updateDynamicSelectReply]
+    [onUpdateReply]
   );
 
-  const deleteReply = useDeletePetitionReply();
   const handleDelete = useMemoFactory(
     (replyId: string) => async () => {
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
-      await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
+      await onDeleteReply({ replyId });
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       if (field.replies.length === 1) {
         setShowNewReply(true);
       }
-      updateLastSaved();
     },
-    [keycode, field.id, field.replies, deleteReply]
+    [field.replies, onDeleteReply]
   );
 
-  const createDynamicSelectReply = useCreateDynamicSelectReply();
   async function handleCreateReply(value: string) {
-    const reply = await createDynamicSelectReply({
-      petitionId,
-      keycode,
-      fieldId: field.id,
-      value: fieldOptions.labels.map((label, i) => [label, i === 0 ? value : null]),
+    const _value = fieldOptions.labels.map((label, i) => [label, i === 0 ? value : null]) as [
+      string,
+      string | null
+    ][];
+    const replyId = await onCreateReply({
+      value: _value,
     });
-    if (reply) {
+    if (replyId) {
       setShowNewReply(false);
       setTimeout(() => {
-        const instance = replyRefs[reply.id].current!;
+        const instance = replyRefs[replyId].current!;
         instance.focus(1);
       });
     }
-    updateLastSaved();
   }
 
   function handleAddNewReply() {

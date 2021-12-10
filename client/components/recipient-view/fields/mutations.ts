@@ -388,16 +388,14 @@ const _publicFileUploadReplyComplete = gql`
   }
 `;
 
-export function useCreateFileUploadReply(
-  uploads: MutableRefObject<Record<string, XMLHttpRequest>>
-) {
+export function useCreateFileUploadReply() {
   const [createFileUploadReply] = useMutation(
     RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument
   );
-  const apollo = useApolloClient();
   const [fileUploadReplyComplete] = useMutation(
     RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument
   );
+  const apollo = useApolloClient();
 
   return useCallback(
     async function _createFileUploadReply({
@@ -405,11 +403,13 @@ export function useCreateFileUploadReply(
       keycode,
       fieldId,
       content,
+      uploads,
     }: {
       petitionId: string;
       keycode: string;
       fieldId: string;
       content: File[];
+      uploads: MutableRefObject<Record<string, XMLHttpRequest>>;
     }) {
       for (const file of content) {
         const { data } = await createFileUploadReply({
@@ -455,7 +455,7 @@ export function useCreateFileUploadReply(
         });
       }
     },
-    [uploads, createFileUploadReply, fileUploadReplyComplete]
+    [createFileUploadReply, fileUploadReplyComplete]
   );
 }
 

@@ -111,7 +111,7 @@ describe("presendPetition", () => {
     const results = await presendPetition(
       [[petition, [contactIds[0]]]],
       {
-        scheduledAt: new Date(2021, 8, 3), // 03/09/2021 (month starts at 0)
+        scheduledAt: new Date(Date.UTC(2021, 8, 3)), // 03/09/2021 (month starts at 0)
         remindersConfig: {
           offset: 2,
           time: "11:45",
@@ -157,7 +157,7 @@ describe("presendPetition", () => {
         petition_access_id: accesses?.[0].id,
         sender_id: user.id,
         status: "SCHEDULED",
-        scheduled_at: new Date(2021, 8, 3),
+        scheduled_at: new Date(Date.UTC(2021, 8, 3)),
       },
     ]);
   });

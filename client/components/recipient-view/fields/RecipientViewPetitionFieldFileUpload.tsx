@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
@@ -21,19 +21,23 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
+  RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation,
   RecipientViewPetitionField_PublicPetitionFieldFragment,
-  RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
+import { Maybe } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useLastSaved } from "../LastSavedProvider";
-import { useCreateFileUploadReply, useDeletePetitionReply } from "./mutations";
-import { RecipientViewPetitionFieldProps } from "./RecipientViewPetitionField";
+import {
+  handleCreateFileUploadReplyProps,
+  handleDeletePetitionReplyProps,
+  handleDonwloadFileUploadReplyProps,
+  RecipientViewPetitionFieldProps,
+} from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -45,59 +49,50 @@ export interface RecipientViewPetitionFieldFileUploadProps
       "children" | "showAddNewReply" | "onAddNewReply"
     >,
     RecipientViewPetitionFieldProps {
-  petitionId: string;
   isDisabled: boolean;
+  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
+  onCreateReply: ({ content, uploads }: handleCreateFileUploadReplyProps) => void;
+  onDownloadReply: ({
+    replyId,
+  }: handleDonwloadFileUploadReplyProps) => Promise<
+    | Maybe<RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation>
+    | undefined
+  >;
 }
 
 export function RecipientViewPetitionFieldFileUpload({
-  petitionId,
-  keycode,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onDeleteReply,
+  onCreateReply,
+  onDownloadReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldFileUploadProps) {
   const uploads = useRef<Record<string, XMLHttpRequest>>({});
 
-  const { updateLastSaved } = useLastSaved();
-
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
-  const deletePetitionReply = useDeletePetitionReply();
   const handleDeletePetitionReply = useCallback(
-    async function handleDeletePetitionReply({
-      keycode,
-      fieldId,
-      replyId,
-    }: {
-      keycode: string;
-      fieldId: string;
-      replyId: string;
-    }) {
+    async function handleDeletePetitionReply({ replyId }: { replyId: string }) {
       uploads.current[replyId]?.abort();
       delete uploads.current[replyId];
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
-      await deletePetitionReply({ petitionId, fieldId, replyId, keycode });
+      await onDeleteReply({ replyId });
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
-      updateLastSaved();
     },
-    [deletePetitionReply, uploads]
+    [uploads]
   );
-  const createFileUploadReply = useCreateFileUploadReply(uploads);
-
   const handleCreateReply = useCallback(
     (content: File[]) => {
-      updateLastSaved();
-      return createFileUploadReply({
-        petitionId,
-        keycode,
-        fieldId: field.id,
+      onCreateReply({
         content,
+        uploads,
       });
     },
-    [createFileUploadReply, keycode, field.id]
+    [uploads, onCreateReply]
   );
 
   return (
@@ -120,17 +115,14 @@ export function RecipientViewPetitionFieldFileUpload({
                 exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
               >
                 <RecipientViewPetitionFieldReplyFileUpload
-                  keycode={keycode}
-                  options={field.options as FieldOptions["FILE_UPLOAD"]}
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id]}
                   onRemove={() =>
                     handleDeletePetitionReply({
-                      keycode,
-                      fieldId: field.id,
                       replyId: reply.id,
                     })
                   }
+                  onDownload={onDownloadReply}
                 />
               </motion.li>
             ))}
@@ -149,38 +141,38 @@ export function RecipientViewPetitionFieldFileUpload({
 }
 
 interface RecipientViewPetitionFieldReplyFileUploadProps {
-  keycode: string;
-  options: FieldOptions["FILE_UPLOAD"];
   reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
   isDisabled: boolean;
   onRemove: () => void;
+  onDownload: ({
+    replyId,
+  }: handleDonwloadFileUploadReplyProps) => Promise<
+    | Maybe<RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation>
+    | undefined
+  >;
 }
 
 export function RecipientViewPetitionFieldReplyFileUpload({
-  keycode,
   reply,
   isDisabled,
   onRemove,
+  onDownload,
 }: RecipientViewPetitionFieldReplyFileUploadProps) {
   const intl = useIntl();
-  const [downloadFileUploadReply] = useMutation(
-    RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument
-  );
+
   const showFailure = useFailureGeneratingLinkDialog();
   function handleDownloadClick() {
     openNewWindow(async () => {
-      const { data } = await downloadFileUploadReply({
-        variables: {
-          keycode,
-          replyId: reply.id,
-          preview: false,
-        },
+      const data = await onDownload({
+        replyId: reply.id,
       });
+
       const { url, result } = data!.publicFileUploadReplyDownloadLink;
       if (result !== "SUCCESS") {
         await withError(showFailure({ filename: reply.content.filename }));
         throw new Error();
       }
+
       return url!;
     });
   }

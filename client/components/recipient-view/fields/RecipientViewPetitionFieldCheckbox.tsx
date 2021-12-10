@@ -3,13 +3,12 @@ import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { useLastSaved } from "../LastSavedProvider";
 import {
-  useCreateCheckboxReply,
-  useDeletePetitionReply,
-  useUpdateCheckboxReply,
-} from "./mutations";
-import { RecipientViewPetitionFieldProps } from "./RecipientViewPetitionField";
+  handleCreateCheckboxReplyProps,
+  handleDeletePetitionReplyProps,
+  handleUpdateCheckboxReplyProps,
+  RecipientViewPetitionFieldProps,
+} from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -22,8 +21,10 @@ export interface RecipientViewPetitionFieldCheckboxProps
       "children" | "showAddNewReply" | "onAddNewReply"
     >,
     RecipientViewPetitionFieldProps {
-  petitionId: string;
   isDisabled: boolean;
+  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
+  onUpdateReply: ({ replyId, values }: handleUpdateCheckboxReplyProps) => void;
+  onCreateReply: ({ values }: handleCreateCheckboxReplyProps) => void;
 }
 
 const haveChanges = ({
@@ -43,13 +44,14 @@ function CustomIcon() {
 }
 
 export function RecipientViewPetitionFieldCheckbox({
-  petitionId,
-  keycode,
   field,
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
   onDownloadAttachment,
+  onDeleteReply,
+  onUpdateReply,
+  onCreateReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldCheckboxProps) {
   const { values, limit } = field.options;
@@ -58,7 +60,6 @@ export function RecipientViewPetitionFieldCheckbox({
 
   const isRejected = field.replies[0]?.status === "REJECTED" ?? false;
   const showRadio = max === 1 && type !== "UNLIMITED";
-  const fieldId = field.id;
   const replyId = field.replies[0]?.id;
 
   const [checkedItems, setCheckedItems] = useState<string[]>(
@@ -66,40 +67,27 @@ export function RecipientViewPetitionFieldCheckbox({
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  const { updateLastSaved } = useLastSaved();
-
-  const updateCheckboxReply = useUpdateCheckboxReply();
   const handleUpdate = async (values: string[]) => {
     setIsSaving(true);
-    await updateCheckboxReply({
-      petitionId,
+    await onUpdateReply({
       replyId,
-      keycode,
       values,
     });
     setIsSaving(false);
-    updateLastSaved();
   };
 
-  const createChekcboxReply = useCreateCheckboxReply();
   const handleCreate = async (values: string[]) => {
     setIsSaving(true);
-    await createChekcboxReply({
-      petitionId,
-      fieldId,
-      keycode,
+    await onCreateReply({
       values,
     });
     setIsSaving(false);
-    updateLastSaved();
   };
 
-  const deleteReply = useDeletePetitionReply();
   const handleDelete = async () => {
     setIsSaving(true);
-    await deleteReply({ petitionId, fieldId, replyId, keycode });
+    await onDeleteReply({ replyId });
     setIsSaving(false);
-    updateLastSaved();
   };
 
   const handleChange = (option: string) => {
