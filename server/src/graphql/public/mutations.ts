@@ -1,4 +1,4 @@
-import { differenceInDays, differenceInSeconds } from "date-fns";
+import { differenceInDays } from "date-fns";
 import {
   booleanArg,
   idArg,
@@ -19,7 +19,7 @@ import { stallFor } from "../../util/promises/stallFor";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
 import { and, chain, checkClientServerToken } from "../helpers/authorize";
-import { ArgValidationError, WhitelistedError } from "../helpers/errors";
+import { InvalidOptionError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { jsonArg } from "../helpers/json";
 import { presendPetition } from "../helpers/presendPetition";
@@ -27,19 +27,25 @@ import { RESULT } from "../helpers/result";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
-import { fieldAttachmentBelongsToField, fieldsHaveCommentsEnabled } from "../petition/authorizers";
+import {
+  fieldAllowsNewReply,
+  fieldAttachmentBelongsToField,
+  fieldHasType,
+  fieldsHaveCommentsEnabled,
+  replyAllowsUpdate,
+  replyIsForFieldOfType,
+} from "../petition/authorizers";
+import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
   fetchPetitionAccess,
   fieldBelongsToAccess,
-  fieldHasType,
   getContactAuthCookieValue,
   replyBelongsToAccess,
-  replyIsForFieldOfType,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
-import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "./utils";
+
 function anonymizePart(part: string) {
   return part.length > 2
     ? part[0] + "*".repeat(part.length - 2) + part[part.length - 1]
@@ -226,23 +232,16 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
 export const publicDeletePetitionReply = mutationField("publicDeletePetitionReply", {
   description: "Deletes a reply to a petition field.",
   type: "Result",
-  authorize: chain(authenticatePublicAccess("keycode"), replyBelongsToAccess("replyId")),
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    replyBelongsToAccess("replyId"),
+    replyAllowsUpdate("replyId")
+  ),
   args: {
     keycode: nonNull(idArg()),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   resolve: async (_, args, ctx) => {
-    const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
-    if (reply.status === "APPROVED") {
-      throw new WhitelistedError("Can't delete an approved reply", "INVALID_REPLY_STATUS");
-    }
-    if (reply.type === "FILE_UPLOAD") {
-      const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
-      await Promise.all([
-        ctx.files.deleteFileUpload(file!.id, `Contact:${ctx.contact!.id}`),
-        ctx.aws.fileUploads.deleteFile(file!.path),
-      ]);
-    }
     await ctx.petitions.deletePetitionFieldReply(args.replyId, `Contact:${ctx.contact!.id}`);
     return RESULT.SUCCESS;
   },
@@ -255,7 +254,11 @@ export const publicFileUploadReplyComplete = mutationField("publicFileUploadRepl
     keycode: nonNull(idArg()),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
-  authorize: chain(authenticatePublicAccess("keycode"), replyBelongsToAccess("replyId")),
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    replyBelongsToAccess("replyId"),
+    replyIsForFieldOfType("replyId", "FILE_UPLOAD")
+  ),
   resolve: async (_, args, ctx) => {
     const reply = await ctx.petitions.loadFieldReply(args.replyId);
     if (reply?.type !== "FILE_UPLOAD") {
@@ -288,8 +291,11 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    fieldBelongsToAccess("fieldId"),
-    fieldHasType("fieldId", "FILE_UPLOAD")
+    and(
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", "FILE_UPLOAD"),
+      fieldAllowsNewReply("fieldId")
+    )
   ),
   resolve: async (_, args, ctx) => {
     const key = random(16);
@@ -329,15 +335,18 @@ export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", 
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    fieldBelongsToAccess("fieldId"),
-    fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT"])
+    and(
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT"]),
+      fieldAllowsNewReply("fieldId")
+    )
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
     if (field.type === "SELECT") {
       const options = field.options.values as Maybe<string[]>;
       if (!options?.includes(args.value)) {
-        throw new ArgValidationError(info, "reply", "Invalid option");
+        throw new InvalidOptionError(info, "reply", "Invalid option");
       }
     }
   },
@@ -367,7 +376,8 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
     authenticatePublicAccess("keycode"),
     and(
       replyBelongsToAccess("replyId"),
-      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"])
+      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
+      replyAllowsUpdate("replyId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {
@@ -375,39 +385,16 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
     if (field.type === "SELECT") {
       const options = field.options.values as Maybe<string[]>;
       if (!options?.includes(args.value)) {
-        throw new ArgValidationError(info, "value", "Invalid option");
+        throw new InvalidOptionError(info, "value", "Invalid option");
       }
     }
   },
   resolve: async (_, args, ctx) => {
-    const petitionId = ctx.access!.petition_id;
-    const [reply, event] = await Promise.all([
-      ctx.petitions.updatePetitionFieldReply(
-        args.replyId,
-        { content: { text: args.value }, status: "PENDING" },
-        `Contact:${ctx.contact!.id}`
-      ),
-      ctx.petitions.getLastEventForPetitionId(petitionId),
-    ]);
-    if (
-      event &&
-      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
-      event.data.petition_field_reply_id === args.replyId &&
-      differenceInSeconds(new Date(), event.created_at) < 60
-    ) {
-      await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
-    } else {
-      await ctx.petitions.createEvent({
-        type: "REPLY_UPDATED",
-        petition_id: petitionId,
-        data: {
-          petition_access_id: reply.petition_access_id!,
-          petition_field_id: reply.petition_field_id,
-          petition_field_reply_id: reply.id,
-        },
-      });
-    }
-    return reply;
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      { content: { text: args.value }, status: "PENDING" },
+      ctx.access!
+    );
   },
 });
 
@@ -421,15 +408,18 @@ export const publicCreateCheckboxReply = mutationField("publicCreateCheckboxRepl
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    fieldBelongsToAccess("fieldId"),
-    fieldHasType("fieldId", ["CHECKBOX"])
+    and(
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", ["CHECKBOX"]),
+      fieldAllowsNewReply("fieldId")
+    )
   ),
   validateArgs: async (_, args, ctx, info) => {
     try {
       const field = (await ctx.petitions.loadField(args.fieldId))!;
       validateCheckboxReplyValues(field, args.values);
     } catch (error: any) {
-      throw new ArgValidationError(info, "values", error.message);
+      throw new InvalidOptionError(info, "values", error.message);
     }
   },
   resolve: async (_, args, ctx) => {
@@ -455,45 +445,29 @@ export const publicUpdateCheckboxReply = mutationField("publicUpdateCheckboxRepl
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(replyBelongsToAccess("replyId"), replyIsForFieldOfType("replyId", ["CHECKBOX"]))
+    and(
+      replyBelongsToAccess("replyId"),
+      replyIsForFieldOfType("replyId", ["CHECKBOX"]),
+      replyAllowsUpdate("replyId")
+    )
   ),
   validateArgs: async (_, args, ctx, info) => {
     try {
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       validateCheckboxReplyValues(field, args.values);
     } catch (error: any) {
-      throw new ArgValidationError(info, "values", error.message);
+      throw new InvalidOptionError(info, "values", error.message);
     }
   },
   resolve: async (_, args, ctx) => {
-    const petitionId = ctx.access!.petition_id;
-    const [reply, event] = await Promise.all([
-      ctx.petitions.updatePetitionFieldReply(
-        args.replyId,
-        { content: { choices: args.values }, status: "PENDING" },
-        `Contact:${ctx.contact!.id}`
-      ),
-      ctx.petitions.getLastEventForPetitionId(petitionId),
-    ]);
-    if (
-      event &&
-      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
-      event.data.petition_field_reply_id === args.replyId &&
-      differenceInSeconds(new Date(), event.created_at) < 60
-    ) {
-      await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
-    } else {
-      await ctx.petitions.createEvent({
-        type: "REPLY_UPDATED",
-        petition_id: petitionId,
-        data: {
-          petition_access_id: reply.petition_access_id!,
-          petition_field_id: reply.petition_field_id,
-          petition_field_reply_id: reply.id,
-        },
-      });
-    }
-    return reply;
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      {
+        content: { choices: args.values },
+        status: "PENDING",
+      },
+      ctx.access!
+    );
   },
 });
 
@@ -507,14 +481,18 @@ export const publicCreateDynamicSelectReply = mutationField("publicCreateDynamic
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(fieldBelongsToAccess("fieldId"), fieldHasType("fieldId", ["DYNAMIC_SELECT"]))
+    and(
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
+      fieldAllowsNewReply("fieldId")
+    )
   ),
   validateArgs: async (_, args, ctx, info) => {
     try {
       const field = (await ctx.petitions.loadField(args.fieldId))!;
       validateDynamicSelectReplyValues(field, args.value);
     } catch (error: any) {
-      throw new ArgValidationError(info, "value", error.message);
+      throw new InvalidOptionError(info, "value", error.message);
     }
   },
   resolve: async (_, args, ctx) => {
@@ -540,48 +518,29 @@ export const publicUpdateDynamicSelectReply = mutationField("publicUpdateDynamic
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(replyBelongsToAccess("replyId"), replyIsForFieldOfType("replyId", "DYNAMIC_SELECT"))
+    and(
+      replyBelongsToAccess("replyId"),
+      replyIsForFieldOfType("replyId", "DYNAMIC_SELECT"),
+      replyAllowsUpdate("replyId")
+    )
   ),
   validateArgs: async (_, args, ctx, info) => {
     try {
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       validateDynamicSelectReplyValues(field, args.value);
     } catch (error: any) {
-      throw new ArgValidationError(info, "reply", error.message);
+      throw new InvalidOptionError(info, "reply", error.message);
     }
   },
   resolve: async (_, args, ctx) => {
-    const petitionId = ctx.access!.petition_id;
-    const [reply, event] = await Promise.all([
-      ctx.petitions.updatePetitionFieldReply(
-        args.replyId,
-        {
-          content: { columns: args.value },
-          status: "PENDING",
-        },
-        `Contact:${ctx.contact!.id}`
-      ),
-      ctx.petitions.getLastEventForPetitionId(petitionId),
-    ]);
-    if (
-      event &&
-      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
-      event.data.petition_field_reply_id === args.replyId &&
-      differenceInSeconds(new Date(), event.created_at) < 60
-    ) {
-      await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
-    } else {
-      await ctx.petitions.createEvent({
-        type: "REPLY_UPDATED",
-        petition_id: petitionId,
-        data: {
-          petition_access_id: reply.petition_access_id!,
-          petition_field_id: reply.petition_field_id,
-          petition_field_reply_id: reply.id,
-        },
-      });
-    }
-    return reply;
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      {
+        content: { columns: args.value },
+        status: "PENDING",
+      },
+      ctx.access!
+    );
   },
 });
 
@@ -621,8 +580,7 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
   type: "PublicPetitionFieldComment",
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    fieldBelongsToAccess("petitionFieldId"),
-    fieldsHaveCommentsEnabled("petitionFieldId")
+    and(fieldBelongsToAccess("petitionFieldId"), fieldsHaveCommentsEnabled("petitionFieldId"))
   ),
   args: {
     keycode: nonNull(idArg()),

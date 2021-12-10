@@ -63,3 +63,21 @@ export class ExcelParsingError extends Error {
     super(message);
   }
 }
+
+export class InvalidOptionError extends ApolloError {
+  readonly name = "InvalidOptionError";
+  constructor(
+    { parentType, fieldName }: GraphQLResolveInfo,
+    argName: string,
+    message: string,
+    extra?: any
+  ) {
+    super(message, "INVALID_OPTION_ERROR", {
+      parentType,
+      fieldName,
+      argName,
+      message,
+      extra,
+    });
+  }
+}

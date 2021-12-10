@@ -509,9 +509,23 @@ type Mutation {
   cloneUserGroup(locale: String, userGroupIds: [GID!]!): [UserGroup!]!
 
   """
+  Creates a reply to a checkbox field.
+  """
+  createCheckboxReply(fieldId: GID!, petitionId: GID!, values: [String!]!): PetitionFieldReply!
+
+  """
   Create a contact.
   """
   createContact(data: CreateContactInput!): Contact!
+
+  """
+  Creates a reply for a dynamic select field.
+  """
+  createDynamicSelectReply(
+    fieldId: GID!
+    petitionId: GID!
+    value: [[String]!]!
+  ): PetitionFieldReply!
 
   """
   Creates an event subscription for the user's petitions
@@ -1133,9 +1147,23 @@ type Mutation {
   untagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
 
   """
+  Updates a reply of a checkbox field
+  """
+  updateCheckboxReply(petitionId: GID!, replyId: GID!, values: [String!]!): PetitionFieldReply!
+
+  """
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: GID!): Contact!
+
+  """
+  Updates a reply for a dynamic select field.
+  """
+  updateDynamicSelectReply(
+    petitionId: GID!
+    replyId: GID!
+    value: [[String]!]!
+  ): PetitionFieldReply!
 
   """
   Updates an existing event subscription for the user's petitions

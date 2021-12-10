@@ -1,5 +1,5 @@
 import DataLoader from "dataloader";
-import { isSameMonth, isThisMonth, subMonths } from "date-fns";
+import { differenceInSeconds, isSameMonth, isThisMonth, subMonths } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
@@ -15,7 +15,12 @@ import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
-import { CreatePetitionEvent, GenericPetitionEvent, PetitionEvent } from "../events";
+import {
+  CreatePetitionEvent,
+  GenericPetitionEvent,
+  PetitionEvent,
+  ReplyUpdatedEvent,
+} from "../events";
 import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
@@ -51,6 +56,7 @@ import {
   TemplateDefaultPermission,
   User,
 } from "../__types";
+import { FileRepository } from "./FileRepository";
 type PetitionType = "PETITION" | "TEMPLATE";
 type PetitionLocale = "en" | "es";
 
@@ -113,7 +119,11 @@ export type PetitionSignatureRequestCancelData<CancelReason extends PetitionSign
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
+  constructor(
+    @inject(KNEX) knex: Knex,
+    @inject(AWS_SERVICE) private aws: Aws,
+    @inject(FileRepository) private files: FileRepository
+  ) {
     super(knex);
   }
 
@@ -1345,11 +1355,18 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionFieldReply(
     replyId: number,
     data: Partial<PetitionFieldReply>,
-    updatedBy: string
+    updater: User | PetitionAccess
   ) {
     const field = await this.loadFieldForReply(replyId);
     if (!field) {
       throw new Error("Petition field not found");
+    }
+
+    let updatedBy: string;
+    if (isDefined((updater as any).keycode)) {
+      updatedBy = `Contact:${(updater as PetitionAccess).contact_id}`;
+    } else {
+      updatedBy = `User:${(updater as User).id}`;
     }
     const [[reply]] = await Promise.all([
       this.from("petition_field_reply")
@@ -1366,6 +1383,11 @@ export class PetitionRepository extends BaseRepository {
         .update({ status: "PENDING" })
         .where({ id: field.petition_id, status: "COMPLETED" }),
     ]);
+
+    await this.createOrUpdateReplyEvent(field.petition_id, reply, {
+      petition_access_id: updatedBy.startsWith("Contact:") ? updater.id : undefined,
+      user_id: updatedBy.startsWith("User:") ? updater.id : undefined,
+    });
     return reply;
   }
 
@@ -1392,6 +1414,15 @@ export class PetitionRepository extends BaseRepository {
     if (!reply) {
       throw new Error("Petition field reply not found");
     }
+
+    if (reply.type === "FILE_UPLOAD") {
+      const file = await this.files.loadFileUpload(reply.content["file_upload_id"]);
+      await Promise.all([
+        this.files.deleteFileUpload(file!.id, deletedBy),
+        this.aws.fileUploads.deleteFile(file!.path),
+      ]);
+    }
+
     await Promise.all([
       this.from("petition_field_reply")
         .update({
@@ -1885,6 +1916,32 @@ export class PetitionRepository extends BaseRepository {
       [petitionId]
     );
     return event;
+  }
+
+  private async createOrUpdateReplyEvent(
+    petitionId: number,
+    reply: PetitionFieldReply,
+    updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">
+  ) {
+    const event = await this.getLastEventForPetitionId(petitionId);
+    if (
+      event &&
+      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
+      event.data.petition_field_reply_id === reply.id &&
+      differenceInSeconds(new Date(), event.created_at) < 60
+    ) {
+      await this.updateEvent(event.id, { created_at: new Date() });
+    } else {
+      await this.createEvent({
+        type: "REPLY_UPDATED",
+        petition_id: petitionId,
+        data: {
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
+          ...updater,
+        },
+      });
+    }
   }
 
   async updateEvent(eventId: number, data: Partial<PetitionEvent>) {

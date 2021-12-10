@@ -763,9 +763,7 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("deletes the linked attachments and uploaded files when deleting a field", async () => {
-      const [newField] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
-        position: 7,
-      }));
+      const [newField] = await mocks.createRandomPetitionFields(userPetition.id, 1);
 
       const [attachment] = await mocks.createPetitionFieldAttachment(newField.id, 1);
 
@@ -801,9 +799,7 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("don't delete the attached file if its being used as attachment in other field", async () => {
-      const newFields = await mocks.createRandomPetitionFields(userPetition.id, 2, (i) => ({
-        position: 8 + i,
-      }));
+      const newFields = await mocks.createRandomPetitionFields(userPetition.id, 2);
 
       const [file] = await mocks.createRandomFileUpload(1);
 
@@ -1560,17 +1556,15 @@ describe("GraphQL/Petition Fields", () => {
       [fixedHeadingField] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
         type: "HEADING",
         is_fixed: true,
-        position: 0,
       }));
 
       [field] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
         type: "TEXT",
-        position: 1,
       }));
 
       [fieldWithReply] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
         type: "TEXT",
-        position: 2,
+
         validated: true,
       }));
 

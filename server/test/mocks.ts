@@ -104,7 +104,7 @@ export class MockStorage implements IStorage {
   }
   async deleteFile() {}
   async getSignedUploadEndpoint() {
-    return { url: "" } as any;
+    return { url: "", fields: {} } as any;
   }
   async getSignedDownloadEndpoint() {
     return "";

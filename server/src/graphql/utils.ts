@@ -1,6 +1,6 @@
 import { difference } from "remeda";
-import { PetitionField } from "../../db/__types";
-import { DynamicSelectOption } from "../helpers/parseDynamicSelectValues";
+import { PetitionField } from "../db/__types";
+import { DynamicSelectOption } from "./helpers/parseDynamicSelectValues";
 
 export function validateDynamicSelectReplyValues(field: PetitionField, reply: (string | null)[][]) {
   const levels = field.options.labels.length;
@@ -29,6 +29,19 @@ export function validateDynamicSelectReplyValues(field: PetitionField, reply: (s
 }
 
 export function validateCheckboxReplyValues(field: PetitionField, values: string[]) {
+  const { type: subtype, min, max } = field.options.limit;
+
+  if (subtype === "RADIO" && values.length > 1) {
+    throw new Error("Invalid values");
+  }
+
+  if (
+    (subtype === "EXACT" || subtype === "RANGE") &&
+    (values.length > max || values.length < min)
+  ) {
+    throw new Error("Invalid values");
+  }
+
   if (difference(values, field.options.values).length !== 0) {
     throw new Error(`Invalid values`);
   }

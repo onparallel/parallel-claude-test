@@ -191,6 +191,11 @@ export class Mocks {
     amount: number,
     builder?: (index: number) => Partial<PetitionField>
   ) {
+    const [{ count }] = await this.knex("petition_field")
+      .where("petition_id", petitionId)
+      .whereNull("deleted_at")
+      .count("*");
+
     return await this.knex<PetitionField>("petition_field")
       .insert(
         range(0, amount).map<CreatePetitionField>((index) => {
@@ -198,7 +203,7 @@ export class Mocks {
           const type = data.type ?? randomPetitionFieldType();
           return {
             petition_id: petitionId,
-            position: index,
+            position: (count as number) + index,
             title: faker.random.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
@@ -262,13 +267,14 @@ export class Mocks {
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>
   ) {
+    const [fileUpload] = await this.createRandomFileUpload(1);
     return await this.knex<PetitionFieldReply>("petition_field_reply")
       .insert(
         range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
           return {
             petition_field_id: fieldId,
             type: "FILE_UPLOAD",
-            content: { file_upload_id: 1 },
+            content: { file_upload_id: fileUpload.id },
             ...builder?.(index),
           };
         })

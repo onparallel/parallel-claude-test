@@ -858,7 +858,9 @@ export interface NexusGenFieldTypes {
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     cloneUserGroup: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
+    createCheckboxReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
+    createDynamicSelectReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -938,7 +940,9 @@ export interface NexusGenFieldTypes {
     transferOrganizationOwnership: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     transferPetitionOwnership: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    updateCheckboxReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
+    updateDynamicSelectReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2114,7 +2118,9 @@ export interface NexusGenFieldTypeNames {
     clonePetitionField: "PetitionBaseAndField";
     clonePetitions: "PetitionBase";
     cloneUserGroup: "UserGroup";
+    createCheckboxReply: "PetitionFieldReply";
     createContact: "Contact";
+    createDynamicSelectReply: "PetitionFieldReply";
     createEventSubscription: "PetitionEventSubscription";
     createExportRepliesTask: "Task";
     createFileUploadReply: "PetitionFieldReply";
@@ -2194,7 +2200,9 @@ export interface NexusGenFieldTypeNames {
     transferOrganizationOwnership: "SupportMethodResponse";
     transferPetitionOwnership: "PetitionBase";
     untagPetition: "PetitionBase";
+    updateCheckboxReply: "PetitionFieldReply";
     updateContact: "Contact";
+    updateDynamicSelectReply: "PetitionFieldReply";
     updateEventSubscription: "PetitionEventSubscription";
     updateFieldPositions: "PetitionBase";
     updateLandingTemplateMetadata: "SupportMethodResponse";
@@ -3227,9 +3235,21 @@ export interface NexusGenArgTypes {
       locale?: string | null; // String
       userGroupIds: NexusGenScalars["GID"][]; // [GID!]!
     };
+    createCheckboxReply: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      values: string[]; // [String!]!
+    };
     createContact: {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
+    };
+    createDynamicSelectReply: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      value: Array<Array<string | null>>; // [[String]!]!
     };
     createEventSubscription: {
       // args
@@ -3678,10 +3698,22 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       tagId: NexusGenScalars["GID"]; // GID!
     };
+    updateCheckboxReply: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      replyId: NexusGenScalars["GID"]; // GID!
+      values: string[]; // [String!]!
+    };
     updateContact: {
       // args
       data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
       id: NexusGenScalars["GID"]; // GID!
+    };
+    updateDynamicSelectReply: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      replyId: NexusGenScalars["GID"]; // GID!
+      value: Array<Array<string | null>>; // [[String]!]!
     };
     updateEventSubscription: {
       // args

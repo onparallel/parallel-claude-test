@@ -397,7 +397,6 @@ describe("repositories/PetitionRepository", () => {
     test("should not copy alias when cloning the field", async () => {
       const [fieldWithAlias] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         alias: "field-alias",
-        position: 100,
       }));
 
       const { field: clonedField } = await petitions.clonePetitionField(

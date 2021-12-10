@@ -61,11 +61,11 @@ import { validRemindersConfig } from "../../helpers/validators/validRemindersCon
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
 import { orgHasAvailablePetitionSendCredits } from "../../organization/authorizers";
-import { fieldHasType } from "../../public/authorizers";
 import { contextUserHasRole } from "../../users/authorizers";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
+  fieldHasType,
   fieldIsNotFixed,
   fieldsBelongsToPetition,
   messageBelongToPetition,

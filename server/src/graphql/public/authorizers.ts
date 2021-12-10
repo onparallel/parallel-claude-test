@@ -1,8 +1,7 @@
-import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
+import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { countBy, isDefined } from "remeda";
-import { PetitionFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
@@ -74,38 +73,6 @@ export function fetchPetitionAccess<
       }
     }
     return true;
-  };
-}
-
-export function fieldHasType<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
->(
-  argFieldId: TArg,
-  fieldType: MaybeArray<PetitionFieldType>
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const fieldId = args[argFieldId] as unknown as number;
-      const field = (await ctx.petitions.loadField(fieldId))!;
-      return unMaybeArray(fieldType).includes(field.type);
-    } catch {}
-    return false;
-  };
-}
-
-export function replyIsForFieldOfType<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
->(
-  argReplyId: TArg,
-  fieldType: MaybeArray<PetitionFieldType>
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const field = (await ctx.petitions.loadFieldForReply(args[argReplyId] as unknown as number))!;
-    return unMaybeArray(fieldType).includes(field.type);
   };
 }
 

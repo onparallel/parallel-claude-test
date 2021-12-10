@@ -1,6 +1,12 @@
+import { ApolloError } from "apollo-server-express";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { countBy, isDefined, uniq } from "remeda";
-import { FeatureFlagName, IntegrationType, PetitionPermissionType } from "../../db/__types";
+import {
+  FeatureFlagName,
+  IntegrationType,
+  PetitionFieldType,
+  PetitionPermissionType,
+} from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
@@ -161,6 +167,79 @@ export function fieldsHaveCommentsEnabled<
       return await ctx.petitions.fieldsHaveCommentsEnabled(ids);
     } catch {}
     return false;
+  };
+}
+
+export function fieldAllowsNewReply<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(fieldIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const fieldId = args[fieldIdArg] as number;
+    const [field, replies] = await Promise.all([
+      ctx.petitions.loadField(fieldId),
+      ctx.petitions.loadRepliesForField(fieldId),
+    ]);
+
+    if (!field || (!field.multiple && replies.length > 0)) {
+      throw new ApolloError(
+        "The field is already replied and does not accept multiple replies",
+        "FIELD_ALREADY_REPLIED_ERROR"
+      );
+    }
+    if (field.validated) {
+      throw new ApolloError("The field is already validated", "FIELD_ALREADY_VALIDATED_ERROR");
+    }
+
+    return true;
+  };
+}
+
+export function fieldHasType<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(
+  argFieldId: TArg,
+  fieldType: MaybeArray<PetitionFieldType>
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const fieldId = args[argFieldId] as unknown as number;
+    const field = (await ctx.petitions.loadField(fieldId))!;
+    const validFieldTypes = unMaybeArray(fieldType);
+
+    if (!validFieldTypes.includes(field.type)) {
+      throw new ApolloError(
+        `Expected ${validFieldTypes.join(" or ")}, got ${field.type}`,
+        "INVALID_FIELD_TYPE_ERROR"
+      );
+    }
+
+    return true;
+  };
+}
+
+export function replyIsForFieldOfType<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(
+  argReplyId: TArg,
+  fieldType: MaybeArray<PetitionFieldType>
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const field = (await ctx.petitions.loadFieldForReply(args[argReplyId] as unknown as number))!;
+    const validFieldTypes = unMaybeArray(fieldType);
+
+    if (!validFieldTypes.includes(field.type)) {
+      throw new ApolloError(
+        `Expected ${validFieldTypes.join(" or ")}, got ${field.type}`,
+        "INVALID_FIELD_TYPE_ERROR"
+      );
+    }
+
+    return true;
   };
 }
 
@@ -369,5 +448,32 @@ export function userHasEnabledIntegration<TypeName extends string, FieldName ext
       return integrations.length > 0;
     } catch {}
     return false;
+  };
+}
+
+export function replyAllowsUpdate<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(argReplyId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const replyId = args[argReplyId] as unknown as number;
+    const [reply, field] = await Promise.all([
+      ctx.petitions.loadFieldReply(replyId),
+      ctx.petitions.loadFieldForReply(replyId),
+    ]);
+
+    if (reply!.status === "APPROVED") {
+      throw new ApolloError(
+        `The reply has been approved and cannot be updated.`,
+        "REPLY_ALREADY_APPROVED_ERROR"
+      );
+    }
+
+    if (field!.validated) {
+      throw new ApolloError("The field is already validated", "FIELD_ALREADY_VALIDATED_ERROR");
+    }
+
+    return true;
   };
 }

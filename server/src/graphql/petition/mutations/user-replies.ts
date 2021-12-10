@@ -1,16 +1,19 @@
-import { mutationField, nonNull, stringArg } from "nexus";
-import { differenceInSeconds } from "date-fns";
+import { list, mutationField, nonNull, stringArg } from "nexus";
 import { random } from "../../../util/token";
 import { Maybe } from "../../../util/types";
 import { authenticateAnd } from "../../helpers/authorize";
-import { ArgValidationError } from "../../helpers/errors";
+import { InvalidOptionError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/result";
 import { uploadArg } from "../../helpers/upload";
-import { fieldHasType } from "../../public/authorizers";
+import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../../utils";
 import {
+  fieldAllowsNewReply,
+  fieldHasType,
   fieldsBelongsToPetition,
   repliesBelongsToPetition,
+  replyAllowsUpdate,
+  replyIsForFieldOfType,
   userHasAccessToPetitions,
 } from "../authorizers";
 
@@ -25,14 +28,15 @@ export const createSimpleReply = mutationField("createSimpleReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", ["TEXT", "SELECT"])
+    fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT"]),
+    fieldAllowsNewReply("fieldId")
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
     if (field.type === "SELECT") {
       const options = field.options.values as Maybe<string[]>;
       if (!options?.includes(args.reply)) {
-        throw new ArgValidationError(info, "reply", "Invalid option");
+        throw new InvalidOptionError(info, "reply", "Invalid option");
       }
     }
   },
@@ -60,52 +64,25 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    repliesBelongsToPetition("petitionId", "replyId")
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
+    replyAllowsUpdate("replyId")
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
     if (field.type === "SELECT") {
       const options = field.options.values as Maybe<string[]>;
       if (!options?.includes(args.reply)) {
-        throw new ArgValidationError(info, "reply", "Invalid option");
+        throw new InvalidOptionError(info, "reply", "Invalid option");
       }
-    }
-    if (!["TEXT", "SELECT"].includes(field.type)) {
-      throw new ArgValidationError(
-        info,
-        "replyId",
-        `Reply ${args.replyId} does not belong to a TEXT or SELECT field`
-      );
     }
   },
   resolve: async (_, args, ctx) => {
-    const [reply, event] = await Promise.all([
-      ctx.petitions.updatePetitionFieldReply(
-        args.replyId,
-        { content: { text: args.reply }, status: "PENDING" },
-        `User:${ctx.user!.id}`
-      ),
-      ctx.petitions.getLastEventForPetitionId(args.petitionId),
-    ]);
-    if (
-      event &&
-      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
-      event.data.petition_field_reply_id === args.replyId &&
-      differenceInSeconds(new Date(), event.created_at) < 60
-    ) {
-      await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
-    } else {
-      await ctx.petitions.createEvent({
-        type: "REPLY_UPDATED",
-        petition_id: args.petitionId,
-        data: {
-          user_id: reply.user_id!,
-          petition_field_id: reply.petition_field_id,
-          petition_field_reply_id: reply.id,
-        },
-      });
-    }
-    return reply;
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      { content: { text: args.reply }, status: "PENDING" },
+      ctx.user!
+    );
   },
 });
 
@@ -120,7 +97,8 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", ["FILE_UPLOAD"])
+    fieldHasType("fieldId", ["FILE_UPLOAD"]),
+    fieldAllowsNewReply("fieldId")
   ),
   resolve: async (_, args, ctx) => {
     const { createReadStream, filename, mimetype } = await args.file;
@@ -151,6 +129,144 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
   },
 });
 
+export const createCheckboxReply = mutationField("createCheckboxReply", {
+  description: "Creates a reply to a checkbox field.",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    values: nonNull(list(nonNull(stringArg()))),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", ["CHECKBOX"]),
+    fieldAllowsNewReply("fieldId")
+  ),
+  validateArgs: async (_, { fieldId, values }, ctx, info) => {
+    try {
+      const field = (await ctx.petitions.loadField(fieldId))!;
+      validateCheckboxReplyValues(field, values);
+    } catch (error: any) {
+      throw new InvalidOptionError(info, "values", error.message);
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        user_id: ctx.user!.id,
+        type: "CHECKBOX",
+        content: { choices: args.values },
+      },
+      ctx.user!
+    );
+  },
+});
+
+export const updateCheckboxReply = mutationField("updateCheckboxReply", {
+  description: "Updates a reply of a checkbox field",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    values: nonNull(list(nonNull(stringArg()))),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["CHECKBOX"]),
+    replyAllowsUpdate("replyId")
+  ),
+  validateArgs: async (_, { replyId, values }, ctx, info) => {
+    try {
+      const field = (await ctx.petitions.loadFieldForReply(replyId))!;
+      validateCheckboxReplyValues(field, values);
+    } catch (error: any) {
+      throw new InvalidOptionError(info, "values", error.message);
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      {
+        content: { choices: args.values },
+        status: "PENDING",
+      },
+      ctx.user!
+    );
+  },
+});
+
+export const createDynamicSelectReply = mutationField("createDynamicSelectReply", {
+  description: "Creates a reply for a dynamic select field.",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    value: nonNull(list(nonNull(list(stringArg())))),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
+    fieldAllowsNewReply("fieldId")
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    try {
+      const field = (await ctx.petitions.loadField(args.fieldId))!;
+      validateDynamicSelectReplyValues(field, args.value);
+    } catch (error: any) {
+      throw new InvalidOptionError(info, "value", error.message);
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        user_id: ctx.user!.id,
+        type: "DYNAMIC_SELECT",
+        content: { columns: args.value },
+      },
+      ctx.user!
+    );
+  },
+});
+
+export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply", {
+  description: "Updates a reply for a dynamic select field.",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    value: nonNull(list(nonNull(list(stringArg())))),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["DYNAMIC_SELECT"]),
+    replyAllowsUpdate("replyId")
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    try {
+      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+      validateDynamicSelectReplyValues(field, args.value);
+    } catch (error: any) {
+      throw new InvalidOptionError(info, "reply", error.message);
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      {
+        content: { columns: args.value },
+        status: "PENDING",
+      },
+      ctx.user!
+    );
+  },
+});
+
 export const deletePetitionReply = mutationField("deletePetitionReply", {
   description: "Deletes a reply to a petition field.",
   type: "Result",
@@ -160,18 +276,10 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    repliesBelongsToPetition("petitionId", "replyId")
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyAllowsUpdate("replyId")
   ),
   resolve: async (_, args, ctx) => {
-    const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
-
-    if (reply.type === "FILE_UPLOAD") {
-      const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
-      await Promise.all([
-        ctx.files.deleteFileUpload(file!.id, `User:${ctx.user!.id}`),
-        ctx.aws.fileUploads.deleteFile(file!.path),
-      ]);
-    }
     await ctx.petitions.deletePetitionFieldReply(args.replyId, `User:${ctx.user!.id}`);
     return RESULT.SUCCESS;
   },
