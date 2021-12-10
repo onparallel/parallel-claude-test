@@ -16,7 +16,7 @@ const email: Email<ForgotPasswordProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
-      defaultMessage: "Parallel team",
+      defaultMessage: "Parallel",
     });
   },
   subject({}, intl) {

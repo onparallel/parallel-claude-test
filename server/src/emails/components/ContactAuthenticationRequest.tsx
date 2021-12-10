@@ -21,7 +21,7 @@ const email: Email<ContactAuthenticationRequest> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
-      defaultMessage: "Parallel team",
+      defaultMessage: "Parallel",
     });
   },
   subject({ code, tone }, intl) {

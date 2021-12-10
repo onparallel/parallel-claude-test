@@ -16,7 +16,7 @@ const email: Email<AccountVerificationProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
-      defaultMessage: "Parallel team",
+      defaultMessage: "Parallel",
     });
   },
   subject({}, intl: IntlShape) {

@@ -151,8 +151,8 @@
   },
   {
     "term": "from.parallel-team",
-    "definition": "Equipo de Parallel",
-    "context": "Parallel team"
+    "definition": "Parallel",
+    "context": "Parallel"
   },
   {
     "term": "from.via-parallel",
@@ -296,8 +296,8 @@
   },
   {
     "term": "petition-comments-contact-notification.access-button",
-    "definition": "{tone, select, INFORMAL{Responder los comentarios} other{Responda aquí a los comentarios}}",
-    "context": "Reply to the comments"
+    "definition": "{tone, select, INFORMAL{Haz click aquí para contestar} other{Haga click aquí para contestar}}",
+    "context": "Click here to reply"
   },
   {
     "term": "petition-comments-contact-notification.access-click-link",

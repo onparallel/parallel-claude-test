@@ -20,7 +20,7 @@ const email: Email<InvitationProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
-      defaultMessage: "Parallel team",
+      defaultMessage: "Parallel",
     });
   },
   subject({ organizationUser, organizationName }, intl) {

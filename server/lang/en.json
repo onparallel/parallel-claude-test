@@ -151,8 +151,8 @@
   },
   {
     "term": "from.parallel-team",
-    "definition": "Parallel team",
-    "context": "Parallel team"
+    "definition": "Parallel",
+    "context": "Parallel"
   },
   {
     "term": "from.via-parallel",
@@ -296,8 +296,8 @@
   },
   {
     "term": "petition-comments-contact-notification.access-button",
-    "definition": "Reply to the comments",
-    "context": "Reply to the comments"
+    "definition": "Click here to reply",
+    "context": "Click here to reply"
   },
   {
     "term": "petition-comments-contact-notification.access-click-link",

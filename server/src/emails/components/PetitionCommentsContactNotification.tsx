@@ -25,7 +25,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
-      defaultMessage: "Parallel team",
+      defaultMessage: "Parallel",
     });
   },
   subject({ emailSubject, tone }, intl: IntlShape) {
@@ -125,7 +125,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
             >
               <FormattedMessage
                 id="petition-comments-contact-notification.access-button"
-                defaultMessage="Reply to the comments"
+                defaultMessage="Click here to reply"
                 values={{ tone }}
               />
             </Button>

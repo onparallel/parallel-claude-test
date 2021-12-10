@@ -22,7 +22,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
-      defaultMessage: "Parallel team",
+      defaultMessage: "Parallel",
     });
   },
   subject({ petitionName }, intl: IntlShape) {
