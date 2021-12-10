@@ -191,7 +191,14 @@ export function SignatureConfigDialog({
               render={({ field: { onChange, value } }) => (
                 <Select
                   {...signatureIntegrationReactProps}
-                  getOptionLabel={(p) => p.name}
+                  getOptionLabel={(p) =>
+                    p.environment === "DEMO"
+                      ? `${p.name} (${intl.formatMessage({
+                          id: "generic.signature-demo-environment",
+                          defaultMessage: "Demo",
+                        })})`
+                      : p.name
+                  }
                   getOptionValue={(p) => p.id}
                   value={providers.find((p) => p.id === value.id)}
                   onChange={onChange}
