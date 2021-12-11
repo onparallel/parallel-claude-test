@@ -45,7 +45,6 @@ export interface PetitionRepliesFieldProps extends BoxProps {
   fieldIndex: PetitionFieldIndex;
   isVisible: boolean;
   isActive: boolean;
-  isRestricted: boolean;
   onAction: (
     action: PetitionRepliesFieldAction,
     reply: PetitionRepliesField_PetitionFieldReplyFragment
@@ -63,7 +62,6 @@ export const PetitionRepliesField = Object.assign(
       fieldIndex,
       isVisible,
       isActive: isShowingComments,
-      isRestricted,
       onAction,
       onToggleComments,
       onValidateToggle,
@@ -208,7 +206,6 @@ export const PetitionRepliesField = Object.assign(
               size="sm"
               variant="ghost"
               onClick={onValidateToggle}
-              isDisabled={isRestricted}
               aria-pressed={field.validated}
               aria-label={
                 field.validated
@@ -297,7 +294,6 @@ export const PetitionRepliesField = Object.assign(
                   reply={reply}
                   onAction={(action) => onAction(action, reply)}
                   onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
-                  isRestricted={isRestricted}
                 />
               ))}
             </Stack>
