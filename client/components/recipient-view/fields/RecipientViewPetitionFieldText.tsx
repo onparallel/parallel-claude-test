@@ -13,12 +13,6 @@ import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react"
 import { useIntl } from "react-intl";
 import { pick } from "remeda";
 import {
-  handleCreateSimpleReplyProps,
-  handleDeletePetitionReplyProps,
-  handleUpdateSimpleReplyProps,
-  RecipientViewPetitionFieldProps,
-} from "./RecipientViewPetitionField";
-import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
@@ -28,14 +22,13 @@ type AnyInputElement = HTMLInputElement | HTMLTextAreaElement;
 
 export interface RecipientViewPetitionFieldTextProps
   extends Omit<
-      RecipientViewPetitionFieldCardProps,
-      "children" | "showAddNewReply" | "onAddNewReply"
-    >,
-    RecipientViewPetitionFieldProps {
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
   isDisabled: boolean;
-  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
-  onUpdateReply: ({ replyId, value }: handleUpdateSimpleReplyProps) => void;
-  onCreateReply: ({ value }: handleCreateSimpleReplyProps) => Promise<string | undefined>;
+  onDeleteReply: (replyId: string) => void;
+  onUpdateReply: (replyId: string, value: string) => void;
+  onCreateReply: (value: string) => Promise<string | undefined>;
 }
 
 export function RecipientViewPetitionFieldText({
@@ -72,7 +65,7 @@ export function RecipientViewPetitionFieldText({
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
-      await onUpdateReply({ replyId, value });
+      await onUpdateReply(replyId, value);
     },
     [onUpdateReply]
   );
@@ -93,7 +86,7 @@ export function RecipientViewPetitionFieldText({
           replyRefs[prevId].current!.focus();
         }
       }
-      await onDeleteReply({ replyId });
+      await onDeleteReply(replyId);
 
       delete isDeletingReplyRef.current[replyId];
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
@@ -111,9 +104,7 @@ export function RecipientViewPetitionFieldText({
       }
       setIsSaving(true);
       try {
-        const replyId = await onCreateReply({
-          value,
-        });
+        const replyId = await onCreateReply(value);
         if (replyId) {
           const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
           setValue("");

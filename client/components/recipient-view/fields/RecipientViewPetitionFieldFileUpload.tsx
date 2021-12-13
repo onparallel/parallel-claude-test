@@ -18,26 +18,15 @@ import { FileIcon } from "@parallel/components/common/FileIcon";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
-  RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation,
   RecipientViewPetitionField_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { withError } from "@parallel/utils/promises/withError";
-import { Maybe } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import {
-  handleCreateFileUploadReplyProps,
-  handleDeletePetitionReplyProps,
-  handleDonwloadFileUploadReplyProps,
-  RecipientViewPetitionFieldProps,
-} from "./RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -45,19 +34,13 @@ import {
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
-      RecipientViewPetitionFieldCardProps,
-      "children" | "showAddNewReply" | "onAddNewReply"
-    >,
-    RecipientViewPetitionFieldProps {
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
   isDisabled: boolean;
-  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
-  onCreateReply: ({ content, uploads }: handleCreateFileUploadReplyProps) => void;
-  onDownloadReply: ({
-    replyId,
-  }: handleDonwloadFileUploadReplyProps) => Promise<
-    | Maybe<RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation>
-    | undefined
-  >;
+  onDeleteReply: (replyId: string) => void;
+  onCreateReply: (content: File[]) => void;
+  onDownloadReply: (replyId: string) => void;
 }
 
 export function RecipientViewPetitionFieldFileUpload({
@@ -71,28 +54,15 @@ export function RecipientViewPetitionFieldFileUpload({
   onDownloadReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldFileUploadProps) {
-  const uploads = useRef<Record<string, XMLHttpRequest>>({});
-
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const handleDeletePetitionReply = useCallback(
     async function handleDeletePetitionReply({ replyId }: { replyId: string }) {
-      uploads.current[replyId]?.abort();
-      delete uploads.current[replyId];
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
-      await onDeleteReply({ replyId });
+      await onDeleteReply(replyId);
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
     },
-    [uploads]
-  );
-  const handleCreateReply = useCallback(
-    (content: File[]) => {
-      onCreateReply({
-        content,
-        uploads,
-      });
-    },
-    [uploads, onCreateReply]
+    [onDeleteReply]
   );
 
   return (
@@ -133,7 +103,7 @@ export function RecipientViewPetitionFieldFileUpload({
         <PetitionFieldFileUploadDropzone
           isDisabled={isDisabled}
           field={field}
-          onCreateReply={handleCreateReply}
+          onCreateReply={onCreateReply}
         />
       </Box>
     </RecipientViewPetitionFieldCard>
@@ -144,12 +114,7 @@ interface RecipientViewPetitionFieldReplyFileUploadProps {
   reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
   isDisabled: boolean;
   onRemove: () => void;
-  onDownload: ({
-    replyId,
-  }: handleDonwloadFileUploadReplyProps) => Promise<
-    | Maybe<RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation>
-    | undefined
-  >;
+  onDownload: (replyId: string) => void;
 }
 
 export function RecipientViewPetitionFieldReplyFileUpload({
@@ -159,23 +124,6 @@ export function RecipientViewPetitionFieldReplyFileUpload({
   onDownload,
 }: RecipientViewPetitionFieldReplyFileUploadProps) {
   const intl = useIntl();
-
-  const showFailure = useFailureGeneratingLinkDialog();
-  function handleDownloadClick() {
-    openNewWindow(async () => {
-      const data = await onDownload({
-        replyId: reply.id,
-      });
-
-      const { url, result } = data!.publicFileUploadReplyDownloadLink;
-      if (result !== "SUCCESS") {
-        await withError(showFailure({ filename: reply.content.filename }));
-        throw new Error();
-      }
-
-      return url!;
-    });
-  }
 
   const uploadHasFailed =
     reply.content.uploadComplete === false && reply.content.progress === undefined;
@@ -261,7 +209,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
       ) : null}
       <IconButtonWithTooltip
         isDisabled={uploadHasFailed || reply.content!.progress < 1}
-        onClick={handleDownloadClick}
+        onClick={() => onDownload(reply.id)}
         variant="ghost"
         icon={<DownloadIcon />}
         size="md"

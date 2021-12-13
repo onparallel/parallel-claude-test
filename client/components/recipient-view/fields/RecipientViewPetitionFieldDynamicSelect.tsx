@@ -10,6 +10,7 @@ import { DynamicSelectOption, FieldOptions } from "@parallel/utils/petitionField
 import { useRecipientViewReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import { OptionType } from "@parallel/utils/react-select/types";
+import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -18,27 +19,22 @@ import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import { countBy } from "remeda";
 import {
-  handleCreateDynamicSelectReplyProps,
-  handleDeletePetitionReplyProps,
-  handleUpdateDynamicSelectReplyProps,
-  RecipientViewPetitionFieldProps,
-} from "./RecipientViewPetitionField";
-import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
+export type DynamicSelectValue = [string, Maybe<string>][];
+
 export interface RecipientViewPetitionFieldDynamicSelectProps
   extends Omit<
-      RecipientViewPetitionFieldCardProps,
-      "children" | "showAddNewReply" | "onAddNewReply"
-    >,
-    RecipientViewPetitionFieldProps {
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
   isDisabled: boolean;
-  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
-  onUpdateReply: ({ replyId, value }: handleUpdateDynamicSelectReplyProps) => void;
-  onCreateReply: ({ value }: handleCreateDynamicSelectReplyProps) => Promise<string | undefined>;
+  onDeleteReply: (reply: string) => void;
+  onUpdateReply: (replyId: string, value: DynamicSelectValue) => void;
+  onCreateReply: (value: DynamicSelectValue) => Promise<string | undefined>;
 }
 
 type SelectInstance = Select<{ label: string; value: string }, false, never>;
@@ -62,8 +58,8 @@ export function RecipientViewPetitionFieldDynamicSelect({
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
 
   const handleUpdate = useMemoFactory(
-    (replyId: string) => async (value: [string, string | null][]) => {
-      await onUpdateReply({ replyId, value });
+    (replyId: string) => async (value: DynamicSelectValue) => {
+      await onUpdateReply(replyId, value);
     },
     [onUpdateReply]
   );
@@ -71,7 +67,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
   const handleDelete = useMemoFactory(
     (replyId: string) => async () => {
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
-      await onDeleteReply({ replyId });
+      await onDeleteReply(replyId);
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       if (field.replies.length === 1) {
         setShowNewReply(true);
@@ -81,13 +77,11 @@ export function RecipientViewPetitionFieldDynamicSelect({
   );
 
   async function handleCreateReply(value: string) {
-    const _value = fieldOptions.labels.map((label, i) => [label, i === 0 ? value : null]) as [
-      string,
-      string | null
-    ][];
-    const replyId = await onCreateReply({
-      value: _value,
-    });
+    const _value = fieldOptions.labels.map((label, i) => [
+      label,
+      i === 0 ? value : null,
+    ]) as DynamicSelectValue;
+    const replyId = await onCreateReply(_value);
     if (replyId) {
       setShowNewReply(false);
       setTimeout(() => {

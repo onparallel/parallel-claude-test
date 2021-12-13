@@ -8473,6 +8473,11 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   }>;
 };
 
+export type RecipientViewPetitionField_PublicPetitionFieldReplyFragment = {
+  __typename?: "PublicPetitionFieldReply";
+  content: { [key: string]: any };
+};
+
 export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutationVariables =
   Exact<{
     keycode: Scalars["ID"];
@@ -16500,6 +16505,11 @@ export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment,
     unknown
   >;
+export const RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc = gql`
+  fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
+    content
+  }
+` as unknown as DocumentNode<RecipientViewPetitionField_PublicPetitionFieldReplyFragment, unknown>;
 export const RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragmentDoc =
   gql`
     fragment RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionField on PublicPetitionField {

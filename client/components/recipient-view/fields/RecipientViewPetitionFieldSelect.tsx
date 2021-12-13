@@ -12,12 +12,6 @@ import { forwardRef, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import {
-  handleCreateSimpleReplyProps,
-  handleDeletePetitionReplyProps,
-  handleUpdateSimpleReplyProps,
-  RecipientViewPetitionFieldProps,
-} from "./RecipientViewPetitionField";
-import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
@@ -25,14 +19,13 @@ import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewP
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
-      RecipientViewPetitionFieldCardProps,
-      "children" | "showAddNewReply" | "onAddNewReply"
-    >,
-    RecipientViewPetitionFieldProps {
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
   isDisabled: boolean;
-  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
-  onUpdateReply: ({ replyId, value }: handleUpdateSimpleReplyProps) => void;
-  onCreateReply: ({ value }: handleCreateSimpleReplyProps) => Promise<string | undefined>;
+  onDeleteReply: (replyId: string) => void;
+  onUpdateReply: (replyId: string, value: string) => void;
+  onCreateReply: (value: string) => Promise<string | undefined>;
 }
 
 type SelectInstance = Select<{ label: string; value: string }, false, never>;
@@ -62,7 +55,7 @@ export function RecipientViewPetitionFieldSelect({
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
-      await onUpdateReply({ replyId, value });
+      await onUpdateReply(replyId, value);
     },
     [onUpdateReply]
   );
@@ -70,7 +63,7 @@ export function RecipientViewPetitionFieldSelect({
   const handleDelete = useMemoFactory(
     (replyId: string) => async () => {
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
-      await onDeleteReply({ replyId });
+      await onDeleteReply(replyId);
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       if (field.replies.length === 1) {
         setShowNewReply(true);
@@ -83,9 +76,7 @@ export function RecipientViewPetitionFieldSelect({
     setValue(value);
     setIsSaving(true);
     try {
-      const replyId = await onCreateReply({
-        value: value.value,
-      });
+      const replyId = await onCreateReply(value.value);
       if (replyId) {
         setShowNewReply(false);
         setValue(null);

@@ -4,27 +4,22 @@ import { CheckboxTypeLabel } from "@parallel/components/petition-common/Checkbox
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import {
-  handleCreateCheckboxReplyProps,
-  handleDeletePetitionReplyProps,
-  handleUpdateCheckboxReplyProps,
-  RecipientViewPetitionFieldProps,
-} from "./RecipientViewPetitionField";
-import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
+export type CheckboxValue = string[];
+
 export interface RecipientViewPetitionFieldCheckboxProps
   extends Omit<
-      RecipientViewPetitionFieldCardProps,
-      "children" | "showAddNewReply" | "onAddNewReply"
-    >,
-    RecipientViewPetitionFieldProps {
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
   isDisabled: boolean;
-  onDeleteReply: ({ replyId }: handleDeletePetitionReplyProps) => void;
-  onUpdateReply: ({ replyId, values }: handleUpdateCheckboxReplyProps) => void;
-  onCreateReply: ({ values }: handleCreateCheckboxReplyProps) => void;
+  onDeleteReply: (replyId: string) => void;
+  onUpdateReply: (replyId: string, value: CheckboxValue) => void;
+  onCreateReply: (value: CheckboxValue) => void;
 }
 
 const haveChanges = ({
@@ -67,26 +62,21 @@ export function RecipientViewPetitionFieldCheckbox({
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleUpdate = async (values: string[]) => {
+  const handleUpdate = async (value: string[]) => {
     setIsSaving(true);
-    await onUpdateReply({
-      replyId,
-      values,
-    });
+    await onUpdateReply(replyId, value);
     setIsSaving(false);
   };
 
-  const handleCreate = async (values: string[]) => {
+  const handleCreate = async (value: string[]) => {
     setIsSaving(true);
-    await onCreateReply({
-      values,
-    });
+    await onCreateReply(value);
     setIsSaving(false);
   };
 
   const handleDelete = async () => {
     setIsSaving(true);
-    await onDeleteReply({ replyId });
+    await onDeleteReply(replyId);
     setIsSaving(false);
   };
 

@@ -1,11 +1,14 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
+  RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { MutableRefObject } from "react";
+import { withError } from "@parallel/utils/promises/withError";
+import { useCallback, useRef } from "react";
 import {
   RecipientViewPetitionFieldCommentsDialog,
   usePetitionFieldCommentsDialog,
@@ -25,8 +28,14 @@ import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
-import { RecipientViewPetitionFieldCheckbox } from "./RecipientViewPetitionFieldCheckbox";
-import { RecipientViewPetitionFieldDynamicSelect } from "./RecipientViewPetitionFieldDynamicSelect";
+import {
+  CheckboxValue,
+  RecipientViewPetitionFieldCheckbox,
+} from "./RecipientViewPetitionFieldCheckbox";
+import {
+  DynamicSelectValue,
+  RecipientViewPetitionFieldDynamicSelect,
+} from "./RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSelect";
@@ -43,47 +52,10 @@ export interface RecipientViewPetitionFieldProps
   isDisabled: boolean;
 }
 
-export type handleUpdateSimpleReplyProps = {
-  replyId: string;
-  value: string;
-};
-
-export type handleDeletePetitionReplyProps = {
-  replyId: string;
-};
-
-export type handleCreateSimpleReplyProps = {
-  value: string;
-};
-
-export type handleUpdateCheckboxReplyProps = {
-  replyId: string;
-  values: string[];
-};
-
-export type handleCreateCheckboxReplyProps = {
-  values: string[];
-};
-
-export type handleUpdateDynamicSelectReplyProps = {
-  replyId: string;
-  value: [string, string | null][];
-};
-
-export type handleCreateDynamicSelectReplyProps = {
-  value: [string, string | null][];
-};
-
-export type handleCreateFileUploadReplyProps = {
-  content: File[];
-  uploads: MutableRefObject<Record<string, XMLHttpRequest>>;
-};
-
-export type handleDonwloadFileUploadReplyProps = {
-  replyId: string;
-};
+export type UploadCache = Record<string, XMLHttpRequest>;
 
 export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
+  const uploads = useRef<UploadCache>({});
   const { updateLastSaved } = useLastSaved();
 
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
@@ -115,133 +87,170 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   }
 
   const deletePetitionReply = useDeletePetitionReply();
-  const handleDeletePetitionReply = async ({ replyId }: handleDeletePetitionReplyProps) => {
-    try {
-      await deletePetitionReply({
-        petitionId: props.petitionId,
-        replyId,
-        fieldId: props.field.id,
-        keycode: props.keycode,
-      });
-      updateLastSaved();
-    } catch {}
-  };
+  const handleDeletePetitionReply = useCallback(
+    async (replyId: string) => {
+      try {
+        if (replyId in uploads.current) {
+          uploads.current[replyId].abort();
+          delete uploads.current[replyId];
+        }
+        await deletePetitionReply({
+          petitionId: props.petitionId,
+          replyId,
+          fieldId: props.field.id,
+          keycode: props.keycode,
+        });
+        updateLastSaved();
+      } catch {}
+    },
+    [deletePetitionReply, updateLastSaved]
+  );
 
   const updateSimpleReply = useUpdateSimpleReply();
-  const handleUpdateSimpleReply = async ({ replyId, value }: handleUpdateSimpleReplyProps) => {
-    try {
-      await updateSimpleReply({
-        petitionId: props.petitionId,
-        replyId,
-        keycode: props.keycode,
-        value,
-      });
-      updateLastSaved();
-    } catch {}
-  };
+  const handleUpdateSimpleReply = useCallback(
+    async (replyId: string, value: string) => {
+      try {
+        await updateSimpleReply({
+          petitionId: props.petitionId,
+          replyId,
+          keycode: props.keycode,
+          value,
+        });
+        updateLastSaved();
+      } catch {}
+    },
+    [updateSimpleReply, updateLastSaved]
+  );
 
   const createSimpleReply = useCreateSimpleReply();
-  const handleCreateSimpleReply = async ({ value }: handleCreateSimpleReplyProps) => {
-    try {
-      const reply = await createSimpleReply({
-        petitionId: props.petitionId,
-        value,
-        fieldId: props.field.id,
-        keycode: props.keycode,
-      });
-      updateLastSaved();
-      return reply?.id;
-    } catch {}
+  const handleCreateSimpleReply = useCallback(
+    async (value: string) => {
+      try {
+        const reply = await createSimpleReply({
+          petitionId: props.petitionId,
+          value,
+          fieldId: props.field.id,
+          keycode: props.keycode,
+        });
+        updateLastSaved();
+        return reply?.id;
+      } catch {}
 
-    return;
-  };
+      return;
+    },
+    [createSimpleReply, updateLastSaved]
+  );
 
   const updateCheckboxReply = useUpdateCheckboxReply();
-  const handleUpdateCheckboxReply = async ({ replyId, values }: handleUpdateCheckboxReplyProps) => {
-    try {
-      await updateCheckboxReply({
-        petitionId: props.petitionId,
-        replyId,
-        keycode: props.keycode,
-        values,
-      });
-      updateLastSaved();
-    } catch {}
-  };
+  const handleUpdateCheckboxReply = useCallback(
+    async (replyId: string, values: string[]) => {
+      try {
+        await updateCheckboxReply({
+          petitionId: props.petitionId,
+          replyId,
+          keycode: props.keycode,
+          values,
+        });
+        updateLastSaved();
+      } catch {}
+    },
+    [updateCheckboxReply, updateLastSaved]
+  );
 
   const createChekcboxReply = useCreateCheckboxReply();
-  const handleCreateCheckboxReply = async ({ values }: handleCreateCheckboxReplyProps) => {
-    try {
-      await createChekcboxReply({
-        petitionId: props.petitionId,
-        fieldId: props.field.id,
-        keycode: props.keycode,
-        values,
-      });
-      updateLastSaved();
-    } catch {}
-  };
+  const handleCreateCheckboxReply = useCallback(
+    async (values: CheckboxValue) => {
+      try {
+        await createChekcboxReply({
+          petitionId: props.petitionId,
+          fieldId: props.field.id,
+          keycode: props.keycode,
+          values,
+        });
+        updateLastSaved();
+      } catch {}
+    },
+    [createChekcboxReply, updateLastSaved]
+  );
 
   const updateDynamicSelectReply = useUpdateDynamicSelectReply();
-  const handleUpdateDynamicSelectReply = async ({
-    replyId,
-    value,
-  }: handleUpdateDynamicSelectReplyProps) => {
-    await updateDynamicSelectReply({
-      petitionId: props.petitionId,
-      keycode: props.keycode,
-      replyId,
-      value,
-    });
-    updateLastSaved();
-  };
-
-  const createDynamicSelectReply = useCreateDynamicSelectReply();
-  const handleCreateDynamicSelectReply = async ({ value }: handleCreateDynamicSelectReplyProps) => {
-    try {
-      const reply = await createDynamicSelectReply({
+  const handleUpdateDynamicSelectReply = useCallback(
+    async (replyId: string, value: DynamicSelectValue) => {
+      await updateDynamicSelectReply({
         petitionId: props.petitionId,
         keycode: props.keycode,
-        fieldId: props.field.id,
+        replyId,
         value,
       });
       updateLastSaved();
-      return reply?.id;
-    } catch {}
-  };
+    },
+    [updateDynamicSelectReply, updateLastSaved]
+  );
+
+  const createDynamicSelectReply = useCreateDynamicSelectReply();
+  const handleCreateDynamicSelectReply = useCallback(
+    async (value: DynamicSelectValue) => {
+      try {
+        const reply = await createDynamicSelectReply({
+          petitionId: props.petitionId,
+          keycode: props.keycode,
+          fieldId: props.field.id,
+          value,
+        });
+        updateLastSaved();
+        return reply?.id;
+      } catch {}
+    },
+    [createDynamicSelectReply, updateLastSaved]
+  );
 
   const createFileUploadReply = useCreateFileUploadReply();
-  const handleCreateFileUploadReply = async ({
-    content,
-    uploads,
-  }: handleCreateFileUploadReplyProps) => {
-    try {
-      createFileUploadReply({
-        petitionId: props.petitionId,
-        keycode: props.keycode,
-        fieldId: props.field.id,
-        content,
-        uploads,
-      });
-      updateLastSaved();
-    } catch {}
-  };
+  const handleCreateFileUploadReply = useCallback(
+    async (content: File[]) => {
+      try {
+        createFileUploadReply({
+          petitionId: props.petitionId,
+          keycode: props.keycode,
+          fieldId: props.field.id,
+          content,
+          uploads,
+        });
+        updateLastSaved();
+      } catch {}
+    },
+    [createFileUploadReply, uploads, updateLastSaved]
+  );
 
   const [downloadFileUploadReply] = useMutation(
     RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument
   );
-  const handleDonwloadFileUploadReply = async ({ replyId }: handleDonwloadFileUploadReplyProps) => {
-    try {
-      const { data } = await downloadFileUploadReply({
-        variables: {
-          keycode: props.keycode,
-          replyId,
-          preview: false,
-        },
-      });
-      return data;
-    } catch {}
-  };
+  const showFailure = useFailureGeneratingLinkDialog();
+  const apollo = useApolloClient();
+  const handleDonwloadFileUploadReply = useCallback(
+    async (replyId: string) => {
+      try {
+        openNewWindow(async () => {
+          const reply = apollo.cache.readFragment({
+            fragment: RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
+          });
+          const { data } = await downloadFileUploadReply({
+            variables: {
+              keycode: props.keycode,
+              replyId,
+              preview: false,
+            },
+          });
+          const { url, result } = data!.publicFileUploadReplyDownloadLink;
+          if (result !== "SUCCESS") {
+            await withError(showFailure({ filename: reply!.content.filename }));
+            throw new Error();
+          }
+          return url!;
+        });
+      } catch {}
+    },
+    [downloadFileUploadReply]
+  );
 
   const commonProps = {
     onCommentsButtonClick: handleCommentsButtonClick,
@@ -305,6 +314,11 @@ RecipientViewPetitionField.fragments = {
       ...RecipientViewPetitionFieldCard_PublicPetitionField
     }
     ${RecipientViewPetitionFieldCard.fragments.PublicPetitionField}
+  `,
+  PublicPetitionFieldReply: gql`
+    fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
+      content
+    }
   `,
 };
 
