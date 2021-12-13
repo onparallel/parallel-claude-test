@@ -1,12 +1,13 @@
 import { Request, RequestHandler, Response, Router } from "express";
 import { OpenAPIV3 } from "openapi-types";
+import pProps from "p-props";
 import { omit } from "remeda";
 import { ParseUrlParams } from "typed-url-params";
 import { Memoize } from "typescript-memoize";
-import { MaybePromise } from "../../util/types";
+import { unMaybeArray } from "../../util/arrays";
+import { MaybeArray, MaybePromise } from "../../util/types";
 import { HttpError, InvalidParameterError, UnknownError } from "./errors";
 import { ParseError } from "./params";
-import pProps from "p-props";
 
 export type RestMethod = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
 
@@ -51,6 +52,7 @@ export interface RestOperationOptions<TQuery, TBody, TResponses extends RestResp
   body?: RestBody<TBody>;
   query?: RestParameters<TQuery>;
   responses?: TResponses;
+  middleware?: MaybeArray<RequestHandler>;
   excludeFromSpec?: boolean;
   [x: string]: unknown;
 }
@@ -154,7 +156,14 @@ const _PathResolver: any = (function () {
         TBody
       >
     ) {
-      const { body, query, excludeFromSpec, responses = {}, ...spec } = operationOptions;
+      const {
+        body,
+        query,
+        excludeFromSpec,
+        responses = {},
+        middleware = [],
+        ...spec
+      } = operationOptions;
       if (!excludeFromSpec) {
         this.spec[method] = { ...spec, responses };
         if (body?.spec) {
@@ -168,7 +177,7 @@ const _PathResolver: any = (function () {
           })
         );
       }
-      this.router[method](this.path, async (req, res, next) => {
+      this.router[method](this.path, ...unMaybeArray(middleware), async (req, res, next) => {
         const response: ResponseWrapper<any> = await (async () => {
           try {
             const context: RestApiContext<TContext> = ((await this.apiOptions.context?.({
