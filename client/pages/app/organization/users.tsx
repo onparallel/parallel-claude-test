@@ -195,6 +195,7 @@ function OrganizationUsers() {
           me,
         });
       }
+      console.log("transferToUser: ", transferToUser);
       await updateUserStatus({
         variables: {
           newStatus,

@@ -4610,6 +4610,11 @@
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
   },
   {
+    "term": "organization.confirm-deactivate-user-dialog.assign-to-other",
+    "definition": "Assign petitions to another user in the organization",
+    "context": "Assign petitions to another user in the organization"
+  },
+  {
     "term": "organization.confirm-deactivate-user-dialog.body",
     "definition": "Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?",
     "context": "Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
@@ -4620,9 +4625,19 @@
     "context": "Inactive users won't be able to login or use Parallel in any way."
   },
   {
+    "term": "organization.confirm-deactivate-user-dialog.delete-all-petitions",
+    "definition": "Delete all petitions",
+    "context": "Delete all petitions"
+  },
+  {
     "term": "organization.confirm-deactivate-user-dialog.transfer-to-user",
-    "definition": "To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate.",
-    "context": "To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
+    "definition": "Before continue, choose what you want to do with the petitions associated to this {count, plural, =1{user} other {users}}:",
+    "context": "Before continue, choose what you want to do with the petitions associated to this {count, plural, =1{user} other {users}}:"
+  },
+  {
+    "term": "organization.confirm-deactivate.user-select.input-error",
+    "definition": "Please, select a user or team or change your reply",
+    "context": "Please, select a user or team or change your reply"
   },
   {
     "term": "organization.confirm-deactivate.user-select.input-placeholder",
@@ -5396,8 +5411,8 @@
   },
   {
     "term": "petition.confirm-deactivate-users.confirm",
-    "definition": "Deactivate and transfer petitions",
-    "context": "Deactivate and transfer petitions"
+    "definition": "Deactivate {count, plural, =1{user} other {users}}",
+    "context": "Deactivate {count, plural, =1{user} other {users}}"
   },
   {
     "term": "petition.confirm-delete-field.body",

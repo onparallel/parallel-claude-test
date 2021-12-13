@@ -1,4 +1,13 @@
-import { Button, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  Radio,
+  RadioGroup,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -8,9 +17,11 @@ import {
   useSearchUsers,
 } from "@parallel/components/common/UserSelect";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+
+type actionType = "TRANSFER" | "DELETE";
 
 function ConfirmDeactivateUserDialog({
   selected,
@@ -32,6 +43,8 @@ function ConfirmDeactivateUserDialog({
     },
   });
 
+  const [option, setOption] = useState<actionType>("TRANSFER");
+
   const userSelectRef = useRef<UserSelectInstance<false>>(null);
 
   const _handleSearchUsers = useSearchUsers();
@@ -44,6 +57,10 @@ function ConfirmDeactivateUserDialog({
     [_handleSearchUsers]
   );
 
+  const handleOnChangeRadio = (option: actionType) => {
+    setOption(option);
+  };
+
   return (
     <ConfirmDialog
       size="lg"
@@ -51,7 +68,10 @@ function ConfirmDeactivateUserDialog({
       content={{
         as: "form",
         onSubmit: handleSubmit(({ user }) => {
-          props.onResolve(user!);
+          const users = option === "DELETE" ? undefined : user!;
+
+          console.log("users: ", users);
+          props.onResolve(users);
         }),
       }}
       header={
@@ -78,37 +98,68 @@ function ConfirmDeactivateUserDialog({
           <Text>
             <FormattedMessage
               id="organization.confirm-deactivate-user-dialog.transfer-to-user"
-              defaultMessage="To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
+              defaultMessage="Before continue, choose what you want to do with the petitions associated to this {count, plural, =1{user} other {users}}:"
               values={{
                 count: selected.length,
               }}
             />
           </Text>
-          <Controller
-            name="user"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <UserSelect
-                ref={userSelectRef}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                onSearch={handleSearchUsers}
-                placeholder={intl.formatMessage({
-                  id: "organization.confirm-deactivate.user-select.input-placeholder",
-                  defaultMessage: "Select a user from your organization",
-                })}
-              />
-            )}
-          />
+          <RadioGroup value={option} onChange={handleOnChangeRadio}>
+            <Stack>
+              <Radio value="TRANSFER">
+                <FormattedMessage
+                  id="organization.confirm-deactivate-user-dialog.assign-to-other"
+                  defaultMessage="Assign petitions to another user in the organization"
+                />
+              </Radio>
+              {option === "TRANSFER" ? (
+                <Box paddingBottom={2}>
+                  <FormControl id="user" isInvalid={!!errors.user}>
+                    <Controller
+                      name="user"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <UserSelect
+                          ref={userSelectRef}
+                          value={value}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          onSearch={handleSearchUsers}
+                          placeholder={intl.formatMessage({
+                            id: "organization.confirm-deactivate.user-select.input-placeholder",
+                            defaultMessage: "Select a user from your organization",
+                          })}
+                        />
+                      )}
+                    />
+                    <FormErrorMessage>
+                      <FormattedMessage
+                        id="organization.confirm-deactivate.user-select.input-error"
+                        defaultMessage="Please, select a user or team or change your reply"
+                      />
+                    </FormErrorMessage>
+                  </FormControl>
+                </Box>
+              ) : null}
+              <Radio value="DELETE">
+                <FormattedMessage
+                  id="organization.confirm-deactivate-user-dialog.delete-all-petitions"
+                  defaultMessage="Delete all petitions"
+                />
+              </Radio>
+            </Stack>
+          </RadioGroup>
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="red" isDisabled={Boolean(errors.user)}>
+        <Button type="submit" colorScheme="red">
           <FormattedMessage
             id="petition.confirm-deactivate-users.confirm"
-            defaultMessage="Deactivate and transfer petitions"
+            defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
+            values={{
+              count: selected.length,
+            }}
           />
         </Button>
       }
