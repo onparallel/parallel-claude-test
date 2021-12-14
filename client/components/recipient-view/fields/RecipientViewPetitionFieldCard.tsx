@@ -142,6 +142,41 @@ export function RecipientViewPetitionFieldCard({
 }
 
 RecipientViewPetitionFieldCard.fragments = {
+  get PetitionField() {
+    return gql`
+      fragment RecipientViewPetitionFieldCard_PetitionField on PetitionField {
+        id
+        type
+        title
+        description
+        options
+        optional
+        multiple
+        validated
+        replies {
+          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+        }
+        attachments {
+          ...RecipientViewFieldAttachment_PetitionFieldAttachment
+        }
+        ...RecipientViewPetitionFieldCommentsDialog_PetitionField
+      }
+      ${this.PetitionFieldReply}
+      ${RecipientViewFieldAttachment.fragments.PetitionFieldAttachment}
+      ${RecipientViewPetitionFieldCommentsDialog.fragments.PetitionField}
+    `;
+  },
+  get PetitionFieldReply() {
+    return gql`
+      fragment RecipientViewPetitionFieldCard_PetitionFieldReply on PetitionFieldReply {
+        id
+        status
+        content
+        createdAt
+        updatedAt
+      }
+    `;
+  },
   get PublicPetitionField() {
     return gql`
       fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {

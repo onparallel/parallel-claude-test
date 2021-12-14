@@ -10,8 +10,8 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
@@ -38,21 +38,19 @@ import { RecipientViewProgressFooter } from "@parallel/components/recipient-view
 import {
   RecipientView_accessDocument,
   RecipientView_publicCompletePetitionDocument,
-  RecipientView_PublicPetitionFieldFragment,
   RecipientView_PublicUserFragment,
   Tone,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
-import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
-import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 
@@ -335,7 +333,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                 {petition.isRecipientViewContentsHidden ? null : (
                   <RecipientViewContentsCard
                     currentPage={currentPage}
-                    sender={granter}
                     petition={petition}
                     display={{ base: "none", [breakpoint]: "flex" }}
                   />
@@ -547,14 +544,6 @@ RecipientView.mutations = [
     ${RecipientView.fragments.PublicPetition}
   `,
 ];
-
-function useGetPageFields(fields: RecipientView_PublicPetitionFieldFragment[], page: number) {
-  const visibility = useFieldVisibility(fields);
-  return useMemo(() => {
-    const pages = groupFieldsByPages(fields, visibility);
-    return { fields: pages[page - 1], pages: pages.length, visibility };
-  }, [fields, page, visibility]);
-}
 
 RecipientView.queries = [
   gql`

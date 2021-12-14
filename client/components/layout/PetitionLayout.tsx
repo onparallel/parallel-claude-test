@@ -16,7 +16,7 @@ export interface PetitionLayoutProps extends BoxProps {
   user: PetitionLayout_UserFragment;
   onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "replies" | "activity";
+  section: "compose" | "preview" | "replies" | "activity";
   scrollBody: boolean;
   headerActions?: ReactNode;
 }
@@ -40,6 +40,10 @@ export function PetitionLayout({
               compose: intl.formatMessage({
                 id: "petition.header.compose-tab",
                 defaultMessage: "Compose",
+              }),
+              preview: intl.formatMessage({
+                id: "petition.header.preview-tab",
+                defaultMessage: "Preview",
               }),
               replies: intl.formatMessage({
                 id: "petition.header.replies-tab",
@@ -86,6 +90,7 @@ export function PetitionLayout({
         <PetitionTemplateHeader
           petition={petition}
           user={user}
+          section={section!}
           onUpdatePetition={onUpdatePetition}
         />
       ) : null}

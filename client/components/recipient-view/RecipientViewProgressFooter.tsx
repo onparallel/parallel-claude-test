@@ -12,7 +12,10 @@ import {
   PopoverTrigger,
   Text,
 } from "@chakra-ui/react";
-import { RecipientViewProgressFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
+import {
+  RecipientViewProgressFooter_PetitionFragment,
+  RecipientViewProgressFooter_PublicPetitionFragment,
+} from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { generateCssStripe } from "@parallel/utils/css";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
@@ -25,7 +28,9 @@ import { Spacer } from "../common/Spacer";
 import { useTone } from "../common/ToneProvider";
 
 export interface RecipientViewProgressFooterProps extends CardProps {
-  petition: RecipientViewProgressFooter_PublicPetitionFragment;
+  petition:
+    | RecipientViewProgressFooter_PublicPetitionFragment
+    | RecipientViewProgressFooter_PetitionFragment;
   onFinalize: () => void;
 }
 
@@ -141,6 +146,36 @@ export function RecipientViewProgressFooter({
 }
 
 RecipientViewProgressFooter.fragments = {
+  get Petition() {
+    return gql`
+      fragment RecipientViewProgressFooter_Petition on Petition {
+        status
+        fields {
+          ...RecipientViewProgressFooter_PetitionField
+        }
+        signatureConfig {
+          review
+        }
+      }
+      ${this.PetitionField}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment RecipientViewProgressFooter_PetitionField on PetitionField {
+        id
+        type
+        optional
+        validated
+        isReadOnly
+        replies {
+          id
+        }
+        ...useFieldVisibility_PetitionField
+      }
+      ${useFieldVisibility.fragments.PetitionField}
+    `;
+  },
   get PublicPetition() {
     return gql`
       fragment RecipientViewProgressFooter_PublicPetition on PublicPetition {

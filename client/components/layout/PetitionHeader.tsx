@@ -59,7 +59,7 @@ export interface PetitionHeaderProps extends BoxProps {
   petition: PetitionHeader_PetitionFragment;
   user: PetitionHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "replies" | "activity";
+  section: "compose" | "preview" | "replies" | "activity";
   actions?: ReactNode;
 }
 
@@ -153,20 +153,18 @@ export function PetitionHeader({
         }),
       },
       {
+        section: "preview",
+        label: intl.formatMessage({
+          id: "petition.header.preview-tab",
+          defaultMessage: "Preview",
+        }),
+      },
+      {
         section: "replies",
         label: intl.formatMessage({
           id: "petition.header.replies-tab",
           defaultMessage: "Replies",
         }),
-        isDisabled: petition.status === "DRAFT",
-        popoverContent: (
-          <Text fontSize="sm">
-            <FormattedMessage
-              id="petition.replies-not-available"
-              defaultMessage="Once you send this petition, you will be able to see all the replies here."
-            />
-          </Text>
-        ),
       },
       {
         section: "activity",
@@ -174,15 +172,6 @@ export function PetitionHeader({
           id: "petition.header.activity-tab",
           defaultMessage: "Activity",
         }),
-        isDisabled: petition.status === "DRAFT",
-        popoverContent: (
-          <Text fontSize="sm">
-            <FormattedMessage
-              id="petition.activity-not-available"
-              defaultMessage="Once you send this petition, you will be able to see all the petition activity here."
-            />
-          </Text>
-        ),
       },
     ],
     [petition.status, petition.isRestricted, intl.locale]
@@ -400,18 +389,8 @@ export function PetitionHeader({
         </Stack>
       </Flex>
       <PetitionHeaderTabs>
-        {sections.map(({ section, label, isDisabled, popoverContent, rightIcon }) => {
-          return isDisabled ? (
-            <PetitionHeaderTab
-              key={section}
-              isActive={current === section}
-              isDisabled
-              popoverContent={popoverContent}
-              rightIcon={rightIcon}
-            >
-              {label}
-            </PetitionHeaderTab>
-          ) : (
+        {sections.map(({ section, label, rightIcon }) => {
+          return (
             <NakedLink key={section} href={`/app/petitions/${petition.id}/${section}`}>
               <PetitionHeaderTab isActive={current === section} rightIcon={rightIcon}>
                 {label}

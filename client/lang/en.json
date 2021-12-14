@@ -5475,6 +5475,11 @@
     "context": "Last saved on: {date}"
   },
   {
+    "term": "petition.header.preview-tab",
+    "definition": "Preview",
+    "context": "Preview"
+  },
+  {
     "term": "petition.header.replies-tab",
     "definition": "Replies",
     "context": "Replies"

@@ -103,11 +103,13 @@ function PageLink({
       {...props}
     />
   );
-  return props.isDisabled ? (
-    button
-  ) : (
-    <NakedLink href={`/petition/${query.keycode}/${page}`}>{button}</NakedLink>
-  );
+
+  let url = `/petition/${query.keycode}/${page}`;
+  if (query.petitionId) {
+    url = `/app/petitions/${query.petitionId}/preview?page=${page}`;
+  }
+
+  return props.isDisabled ? button : <NakedLink href={url}>{button}</NakedLink>;
 }
 
 function usePagination({

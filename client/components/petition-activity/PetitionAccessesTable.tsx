@@ -3,6 +3,7 @@ import {
   Box,
   BoxProps,
   Button,
+  Center,
   Flex,
   HStack,
   Menu,
@@ -34,7 +35,9 @@ import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
 import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
+import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NormalLink } from "../common/Link";
 import { Table, TableColumn } from "../common/Table";
 
 export interface PetitionAccessesTable extends BoxProps {
@@ -44,6 +47,7 @@ export interface PetitionAccessesTable extends BoxProps {
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
   onConfigureReminders: (selected: PetitionAccessTable_PetitionAccessFragment[]) => void;
+  onPetitionShare: () => void;
 }
 
 export function PetitionAccessesTable({
@@ -53,6 +57,7 @@ export function PetitionAccessesTable({
   onReactivateAccess,
   onDeactivateAccess,
   onConfigureReminders,
+  onPetitionShare,
   ...props
 }: PetitionAccessesTable) {
   const intl = useIntl();
@@ -141,15 +146,42 @@ export function PetitionAccessesTable({
         <FormattedMessage id="petition-access.header" defaultMessage="Petition access control" />
       </GenericCardHeader>
       <Box overflowX="auto">
-        <Table
-          columns={columns}
-          context={context}
-          rows={petition.accesses ?? []}
-          rowKeyProp="id"
-          isSelectable
-          onSelectionChange={setSelection}
-          marginBottom={2}
-        />
+        {petition.accesses.length ? (
+          <Table
+            columns={columns}
+            context={context}
+            rows={petition.accesses ?? []}
+            rowKeyProp="id"
+            isSelectable
+            onSelectionChange={setSelection}
+            marginBottom={2}
+          />
+        ) : (
+          <>
+            <Divider />
+            <Center minHeight="60px" textAlign="center" padding={3} color="gray.400">
+              <Stack>
+                <Text>
+                  <FormattedMessage
+                    id="petition-access.no-access-added"
+                    defaultMessage="No access has been added yet."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="petition-access.send-request-or-add-access"
+                    defaultMessage="<a>Send the request</a> to include recipients or do it from the <b>Add access</b> button of this table."
+                    values={{
+                      a: (chunks: any) => (
+                        <NormalLink onClick={onPetitionShare}>{chunks}</NormalLink>
+                      ),
+                    }}
+                  />
+                </Text>
+              </Stack>
+            </Center>
+          </>
+        )}
       </Box>
     </Card>
   );

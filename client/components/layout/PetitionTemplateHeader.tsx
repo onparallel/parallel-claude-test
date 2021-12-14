@@ -12,9 +12,16 @@ import {
   MenuItem,
   MenuList,
   Portal,
+  Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon, MoreVerticalIcon, UserArrowIcon } from "@parallel/chakra/icons";
+import {
+  CopyIcon,
+  DeleteIcon,
+  LockClosedIcon,
+  MoreVerticalIcon,
+  UserArrowIcon,
+} from "@parallel/chakra/icons";
 import {
   PetitionTemplateHeader_PetitionTemplateFragment,
   PetitionTemplateHeader_UserFragment,
@@ -26,22 +33,29 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { NakedLink } from "../common/Link";
 import { LocaleBadge } from "../common/LocaleBadge";
+import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
 import { HeaderNameEditable } from "./HeaderNameEditable";
+import { PetitionHeaderTab } from "./PetitionHeaderTab";
+import { PetitionHeaderTabs } from "./PetitionHeaderTabs";
 
 export interface PetitionTemplateHeaderProps extends BoxProps {
   petition: PetitionTemplateHeader_PetitionTemplateFragment;
   user: PetitionTemplateHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
+  section: "compose" | "preview" | "replies" | "activity";
 }
 
 export function PetitionTemplateHeader({
   petition,
   user,
   onUpdatePetition,
+  section: current,
   ...props
 }: PetitionTemplateHeaderProps) {
   const intl = useIntl();
@@ -87,6 +101,40 @@ export function PetitionTemplateHeader({
       });
     } catch {}
   };
+
+  const sections = useMemo(
+    () => [
+      {
+        rightIcon: petition.isRestricted ? (
+          <SmallPopover
+            content={
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-header.compose-tab.readonly"
+                  defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
+                />
+              </Text>
+            }
+          >
+            <LockClosedIcon color="gray.600" _hover={{ color: "gray.700" }} />
+          </SmallPopover>
+        ) : undefined,
+        section: "compose",
+        label: intl.formatMessage({
+          id: "petition.header.compose-tab",
+          defaultMessage: "Compose",
+        }),
+      },
+      {
+        section: "preview",
+        label: intl.formatMessage({
+          id: "petition.header.preview-tab",
+          defaultMessage: "Preview",
+        }),
+      },
+    ],
+    [petition.isRestricted, intl.locale]
+  );
 
   return (
     <Box
@@ -210,6 +258,17 @@ export function PetitionTemplateHeader({
           </Portal>
         </Menu>
       </Flex>
+      <PetitionHeaderTabs>
+        {sections.map(({ section, label, rightIcon }) => {
+          return (
+            <NakedLink key={section} href={`/app/petitions/${petition.id}/${section}`}>
+              <PetitionHeaderTab isActive={current === section} rightIcon={rightIcon}>
+                {label}
+              </PetitionHeaderTab>
+            </NakedLink>
+          );
+        })}
+      </PetitionHeaderTabs>
     </Box>
   );
 }
@@ -220,6 +279,7 @@ PetitionTemplateHeader.fragments = {
       id
       locale
       isPublic
+      isRestricted
       ...HeaderNameEditable_PetitionBase
     }
     ${HeaderNameEditable.fragments.PetitionBase}

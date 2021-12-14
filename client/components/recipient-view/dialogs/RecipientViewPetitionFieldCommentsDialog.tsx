@@ -412,6 +412,14 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
       }
     `;
   },
+  get PetitionField() {
+    return gql`
+      fragment RecipientViewPetitionFieldCommentsDialog_PetitionField on PetitionField {
+        id
+        title
+      }
+    `;
+  },
   get PublicPetitionField() {
     return gql`
       fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
