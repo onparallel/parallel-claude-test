@@ -1,8 +1,11 @@
 {
   "schemaPath": [
-    "server/parallel-schema.graphql",
+    "server/parallel-schema.graphql"
   ],
-  "include": "./client/**/*.tsx",
+  "include": [
+    ".client/graphql/__types.ts",
+    ".server/src/api/public/__types.ts"
+  ],
   "endpoint": "http://localhost/graphql",
   "extensions": {
     "endpoints": {
