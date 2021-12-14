@@ -170,13 +170,13 @@ export function fieldsHaveCommentsEnabled<
   };
 }
 
-export function fieldAllowsNewReply<
+export function fieldCanBeReplied<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, number>
 >(fieldIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldId = args[fieldIdArg] as number;
+    const fieldId = args[fieldIdArg] as unknown as number;
     const [field, replies] = await Promise.all([
       ctx.petitions.loadField(fieldId),
       ctx.petitions.loadRepliesForField(fieldId),
@@ -451,7 +451,7 @@ export function userHasEnabledIntegration<TypeName extends string, FieldName ext
   };
 }
 
-export function replyAllowsUpdate<
+export function replyCanBeUpdated<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, number>

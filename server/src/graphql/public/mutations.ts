@@ -28,11 +28,11 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import {
-  fieldAllowsNewReply,
+  fieldCanBeReplied,
   fieldAttachmentBelongsToField,
   fieldHasType,
   fieldsHaveCommentsEnabled,
-  replyAllowsUpdate,
+  replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../petition/authorizers";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
@@ -235,7 +235,7 @@ export const publicDeletePetitionReply = mutationField("publicDeletePetitionRepl
   authorize: chain(
     authenticatePublicAccess("keycode"),
     replyBelongsToAccess("replyId"),
-    replyAllowsUpdate("replyId")
+    replyCanBeUpdated("replyId")
   ),
   args: {
     keycode: nonNull(idArg()),
@@ -294,7 +294,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     and(
       fieldBelongsToAccess("fieldId"),
       fieldHasType("fieldId", "FILE_UPLOAD"),
-      fieldAllowsNewReply("fieldId")
+      fieldCanBeReplied("fieldId")
     )
   ),
   resolve: async (_, args, ctx) => {
@@ -338,7 +338,7 @@ export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", 
     and(
       fieldBelongsToAccess("fieldId"),
       fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT"]),
-      fieldAllowsNewReply("fieldId")
+      fieldCanBeReplied("fieldId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {
@@ -377,7 +377,7 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
     and(
       replyBelongsToAccess("replyId"),
       replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
-      replyAllowsUpdate("replyId")
+      replyCanBeUpdated("replyId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {
@@ -411,7 +411,7 @@ export const publicCreateCheckboxReply = mutationField("publicCreateCheckboxRepl
     and(
       fieldBelongsToAccess("fieldId"),
       fieldHasType("fieldId", ["CHECKBOX"]),
-      fieldAllowsNewReply("fieldId")
+      fieldCanBeReplied("fieldId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {
@@ -448,7 +448,7 @@ export const publicUpdateCheckboxReply = mutationField("publicUpdateCheckboxRepl
     and(
       replyBelongsToAccess("replyId"),
       replyIsForFieldOfType("replyId", ["CHECKBOX"]),
-      replyAllowsUpdate("replyId")
+      replyCanBeUpdated("replyId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {
@@ -484,7 +484,7 @@ export const publicCreateDynamicSelectReply = mutationField("publicCreateDynamic
     and(
       fieldBelongsToAccess("fieldId"),
       fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
-      fieldAllowsNewReply("fieldId")
+      fieldCanBeReplied("fieldId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {
@@ -521,7 +521,7 @@ export const publicUpdateDynamicSelectReply = mutationField("publicUpdateDynamic
     and(
       replyBelongsToAccess("replyId"),
       replyIsForFieldOfType("replyId", "DYNAMIC_SELECT"),
-      replyAllowsUpdate("replyId")
+      replyCanBeUpdated("replyId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {

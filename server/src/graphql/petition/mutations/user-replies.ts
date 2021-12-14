@@ -8,11 +8,11 @@ import { RESULT } from "../../helpers/result";
 import { uploadArg } from "../../helpers/upload";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../../utils";
 import {
-  fieldAllowsNewReply,
+  fieldCanBeReplied,
   fieldHasType,
   fieldsBelongsToPetition,
   repliesBelongsToPetition,
-  replyAllowsUpdate,
+  replyCanBeUpdated,
   replyIsForFieldOfType,
   userHasAccessToPetitions,
 } from "../authorizers";
@@ -29,7 +29,7 @@ export const createSimpleReply = mutationField("createSimpleReply", {
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT"]),
-    fieldAllowsNewReply("fieldId")
+    fieldCanBeReplied("fieldId")
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
@@ -66,7 +66,7 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
-    replyAllowsUpdate("replyId")
+    replyCanBeUpdated("replyId")
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
@@ -98,7 +98,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
-    fieldAllowsNewReply("fieldId")
+    fieldCanBeReplied("fieldId")
   ),
   resolve: async (_, args, ctx) => {
     const { createReadStream, filename, mimetype } = await args.file;
@@ -141,7 +141,7 @@ export const createCheckboxReply = mutationField("createCheckboxReply", {
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["CHECKBOX"]),
-    fieldAllowsNewReply("fieldId")
+    fieldCanBeReplied("fieldId")
   ),
   validateArgs: async (_, { fieldId, values }, ctx, info) => {
     try {
@@ -176,7 +176,7 @@ export const updateCheckboxReply = mutationField("updateCheckboxReply", {
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["CHECKBOX"]),
-    replyAllowsUpdate("replyId")
+    replyCanBeUpdated("replyId")
   ),
   validateArgs: async (_, { replyId, values }, ctx, info) => {
     try {
@@ -210,7 +210,7 @@ export const createDynamicSelectReply = mutationField("createDynamicSelectReply"
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
-    fieldAllowsNewReply("fieldId")
+    fieldCanBeReplied("fieldId")
   ),
   validateArgs: async (_, args, ctx, info) => {
     try {
@@ -245,7 +245,7 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["DYNAMIC_SELECT"]),
-    replyAllowsUpdate("replyId")
+    replyCanBeUpdated("replyId")
   ),
   validateArgs: async (_, args, ctx, info) => {
     try {
@@ -277,7 +277,7 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
-    replyAllowsUpdate("replyId")
+    replyCanBeUpdated("replyId")
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionFieldReply(args.replyId, `User:${ctx.user!.id}`);

@@ -1362,12 +1362,9 @@ export class PetitionRepository extends BaseRepository {
       throw new Error("Petition field not found");
     }
 
-    let updatedBy: string;
-    if (isDefined((updater as any).keycode)) {
-      updatedBy = `Contact:${(updater as PetitionAccess).contact_id}`;
-    } else {
-      updatedBy = `User:${(updater as User).id}`;
-    }
+    const isContact = "keycode" in updater;
+    const updatedBy = isContact ? `Contact:${updater.contact_id}` : `User:${updater.id}`;
+
     const [[reply]] = await Promise.all([
       this.from("petition_field_reply")
         .where("id", replyId)
@@ -1384,10 +1381,11 @@ export class PetitionRepository extends BaseRepository {
         .where({ id: field.petition_id, status: "COMPLETED" }),
     ]);
 
-    await this.createOrUpdateReplyEvent(field.petition_id, reply, {
-      petition_access_id: updatedBy.startsWith("Contact:") ? updater.id : undefined,
-      user_id: updatedBy.startsWith("User:") ? updater.id : undefined,
-    });
+    await this.createOrUpdateReplyEvent(
+      field.petition_id,
+      reply,
+      isContact ? { petition_access_id: updater.id } : { user_id: updater.id }
+    );
     return reply;
   }
 
