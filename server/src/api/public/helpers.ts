@@ -1,6 +1,6 @@
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import { performance } from "perf_hooks";
-import { pipe } from "remeda";
+import { omit, pipe } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { RestParameter } from "../rest/core";
 import { InternalError } from "../rest/errors";
@@ -110,11 +110,22 @@ function mapPetitionFieldRepliesContent<T extends Pick<PetitionFragment, "fields
   return {
     ...petition,
     fields: petition.fields?.map((field) => ({
-      ...field,
+      ...omit(field, ["options"]),
+      options: field.options.values ?? undefined,
       replies: field.replies.map((reply) => ({
         ...reply,
         content: mapFieldReplyContent(field.type, reply.content),
       })),
+    })),
+  };
+}
+
+function mapTemplateFields<T extends Pick<TemplateFragment, "fields">>(template: T) {
+  return {
+    ...template,
+    fields: template.fields?.map((field) => ({
+      ...omit(field, ["options"]),
+      options: field.options.values ?? undefined,
     })),
   };
 }
@@ -130,8 +141,8 @@ export function mapPetition<T extends Pick<PetitionFragment, "tags" | "fields">>
   return pipe(petition, mapPetitionFieldRepliesContent, mapPetitionTags);
 }
 
-export function mapTemplate<T extends Pick<TemplateFragment, "tags">>(petition: T) {
-  return pipe(petition, mapPetitionTags);
+export function mapTemplate<T extends Pick<TemplateFragment, "tags" | "fields">>(petition: T) {
+  return pipe(petition, mapTemplateFields, mapPetitionTags);
 }
 
 export async function getTags(client: GraphQLClient) {

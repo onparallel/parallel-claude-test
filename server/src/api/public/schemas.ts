@@ -195,10 +195,9 @@ const _PetitionAccess = {
 } as const;
 
 const _PetitionField = {
-  title: "PetitionFieldWithReply",
   type: "object",
   additionalProperties: false,
-  required: ["id", "title", "type"],
+  required: ["id", "title", "type", "multiple", "validated"],
   properties: {
     id: {
       type: "string",
@@ -234,6 +233,109 @@ const _PetitionField = {
       description: "The field alias specified within the request / template",
       example: "first-name",
     },
+    options: {
+      type: ["array", "null"],
+      description:
+        "For fields of type `SELECT`, `DYNAMIC_SELECT` and `CHECKBOX`. An array with valid options for the reply.",
+    },
+    multiple: {
+      type: "boolean",
+      description: "If `true`, this field allows an unlimited amount of replies.",
+      example: false,
+    },
+    validated: {
+      type: "boolean",
+      description:
+        "If `true`, this field is already validated and its replies cannot be edited in any way.",
+      example: false,
+    },
+  },
+} as const;
+
+const _PetitionFieldReply = {
+  type: "object",
+  required: ["id", "content", "status", "createdAt", "updatedAt"],
+  properties: {
+    id: {
+      type: "string",
+      description: "The ID of the petition field reply",
+      example: toGlobalId("PetitionFieldReply", 100),
+    },
+    status: {
+      type: "string",
+      description: "Status of the reply. `APPROVED` replies cannot be modified or deleted.",
+      enum: ["PENDING", "APPROVED", "REJECTED"],
+      example: "PENDING",
+    },
+    content: {
+      anyOf: [
+        {
+          title: "Text reply",
+          type: "string",
+          description: "The text content of the reply",
+          example: "Robert Baratheon",
+        },
+        {
+          title: "File reply",
+          type: "object",
+          required: ["filename", "size", "contentType"],
+          additionalProperties: false,
+          properties: {
+            filename: {
+              type: "string",
+              description: "The name of the submitted file",
+              example: "Photo_ID.jpeg",
+            },
+            size: {
+              type: "integer",
+              description: "The size of the file in bytes",
+              example: 1928824,
+            },
+            contentType: {
+              type: "string",
+              description: "The content-type of the file",
+              example: "image/jpeg",
+            },
+          },
+        },
+        {
+          title: "Dynamic select reply",
+          description:
+            "An array of tuples where the first element is the name of the field and the second element is the reply",
+          type: "array",
+          minItems: 2,
+          items: {
+            type: "array",
+            items: [{ type: "string" }, { type: "string" }],
+          },
+          example: [
+            ["Comunidad autónoma", "Andalucía"],
+            ["Provincia", "Cádiz"],
+          ],
+        },
+        {
+          title: "Checkbox reply",
+          description: "An array with the selected choices.",
+          type: "array",
+          items: {
+            type: "string",
+          },
+          example: ["Option 1", "Option 3"],
+        },
+      ],
+    },
+    createdAt: {
+      type: "string",
+      format: "date-time",
+      description: "Creation date of the reply",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+    updatedAt: {
+      type: "string",
+      format: "date-time",
+      description: "Last time update of the reply",
+      example: new Date(2020, 2, 20).toISOString(),
+    },
   },
 } as const;
 
@@ -244,86 +346,7 @@ const _PetitionFieldWithReplies = {
     ..._PetitionField.properties,
     replies: {
       type: "array",
-      items: {
-        type: "object",
-        required: ["id", "content", "createdAt", "updatedAt"],
-        properties: {
-          id: {
-            type: "string",
-            description: "The ID of the petition field reply",
-            example: toGlobalId("PetitionFieldReply", 100),
-          },
-          content: {
-            oneOf: [
-              {
-                title: "Text reply",
-                type: "string",
-                description: "The text content of the reply",
-                example: "Robert Baratheon",
-              },
-              {
-                title: "File reply",
-                type: "object",
-                required: ["filename", "size", "contentType"],
-                additionalProperties: false,
-                properties: {
-                  filename: {
-                    type: "string",
-                    description: "The name of the submitted file",
-                    example: "Photo_ID.jpeg",
-                  },
-                  size: {
-                    type: "integer",
-                    description: "The size of the file in bytes",
-                    example: 1928824,
-                  },
-                  contentType: {
-                    type: "string",
-                    description: "The content-type of the file",
-                    example: "image/jpeg",
-                  },
-                },
-              },
-              {
-                title: "Dynamic select reply",
-                description:
-                  "An array of tuples where the first element is the name of the field and the second element is the reply",
-                type: "array",
-                minItems: 2,
-                items: {
-                  type: "array",
-                  items: [{ type: "string" }, { type: "string" }],
-                },
-                example: [
-                  ["Comunidad autónoma", "Andalucía"],
-                  ["Provincia", "Cádiz"],
-                ],
-              },
-              {
-                title: "Checkbox reply",
-                description: "An array with the selected choices.",
-                type: "array",
-                items: {
-                  type: "string",
-                },
-                example: ["Option 1", "Option 3"],
-              },
-            ],
-          },
-          createdAt: {
-            type: "string",
-            format: "date-time",
-            description: "Creation date of the reply",
-            example: new Date(2020, 2, 15).toISOString(),
-          },
-          updatedAt: {
-            type: "string",
-            format: "date-time",
-            description: "Last time update of the reply",
-            example: new Date(2020, 2, 20).toISOString(),
-          },
-        },
-      },
+      items: { ..._PetitionFieldReply },
     },
   },
 } as const;
@@ -741,9 +764,83 @@ export const SharePetition = schema({
   },
 } as const);
 
+const _SimpleReplySubmitContent = {
+  title: "SimpleReplyContent",
+  type: "string",
+  description:
+    "For simple replies. The referred field must be of type `TEXT`, `SHORT_TEXT` or `SELECT`.",
+  example: "Jamie Lannister",
+} as const;
+
+const _FileUploadReplySubmitContent = {
+  title: "FileUploadReplyContent",
+  type: "object",
+  format: "binary",
+  description:
+    "For fields of type `FILE_UPLOAD`. The content of this reply is the file to be uploaded.",
+} as const;
+
+const _CheckboxReplySubmitContent = {
+  title: "CheckboxReplyContent",
+  type: "array",
+  description:
+    "For fields of type `CHECKBOX`. Each of the elements in the array is an option of the checkbox field.",
+  items: { type: "string", example: "Option 1" },
+  example: ["Option 1", "Option 2"],
+} as const;
+
+const _DynamicSelectReplySubmitContent = {
+  title: "DynamicSelectReplyContent",
+  type: "array",
+  description: "For fields of type `DYNAMIC_SELECT`.",
+  items: { type: "string", example: "Cataluña" },
+  example: ["Cataluña", "Barcelona"],
+} as const;
+
+export const SubmitReply = schema({
+  title: "SubmitReply",
+  type: "object",
+  additionalProperties: false,
+  required: ["fieldId", "reply"],
+  properties: {
+    fieldId: {
+      description: "The ID of the field to be replied.",
+      type: "string",
+      example: toGlobalId("PetitionField", 2),
+    },
+    reply: {
+      anyOf: [
+        _SimpleReplySubmitContent,
+        _FileUploadReplySubmitContent,
+        _CheckboxReplySubmitContent,
+        _DynamicSelectReplySubmitContent,
+      ],
+    },
+  },
+} as const);
+
+export const UpdateReply = schema({
+  title: "UpdateReply",
+  type: "object",
+  additionalProperties: false,
+  required: ["content"],
+  properties: {
+    content: {
+      anyOf: [
+        _SimpleReplySubmitContent,
+        _FileUploadReplySubmitContent,
+        _CheckboxReplySubmitContent,
+        _DynamicSelectReplySubmitContent,
+      ],
+    },
+  },
+} as const);
+
 export const ListOfPermissions = ListOf(_Permission);
 
 export const ListOfPetitionFieldsWithReplies = ListOf(_PetitionFieldWithReplies);
+
+export const PetitionFieldReply = schema(_PetitionFieldReply);
 
 export const FieldReplyDownloadContent = schema({
   type: "string",

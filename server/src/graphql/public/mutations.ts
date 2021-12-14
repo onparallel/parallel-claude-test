@@ -29,8 +29,8 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import {
-  fieldCanBeReplied,
   fieldAttachmentBelongsToField,
+  fieldCanBeReplied,
   fieldHasType,
   fieldsHaveCommentsEnabled,
   replyCanBeUpdated,

@@ -1259,6 +1259,32 @@ describe("GraphQL/Public", () => {
         fileUploadReplyId = data!.publicCreateFileUploadReply.reply.id;
       });
 
+      it("sends error when trying to submit a file of more than 50MB", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $data: FileUploadInput!) {
+              publicCreateFileUploadReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
+                reply {
+                  id
+                }
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", fileUploadField.id),
+            data: {
+              contentType: "text/plain",
+              filename: "file.txt",
+              size: 50 * 1024 * 1024 + 1,
+            },
+          },
+        });
+
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+        expect(data).toBeNull();
+      });
+
       it("notifies backend that a file reply was uploaded successfully", async () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`

@@ -55,6 +55,9 @@ export const PetitionFieldFragment = gql`
     type
     fromPetitionFieldId
     alias
+    options
+    multiple
+    validated
   }
 `;
 
@@ -62,6 +65,7 @@ export const PetitionFieldReplyFragment = gql`
   fragment PetitionFieldReply on PetitionFieldReply {
     id
     content
+    status
     createdAt
     updatedAt
   }

@@ -1,6 +1,7 @@
 import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -132,8 +133,8 @@ export type Contact = Timestamps & {
 
 /** A contact in the system. */
 export type ContactaccessesArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
 };
 
 export type ContactPagination = {
@@ -145,8 +146,8 @@ export type ContactPagination = {
 
 export type CreateContactInput = {
   email: Scalars["String"];
-  firstName?: Maybe<Scalars["String"]>;
-  lastName?: Maybe<Scalars["String"]>;
+  firstName?: InputMaybe<Scalars["String"]>;
+  lastName?: InputMaybe<Scalars["String"]>;
 };
 
 export type CreateFileUploadFieldAttachment = {
@@ -272,9 +273,9 @@ export type LandingTemplateCategorySample = {
 };
 
 export type LandingTemplateCategorySampletemplatesArgs = {
-  limit?: Maybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
   locale: PetitionLocale;
-  offset?: Maybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
 };
 
 /** A public template field */
@@ -347,8 +348,12 @@ export type Mutation = {
   clonePetitions: Array<PetitionBase>;
   /** Clones the user group with all its members */
   cloneUserGroup: Array<UserGroup>;
+  /** Creates a reply to a checkbox field. */
+  createCheckboxReply: PetitionFieldReply;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates a reply for a dynamic select field. */
+  createDynamicSelectReply: PetitionFieldReply;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
@@ -506,8 +511,12 @@ export type Mutation = {
   transferPetitionOwnership: Array<PetitionBase>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
+  /** Updates a reply of a checkbox field */
+  updateCheckboxReply: PetitionFieldReply;
   /** Updates a contact. */
   updateContact: Contact;
+  /** Updates a reply for a dynamic select field. */
+  updateDynamicSelectReply: PetitionFieldReply;
   /** Updates an existing event subscription for the user's petitions */
   updateEventSubscription: PetitionEventSubscription;
   /** Updates the positions of the petition fields */
@@ -572,13 +581,13 @@ export type Mutation = {
 };
 
 export type MutationaddPetitionPermissionArgs = {
-  message?: Maybe<Scalars["String"]>;
-  notify?: Maybe<Scalars["Boolean"]>;
+  message?: InputMaybe<Scalars["String"]>;
+  notify?: InputMaybe<Scalars["Boolean"]>;
   permissionType: PetitionPermissionTypeRW;
   petitionIds: Array<Scalars["GID"]>;
-  subscribe?: Maybe<Scalars["Boolean"]>;
-  userGroupIds?: Maybe<Array<Scalars["GID"]>>;
-  userIds?: Maybe<Array<Scalars["GID"]>>;
+  subscribe?: InputMaybe<Scalars["Boolean"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationaddUsersToUserGroupArgs = {
@@ -597,12 +606,12 @@ export type MutationautoSendTemplateArgs = {
 };
 
 export type MutationbatchSendPetitionArgs = {
-  batchSendSigningMode?: Maybe<BatchSendSigningMode>;
+  batchSendSigningMode?: InputMaybe<BatchSendSigningMode>;
   body: Scalars["JSON"];
   contactIdGroups: Array<Array<Scalars["GID"]>>;
   petitionId: Scalars["GID"];
-  remindersConfig?: Maybe<RemindersConfigInput>;
-  scheduledAt?: Maybe<Scalars["DateTime"]>;
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
+  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
 };
 
@@ -626,7 +635,7 @@ export type MutationchangePasswordArgs = {
 
 export type MutationchangePetitionFieldTypeArgs = {
   fieldId: Scalars["GID"];
-  force?: Maybe<Scalars["Boolean"]>;
+  force?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
   type: PetitionFieldType;
 };
@@ -641,21 +650,33 @@ export type MutationclonePetitionsArgs = {
 };
 
 export type MutationcloneUserGroupArgs = {
-  locale?: Maybe<Scalars["String"]>;
+  locale?: InputMaybe<Scalars["String"]>;
   userGroupIds: Array<Scalars["GID"]>;
+};
+
+export type MutationcreateCheckboxReplyArgs = {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  values: Array<Scalars["String"]>;
 };
 
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
 };
 
+export type MutationcreateDynamicSelectReplyArgs = {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  value: Array<Array<InputMaybe<Scalars["String"]>>>;
+};
+
 export type MutationcreateEventSubscriptionArgs = {
-  eventTypes?: Maybe<Array<PetitionEventType>>;
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
 };
 
 export type MutationcreateExportRepliesTaskArgs = {
-  pattern?: Maybe<Scalars["String"]>;
+  pattern?: InputMaybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
 };
 
@@ -674,20 +695,20 @@ export type MutationcreateOrganizationUserArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
-  locale?: Maybe<Scalars["String"]>;
+  locale?: InputMaybe<Scalars["String"]>;
   role: OrganizationRole;
 };
 
 export type MutationcreatePetitionArgs = {
-  locale?: Maybe<PetitionLocale>;
-  name?: Maybe<Scalars["String"]>;
-  petitionId?: Maybe<Scalars["GID"]>;
-  type?: Maybe<PetitionBaseType>;
+  locale?: InputMaybe<PetitionLocale>;
+  name?: InputMaybe<Scalars["String"]>;
+  petitionId?: InputMaybe<Scalars["GID"]>;
+  type?: InputMaybe<PetitionBaseType>;
 };
 
 export type MutationcreatePetitionFieldArgs = {
   petitionId: Scalars["GID"];
-  position?: Maybe<Scalars["Int"]>;
+  position?: InputMaybe<Scalars["Int"]>;
   type: PetitionFieldType;
 };
 
@@ -699,7 +720,7 @@ export type MutationcreatePetitionFieldAttachmentUploadLinkArgs = {
 
 export type MutationcreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
-  isInternal?: Maybe<Scalars["Boolean"]>;
+  isInternal?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 };
@@ -711,14 +732,14 @@ export type MutationcreatePrintPdfTaskArgs = {
 export type MutationcreatePublicPetitionLinkArgs = {
   description: Scalars["String"];
   ownerId: Scalars["GID"];
-  slug?: Maybe<Scalars["String"]>;
+  slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["GID"];
   title: Scalars["String"];
 };
 
 export type MutationcreateSignatureIntegrationArgs = {
   apiKey: Scalars["String"];
-  isDefault?: Maybe<Scalars["Boolean"]>;
+  isDefault?: InputMaybe<Scalars["Boolean"]>;
   name: Scalars["String"];
   provider: SignatureOrgIntegrationProvider;
 };
@@ -738,7 +759,7 @@ export type MutationcreateUserArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
-  locale?: Maybe<Scalars["String"]>;
+  locale?: InputMaybe<Scalars["String"]>;
   organizationId: Scalars["Int"];
   password: Scalars["String"];
   role: OrganizationRole;
@@ -768,7 +789,7 @@ export type MutationdeletePetitionArgs = {
 
 export type MutationdeletePetitionFieldArgs = {
   fieldId: Scalars["GID"];
-  force?: Maybe<Scalars["Boolean"]>;
+  force?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
 };
 
@@ -784,12 +805,12 @@ export type MutationdeletePetitionReplyArgs = {
 };
 
 export type MutationdeletePetitionsArgs = {
-  force?: Maybe<Scalars["Boolean"]>;
+  force?: InputMaybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
 };
 
 export type MutationdeleteSignatureIntegrationArgs = {
-  force?: Maybe<Scalars["Boolean"]>;
+  force?: InputMaybe<Scalars["Boolean"]>;
   id: Scalars["GID"];
 };
 
@@ -809,13 +830,13 @@ export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
 export type MutationeditPetitionPermissionArgs = {
   permissionType: PetitionPermissionType;
   petitionIds: Array<Scalars["GID"]>;
-  userGroupIds?: Maybe<Array<Scalars["GID"]>>;
-  userIds?: Maybe<Array<Scalars["GID"]>>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationfileUploadReplyDownloadLinkArgs = {
   petitionId: Scalars["GID"];
-  preview?: Maybe<Scalars["Boolean"]>;
+  preview?: InputMaybe<Scalars["Boolean"]>;
   replyId: Scalars["GID"];
 };
 
@@ -824,7 +845,7 @@ export type MutationgenerateUserAuthTokenArgs = {
 };
 
 export type MutationgetTaskResultFileUrlArgs = {
-  preview?: Maybe<Scalars["Boolean"]>;
+  preview?: InputMaybe<Scalars["Boolean"]>;
   taskId: Scalars["GID"];
 };
 
@@ -835,7 +856,7 @@ export type MutationmarkSignatureIntegrationAsDefaultArgs = {
 export type MutationmodifyPetitionCustomPropertyArgs = {
   key: Scalars["String"];
   petitionId: Scalars["GID"];
-  value?: Maybe<Scalars["String"]>;
+  value?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
@@ -857,16 +878,16 @@ export type MutationpublicCheckVerificationCodeArgs = {
 };
 
 export type MutationpublicCompletePetitionArgs = {
-  additionalSigners?: Maybe<Array<PublicPetitionSignerDataInput>>;
+  additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   keycode: Scalars["ID"];
-  message?: Maybe<Scalars["String"]>;
+  message?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
   contactEmail: Scalars["String"];
   contactFirstName: Scalars["String"];
   contactLastName: Scalars["String"];
-  force?: Maybe<Scalars["Boolean"]>;
+  force?: InputMaybe<Scalars["Boolean"]>;
   slug: Scalars["ID"];
 };
 
@@ -879,7 +900,7 @@ export type MutationpublicCreateCheckboxReplyArgs = {
 export type MutationpublicCreateDynamicSelectReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-  value: Array<Array<Maybe<Scalars["String"]>>>;
+  value: Array<Array<InputMaybe<Scalars["String"]>>>;
 };
 
 export type MutationpublicCreateFileUploadReplyArgs = {
@@ -926,7 +947,7 @@ export type MutationpublicFileUploadReplyCompleteArgs = {
 
 export type MutationpublicFileUploadReplyDownloadLinkArgs = {
   keycode: Scalars["ID"];
-  preview?: Maybe<Scalars["Boolean"]>;
+  preview?: InputMaybe<Scalars["Boolean"]>;
   replyId: Scalars["GID"];
 };
 
@@ -939,14 +960,14 @@ export type MutationpublicOptOutRemindersArgs = {
   keycode: Scalars["ID"];
   other: Scalars["String"];
   reason: Scalars["String"];
-  referer?: Maybe<Scalars["String"]>;
+  referer?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-  preview?: Maybe<Scalars["Boolean"]>;
+  preview?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationpublicSendReminderArgs = {
@@ -967,7 +988,7 @@ export type MutationpublicUpdateCheckboxReplyArgs = {
 export type MutationpublicUpdateDynamicSelectReplyArgs = {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
-  value: Array<Array<Maybe<Scalars["String"]>>>;
+  value: Array<Array<InputMaybe<Scalars["String"]>>>;
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
@@ -996,9 +1017,9 @@ export type MutationremovePetitionFieldAttachmentArgs = {
 
 export type MutationremovePetitionPermissionArgs = {
   petitionIds: Array<Scalars["GID"]>;
-  removeAll?: Maybe<Scalars["Boolean"]>;
-  userGroupIds?: Maybe<Array<Scalars["GID"]>>;
-  userIds?: Maybe<Array<Scalars["GID"]>>;
+  removeAll?: InputMaybe<Scalars["Boolean"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationremoveUsersFromGroupArgs = {
@@ -1012,7 +1033,7 @@ export type MutationreopenPetitionArgs = {
 
 export type MutationresendVerificationCodeArgs = {
   email: Scalars["String"];
-  locale?: Maybe<Scalars["String"]>;
+  locale?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationresetSignaturitOrganizationBrandingArgs = {
@@ -1029,25 +1050,25 @@ export type MutationrevokeUserAuthTokenArgs = {
 };
 
 export type MutationsendPetitionArgs = {
-  body?: Maybe<Scalars["JSON"]>;
+  body?: InputMaybe<Scalars["JSON"]>;
   contactIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
-  remindersConfig?: Maybe<RemindersConfigInput>;
-  scheduledAt?: Maybe<Scalars["DateTime"]>;
-  subject?: Maybe<Scalars["String"]>;
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
+  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
+  subject?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationsendPetitionClosedNotificationArgs = {
   attachPdfExport: Scalars["Boolean"];
   emailBody: Scalars["JSON"];
-  force?: Maybe<Scalars["Boolean"]>;
-  pdfExportTitle?: Maybe<Scalars["String"]>;
+  force?: InputMaybe<Scalars["Boolean"]>;
+  pdfExportTitle?: InputMaybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
 };
 
 export type MutationsendRemindersArgs = {
   accessIds: Array<Scalars["GID"]>;
-  body?: Maybe<Scalars["JSON"]>;
+  body?: InputMaybe<Scalars["JSON"]>;
   petitionId: Scalars["GID"];
 };
 
@@ -1060,9 +1081,9 @@ export type MutationsetUserPreferredLocaleArgs = {
 };
 
 export type MutationsignedPetitionDownloadLinkArgs = {
-  downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
+  downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
   petitionSignatureRequestId: Scalars["GID"];
-  preview?: Maybe<Scalars["Boolean"]>;
+  preview?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationstartSignatureRequestArgs = {
@@ -1072,7 +1093,7 @@ export type MutationstartSignatureRequestArgs = {
 export type MutationswitchAutomaticRemindersArgs = {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
-  remindersConfig?: Maybe<RemindersConfigInput>;
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
   start: Scalars["Boolean"];
 };
 
@@ -1096,9 +1117,21 @@ export type MutationuntagPetitionArgs = {
   tagId: Scalars["GID"];
 };
 
+export type MutationupdateCheckboxReplyArgs = {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  values: Array<Scalars["String"]>;
+};
+
 export type MutationupdateContactArgs = {
   data: UpdateContactInput;
   id: Scalars["GID"];
+};
+
+export type MutationupdateDynamicSelectReplyArgs = {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  value: Array<Array<InputMaybe<Scalars["String"]>>>;
 };
 
 export type MutationupdateEventSubscriptionArgs = {
@@ -1112,11 +1145,11 @@ export type MutationupdateFieldPositionsArgs = {
 };
 
 export type MutationupdateLandingTemplateMetadataArgs = {
-  backgroundColor?: Maybe<Scalars["String"]>;
-  categories?: Maybe<Scalars["String"]>;
-  description?: Maybe<Scalars["String"]>;
-  image?: Maybe<Scalars["Upload"]>;
-  slug?: Maybe<Scalars["String"]>;
+  backgroundColor?: InputMaybe<Scalars["String"]>;
+  categories?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]>;
+  image?: InputMaybe<Scalars["Upload"]>;
+  slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["ID"];
 };
 
@@ -1176,25 +1209,25 @@ export type MutationupdatePetitionPermissionSubscriptionArgs = {
 
 export type MutationupdatePetitionRestrictionArgs = {
   isRestricted: Scalars["Boolean"];
-  password?: Maybe<Scalars["String"]>;
+  password?: InputMaybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionUserNotificationReadStatusArgs = {
-  filter?: Maybe<PetitionUserNotificationFilter>;
+  filter?: InputMaybe<PetitionUserNotificationFilter>;
   isRead: Scalars["Boolean"];
-  petitionFieldCommentIds?: Maybe<Array<Scalars["GID"]>>;
-  petitionIds?: Maybe<Array<Scalars["GID"]>>;
-  petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]>>;
+  petitionFieldCommentIds?: InputMaybe<Array<Scalars["GID"]>>;
+  petitionIds?: InputMaybe<Array<Scalars["GID"]>>;
+  petitionUserNotificationIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationupdatePublicPetitionLinkArgs = {
-  description?: Maybe<Scalars["String"]>;
-  isActive?: Maybe<Scalars["Boolean"]>;
-  ownerId?: Maybe<Scalars["GID"]>;
+  description?: InputMaybe<Scalars["String"]>;
+  isActive?: InputMaybe<Scalars["Boolean"]>;
+  ownerId?: InputMaybe<Scalars["GID"]>;
   publicPetitionLinkId: Scalars["GID"];
-  slug?: Maybe<Scalars["String"]>;
-  title?: Maybe<Scalars["String"]>;
+  slug?: InputMaybe<Scalars["String"]>;
+  title?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationupdateSignatureRequestMetadataArgs = {
@@ -1230,7 +1263,7 @@ export type MutationupdateUserGroupArgs = {
 
 export type MutationupdateUserStatusArgs = {
   status: UserStatus;
-  transferToUserId?: Maybe<Scalars["GID"]>;
+  transferToUserId?: InputMaybe<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
 };
 
@@ -1248,28 +1281,28 @@ export type MutationuploadUserAvatarArgs = {
 export type MutationuserSignUpArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
-  industry?: Maybe<Scalars["String"]>;
+  industry?: InputMaybe<Scalars["String"]>;
   lastName: Scalars["String"];
-  locale?: Maybe<Scalars["String"]>;
-  organizationLogo?: Maybe<Scalars["Upload"]>;
+  locale?: InputMaybe<Scalars["String"]>;
+  organizationLogo?: InputMaybe<Scalars["Upload"]>;
   organizationName: Scalars["String"];
   password: Scalars["String"];
-  position?: Maybe<Scalars["String"]>;
-  role?: Maybe<Scalars["String"]>;
+  position?: InputMaybe<Scalars["String"]>;
+  role?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationvalidatePetitionFieldsArgs = {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
-  validateRepliesWith?: Maybe<PetitionFieldReplyStatus>;
+  validateRepliesWith?: InputMaybe<PetitionFieldReplyStatus>;
   value: Scalars["Boolean"];
 };
 
 export type MutationverifyPublicAccessArgs = {
-  ip?: Maybe<Scalars["String"]>;
+  ip?: InputMaybe<Scalars["String"]>;
   keycode: Scalars["ID"];
   token: Scalars["ID"];
-  userAgent?: Maybe<Scalars["String"]>;
+  userAgent?: InputMaybe<Scalars["String"]>;
 };
 
 export type OnboardingKey =
@@ -1332,19 +1365,19 @@ export type Organization = Timestamps & {
 
 /** An organization in the system. */
 export type OrganizationintegrationsArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  type?: Maybe<IntegrationType>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  type?: InputMaybe<IntegrationType>;
 };
 
 /** An organization in the system. */
 export type OrganizationusersArgs = {
-  exclude?: Maybe<Array<Scalars["GID"]>>;
-  includeInactive?: Maybe<Scalars["Boolean"]>;
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<OrganizationUsers_OrderBy>>;
+  exclude?: InputMaybe<Array<Scalars["GID"]>>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
 };
 
 export type OrganizationPagination = {
@@ -1475,13 +1508,13 @@ export type Petition = PetitionBase & {
 
 /** A petition */
 export type PetitioncurrentSignatureRequestArgs = {
-  token?: Maybe<Scalars["String"]>;
+  token?: InputMaybe<Scalars["String"]>;
 };
 
 /** A petition */
 export type PetitioneventsArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
 };
 
 /** A petition access */
@@ -1817,11 +1850,11 @@ export type PetitionFieldType =
   | "TEXT";
 
 export type PetitionFilter = {
-  locale?: Maybe<PetitionLocale>;
-  sharedWith?: Maybe<PetitionSharedWithFilter>;
-  status?: Maybe<Array<PetitionStatus>>;
-  tagIds?: Maybe<Array<Scalars["GID"]>>;
-  type?: Maybe<PetitionBaseType>;
+  locale?: InputMaybe<PetitionLocale>;
+  sharedWith?: InputMaybe<PetitionSharedWithFilter>;
+  status?: InputMaybe<Array<PetitionStatus>>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
+  type?: InputMaybe<PetitionBaseType>;
 };
 
 /** The locale used for rendering the petition to the contact. */
@@ -2392,11 +2425,11 @@ export type QuerycontactArgs = {
 };
 
 export type QuerycontactsArgs = {
-  exclude?: Maybe<Array<Scalars["GID"]>>;
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
+  exclude?: InputMaybe<Array<Scalars["GID"]>>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<QueryContacts_OrderBy>>;
 };
 
 export type QuerycontactsByEmailArgs = {
@@ -2408,7 +2441,7 @@ export type QueryemailIsAvailableArgs = {
 };
 
 export type QuerygetSlugForPublicPetitionLinkArgs = {
-  petitionName?: Maybe<Scalars["String"]>;
+  petitionName?: InputMaybe<Scalars["String"]>;
 };
 
 export type QuerygetUsersOrGroupsArgs = {
@@ -2433,10 +2466,10 @@ export type QuerylandingTemplateBySlugArgs = {
 };
 
 export type QuerylandingTemplatesArgs = {
-  categories?: Maybe<Array<Scalars["String"]>>;
-  limit?: Maybe<Scalars["Int"]>;
+  categories?: InputMaybe<Array<Scalars["String"]>>;
+  limit?: InputMaybe<Scalars["Int"]>;
   locale: PetitionLocale;
-  offset?: Maybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
 };
 
 export type QueryorganizationArgs = {
@@ -2444,11 +2477,11 @@ export type QueryorganizationArgs = {
 };
 
 export type QueryorganizationsArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryOrganizations_OrderBy>>;
-  status?: Maybe<OrganizationStatus>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<QueryOrganizations_OrderBy>>;
+  status?: InputMaybe<OrganizationStatus>;
 };
 
 export type QuerypetitionArgs = {
@@ -2465,11 +2498,11 @@ export type QuerypetitionFieldCommentsArgs = {
 };
 
 export type QuerypetitionsArgs = {
-  filters?: Maybe<PetitionFilter>;
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
+  filters?: InputMaybe<PetitionFilter>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<QueryPetitions_OrderBy>>;
 };
 
 export type QuerypetitionsByIdArgs = {
@@ -2485,17 +2518,17 @@ export type QuerypublicPetitionLinkBySlugArgs = {
 };
 
 export type QuerysearchUsersArgs = {
-  excludeUserGroups?: Maybe<Array<Scalars["GID"]>>;
-  excludeUsers?: Maybe<Array<Scalars["GID"]>>;
-  includeGroups?: Maybe<Scalars["Boolean"]>;
-  includeInactive?: Maybe<Scalars["Boolean"]>;
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]>>;
+  excludeUsers?: InputMaybe<Array<Scalars["GID"]>>;
+  includeGroups?: InputMaybe<Scalars["Boolean"]>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]>;
   search: Scalars["String"];
 };
 
 export type QuerytagsArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
 };
 
 export type QuerytaskArgs = {
@@ -2503,13 +2536,13 @@ export type QuerytaskArgs = {
 };
 
 export type QuerytemplatesArgs = {
-  category?: Maybe<Scalars["String"]>;
-  isOwner?: Maybe<Scalars["Boolean"]>;
+  category?: InputMaybe<Scalars["String"]>;
+  isOwner?: InputMaybe<Scalars["Boolean"]>;
   isPublic: Scalars["Boolean"];
-  limit?: Maybe<Scalars["Int"]>;
-  locale?: Maybe<PetitionLocale>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  locale?: InputMaybe<PetitionLocale>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
 };
 
 export type QueryuserGroupArgs = {
@@ -2517,10 +2550,10 @@ export type QueryuserGroupArgs = {
 };
 
 export type QueryuserGroupsArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryUserGroups_OrderBy>>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<QueryUserGroups_OrderBy>>;
 };
 
 /** Order to use on Query.contacts */
@@ -2854,52 +2887,52 @@ export type Timestamps = {
 export type Tone = "FORMAL" | "INFORMAL";
 
 export type UpdateContactInput = {
-  firstName?: Maybe<Scalars["String"]>;
-  lastName?: Maybe<Scalars["String"]>;
+  firstName?: InputMaybe<Scalars["String"]>;
+  lastName?: InputMaybe<Scalars["String"]>;
 };
 
 export type UpdateEventSubscriptionInput = {
-  eventTypes?: Maybe<Array<PetitionEventType>>;
-  eventsUrl?: Maybe<Scalars["String"]>;
-  isEnabled?: Maybe<Scalars["Boolean"]>;
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  eventsUrl?: InputMaybe<Scalars["String"]>;
+  isEnabled?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type UpdatePetitionFieldInput = {
-  alias?: Maybe<Scalars["String"]>;
-  description?: Maybe<Scalars["String"]>;
-  multiple?: Maybe<Scalars["Boolean"]>;
-  optional?: Maybe<Scalars["Boolean"]>;
-  options?: Maybe<Scalars["JSONObject"]>;
-  title?: Maybe<Scalars["String"]>;
-  visibility?: Maybe<Scalars["JSONObject"]>;
+  alias?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]>;
+  multiple?: InputMaybe<Scalars["Boolean"]>;
+  optional?: InputMaybe<Scalars["Boolean"]>;
+  options?: InputMaybe<Scalars["JSONObject"]>;
+  title?: InputMaybe<Scalars["String"]>;
+  visibility?: InputMaybe<Scalars["JSONObject"]>;
 };
 
 export type UpdatePetitionInput = {
-  deadline?: Maybe<Scalars["DateTime"]>;
-  description?: Maybe<Scalars["JSON"]>;
-  emailBody?: Maybe<Scalars["JSON"]>;
-  emailSubject?: Maybe<Scalars["String"]>;
-  isRecipientViewContentsHidden?: Maybe<Scalars["Boolean"]>;
-  locale?: Maybe<PetitionLocale>;
-  name?: Maybe<Scalars["String"]>;
-  remindersConfig?: Maybe<RemindersConfigInput>;
-  signatureConfig?: Maybe<SignatureConfigInput>;
-  skipForwardSecurity?: Maybe<Scalars["Boolean"]>;
+  deadline?: InputMaybe<Scalars["DateTime"]>;
+  description?: InputMaybe<Scalars["JSON"]>;
+  emailBody?: InputMaybe<Scalars["JSON"]>;
+  emailSubject?: InputMaybe<Scalars["String"]>;
+  isRecipientViewContentsHidden?: InputMaybe<Scalars["Boolean"]>;
+  locale?: InputMaybe<PetitionLocale>;
+  name?: InputMaybe<Scalars["String"]>;
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
+  signatureConfig?: InputMaybe<SignatureConfigInput>;
+  skipForwardSecurity?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type UpdateTagInput = {
-  color?: Maybe<Scalars["String"]>;
-  name?: Maybe<Scalars["String"]>;
+  color?: InputMaybe<Scalars["String"]>;
+  name?: InputMaybe<Scalars["String"]>;
 };
 
 export type UpdateUserGroupInput = {
-  name?: Maybe<Scalars["String"]>;
+  name?: InputMaybe<Scalars["String"]>;
 };
 
 export type UpdateUserInput = {
-  firstName?: Maybe<Scalars["String"]>;
-  lastName?: Maybe<Scalars["String"]>;
-  role?: Maybe<OrganizationRole>;
+  firstName?: InputMaybe<Scalars["String"]>;
+  lastName?: InputMaybe<Scalars["String"]>;
+  role?: InputMaybe<OrganizationRole>;
 };
 
 /** A user in the system. */
@@ -2947,9 +2980,9 @@ export type UserhasFeatureFlagArgs = {
 
 /** A user in the system. */
 export type UsernotificationsArgs = {
-  before?: Maybe<Scalars["DateTime"]>;
-  filter?: Maybe<PetitionUserNotificationFilter>;
-  limit?: Maybe<Scalars["Int"]>;
+  before?: InputMaybe<Scalars["DateTime"]>;
+  filter?: InputMaybe<PetitionUserNotificationFilter>;
+  limit?: InputMaybe<Scalars["Int"]>;
 };
 
 export type UserAuthenticationToken = CreatedAt & {
@@ -3001,8 +3034,8 @@ export type UserOrUserGroup = User | UserGroup;
 export type UserOrUserGroupPermissionInput = {
   isSubscribed: Scalars["Boolean"];
   permissionType: PetitionPermissionTypeRW;
-  userGroupId?: Maybe<Scalars["GID"]>;
-  userId?: Maybe<Scalars["GID"]>;
+  userGroupId?: InputMaybe<Scalars["GID"]>;
+  userId?: InputMaybe<Scalars["GID"]>;
 };
 
 export type UserPagination = {
@@ -3111,11 +3144,15 @@ export type PetitionFieldFragment = {
   type: PetitionFieldType;
   fromPetitionFieldId: string | null;
   alias: string | null;
+  options: { [key: string]: any };
+  multiple: boolean;
+  validated: boolean;
 };
 
 export type PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
+  status: PetitionFieldReplyStatus;
   createdAt: string;
   updatedAt: string;
 };
@@ -3126,9 +3163,13 @@ export type PetitionFieldWithRepliesFragment = {
   type: PetitionFieldType;
   fromPetitionFieldId: string | null;
   alias: string | null;
+  options: { [key: string]: any };
+  multiple: boolean;
+  validated: boolean;
   replies: Array<{
     id: string;
     content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -3175,9 +3216,13 @@ export type PetitionFragment = {
     type: PetitionFieldType;
     fromPetitionFieldId: string | null;
     alias: string | null;
+    options: { [key: string]: any };
+    multiple: boolean;
+    validated: boolean;
     replies: Array<{
       id: string;
       content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
       createdAt: string;
       updatedAt: string;
     }>;
@@ -3198,6 +3243,9 @@ export type TemplateFragment = {
     type: PetitionFieldType;
     fromPetitionFieldId: string | null;
     alias: string | null;
+    options: { [key: string]: any };
+    multiple: boolean;
+    validated: boolean;
   }>;
   tags?: Array<{ id: string; name: string }>;
 };
@@ -3255,7 +3303,7 @@ export type getTaskResultFileUrl_getTaskResultFileUrlMutation = {
 export type GetTags_tagsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
-  search?: Maybe<Scalars["String"]>;
+  search?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type GetTags_tagsQuery = {
@@ -3265,9 +3313,9 @@ export type GetTags_tagsQuery = {
 export type GetPetitions_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
-  status?: Maybe<Array<PetitionStatus> | PetitionStatus>;
-  tagIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  status?: InputMaybe<Array<PetitionStatus> | PetitionStatus>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
@@ -3316,9 +3364,13 @@ export type GetPetitions_petitionsQuery = {
             type: PetitionFieldType;
             fromPetitionFieldId: string | null;
             alias: string | null;
+            options: { [key: string]: any };
+            multiple: boolean;
+            validated: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
               createdAt: string;
               updatedAt: string;
             }>;
@@ -3331,8 +3383,8 @@ export type GetPetitions_petitionsQuery = {
 };
 
 export type CreatePetition_petitionMutationVariables = Exact<{
-  name?: Maybe<Scalars["String"]>;
-  templateId?: Maybe<Scalars["GID"]>;
+  name?: InputMaybe<Scalars["String"]>;
+  templateId?: InputMaybe<Scalars["GID"]>;
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
@@ -3379,9 +3431,13 @@ export type CreatePetition_petitionMutation = {
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
           }>;
@@ -3439,9 +3495,13 @@ export type GetPetition_petitionQuery = {
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
           }>;
@@ -3501,9 +3561,13 @@ export type UpdatePetition_updatePetitionMutation = {
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
           }>;
@@ -3535,7 +3599,7 @@ export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMut
   Exact<{
     petitionId: Scalars["GID"];
     key: Scalars["String"];
-    value?: Maybe<Scalars["String"]>;
+    value?: InputMaybe<Scalars["String"]>;
   }>;
 
 export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutation = {
@@ -3613,10 +3677,10 @@ export type CreatePetitionRecipients_createContactMutation = { createContact: { 
 export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   contactIds: Array<Scalars["GID"]> | Scalars["GID"];
-  subject?: Maybe<Scalars["String"]>;
-  body?: Maybe<Scalars["JSON"]>;
-  scheduledAt?: Maybe<Scalars["DateTime"]>;
-  remindersConfig?: Maybe<RemindersConfigInput>;
+  subject?: InputMaybe<Scalars["String"]>;
+  body?: InputMaybe<Scalars["JSON"]>;
+  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
 }>;
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
@@ -3661,9 +3725,13 @@ export type PetitionReplies_repliesQuery = {
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
           }>;
@@ -3676,9 +3744,13 @@ export type PetitionReplies_repliesQuery = {
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
             createdAt: string;
             updatedAt: string;
           }>;
@@ -3686,6 +3758,13 @@ export type PetitionReplies_repliesQuery = {
       }
     | null;
 };
+
+export type DeleteReply_deletePetitionReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type DeleteReply_deletePetitionReplyMutation = { deletePetitionReply: Result };
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -3698,7 +3777,7 @@ export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
 
 export type ExportPetitionReplies_createExportRepliesTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  pattern?: Maybe<Scalars["String"]>;
+  pattern?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type ExportPetitionReplies_createExportRepliesTaskMutation = {
@@ -3762,8 +3841,8 @@ export type GetPermissions_permissionsQuery = {
 
 export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  userIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
 export type SharePetition_addPetitionPermissionMutation = {
@@ -3886,8 +3965,8 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
 export type GetTemplates_templatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
-  tagIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
 }>;
@@ -3909,6 +3988,9 @@ export type GetTemplates_templatesQuery = {
             type: PetitionFieldType;
             fromPetitionFieldId: string | null;
             alias: string | null;
+            options: { [key: string]: any };
+            multiple: boolean;
+            validated: boolean;
           }>;
           tags?: Array<{ id: string; name: string }>;
         }
@@ -3938,6 +4020,9 @@ export type GetTemplate_templateQuery = {
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          validated: boolean;
         }>;
         tags?: Array<{ id: string; name: string }>;
       }
@@ -3955,7 +4040,7 @@ export type DeleteTemplate_deletePetitionsMutation = { deletePetitions: Result }
 export type GetContacts_contactsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
-  sortBy?: Maybe<Array<QueryContacts_OrderBy> | QueryContacts_OrderBy>;
+  sortBy?: InputMaybe<Array<QueryContacts_OrderBy> | QueryContacts_OrderBy>;
 }>;
 
 export type GetContacts_contactsQuery = {
@@ -4008,7 +4093,7 @@ export type GetContact_contactQuery = {
 export type GetOrganizationUsers_usersQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
-  sortBy?: Maybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
+  sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
 }>;
 
 export type GetOrganizationUsers_usersQuery = {
@@ -4057,6 +4142,160 @@ export type EventSubscriptions_deleteSubscriptionMutationVariables = Exact<{
 
 export type EventSubscriptions_deleteSubscriptionMutation = { deleteEventSubscriptions: Result };
 
+export type SubmitReply_createSimpleReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  reply: Scalars["String"];
+}>;
+
+export type SubmitReply_createSimpleReplyMutation = {
+  createSimpleReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type SubmitReply_createCheckboxReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  reply: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type SubmitReply_createCheckboxReplyMutation = {
+  createCheckboxReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type SubmitReply_createFileUploadReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+}>;
+
+export type SubmitReply_createFileUploadReplyMutation = {
+  createFileUploadReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type SubmitReply_createDynamicSelectReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  value:
+    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
+    | Array<InputMaybe<Scalars["String"]>>
+    | InputMaybe<Scalars["String"]>;
+}>;
+
+export type SubmitReply_createDynamicSelectReplyMutation = {
+  createDynamicSelectReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type UpdateReply_updateSimpleReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  reply: Scalars["String"];
+}>;
+
+export type UpdateReply_updateSimpleReplyMutation = {
+  updateSimpleReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type UpdateReply_updateCheckboxReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  values: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type UpdateReply_updateCheckboxReplyMutation = {
+  updateCheckboxReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type UpdateReply_updateDynamicSelectReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  value:
+    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
+    | Array<InputMaybe<Scalars["String"]>>
+    | InputMaybe<Scalars["String"]>;
+}>;
+
+export type UpdateReply_updateDynamicSelectReplyMutation = {
+  updateDynamicSelectReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type UpdateReply_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type UpdateReply_petitionQuery = {
+  petition:
+    | {
+        fields: Array<{
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          replies: Array<{ id: string }>;
+        }>;
+      }
+    | {
+        fields: Array<{
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          replies: Array<{ id: string }>;
+        }>;
+      }
+    | null;
+};
+
+export type SubmitReply_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type SubmitReply_petitionQuery = {
+  petition:
+    | { fields: Array<{ id: string; type: PetitionFieldType; options: { [key: string]: any } }> }
+    | { fields: Array<{ id: string; type: PetitionFieldType; options: { [key: string]: any } }> }
+    | null;
+};
+
 export const ContactFragmentDoc = gql`
   fragment Contact on Contact {
     id
@@ -4102,12 +4341,16 @@ export const PetitionFieldFragmentDoc = gql`
     type
     fromPetitionFieldId
     alias
+    options
+    multiple
+    validated
   }
 ` as unknown as DocumentNode<PetitionFieldFragment, unknown>;
 export const PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionFieldReply on PetitionFieldReply {
     id
     content
+    status
     createdAt
     updatedAt
   }
@@ -4452,6 +4695,14 @@ export const PetitionReplies_repliesDocument = gql`
   }
   ${PetitionFieldWithRepliesFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_repliesQuery, PetitionReplies_repliesQueryVariables>;
+export const DeleteReply_deletePetitionReplyDocument = gql`
+  mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+  }
+` as unknown as DocumentNode<
+  DeleteReply_deletePetitionReplyMutation,
+  DeleteReply_deletePetitionReplyMutationVariables
+>;
 export const DownloadFileReply_fileUploadReplyDownloadLinkDocument = gql`
   mutation DownloadFileReply_fileUploadReplyDownloadLink($petitionId: GID!, $replyId: GID!) {
     fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
@@ -4683,3 +4934,113 @@ export const EventSubscriptions_deleteSubscriptionDocument = gql`
   EventSubscriptions_deleteSubscriptionMutation,
   EventSubscriptions_deleteSubscriptionMutationVariables
 >;
+export const SubmitReply_createSimpleReplyDocument = gql`
+  mutation SubmitReply_createSimpleReply($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  SubmitReply_createSimpleReplyMutation,
+  SubmitReply_createSimpleReplyMutationVariables
+>;
+export const SubmitReply_createCheckboxReplyDocument = gql`
+  mutation SubmitReply_createCheckboxReply($petitionId: GID!, $fieldId: GID!, $reply: [String!]!) {
+    createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $reply) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  SubmitReply_createCheckboxReplyMutation,
+  SubmitReply_createCheckboxReplyMutationVariables
+>;
+export const SubmitReply_createFileUploadReplyDocument = gql`
+  mutation SubmitReply_createFileUploadReply($petitionId: GID!, $fieldId: GID!, $file: Upload!) {
+    createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  SubmitReply_createFileUploadReplyMutation,
+  SubmitReply_createFileUploadReplyMutationVariables
+>;
+export const SubmitReply_createDynamicSelectReplyDocument = gql`
+  mutation SubmitReply_createDynamicSelectReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $value: [[String]!]!
+  ) {
+    createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  SubmitReply_createDynamicSelectReplyMutation,
+  SubmitReply_createDynamicSelectReplyMutationVariables
+>;
+export const UpdateReply_updateSimpleReplyDocument = gql`
+  mutation UpdateReply_updateSimpleReply($petitionId: GID!, $replyId: GID!, $reply: String!) {
+    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateReply_updateSimpleReplyMutation,
+  UpdateReply_updateSimpleReplyMutationVariables
+>;
+export const UpdateReply_updateCheckboxReplyDocument = gql`
+  mutation UpdateReply_updateCheckboxReply($petitionId: GID!, $replyId: GID!, $values: [String!]!) {
+    updateCheckboxReply(petitionId: $petitionId, replyId: $replyId, values: $values) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateReply_updateCheckboxReplyMutation,
+  UpdateReply_updateCheckboxReplyMutationVariables
+>;
+export const UpdateReply_updateDynamicSelectReplyDocument = gql`
+  mutation UpdateReply_updateDynamicSelectReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $value: [[String]!]!
+  ) {
+    updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateReply_updateDynamicSelectReplyMutation,
+  UpdateReply_updateDynamicSelectReplyMutationVariables
+>;
+export const UpdateReply_petitionDocument = gql`
+  query UpdateReply_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      fields {
+        id
+        type
+        options
+        replies {
+          id
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<UpdateReply_petitionQuery, UpdateReply_petitionQueryVariables>;
+export const SubmitReply_petitionDocument = gql`
+  query SubmitReply_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      fields {
+        id
+        type
+        options
+      }
+    }
+  }
+` as unknown as DocumentNode<SubmitReply_petitionQuery, SubmitReply_petitionQueryVariables>;

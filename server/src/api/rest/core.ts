@@ -9,6 +9,8 @@ import { MaybeArray, MaybePromise } from "../../util/types";
 import { HttpError, InvalidParameterError, UnknownError } from "./errors";
 import { ParseError } from "./params";
 
+type File = Exclude<Request["file"], undefined>;
+
 export type RestMethod = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
 
 export type RestParameters<T> = {
@@ -27,7 +29,7 @@ type PathParameters<TPath extends string> = {
 export interface RestBody<T> {
   _type?: T;
   spec: OpenAPIV3.RequestBodyObject;
-  validate?: (value?: any) => void;
+  validate?: (req: Request, context: RestApiContext) => void;
 }
 
 export interface RestPathOptions {
@@ -220,10 +222,7 @@ const _PathResolver: any = (function () {
                 }
               }
             );
-            if (body?.validate) {
-              body?.validate(req.body);
-            }
-            context.body = req.body;
+            body?.validate?.(req, context);
             return await resolver(context);
           } catch (error: any) {
             if (error instanceof HttpError) {
@@ -296,6 +295,7 @@ export type RestApiContext<TContext = {}, TParams = any, TQuery = any, TBody = a
   params: TParams;
   query: TQuery;
   body: TBody;
+  files: Record<string, File[]>;
 };
 
 export class RestApi<TContext = {}> {

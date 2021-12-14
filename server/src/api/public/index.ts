@@ -1,9 +1,14 @@
+import { createReadStream } from "fs";
+import { mkdir, unlink } from "fs/promises";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
+import multer from "multer";
 import { outdent } from "outdent";
 import pMap from "p-map";
 import { isDefined, pick } from "remeda";
+import { callbackify } from "util";
 import { toGlobalId } from "../../util/globalId";
-import { JsonBody } from "../rest/body";
+import { random } from "../../util/token";
+import { FormDataBody, JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
 import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam, stringParam } from "../rest/params";
@@ -57,11 +62,14 @@ import {
   PaginatedUsers,
   Petition,
   PetitionCustomProperties,
+  PetitionFieldReply,
   SendPetition,
   SharePetition,
+  SubmitReply,
   Subscription,
   Template,
   UpdatePetition,
+  UpdateReply,
 } from "./schemas";
 import {
   CreateContact_contactDocument,
@@ -73,6 +81,7 @@ import {
   CreatePetition_petitionDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
+  DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
   EventSubscriptions_createSubscriptionDocument,
@@ -90,6 +99,7 @@ import {
   GetTags_tagsDocument,
   GetTemplates_templatesDocument,
   GetTemplate_templateDocument,
+  Maybe,
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_repliesDocument,
   ReadPetitionCustomPropertiesDocument,
@@ -97,10 +107,19 @@ import {
   RemoveUserPermission_removePetitionPermissionDocument,
   SharePetition_addPetitionPermissionDocument,
   StopSharing_removePetitionPermissionDocument,
+  SubmitReply_createCheckboxReplyDocument,
+  SubmitReply_createDynamicSelectReplyDocument,
+  SubmitReply_createFileUploadReplyDocument,
+  SubmitReply_createSimpleReplyDocument,
+  SubmitReply_petitionDocument,
   TagFragmentDoc,
   TemplateFragment as TemplateFragmentType,
   TransferPetition_transferPetitionOwnershipDocument,
   UpdatePetition_updatePetitionDocument,
+  UpdateReply_petitionDocument,
+  UpdateReply_updateCheckboxReplyDocument,
+  UpdateReply_updateDynamicSelectReplyDocument,
+  UpdateReply_updateSimpleReplyDocument,
 } from "./__types";
 
 function assert(condition: any): asserts condition {}
@@ -868,6 +887,292 @@ const replyId = idParam({
   type: "PetitionFieldReply",
   description: "The ID of the reply",
 });
+
+const uploadFile = multer({
+  storage: multer.diskStorage({
+    destination: callbackify(async function (req: any, file: any) {
+      const path = `/tmp/${random(16)}`;
+      await mkdir(path);
+      return path;
+    }),
+    filename: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  }),
+});
+
+api
+  .path("/petitions/:petitionId/replies", {
+    params: { petitionId },
+  })
+  .post(
+    {
+      middleware: uploadFile.single("reply"),
+      operationId: "SubmitReply",
+      summary: "Submit a reply",
+      description: outdent`
+        Submits a reply on a given field of the petition.\n
+        Depending on the type of the field to be replied, the \`reply\` field in the request body will be different:
+        - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, its a simple string of plain text containing the reply.
+        - For \`FILE_UPLOAD\` fields, it's the file to be uploaded as reply.
+        - For \`CHECKBOX\` fields, it's an array of strings containing all the chosen options of the field.
+        - For \`DYNAMIC_SELECT\` fields, it's an array of strings in which each position in the array represents the selected option in the same level.
+      `,
+      body: FormDataBody(SubmitReply),
+      responses: {
+        201: SuccessResponse(PetitionFieldReply),
+        400: ErrorResponse({ description: "Invalid parameters" }),
+        409: ErrorResponse({ description: "The field does not accept more replies." }),
+      },
+      tags: ["Petitions"],
+    },
+    async ({ client, body, params, files }) => {
+      const { petition } = await client.request(SubmitReply_petitionDocument, {
+        petitionId: params.petitionId,
+      });
+      const field = petition?.fields.find((f) => f.id === body.fieldId);
+      try {
+        const fieldType = field?.type;
+        switch (fieldType) {
+          case "TEXT":
+          case "SHORT_TEXT":
+          case "SELECT":
+            if (typeof body.reply !== "string") {
+              throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
+            }
+            const { createSimpleReply } = await client.request(
+              SubmitReply_createSimpleReplyDocument,
+              {
+                petitionId: params.petitionId,
+                fieldId: body.fieldId,
+                reply: body.reply,
+              }
+            );
+            return Ok({ ...createSimpleReply, content: createSimpleReply.content.text });
+          case "CHECKBOX":
+            if (!Array.isArray(body.reply)) {
+              throw new BadRequestError(
+                `Reply for ${fieldType} field must be an array with the chosen options.`
+              );
+            }
+            const { createCheckboxReply } = await client.request(
+              SubmitReply_createCheckboxReplyDocument,
+              {
+                petitionId: params.petitionId,
+                fieldId: body.fieldId,
+                reply: body.reply as string[],
+              }
+            );
+            return Ok({ ...createCheckboxReply, content: createCheckboxReply.content.choices });
+          case "DYNAMIC_SELECT":
+            if (!Array.isArray(body.reply)) {
+              throw new BadRequestError(
+                `Reply for ${fieldType} field must be an array with the chosen options.`
+              );
+            }
+            const labels = petition?.fields.find((f) => f.id === body.fieldId)?.options
+              ?.labels as string[];
+            const replies = body.reply as Maybe<string>[];
+
+            const { createDynamicSelectReply } = await client.request(
+              SubmitReply_createDynamicSelectReplyDocument,
+              {
+                petitionId: params.petitionId,
+                fieldId: body.fieldId,
+                value: labels.map((label, i) => [label, replies[i]]),
+              }
+            );
+            return Ok({
+              ...createDynamicSelectReply,
+              content: createDynamicSelectReply.content.columns,
+            });
+          case "FILE_UPLOAD":
+            const file = files["reply"]?.[0];
+            if (!file) {
+              throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
+            }
+            const { createFileUploadReply } = await client.request(
+              SubmitReply_createFileUploadReplyDocument,
+              {
+                petitionId: params.petitionId,
+                fieldId: body.fieldId,
+                file: createReadStream(file.path),
+              }
+            );
+
+            await unlink(file.path);
+            return Ok(createFileUploadReply);
+          default:
+            throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
+        }
+      } catch (error: any) {
+        if (error instanceof ClientError) {
+          if (containsGraphQLError(error, "INVALID_OPTION_ERROR")) {
+            throw new BadRequestError(
+              `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
+            );
+          } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
+            throw new BadRequestError(
+              "The field is already replied and does not accept any more replies."
+            );
+          } else if (containsGraphQLError(error, "FIELD_ALREADY_VALIDATED_ERROR")) {
+            throw new BadRequestError(
+              "The field is already validated and does not accept any more replies."
+            );
+          }
+        }
+        throw error;
+      }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/replies/:replyId", {
+    params: { petitionId, replyId },
+  })
+  .put(
+    {
+      operationId: "UpdateReply",
+      summary: "Update a reply",
+      description: outdent`
+        Updates the \`content\` of a previously submitted reply.
+        The \`status\` of the reply must be \`PENDING\` or \`REJECTED\`.
+      `,
+      responses: {
+        201: SuccessResponse(PetitionFieldReply),
+        400: ErrorResponse({ description: "Invalid parameters" }),
+        409: ErrorResponse({ description: "The reply cannot be updated." }),
+      },
+      tags: ["Petitions"],
+      body: JsonBody(UpdateReply),
+    },
+    async ({ client, body, params }) => {
+      const { petition } = await client.request(UpdateReply_petitionDocument, {
+        petitionId: params.petitionId,
+      });
+
+      const field = petition?.fields.find((f) => f.replies.some((r) => r.id === params.replyId));
+
+      const fieldType = field?.type;
+      try {
+        switch (fieldType) {
+          case "TEXT":
+          case "SHORT_TEXT":
+          case "SELECT":
+            if (typeof body.content !== "string") {
+              throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
+            }
+            const { updateSimpleReply } = await client.request(
+              UpdateReply_updateSimpleReplyDocument,
+              {
+                petitionId: params.petitionId,
+                replyId: params.replyId,
+                reply: body.content,
+              }
+            );
+            return Ok({ ...updateSimpleReply, content: updateSimpleReply.content.text });
+          case "CHECKBOX":
+            if (!Array.isArray(body.content)) {
+              throw new BadRequestError(
+                `Reply for ${fieldType} field must be an array with the chosen options.`
+              );
+            }
+            const { updateCheckboxReply } = await client.request(
+              UpdateReply_updateCheckboxReplyDocument,
+              {
+                petitionId: params.petitionId,
+                replyId: params.replyId,
+                values: body.content,
+              }
+            );
+            return Ok({ ...updateCheckboxReply, content: updateCheckboxReply.content.choices });
+          case "DYNAMIC_SELECT":
+            if (!Array.isArray(body.content)) {
+              throw new BadRequestError(
+                `Reply for ${fieldType} field must be an array with the chosen options.`
+              );
+            }
+            const labels = field?.options?.labels as string[];
+            const replies = body.content as Maybe<string>[];
+
+            const { updateDynamicSelectReply } = await client.request(
+              UpdateReply_updateDynamicSelectReplyDocument,
+              {
+                petitionId: params.petitionId,
+                replyId: params.replyId,
+                value: labels.map((label, i) => [label, replies[i]]),
+              }
+            );
+            return Ok({
+              ...updateDynamicSelectReply,
+              content: updateDynamicSelectReply.content.columns,
+            });
+            break;
+          case "FILE_UPLOAD":
+            throw new BadRequestError(
+              `You can't update a reply for a field of type FILE_UPLOAD. Please, delete the reply first and then submit a new one.`
+            );
+          default:
+            throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
+        }
+      } catch (error: any) {
+        if (error instanceof ClientError) {
+          if (containsGraphQLError(error, "INVALID_OPTION_ERROR")) {
+            throw new BadRequestError(
+              `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
+            );
+          } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
+            throw new BadRequestError("The reply is already approved and cannot be modified.");
+          } else if (containsGraphQLError(error, "FIELD_ALREADY_VALIDATED_ERROR")) {
+            throw new BadRequestError(
+              "The field is already validated and does not accept any modification in its replies."
+            );
+          }
+        }
+        throw error;
+      }
+    }
+  )
+  .delete(
+    {
+      operationId: "DeleteReply",
+      summary: "Delete a reply",
+      description: outdent`
+        Deletes a previously submitted reply.
+      `,
+      responses: {
+        204: SuccessResponse(),
+        409: ErrorResponse({ description: "The reply can't be deleted" }),
+      },
+      tags: ["Petitions"],
+    },
+    async ({ client, params }) => {
+      try {
+        gql`
+          mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+          }
+        `;
+        await client.request(DeleteReply_deletePetitionReplyDocument, params);
+        return NoContent();
+      } catch (error: any) {
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")
+        ) {
+          throw new ConflictError("The reply is already approved and cannot be deleted.");
+        } else if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "FIELD_ALREADY_VALIDATED_ERROR")
+        ) {
+          throw new BadRequestError(
+            "The field is already validated and its replies cannot be deleted."
+          );
+        }
+        throw error;
+      }
+    }
+  );
 
 api
   .path("/petitions/:petitionId/replies/:replyId/download", {
@@ -1664,7 +1969,6 @@ api
       responses: {
         201: SuccessResponse(Subscription),
         400: ErrorResponse({ description: "Invalid request" }),
-        409: ErrorResponse({ description: "You already have a subscription" }),
       },
       tags: ["Subscriptions"],
     },
@@ -1689,9 +1993,6 @@ api
           }
           if (containsGraphQLError(error, "WEBHOOK_CHALLENGE_FAILED")) {
             throw new BadRequestError(`Your URL does not seem to accept POST requests.`);
-          }
-          if (containsGraphQLError(error, "EXISTING_SUBSCRIPTION_ERROR")) {
-            throw new ConflictError("You already have a subscription.");
           }
         }
         throw error;
