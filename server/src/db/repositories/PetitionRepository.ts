@@ -1409,6 +1409,14 @@ export class PetitionRepository extends BaseRepository {
     return reply;
   }
 
+  async deleteFileUpload(fileUploadId: number, deletedBy: string) {
+    const file = await this.files.loadFileUpload(fileUploadId);
+    await Promise.all([
+      this.files.deleteFileUpload(file!.id, deletedBy),
+      this.aws.fileUploads.deleteFile(file!.path),
+    ]);
+  }
+
   async deletePetitionFieldReply(replyId: number, deletedBy: string) {
     const reply = await this.loadFieldReply(replyId);
     const field = await this.loadField(reply!.petition_field_id);
@@ -1423,11 +1431,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (reply.type === "FILE_UPLOAD") {
-      const file = await this.files.loadFileUpload(reply.content["file_upload_id"]);
-      await Promise.all([
-        this.files.deleteFileUpload(file!.id, deletedBy),
-        this.aws.fileUploads.deleteFile(file!.path),
-      ]);
+      await this.deleteFileUpload(reply.content["file_upload_id"], deletedBy);
     }
 
     await Promise.all([

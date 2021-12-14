@@ -119,6 +119,7 @@ import {
   UpdateReply_petitionDocument,
   UpdateReply_updateCheckboxReplyDocument,
   UpdateReply_updateDynamicSelectReplyDocument,
+  UpdateReply_updateFileUploadReplyDocument,
   UpdateReply_updateSimpleReplyDocument,
 } from "./__types";
 
@@ -1032,6 +1033,7 @@ api
   })
   .put(
     {
+      middleware: uploadFile.single("reply"),
       operationId: "UpdateReply",
       summary: "Update a reply",
       description: outdent`
@@ -1044,9 +1046,9 @@ api
         409: ErrorResponse({ description: "The reply cannot be updated." }),
       },
       tags: ["Petitions"],
-      body: JsonBody(UpdateReply),
+      body: FormDataBody(UpdateReply),
     },
-    async ({ client, body, params }) => {
+    async ({ client, body, params, files }) => {
       const { petition } = await client.request(UpdateReply_petitionDocument, {
         petitionId: params.petitionId,
       });
@@ -1059,7 +1061,7 @@ api
           case "TEXT":
           case "SHORT_TEXT":
           case "SELECT":
-            if (typeof body.content !== "string") {
+            if (typeof body.reply !== "string") {
               throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
             }
             const { updateSimpleReply } = await client.request(
@@ -1067,12 +1069,12 @@ api
               {
                 petitionId: params.petitionId,
                 replyId: params.replyId,
-                reply: body.content,
+                reply: body.reply,
               }
             );
             return Ok({ ...updateSimpleReply, content: updateSimpleReply.content.text });
           case "CHECKBOX":
-            if (!Array.isArray(body.content)) {
+            if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
                 `Reply for ${fieldType} field must be an array with the chosen options.`
               );
@@ -1082,18 +1084,18 @@ api
               {
                 petitionId: params.petitionId,
                 replyId: params.replyId,
-                values: body.content,
+                values: body.reply,
               }
             );
             return Ok({ ...updateCheckboxReply, content: updateCheckboxReply.content.choices });
           case "DYNAMIC_SELECT":
-            if (!Array.isArray(body.content)) {
+            if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
                 `Reply for ${fieldType} field must be an array with the chosen options.`
               );
             }
             const labels = field?.options?.labels as string[];
-            const replies = body.content as Maybe<string>[];
+            const replies = body.reply as Maybe<string>[];
 
             const { updateDynamicSelectReply } = await client.request(
               UpdateReply_updateDynamicSelectReplyDocument,
@@ -1107,11 +1109,22 @@ api
               ...updateDynamicSelectReply,
               content: updateDynamicSelectReply.content.columns,
             });
-            break;
           case "FILE_UPLOAD":
-            throw new BadRequestError(
-              `You can't update a reply for a field of type FILE_UPLOAD. Please, delete the reply first and then submit a new one.`
+            const file = files["reply"]?.[0];
+            if (!file) {
+              throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
+            }
+            const { updateFileUploadReply } = await client.request(
+              UpdateReply_updateFileUploadReplyDocument,
+              {
+                petitionId: params.petitionId,
+                replyId: params.replyId,
+                file: createReadStream(file.path),
+              }
             );
+
+            await unlink(file.path);
+            return Ok(updateFileUploadReply);
           default:
             throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
         }

@@ -1185,6 +1185,11 @@ type Mutation {
   updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): PetitionBase!
 
   """
+  Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3.
+  """
+  updateFileUploadReply(file: Upload!, petitionId: GID!, replyId: GID!): PetitionFieldReply!
+
+  """
   Updates the metadata of a public landing template.
   """
   updateLandingTemplateMetadata(

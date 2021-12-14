@@ -823,9 +823,9 @@ export const UpdateReply = schema({
   title: "UpdateReply",
   type: "object",
   additionalProperties: false,
-  required: ["content"],
+  required: ["reply"],
   properties: {
-    content: {
+    reply: {
       anyOf: [
         _SimpleReplySubmitContent,
         _FileUploadReplySubmitContent,

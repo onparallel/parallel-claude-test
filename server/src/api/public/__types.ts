@@ -521,6 +521,8 @@ export type Mutation = {
   updateEventSubscription: PetitionEventSubscription;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
+  /** Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3. */
+  updateFileUploadReply: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the onboarding status for one of the pages. */
@@ -1142,6 +1144,12 @@ export type MutationupdateEventSubscriptionArgs = {
 export type MutationupdateFieldPositionsArgs = {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
+};
+
+export type MutationupdateFileUploadReplyArgs = {
+  file: Scalars["Upload"];
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationupdateLandingTemplateMetadataArgs = {
@@ -4260,6 +4268,22 @@ export type UpdateReply_updateDynamicSelectReplyMutation = {
   };
 };
 
+export type UpdateReply_updateFileUploadReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  file: Scalars["Upload"];
+}>;
+
+export type UpdateReply_updateFileUploadReplyMutation = {
+  updateFileUploadReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
 export type UpdateReply_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -5018,6 +5042,17 @@ export const UpdateReply_updateDynamicSelectReplyDocument = gql`
 ` as unknown as DocumentNode<
   UpdateReply_updateDynamicSelectReplyMutation,
   UpdateReply_updateDynamicSelectReplyMutationVariables
+>;
+export const UpdateReply_updateFileUploadReplyDocument = gql`
+  mutation UpdateReply_updateFileUploadReply($petitionId: GID!, $replyId: GID!, $file: Upload!) {
+    updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateReply_updateFileUploadReplyMutation,
+  UpdateReply_updateFileUploadReplyMutationVariables
 >;
 export const UpdateReply_petitionDocument = gql`
   query UpdateReply_petition($petitionId: GID!) {

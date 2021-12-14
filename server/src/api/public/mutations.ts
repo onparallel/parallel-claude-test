@@ -78,3 +78,11 @@ gql`
   }
   ${PetitionFieldReplyFragment}
 `;
+gql`
+  mutation UpdateReply_updateFileUploadReply($petitionId: GID!, $replyId: GID!, $file: Upload!) {
+    updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragment}
+`;

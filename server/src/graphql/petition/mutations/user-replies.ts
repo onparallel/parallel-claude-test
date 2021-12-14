@@ -161,6 +161,50 @@ export const fileUploadReplyComplete = mutationField("fileUploadReplyComplete", 
   },
 });
 
+export const updateFileUploadReply = mutationField("updateFileUploadReply", {
+  description:
+    "Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3.",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    file: nonNull(uploadArg()),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
+    replyCanBeUpdated("replyId")
+  ),
+  validateArgs: maxFileSize((args) => args.file, 50 * 1024 * 1024, "file"),
+  resolve: async (_, args, ctx) => {
+    const { createReadStream, filename, mimetype } = await args.file;
+    const key = random(16);
+    const res = await ctx.aws.fileUploads.uploadFile(key, mimetype, createReadStream());
+
+    const oldReply = (await ctx.petitions.loadFieldReply(args.replyId))!;
+    const [newFile] = await Promise.all([
+      ctx.files.createFileUpload(
+        {
+          content_type: mimetype,
+          filename,
+          path: key,
+          size: res["ContentLength"]!.toString(),
+          upload_complete: true,
+        },
+        `User:${ctx.user!.id}`
+      ),
+      ctx.petitions.deleteFileUpload(oldReply.content["file_upload_id"], `User:${ctx.user!.id}`),
+    ]);
+
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      { content: { file_upload_id: newFile.id } },
+      ctx.user!
+    );
+  },
+});
+
 export const createCheckboxReply = mutationField("createCheckboxReply", {
   description: "Creates a reply to a checkbox field.",
   type: "PetitionFieldReply",
