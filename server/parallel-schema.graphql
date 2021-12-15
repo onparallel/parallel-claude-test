@@ -184,7 +184,7 @@ type CreateFileUploadFieldAttachment {
 
 type CreateFileUploadReply {
   presignedPostData: AWSPresignedPostData!
-  reply: PublicPetitionFieldReply!
+  reply: PetitionFieldReply!
 }
 
 interface CreatedAt {
@@ -543,7 +543,11 @@ type Mutation {
   """
   Creates a reply to a file upload field.
   """
-  createFileUploadReply(fieldId: GID!, file: Upload!, petitionId: GID!): PetitionFieldReply!
+  createFileUploadReply(
+    fieldId: GID!
+    file: FileUploadInput!
+    petitionId: GID!
+  ): CreateFileUploadReply!
 
   """
   Creates a new organization.
@@ -770,6 +774,11 @@ type Mutation {
   ): [Petition!]!
 
   """
+  Notifies the backend that the upload is complete.
+  """
+  fileUploadReplyComplete(petitionId: GID!, replyId: GID!): PetitionFieldReply!
+
+  """
   Generates a download link for a file reply.
   """
   fileUploadReplyDownloadLink(
@@ -871,7 +880,7 @@ type Mutation {
     data: FileUploadInput!
     fieldId: GID!
     keycode: ID!
-  ): CreateFileUploadReply!
+  ): PublicCreateFileUploadReply!
 
   """
   Create a petition field comment.
@@ -3013,6 +3022,11 @@ type PublicContact {
   The last name of the user.
   """
   lastName: String
+}
+
+type PublicCreateFileUploadReply {
+  presignedPostData: AWSPresignedPostData!
+  reply: PublicPetitionFieldReply!
 }
 
 """

@@ -1144,6 +1144,125 @@ describe("GraphQL/Petition Field Replies", () => {
     });
   });
 
+  describe("createFileUploadReply", () => {
+    let fileUploadField: PetitionField;
+
+    let fileUploadReplyGID: string;
+
+    beforeAll(async () => {
+      [fileUploadField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+      }));
+    });
+
+    it("sends error when trying to create a file reply of more than 50MB", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $file: FileUploadInput!) {
+            createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+              presignedPostData {
+                url
+                fields
+              }
+              reply {
+                id
+                content
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", fileUploadField.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 50 * 1024 * 1024 + 1,
+          },
+        },
+      });
+      expect(errors).toContainGraphQLError("MAX_FILE_SIZE_EXCEEDED_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("returns a file reply with incomplete upload and an AWS signed upload endpoint", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $file: FileUploadInput!) {
+            createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+              presignedPostData {
+                url
+                fields
+              }
+              reply {
+                id
+                content
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", fileUploadField.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 500,
+          },
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFileUploadReply).toMatchObject({
+        presignedPostData: { url: "", fields: {} },
+        reply: {
+          content: {
+            filename: "my_file.txt",
+            size: "500",
+            contentType: "text/plain",
+            extension: "txt",
+            uploadComplete: false,
+          },
+          status: "PENDING",
+        },
+      });
+      fileUploadReplyGID = data?.createFileUploadReply.reply.id;
+    });
+
+    it("notifies the backend that the upload was completed", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            fileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
+              id
+              content
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: fileUploadReplyGID,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.fileUploadReplyComplete).toEqual({
+        id: fileUploadReplyGID,
+        content: {
+          filename: "my_file.txt",
+          size: "500",
+          contentType: "text/plain",
+          extension: "txt",
+          uploadComplete: true,
+        },
+        status: "PENDING",
+      });
+    });
+  });
+
   describe("deletePetitionReply", () => {
     let userSimpleReply: PetitionFieldReply;
     let uploadedFile: FileUpload;

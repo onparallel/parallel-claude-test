@@ -24,6 +24,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { jsonArg } from "../helpers/json";
 import { presendPetition } from "../helpers/presendPetition";
 import { RESULT } from "../helpers/result";
+import { fileUploadInputMaxSize } from "../helpers/validators/maxFileSize";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
@@ -267,7 +268,7 @@ export const publicFileUploadReplyComplete = mutationField("publicFileUploadRepl
     const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
     // Try to get metadata
     await ctx.aws.fileUploads.getFileMetadata(file!.path);
-    await ctx.files.markFileUploadComplete(file!.id);
+    await ctx.files.markFileUploadComplete(file!.id, `Contact:${ctx.access!.contact_id}`);
     ctx.files.loadFileUpload.dataloader.clear(file!.id);
     return reply;
   },
@@ -276,7 +277,7 @@ export const publicFileUploadReplyComplete = mutationField("publicFileUploadRepl
 export const publicCreateFileUploadReply = mutationField("publicCreateFileUploadReply", {
   description: "Creates a reply to a file upload field.",
   type: objectType({
-    name: "CreateFileUploadReply",
+    name: "PublicCreateFileUploadReply",
     definition(t) {
       t.field("presignedPostData", {
         type: "AWSPresignedPostData",
@@ -297,6 +298,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
       fieldCanBeReplied("fieldId")
     )
   ),
+  validateArgs: fileUploadInputMaxSize((args) => args.data, 50 * 1024 * 1024, "data"),
   resolve: async (_, args, ctx) => {
     const key = random(16);
     const { filename, size, contentType } = args.data;
@@ -693,7 +695,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);
-          await ctx.files.markFileUploadComplete(file.id);
+          await ctx.files.markFileUploadComplete(file.id, `Contact:${ctx.access!.contact_id}`);
         }
         return {
           result: RESULT.SUCCESS,
@@ -920,7 +922,7 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);
-          await ctx.files.markFileUploadComplete(file.id);
+          await ctx.files.markFileUploadComplete(file.id, `Contact:${ctx.access!.contact_id}`);
         }
         return {
           result: RESULT.SUCCESS,

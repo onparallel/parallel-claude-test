@@ -26,8 +26,17 @@ export class FileRepository extends BaseRepository {
     return rows[0];
   }
 
-  async markFileUploadComplete(id: number) {
-    await this.from("file_upload").update({ upload_complete: true }, "*").where("id", id);
+  async markFileUploadComplete(id: number, updatedBy: string) {
+    await this.from("file_upload")
+      .update(
+        {
+          upload_complete: true,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      )
+      .where({ id: id, upload_complete: false });
   }
 
   async deleteFileUpload(id: number, deletedBy: string) {

@@ -94,7 +94,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
       const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
 
       await ctx.aws.fileUploads.getFileMetadata(file!.path);
-      await ctx.files.markFileUploadComplete(file!.id);
+      await ctx.files.markFileUploadComplete(file!.id, `User:${ctx.user!.id}`);
       ctx.files.loadFileUpload.dataloader.clear(file!.id);
 
       return attachment;
@@ -147,7 +147,7 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);
-          await ctx.files.markFileUploadComplete(file.id);
+          await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
         }
         return {
           result: RESULT.SUCCESS,

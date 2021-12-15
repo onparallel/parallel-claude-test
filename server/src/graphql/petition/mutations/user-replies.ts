@@ -1,11 +1,11 @@
-import { list, mutationField, nonNull, stringArg } from "nexus";
+import { list, mutationField, nonNull, objectType, stringArg } from "nexus";
 import { random } from "../../../util/token";
 import { Maybe } from "../../../util/types";
 import { authenticateAnd } from "../../helpers/authorize";
 import { InvalidOptionError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/result";
-import { uploadArg } from "../../helpers/upload";
+import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../../utils";
 import {
   fieldCanBeReplied,
@@ -88,11 +88,19 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
 
 export const createFileUploadReply = mutationField("createFileUploadReply", {
   description: "Creates a reply to a file upload field.",
-  type: "PetitionFieldReply",
+  type: objectType({
+    name: "CreateFileUploadReply",
+    definition(t) {
+      t.field("presignedPostData", {
+        type: "AWSPresignedPostData",
+      });
+      t.field("reply", { type: "PetitionFieldReply" });
+    },
+  }),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
-    file: nonNull(uploadArg()),
+    file: nonNull("FileUploadInput"),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -100,32 +108,56 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
     fieldCanBeReplied("fieldId")
   ),
+  validateArgs: fileUploadInputMaxSize((args) => args.file, 50 * 1024 * 1024, "file"),
   resolve: async (_, args, ctx) => {
-    const { createReadStream, filename, mimetype } = await args.file;
     const key = random(16);
-
-    const res = await ctx.aws.fileUploads.uploadFile(key, mimetype, createReadStream());
-
+    const { filename, size, contentType } = args.file;
     const file = await ctx.files.createFileUpload(
       {
-        content_type: mimetype,
-        filename,
         path: key,
-        size: res["ContentLength"]!.toString(),
-        upload_complete: true,
+        filename,
+        size: size.toString(),
+        content_type: contentType,
+        upload_complete: false,
       },
       `User:${ctx.user!.id}`
     );
+    const [presignedPostData, reply] = await Promise.all([
+      ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+      ctx.petitions.createPetitionFieldReply(
+        {
+          petition_field_id: args.fieldId,
+          user_id: ctx.user!.id,
+          type: "FILE_UPLOAD",
+          content: { file_upload_id: file.id },
+        },
+        ctx.user!
+      ),
+    ]);
+    return { presignedPostData, reply };
+  },
+});
 
-    return await ctx.petitions.createPetitionFieldReply(
-      {
-        petition_field_id: args.fieldId,
-        user_id: ctx.user!.id,
-        type: "FILE_UPLOAD",
-        content: { file_upload_id: file.id },
-      },
-      ctx.user!
-    );
+export const fileUploadReplyComplete = mutationField("fileUploadReplyComplete", {
+  description: "Notifies the backend that the upload is complete.",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["FILE_UPLOAD"])
+  ),
+  resolve: async (_, args, ctx) => {
+    const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
+    const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
+    // Try to get metadata
+    await ctx.aws.fileUploads.getFileMetadata(file!.path);
+    await ctx.files.markFileUploadComplete(file!.id, `User:${ctx.user!.id}`);
+    ctx.files.loadFileUpload.dataloader.clear(file!.id);
+    return reply;
   },
 });
 

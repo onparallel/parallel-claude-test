@@ -81,3 +81,21 @@ export class InvalidOptionError extends ApolloError {
     });
   }
 }
+
+export class MaxFileSizeExceededError extends ApolloError {
+  readonly name = "MaxFileSizeExceededError";
+  constructor(
+    { parentType, fieldName }: GraphQLResolveInfo,
+    argName: string,
+    message: string,
+    extra?: any
+  ) {
+    super(message, "MAX_FILE_SIZE_EXCEEDED_ERROR", {
+      parentType,
+      fieldName,
+      argName,
+      message,
+      extra,
+    });
+  }
+}

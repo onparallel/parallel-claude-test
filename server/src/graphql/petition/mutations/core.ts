@@ -1081,7 +1081,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
       }
       if (!file.upload_complete) {
         await ctx.aws.fileUploads.getFileMetadata(file!.path);
-        await ctx.files.markFileUploadComplete(file.id);
+        await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
       }
       return {
         result: RESULT.SUCCESS,
