@@ -8,7 +8,6 @@ import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
-import { RecipientViewPetitionFieldCard } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldCard";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
@@ -202,50 +201,38 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 }
 
 PetitionPreview.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment PetitionPreview_PetitionField on PetitionField {
-        id
-        ...RecipientViewPetitionFieldCard_PetitionField
-      }
-      ${RecipientViewPetitionFieldCard.fragments.PetitionField}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionPreview_PetitionBase on PetitionBase {
-        id
-        tone
-        ... on Petition {
-          status
-          signatureConfig {
-            integration {
-              environment
-              name
-            }
+  PetitionBase: gql`
+    fragment PetitionPreview_PetitionBase on PetitionBase {
+      id
+      tone
+      ... on Petition {
+        status
+        signatureConfig {
+          integration {
+            environment
+            name
           }
         }
-        fields {
-          ...PetitionPreview_PetitionField
-        }
-        ...RecipientViewContentsCard_PetitionBase
-        ...PetitionLayout_PetitionBase
-        ...RecipientViewProgressFooter_Petition
       }
-      ${this.PetitionField}
-      ${RecipientViewContentsCard.fragments.PetitionBase}
-      ${RecipientViewProgressFooter.fragments.Petition}
-      ${PetitionLayout.fragments.PetitionBase}
-    `;
-  },
-  get User() {
-    return gql`
-      fragment PetitionPreview_User on User {
-        ...PetitionLayout_User
+      fields {
+        id
+        ...PreviewPetitionField_PetitionField
       }
-      ${PetitionLayout.fragments.User}
-    `;
-  },
+      ...RecipientViewContentsCard_PetitionBase
+      ...PetitionLayout_PetitionBase
+      ...RecipientViewProgressFooter_Petition
+    }
+    ${PreviewPetitionField.fragments.PetitionField}
+    ${RecipientViewContentsCard.fragments.PetitionBase}
+    ${RecipientViewProgressFooter.fragments.Petition}
+    ${PetitionLayout.fragments.PetitionBase}
+  `,
+  User: gql`
+    fragment PetitionPreview_User on User {
+      ...PetitionLayout_User
+    }
+    ${PetitionLayout.fragments.User}
+  `,
 };
 
 PetitionPreview.mutations = [

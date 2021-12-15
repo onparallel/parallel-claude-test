@@ -27,7 +27,7 @@ const _deletePetitionReply = gql`
 `;
 
 export function useDeletePetitionReply() {
-  const { cache } = useApolloClient();
+  const client = useApolloClient();
 
   const [deletePetitionReply] = useMutation(
     PreviewPetitionFieldMutations_deletePetitionReplyDocument,
@@ -46,8 +46,10 @@ export function useDeletePetitionReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        updateFieldReplies(cache, fieldId, (replies) => replies.filter(({ id }) => id !== replyId));
-        updatePetitionStatus(cache, petitionId);
+        // updateFieldReplies(client, fieldId, (replies) =>
+        //   replies.filter(({ id }) => id !== replyId)
+        // );
+        // updatePetitionStatus(client, petitionId);
       } else {
         await deletePetitionReply({
           variables: { petitionId, replyId },
@@ -60,7 +62,7 @@ export function useDeletePetitionReply() {
         });
       }
     },
-    [deletePetitionReply, cache]
+    [deletePetitionReply]
   );
 }
 
@@ -133,7 +135,7 @@ const _createSimpleReply = gql`
 `;
 
 export function useCreateSimpleReply() {
-  const { cache } = useApolloClient();
+  const client = useApolloClient();
 
   const [createSimpleReply] = useMutation(PreviewPetitionFieldMutations_createSimpleReplyDocument);
   return useCallback(
@@ -149,10 +151,11 @@ export function useCreateSimpleReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
+        console.log("lol");
         const random = Math.floor(1000000 + Math.random() * 9000000);
         const id = `${fieldId}-${random}`;
-        updateFieldReplies(cache, fieldId, (replies) => [
-          ...replies,
+        updatePreviewFieldReplies(client, fieldId, (replies) => [
+          ...(replies ?? []),
           {
             id,
             __typename: "PetitionFieldReply",
@@ -162,7 +165,7 @@ export function useCreateSimpleReply() {
             updatedAt: new Date().toISOString(),
           },
         ]);
-        updatePetitionStatus(cache, petitionId);
+        // updatePetitionStatus(cache, petitionId);
         return { id, __typename: "PetitionFieldReply" };
       } else {
         const { data } = await createSimpleReply({
@@ -181,7 +184,7 @@ export function useCreateSimpleReply() {
         return data?.createSimpleReply;
       }
     },
-    [createSimpleReply, cache]
+    [createSimpleReply, client]
   );
 }
 
@@ -484,18 +487,46 @@ function updateFieldReplies(
   });
 }
 
+function updatePreviewFieldReplies(
+  proxy: DataProxy,
+  fieldId: string,
+  updateFn: (
+    cached: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment["previewReplies"]
+  ) => PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment["previewReplies"]
+) {
+  updateFragment(proxy, {
+    id: fieldId,
+    fragment: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
+    fragmentName: "PreviewPetitionFieldMutations_updateFieldReplies_PetitionField",
+    data: (cached) => ({ ...cached, replies: [], previewReplies: updateFn(cached!.replies) }),
+  });
+}
+
 updateFieldReplies.fragments = {
-  PetitionField: gql`
-    fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionField on PetitionField {
-      replies {
+  get PetitionFieldReply() {
+    return gql`
+      fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply on PetitionFieldReply {
         id
         content
         status
         createdAt
         updatedAt
       }
-    }
-  `,
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionField on PetitionField {
+        previewReplies @client {
+          ...PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply
+        }
+        replies {
+          ...PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply
+        }
+      }
+      ${this.PetitionFieldReply}
+    `;
+  },
 };
 function updateReplyContent(
   proxy: DataProxy,

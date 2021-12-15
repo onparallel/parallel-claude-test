@@ -9,6 +9,7 @@ import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { IncomingMessage } from "http";
 import Router from "next/router";
 import { filter, indexBy, map, pipe, sortBy, uniqBy } from "remeda";
+import typeDefs from "./client-schema.graphql";
 
 export interface CreateApolloClientOptions {
   req?: IncomingMessage;
@@ -160,6 +161,12 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             attachments: {
               merge: mergeArraysBy(["id"]),
             },
+            previewReplies: {
+              merge: false,
+              read(value) {
+                return value ?? [];
+              },
+            },
           },
         },
         PublicPetitionField: {
@@ -205,6 +212,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         },
       },
     }).restore(initialState ?? {}),
+    typeDefs,
     connectToDevTools: typeof window !== "undefined" && process.env.NODE_ENV === "development",
   });
   _cached = client;

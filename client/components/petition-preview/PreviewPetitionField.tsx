@@ -1,6 +1,7 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import {
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
+  PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
@@ -10,7 +11,10 @@ import { useCallback, useRef } from "react";
 import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/FailureGeneratingLinkDialog";
 import { usePetitionFieldCommentsDialog } from "../recipient-view/dialogs/RecipientViewPetitionFieldCommentsDialog";
 import { UploadCache } from "../recipient-view/fields/RecipientViewPetitionField";
-import { RecipientViewPetitionFieldCardProps } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
+import {
+  RecipientViewPetitionFieldCard,
+  RecipientViewPetitionFieldCardProps,
+} from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 import {
   CheckboxValue,
   RecipientViewPetitionFieldCheckbox,
@@ -37,14 +41,15 @@ import {
 export interface PreviewPetitionFieldProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment"
+    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
+  field: PreviewPetitionField_PetitionFieldFragment;
   petitionId: string;
   isDisabled: boolean;
   isCacheOnly: boolean;
 }
 
-export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
+export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPetitionFieldProps) {
   const uploads = useRef<UploadCache>({});
 
   const [petitionFieldAttachmentDownloadLink] = useMutation(
@@ -55,7 +60,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       const { data } = await petitionFieldAttachmentDownloadLink({
         variables: {
           petitionId: props.petitionId,
-          fieldId: props.field.id,
+          fieldId: field.id,
           attachmentId,
         },
       });
@@ -80,9 +85,9 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
         }
         await deletePetitionReply({
           petitionId: props.petitionId,
-          fieldId: props.field.id,
+          fieldId: field.id,
           replyId,
-          isCacheOnly: props.isCacheOnly,
+          isCacheOnly,
         });
       } catch {}
     },
@@ -97,7 +102,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
           petitionId: props.petitionId,
           replyId,
           reply,
-          isCacheOnly: props.isCacheOnly,
+          isCacheOnly,
         });
       } catch {}
     },
@@ -110,9 +115,9 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       try {
         const res = await createSimpleReply({
           petitionId: props.petitionId,
-          fieldId: props.field.id,
+          fieldId: field.id,
           reply,
-          isCacheOnly: props.isCacheOnly,
+          isCacheOnly,
         });
         return res?.id;
       } catch {}
@@ -142,7 +147,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       try {
         await createChekcboxReply({
           petitionId: props.petitionId,
-          fieldId: props.field.id,
+          fieldId: field.id,
           values,
         });
       } catch {}
@@ -168,7 +173,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       try {
         const reply = await createDynamicSelectReply({
           petitionId: props.petitionId,
-          fieldId: props.field.id,
+          fieldId: field.id,
           value,
         });
 
@@ -184,7 +189,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       try {
         createFileUploadReply({
           petitionId: props.petitionId,
-          fieldId: props.field.id,
+          fieldId: field.id,
           content,
           uploads,
         });
@@ -225,13 +230,14 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
   );
 
   const commonProps = {
+    field: { ...field, replies: isCacheOnly ? field.previewReplies : field.replies },
     onCommentsButtonClick: handleCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment,
   };
 
-  return props.field.type === "HEADING" ? (
+  return field.type === "HEADING" ? (
     <RecipientViewPetitionFieldHeading {...props} {...commonProps} />
-  ) : props.field.type === "TEXT" || props.field.type === "SHORT_TEXT" ? (
+  ) : field.type === "TEXT" || field.type === "SHORT_TEXT" ? (
     <RecipientViewPetitionFieldText
       {...props}
       {...commonProps}
@@ -239,7 +245,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       onUpdateReply={handleUpdateSimpleReply}
       onCreateReply={handleCreateSimpleReply}
     />
-  ) : props.field.type === "SELECT" ? (
+  ) : field.type === "SELECT" ? (
     <RecipientViewPetitionFieldSelect
       {...props}
       {...commonProps}
@@ -247,7 +253,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       onUpdateReply={handleUpdateSimpleReply}
       onCreateReply={handleCreateSimpleReply}
     />
-  ) : props.field.type === "FILE_UPLOAD" ? (
+  ) : field.type === "FILE_UPLOAD" ? (
     <RecipientViewPetitionFieldFileUpload
       {...props}
       {...commonProps}
@@ -255,7 +261,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       onCreateReply={handleCreateFileUploadReply}
       onDownloadReply={handleDonwloadFileUploadReply}
     />
-  ) : props.field.type === "DYNAMIC_SELECT" ? (
+  ) : field.type === "DYNAMIC_SELECT" ? (
     <RecipientViewPetitionFieldDynamicSelect
       {...props}
       {...commonProps}
@@ -263,7 +269,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
       onUpdateReply={handleUpdateDynamicSelectReply}
       onCreateReply={handleCreateDynamicSelectReply}
     />
-  ) : props.field.type === "CHECKBOX" ? (
+  ) : field.type === "CHECKBOX" ? (
     <RecipientViewPetitionFieldCheckbox
       {...props}
       {...commonProps}
@@ -275,7 +281,17 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
 }
 
 PreviewPetitionField.fragments = {
-  PublicPetitionFieldReply: gql`
+  PetitionField: gql`
+    fragment PreviewPetitionField_PetitionField on PetitionField {
+      ...RecipientViewPetitionFieldCard_PetitionField
+      previewReplies @client {
+        ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PetitionField}
+    ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+  `,
+  PetitionFieldReply: gql`
     fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {
       content
     }

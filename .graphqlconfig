@@ -1,6 +1,7 @@
 {
   "schemaPath": [
-    "server/parallel-schema.graphql"
+    "server/parallel-schema.graphql",
+    "client/utils/apollo/client-schema.graphql"
   ],
   "include": [
     ".client/graphql/__types.ts",

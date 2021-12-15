@@ -1919,6 +1919,7 @@ export interface PetitionField {
   /** The options of the petition field. */
   options: Scalars["JSONObject"];
   position: Scalars["Int"];
+  previewReplies: Array<PetitionFieldReply>;
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
   /** The title of the petition field. */
@@ -7880,6 +7881,46 @@ export type TemplateCard_PetitionTemplateFragment = {
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
 };
 
+export type PreviewPetitionField_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  title?: string | null;
+  description?: string | null;
+  options: { [key: string]: any };
+  optional: boolean;
+  multiple: boolean;
+  validated: boolean;
+  previewReplies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  attachments: Array<{
+    __typename?: "PetitionFieldAttachment";
+    id: string;
+    file: {
+      __typename?: "FileUpload";
+      filename: string;
+      contentType: string;
+      size: number;
+      isComplete: boolean;
+    };
+  }>;
+  comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+};
+
 export type PreviewPetitionField_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   content: { [key: string]: any };
@@ -8050,8 +8091,25 @@ export type PreviewPetitionFieldMutations_fileUploadReplyCompleteMutation = {
   };
 };
 
+export type PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
+  status: PetitionFieldReplyStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
+  previewReplies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  }>;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -13957,38 +14015,6 @@ export type PetitionQuery = {
     | null;
 };
 
-export type PetitionPreview_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: string | null;
-  description?: string | null;
-  options: { [key: string]: any };
-  optional: boolean;
-  multiple: boolean;
-  validated: boolean;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
-};
-
 export type PetitionPreview_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   status: PetitionStatus;
@@ -14020,6 +14046,14 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     description?: string | null;
     multiple: boolean;
     visibility?: { [key: string]: any } | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+    }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -14068,6 +14102,14 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     description?: string | null;
     multiple: boolean;
     visibility?: { [key: string]: any } | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+    }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -14157,6 +14199,14 @@ export type PetitionPreview_updatePetitionMutation = {
           description?: string | null;
           multiple: boolean;
           visibility?: { [key: string]: any } | null;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            status: PetitionFieldReplyStatus;
+            content: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -14204,6 +14254,14 @@ export type PetitionPreview_updatePetitionMutation = {
           description?: string | null;
           multiple: boolean;
           visibility?: { [key: string]: any } | null;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            status: PetitionFieldReplyStatus;
+            content: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -14265,6 +14323,14 @@ export type PetitionPreview_petitionQuery = {
           description?: string | null;
           multiple: boolean;
           visibility?: { [key: string]: any } | null;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            status: PetitionFieldReplyStatus;
+            content: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -14312,6 +14378,14 @@ export type PetitionPreview_petitionQuery = {
           description?: string | null;
           multiple: boolean;
           visibility?: { [key: string]: any } | null;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            status: PetitionFieldReplyStatus;
+            content: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -17522,16 +17596,28 @@ export const PreviewPetitionField_PetitionFieldReplyFragmentDoc = gql`
     content
   }
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldReplyFragment, unknown>;
+export const PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReplyFragmentDoc = gql`
+  fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    status
+    createdAt
+    updatedAt
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReplyFragment,
+  unknown
+>;
 export const PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionField on PetitionField {
+    previewReplies @client {
+      ...PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply
+    }
     replies {
-      id
-      content
-      status
-      createdAt
-      updatedAt
+      ...PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply
     }
   }
+  ${PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment,
   unknown
@@ -19207,13 +19293,16 @@ export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
   ${RecipientViewFieldAttachment_PetitionFieldAttachmentFragmentDoc}
   ${RecipientViewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PetitionFieldFragment, unknown>;
-export const PetitionPreview_PetitionFieldFragmentDoc = gql`
-  fragment PetitionPreview_PetitionField on PetitionField {
-    id
+export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
+  fragment PreviewPetitionField_PetitionField on PetitionField {
     ...RecipientViewPetitionFieldCard_PetitionField
+    previewReplies @client {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
   }
   ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionPreview_PetitionFieldFragment, unknown>;
+  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldFragment, unknown>;
 export const useFieldVisibility_PetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PetitionField on PetitionField {
     id
@@ -19295,13 +19384,14 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       }
     }
     fields {
-      ...PetitionPreview_PetitionField
+      id
+      ...PreviewPetitionField_PetitionField
     }
     ...RecipientViewContentsCard_PetitionBase
     ...PetitionLayout_PetitionBase
     ...RecipientViewProgressFooter_Petition
   }
-  ${PetitionPreview_PetitionFieldFragmentDoc}
+  ${PreviewPetitionField_PetitionFieldFragmentDoc}
   ${RecipientViewContentsCard_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${RecipientViewProgressFooter_PetitionFragmentDoc}

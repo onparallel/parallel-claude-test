@@ -1,5 +1,6 @@
 schema:
   - ../server/parallel-schema.graphql
+  - utils/apollo/client-schema.graphql
 documents:
   - "{pages,components,utils}/**/*.{tsx,ts}"
 generates:
