@@ -150,6 +150,19 @@ export type CreateContactInput = {
   lastName?: InputMaybe<Scalars["String"]>;
 };
 
+export type CreateFileUploadFieldAttachment = {
+  attachment: PetitionFieldAttachment;
+  presignedPostData: AWSPresignedPostData;
+};
+
+<<<<<<< master
+=======
+export type CreateFileUploadReply = {
+  presignedPostData: AWSPresignedPostData;
+  reply: PetitionFieldReply;
+};
+
+>>>>>>> [feat/ch1830] Updated createFileUploadReply and *ReplyComplete
 export type CreatedAt = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -359,9 +372,13 @@ export type Mutation = {
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
   /** Creates a reply to a file upload field. */
+<<<<<<< master
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
+=======
+  createFileUploadReply: CreateFileUploadReply;
+>>>>>>> [feat/ch1830] Updated createFileUploadReply and *ReplyComplete
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -420,6 +437,8 @@ export type Mutation = {
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   /** Edits permissions on given petitions and users */
   editPetitionPermission: Array<Petition>;
+  /** Notifies the backend that the upload is complete. */
+  fileUploadReplyComplete: PetitionFieldReply;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
@@ -873,6 +892,11 @@ export type MutationeditPetitionPermissionArgs = {
   petitionIds: Array<Scalars["GID"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
   userIds?: InputMaybe<Array<Scalars["GID"]>>;
+};
+
+export type MutationfileUploadReplyCompleteArgs = {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationfileUploadReplyDownloadLinkArgs = {

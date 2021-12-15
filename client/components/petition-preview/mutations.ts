@@ -5,6 +5,7 @@ import {
   PreviewPetitionFieldMutations_createFileUploadReplyDocument,
   PreviewPetitionFieldMutations_createSimpleReplyDocument,
   PreviewPetitionFieldMutations_deletePetitionReplyDocument,
+  PreviewPetitionFieldMutations_fileUploadReplyCompleteDocument,
   PreviewPetitionFieldMutations_updateCheckboxReplyDocument,
   PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument,
   PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment,
@@ -340,19 +341,38 @@ const _createFileUploadReply = gql`
   mutation PreviewPetitionFieldMutations_createFileUploadReply(
     $petitionId: GID!
     $fieldId: GID!
-    $file: Upload!
+    $file: FileUploadInput!
   ) {
     createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
-      id
-      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      presignedPostData {
+        ...uploadFile_AWSPresignedPostData
+      }
+      reply {
+        ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      }
     }
   }
+  ${uploadFile.fragments.AWSPresignedPostData}
   ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+`;
+const _fileUploadReplyComplete = gql`
+  mutation PreviewPetitionFieldMutations_fileUploadReplyComplete(
+    $petitionId: GID!
+    $replyId: GID!
+  ) {
+    fileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
+      id
+      content
+    }
+  }
 `;
 
 export function useCreateFileUploadReply() {
   const [createFileUploadReply] = useMutation(
     PreviewPetitionFieldMutations_createFileUploadReplyDocument
+  );
+  const [fileUploadReplyComplete] = useMutation(
+    PreviewPetitionFieldMutations_fileUploadReplyCompleteDocument
   );
   const apollo = useApolloClient();
 
@@ -405,11 +425,14 @@ export function useCreateFileUploadReply() {
           },
           async onComplete() {
             delete uploads.current[reply.id];
+            await fileUploadReplyComplete({
+              variables: { petitionId, replyId: reply.id },
+            });
           },
         });
       }
     },
-    [createFileUploadReply]
+    [createFileUploadReply, fileUploadReplyComplete]
   );
 }
 
