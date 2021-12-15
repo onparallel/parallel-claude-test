@@ -7851,6 +7851,170 @@ export type TemplateCard_PetitionTemplateFragment = {
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
 };
 
+export type PreviewPetitionField_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  content: { [key: string]: any };
+};
+
+export type PreviewPetitionField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
+
+export type PreviewPetitionField_petitionFieldAttachmentDownloadLinkMutation = {
+  petitionFieldAttachmentDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    url?: string | null;
+  };
+};
+
+export type PreviewPetitionFieldMutations_deletePetitionReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type PreviewPetitionFieldMutations_deletePetitionReplyMutation = {
+  deletePetitionReply: Result;
+};
+
+export type PreviewPetitionFieldMutations_updateSimpleReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  reply: Scalars["String"];
+}>;
+
+export type PreviewPetitionFieldMutations_updateSimpleReplyMutation = {
+  updateSimpleReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    updatedAt: string;
+  };
+};
+
+export type PreviewPetitionFieldMutations_createSimpleReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  reply: Scalars["String"];
+}>;
+
+export type PreviewPetitionFieldMutations_createSimpleReplyMutation = {
+  createSimpleReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type PreviewPetitionFieldMutations_createCheckboxReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  values: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type PreviewPetitionFieldMutations_createCheckboxReplyMutation = {
+  createCheckboxReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type PreviewPetitionFieldMutations_updateCheckboxReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  values: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type PreviewPetitionFieldMutations_updateCheckboxReplyMutation = {
+  updateCheckboxReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    updatedAt: string;
+  };
+};
+
+export type PreviewPetitionFieldMutations_createDynamicSelectReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  value:
+    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
+    | Array<InputMaybe<Scalars["String"]>>
+    | InputMaybe<Scalars["String"]>;
+}>;
+
+export type PreviewPetitionFieldMutations_createDynamicSelectReplyMutation = {
+  createDynamicSelectReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type PreviewPetitionFieldMutations_updateDynamicSelectReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  value:
+    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
+    | Array<InputMaybe<Scalars["String"]>>
+    | InputMaybe<Scalars["String"]>;
+}>;
+
+export type PreviewPetitionFieldMutations_updateDynamicSelectReplyMutation = {
+  updateDynamicSelectReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    updatedAt: string;
+  };
+};
+
+export type PreviewPetitionFieldMutations_createFileUploadReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+}>;
+
+export type PreviewPetitionFieldMutations_createFileUploadReplyMutation = {
+  createFileUploadReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+};
+
+export type PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  content: { [key: string]: any };
+};
+
+export type PreviewPetitionFieldMutations_updatePetitionStatus_PetitionFragment = {
+  __typename?: "Petition";
+  status: PetitionStatus;
+};
+
 export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
   id: string;
@@ -8886,6 +9050,21 @@ export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLi
 
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation = {
   publicFileUploadReplyDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+  };
+};
+
+export type RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"];
+    replyId: Scalars["GID"];
+    preview?: InputMaybe<Scalars["Boolean"]>;
+  }>;
+
+export type RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutation = {
+  fileUploadReplyDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
     url?: string | null;
@@ -17281,6 +17460,37 @@ export const PetitionListTagFilter_TagFragmentDoc = gql`
   }
   ${Tag_TagFragmentDoc}
 ` as unknown as DocumentNode<PetitionListTagFilter_TagFragment, unknown>;
+export const PreviewPetitionField_PetitionFieldReplyFragmentDoc = gql`
+  fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {
+    content
+  }
+` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldReplyFragment, unknown>;
+export const PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc = gql`
+  fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionField on PetitionField {
+    replies {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment,
+  unknown
+>;
+export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc = gql`
+  fragment PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply on PetitionFieldReply {
+    content
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
+  unknown
+>;
+export const PreviewPetitionFieldMutations_updatePetitionStatus_PetitionFragmentDoc = gql`
+  fragment PreviewPetitionFieldMutations_updatePetitionStatus_Petition on Petition {
+    status
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updatePetitionStatus_PetitionFragment,
+  unknown
+>;
 export const useFilenamePlaceholdersRename_PetitionFieldFragmentDoc = gql`
   fragment useFilenamePlaceholdersRename_PetitionField on PetitionField {
     id
@@ -20463,19 +20673,143 @@ export const PetitionListTagFilter_tagsDocument = gql`
   PetitionListTagFilter_tagsQuery,
   PetitionListTagFilter_tagsQueryVariables
 >;
-export const PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument = gql`
-  mutation PetitionAttachmentsCard_petitionAttachmentDownloadLink(
+export const PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument = gql`
+  mutation PreviewPetitionField_petitionFieldAttachmentDownloadLink(
     $petitionId: GID!
+    $fieldId: GID!
     $attachmentId: GID!
   ) {
-    petitionAttachmentDownloadLink(petitionId: $petitionId, attachmentId: $attachmentId) {
-      result
+    petitionFieldAttachmentDownloadLink(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      attachmentId: $attachmentId
+    ) {
       url
     }
   }
 ` as unknown as DocumentNode<
-  PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutation,
-  PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutationVariables
+  PreviewPetitionField_petitionFieldAttachmentDownloadLinkMutation,
+  PreviewPetitionField_petitionFieldAttachmentDownloadLinkMutationVariables
+>;
+export const PreviewPetitionFieldMutations_deletePetitionReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_deletePetitionReplyMutation,
+  PreviewPetitionFieldMutations_deletePetitionReplyMutationVariables
+>;
+export const PreviewPetitionFieldMutations_updateSimpleReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_updateSimpleReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $reply: String!
+  ) {
+    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updateSimpleReplyMutation,
+  PreviewPetitionFieldMutations_updateSimpleReplyMutationVariables
+>;
+export const PreviewPetitionFieldMutations_createSimpleReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_createSimpleReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $reply: String!
+  ) {
+    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_createSimpleReplyMutation,
+  PreviewPetitionFieldMutations_createSimpleReplyMutationVariables
+>;
+export const PreviewPetitionFieldMutations_createCheckboxReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_createCheckboxReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $values: [String!]!
+  ) {
+    createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_createCheckboxReplyMutation,
+  PreviewPetitionFieldMutations_createCheckboxReplyMutationVariables
+>;
+export const PreviewPetitionFieldMutations_updateCheckboxReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_updateCheckboxReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $values: [String!]!
+  ) {
+    updateCheckboxReply(petitionId: $petitionId, replyId: $replyId, values: $values) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updateCheckboxReplyMutation,
+  PreviewPetitionFieldMutations_updateCheckboxReplyMutationVariables
+>;
+export const PreviewPetitionFieldMutations_createDynamicSelectReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_createDynamicSelectReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $value: [[String]!]!
+  ) {
+    createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_createDynamicSelectReplyMutation,
+  PreviewPetitionFieldMutations_createDynamicSelectReplyMutationVariables
+>;
+export const PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_updateDynamicSelectReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $value: [[String]!]!
+  ) {
+    updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updateDynamicSelectReplyMutation,
+  PreviewPetitionFieldMutations_updateDynamicSelectReplyMutationVariables
+>;
+export const PreviewPetitionFieldMutations_createFileUploadReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_createFileUploadReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $file: Upload!
+  ) {
+    createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+      id
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_createFileUploadReplyMutation,
+  PreviewPetitionFieldMutations_createFileUploadReplyMutationVariables
 >;
 export const PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
@@ -20789,6 +21123,21 @@ export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadL
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables
+>;
+export const RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument = gql`
+  mutation RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLink(
+    $petitionId: GID!
+    $replyId: GID!
+    $preview: Boolean
+  ) {
+    fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId, preview: $preview) {
+      result
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutation,
+  RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutationVariables
 >;
 export const RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicDeletePetitionReply(

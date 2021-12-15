@@ -7,7 +7,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { PetitionPreviewPetitionField } from "@parallel/components/petition-preview/PetitionPreviewPetitionField";
+import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
 import { RecipientViewPetitionFieldCard } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldCard";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
@@ -25,6 +25,7 @@ import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
@@ -160,21 +161,25 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             </Box>
             <Flex flexDirection="column" flex="2" minWidth={0}>
               <Stack spacing={4} key={0}>
-                {fields.map((field) => (
-                  <PetitionPreviewPetitionField
-                    key={field.id}
-                    petitionId={petition.id}
-                    field={field}
-                    isDisabled={isPetition && (field.validated || petition.status === "CLOSED")}
-                    isInvalid={
-                      finalized &&
-                      !field.validated &&
-                      completedFieldReplies(field).length === 0 &&
-                      !field.optional
-                    }
-                    hasCommentsEnabled={field.options.hasCommentsEnabled}
-                  />
-                ))}
+                <AnimatePresence initial={false}>
+                  {fields.map((field) => (
+                    <motion.div key={field.id} layout="position">
+                      <PreviewPetitionField
+                        key={field.id}
+                        petitionId={petition.id}
+                        field={field}
+                        isDisabled={isPetition && (field.validated || petition.status === "CLOSED")}
+                        isInvalid={
+                          finalized &&
+                          !field.validated &&
+                          completedFieldReplies(field).length === 0 &&
+                          !field.optional
+                        }
+                        hasCommentsEnabled={field.options.hasCommentsEnabled}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </Stack>
               <Spacer />
               {pages > 1 ? (

@@ -338,3 +338,16 @@ const _publicFileUploadReplyDownloadLink = gql`
     }
   }
 `;
+
+const _fileUploadReplyDownloadLink = gql`
+  mutation RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLink(
+    $petitionId: GID!
+    $replyId: GID!
+    $preview: Boolean
+  ) {
+    fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId, preview: $preview) {
+      result
+      url
+    }
+  }
+`;

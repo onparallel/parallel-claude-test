@@ -1,0 +1,481 @@
+import { DataProxy, gql, useApolloClient, useMutation } from "@apollo/client";
+import {
+  PreviewPetitionFieldMutations_createCheckboxReplyDocument,
+  PreviewPetitionFieldMutations_createDynamicSelectReplyDocument,
+  PreviewPetitionFieldMutations_createFileUploadReplyDocument,
+  PreviewPetitionFieldMutations_createSimpleReplyDocument,
+  PreviewPetitionFieldMutations_deletePetitionReplyDocument,
+  PreviewPetitionFieldMutations_updateCheckboxReplyDocument,
+  PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument,
+  PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment,
+  PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
+  PreviewPetitionFieldMutations_updatePetitionStatus_PetitionFragmentDoc,
+  PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
+  PreviewPetitionFieldMutations_updateSimpleReplyDocument,
+  Scalars,
+} from "@parallel/graphql/__types";
+import { updateFragment } from "@parallel/utils/apollo/updateFragment";
+import { uploadFile } from "@parallel/utils/uploadFile";
+import { MutableRefObject, useCallback } from "react";
+import { pick } from "remeda";
+import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
+
+const _deletePetitionReply = gql`
+  mutation PreviewPetitionFieldMutations_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+  }
+`;
+
+export function useDeletePetitionReply() {
+  const [deletePetitionReply] = useMutation(
+    PreviewPetitionFieldMutations_deletePetitionReplyDocument,
+    { optimisticResponse: { deletePetitionReply: "SUCCESS" } }
+  );
+  return useCallback(
+    async function _deletePetitionReply({
+      petitionId,
+      fieldId,
+      replyId,
+    }: {
+      petitionId: string;
+      fieldId: string;
+      replyId: string;
+    }) {
+      await deletePetitionReply({
+        variables: { petitionId, replyId },
+        update(cache) {
+          updateFieldReplies(cache, fieldId, (replies) =>
+            replies.filter(({ id }) => id !== replyId)
+          );
+          updatePetitionStatus(cache, petitionId);
+        },
+      });
+    },
+    [deletePetitionReply]
+  );
+}
+
+const _updateSimpleReply = gql`
+  mutation PreviewPetitionFieldMutations_updateSimpleReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $reply: String!
+  ) {
+    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+`;
+
+export function useUpdateSimpleReply() {
+  const [updateSimpleReply] = useMutation(PreviewPetitionFieldMutations_updateSimpleReplyDocument);
+  return useCallback(
+    async function _updateSimpleReply({
+      petitionId,
+      replyId,
+      reply,
+    }: {
+      petitionId: string;
+      replyId: string;
+      reply: string;
+    }) {
+      await updateSimpleReply({
+        variables: {
+          petitionId,
+          replyId,
+          reply,
+        },
+        update(cache, { data }) {
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+    },
+    [updateSimpleReply]
+  );
+}
+
+const _createSimpleReply = gql`
+  mutation PreviewPetitionFieldMutations_createSimpleReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $reply: String!
+  ) {
+    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+`;
+
+export function useCreateSimpleReply() {
+  const [createSimpleReply] = useMutation(PreviewPetitionFieldMutations_createSimpleReplyDocument);
+  return useCallback(
+    async function _createSimpleReply({
+      petitionId,
+      fieldId,
+      reply,
+    }: {
+      petitionId: string;
+      fieldId: string;
+      reply: string;
+    }) {
+      const { data } = await createSimpleReply({
+        variables: {
+          petitionId,
+          fieldId,
+          reply,
+        },
+        update(cache, { data }) {
+          updateFieldReplies(cache, fieldId, (replies) => [
+            ...replies,
+            pick(data!.createSimpleReply, ["id", "__typename"]),
+          ]);
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+      return data?.createSimpleReply;
+    },
+    [createSimpleReply]
+  );
+}
+
+const _createCheckboxReply = gql`
+  mutation PreviewPetitionFieldMutations_createCheckboxReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $values: [String!]!
+  ) {
+    createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+`;
+
+export function useCreateCheckboxReply() {
+  const [createCheckboxReply] = useMutation(
+    PreviewPetitionFieldMutations_createCheckboxReplyDocument
+  );
+  return useCallback(
+    async function _createCheckboxReply({
+      petitionId,
+      fieldId,
+      values,
+    }: {
+      petitionId: string;
+      fieldId: string;
+      values: string[];
+    }) {
+      const { data } = await createCheckboxReply({
+        variables: {
+          petitionId,
+          fieldId,
+          values,
+        },
+        update(cache, { data }) {
+          updateFieldReplies(cache, fieldId, (replies) => [
+            ...replies,
+            pick(data!.createCheckboxReply, ["id", "__typename"]),
+          ]);
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+      return data?.createCheckboxReply;
+    },
+    [createCheckboxReply]
+  );
+}
+
+const _updateCheckboxReply = gql`
+  mutation PreviewPetitionFieldMutations_updateCheckboxReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $values: [String!]!
+  ) {
+    updateCheckboxReply(petitionId: $petitionId, replyId: $replyId, values: $values) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+`;
+
+export function useUpdateCheckboxReply() {
+  const [updateCheckboxReply] = useMutation(
+    PreviewPetitionFieldMutations_updateCheckboxReplyDocument
+  );
+  return useCallback(
+    async function _updateCheckboxReply({
+      petitionId,
+      replyId,
+      values,
+    }: {
+      petitionId: string;
+      replyId: string;
+      values: string[];
+    }) {
+      await updateCheckboxReply({
+        variables: {
+          petitionId,
+          replyId,
+          values,
+        },
+        update(cache, { data }) {
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+    },
+    [updateCheckboxReply]
+  );
+}
+
+const _createDynamicSelectReply = gql`
+  mutation PreviewPetitionFieldMutations_createDynamicSelectReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $value: [[String]!]!
+  ) {
+    createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+`;
+
+export function useCreateDynamicSelectReply() {
+  const [createDynamicSelectReply] = useMutation(
+    PreviewPetitionFieldMutations_createDynamicSelectReplyDocument
+  );
+  return useCallback(
+    async function _createDynamicSelectReply({
+      petitionId,
+      fieldId,
+      value,
+    }: {
+      petitionId: string;
+      fieldId: string;
+      value: [string, string | null][];
+    }) {
+      const { data } = await createDynamicSelectReply({
+        variables: {
+          petitionId,
+          fieldId,
+          value,
+        },
+        update(cache, { data }) {
+          updateFieldReplies(cache, fieldId, (replies) => [
+            ...replies,
+            pick(data!.createDynamicSelectReply, ["id", "__typename"]),
+          ]);
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+      return data?.createDynamicSelectReply;
+    },
+    [createDynamicSelectReply]
+  );
+}
+
+const _updateDynamicSelectReply = gql`
+  mutation PreviewPetitionFieldMutations_updateDynamicSelectReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $value: [[String]!]!
+  ) {
+    updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+`;
+
+export function useUpdateDynamicSelectReply() {
+  const [updateDynamicSelectReply] = useMutation(
+    PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument
+  );
+  return useCallback(
+    async function _updateDynamicSelectReply({
+      petitionId,
+      replyId,
+      value,
+    }: {
+      petitionId: string;
+      replyId: string;
+      value: [string, string | null][];
+    }) {
+      await updateDynamicSelectReply({
+        variables: {
+          petitionId,
+          replyId,
+          value,
+        },
+        update(cache, { data }) {
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+    },
+    [updateDynamicSelectReply]
+  );
+}
+
+const _createFileUploadReply = gql`
+  mutation PreviewPetitionFieldMutations_createFileUploadReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $file: Upload!
+  ) {
+    createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+      id
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+`;
+
+export function useCreateFileUploadReply() {
+  const [createFileUploadReply] = useMutation(
+    PreviewPetitionFieldMutations_createFileUploadReplyDocument
+  );
+  const apollo = useApolloClient();
+
+  return useCallback(
+    async function _createFileUploadReply({
+      petitionId,
+      fieldId,
+      content,
+      uploads,
+    }: {
+      petitionId: string;
+      fieldId: string;
+      content: File[];
+      uploads: MutableRefObject<Record<string, XMLHttpRequest>>;
+    }) {
+      for (const file of content) {
+        const { data } = await createFileUploadReply({
+          variables: {
+            petitionId,
+            fieldId: fieldId,
+            file: {
+              filename: file.name,
+              size: file.size,
+              contentType: file.type,
+            },
+          },
+          update(cache, { data }) {
+            const reply = data!.createFileUploadReply.reply;
+            updateFieldReplies(cache, fieldId, (replies) => [
+              ...replies,
+              pick(reply, ["id", "__typename"]),
+            ]);
+            updateReplyContent(cache, reply.id, (content) => ({
+              ...content,
+              progress: 0,
+            }));
+            if (data) {
+              updatePetitionStatus(cache, petitionId);
+            }
+          },
+        });
+        const { reply, presignedPostData } = data!.createFileUploadReply;
+
+        uploads.current[reply.id] = uploadFile(file, presignedPostData, {
+          onProgress(progress) {
+            updateReplyContent(apollo, reply.id, (content) => ({
+              ...content,
+              progress,
+            }));
+          },
+          async onComplete() {
+            delete uploads.current[reply.id];
+          },
+        });
+      }
+    },
+    [createFileUploadReply]
+  );
+}
+
+// CACHE UPDATES
+
+function updateFieldReplies(
+  proxy: DataProxy,
+  fieldId: string,
+  updateFn: (
+    cached: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment["replies"]
+  ) => PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment["replies"]
+) {
+  updateFragment(proxy, {
+    id: fieldId,
+    fragment: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
+    data: (cached) => ({ ...cached, replies: updateFn(cached!.replies) }),
+  });
+}
+
+updateFieldReplies.fragments = {
+  PetitionField: gql`
+    fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionField on PetitionField {
+      replies {
+        id
+      }
+    }
+  `,
+};
+function updateReplyContent(
+  proxy: DataProxy,
+  replyId: string,
+  updateFn: (cached: Scalars["JSONObject"]) => Scalars["JSONObject"]
+) {
+  updateFragment(proxy, {
+    fragment: PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
+    id: replyId,
+    data: (cached) => ({
+      ...cached,
+      content: updateFn(cached!.content),
+    }),
+  });
+}
+
+updateReplyContent.fragments = {
+  PetitionFieldReply: gql`
+    fragment PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply on PetitionFieldReply {
+      content
+    }
+  `,
+};
+
+function updatePetitionStatus(proxy: DataProxy, petitionId: string) {
+  updateFragment(proxy, {
+    fragment: PreviewPetitionFieldMutations_updatePetitionStatus_PetitionFragmentDoc,
+    id: petitionId,
+    data: (cached) => ({
+      ...cached,
+      status: cached!.status === "COMPLETED" ? "PENDING" : cached!.status,
+    }),
+  });
+}
+
+updatePetitionStatus.fragments = {
+  Petition: gql`
+    fragment PreviewPetitionFieldMutations_updatePetitionStatus_Petition on Petition {
+      status
+    }
+  `,
+};
