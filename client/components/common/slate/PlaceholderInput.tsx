@@ -139,8 +139,8 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
             editor={editor}
             plugins={plugins}
             value={slateValue}
-            onChange={(value: PlaceholderInputValue) =>
-              onChange(slateNodesToTextWithPlaceholders(value))
+            onChange={(value) =>
+              onChange(slateNodesToTextWithPlaceholders(value as PlaceholderInputValue))
             }
             editableProps={{
               readOnly: isDisabled,
