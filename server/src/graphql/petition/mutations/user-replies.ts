@@ -24,6 +24,7 @@ export const createSimpleReply = mutationField("createSimpleReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     reply: nonNull(stringArg()),
+    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -47,6 +48,7 @@ export const createSimpleReply = mutationField("createSimpleReply", {
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
         type: field.type,
+        status: args.status ?? "PENDING",
         content: { text: args.reply },
       },
       ctx.user!
@@ -61,12 +63,13 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
     reply: nonNull(stringArg()),
+    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
-    replyCanBeUpdated("replyId")
+    replyCanBeUpdated("replyId", "status")
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
@@ -80,27 +83,30 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
-      { content: { text: args.reply }, status: "PENDING" },
+      { content: { text: args.reply }, status: args.status ?? "PENDING" },
       ctx.user!
     );
   },
 });
 
+export const FileUploadReplyInput = objectType({
+  name: "FileUploadReplyInput",
+  definition(t) {
+    t.field("presignedPostData", {
+      type: "AWSPresignedPostData",
+    });
+    t.field("reply", { type: "PetitionFieldReply" });
+  },
+});
+
 export const createFileUploadReply = mutationField("createFileUploadReply", {
   description: "Creates a reply to a file upload field.",
-  type: objectType({
-    name: "CreateFileUploadReply",
-    definition(t) {
-      t.field("presignedPostData", {
-        type: "AWSPresignedPostData",
-      });
-      t.field("reply", { type: "PetitionFieldReply" });
-    },
-  }),
+  type: "FileUploadReplyInput",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     file: nonNull("FileUploadInput"),
+    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -130,6 +136,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
           user_id: ctx.user!.id,
           type: "FILE_UPLOAD",
           content: { file_upload_id: file.id },
+          status: args.status ?? "PENDING",
         },
         ctx.user!
       ),
@@ -138,7 +145,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
   },
 });
 
-export const fileUploadReplyComplete = mutationField("fileUploadReplyComplete", {
+export const createFileUploadReplyComplete = mutationField("createFileUploadReplyComplete", {
   description: "Notifies the backend that the upload is complete.",
   type: "PetitionFieldReply",
   args: {
@@ -163,43 +170,91 @@ export const fileUploadReplyComplete = mutationField("fileUploadReplyComplete", 
 
 export const updateFileUploadReply = mutationField("updateFileUploadReply", {
   description:
-    "Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3.",
-  type: "PetitionFieldReply",
+    "Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation.",
+  type: "FileUploadReplyInput",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
-    file: nonNull(uploadArg()),
+    file: nonNull("FileUploadInput"),
+    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
-    replyCanBeUpdated("replyId")
+    replyCanBeUpdated("replyId", "status")
   ),
-  validateArgs: maxFileSize((args) => args.file, 50 * 1024 * 1024, "file"),
+  validateArgs: fileUploadInputMaxSize((args) => args.file, 50 * 1024 * 1024, "file"),
   resolve: async (_, args, ctx) => {
-    const { createReadStream, filename, mimetype } = await args.file;
-    const key = random(16);
-    const res = await ctx.aws.fileUploads.uploadFile(key, mimetype, createReadStream());
-
     const oldReply = (await ctx.petitions.loadFieldReply(args.replyId))!;
-    const [newFile] = await Promise.all([
-      ctx.files.createFileUpload(
+
+    const { size, filename, contentType } = await args.file;
+    const key = random(16);
+
+    const newFile = await ctx.files.createFileUpload(
+      {
+        path: key,
+        filename,
+        size: size.toString(),
+        content_type: contentType,
+        upload_complete: false,
+      },
+      `User:${ctx.user!.id}`
+    );
+
+    const [presignedPostData, reply] = await Promise.all([
+      ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+      ctx.petitions.updatePetitionFieldReply(
+        args.replyId,
         {
-          content_type: mimetype,
-          filename,
-          path: key,
-          size: res["ContentLength"]!.toString(),
-          upload_complete: true,
+          content: {
+            file_upload_id: newFile.id,
+            old_file_upload_id: oldReply.content["file_upload_id"], // old file_upload_id will be removed and the file deleted once updatefileUploadReplyComplete has been called
+          },
+          status: args.status ?? "PENDING",
         },
-        `User:${ctx.user!.id}`
+        ctx.user!
       ),
-      ctx.petitions.deleteFileUpload(oldReply.content["file_upload_id"], `User:${ctx.user!.id}`),
     ]);
 
+    return { presignedPostData, reply };
+  },
+});
+
+export const updateFileUploadReplyComplete = mutationField("updateFileUploadReplyComplete", {
+  description:
+    "Notifies the backend that the new file was successfully uploaded to S3. Marks the file upload as completed and deletes the old file.",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["FILE_UPLOAD"])
+  ),
+  resolve: async (_, args, ctx) => {
+    const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
+    const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
+    // Try to get metadata
+    await Promise.all([
+      ctx.aws.fileUploads.getFileMetadata(file!.path),
+      ctx.files.markFileUploadComplete(file!.id, `User:${ctx.user!.id}`),
+      reply.content["old_file_upload_id"]
+        ? ctx.petitions.deleteFileUpload(
+            reply.content["old_file_upload_id"] as number,
+            `User:${ctx.user!.id}`
+          )
+        : null,
+    ]);
+
+    ctx.files.loadFileUpload.dataloader.clear(file!.id);
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
-      { content: { file_upload_id: newFile.id } },
+      {
+        content: { file_upload_id: reply.content["file_upload_id"] }, // rewrite content to remove old_file_upload_id reference
+      },
       ctx.user!
     );
   },
@@ -212,6 +267,7 @@ export const createCheckboxReply = mutationField("createCheckboxReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     values: nonNull(list(nonNull(stringArg()))),
+    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -233,6 +289,7 @@ export const createCheckboxReply = mutationField("createCheckboxReply", {
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
         type: "CHECKBOX",
+        status: args.status ?? "PENDING",
         content: { choices: args.values },
       },
       ctx.user!
@@ -247,12 +304,13 @@ export const updateCheckboxReply = mutationField("updateCheckboxReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
     values: nonNull(list(nonNull(stringArg()))),
+    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["CHECKBOX"]),
-    replyCanBeUpdated("replyId")
+    replyCanBeUpdated("replyId", "status")
   ),
   validateArgs: async (_, { replyId, values }, ctx, info) => {
     try {
@@ -267,7 +325,7 @@ export const updateCheckboxReply = mutationField("updateCheckboxReply", {
       args.replyId,
       {
         content: { choices: args.values },
-        status: "PENDING",
+        status: args.status ?? "PENDING",
       },
       ctx.user!
     );
@@ -281,6 +339,7 @@ export const createDynamicSelectReply = mutationField("createDynamicSelectReply"
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     value: nonNull(list(nonNull(list(stringArg())))),
+    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -302,6 +361,7 @@ export const createDynamicSelectReply = mutationField("createDynamicSelectReply"
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
         type: "DYNAMIC_SELECT",
+        status: args.status ?? "PENDING",
         content: { columns: args.value },
       },
       ctx.user!
@@ -316,12 +376,13 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
     value: nonNull(list(nonNull(list(stringArg())))),
+    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["DYNAMIC_SELECT"]),
-    replyCanBeUpdated("replyId")
+    replyCanBeUpdated("replyId", "status")
   ),
   validateArgs: async (_, args, ctx, info) => {
     try {
@@ -336,7 +397,7 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
       args.replyId,
       {
         content: { columns: args.value },
-        status: "PENDING",
+        status: args.status ?? "PENDING",
       },
       ctx.user!
     );

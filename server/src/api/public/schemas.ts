@@ -263,7 +263,7 @@ const _PetitionFieldReply = {
     },
     status: {
       type: "string",
-      description: "Status of the reply. `APPROVED` replies cannot be modified or deleted.",
+      description: "Status of the reply. `APPROVED` replies cannot be updated or deleted.",
       enum: ["PENDING", "APPROVED", "REJECTED"],
       example: "PENDING",
     },
@@ -797,6 +797,14 @@ const _DynamicSelectReplySubmitContent = {
   example: ["Cataluña", "Barcelona"],
 } as const;
 
+const _PetitionFieldReplyStatus = {
+  type: "string",
+  description:
+    "Optionally, you can pass a status for the reply. `APPROVED` replies can't be updated or deleted. This can be useful when you don't want your replies to be modified.",
+  enum: ["PENDING", "APPROVED", "REJECTED"],
+  example: "APPROVED",
+} as const;
+
 export const SubmitReply = schema({
   title: "SubmitReply",
   type: "object",
@@ -816,6 +824,7 @@ export const SubmitReply = schema({
         _DynamicSelectReplySubmitContent,
       ],
     },
+    status: _PetitionFieldReplyStatus,
   },
 } as const);
 
@@ -832,6 +841,12 @@ export const UpdateReply = schema({
         _CheckboxReplySubmitContent,
         _DynamicSelectReplySubmitContent,
       ],
+    },
+    status: {
+      ..._PetitionFieldReplyStatus,
+      description: _PetitionFieldReplyStatus.description.concat(
+        " In order to update an `APPROVED` reply, you must pass a new `status` on the request."
+      ),
     },
   },
 } as const);

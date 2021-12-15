@@ -197,6 +197,41 @@ describe("GraphQL/Petition Field Replies", () => {
       ]);
     });
 
+    it("creates a new reply and sets its status to APPROVED", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $reply: String!
+            $status: PetitionFieldReplyStatus
+          ) {
+            createSimpleReply(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              reply: $reply
+              status: $status
+            ) {
+              content
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          reply: "option 2",
+          status: "APPROVED",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createSimpleReply).toEqual({
+        content: { text: "option 2" },
+        status: "APPROVED",
+      });
+    });
+
     it("sends error when creating a reply on a FILE_UPLOAD field", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
@@ -644,6 +679,41 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data?.createCheckboxReply).toEqual({
         status: "PENDING",
         content: { choices: ["1", "2"] },
+      });
+    });
+
+    it("creates a checkbox reply and sets its status to REJECTED", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $values: [String!]!
+            $status: PetitionFieldReplyStatus
+          ) {
+            createCheckboxReply(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              values: $values
+              status: $status
+            ) {
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", checkboxField.id),
+          values: ["1"],
+          status: "REJECTED",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createCheckboxReply).toEqual({
+        status: "REJECTED",
+        content: { choices: ["1"] },
       });
     });
 
@@ -1235,7 +1305,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!) {
-            fileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
+            createFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
               id
               content
               status
@@ -1249,7 +1319,7 @@ describe("GraphQL/Petition Field Replies", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.fileUploadReplyComplete).toEqual({
+      expect(data?.createFileUploadReplyComplete).toEqual({
         id: fileUploadReplyGID,
         content: {
           filename: "my_file.txt",
@@ -1260,6 +1330,108 @@ describe("GraphQL/Petition Field Replies", () => {
         },
         status: "PENDING",
       });
+    });
+  });
+
+  describe("updateFileUploadReply", () => {
+    let fileUploadReply: PetitionFieldReply;
+
+    beforeAll(async () => {
+      const [fileUploadField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+      }));
+      [fileUploadReply] = await mocks.createRandomFileReply(fileUploadField.id, 1, () => ({
+        user_id: user.id,
+      }));
+    });
+
+    it("updates the reply of a file_upload to an incomplete file and returns an upload endpoint for the new file", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $file: FileUploadInput!) {
+            updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+              presignedPostData {
+                url
+                fields
+              }
+              reply {
+                id
+                content
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", fileUploadReply.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 500,
+          },
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateFileUploadReply).toEqual({
+        presignedPostData: { url: "", fields: {} },
+        reply: {
+          id: toGlobalId("PetitionFieldReply", fileUploadReply.id),
+          content: {
+            filename: "my_file.txt",
+            size: "500",
+            contentType: "text/plain",
+            extension: "txt",
+            uploadComplete: false,
+          },
+          status: "PENDING",
+        },
+      });
+
+      const [dbReply] = await mocks.knex
+        .from<PetitionFieldReply>("petition_field_reply")
+        .where("id", fileUploadReply.id)
+        .select("*");
+
+      expect(dbReply.content.old_file_upload_id).not.toBeNull();
+    });
+
+    it("notifies backend the file was successfully uploaded", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            updateFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
+              id
+              content
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", fileUploadReply.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateFileUploadReplyComplete).toEqual({
+        id: toGlobalId("PetitionFieldReply", fileUploadReply.id),
+        content: {
+          filename: "my_file.txt",
+          size: "500",
+          contentType: "text/plain",
+          extension: "txt",
+          uploadComplete: true,
+        },
+        status: "PENDING",
+      });
+      const [dbReply] = await mocks.knex
+        .from<PetitionFieldReply>("petition_field_reply")
+        .where("id", fileUploadReply.id)
+        .select("*");
+
+      expect(dbReply.content.old_file_upload_id).toBeUndefined();
     });
   });
 

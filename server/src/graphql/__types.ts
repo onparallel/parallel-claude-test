@@ -315,11 +315,6 @@ export interface NexusGenObjects {
     attachment: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
-  CreateFileUploadReply: {
-    // root type
-    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
-    reply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
-  };
   EffectivePetitionUserPermission: Pick<
     db.PetitionPermission,
     "petition_id" | "user_id" | "type" | "is_subscribed"
@@ -330,6 +325,11 @@ export interface NexusGenObjects {
     file?: NexusGenRootTypes["FileUpload"] | null; // FileUpload
     result: NexusGenEnums["Result"]; // Result!
     url?: string | null; // String
+  };
+  FileUploadReplyInput: {
+    // root type
+    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
+    reply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
   };
   GenerateUserAuthTokenResponse: {
     // root type
@@ -728,11 +728,6 @@ export interface NexusGenFieldTypes {
     attachment: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
-  CreateFileUploadReply: {
-    // field return type
-    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
-    reply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
-  };
   EffectivePetitionUserPermission: {
     // field return type
     isSubscribed: boolean; // Boolean!
@@ -750,6 +745,11 @@ export interface NexusGenFieldTypes {
     file: NexusGenRootTypes["FileUpload"] | null; // FileUpload
     result: NexusGenEnums["Result"]; // Result!
     url: string | null; // String
+  };
+  FileUploadReplyInput: {
+    // field return type
+    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
+    reply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
   };
   GenerateUserAuthTokenResponse: {
     // field return type
@@ -868,7 +868,8 @@ export interface NexusGenFieldTypes {
     createDynamicSelectReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
-    createFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
+    createFileUploadReply: NexusGenRootTypes["FileUploadReplyInput"]; // FileUploadReplyInput!
+    createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -895,7 +896,6 @@ export interface NexusGenFieldTypes {
     deleteUserGroup: NexusGenEnums["Result"]; // Result!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     editPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
-    fileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getTaskResultFileUrl: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -951,7 +951,8 @@ export interface NexusGenFieldTypes {
     updateDynamicSelectReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    updateFileUploadReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    updateFileUploadReply: NexusGenRootTypes["FileUploadReplyInput"]; // FileUploadReplyInput!
+    updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
@@ -1995,11 +1996,6 @@ export interface NexusGenFieldTypeNames {
     attachment: "PetitionFieldAttachment";
     presignedPostData: "AWSPresignedPostData";
   };
-  CreateFileUploadReply: {
-    // field return type name
-    presignedPostData: "AWSPresignedPostData";
-    reply: "PetitionFieldReply";
-  };
   EffectivePetitionUserPermission: {
     // field return type name
     isSubscribed: "Boolean";
@@ -2017,6 +2013,11 @@ export interface NexusGenFieldTypeNames {
     file: "FileUpload";
     result: "Result";
     url: "String";
+  };
+  FileUploadReplyInput: {
+    // field return type name
+    presignedPostData: "AWSPresignedPostData";
+    reply: "PetitionFieldReply";
   };
   GenerateUserAuthTokenResponse: {
     // field return type name
@@ -2135,7 +2136,8 @@ export interface NexusGenFieldTypeNames {
     createDynamicSelectReply: "PetitionFieldReply";
     createEventSubscription: "PetitionEventSubscription";
     createExportRepliesTask: "Task";
-    createFileUploadReply: "CreateFileUploadReply";
+    createFileUploadReply: "FileUploadReplyInput";
+    createFileUploadReplyComplete: "PetitionFieldReply";
     createOrganization: "SupportMethodResponse";
     createOrganizationUser: "User";
     createPetition: "PetitionBase";
@@ -2162,7 +2164,6 @@ export interface NexusGenFieldTypeNames {
     deleteUserGroup: "Result";
     dynamicSelectFieldFileDownloadLink: "FileUploadDownloadLinkResult";
     editPetitionPermission: "Petition";
-    fileUploadReplyComplete: "PetitionFieldReply";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getTaskResultFileUrl: "FileUploadDownloadLinkResult";
@@ -2218,7 +2219,8 @@ export interface NexusGenFieldTypeNames {
     updateDynamicSelectReply: "PetitionFieldReply";
     updateEventSubscription: "PetitionEventSubscription";
     updateFieldPositions: "PetitionBase";
-    updateFileUploadReply: "PetitionFieldReply";
+    updateFileUploadReply: "FileUploadReplyInput";
+    updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOnboardingStatus: "User";
     updateOrganizationLogo: "Organization";
@@ -3258,6 +3260,7 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       values: string[]; // [String!]!
     };
     createContact: {
@@ -3268,6 +3271,7 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       value: Array<Array<string | null>>; // [[String]!]!
     };
     createEventSubscription: {
@@ -3285,6 +3289,12 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
       petitionId: NexusGenScalars["GID"]; // GID!
+      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
+    };
+    createFileUploadReplyComplete: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     createOrganization: {
       // args
@@ -3349,6 +3359,7 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
       reply: string; // String!
+      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
     };
     createTag: {
       // args
@@ -3433,11 +3444,6 @@ export interface NexusGenArgTypes {
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
-    };
-    fileUploadReplyComplete: {
-      // args
-      petitionId: NexusGenScalars["GID"]; // GID!
-      replyId: NexusGenScalars["GID"]; // GID!
     };
     fileUploadReplyDownloadLink: {
       // args
@@ -3726,6 +3732,7 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
+      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       values: string[]; // [String!]!
     };
     updateContact: {
@@ -3737,6 +3744,7 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
+      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       value: Array<Array<string | null>>; // [[String]!]!
     };
     updateEventSubscription: {
@@ -3751,7 +3759,13 @@ export interface NexusGenArgTypes {
     };
     updateFileUploadReply: {
       // args
-      file: NexusGenScalars["Upload"]; // Upload!
+      file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      replyId: NexusGenScalars["GID"]; // GID!
+      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
+    };
+    updateFileUploadReplyComplete: {
+      // args
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
     };
@@ -3851,6 +3865,7 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       reply: string; // String!
       replyId: NexusGenScalars["GID"]; // GID!
+      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
     };
     updateTag: {
       // args

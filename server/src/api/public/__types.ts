@@ -659,6 +659,7 @@ export type MutationcloneUserGroupArgs = {
 export type MutationcreateCheckboxReplyArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
   values: Array<Scalars["String"]>;
 };
 
@@ -669,6 +670,7 @@ export type MutationcreateContactArgs = {
 export type MutationcreateDynamicSelectReplyArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
   value: Array<Array<InputMaybe<Scalars["String"]>>>;
 };
 
@@ -686,6 +688,7 @@ export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
   petitionId: Scalars["GID"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 };
 
 export type MutationcreateOrganizationArgs = {
@@ -750,6 +753,7 @@ export type MutationcreateSimpleReplyArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   reply: Scalars["String"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 };
 
 export type MutationcreateTagArgs = {
@@ -1122,6 +1126,7 @@ export type MutationuntagPetitionArgs = {
 export type MutationupdateCheckboxReplyArgs = {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
   values: Array<Scalars["String"]>;
 };
 
@@ -1133,6 +1138,7 @@ export type MutationupdateContactArgs = {
 export type MutationupdateDynamicSelectReplyArgs = {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
   value: Array<Array<InputMaybe<Scalars["String"]>>>;
 };
 
@@ -1150,6 +1156,7 @@ export type MutationupdateFileUploadReplyArgs = {
   file: Scalars["Upload"];
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 };
 
 export type MutationupdateLandingTemplateMetadataArgs = {
@@ -1247,6 +1254,7 @@ export type MutationupdateSimpleReplyArgs = {
   petitionId: Scalars["GID"];
   reply: Scalars["String"];
   replyId: Scalars["GID"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 };
 
 export type MutationupdateTagArgs = {
@@ -4154,6 +4162,7 @@ export type SubmitReply_createSimpleReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
   reply: Scalars["String"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
 export type SubmitReply_createSimpleReplyMutation = {
@@ -4170,6 +4179,7 @@ export type SubmitReply_createCheckboxReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
   reply: Array<Scalars["String"]> | Scalars["String"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
 export type SubmitReply_createCheckboxReplyMutation = {
@@ -4186,6 +4196,7 @@ export type SubmitReply_createFileUploadReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
 export type SubmitReply_createFileUploadReplyMutation = {
@@ -4205,6 +4216,7 @@ export type SubmitReply_createDynamicSelectReplyMutationVariables = Exact<{
     | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
     | Array<InputMaybe<Scalars["String"]>>
     | InputMaybe<Scalars["String"]>;
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
 export type SubmitReply_createDynamicSelectReplyMutation = {
@@ -4221,6 +4233,7 @@ export type UpdateReply_updateSimpleReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
   reply: Scalars["String"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
 export type UpdateReply_updateSimpleReplyMutation = {
@@ -4237,6 +4250,7 @@ export type UpdateReply_updateCheckboxReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
   values: Array<Scalars["String"]> | Scalars["String"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
 export type UpdateReply_updateCheckboxReplyMutation = {
@@ -4256,6 +4270,7 @@ export type UpdateReply_updateDynamicSelectReplyMutationVariables = Exact<{
     | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
     | Array<InputMaybe<Scalars["String"]>>
     | InputMaybe<Scalars["String"]>;
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
 export type UpdateReply_updateDynamicSelectReplyMutation = {
@@ -4272,6 +4287,7 @@ export type UpdateReply_updateFileUploadReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
   file: Scalars["Upload"];
+  status?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
 export type UpdateReply_updateFileUploadReplyMutation = {
@@ -4959,8 +4975,13 @@ export const EventSubscriptions_deleteSubscriptionDocument = gql`
   EventSubscriptions_deleteSubscriptionMutationVariables
 >;
 export const SubmitReply_createSimpleReplyDocument = gql`
-  mutation SubmitReply_createSimpleReply($petitionId: GID!, $fieldId: GID!, $reply: String!) {
-    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+  mutation SubmitReply_createSimpleReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $reply: String!
+    $status: PetitionFieldReplyStatus
+  ) {
+    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply, status: $status) {
       ...PetitionFieldReply
     }
   }
@@ -4970,8 +4991,18 @@ export const SubmitReply_createSimpleReplyDocument = gql`
   SubmitReply_createSimpleReplyMutationVariables
 >;
 export const SubmitReply_createCheckboxReplyDocument = gql`
-  mutation SubmitReply_createCheckboxReply($petitionId: GID!, $fieldId: GID!, $reply: [String!]!) {
-    createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $reply) {
+  mutation SubmitReply_createCheckboxReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $reply: [String!]!
+    $status: PetitionFieldReplyStatus
+  ) {
+    createCheckboxReply(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      values: $reply
+      status: $status
+    ) {
       ...PetitionFieldReply
     }
   }
@@ -4981,8 +5012,18 @@ export const SubmitReply_createCheckboxReplyDocument = gql`
   SubmitReply_createCheckboxReplyMutationVariables
 >;
 export const SubmitReply_createFileUploadReplyDocument = gql`
-  mutation SubmitReply_createFileUploadReply($petitionId: GID!, $fieldId: GID!, $file: Upload!) {
-    createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+  mutation SubmitReply_createFileUploadReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $file: Upload!
+    $status: PetitionFieldReplyStatus
+  ) {
+    createFileUploadReply(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      file: $file
+      status: $status
+    ) {
       ...PetitionFieldReply
     }
   }
@@ -4996,8 +5037,14 @@ export const SubmitReply_createDynamicSelectReplyDocument = gql`
     $petitionId: GID!
     $fieldId: GID!
     $value: [[String]!]!
+    $status: PetitionFieldReplyStatus
   ) {
-    createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
+    createDynamicSelectReply(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      value: $value
+      status: $status
+    ) {
       ...PetitionFieldReply
     }
   }
@@ -5007,8 +5054,13 @@ export const SubmitReply_createDynamicSelectReplyDocument = gql`
   SubmitReply_createDynamicSelectReplyMutationVariables
 >;
 export const UpdateReply_updateSimpleReplyDocument = gql`
-  mutation UpdateReply_updateSimpleReply($petitionId: GID!, $replyId: GID!, $reply: String!) {
-    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+  mutation UpdateReply_updateSimpleReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $reply: String!
+    $status: PetitionFieldReplyStatus
+  ) {
+    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply, status: $status) {
       ...PetitionFieldReply
     }
   }
@@ -5018,8 +5070,18 @@ export const UpdateReply_updateSimpleReplyDocument = gql`
   UpdateReply_updateSimpleReplyMutationVariables
 >;
 export const UpdateReply_updateCheckboxReplyDocument = gql`
-  mutation UpdateReply_updateCheckboxReply($petitionId: GID!, $replyId: GID!, $values: [String!]!) {
-    updateCheckboxReply(petitionId: $petitionId, replyId: $replyId, values: $values) {
+  mutation UpdateReply_updateCheckboxReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $values: [String!]!
+    $status: PetitionFieldReplyStatus
+  ) {
+    updateCheckboxReply(
+      petitionId: $petitionId
+      replyId: $replyId
+      values: $values
+      status: $status
+    ) {
       ...PetitionFieldReply
     }
   }
@@ -5033,8 +5095,14 @@ export const UpdateReply_updateDynamicSelectReplyDocument = gql`
     $petitionId: GID!
     $replyId: GID!
     $value: [[String]!]!
+    $status: PetitionFieldReplyStatus
   ) {
-    updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
+    updateDynamicSelectReply(
+      petitionId: $petitionId
+      replyId: $replyId
+      value: $value
+      status: $status
+    ) {
       ...PetitionFieldReply
     }
   }
@@ -5044,8 +5112,18 @@ export const UpdateReply_updateDynamicSelectReplyDocument = gql`
   UpdateReply_updateDynamicSelectReplyMutationVariables
 >;
 export const UpdateReply_updateFileUploadReplyDocument = gql`
-  mutation UpdateReply_updateFileUploadReply($petitionId: GID!, $replyId: GID!, $file: Upload!) {
-    updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+  mutation UpdateReply_updateFileUploadReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $file: Upload!
+    $status: PetitionFieldReplyStatus
+  ) {
+    updateFileUploadReply(
+      petitionId: $petitionId
+      replyId: $replyId
+      file: $file
+      status: $status
+    ) {
       ...PetitionFieldReply
     }
   }

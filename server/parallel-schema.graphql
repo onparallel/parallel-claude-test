@@ -182,11 +182,6 @@ type CreateFileUploadFieldAttachment {
   presignedPostData: AWSPresignedPostData!
 }
 
-type CreateFileUploadReply {
-  presignedPostData: AWSPresignedPostData!
-  reply: PetitionFieldReply!
-}
-
 interface CreatedAt {
   """
   Time when the resource was created.
@@ -249,6 +244,11 @@ input FileUploadInput {
   contentType: String!
   filename: String!
   size: Int!
+}
+
+type FileUploadReplyInput {
+  presignedPostData: AWSPresignedPostData!
+  reply: PetitionFieldReply!
 }
 
 enum FilterSharedWithLogicalOperator {
@@ -511,7 +511,12 @@ type Mutation {
   """
   Creates a reply to a checkbox field.
   """
-  createCheckboxReply(fieldId: GID!, petitionId: GID!, values: [String!]!): PetitionFieldReply!
+  createCheckboxReply(
+    fieldId: GID!
+    petitionId: GID!
+    status: PetitionFieldReplyStatus
+    values: [String!]!
+  ): PetitionFieldReply!
 
   """
   Create a contact.
@@ -524,6 +529,7 @@ type Mutation {
   createDynamicSelectReply(
     fieldId: GID!
     petitionId: GID!
+    status: PetitionFieldReplyStatus
     value: [[String]!]!
   ): PetitionFieldReply!
 
@@ -547,7 +553,13 @@ type Mutation {
     fieldId: GID!
     file: FileUploadInput!
     petitionId: GID!
-  ): CreateFileUploadReply!
+    status: PetitionFieldReplyStatus
+  ): FileUploadReplyInput!
+
+  """
+  Notifies the backend that the upload is complete.
+  """
+  createFileUploadReplyComplete(petitionId: GID!, replyId: GID!): PetitionFieldReply!
 
   """
   Creates a new organization.
@@ -646,7 +658,12 @@ type Mutation {
   """
   Creates a reply to a text or select field.
   """
-  createSimpleReply(fieldId: GID!, petitionId: GID!, reply: String!): PetitionFieldReply!
+  createSimpleReply(
+    fieldId: GID!
+    petitionId: GID!
+    reply: String!
+    status: PetitionFieldReplyStatus
+  ): PetitionFieldReply!
 
   """
   Creates a tag in the user's organization
@@ -772,11 +789,6 @@ type Mutation {
     userGroupIds: [GID!]
     userIds: [GID!]
   ): [Petition!]!
-
-  """
-  Notifies the backend that the upload is complete.
-  """
-  fileUploadReplyComplete(petitionId: GID!, replyId: GID!): PetitionFieldReply!
 
   """
   Generates a download link for a file reply.
@@ -1158,7 +1170,12 @@ type Mutation {
   """
   Updates a reply of a checkbox field
   """
-  updateCheckboxReply(petitionId: GID!, replyId: GID!, values: [String!]!): PetitionFieldReply!
+  updateCheckboxReply(
+    petitionId: GID!
+    replyId: GID!
+    status: PetitionFieldReplyStatus
+    values: [String!]!
+  ): PetitionFieldReply!
 
   """
   Updates a contact.
@@ -1171,6 +1188,7 @@ type Mutation {
   updateDynamicSelectReply(
     petitionId: GID!
     replyId: GID!
+    status: PetitionFieldReplyStatus
     value: [[String]!]!
   ): PetitionFieldReply!
 
@@ -1185,9 +1203,19 @@ type Mutation {
   updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): PetitionBase!
 
   """
-  Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3.
+  Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation.
   """
-  updateFileUploadReply(file: Upload!, petitionId: GID!, replyId: GID!): PetitionFieldReply!
+  updateFileUploadReply(
+    file: FileUploadInput!
+    petitionId: GID!
+    replyId: GID!
+    status: PetitionFieldReplyStatus
+  ): FileUploadReplyInput!
+
+  """
+  Notifies the backend that the new file was successfully uploaded to S3. Marks the file upload as completed and deletes the old file.
+  """
+  updateFileUploadReplyComplete(petitionId: GID!, replyId: GID!): PetitionFieldReply!
 
   """
   Updates the metadata of a public landing template.
@@ -1332,7 +1360,12 @@ type Mutation {
   """
   Updates a reply to a text or select field.
   """
-  updateSimpleReply(petitionId: GID!, reply: String!, replyId: GID!): PetitionFieldReply!
+  updateSimpleReply(
+    petitionId: GID!
+    reply: String!
+    replyId: GID!
+    status: PetitionFieldReplyStatus
+  ): PetitionFieldReply!
 
   """
   Updates the name and color of a given tag

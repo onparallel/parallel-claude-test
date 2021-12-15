@@ -947,6 +947,7 @@ api
                 petitionId: params.petitionId,
                 fieldId: body.fieldId,
                 reply: body.reply,
+                status: body.status,
               }
             );
             return Ok({ ...createSimpleReply, content: createSimpleReply.content.text });
@@ -962,6 +963,7 @@ api
                 petitionId: params.petitionId,
                 fieldId: body.fieldId,
                 reply: body.reply as string[],
+                status: body.status,
               }
             );
             return Ok({ ...createCheckboxReply, content: createCheckboxReply.content.choices });
@@ -981,6 +983,7 @@ api
                 petitionId: params.petitionId,
                 fieldId: body.fieldId,
                 value: labels.map((label, i) => [label, replies[i]]),
+                status: body.status,
               }
             );
             return Ok({
@@ -998,6 +1001,7 @@ api
                 petitionId: params.petitionId,
                 fieldId: body.fieldId,
                 file: createReadStream(file.path),
+                status: body.status,
               }
             );
 
@@ -1037,8 +1041,8 @@ api
       operationId: "UpdateReply",
       summary: "Update a reply",
       description: outdent`
-        Updates the \`content\` of a previously submitted reply.
-        The \`status\` of the reply must be \`PENDING\` or \`REJECTED\`.
+        Updates the \`content\` and \`status\` of a previously submitted reply.
+        In order to update the content of the reply, its \`status\` must be \`PENDING\` or \`REJECTED\` or you must pass \`PENDING\` or \`REJECTED\` as new status in the request body.
       `,
       responses: {
         201: SuccessResponse(PetitionFieldReply),
@@ -1070,6 +1074,7 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: body.reply,
+                status: body.status,
               }
             );
             return Ok({ ...updateSimpleReply, content: updateSimpleReply.content.text });
@@ -1085,6 +1090,7 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 values: body.reply,
+                status: body.status,
               }
             );
             return Ok({ ...updateCheckboxReply, content: updateCheckboxReply.content.choices });
@@ -1103,6 +1109,7 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 value: labels.map((label, i) => [label, replies[i]]),
+                status: body.status,
               }
             );
             return Ok({
@@ -1120,6 +1127,7 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 file: createReadStream(file.path),
+                status: body.status,
               }
             );
 
@@ -1135,7 +1143,9 @@ api
               `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
             );
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
-            throw new BadRequestError("The reply is already approved and cannot be modified.");
+            throw new BadRequestError(
+              "The reply is already approved and cannot be modified. You can pass `APPROVED` as status to confirm and approve your new reply."
+            );
           } else if (containsGraphQLError(error, "FIELD_ALREADY_VALIDATED_ERROR")) {
             throw new BadRequestError(
               "The field is already validated and does not accept any modification in its replies."

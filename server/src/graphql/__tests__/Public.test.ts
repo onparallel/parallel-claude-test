@@ -1281,7 +1281,7 @@ describe("GraphQL/Public", () => {
           },
         });
 
-        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+        expect(errors).toContainGraphQLError("MAX_FILE_SIZE_EXCEEDED_ERROR");
         expect(data).toBeNull();
       });
 
