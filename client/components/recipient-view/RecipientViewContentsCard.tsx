@@ -57,10 +57,9 @@ export function RecipientViewContentsCard({
       </CardHeader>
       <Stack as={List} spacing={1} paddingY={2} paddingX={1.5}>
         {pages.map(({ title, commentCount, hasUnreadComments }, index) => {
-          let url = `/petition/${query.keycode}/${index + 1}`;
-          if (query.petitionId) {
-            url = `/app/petitions/${query.petitionId}/preview?page=${index + 1}`;
-          }
+          const url = query.petitionId
+            ? `/app/petitions/${query.petitionId}/preview?page=${index + 1}`
+            : `/petition/${query.keycode}/${index + 1}`;
 
           return (
             <ListItem key={index}>

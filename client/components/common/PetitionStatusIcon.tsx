@@ -41,7 +41,6 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
 
     return (
       <Tooltip label={getTooltipLabel()}>
-        {/* TODO: Substituir por el futuro componente SWITCH de conditions.jsx*/}
         {status === "DRAFT" ? (
           <EditIcon ref={ref} boxSize="18px" color="gray.500" {...props} />
         ) : status === "PENDING" ? (

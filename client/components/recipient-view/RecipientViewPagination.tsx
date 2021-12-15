@@ -104,10 +104,9 @@ function PageLink({
     />
   );
 
-  let url = `/petition/${query.keycode}/${page}`;
-  if (query.petitionId) {
-    url = `/app/petitions/${query.petitionId}/preview?page=${page}`;
-  }
+  const url = query.petitionId
+    ? `/app/petitions/${query.petitionId}/preview?page=${page}`
+    : `/petition/${query.keycode}/${page}`;
 
   return props.isDisabled ? button : <NakedLink href={url}>{button}</NakedLink>;
 }
