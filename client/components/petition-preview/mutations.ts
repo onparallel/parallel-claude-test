@@ -18,7 +18,6 @@ import {
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { uploadFile } from "@parallel/utils/uploadFile";
 import { MutableRefObject, useCallback } from "react";
-import { pick } from "remeda";
 import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 
 const _deletePetitionReply = gql`
@@ -28,6 +27,8 @@ const _deletePetitionReply = gql`
 `;
 
 export function useDeletePetitionReply() {
+  const { cache } = useApolloClient();
+
   const [deletePetitionReply] = useMutation(
     PreviewPetitionFieldMutations_deletePetitionReplyDocument,
     { optimisticResponse: { deletePetitionReply: "SUCCESS" } }
@@ -37,22 +38,29 @@ export function useDeletePetitionReply() {
       petitionId,
       fieldId,
       replyId,
+      isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
       replyId: string;
+      isCacheOnly?: boolean;
     }) {
-      await deletePetitionReply({
-        variables: { petitionId, replyId },
-        update(cache) {
-          updateFieldReplies(cache, fieldId, (replies) =>
-            replies.filter(({ id }) => id !== replyId)
-          );
-          updatePetitionStatus(cache, petitionId);
-        },
-      });
+      if (isCacheOnly) {
+        updateFieldReplies(cache, fieldId, (replies) => replies.filter(({ id }) => id !== replyId));
+        updatePetitionStatus(cache, petitionId);
+      } else {
+        await deletePetitionReply({
+          variables: { petitionId, replyId },
+          update(cache) {
+            updateFieldReplies(cache, fieldId, (replies) =>
+              replies.filter(({ id }) => id !== replyId)
+            );
+            updatePetitionStatus(cache, petitionId);
+          },
+        });
+      }
     },
-    [deletePetitionReply]
+    [deletePetitionReply, cache]
   );
 }
 
@@ -72,31 +80,42 @@ const _updateSimpleReply = gql`
 `;
 
 export function useUpdateSimpleReply() {
+  const { cache } = useApolloClient();
   const [updateSimpleReply] = useMutation(PreviewPetitionFieldMutations_updateSimpleReplyDocument);
   return useCallback(
     async function _updateSimpleReply({
       petitionId,
       replyId,
       reply,
+      isCacheOnly,
     }: {
       petitionId: string;
       replyId: string;
       reply: string;
+      isCacheOnly?: boolean;
     }) {
-      await updateSimpleReply({
-        variables: {
-          petitionId,
-          replyId,
-          reply,
-        },
-        update(cache, { data }) {
-          if (data) {
-            updatePetitionStatus(cache, petitionId);
-          }
-        },
-      });
+      if (isCacheOnly) {
+        updateReplyContent(cache, replyId, (content) => ({
+          ...content,
+          text: reply,
+        }));
+        updatePetitionStatus(cache, petitionId);
+      } else {
+        await updateSimpleReply({
+          variables: {
+            petitionId,
+            replyId,
+            reply,
+          },
+          update(cache, { data }) {
+            if (data) {
+              updatePetitionStatus(cache, petitionId);
+            }
+          },
+        });
+      }
     },
-    [updateSimpleReply]
+    [updateSimpleReply, cache]
   );
 }
 
@@ -114,36 +133,55 @@ const _createSimpleReply = gql`
 `;
 
 export function useCreateSimpleReply() {
+  const { cache } = useApolloClient();
+
   const [createSimpleReply] = useMutation(PreviewPetitionFieldMutations_createSimpleReplyDocument);
   return useCallback(
     async function _createSimpleReply({
       petitionId,
       fieldId,
       reply,
+      isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
       reply: string;
+      isCacheOnly?: boolean;
     }) {
-      const { data } = await createSimpleReply({
-        variables: {
-          petitionId,
-          fieldId,
-          reply,
-        },
-        update(cache, { data }) {
-          updateFieldReplies(cache, fieldId, (replies) => [
-            ...replies,
-            pick(data!.createSimpleReply, ["id", "__typename"]),
-          ]);
-          if (data) {
-            updatePetitionStatus(cache, petitionId);
-          }
-        },
-      });
-      return data?.createSimpleReply;
+      if (isCacheOnly) {
+        const random = Math.floor(1000000 + Math.random() * 9000000);
+        const id = `${fieldId}-${random}`;
+        updateFieldReplies(cache, fieldId, (replies) => [
+          ...replies,
+          {
+            id,
+            __typename: "PetitionFieldReply",
+            status: "PENDING",
+            content: { text: reply },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ]);
+        updatePetitionStatus(cache, petitionId);
+        return { id, __typename: "PetitionFieldReply" };
+      } else {
+        const { data } = await createSimpleReply({
+          variables: {
+            petitionId,
+            fieldId,
+            reply,
+          },
+          update(cache, { data }) {
+            updateFieldReplies(cache, fieldId, (replies) => [...replies, data!.createSimpleReply]);
+            if (data) {
+              updatePetitionStatus(cache, petitionId);
+            }
+          },
+        });
+        return data?.createSimpleReply;
+      }
     },
-    [createSimpleReply]
+    [createSimpleReply, cache]
   );
 }
 
@@ -181,10 +219,7 @@ export function useCreateCheckboxReply() {
           values,
         },
         update(cache, { data }) {
-          updateFieldReplies(cache, fieldId, (replies) => [
-            ...replies,
-            pick(data!.createCheckboxReply, ["id", "__typename"]),
-          ]);
+          updateFieldReplies(cache, fieldId, (replies) => [...replies, data!.createCheckboxReply]);
           if (data) {
             updatePetitionStatus(cache, petitionId);
           }
@@ -278,7 +313,7 @@ export function useCreateDynamicSelectReply() {
         update(cache, { data }) {
           updateFieldReplies(cache, fieldId, (replies) => [
             ...replies,
-            pick(data!.createDynamicSelectReply, ["id", "__typename"]),
+            data!.createDynamicSelectReply,
           ]);
           if (data) {
             updatePetitionStatus(cache, petitionId);
@@ -401,10 +436,7 @@ export function useCreateFileUploadReply() {
           },
           update(cache, { data }) {
             const reply = data!.createFileUploadReply.reply;
-            updateFieldReplies(cache, fieldId, (replies) => [
-              ...replies,
-              pick(reply, ["id", "__typename"]),
-            ]);
+            updateFieldReplies(cache, fieldId, (replies) => [...replies, reply]);
             updateReplyContent(cache, reply.id, (content) => ({
               ...content,
               progress: 0,
@@ -457,6 +489,10 @@ updateFieldReplies.fragments = {
     fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionField on PetitionField {
       replies {
         id
+        content
+        status
+        createdAt
+        updatedAt
       }
     }
   `,

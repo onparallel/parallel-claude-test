@@ -8052,7 +8052,14 @@ export type PreviewPetitionFieldMutations_fileUploadReplyCompleteMutation = {
 
 export type PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
-  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  }>;
 };
 
 export type PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment = {
@@ -17519,6 +17526,10 @@ export const PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragm
   fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionField on PetitionField {
     replies {
       id
+      content
+      status
+      createdAt
+      updatedAt
     }
   }
 ` as unknown as DocumentNode<

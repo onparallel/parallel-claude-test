@@ -176,6 +176,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                           !field.optional
                         }
                         hasCommentsEnabled={field.options.hasCommentsEnabled}
+                        isCacheOnly={!isPetition}
                       />
                     </motion.div>
                   ))}

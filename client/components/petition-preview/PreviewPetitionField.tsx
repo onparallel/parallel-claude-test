@@ -41,6 +41,7 @@ export interface PreviewPetitionFieldProps
   > {
   petitionId: string;
   isDisabled: boolean;
+  isCacheOnly: boolean;
 }
 
 export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
@@ -81,6 +82,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
           petitionId: props.petitionId,
           fieldId: props.field.id,
           replyId,
+          isCacheOnly: props.isCacheOnly,
         });
       } catch {}
     },
@@ -95,6 +97,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
           petitionId: props.petitionId,
           replyId,
           reply,
+          isCacheOnly: props.isCacheOnly,
         });
       } catch {}
     },
@@ -109,6 +112,7 @@ export function PreviewPetitionField(props: PreviewPetitionFieldProps) {
           petitionId: props.petitionId,
           fieldId: props.field.id,
           reply,
+          isCacheOnly: props.isCacheOnly,
         });
         return res?.id;
       } catch {}
