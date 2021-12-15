@@ -1,4 +1,3 @@
-import { createReadStream } from "fs";
 import { mkdir, unlink } from "fs/promises";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import multer from "multer";
@@ -42,6 +41,7 @@ import {
   mapTemplate,
   paginationParams,
   sortByParam,
+  uploadFile,
   waitForTask,
 } from "./helpers";
 import {
@@ -109,6 +109,7 @@ import {
   StopSharing_removePetitionPermissionDocument,
   SubmitReply_createCheckboxReplyDocument,
   SubmitReply_createDynamicSelectReplyDocument,
+  SubmitReply_createFileUploadReplyCompleteDocument,
   SubmitReply_createFileUploadReplyDocument,
   SubmitReply_createSimpleReplyDocument,
   SubmitReply_petitionDocument,
@@ -119,6 +120,7 @@ import {
   UpdateReply_petitionDocument,
   UpdateReply_updateCheckboxReplyDocument,
   UpdateReply_updateDynamicSelectReplyDocument,
+  UpdateReply_updateFileUploadReplyCompleteDocument,
   UpdateReply_updateFileUploadReplyDocument,
   UpdateReply_updateSimpleReplyDocument,
 } from "./__types";
@@ -889,7 +891,7 @@ const replyId = idParam({
   description: "The ID of the reply",
 });
 
-const uploadFile = multer({
+const uploadFileMiddleware = multer({
   storage: multer.diskStorage({
     destination: callbackify(async function (req: any, file: any) {
       const path = `/tmp/${random(16)}`;
@@ -908,7 +910,7 @@ api
   })
   .post(
     {
-      middleware: uploadFile.single("reply"),
+      middleware: uploadFileMiddleware.single("reply"),
       operationId: "SubmitReply",
       summary: "Submit a reply",
       description: outdent`
@@ -995,18 +997,30 @@ api
             if (!file) {
               throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
             }
-            const { createFileUploadReply } = await client.request(
-              SubmitReply_createFileUploadReplyDocument,
-              {
-                petitionId: params.petitionId,
-                fieldId: body.fieldId,
-                file: createReadStream(file.path),
-                status: body.status,
-              }
-            );
+            const {
+              createFileUploadReply: { presignedPostData, reply },
+            } = await client.request(SubmitReply_createFileUploadReplyDocument, {
+              petitionId: params.petitionId,
+              fieldId: body.fieldId,
+              file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
+              status: body.status,
+            });
 
-            await unlink(file.path);
-            return Ok(createFileUploadReply);
+            const uploadResponse = await uploadFile(file, presignedPostData);
+            if (uploadResponse.ok) {
+              await unlink(file.path);
+              const { createFileUploadReplyComplete } = await client.request(
+                SubmitReply_createFileUploadReplyCompleteDocument,
+                {
+                  petitionId: params.petitionId,
+                  replyId: reply.id,
+                }
+              );
+
+              return Ok(createFileUploadReplyComplete);
+            } else {
+              throw new BadRequestError(uploadResponse.statusText);
+            }
           default:
             throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
         }
@@ -1037,12 +1051,12 @@ api
   })
   .put(
     {
-      middleware: uploadFile.single("reply"),
+      middleware: uploadFileMiddleware.single("reply"),
       operationId: "UpdateReply",
       summary: "Update a reply",
       description: outdent`
         Updates the \`content\` and \`status\` of a previously submitted reply.
-        In order to update the content of the reply, its \`status\` must be \`PENDING\` or \`REJECTED\` or you must pass \`PENDING\` or \`REJECTED\` as new status in the request body.
+        In order to update the content of the reply, its \`status\` must be \`PENDING\` or \`REJECTED\` or you must pass a new \`status\` in the request body.
       `,
       responses: {
         201: SuccessResponse(PetitionFieldReply),
@@ -1121,18 +1135,31 @@ api
             if (!file) {
               throw new BadRequestError(`Reply for ${fieldType} field must be a single file.`);
             }
-            const { updateFileUploadReply } = await client.request(
-              UpdateReply_updateFileUploadReplyDocument,
-              {
-                petitionId: params.petitionId,
-                replyId: params.replyId,
-                file: createReadStream(file.path),
-                status: body.status,
-              }
-            );
+            const {
+              updateFileUploadReply: { presignedPostData, reply },
+            } = await client.request(UpdateReply_updateFileUploadReplyDocument, {
+              petitionId: params.petitionId,
+              replyId: params.replyId,
+              file: { contentType: file.mimetype, filename: file.originalname, size: file.size },
+              status: body.status,
+            });
 
-            await unlink(file.path);
-            return Ok(updateFileUploadReply);
+            const uploadResponse = await uploadFile(file, presignedPostData);
+            if (uploadResponse.ok) {
+              await unlink(file.path);
+              const { updateFileUploadReplyComplete } = await client.request(
+                UpdateReply_updateFileUploadReplyCompleteDocument,
+                {
+                  petitionId: params.petitionId,
+                  replyId: reply.id,
+                }
+              );
+
+              return Ok(updateFileUploadReplyComplete);
+            } else {
+              throw new BadRequestError(uploadResponse.statusText);
+            }
+
           default:
             throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
         }

@@ -1,5 +1,12 @@
 import { gql } from "graphql-request";
 
+export const AWSPresignedPostDataFragment = gql`
+  fragment AWSPresignedPostData on AWSPresignedPostData {
+    fields
+    url
+  }
+`;
+
 export const UserFragment = gql`
   fragment User on User {
     id

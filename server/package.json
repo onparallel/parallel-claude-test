@@ -64,6 +64,7 @@
     "fast-safe-stringify": "^2.1.1",
     "file-type": "^16.5.3",
     "fold-to-ascii": "^5.0.0",
+    "form-data": "^4.0.0",
     "fuse.js": "^6.4.6",
     "graphemer": "^1.2.0",
     "graphql": "^16.1.0",
@@ -169,5 +170,8 @@
     "ts-jest": "^27.1.1",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.5.2"
+  },
+  "resolutions": {
+    "graphql": "^16.1.0"
   }
 }

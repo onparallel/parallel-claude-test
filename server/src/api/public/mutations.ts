@@ -1,5 +1,5 @@
 import { gql } from "graphql-request";
-import { PetitionFieldReplyFragment } from "./fragments";
+import { AWSPresignedPostDataFragment, PetitionFieldReplyFragment } from "./fragments";
 
 gql`
   mutation SubmitReply_createSimpleReply(
@@ -36,7 +36,7 @@ gql`
   mutation SubmitReply_createFileUploadReply(
     $petitionId: GID!
     $fieldId: GID!
-    $file: Upload!
+    $file: FileUploadInput!
     $status: PetitionFieldReplyStatus
   ) {
     createFileUploadReply(
@@ -45,6 +45,20 @@ gql`
       file: $file
       status: $status
     ) {
+      presignedPostData {
+        ...AWSPresignedPostData
+      }
+      reply {
+        ...PetitionFieldReply
+      }
+    }
+  }
+  ${AWSPresignedPostDataFragment}
+  ${PetitionFieldReplyFragment}
+`;
+gql`
+  mutation SubmitReply_createFileUploadReplyComplete($petitionId: GID!, $replyId: GID!) {
+    createFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
       ...PetitionFieldReply
     }
   }
@@ -122,7 +136,7 @@ gql`
   mutation UpdateReply_updateFileUploadReply(
     $petitionId: GID!
     $replyId: GID!
-    $file: Upload!
+    $file: FileUploadInput!
     $status: PetitionFieldReplyStatus
   ) {
     updateFileUploadReply(
@@ -131,6 +145,20 @@ gql`
       file: $file
       status: $status
     ) {
+      presignedPostData {
+        ...AWSPresignedPostData
+      }
+      reply {
+        ...PetitionFieldReply
+      }
+    }
+  }
+  ${AWSPresignedPostDataFragment}
+  ${PetitionFieldReplyFragment}
+`;
+gql`
+  mutation UpdateReply_updateFileUploadReplyComplete($petitionId: GID!, $replyId: GID!) {
+    updateFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
       ...PetitionFieldReply
     }
   }

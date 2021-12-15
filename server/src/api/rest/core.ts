@@ -9,7 +9,7 @@ import { MaybeArray, MaybePromise } from "../../util/types";
 import { HttpError, InvalidParameterError, UnknownError } from "./errors";
 import { ParseError } from "./params";
 
-type File = Exclude<Request["file"], undefined>;
+export type File = Exclude<Request["file"], undefined>;
 
 export type RestMethod = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
 

@@ -1,8 +1,12 @@
+import FormData from "form-data";
+import { createReadStream } from "fs";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
+import fetch from "node-fetch";
 import { performance } from "perf_hooks";
 import { omit, pipe } from "remeda";
+import { promisify } from "util";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { RestParameter } from "../rest/core";
+import { File, RestParameter } from "../rest/core";
 import { InternalError } from "../rest/errors";
 import {
   buildDefinition,
@@ -15,6 +19,7 @@ import {
 } from "../rest/params";
 import { TaskFragment } from "./fragments";
 import {
+  AWSPresignedPostDataFragment,
   getTags_tagsDocument,
   getTaskResultFileUrl_getTaskResultFileUrlDocument,
   PetitionFieldType,
@@ -207,4 +212,24 @@ export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType
   } else {
     return result.getTaskResultFileUrl.url!;
   }
+}
+
+export async function uploadFile(file: File, presignedPostData: AWSPresignedPostDataFragment) {
+  const formData = new FormData();
+  Object.keys(presignedPostData.fields).forEach((key) => {
+    formData.append(key, presignedPostData.fields[key]);
+  });
+  formData.append("Content-Type", file.mimetype);
+  formData.append("file", createReadStream(file.path));
+
+  const contentLength = await promisify(formData.getLength)();
+
+  return await fetch(presignedPostData.url, {
+    method: "POST",
+    body: formData,
+    headers: {
+      "Content-Type": `multipart/form-data; boundary=${formData.getBoundary()}`,
+      "Content-Length": contentLength.toString(),
+    },
+  });
 }
