@@ -5,16 +5,30 @@ import { Card } from "@parallel/components/common/Card";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Linkify } from "@parallel/components/common/Linkify";
-import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  RecipientViewPetitionFieldCard_PetitionFieldFragment,
+  RecipientViewPetitionFieldCard_PetitionFieldReplyFragment,
+  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
+  RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
+} from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewPetitionFieldCommentsDialog } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
+import { countBy } from "remeda";
+
+export type RecipientViewPetitionFieldCard_PetitionFieldSelection =
+  | RecipientViewPetitionFieldCard_PublicPetitionFieldFragment
+  | RecipientViewPetitionFieldCard_PetitionFieldFragment;
+
+export type RecipientViewPetitionFieldCard_PetitionFieldReplySelection =
+  | RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment
+  | RecipientViewPetitionFieldCard_PetitionFieldReplyFragment;
 
 export interface RecipientViewPetitionFieldCardProps {
-  field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
+  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
   isInvalid: boolean;
   hasCommentsEnabled: boolean;
   showAddNewReply?: boolean;
@@ -39,6 +53,15 @@ export function RecipientViewPetitionFieldCard({
   const intl = useIntl();
 
   const fieldReplies = completedFieldReplies(field);
+  const { commentCount, unreadCommentCount } =
+    field.__typename === "PublicPetitionField"
+      ? field
+      : field.__typename === "PetitionField"
+      ? {
+          commentCount: field.comments.length,
+          unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
+        }
+      : (null as never);
 
   return (
     <Card
@@ -77,8 +100,8 @@ export function RecipientViewPetitionFieldCard({
         </Box>
         {hasCommentsEnabled ? (
           <CommentsButton
-            commentCount={field.commentCount}
-            hasUnreadComments={field.unreadCommentCount > 0}
+            commentCount={commentCount}
+            hasUnreadComments={unreadCommentCount > 0}
             onClick={onCommentsButtonClick}
           />
         ) : null}
@@ -158,6 +181,10 @@ RecipientViewPetitionFieldCard.fragments = {
         }
         attachments {
           ...RecipientViewFieldAttachment_PetitionFieldAttachment
+        }
+        comments {
+          id
+          isUnread
         }
         ...RecipientViewPetitionFieldCommentsDialog_PetitionField
       }

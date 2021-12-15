@@ -13,7 +13,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
+  RecipientViewProgressFooter_PetitionFieldFragment,
   RecipientViewProgressFooter_PetitionFragment,
+  RecipientViewProgressFooter_PublicPetitionFieldFragment,
   RecipientViewProgressFooter_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
@@ -27,25 +29,31 @@ import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { Spacer } from "../common/Spacer";
 import { useTone } from "../common/ToneProvider";
 
+type PetitionSelection =
+  | RecipientViewProgressFooter_PublicPetitionFragment
+  | RecipientViewProgressFooter_PetitionFragment;
+
+type PetitionFieldSelection =
+  | RecipientViewProgressFooter_PublicPetitionFieldFragment
+  | RecipientViewProgressFooter_PetitionFieldFragment;
+
 export interface RecipientViewProgressFooterProps extends CardProps {
-  petition:
-    | RecipientViewProgressFooter_PublicPetitionFragment
-    | RecipientViewProgressFooter_PetitionFragment;
+  petition: PetitionSelection;
   onFinalize: () => void;
 }
 
 export function RecipientViewProgressFooter({
-  petition,
+  petition: { status, fields, signatureConfig },
   onFinalize,
   ...props
 }: RecipientViewProgressFooterProps) {
-  const fieldVisibility = useFieldVisibility(petition.fields);
+  const visibility = useFieldVisibility(fields);
   const [poppoverClosed, setPoppoverClosed] = useState(false);
   const { replied, optional, total } = useMemo(() => {
     let replied = 0;
     let optional = 0;
     let total = 0;
-    for (const [field, isVisible] of zip(petition.fields, fieldVisibility)) {
+    for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
       const fieldReplies = completedFieldReplies(field);
       if (isVisible && !field.isReadOnly) {
         replied += fieldReplies.length || field.validated ? 1 : 0;
@@ -54,11 +62,11 @@ export function RecipientViewProgressFooter({
       }
     }
     return { replied, optional, total };
-  }, [petition.fields, fieldVisibility]);
+  }, [fields, visibility]);
 
   const tone = useTone();
 
-  const isCompleted = petition.status === "COMPLETED";
+  const isCompleted = status === "COMPLETED";
   return (
     <Card
       display="flex"
@@ -118,7 +126,7 @@ export function RecipientViewProgressFooter({
       >
         <PopoverTrigger>
           <Button colorScheme="purple" size="sm" isDisabled={isCompleted} onClick={onFinalize}>
-            {petition.signatureConfig?.review === false ? (
+            {signatureConfig?.review === false ? (
               <FormattedMessage
                 id="recipient-view.submit-and-sign-button-short"
                 defaultMessage="Finalize and sign"

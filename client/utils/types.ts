@@ -13,6 +13,8 @@ export type If<Condition extends boolean | undefined, Then, Else = never> = Cond
   ? Then
   : Else;
 
+export type UnionToArrayUnion<T> = T extends any ? T[] : never;
+
 export interface Focusable {
   focus(options?: FocusOptions): void;
 }

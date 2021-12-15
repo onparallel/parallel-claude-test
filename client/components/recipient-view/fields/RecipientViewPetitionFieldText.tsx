@@ -2,7 +2,6 @@ import { Center, Flex, Input, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -15,6 +14,8 @@ import { pick } from "remeda";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
+  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
@@ -218,8 +219,8 @@ export function RecipientViewPetitionFieldText({
 }
 
 interface RecipientViewPetitionFieldReplyTextProps {
-  field: RecipientViewPetitionFieldTextProps["field"];
-  reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
+  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
   onUpdate: (content: string) => Promise<void>;
   onDelete: (focusPrev?: boolean) => void;

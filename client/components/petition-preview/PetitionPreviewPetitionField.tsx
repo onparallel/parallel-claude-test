@@ -1,3 +1,4 @@
+import { RecipientViewPetitionFieldCard_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { RecipientViewPetitionFieldCardProps } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 import {
@@ -16,8 +17,9 @@ import { RecipientViewPetitionFieldText } from "../recipient-view/fields/Recipie
 export interface PetitionPreviewPetitionFieldProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment"
+    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
+  field: RecipientViewPetitionFieldCard_PetitionFieldFragment;
   petitionId: string;
   isDisabled: boolean;
 }
@@ -83,7 +85,6 @@ export function PetitionPreviewPetitionField(props: PetitionPreviewPetitionField
     onCommentsButtonClick: handleCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment,
   };
-
   return props.field.type === "HEADING" ? (
     <RecipientViewPetitionFieldHeading {...props} {...commonProps} />
   ) : props.field.type === "TEXT" || props.field.type === "SHORT_TEXT" ? (

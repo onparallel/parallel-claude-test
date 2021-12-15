@@ -18,10 +18,6 @@ import { FileIcon } from "@parallel/components/common/FileIcon";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import {
-  RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
-  RecipientViewPetitionField_PublicPetitionFieldFragment,
-} from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,6 +26,8 @@ import { FormattedMessage, useIntl } from "react-intl";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
+  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 
 export interface RecipientViewPetitionFieldFileUploadProps
@@ -111,7 +109,7 @@ export function RecipientViewPetitionFieldFileUpload({
 }
 
 interface RecipientViewPetitionFieldReplyFileUploadProps {
-  reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
   onRemove: () => void;
   onDownload: (replyId: string) => void;
@@ -237,7 +235,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
 
 interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
   isDisabled: boolean;
-  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
+  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
   onCreateReply: (files: File[]) => void;
 }
 

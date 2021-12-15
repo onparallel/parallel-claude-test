@@ -5,19 +5,20 @@
 
 import { gql } from "@apollo/client";
 import {
-  useFieldVisibility_PublicPetitionFieldFragment,
   useFieldVisibility_PetitionFieldFragment,
+  useFieldVisibility_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { indexBy } from "remeda";
 import { completedFieldReplies } from "../completedFieldReplies";
+import { UnionToArrayUnion } from "../types";
 import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityCondition,
   PetitionFieldVisibilityConditionOperator,
 } from "./types";
 
-type VisibilityField =
+type PetitionFieldSelection =
   | useFieldVisibility_PublicPetitionFieldFragment
   | useFieldVisibility_PetitionFieldFragment;
 
@@ -60,7 +61,7 @@ function evaluatePredicate<T extends string | number | string[]>(
 
 function conditionIsMet(
   condition: PetitionFieldVisibilityCondition,
-  field: VisibilityField,
+  field: PetitionFieldSelection,
   isVisible: boolean
 ) {
   const replies = isVisible ? (field.replies as any[]) : [];
@@ -96,9 +97,9 @@ function conditionIsMet(
  * Returns an array with the visibilities corresponding to each field in the
  * passed array of fields.
  */
-export function useFieldVisibility<T extends VisibilityField>(fields: T[]) {
+export function useFieldVisibility(fields: UnionToArrayUnion<PetitionFieldSelection>) {
   return useMemo(() => {
-    const fieldsById = indexBy(fields, (f) => f.id);
+    const fieldsById = indexBy<PetitionFieldSelection>(fields, (f) => f.id);
     const visibilitiesById: { [fieldId: string]: boolean } = {};
     for (const field of fields) {
       if (field.visibility) {

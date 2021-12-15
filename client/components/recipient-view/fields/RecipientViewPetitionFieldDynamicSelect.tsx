@@ -1,10 +1,6 @@
 import { Box, Center, Flex, FormControl, FormLabel, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import {
-  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
-  RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
-} from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { DynamicSelectOption, FieldOptions } from "@parallel/utils/petitionFields";
 import { useRecipientViewReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -21,6 +17,8 @@ import { countBy } from "remeda";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
+  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
@@ -147,8 +145,8 @@ export function RecipientViewPetitionFieldDynamicSelect({
   );
 }
 interface RecipientViewPetitionFieldReplyDynamicSelectProps {
-  field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
-  reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
+  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled?: boolean;
   onChange: (content: [string, string | null][]) => Promise<void>;
   onDelete: () => void;
@@ -221,8 +219,8 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
 interface RecipientViewPetitionFieldReplyDynamicSelectLevelProps {
   label: string;
   level: number;
-  field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
-  reply?: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
+  reply?: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled?: boolean;
   onChange: (value: string) => Promise<void>;
   onDeleteReply?: () => void;

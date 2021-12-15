@@ -201,12 +201,8 @@ PetitionPreview.fragments = {
       fragment PetitionPreview_PetitionField on PetitionField {
         id
         ...RecipientViewPetitionFieldCard_PetitionField
-        ...RecipientViewContentsCard_PetitionField
-        ...RecipientViewProgressFooter_PetitionField
       }
       ${RecipientViewPetitionFieldCard.fragments.PetitionField}
-      ${RecipientViewContentsCard.fragments.PetitionField}
-      ${RecipientViewProgressFooter.fragments.PetitionField}
     `;
   },
   get PetitionBase() {
@@ -226,12 +222,12 @@ PetitionPreview.fragments = {
         fields {
           ...PetitionPreview_PetitionField
         }
+        ...RecipientViewContentsCard_PetitionBase
         ...PetitionLayout_PetitionBase
-        ...RecipientViewContentsCard_Petition
         ...RecipientViewProgressFooter_Petition
       }
       ${this.PetitionField}
-      ${RecipientViewContentsCard.fragments.Petition}
+      ${RecipientViewContentsCard.fragments.PetitionBase}
       ${RecipientViewProgressFooter.fragments.Petition}
       ${PetitionLayout.fragments.PetitionBase}
     `;

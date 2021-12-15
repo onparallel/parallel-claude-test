@@ -1,6 +1,7 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
+  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
@@ -44,8 +45,9 @@ import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText
 export interface RecipientViewPetitionFieldProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment"
+    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
+  field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
   keycode: string;
   access: RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment;
   petitionId: string;

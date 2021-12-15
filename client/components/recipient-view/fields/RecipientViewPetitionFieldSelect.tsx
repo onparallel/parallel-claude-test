@@ -1,7 +1,6 @@
 import { Box, Center, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useRecipientViewReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
@@ -14,6 +13,8 @@ import Select from "react-select";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
+  RecipientViewPetitionFieldCard_PetitionFieldReplySelection,
+  RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
@@ -159,8 +160,8 @@ export function RecipientViewPetitionFieldSelect({
 }
 
 interface RecipientViewPetitionFieldReplySelectProps {
-  field: RecipientViewPetitionFieldSelectProps["field"];
-  reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+  field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
+  reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
   onUpdate: (content: string) => Promise<void>;
   onDelete: () => void;

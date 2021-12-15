@@ -1,14 +1,25 @@
 import { gql } from "@apollo/client";
+import {
+  useGetPageFields_PetitionFieldFragment,
+  useGetPageFields_PublicPetitionFieldFragment,
+} from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useFieldVisibility } from "./fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "./groupFieldsByPage";
+import { UnionToArrayUnion } from "./types";
 
-// TODO: Fix types
-export function useGetPageFields(fields: any[], page: number) {
+type PetitionFieldSelection =
+  | useGetPageFields_PublicPetitionFieldFragment
+  | useGetPageFields_PetitionFieldFragment;
+
+export function useGetPageFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
+  fields: T,
+  page: number
+) {
   const visibility = useFieldVisibility(fields);
   return useMemo(() => {
-    const pages = groupFieldsByPages(fields, visibility);
-    return { fields: pages[page - 1], pages: pages.length, visibility };
+    const pages = groupFieldsByPages<PetitionFieldSelection>(fields, visibility);
+    return { fields: pages[page - 1] as T, pages: pages.length, visibility };
   }, [fields, page, visibility]);
 }
 

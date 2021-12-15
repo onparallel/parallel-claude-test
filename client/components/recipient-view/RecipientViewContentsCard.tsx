@@ -3,25 +3,31 @@ import { Box, Button, Flex, List, ListItem, Stack, Text, VisuallyHidden } from "
 import { ChevronFilledIcon, CommentIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewContentsCard_PetitionFieldFragment,
-  RecipientViewContentsCard_PetitionFragment,
+  RecipientViewContentsCard_PetitionBaseFragment,
   RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
-import { Maybe } from "@parallel/utils/types";
+import { Maybe, UnionToArrayUnion } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
-import { zip } from "remeda";
+import { countBy, zip } from "remeda";
 import { Card, CardHeader, CardProps } from "../common/Card";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
+type PetitionSelection =
+  | RecipientViewContentsCard_PublicPetitionFragment
+  | RecipientViewContentsCard_PetitionBaseFragment;
+
+type PetitionFieldSelection =
+  | RecipientViewContentsCard_PublicPetitionFieldFragment
+  | RecipientViewContentsCard_PetitionFieldFragment;
+
 interface RecipientViewContentsCardProps extends CardProps {
   currentPage: number;
-  petition:
-    | RecipientViewContentsCard_PublicPetitionFragment
-    | RecipientViewContentsCard_PetitionFragment;
+  petition: PetitionSelection;
 }
 
 export function RecipientViewContentsCard({
@@ -32,11 +38,7 @@ export function RecipientViewContentsCard({
   const { query } = useRouter();
   const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
 
-  const handleFocusField = (
-    field:
-      | RecipientViewContentsCard_PublicPetitionFieldFragment
-      | RecipientViewContentsCard_PetitionFieldFragment
-  ) => {
+  const handleFocusField = (field: PetitionFieldSelection) => {
     if (field.type === "SHORT_TEXT" || field.type === "TEXT") {
       const id = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
       const element = document.getElementById(id) as HTMLInputElement;
@@ -45,10 +47,10 @@ export function RecipientViewContentsCard({
     }
   };
 
-  const filteredFields = fields
+  const filteredFields = (fields as PetitionFieldSelection[])
     .filter((field) => (field.type === "HEADING" && !field.title ? false : true))
     // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
-    .slice(fields[0].title ? 1 : 0);
+    .slice(fields[0].title ? 1 : 0) as typeof fields;
 
   return (
     <Card display="flex" flexDirection="column" {...props}>
@@ -109,6 +111,15 @@ export function RecipientViewContentsCard({
               {index + 1 === currentPage ? (
                 <Stack as={List} spacing={1}>
                   {filteredFields.map((field) => {
+                    const { commentCount, unreadCommentCount } =
+                      field.__typename === "PublicPetitionField"
+                        ? field
+                        : field.__typename === "PetitionField"
+                        ? {
+                            commentCount: field.comments.length,
+                            unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
+                          }
+                        : (null as never);
                     return (
                       <ListItem key={field.id} position="relative">
                         <Text
@@ -153,10 +164,10 @@ export function RecipientViewContentsCard({
                                   />
                                 )}
                               </Box>
-                              {field.commentCount ? (
+                              {commentCount ? (
                                 <RecipientViewContentsIndicators
-                                  hasUnreadComments={!!field.unreadCommentCount}
-                                  commentCount={field.commentCount}
+                                  hasUnreadComments={!!unreadCommentCount}
+                                  commentCount={commentCount}
                                 />
                               ) : null}
                             </Button>
@@ -209,10 +220,8 @@ function RecipientViewContentsIndicators({
   );
 }
 
-function useGetPagesAndFields(
-  fields:
-    | RecipientViewContentsCard_PublicPetitionFieldFragment[]
-    | RecipientViewContentsCard_PetitionFieldFragment[],
+function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
+  fields: T,
   page: number
 ) {
   const pages: {
@@ -220,20 +229,24 @@ function useGetPagesAndFields(
     commentCount: number;
     hasUnreadComments?: boolean;
   }[] = [];
-  const fieldVisibility = useFieldVisibility(fields);
-  const _fields:
-    | RecipientViewContentsCard_PublicPetitionFieldFragment[]
-    | RecipientViewContentsCard_PetitionFieldFragment[] = [];
-  for (const [field, isVisible] of zip(fields, fieldVisibility)) {
+  const visibility = useFieldVisibility(fields);
+  const _fields: T = [] as any;
+  for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
     if (field.type === "HEADING" && (pages.length === 0 || field.options.hasPageBreak)) {
       pages.push({ title: field.title ?? null, commentCount: 0 });
       page -= 1;
     }
     const currentPage = pages[pages.length - 1];
-    currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
-    currentPage.commentCount += field.commentCount;
+    if (field.__typename === "PublicPetitionField") {
+      currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
+      currentPage.commentCount += field.commentCount;
+    } else if (field.__typename === "PetitionField") {
+      currentPage.hasUnreadComments =
+        currentPage.hasUnreadComments || field.comments.some((c) => c.isUnread);
+      currentPage.commentCount += field.comments.length;
+    }
     if (page === 0 && isVisible) {
-      _fields.push(field);
+      _fields.push(field as any);
     } else {
       continue;
     }
@@ -252,7 +265,6 @@ RecipientViewContentsCard.fragments = {
   get PublicPetition() {
     return gql`
       fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
-        status
         fields {
           ...RecipientViewContentsCard_PublicPetitionField
         }
@@ -281,10 +293,9 @@ RecipientViewContentsCard.fragments = {
       ${useFieldVisibility.fragments.PublicPetitionField}
     `;
   },
-  get Petition() {
+  get PetitionBase() {
     return gql`
-      fragment RecipientViewContentsCard_Petition on Petition {
-        status
+      fragment RecipientViewContentsCard_PetitionBase on PetitionBase {
         fields {
           ...RecipientViewContentsCard_PetitionField
         }
@@ -305,6 +316,10 @@ RecipientViewContentsCard.fragments = {
         replies {
           id
           status
+        }
+        comments {
+          id
+          isUnread
         }
         ...useFieldVisibility_PetitionField
       }
