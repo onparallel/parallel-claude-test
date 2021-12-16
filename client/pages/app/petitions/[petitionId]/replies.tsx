@@ -888,6 +888,7 @@ PetitionReplies.mutations = [
         petitionFieldId: $petitionFieldId
         petitionFieldReplyIds: $petitionFieldReplyIds
         status: $status
+        validateFields: true
       ) {
         petition {
           id

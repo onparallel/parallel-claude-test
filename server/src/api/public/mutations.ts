@@ -2,31 +2,16 @@ import { gql } from "graphql-request";
 import { AWSPresignedPostDataFragment, PetitionFieldReplyFragment } from "./fragments";
 
 gql`
-  mutation SubmitReply_createSimpleReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $reply: String!
-    $status: PetitionFieldReplyStatus
-  ) {
-    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply, status: $status) {
+  mutation SubmitReply_createSimpleReply($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
       ...PetitionFieldReply
     }
   }
   ${PetitionFieldReplyFragment}
 `;
 gql`
-  mutation SubmitReply_createCheckboxReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $reply: [String!]!
-    $status: PetitionFieldReplyStatus
-  ) {
-    createCheckboxReply(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      values: $reply
-      status: $status
-    ) {
+  mutation SubmitReply_createCheckboxReply($petitionId: GID!, $fieldId: GID!, $reply: [String!]!) {
+    createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $reply) {
       ...PetitionFieldReply
     }
   }
@@ -37,14 +22,8 @@ gql`
     $petitionId: GID!
     $fieldId: GID!
     $file: FileUploadInput!
-    $status: PetitionFieldReplyStatus
   ) {
-    createFileUploadReply(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      file: $file
-      status: $status
-    ) {
+    createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
       presignedPostData {
         ...AWSPresignedPostData
       }
@@ -69,47 +48,54 @@ gql`
     $petitionId: GID!
     $fieldId: GID!
     $value: [[String]!]!
-    $status: PetitionFieldReplyStatus
   ) {
-    createDynamicSelectReply(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      value: $value
-      status: $status
-    ) {
-      ...PetitionFieldReply
-    }
-  }
-  ${PetitionFieldReplyFragment}
-`;
-
-gql`
-  mutation UpdateReply_updateSimpleReply(
-    $petitionId: GID!
-    $replyId: GID!
-    $reply: String!
-    $status: PetitionFieldReplyStatus
-  ) {
-    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply, status: $status) {
+    createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
       ...PetitionFieldReply
     }
   }
   ${PetitionFieldReplyFragment}
 `;
 gql`
-  mutation UpdateReply_updateCheckboxReply(
+  mutation UpdateReplyStatus_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
+    $fieldId: GID!
     $replyId: GID!
-    $values: [String!]!
-    $status: PetitionFieldReplyStatus
+    $status: PetitionFieldReplyStatus!
   ) {
-    updateCheckboxReply(
+    updatePetitionFieldRepliesStatus(
       petitionId: $petitionId
-      replyId: $replyId
-      values: $values
+      petitionFieldId: $fieldId
+      petitionFieldReplyIds: [$replyId]
       status: $status
     ) {
+      replies {
+        ...PetitionFieldReply
+        field {
+          id
+        }
+      }
+    }
+  }
+  ${PetitionFieldReplyFragment}
+`;
+gql`
+  mutation UpdateReply_updateSimpleReply($petitionId: GID!, $replyId: GID!, $reply: String!) {
+    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
       ...PetitionFieldReply
+      field {
+        id
+      }
+    }
+  }
+  ${PetitionFieldReplyFragment}
+`;
+gql`
+  mutation UpdateReply_updateCheckboxReply($petitionId: GID!, $replyId: GID!, $values: [String!]!) {
+    updateCheckboxReply(petitionId: $petitionId, replyId: $replyId, values: $values) {
+      ...PetitionFieldReply
+      field {
+        id
+      }
     }
   }
   ${PetitionFieldReplyFragment}
@@ -119,15 +105,12 @@ gql`
     $petitionId: GID!
     $replyId: GID!
     $value: [[String]!]!
-    $status: PetitionFieldReplyStatus
   ) {
-    updateDynamicSelectReply(
-      petitionId: $petitionId
-      replyId: $replyId
-      value: $value
-      status: $status
-    ) {
+    updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
       ...PetitionFieldReply
+      field {
+        id
+      }
     }
   }
   ${PetitionFieldReplyFragment}
@@ -137,14 +120,8 @@ gql`
     $petitionId: GID!
     $replyId: GID!
     $file: FileUploadInput!
-    $status: PetitionFieldReplyStatus
   ) {
-    updateFileUploadReply(
-      petitionId: $petitionId
-      replyId: $replyId
-      file: $file
-      status: $status
-    ) {
+    updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
       presignedPostData {
         ...AWSPresignedPostData
       }
@@ -160,6 +137,9 @@ gql`
   mutation UpdateReply_updateFileUploadReplyComplete($petitionId: GID!, $replyId: GID!) {
     updateFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
       ...PetitionFieldReply
+      field {
+        id
+      }
     }
   }
   ${PetitionFieldReplyFragment}

@@ -5,6 +5,7 @@ import fetch from "node-fetch";
 import { performance } from "perf_hooks";
 import { omit, pipe } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { Maybe } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
 import { InternalError } from "../rest/errors";
 import {
@@ -21,6 +22,7 @@ import {
   AWSPresignedPostDataFragment,
   getTags_tagsDocument,
   getTaskResultFileUrl_getTaskResultFileUrlDocument,
+  PetitionFieldReplyFragment,
   PetitionFieldType,
   PetitionFragment,
   TagFragmentDoc,
@@ -242,4 +244,17 @@ export async function uploadFile(file: File, presignedPostData: AWSPresignedPost
     body: formData,
     headers: { ...formData.getHeaders(), "Content-Length": contentLength.toString() },
   });
+}
+
+export function mapReplyResponse(
+  reply: PetitionFieldReplyFragment & { field?: Maybe<{ id: string }> }
+) {
+  return {
+    ...omit(reply, ["field"]),
+    content:
+      reply.content.text ?? // simple replies
+      reply.content.choices ?? // checkbox replies
+      reply.content.columns ?? // dynamic_select replies
+      reply.content, // file_upload replies
+  };
 }

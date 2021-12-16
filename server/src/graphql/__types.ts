@@ -3260,7 +3260,6 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
-      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       values: string[]; // [String!]!
     };
     createContact: {
@@ -3271,7 +3270,6 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
-      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       value: Array<Array<string | null>>; // [[String]!]!
     };
     createEventSubscription: {
@@ -3289,7 +3287,6 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
       petitionId: NexusGenScalars["GID"]; // GID!
-      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
     };
     createFileUploadReplyComplete: {
       // args
@@ -3359,7 +3356,6 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
       reply: string; // String!
-      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
     };
     createTag: {
       // args
@@ -3732,7 +3728,6 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
-      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       values: string[]; // [String!]!
     };
     updateContact: {
@@ -3744,7 +3739,6 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
-      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       value: Array<Array<string | null>>; // [[String]!]!
     };
     updateEventSubscription: {
@@ -3762,7 +3756,6 @@ export interface NexusGenArgTypes {
       file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
-      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
     };
     updateFileUploadReplyComplete: {
       // args
@@ -3820,6 +3813,7 @@ export interface NexusGenArgTypes {
       petitionFieldReplyIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
+      validateFields?: boolean | null; // Boolean
     };
     updatePetitionFieldReplyMetadata: {
       // args
@@ -3865,7 +3859,6 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       reply: string; // String!
       replyId: NexusGenScalars["GID"]; // GID!
-      status?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
     };
     updateTag: {
       // args

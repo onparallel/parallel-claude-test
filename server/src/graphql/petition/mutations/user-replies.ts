@@ -24,7 +24,6 @@ export const createSimpleReply = mutationField("createSimpleReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     reply: nonNull(stringArg()),
-    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -48,7 +47,7 @@ export const createSimpleReply = mutationField("createSimpleReply", {
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
         type: field.type,
-        status: args.status ?? "PENDING",
+        status: "PENDING",
         content: { text: args.reply },
       },
       ctx.user!
@@ -63,13 +62,12 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
     reply: nonNull(stringArg()),
-    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
-    replyCanBeUpdated("replyId", "status")
+    replyCanBeUpdated("replyId")
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
@@ -83,7 +81,7 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
-      { content: { text: args.reply }, status: args.status ?? "PENDING" },
+      { content: { text: args.reply }, status: "PENDING" },
       ctx.user!
     );
   },
@@ -106,7 +104,6 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     file: nonNull("FileUploadInput"),
-    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -136,7 +133,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
           user_id: ctx.user!.id,
           type: "FILE_UPLOAD",
           content: { file_upload_id: file.id },
-          status: args.status ?? "PENDING",
+          status: "PENDING",
         },
         ctx.user!
       ),
@@ -176,13 +173,12 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
     file: nonNull("FileUploadInput"),
-    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
-    replyCanBeUpdated("replyId", "status")
+    replyCanBeUpdated("replyId")
   ),
   validateArgs: fileUploadInputMaxSize((args) => args.file, 50 * 1024 * 1024, "file"),
   resolve: async (_, args, ctx) => {
@@ -211,7 +207,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
             file_upload_id: newFile.id,
             old_file_upload_id: oldReply.content["file_upload_id"], // old file_upload_id will be removed and the file deleted once updatefileUploadReplyComplete has been called
           },
-          status: args.status ?? "PENDING",
+          status: "PENDING",
         },
         ctx.user!
       ),
@@ -267,7 +263,6 @@ export const createCheckboxReply = mutationField("createCheckboxReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     values: nonNull(list(nonNull(stringArg()))),
-    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -289,7 +284,7 @@ export const createCheckboxReply = mutationField("createCheckboxReply", {
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
         type: "CHECKBOX",
-        status: args.status ?? "PENDING",
+        status: "PENDING",
         content: { choices: args.values },
       },
       ctx.user!
@@ -304,13 +299,12 @@ export const updateCheckboxReply = mutationField("updateCheckboxReply", {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
     values: nonNull(list(nonNull(stringArg()))),
-    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["CHECKBOX"]),
-    replyCanBeUpdated("replyId", "status")
+    replyCanBeUpdated("replyId")
   ),
   validateArgs: async (_, { replyId, values }, ctx, info) => {
     try {
@@ -325,7 +319,7 @@ export const updateCheckboxReply = mutationField("updateCheckboxReply", {
       args.replyId,
       {
         content: { choices: args.values },
-        status: args.status ?? "PENDING",
+        status: "PENDING",
       },
       ctx.user!
     );
@@ -339,7 +333,6 @@ export const createDynamicSelectReply = mutationField("createDynamicSelectReply"
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
     value: nonNull(list(nonNull(list(stringArg())))),
-    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -361,7 +354,7 @@ export const createDynamicSelectReply = mutationField("createDynamicSelectReply"
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
         type: "DYNAMIC_SELECT",
-        status: args.status ?? "PENDING",
+        status: "PENDING",
         content: { columns: args.value },
       },
       ctx.user!
@@ -376,13 +369,12 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
     value: nonNull(list(nonNull(list(stringArg())))),
-    status: "PetitionFieldReplyStatus",
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["DYNAMIC_SELECT"]),
-    replyCanBeUpdated("replyId", "status")
+    replyCanBeUpdated("replyId")
   ),
   validateArgs: async (_, args, ctx, info) => {
     try {
@@ -397,7 +389,7 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
       args.replyId,
       {
         content: { columns: args.value },
-        status: args.status ?? "PENDING",
+        status: "PENDING",
       },
       ctx.user!
     );

@@ -169,12 +169,6 @@ export interface CreateFileUploadFieldAttachment {
   presignedPostData: AWSPresignedPostData;
 }
 
-export interface CreateFileUploadReply {
-  __typename?: "CreateFileUploadReply";
-  presignedPostData: AWSPresignedPostData;
-  reply: PublicPetitionFieldReply;
-}
-
 export interface CreatedAt {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -220,6 +214,12 @@ export interface FileUploadInput {
   contentType: Scalars["String"];
   filename: Scalars["String"];
   size: Scalars["Int"];
+}
+
+export interface FileUploadReplyInput {
+  __typename?: "FileUploadReplyInput";
+  presignedPostData: AWSPresignedPostData;
+  reply: PetitionFieldReply;
 }
 
 export type FilterSharedWithLogicalOperator = "AND" | "OR";
@@ -379,14 +379,20 @@ export interface Mutation {
   clonePetitions: Array<PetitionBase>;
   /** Clones the user group with all its members */
   cloneUserGroup: Array<UserGroup>;
+  /** Creates a reply to a checkbox field. */
+  createCheckboxReply: PetitionFieldReply;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates a reply for a dynamic select field. */
+  createDynamicSelectReply: PetitionFieldReply;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
   /** Creates a reply to a file upload field. */
-  createFileUploadReply: PetitionFieldReply;
+  createFileUploadReply: FileUploadReplyInput;
+  /** Notifies the backend that the upload is complete. */
+  createFileUploadReplyComplete: PetitionFieldReply;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -466,7 +472,7 @@ export interface Mutation {
   /** Creates a reply for a dynamic select field. */
   publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
-  publicCreateFileUploadReply: CreateFileUploadReply;
+  publicCreateFileUploadReply: PublicCreateFileUploadReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates a reply to a text or select field. */
@@ -538,12 +544,20 @@ export interface Mutation {
   transferPetitionOwnership: Array<PetitionBase>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
+  /** Updates a reply of a checkbox field */
+  updateCheckboxReply: PetitionFieldReply;
   /** Updates a contact. */
   updateContact: Contact;
+  /** Updates a reply for a dynamic select field. */
+  updateDynamicSelectReply: PetitionFieldReply;
   /** Updates an existing event subscription for the user's petitions */
   updateEventSubscription: PetitionEventSubscription;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
+  /** Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation. */
+  updateFileUploadReply: FileUploadReplyInput;
+  /** Notifies the backend that the new file was successfully uploaded to S3. Marks the file upload as completed and deletes the old file. */
+  updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the onboarding status for one of the pages. */
@@ -677,8 +691,20 @@ export interface MutationcloneUserGroupArgs {
   userGroupIds: Array<Scalars["GID"]>;
 }
 
+export interface MutationcreateCheckboxReplyArgs {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  values: Array<Scalars["String"]>;
+}
+
 export interface MutationcreateContactArgs {
   data: CreateContactInput;
+}
+
+export interface MutationcreateDynamicSelectReplyArgs {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  value: Array<Array<InputMaybe<Scalars["String"]>>>;
 }
 
 export interface MutationcreateEventSubscriptionArgs {
@@ -693,8 +719,13 @@ export interface MutationcreateExportRepliesTaskArgs {
 
 export interface MutationcreateFileUploadReplyArgs {
   fieldId: Scalars["GID"];
-  file: Scalars["Upload"];
+  file: FileUploadInput;
   petitionId: Scalars["GID"];
+}
+
+export interface MutationcreateFileUploadReplyCompleteArgs {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
 }
 
 export interface MutationcreateOrganizationArgs {
@@ -1128,9 +1159,21 @@ export interface MutationuntagPetitionArgs {
   tagId: Scalars["GID"];
 }
 
+export interface MutationupdateCheckboxReplyArgs {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  values: Array<Scalars["String"]>;
+}
+
 export interface MutationupdateContactArgs {
   data: UpdateContactInput;
   id: Scalars["GID"];
+}
+
+export interface MutationupdateDynamicSelectReplyArgs {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  value: Array<Array<InputMaybe<Scalars["String"]>>>;
 }
 
 export interface MutationupdateEventSubscriptionArgs {
@@ -1141,6 +1184,17 @@ export interface MutationupdateEventSubscriptionArgs {
 export interface MutationupdateFieldPositionsArgs {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
+}
+
+export interface MutationupdateFileUploadReplyArgs {
+  file: FileUploadInput;
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}
+
+export interface MutationupdateFileUploadReplyCompleteArgs {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
 }
 
 export interface MutationupdateLandingTemplateMetadataArgs {
@@ -1193,6 +1247,7 @@ export interface MutationupdatePetitionFieldRepliesStatusArgs {
   petitionFieldReplyIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   status: PetitionFieldReplyStatus;
+  validateFields?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationupdatePetitionFieldReplyMetadataArgs {
@@ -2235,6 +2290,12 @@ export interface PublicContact {
   id: Scalars["GID"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
+}
+
+export interface PublicCreateFileUploadReply {
+  __typename?: "PublicCreateFileUploadReply";
+  presignedPostData: AWSPresignedPostData;
+  reply: PublicPetitionFieldReply;
 }
 
 /** A public view of an organization */
@@ -8674,7 +8735,7 @@ export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutat
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation = {
   publicCreateFileUploadReply: {
-    __typename?: "CreateFileUploadReply";
+    __typename?: "PublicCreateFileUploadReply";
     presignedPostData: {
       __typename?: "AWSPresignedPostData";
       url: string;
@@ -20850,6 +20911,7 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
       petitionFieldId: $petitionFieldId
       petitionFieldReplyIds: $petitionFieldReplyIds
       status: $status
+      validateFields: true
     ) {
       petition {
         id

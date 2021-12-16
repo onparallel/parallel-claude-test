@@ -197,41 +197,6 @@ describe("GraphQL/Petition Field Replies", () => {
       ]);
     });
 
-    it("creates a new reply and sets its status to APPROVED", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $reply: String!
-            $status: PetitionFieldReplyStatus
-          ) {
-            createSimpleReply(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              reply: $reply
-              status: $status
-            ) {
-              content
-              status
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          fieldId: toGlobalId("PetitionField", fields[1].id),
-          reply: "option 2",
-          status: "APPROVED",
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.createSimpleReply).toEqual({
-        content: { text: "option 2" },
-        status: "APPROVED",
-      });
-    });
-
     it("sends error when creating a reply on a FILE_UPLOAD field", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
@@ -679,41 +644,6 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data?.createCheckboxReply).toEqual({
         status: "PENDING",
         content: { choices: ["1", "2"] },
-      });
-    });
-
-    it("creates a checkbox reply and sets its status to REJECTED", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $values: [String!]!
-            $status: PetitionFieldReplyStatus
-          ) {
-            createCheckboxReply(
-              petitionId: $petitionId
-              fieldId: $fieldId
-              values: $values
-              status: $status
-            ) {
-              status
-              content
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          fieldId: toGlobalId("PetitionField", checkboxField.id),
-          values: ["1"],
-          status: "REJECTED",
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.createCheckboxReply).toEqual({
-        status: "REJECTED",
-        content: { choices: ["1"] },
       });
     });
 

@@ -1460,8 +1460,19 @@ export class PetitionRepository extends BaseRepository {
     ]);
   }
 
-  async updatePetitionFieldRepliesStatus(replyIds: number[], status: PetitionFieldReplyStatus) {
-    return await this.from("petition_field_reply").whereIn("id", replyIds).update({ status }, "*");
+  async updatePetitionFieldRepliesStatus(
+    replyIds: number[],
+    status: PetitionFieldReplyStatus,
+    updatedBy: string
+  ) {
+    return await this.from("petition_field_reply").whereIn("id", replyIds).update(
+      {
+        status,
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      },
+      "*"
+    );
   }
 
   async completePetition(petitionId: number, accessId: number) {

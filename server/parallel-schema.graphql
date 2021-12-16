@@ -511,12 +511,7 @@ type Mutation {
   """
   Creates a reply to a checkbox field.
   """
-  createCheckboxReply(
-    fieldId: GID!
-    petitionId: GID!
-    status: PetitionFieldReplyStatus
-    values: [String!]!
-  ): PetitionFieldReply!
+  createCheckboxReply(fieldId: GID!, petitionId: GID!, values: [String!]!): PetitionFieldReply!
 
   """
   Create a contact.
@@ -529,7 +524,6 @@ type Mutation {
   createDynamicSelectReply(
     fieldId: GID!
     petitionId: GID!
-    status: PetitionFieldReplyStatus
     value: [[String]!]!
   ): PetitionFieldReply!
 
@@ -553,7 +547,6 @@ type Mutation {
     fieldId: GID!
     file: FileUploadInput!
     petitionId: GID!
-    status: PetitionFieldReplyStatus
   ): FileUploadReplyInput!
 
   """
@@ -658,12 +651,7 @@ type Mutation {
   """
   Creates a reply to a text or select field.
   """
-  createSimpleReply(
-    fieldId: GID!
-    petitionId: GID!
-    reply: String!
-    status: PetitionFieldReplyStatus
-  ): PetitionFieldReply!
+  createSimpleReply(fieldId: GID!, petitionId: GID!, reply: String!): PetitionFieldReply!
 
   """
   Creates a tag in the user's organization
@@ -1170,12 +1158,7 @@ type Mutation {
   """
   Updates a reply of a checkbox field
   """
-  updateCheckboxReply(
-    petitionId: GID!
-    replyId: GID!
-    status: PetitionFieldReplyStatus
-    values: [String!]!
-  ): PetitionFieldReply!
+  updateCheckboxReply(petitionId: GID!, replyId: GID!, values: [String!]!): PetitionFieldReply!
 
   """
   Updates a contact.
@@ -1188,7 +1171,6 @@ type Mutation {
   updateDynamicSelectReply(
     petitionId: GID!
     replyId: GID!
-    status: PetitionFieldReplyStatus
     value: [[String]!]!
   ): PetitionFieldReply!
 
@@ -1209,7 +1191,6 @@ type Mutation {
     file: FileUploadInput!
     petitionId: GID!
     replyId: GID!
-    status: PetitionFieldReplyStatus
   ): FileUploadReplyInput!
 
   """
@@ -1300,6 +1281,11 @@ type Mutation {
     petitionFieldReplyIds: [GID!]!
     petitionId: GID!
     status: PetitionFieldReplyStatus!
+
+    """
+    If true, the field will be validated if all the replies are approved or rejected
+    """
+    validateFields: Boolean
   ): PetitionWithFieldAndReplies!
 
   """
@@ -1360,12 +1346,7 @@ type Mutation {
   """
   Updates a reply to a text or select field.
   """
-  updateSimpleReply(
-    petitionId: GID!
-    reply: String!
-    replyId: GID!
-    status: PetitionFieldReplyStatus
-  ): PetitionFieldReply!
+  updateSimpleReply(petitionId: GID!, reply: String!, replyId: GID!): PetitionFieldReply!
 
   """
   Updates the name and color of a given tag

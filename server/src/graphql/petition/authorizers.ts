@@ -4,12 +4,11 @@ import { countBy, isDefined, uniq } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
-  PetitionFieldReplyStatus,
   PetitionFieldType,
   PetitionPermissionType,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
-import { Maybe, MaybeArray } from "../../util/types";
+import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
 export function userHasAccessToPetitions<
@@ -455,20 +454,17 @@ export function userHasEnabledIntegration<TypeName extends string, FieldName ext
 export function replyCanBeUpdated<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, Maybe<PetitionFieldReplyStatus> | undefined>
->(argReplyId: TArg1, argNewStatus?: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg1 extends Arg<TypeName, FieldName, number>
+>(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const replyId = args[argReplyId] as unknown as number;
-    const newStatus = argNewStatus
-      ? (args[argNewStatus] as unknown as Maybe<PetitionFieldReplyStatus> | undefined)
-      : undefined;
+
     const [reply, field] = await Promise.all([
       ctx.petitions.loadFieldReply(replyId),
       ctx.petitions.loadFieldForReply(replyId),
     ]);
 
-    if (reply!.status === "APPROVED" && !isDefined(newStatus)) {
+    if (reply!.status === "APPROVED") {
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
         "REPLY_ALREADY_APPROVED_ERROR"

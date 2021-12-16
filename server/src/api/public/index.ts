@@ -38,6 +38,7 @@ import {
   getTaskResultFileUrl,
   idParam,
   mapPetition,
+  mapReplyResponse,
   mapTemplate,
   paginationParams,
   sortByParam,
@@ -70,6 +71,7 @@ import {
   Template,
   UpdatePetition,
   UpdateReply,
+  UpdateReplyStatus,
 } from "./schemas";
 import {
   CreateContact_contactDocument,
@@ -117,6 +119,7 @@ import {
   TemplateFragment as TemplateFragmentType,
   TransferPetition_transferPetitionOwnershipDocument,
   UpdatePetition_updatePetitionDocument,
+  UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
   UpdateReply_petitionDocument,
   UpdateReply_updateCheckboxReplyDocument,
   UpdateReply_updateDynamicSelectReplyDocument,
@@ -936,6 +939,7 @@ api
       const field = petition?.fields.find((f) => f.id === body.fieldId);
       try {
         const fieldType = field?.type;
+        let newReply;
         switch (fieldType) {
           case "TEXT":
           case "SHORT_TEXT":
@@ -949,10 +953,10 @@ api
                 petitionId: params.petitionId,
                 fieldId: body.fieldId,
                 reply: body.reply,
-                status: body.status,
               }
             );
-            return Ok({ ...createSimpleReply, content: createSimpleReply.content.text });
+            newReply = createSimpleReply;
+            break;
           case "CHECKBOX":
             if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
@@ -965,10 +969,10 @@ api
                 petitionId: params.petitionId,
                 fieldId: body.fieldId,
                 reply: body.reply as string[],
-                status: body.status,
               }
             );
-            return Ok({ ...createCheckboxReply, content: createCheckboxReply.content.choices });
+            newReply = createCheckboxReply;
+            break;
           case "DYNAMIC_SELECT":
             if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
@@ -985,13 +989,10 @@ api
                 petitionId: params.petitionId,
                 fieldId: body.fieldId,
                 value: labels.map((label, i) => [label, replies[i]]),
-                status: body.status,
               }
             );
-            return Ok({
-              ...createDynamicSelectReply,
-              content: createDynamicSelectReply.content.columns,
-            });
+            newReply = createDynamicSelectReply;
+            break;
           case "FILE_UPLOAD":
             const file = files["reply"]?.[0];
             if (!file) {
@@ -1003,7 +1004,6 @@ api
               petitionId: params.petitionId,
               fieldId: body.fieldId,
               file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
-              status: body.status,
             });
 
             const uploadResponse = await uploadFile(file, presignedPostData);
@@ -1016,14 +1016,29 @@ api
                   replyId: reply.id,
                 }
               );
-
-              return Ok(createFileUploadReplyComplete);
+              newReply = createFileUploadReplyComplete;
             } else {
               throw new BadRequestError(uploadResponse.statusText);
             }
+            break;
           default:
             throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
         }
+
+        if (isDefined(body.status)) {
+          const { updatePetitionFieldRepliesStatus } = await client.request(
+            UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
+            {
+              petitionId: params.petitionId,
+              fieldId: body.fieldId,
+              replyId: newReply.id,
+              status: body.status,
+            }
+          );
+          newReply = updatePetitionFieldRepliesStatus.replies[0];
+        }
+
+        return Ok(mapReplyResponse(newReply));
       } catch (error: any) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "INVALID_OPTION_ERROR")) {
@@ -1055,8 +1070,8 @@ api
       operationId: "UpdateReply",
       summary: "Update a reply",
       description: outdent`
-        Updates the \`content\` and \`status\` of a previously submitted reply.
-        In order to update the content of the reply, its \`status\` must be \`PENDING\` or \`REJECTED\` or you must pass a new \`status\` in the request body.
+        Updates the \`content\` of a previously submitted reply.
+        In order to update the content of the reply, its \`status\` must be \`PENDING\` or \`REJECTED\`.
       `,
       responses: {
         201: SuccessResponse(PetitionFieldReply),
@@ -1075,6 +1090,7 @@ api
 
       const fieldType = field?.type;
       try {
+        let updatedReply;
         switch (fieldType) {
           case "TEXT":
           case "SHORT_TEXT":
@@ -1088,10 +1104,10 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: body.reply,
-                status: body.status,
               }
             );
-            return Ok({ ...updateSimpleReply, content: updateSimpleReply.content.text });
+            updatedReply = updateSimpleReply;
+            break;
           case "CHECKBOX":
             if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
@@ -1104,10 +1120,10 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 values: body.reply,
-                status: body.status,
               }
             );
-            return Ok({ ...updateCheckboxReply, content: updateCheckboxReply.content.choices });
+            updatedReply = updateCheckboxReply;
+            break;
           case "DYNAMIC_SELECT":
             if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
@@ -1123,13 +1139,11 @@ api
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 value: labels.map((label, i) => [label, replies[i]]),
-                status: body.status,
               }
             );
-            return Ok({
-              ...updateDynamicSelectReply,
-              content: updateDynamicSelectReply.content.columns,
-            });
+            updatedReply = updateDynamicSelectReply;
+            break;
+
           case "FILE_UPLOAD":
             const file = files["reply"]?.[0];
             if (!file) {
@@ -1141,7 +1155,6 @@ api
               petitionId: params.petitionId,
               replyId: params.replyId,
               file: { contentType: file.mimetype, filename: file.originalname, size: file.size },
-              status: body.status,
             });
 
             const uploadResponse = await uploadFile(file, presignedPostData);
@@ -1155,14 +1168,15 @@ api
                 }
               );
 
-              return Ok(updateFileUploadReplyComplete);
+              updatedReply = updateFileUploadReplyComplete;
             } else {
               throw new BadRequestError(uploadResponse.statusText);
             }
-
+            break;
           default:
             throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
         }
+        return Ok(mapReplyResponse(updatedReply));
       } catch (error: any) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "INVALID_OPTION_ERROR")) {
@@ -1170,9 +1184,7 @@ api
               `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
             );
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
-            throw new BadRequestError(
-              "The reply is already approved and cannot be modified. You can pass `APPROVED` as status to confirm and approve your new reply."
-            );
+            throw new BadRequestError("The reply is already approved and cannot be modified.");
           } else if (containsGraphQLError(error, "FIELD_ALREADY_VALIDATED_ERROR")) {
             throw new BadRequestError(
               "The field is already validated and does not accept any modification in its replies."
@@ -1221,6 +1233,42 @@ api
         }
         throw error;
       }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/replies/:replyId/status", {
+    params: { petitionId, replyId },
+  })
+  .put(
+    {
+      operationId: "UpdateReplyStatus",
+      summary: "Update a reply status",
+      description: "Updates the `status` of a previously submitted reply.",
+      responses: {
+        201: SuccessResponse(PetitionFieldReply),
+        400: ErrorResponse({ description: "Invalid parameters" }),
+      },
+      tags: ["Petitions"],
+      body: JsonBody(UpdateReplyStatus),
+    },
+    async ({ client, params, body }) => {
+      const { petition } = await client.request(UpdateReply_petitionDocument, {
+        petitionId: params.petitionId,
+      });
+      const field = petition?.fields.find((f) => f.replies.some((r) => r.id === params.replyId));
+
+      const { updatePetitionFieldRepliesStatus } = await client.request(
+        UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
+        {
+          petitionId: params.petitionId,
+          replyId: params.replyId,
+          fieldId: field!.id,
+          status: body.status,
+        }
+      );
+      const updatedReply = updatePetitionFieldRepliesStatus.replies[0];
+      return Ok(mapReplyResponse(updatedReply));
     }
   );
 

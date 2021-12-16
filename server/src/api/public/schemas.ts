@@ -842,11 +842,20 @@ export const UpdateReply = schema({
         _DynamicSelectReplySubmitContent,
       ],
     },
+  },
+} as const);
+
+export const UpdateReplyStatus = schema({
+  title: "UpdateReplyStatus",
+  type: "object",
+  additionalProperties: false,
+  required: ["status"],
+  properties: {
     status: {
-      ..._PetitionFieldReplyStatus,
-      description: _PetitionFieldReplyStatus.description.concat(
-        " In order to update an `APPROVED` reply, you must pass a new `status` on the request."
-      ),
+      type: "string",
+      description: "The new status for the reply. `APPROVED` replies can't be updated or deleted",
+      enum: ["PENDING", "APPROVED", "REJECTED"],
+      example: "APPROVED",
     },
   },
 } as const);

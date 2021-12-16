@@ -968,7 +968,8 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
       });
       await ctx.petitions.updatePetitionFieldRepliesStatus(
         replies.flatMap((r) => r.filter((r) => r.status === "PENDING").map((r) => r.id)),
-        args.validateRepliesWith || "APPROVED"
+        args.validateRepliesWith || "APPROVED",
+        `User:${ctx.user!.id}`
       );
     }
 
@@ -1004,27 +1005,29 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
       t.list.nonNull.field("replies", { type: "PetitionFieldReply" });
     },
   }),
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-      repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds")
-    )
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+    repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
     petitionFieldReplyIds: nonNull(list(nonNull(globalIdArg("PetitionFieldReply")))),
     status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
+    validateFields: booleanArg({
+      description:
+        "If true, the field will be validated if all the replies are approved or rejected",
+    }),
   },
   validateArgs: notEmptyArray((args) => args.petitionFieldReplyIds, "petitionFieldReplyIds"),
   resolve: async (_, args, ctx) => {
     const replies = await ctx.petitions.updatePetitionFieldRepliesStatus(
       args.petitionFieldReplyIds,
-      args.status
+      args.status,
+      `User:${ctx.user!.id}`
     );
-    if (args.status === "APPROVED") {
+    if (args.status === "APPROVED" && args.validateFields) {
       const allReplies = await ctx.petitions.loadRepliesForField(args.petitionFieldId);
       if (allReplies.every((r) => ["APPROVED", "REJECTED"].includes(r.status))) {
         const field = (
