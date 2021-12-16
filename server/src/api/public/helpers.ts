@@ -4,6 +4,7 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import { performance } from "perf_hooks";
 import { omit, pipe } from "remeda";
+import { promisify } from "util";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
@@ -222,22 +223,8 @@ export async function uploadFile(file: File, presignedPostData: AWSPresignedPost
   });
   formData.append("Content-Type", file.mimetype);
   formData.append("file", createReadStream(file.path));
-  /**
-   * TODO: review this
-   * for some reason, doing:
-   * const contentLength = await promisify(formData.getLength)();
-   * instead of this whole 'await new Promise...'
-   * ends up throwing "Cannot read properties of undefined (reading 'length')" error
-   */
-  const contentLength = await new Promise<number>((resolve, reject) => {
-    formData.getLength((err, len) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(len);
-      }
-    });
-  });
+
+  const contentLength = await promisify(formData.getLength.bind(formData))();
 
   return await fetch(presignedPostData.url, {
     method: "POST",

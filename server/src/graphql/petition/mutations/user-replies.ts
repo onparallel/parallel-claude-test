@@ -87,8 +87,8 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
   },
 });
 
-export const FileUploadReplyInput = objectType({
-  name: "FileUploadReplyInput",
+export const FileUploadReplyResponse = objectType({
+  name: "FileUploadReplyResponse",
   definition(t) {
     t.field("presignedPostData", {
       type: "AWSPresignedPostData",
@@ -99,7 +99,7 @@ export const FileUploadReplyInput = objectType({
 
 export const createFileUploadReply = mutationField("createFileUploadReply", {
   description: "Creates a reply to a file upload field.",
-  type: "FileUploadReplyInput",
+  type: "FileUploadReplyResponse",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
@@ -168,7 +168,7 @@ export const createFileUploadReplyComplete = mutationField("createFileUploadRepl
 export const updateFileUploadReply = mutationField("updateFileUploadReply", {
   description:
     "Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation.",
-  type: "FileUploadReplyInput",
+  type: "FileUploadReplyResponse",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),

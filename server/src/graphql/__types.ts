@@ -326,7 +326,7 @@ export interface NexusGenObjects {
     result: NexusGenEnums["Result"]; // Result!
     url?: string | null; // String
   };
-  FileUploadReplyInput: {
+  FileUploadReplyResponse: {
     // root type
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
     reply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -746,7 +746,7 @@ export interface NexusGenFieldTypes {
     result: NexusGenEnums["Result"]; // Result!
     url: string | null; // String
   };
-  FileUploadReplyInput: {
+  FileUploadReplyResponse: {
     // field return type
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
     reply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -868,7 +868,7 @@ export interface NexusGenFieldTypes {
     createDynamicSelectReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
-    createFileUploadReply: NexusGenRootTypes["FileUploadReplyInput"]; // FileUploadReplyInput!
+    createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
@@ -951,7 +951,7 @@ export interface NexusGenFieldTypes {
     updateDynamicSelectReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    updateFileUploadReply: NexusGenRootTypes["FileUploadReplyInput"]; // FileUploadReplyInput!
+    updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
@@ -2014,7 +2014,7 @@ export interface NexusGenFieldTypeNames {
     result: "Result";
     url: "String";
   };
-  FileUploadReplyInput: {
+  FileUploadReplyResponse: {
     // field return type name
     presignedPostData: "AWSPresignedPostData";
     reply: "PetitionFieldReply";
@@ -2136,7 +2136,7 @@ export interface NexusGenFieldTypeNames {
     createDynamicSelectReply: "PetitionFieldReply";
     createEventSubscription: "PetitionEventSubscription";
     createExportRepliesTask: "Task";
-    createFileUploadReply: "FileUploadReplyInput";
+    createFileUploadReply: "FileUploadReplyResponse";
     createFileUploadReplyComplete: "PetitionFieldReply";
     createOrganization: "SupportMethodResponse";
     createOrganizationUser: "User";
@@ -2219,7 +2219,7 @@ export interface NexusGenFieldTypeNames {
     updateDynamicSelectReply: "PetitionFieldReply";
     updateEventSubscription: "PetitionEventSubscription";
     updateFieldPositions: "PetitionBase";
-    updateFileUploadReply: "FileUploadReplyInput";
+    updateFileUploadReply: "FileUploadReplyResponse";
     updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOnboardingStatus: "User";

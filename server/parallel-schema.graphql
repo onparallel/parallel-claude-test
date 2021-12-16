@@ -246,7 +246,7 @@ input FileUploadInput {
   size: Int!
 }
 
-type FileUploadReplyInput {
+type FileUploadReplyResponse {
   presignedPostData: AWSPresignedPostData!
   reply: PetitionFieldReply!
 }
@@ -547,7 +547,7 @@ type Mutation {
     fieldId: GID!
     file: FileUploadInput!
     petitionId: GID!
-  ): FileUploadReplyInput!
+  ): FileUploadReplyResponse!
 
   """
   Notifies the backend that the upload is complete.
@@ -1191,7 +1191,7 @@ type Mutation {
     file: FileUploadInput!
     petitionId: GID!
     replyId: GID!
-  ): FileUploadReplyInput!
+  ): FileUploadReplyResponse!
 
   """
   Notifies the backend that the new file was successfully uploaded to S3. Marks the file upload as completed and deletes the old file.

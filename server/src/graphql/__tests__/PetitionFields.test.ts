@@ -2344,7 +2344,7 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
-    it("validates field when all replies are approved", async () => {
+    it("validates field when all replies are approved and validateFields flag is set to true", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
@@ -2352,12 +2352,14 @@ describe("GraphQL/Petition Fields", () => {
             $petitionFieldId: GID!
             $petitionFieldReplyIds: [GID!]!
             $status: PetitionFieldReplyStatus!
+            $validateFields: Boolean
           ) {
             updatePetitionFieldRepliesStatus(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               petitionFieldReplyIds: $petitionFieldReplyIds
               status: $status
+              validateFields: $validateFields
             ) {
               field {
                 id
@@ -2375,6 +2377,7 @@ describe("GraphQL/Petition Fields", () => {
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
           petitionFieldReplyIds: field2Replies.map((r) => toGlobalId("PetitionFieldReply", r.id)),
           status: "APPROVED",
+          validateFields: true,
         },
       });
 

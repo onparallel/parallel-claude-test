@@ -809,13 +809,8 @@ export const SubmitReply = schema({
   title: "SubmitReply",
   type: "object",
   additionalProperties: false,
-  required: ["fieldId", "reply"],
+  required: ["reply"],
   properties: {
-    fieldId: {
-      description: "The ID of the field to be replied.",
-      type: "string",
-      example: toGlobalId("PetitionField", 2),
-    },
     reply: {
       anyOf: [
         _SimpleReplySubmitContent,

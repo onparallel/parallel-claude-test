@@ -894,6 +894,11 @@ const replyId = idParam({
   description: "The ID of the reply",
 });
 
+const fieldId = idParam({
+  type: "PetitionField",
+  description: "The ID of the petition field",
+});
+
 const uploadFileMiddleware = multer({
   storage: multer.diskStorage({
     destination: callbackify(async function (req: any, file: any) {
@@ -908,8 +913,8 @@ const uploadFileMiddleware = multer({
 });
 
 api
-  .path("/petitions/:petitionId/replies", {
-    params: { petitionId },
+  .path("/petitions/:petitionId/fields/:fieldId/replies", {
+    params: { petitionId, fieldId },
   })
   .post(
     {
@@ -936,7 +941,7 @@ api
       const { petition } = await client.request(SubmitReply_petitionDocument, {
         petitionId: params.petitionId,
       });
-      const field = petition?.fields.find((f) => f.id === body.fieldId);
+      const field = petition?.fields.find((f) => f.id === params.fieldId);
       try {
         const fieldType = field?.type;
         let newReply;
@@ -951,7 +956,7 @@ api
               SubmitReply_createSimpleReplyDocument,
               {
                 petitionId: params.petitionId,
-                fieldId: body.fieldId,
+                fieldId: params.fieldId,
                 reply: body.reply,
               }
             );
@@ -967,7 +972,7 @@ api
               SubmitReply_createCheckboxReplyDocument,
               {
                 petitionId: params.petitionId,
-                fieldId: body.fieldId,
+                fieldId: params.fieldId,
                 reply: body.reply as string[],
               }
             );
@@ -979,7 +984,7 @@ api
                 `Reply for ${fieldType} field must be an array with the chosen options.`
               );
             }
-            const labels = petition?.fields.find((f) => f.id === body.fieldId)?.options
+            const labels = petition?.fields.find((f) => f.id === params.fieldId)?.options
               ?.labels as string[];
             const replies = body.reply as Maybe<string>[];
 
@@ -987,7 +992,7 @@ api
               SubmitReply_createDynamicSelectReplyDocument,
               {
                 petitionId: params.petitionId,
-                fieldId: body.fieldId,
+                fieldId: params.fieldId,
                 value: labels.map((label, i) => [label, replies[i]]),
               }
             );
@@ -1002,7 +1007,7 @@ api
               createFileUploadReply: { presignedPostData, reply },
             } = await client.request(SubmitReply_createFileUploadReplyDocument, {
               petitionId: params.petitionId,
-              fieldId: body.fieldId,
+              fieldId: params.fieldId,
               file: { size: file.size, contentType: file.mimetype, filename: file.originalname },
             });
 
@@ -1030,7 +1035,7 @@ api
             UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
             {
               petitionId: params.petitionId,
-              fieldId: body.fieldId,
+              fieldId: params.fieldId,
               replyId: newReply.id,
               status: body.status,
             }
@@ -1061,8 +1066,8 @@ api
   );
 
 api
-  .path("/petitions/:petitionId/replies/:replyId", {
-    params: { petitionId, replyId },
+  .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId", {
+    params: { petitionId, fieldId, replyId },
   })
   .put(
     {
@@ -1237,8 +1242,8 @@ api
   );
 
 api
-  .path("/petitions/:petitionId/replies/:replyId/status", {
-    params: { petitionId, replyId },
+  .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId/status", {
+    params: { petitionId, fieldId, replyId },
   })
   .put(
     {
@@ -1253,17 +1258,12 @@ api
       body: JsonBody(UpdateReplyStatus),
     },
     async ({ client, params, body }) => {
-      const { petition } = await client.request(UpdateReply_petitionDocument, {
-        petitionId: params.petitionId,
-      });
-      const field = petition?.fields.find((f) => f.replies.some((r) => r.id === params.replyId));
-
       const { updatePetitionFieldRepliesStatus } = await client.request(
         UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
         {
           petitionId: params.petitionId,
+          fieldId: params.fieldId,
           replyId: params.replyId,
-          fieldId: field!.id,
           status: body.status,
         }
       );

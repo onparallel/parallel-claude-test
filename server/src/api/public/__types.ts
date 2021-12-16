@@ -199,7 +199,7 @@ export type FileUploadInput = {
   size: Scalars["Int"];
 };
 
-export type FileUploadReplyInput = {
+export type FileUploadReplyResponse = {
   presignedPostData: AWSPresignedPostData;
   reply: PetitionFieldReply;
 };
@@ -359,7 +359,7 @@ export type Mutation = {
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
   /** Creates a reply to a file upload field. */
-  createFileUploadReply: FileUploadReplyInput;
+  createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
   /** Creates a new organization. */
@@ -524,7 +524,7 @@ export type Mutation = {
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation. */
-  updateFileUploadReply: FileUploadReplyInput;
+  updateFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the new file was successfully uploaded to S3. Marks the file upload as completed and deletes the old file. */
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
