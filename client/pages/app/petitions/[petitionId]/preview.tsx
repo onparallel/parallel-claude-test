@@ -136,7 +136,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             <Text>
               <FormattedMessage
                 id="page.preview.template-only-cache-alert"
-                defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be copied to the request. will not be copied into the request. To complete and submit this template click on <b>Use template</b>."
+                defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>Use template</b>."
               />
             </Text>
           </Alert>

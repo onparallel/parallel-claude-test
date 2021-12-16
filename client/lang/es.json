@@ -4716,8 +4716,8 @@
   },
   {
     "term": "page.preview.template-only-cache-alert",
-    "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se copiarán en la petición. Para completar y enviar esta plantilla dale a <b>Utilizar plantilla</b>.",
-    "context": "<b>Preview only</b> - Changes you add as replies or comments will not be copied to the request. will not be copied into the request. To complete and submit this template click on <b>Use template</b>."
+    "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se guardarán. Para completar y enviar esta plantilla dale a <b>Utilizar plantilla</b>.",
+    "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>Use template</b>."
   },
   {
     "term": "page.pricing.activity-log",
@@ -4971,12 +4971,12 @@
   },
   {
     "term": "petition-access.no-access-added",
-    "definition": "",
+    "definition": "No se ha añadido ningún acceso todavía.",
     "context": "No access has been added yet."
   },
   {
     "term": "petition-access.send-request-or-add-access",
-    "definition": "",
+    "definition": "<a>Envía la petición</a> para incluir destinatarios o hazlo desde el botón de <b>Añadir acceso</b> de esta tabla.",
     "context": "<a>Send the request</a> to include recipients or do it from the <b>Add access</b> button of this table."
   },
   {

@@ -20,6 +20,12 @@ import { uploadFile } from "@parallel/utils/uploadFile";
 import { MutableRefObject, useCallback } from "react";
 import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 import { DynamicSelectValue } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
+import { customAlphabet } from "nanoid";
+
+function getRandomId() {
+  const nanoid = customAlphabet("1234567890abcdefgihjklmnopqrstvwxyz", 6);
+  return nanoid();
+}
 
 const _deletePetitionReply = gql`
   mutation PreviewPetitionFieldMutations_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
@@ -150,8 +156,7 @@ export function useCreateSimpleReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        const random = Math.floor(1000000 + Math.random() * 9000000);
-        const id = `${fieldId}-${random}`;
+        const id = `${fieldId}-${getRandomId()}`;
         updatePreviewFieldReplies(client, fieldId, (replies) => [
           ...(replies ?? []),
           {
@@ -217,8 +222,7 @@ export function useCreateCheckboxReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        const random = Math.floor(1000000 + Math.random() * 9000000);
-        const id = `${fieldId}-${random}`;
+        const id = `${fieldId}-${getRandomId()}`;
         updatePreviewFieldReplies(client, fieldId, (replies) => [
           ...(replies ?? []),
           {
@@ -344,8 +348,7 @@ export function useCreateDynamicSelectReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        const random = Math.floor(1000000 + Math.random() * 9000000);
-        const id = `${fieldId}-${random}`;
+        const id = `${fieldId}-${getRandomId()}`;
         updatePreviewFieldReplies(client, fieldId, (replies) => [
           ...(replies ?? []),
           {
@@ -573,6 +576,7 @@ function updateFieldReplies(
   updateFragment(proxy, {
     id: fieldId,
     fragment: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
+    fragmentName: "PreviewPetitionFieldMutations_updateFieldReplies_PetitionField",
     data: (cached) => ({ ...cached, replies: updateFn(cached!.replies), previewReplies: [] }),
   });
 }
