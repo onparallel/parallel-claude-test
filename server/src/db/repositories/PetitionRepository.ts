@@ -1169,10 +1169,19 @@ export class PetitionRepository extends BaseRepository {
             deleted_at: null,
           })
           .where("position", ">", field.position),
+        // safe-delete attachments on this field (same attachment can be linked to another field)
+        this.removePetitionFieldAttachmentByFieldId(fieldId, user, t),
+        // delete user notifications related to this petition field
+        this.from("petition_user_notification", t)
+          .where({ petition_id: petitionId, type: "COMMENT_CREATED" })
+          .whereRaw("data ->> 'petition_field_id' = ?", fieldId)
+          .delete(),
+        // delete contact notifications related to this petition field
+        this.from("petition_contact_notification", t)
+          .where({ petition_id: petitionId, type: "COMMENT_CREATED" })
+          .whereRaw("data ->> 'petition_field_id' = ?", fieldId)
+          .delete(),
       ]);
-
-      await this.removePetitionFieldAttachmentByFieldId(fieldId, user);
-
       return petition;
     });
   }

@@ -9,6 +9,8 @@ import {
   PetitionField,
   PetitionAccess,
   Contact,
+  PetitionUserNotification,
+  PetitionContactNotification,
 } from "../../__types";
 import { Mocks } from "./mocks";
 import { PetitionRepository } from "../PetitionRepository";
@@ -275,6 +277,44 @@ describe("repositories/PetitionRepository", () => {
           deleted_at: null,
         }))
       );
+    });
+
+    it("deleting a field with linked notifications should also delete the notifications", async () => {
+      const [access] = await mocks.createPetitionAccess(
+        petition1.id,
+        user.id,
+        [contact.id],
+        user.id
+      );
+      const [fieldToDelete] = await mocks.createRandomPetitionFields(petition1.id, 1);
+      await mocks.knex.from<PetitionUserNotification>("petition_user_notification").insert({
+        type: "COMMENT_CREATED",
+        data: { petition_field_comment_id: 1, petition_field_id: fieldToDelete.id },
+        petition_id: petition1.id,
+        user_id: user.id,
+      });
+      await mocks.knex.from<PetitionContactNotification>("petition_contact_notification").insert({
+        type: "COMMENT_CREATED",
+        data: { petition_field_comment_id: 1, petition_field_id: fieldToDelete.id },
+        petition_id: petition1.id,
+        petition_access_id: access.id,
+      });
+
+      await petitions.deletePetitionField(petition1.id, fieldToDelete.id, user);
+
+      const [userNotifications, contactNotifications] = await Promise.all([
+        mocks.knex
+          .from("petition_user_notification")
+          .where({ petition_id: petition1.id, type: "COMMENT_CREATED" })
+          .select("*"),
+        mocks.knex
+          .from("petition_contact_notification")
+          .where({ petition_id: petition1.id, type: "COMMENT_CREATED" })
+          .select("*"),
+      ]);
+
+      expect(userNotifications).toHaveLength(0);
+      expect(contactNotifications).toHaveLength(0);
     });
   });
 
