@@ -24,7 +24,7 @@ import {
   useUpdateCheckboxReply,
   useUpdateDynamicSelectReply,
   useUpdateSimpleReply,
-} from "./mutations";
+} from "./clientMutations";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,

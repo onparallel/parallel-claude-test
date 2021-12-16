@@ -1,29 +1,22 @@
 import { DataProxy, gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
-  Box,
   Button,
   Center,
   Flex,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Portal,
   Spinner,
   Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
-import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
+import { CommentIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { FieldComment } from "@parallel/components/common/FieldComment";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   RecipientViewPetitionFieldCommentsDialog_commentsDocument,
@@ -40,18 +33,13 @@ import {
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { updateQuery } from "@parallel/utils/apollo/updateQuery";
-import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { BreakLines } from "../../common/BreakLines";
-import { DateTime } from "../../common/DateTime";
-import { DeletedContact } from "../../common/DeletedContact";
 import { Divider } from "../../common/Divider";
 import { GrowingTextarea } from "../../common/GrowingTextarea";
-import { Spacer } from "../../common/Spacer";
 
 interface RecipientViewPetitionFieldCommentsDialogProps {
   keycode: string;
@@ -272,131 +260,6 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
 export function usePetitionFieldCommentsDialog() {
   return useDialog(RecipientViewPetitionFieldCommentsDialog);
-}
-
-function FieldComment({
-  comment,
-  contactId,
-  onDelete,
-  onEdit,
-}: {
-  comment: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
-  contactId: string;
-  onDelete: () => void;
-  onEdit: (content: string) => void;
-}) {
-  const intl = useIntl();
-  const [isEditing, setIsEditing] = useState(false);
-  const [content, setContent] = useState(comment.content);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  function handleEditClick() {
-    setContent(comment.content);
-    setIsEditing(true);
-    setTimeout(() => {
-      textareaRef.current!.focus();
-      textareaRef.current!.select();
-    });
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (isMetaReturn(event)) {
-      event.preventDefault();
-      setIsEditing(false);
-      onEdit(content);
-    }
-  }
-
-  function handleCancelClick() {
-    setIsEditing(false);
-  }
-
-  function handleSaveClick() {
-    setIsEditing(false);
-    onEdit(content);
-  }
-
-  function handleContentChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setContent(event.target.value);
-  }
-
-  return (
-    <Box paddingX={6} paddingY={2} backgroundColor={comment.isUnread ? "purple.50" : "white"}>
-      <Box fontSize="sm" display="flex" alignItems="center">
-        <Box as="strong" marginRight={2}>
-          {comment.author?.__typename === "PublicContact" ? (
-            comment.author.fullName
-          ) : comment.author?.__typename === "PublicUser" ? (
-            comment.author.fullName
-          ) : (
-            <DeletedContact />
-          )}
-        </Box>
-
-        <DateTime color="gray.500" value={comment.createdAt} format={FORMATS.LLL} useRelativeTime />
-        <Spacer />
-        {contactId === comment.author?.id ? (
-          <Menu placement="bottom-end">
-            <Tooltip
-              label={intl.formatMessage({
-                id: "generic.more-options",
-                defaultMessage: "More options...",
-              })}
-            >
-              <MenuButton
-                as={IconButton}
-                variant="ghost"
-                size="xs"
-                icon={<MoreVerticalIcon />}
-                aria-label={intl.formatMessage({
-                  id: "generic.more-options",
-                  defaultMessage: "More options...",
-                })}
-              />
-            </Tooltip>
-            <Portal>
-              <MenuList minWidth="160px">
-                <MenuItem onClick={handleEditClick}>
-                  <FormattedMessage id="generic.edit" defaultMessage="Edit" />
-                </MenuItem>
-                <MenuItem onClick={onDelete}>
-                  <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        ) : null}
-      </Box>
-      {isEditing ? (
-        <Box marginTop={1} marginX={-2}>
-          <GrowingTextarea
-            ref={textareaRef}
-            height="20px"
-            size="sm"
-            borderRadius="md"
-            paddingX={2}
-            minHeight={0}
-            rows={1}
-            value={content}
-            onKeyDown={handleKeyDown as any}
-            onChange={handleContentChange as any}
-          />
-          <Stack direction="row" justifyContent="flex-end" marginTop={2}>
-            <Button size="sm" onClick={handleCancelClick}>
-              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-            </Button>
-            <Button size="sm" colorScheme="purple" onClick={handleSaveClick}>
-              <FormattedMessage id="generic.save" defaultMessage="Save" />
-            </Button>
-          </Stack>
-        </Box>
-      ) : (
-        <Box fontSize="sm">
-          <BreakLines>{content}</BreakLines>
-        </Box>
-      )}
-    </Box>
-  );
 }
 
 RecipientViewPetitionFieldCommentsDialog.fragments = {

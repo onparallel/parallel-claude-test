@@ -62,9 +62,14 @@ function evaluatePredicate<T extends string | number | string[]>(
 function conditionIsMet(
   condition: PetitionFieldVisibilityCondition,
   field: PetitionFieldSelection,
-  isVisible: boolean
+  isVisible: boolean,
+  isCacheOnly: boolean
 ) {
-  const replies = isVisible ? (field.replies as any[]) : [];
+  const replies = isVisible
+    ? isCacheOnly && field.__typename === "PetitionField"
+      ? (field.previewReplies as any[])
+      : (field.replies as any[])
+    : [];
   const { operator, value, modifier } = condition;
   function evaluator(reply: any) {
     const _value =
@@ -76,6 +81,8 @@ function conditionIsMet(
 
     return evaluatePredicate(_value, operator, value);
   }
+
+  const { type, options } = field;
   switch (modifier) {
     case "ANY":
       return replies.some(evaluator);
@@ -84,7 +91,11 @@ function conditionIsMet(
     case "NONE":
       return !replies.some(evaluator);
     case "NUMBER_OF_REPLIES":
-      const completed = completedFieldReplies(field);
+      const completed = completedFieldReplies({
+        type,
+        options,
+        replies,
+      });
       return evaluatePredicate(completed.length, operator, value);
     default:
       return false;
@@ -97,7 +108,10 @@ function conditionIsMet(
  * Returns an array with the visibilities corresponding to each field in the
  * passed array of fields.
  */
-export function useFieldVisibility(fields: UnionToArrayUnion<PetitionFieldSelection>) {
+export function useFieldVisibility(
+  fields: UnionToArrayUnion<PetitionFieldSelection>,
+  isCacheOnly: boolean
+) {
   return useMemo(() => {
     const fieldsById = indexBy<PetitionFieldSelection>(fields, (f) => f.id);
     const visibilitiesById: { [fieldId: string]: boolean } = {};
@@ -107,10 +121,10 @@ export function useFieldVisibility(fields: UnionToArrayUnion<PetitionFieldSelect
         const result =
           v.operator === "OR"
             ? v.conditions.some((c) =>
-                conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
+                conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId], isCacheOnly)
               )
             : v.conditions.every((c) =>
-                conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
+                conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId], isCacheOnly)
               );
         visibilitiesById[field.id] = v.type === "SHOW" ? result : !result;
       } else {
@@ -141,6 +155,10 @@ useFieldVisibility.fragments = {
       options
       visibility
       replies {
+        id
+        content
+      }
+      previewReplies @client {
         id
         content
       }

@@ -4715,6 +4715,11 @@
     "context": "Export to PDF"
   },
   {
+    "term": "page.preview.template-only-cache-alert",
+    "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se copiarán en la petición. Para completar y enviar esta plantilla dale a <b>Utilizar plantilla</b>.",
+    "context": "<b>Preview only</b> - Changes you add as replies or comments will not be copied to the request. will not be copied into the request. To complete and submit this template click on <b>Use template</b>."
+  },
+  {
     "term": "page.pricing.activity-log",
     "definition": "Registro de actividades",
     "context": "Activity log"
@@ -4963,6 +4968,16 @@
     "term": "petition-access.header",
     "definition": "Control de acceso",
     "context": "Petition access control"
+  },
+  {
+    "term": "petition-access.no-access-added",
+    "definition": "",
+    "context": "No access has been added yet."
+  },
+  {
+    "term": "petition-access.send-request-or-add-access",
+    "definition": "",
+    "context": "<a>Send the request</a> to include recipients or do it from the <b>Add access</b> button of this table."
   },
   {
     "term": "petition-access.status-active",
@@ -5268,11 +5283,6 @@
     "term": "petition-signature.no-reply-submitted",
     "definition": "No se ha subido ninguna respuesta.",
     "context": "No replies have been submitted."
-  },
-  {
-    "term": "petition.activity-not-available",
-    "definition": "Una vez envíes esta petición, podrás ver toda la actividad aquí",
-    "context": "Once you send this petition, you will be able to see all the petition activity here."
   },
   {
     "term": "petition.add-access.header",
@@ -5643,11 +5653,6 @@
     "term": "petition.reopen.dialog-subheading",
     "definition": "Vas a reabrir la petición y quedará registrado internamente. Siempre podrás cerrarla de nuevo manualmente.",
     "context": "You are about to reopen the petition and it will be registered internally. You can always close it again manually."
-  },
-  {
-    "term": "petition.replies-not-available",
-    "definition": "Cuando envíes esta petición, encontrarás todas las respuestas aquí. ",
-    "context": "Once you send this petition, you will be able to see all the replies here."
   },
   {
     "term": "petition.replies.download-file-error-dialog.body",

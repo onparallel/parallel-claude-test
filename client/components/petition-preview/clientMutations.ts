@@ -19,6 +19,7 @@ import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { uploadFile } from "@parallel/utils/uploadFile";
 import { MutableRefObject, useCallback } from "react";
 import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
+import { DynamicSelectValue } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
 
 const _deletePetitionReply = gql`
   mutation PreviewPetitionFieldMutations_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
@@ -46,10 +47,9 @@ export function useDeletePetitionReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        // updateFieldReplies(client, fieldId, (replies) =>
-        //   replies.filter(({ id }) => id !== replyId)
-        // );
-        // updatePetitionStatus(client, petitionId);
+        updatePreviewFieldReplies(client, fieldId, (replies) =>
+          replies.filter(({ id }) => id !== replyId)
+        );
       } else {
         await deletePetitionReply({
           variables: { petitionId, replyId },
@@ -62,7 +62,7 @@ export function useDeletePetitionReply() {
         });
       }
     },
-    [deletePetitionReply]
+    [deletePetitionReply, client]
   );
 }
 
@@ -82,7 +82,7 @@ const _updateSimpleReply = gql`
 `;
 
 export function useUpdateSimpleReply() {
-  const { cache } = useApolloClient();
+  const client = useApolloClient();
   const [updateSimpleReply] = useMutation(PreviewPetitionFieldMutations_updateSimpleReplyDocument);
   return useCallback(
     async function _updateSimpleReply({
@@ -97,11 +97,10 @@ export function useUpdateSimpleReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        updateReplyContent(cache, replyId, (content) => ({
+        updateReplyContent(client, replyId, (content) => ({
           ...content,
           text: reply,
         }));
-        updatePetitionStatus(cache, petitionId);
       } else {
         await updateSimpleReply({
           variables: {
@@ -117,7 +116,7 @@ export function useUpdateSimpleReply() {
         });
       }
     },
-    [updateSimpleReply, cache]
+    [updateSimpleReply, client]
   );
 }
 
@@ -151,7 +150,6 @@ export function useCreateSimpleReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        console.log("lol");
         const random = Math.floor(1000000 + Math.random() * 9000000);
         const id = `${fieldId}-${random}`;
         updatePreviewFieldReplies(client, fieldId, (replies) => [
@@ -165,7 +163,6 @@ export function useCreateSimpleReply() {
             updatedAt: new Date().toISOString(),
           },
         ]);
-        // updatePetitionStatus(cache, petitionId);
         return { id, __typename: "PetitionFieldReply" };
       } else {
         const { data } = await createSimpleReply({
@@ -202,6 +199,8 @@ const _createCheckboxReply = gql`
 `;
 
 export function useCreateCheckboxReply() {
+  const client = useApolloClient();
+
   const [createCheckboxReply] = useMutation(
     PreviewPetitionFieldMutations_createCheckboxReplyDocument
   );
@@ -210,27 +209,49 @@ export function useCreateCheckboxReply() {
       petitionId,
       fieldId,
       values,
+      isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
       values: string[];
+      isCacheOnly?: boolean;
     }) {
-      const { data } = await createCheckboxReply({
-        variables: {
-          petitionId,
-          fieldId,
-          values,
-        },
-        update(cache, { data }) {
-          updateFieldReplies(cache, fieldId, (replies) => [...replies, data!.createCheckboxReply]);
-          if (data) {
-            updatePetitionStatus(cache, petitionId);
-          }
-        },
-      });
-      return data?.createCheckboxReply;
+      if (isCacheOnly) {
+        const random = Math.floor(1000000 + Math.random() * 9000000);
+        const id = `${fieldId}-${random}`;
+        updatePreviewFieldReplies(client, fieldId, (replies) => [
+          ...(replies ?? []),
+          {
+            id,
+            __typename: "PetitionFieldReply",
+            status: "PENDING",
+            content: { choices: values },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ]);
+        return { id, __typename: "PetitionFieldReply" };
+      } else {
+        const { data } = await createCheckboxReply({
+          variables: {
+            petitionId,
+            fieldId,
+            values,
+          },
+          update(cache, { data }) {
+            updateFieldReplies(cache, fieldId, (replies) => [
+              ...replies,
+              data!.createCheckboxReply,
+            ]);
+            if (data) {
+              updatePetitionStatus(cache, petitionId);
+            }
+          },
+        });
+        return data?.createCheckboxReply;
+      }
     },
-    [createCheckboxReply]
+    [createCheckboxReply, client]
   );
 }
 
@@ -250,6 +271,8 @@ const _updateCheckboxReply = gql`
 `;
 
 export function useUpdateCheckboxReply() {
+  const client = useApolloClient();
+
   const [updateCheckboxReply] = useMutation(
     PreviewPetitionFieldMutations_updateCheckboxReplyDocument
   );
@@ -258,25 +281,34 @@ export function useUpdateCheckboxReply() {
       petitionId,
       replyId,
       values,
+      isCacheOnly,
     }: {
       petitionId: string;
       replyId: string;
       values: string[];
+      isCacheOnly?: boolean;
     }) {
-      await updateCheckboxReply({
-        variables: {
-          petitionId,
-          replyId,
-          values,
-        },
-        update(cache, { data }) {
-          if (data) {
-            updatePetitionStatus(cache, petitionId);
-          }
-        },
-      });
+      if (isCacheOnly) {
+        updateReplyContent(client, replyId, (content) => ({
+          ...content,
+          choices: values,
+        }));
+      } else {
+        await updateCheckboxReply({
+          variables: {
+            petitionId,
+            replyId,
+            values,
+          },
+          update(cache, { data }) {
+            if (data) {
+              updatePetitionStatus(cache, petitionId);
+            }
+          },
+        });
+      }
     },
-    [updateCheckboxReply]
+    [updateCheckboxReply, client]
   );
 }
 
@@ -294,6 +326,8 @@ const _createDynamicSelectReply = gql`
 `;
 
 export function useCreateDynamicSelectReply() {
+  const client = useApolloClient();
+
   const [createDynamicSelectReply] = useMutation(
     PreviewPetitionFieldMutations_createDynamicSelectReplyDocument
   );
@@ -302,30 +336,49 @@ export function useCreateDynamicSelectReply() {
       petitionId,
       fieldId,
       value,
+      isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
-      value: [string, string | null][];
+      value: DynamicSelectValue;
+      isCacheOnly?: boolean;
     }) {
-      const { data } = await createDynamicSelectReply({
-        variables: {
-          petitionId,
-          fieldId,
-          value,
-        },
-        update(cache, { data }) {
-          updateFieldReplies(cache, fieldId, (replies) => [
-            ...replies,
-            data!.createDynamicSelectReply,
-          ]);
-          if (data) {
-            updatePetitionStatus(cache, petitionId);
-          }
-        },
-      });
-      return data?.createDynamicSelectReply;
+      if (isCacheOnly) {
+        const random = Math.floor(1000000 + Math.random() * 9000000);
+        const id = `${fieldId}-${random}`;
+        updatePreviewFieldReplies(client, fieldId, (replies) => [
+          ...(replies ?? []),
+          {
+            id,
+            __typename: "PetitionFieldReply",
+            status: "PENDING",
+            content: { columns: value },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ]);
+        return { id, __typename: "PetitionFieldReply" };
+      } else {
+        const { data } = await createDynamicSelectReply({
+          variables: {
+            petitionId,
+            fieldId,
+            value,
+          },
+          update(cache, { data }) {
+            updateFieldReplies(cache, fieldId, (replies) => [
+              ...replies,
+              data!.createDynamicSelectReply,
+            ]);
+            if (data) {
+              updatePetitionStatus(cache, petitionId);
+            }
+          },
+        });
+        return data?.createDynamicSelectReply;
+      }
     },
-    [createDynamicSelectReply]
+    [createDynamicSelectReply, client]
   );
 }
 
@@ -345,6 +398,8 @@ const _updateDynamicSelectReply = gql`
 `;
 
 export function useUpdateDynamicSelectReply() {
+  const client = useApolloClient();
+
   const [updateDynamicSelectReply] = useMutation(
     PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument
   );
@@ -353,25 +408,34 @@ export function useUpdateDynamicSelectReply() {
       petitionId,
       replyId,
       value,
+      isCacheOnly,
     }: {
       petitionId: string;
       replyId: string;
-      value: [string, string | null][];
+      value: DynamicSelectValue;
+      isCacheOnly?: boolean;
     }) {
-      await updateDynamicSelectReply({
-        variables: {
-          petitionId,
-          replyId,
-          value,
-        },
-        update(cache, { data }) {
-          if (data) {
-            updatePetitionStatus(cache, petitionId);
-          }
-        },
-      });
+      if (isCacheOnly) {
+        updateReplyContent(client, replyId, (content) => ({
+          ...content,
+          columns: value,
+        }));
+      } else {
+        await updateDynamicSelectReply({
+          variables: {
+            petitionId,
+            replyId,
+            value,
+          },
+          update(cache, { data }) {
+            if (data) {
+              updatePetitionStatus(cache, petitionId);
+            }
+          },
+        });
+      }
     },
-    [updateDynamicSelectReply]
+    [updateDynamicSelectReply, client]
   );
 }
 
@@ -420,51 +484,77 @@ export function useCreateFileUploadReply() {
       fieldId,
       content,
       uploads,
+      isCacheOnly,
     }: {
       petitionId: string;
       fieldId: string;
       content: File[];
       uploads: MutableRefObject<Record<string, XMLHttpRequest>>;
+      isCacheOnly?: boolean;
     }) {
-      for (const file of content) {
-        const { data } = await createFileUploadReply({
-          variables: {
-            petitionId,
-            fieldId: fieldId,
-            file: {
-              filename: file.name,
-              size: file.size,
-              contentType: file.type,
+      if (isCacheOnly) {
+        for (const file of content) {
+          const random = Math.floor(1000000 + Math.random() * 9000000);
+          const id = `${fieldId}-${random}`;
+          updatePreviewFieldReplies(apollo, fieldId, (replies) => [
+            ...(replies ?? []),
+            {
+              id,
+              __typename: "PetitionFieldReply",
+              status: "PENDING",
+              content: {
+                filename: file.name,
+                size: file.size,
+                contentType: file.type,
+                uploadComplete: true,
+                progress: Math.floor(Math.random() * (99 - 70 + 1) + 70) / 100,
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
             },
-          },
-          update(cache, { data }) {
-            const reply = data!.createFileUploadReply.reply;
-            updateFieldReplies(cache, fieldId, (replies) => [...replies, reply]);
-            updateReplyContent(cache, reply.id, (content) => ({
-              ...content,
-              progress: 0,
-            }));
-            if (data) {
-              updatePetitionStatus(cache, petitionId);
-            }
-          },
-        });
-        const { reply, presignedPostData } = data!.createFileUploadReply;
+          ]);
+        }
+      } else {
+        for (const file of content) {
+          const { data } = await createFileUploadReply({
+            variables: {
+              petitionId,
+              fieldId: fieldId,
+              file: {
+                filename: file.name,
+                size: file.size,
+                contentType: file.type,
+              },
+            },
+            update(cache, { data }) {
+              const reply = data!.createFileUploadReply.reply;
+              updateFieldReplies(cache, fieldId, (replies) => [...replies, reply]);
+              updateReplyContent(cache, reply.id, (content) => ({
+                ...content,
+                progress: 0,
+              }));
+              if (data) {
+                updatePetitionStatus(cache, petitionId);
+              }
+            },
+          });
+          const { reply, presignedPostData } = data!.createFileUploadReply;
 
-        uploads.current[reply.id] = uploadFile(file, presignedPostData, {
-          onProgress(progress) {
-            updateReplyContent(apollo, reply.id, (content) => ({
-              ...content,
-              progress,
-            }));
-          },
-          async onComplete() {
-            delete uploads.current[reply.id];
-            await fileUploadReplyComplete({
-              variables: { petitionId, replyId: reply.id },
-            });
-          },
-        });
+          uploads.current[reply.id] = uploadFile(file, presignedPostData, {
+            onProgress(progress) {
+              updateReplyContent(apollo, reply.id, (content) => ({
+                ...content,
+                progress,
+              }));
+            },
+            async onComplete() {
+              delete uploads.current[reply.id];
+              await fileUploadReplyComplete({
+                variables: { petitionId, replyId: reply.id },
+              });
+            },
+          });
+        }
       }
     },
     [createFileUploadReply, fileUploadReplyComplete]
@@ -483,7 +573,7 @@ function updateFieldReplies(
   updateFragment(proxy, {
     id: fieldId,
     fragment: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
-    data: (cached) => ({ ...cached, replies: updateFn(cached!.replies) }),
+    data: (cached) => ({ ...cached, replies: updateFn(cached!.replies), previewReplies: [] }),
   });
 }
 
@@ -498,7 +588,11 @@ function updatePreviewFieldReplies(
     id: fieldId,
     fragment: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
     fragmentName: "PreviewPetitionFieldMutations_updateFieldReplies_PetitionField",
-    data: (cached) => ({ ...cached, replies: [], previewReplies: updateFn(cached!.replies) }),
+    data: (cached) => ({
+      ...cached,
+      replies: [],
+      previewReplies: updateFn(cached!.previewReplies),
+    }),
   });
 }
 

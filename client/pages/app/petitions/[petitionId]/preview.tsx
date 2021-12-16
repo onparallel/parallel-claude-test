@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Flex, Stack } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Flex, Stack, Text } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
@@ -27,7 +27,7 @@ import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/useP
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
@@ -55,17 +55,16 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   );
 
   const petition = data!.petition as PetitionPreview_PetitionBaseFragment;
+  const isPetition = petition.__typename === "Petition";
 
   const pageCount =
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;
 
   const currentPage = Number(query.page) || 1;
 
-  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage);
+  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, !isPetition);
 
   const breakpoint = "md";
-
-  const isPetition = petition.__typename === "Petition";
 
   const handleNextClick = useCallback(async () => {}, [petition]);
 
@@ -131,6 +130,17 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           ) : null
         }
       >
+        {!isPetition ? (
+          <Alert status="info">
+            <AlertIcon />
+            <Text>
+              <FormattedMessage
+                id="page.preview.template-only-cache-alert"
+                defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be copied to the request. will not be copied into the request. To complete and submit this template click on <b>Use template</b>."
+              />
+            </Text>
+          </Alert>
+        ) : null}
         <Flex backgroundColor="gray.50" minHeight="100%" flexDirection="column" alignItems="center">
           <Flex
             flex="1"

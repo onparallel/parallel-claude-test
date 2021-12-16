@@ -14,9 +14,10 @@ type PetitionFieldSelection =
 
 export function useGetPageFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
   fields: T,
-  page: number
+  page: number,
+  isCacheOnly: boolean
 ) {
-  const visibility = useFieldVisibility(fields);
+  const visibility = useFieldVisibility(fields, isCacheOnly);
   return useMemo(() => {
     const pages = groupFieldsByPages<PetitionFieldSelection>(fields, visibility);
     return { fields: pages[page - 1] as T, pages: pages.length, visibility };

@@ -9,7 +9,6 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useCallback, useRef } from "react";
 import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/FailureGeneratingLinkDialog";
-import { usePetitionFieldCommentsDialog } from "../recipient-view/dialogs/RecipientViewPetitionFieldCommentsDialog";
 import { UploadCache } from "../recipient-view/fields/RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
@@ -36,12 +35,17 @@ import {
   useUpdateCheckboxReply,
   useUpdateDynamicSelectReply,
   useUpdateSimpleReply,
-} from "./mutations";
+} from "./clientMutations";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
+    | "children"
+    | "showAddNewReply"
+    | "onAddNewReply"
+    | "onDownloadAttachment"
+    | "field"
+    | "petitionId"
   > {
   field: PreviewPetitionField_PetitionFieldFragment;
   petitionId: string;
@@ -49,8 +53,14 @@ export interface PreviewPetitionFieldProps
   isCacheOnly: boolean;
 }
 
-export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPetitionFieldProps) {
+export function PreviewPetitionField({
+  field,
+  petitionId,
+  isCacheOnly,
+  ...props
+}: PreviewPetitionFieldProps) {
   const uploads = useRef<UploadCache>({});
+  const fieldId = field.id;
 
   const [petitionFieldAttachmentDownloadLink] = useMutation(
     PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument
@@ -59,8 +69,8 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
     openNewWindow(async () => {
       const { data } = await petitionFieldAttachmentDownloadLink({
         variables: {
-          petitionId: props.petitionId,
-          fieldId: field.id,
+          petitionId,
+          fieldId,
           attachmentId,
         },
       });
@@ -69,7 +79,7 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
     });
   };
 
-  const showFieldComments = usePetitionFieldCommentsDialog();
+  // const showFieldComments = usePetitionFieldCommentsDialog();
   async function handleCommentsButtonClick() {
     try {
     } catch {}
@@ -84,8 +94,8 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
           delete uploads.current[replyId];
         }
         await deletePetitionReply({
-          petitionId: props.petitionId,
-          fieldId: field.id,
+          petitionId,
+          fieldId,
           replyId,
           isCacheOnly,
         });
@@ -99,7 +109,7 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
     async (replyId: string, reply: string) => {
       try {
         await updateSimpleReply({
-          petitionId: props.petitionId,
+          petitionId,
           replyId,
           reply,
           isCacheOnly,
@@ -114,8 +124,8 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
     async (reply: string) => {
       try {
         const res = await createSimpleReply({
-          petitionId: props.petitionId,
-          fieldId: field.id,
+          petitionId,
+          fieldId,
           reply,
           isCacheOnly,
         });
@@ -132,9 +142,10 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
     async (replyId: string, values: string[]) => {
       try {
         await updateCheckboxReply({
-          petitionId: props.petitionId,
+          petitionId,
           replyId,
           values,
+          isCacheOnly,
         });
       } catch {}
     },
@@ -146,9 +157,10 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
     async (values: CheckboxValue) => {
       try {
         await createChekcboxReply({
-          petitionId: props.petitionId,
-          fieldId: field.id,
+          petitionId,
+          fieldId,
           values,
+          isCacheOnly,
         });
       } catch {}
     },
@@ -159,9 +171,10 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
   const handleUpdateDynamicSelectReply = useCallback(
     async (replyId: string, value: DynamicSelectValue) => {
       await updateDynamicSelectReply({
-        petitionId: props.petitionId,
+        petitionId,
         replyId,
         value,
+        isCacheOnly,
       });
     },
     [updateDynamicSelectReply]
@@ -172,9 +185,10 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
     async (value: DynamicSelectValue) => {
       try {
         const reply = await createDynamicSelectReply({
-          petitionId: props.petitionId,
-          fieldId: field.id,
+          petitionId,
+          fieldId,
           value,
+          isCacheOnly,
         });
 
         return reply?.id;
@@ -188,10 +202,11 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
     async (content: File[]) => {
       try {
         createFileUploadReply({
-          petitionId: props.petitionId,
-          fieldId: field.id,
+          petitionId,
+          fieldId,
           content,
           uploads,
+          isCacheOnly,
         });
       } catch {}
     },
@@ -206,13 +221,14 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
   const handleDonwloadFileUploadReply = useCallback(
     async (replyId: string) => {
       try {
+        if (isCacheOnly) return;
         openNewWindow(async () => {
           const reply = apollo.cache.readFragment({
             fragment: PreviewPetitionField_PetitionFieldReplyFragmentDoc,
           });
           const { data } = await downloadFileUploadReply({
             variables: {
-              petitionId: props.petitionId,
+              petitionId,
               replyId,
               preview: false,
             },
@@ -231,6 +247,7 @@ export function PreviewPetitionField({ isCacheOnly, field, ...props }: PreviewPe
 
   const commonProps = {
     field: { ...field, replies: isCacheOnly ? field.previewReplies : field.replies },
+    petitionId,
     onCommentsButtonClick: handleCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment,
   };

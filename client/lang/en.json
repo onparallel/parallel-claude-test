@@ -4715,6 +4715,11 @@
     "context": "Export to PDF"
   },
   {
+    "term": "page.preview.template-only-cache-alert",
+    "definition": "<b>Preview only</b> - Changes you add as replies or comments will not be copied to the request. will not be copied into the request. To complete and submit this template click on <b>Use template</b>.",
+    "context": "<b>Preview only</b> - Changes you add as replies or comments will not be copied to the request. will not be copied into the request. To complete and submit this template click on <b>Use template</b>."
+  },
+  {
     "term": "page.pricing.activity-log",
     "definition": "Activity log",
     "context": "Activity log"
@@ -4963,6 +4968,16 @@
     "term": "petition-access.header",
     "definition": "Petition access control",
     "context": "Petition access control"
+  },
+  {
+    "term": "petition-access.no-access-added",
+    "definition": "No access has been added yet.",
+    "context": "No access has been added yet."
+  },
+  {
+    "term": "petition-access.send-request-or-add-access",
+    "definition": "<a>Send the request</a> to include recipients or do it from the <b>Add access</b> button of this table.",
+    "context": "<a>Send the request</a> to include recipients or do it from the <b>Add access</b> button of this table."
   },
   {
     "term": "petition-access.status-active",
@@ -5268,11 +5283,6 @@
     "term": "petition-signature.no-reply-submitted",
     "definition": "No replies have been submitted.",
     "context": "No replies have been submitted."
-  },
-  {
-    "term": "petition.activity-not-available",
-    "definition": "Once you send this petition, you will be able to see all the petition activity here.",
-    "context": "Once you send this petition, you will be able to see all the petition activity here."
   },
   {
     "term": "petition.add-access.header",
@@ -5643,11 +5653,6 @@
     "term": "petition.reopen.dialog-subheading",
     "definition": "You are about to reopen the petition and it will be registered internally. You can always close it again manually.",
     "context": "You are about to reopen the petition and it will be registered internally. You can always close it again manually."
-  },
-  {
-    "term": "petition.replies-not-available",
-    "definition": "Once you send this petition, you will be able to see all the replies here.",
-    "context": "Once you send this petition, you will be able to see all the replies here."
   },
   {
     "term": "petition.replies.download-file-error-dialog.body",

@@ -20,6 +20,7 @@ import { uploadFile } from "@parallel/utils/uploadFile";
 import { MutableRefObject, useCallback } from "react";
 import { pick } from "remeda";
 import { RecipientViewPetitionFieldCard } from "./RecipientViewPetitionFieldCard";
+import { DynamicSelectValue } from "./RecipientViewPetitionFieldDynamicSelect";
 
 const _publicDeletePetitionReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicDeletePetitionReply(
@@ -286,7 +287,7 @@ export function useCreateDynamicSelectReply() {
       petitionId: string;
       keycode: string;
       fieldId: string;
-      value: [string, string | null][];
+      value: DynamicSelectValue;
     }) {
       const { data } = await createDynamicSelectReply({
         variables: {
@@ -339,7 +340,7 @@ export function useUpdateDynamicSelectReply() {
       petitionId: string;
       keycode: string;
       replyId: string;
-      value: [string, string | null][];
+      value: DynamicSelectValue;
     }) {
       await updateDynamicSelectReply({
         variables: {
