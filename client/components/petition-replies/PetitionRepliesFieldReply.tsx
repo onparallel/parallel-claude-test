@@ -11,7 +11,9 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionFieldReplyStatus,
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
+  PetitionRepliesFieldReply_userDocument,
 } from "@parallel/graphql/__types";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { FORMATS } from "@parallel/utils/dates";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
@@ -39,6 +41,11 @@ export function PetitionRepliesFieldReply({
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
   const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(reply.field!.type);
+
+  const {
+    data: { me },
+  } = useAssertQueryOrPreviousData(PetitionRepliesFieldReply_userDocument);
+
   return (
     <Flex>
       <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
@@ -142,7 +149,15 @@ export function PetitionRepliesFieldReply({
               />
             </Text>
           ) : (
-            <DateTime as="span" color="gray.500" value={reply.createdAt} format={FORMATS.LLL} />
+            <Text color="gray.500">
+              {reply.updatedBy.id === me.id
+                ? intl.formatMessage({
+                    id: "generic.you",
+                    defaultMessage: "You",
+                  })
+                : reply.updatedBy.fullName}
+              , <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
+            </Text>
           )}
         </Box>
       </Flex>
@@ -189,9 +204,29 @@ PetitionRepliesFieldReply.fragments = {
       field {
         type
       }
+      updatedBy {
+        ... on User {
+          id
+          fullName
+        }
+        ... on Contact {
+          id
+          fullName
+        }
+      }
     }
   `,
 };
+
+PetitionRepliesFieldReply.queries = [
+  gql`
+    query PetitionRepliesFieldReply_user {
+      me {
+        id
+      }
+    }
+  `,
+];
 
 const ReplyDownloadButton = chakraForwardRef<
   "button",

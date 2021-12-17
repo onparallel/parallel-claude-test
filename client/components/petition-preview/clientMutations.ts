@@ -17,10 +17,10 @@ import {
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { uploadFile } from "@parallel/utils/uploadFile";
+import { customAlphabet } from "nanoid";
 import { MutableRefObject, useCallback } from "react";
 import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 import { DynamicSelectValue } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
-import { customAlphabet } from "nanoid";
 
 function getRandomId() {
   const nanoid = customAlphabet("1234567890abcdefgihjklmnopqrstvwxyz", 6);
@@ -68,7 +68,7 @@ export function useDeletePetitionReply() {
         });
       }
     },
-    [deletePetitionReply, client]
+    [deletePetitionReply]
   );
 }
 
@@ -122,7 +122,7 @@ export function useUpdateSimpleReply() {
         });
       }
     },
-    [updateSimpleReply, client]
+    [updateSimpleReply]
   );
 }
 
@@ -186,7 +186,7 @@ export function useCreateSimpleReply() {
         return data?.createSimpleReply;
       }
     },
-    [createSimpleReply, client]
+    [createSimpleReply]
   );
 }
 
@@ -255,7 +255,7 @@ export function useCreateCheckboxReply() {
         return data?.createCheckboxReply;
       }
     },
-    [createCheckboxReply, client]
+    [createCheckboxReply]
   );
 }
 
@@ -312,7 +312,7 @@ export function useUpdateCheckboxReply() {
         });
       }
     },
-    [updateCheckboxReply, client]
+    [updateCheckboxReply]
   );
 }
 
@@ -381,7 +381,7 @@ export function useCreateDynamicSelectReply() {
         return data?.createDynamicSelectReply;
       }
     },
-    [createDynamicSelectReply, client]
+    [createDynamicSelectReply]
   );
 }
 
@@ -438,7 +438,7 @@ export function useUpdateDynamicSelectReply() {
         });
       }
     },
-    [updateDynamicSelectReply, client]
+    [updateDynamicSelectReply]
   );
 }
 
@@ -510,7 +510,6 @@ export function useCreateFileUploadReply() {
                 size: file.size,
                 contentType: file.type,
                 uploadComplete: true,
-                progress: Math.floor(Math.random() * (99 - 70 + 1) + 70) / 100,
               },
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),

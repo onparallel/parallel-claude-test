@@ -12,7 +12,10 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import { MoreVerticalIcon } from "@parallel/chakra/icons";
-import { RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment } from "@parallel/graphql/__types";
+import {
+  PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment,
+  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
+} from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
@@ -28,7 +31,9 @@ export function FieldComment({
   onDelete,
   onEdit,
 }: {
-  comment: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
+  comment:
+    | RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
+    | PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment;
   contactId: string;
   onDelete: () => void;
   onEdit: (content: string) => void;
@@ -72,13 +77,7 @@ export function FieldComment({
     <Box paddingX={6} paddingY={2} backgroundColor={comment.isUnread ? "purple.50" : "white"}>
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
-          {comment.author?.__typename === "PublicContact" ? (
-            comment.author.fullName
-          ) : comment.author?.__typename === "PublicUser" ? (
-            comment.author.fullName
-          ) : (
-            <DeletedContact />
-          )}
+          {comment?.author?.fullName ? comment.author.fullName : <DeletedContact />}
         </Box>
 
         <DateTime color="gray.500" value={comment.createdAt} format={FORMATS.LLL} useRelativeTime />

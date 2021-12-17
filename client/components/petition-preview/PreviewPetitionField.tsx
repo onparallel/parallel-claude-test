@@ -36,6 +36,10 @@ import {
   useUpdateDynamicSelectReply,
   useUpdateSimpleReply,
 } from "./clientMutations";
+import {
+  PreviewPetitionFieldCommentsDialog,
+  usePreviewPetitionFieldCommentsDialog,
+} from "./dialogs/PreviewPetitionFieldCommentsDialog";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -79,9 +83,13 @@ export function PreviewPetitionField({
     });
   };
 
-  // const showFieldComments = usePetitionFieldCommentsDialog();
+  const showFieldComments = usePreviewPetitionFieldCommentsDialog();
   async function handleCommentsButtonClick() {
     try {
+      await showFieldComments({
+        petitionId,
+        field,
+      });
     } catch {}
   }
 
@@ -301,10 +309,12 @@ PreviewPetitionField.fragments = {
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
+      ...PreviewPetitionFieldCommentsDialog_PetitionField
       previewReplies @client {
         ...RecipientViewPetitionFieldCard_PetitionFieldReply
       }
     }
+    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
   `,
