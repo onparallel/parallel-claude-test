@@ -3572,7 +3572,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async removePetitionFieldAttachment(attachmentId: number, user: User) {
-    await this.withTransaction(async (t) => {
+    return await this.withTransaction(async (t) => {
       const [row] = await this.from("petition_field_attachment", t)
         .where("id", attachmentId)
         .update({
@@ -3581,7 +3581,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .returning("*");
 
-      await this.safeDeleteFileUploadAttachments([row.file_upload_id], user, t);
+      return await this.safeDeleteFileUploadAttachments([row.file_upload_id], user, t);
     });
   }
 
@@ -3591,9 +3591,12 @@ export class PetitionRepository extends BaseRepository {
     user: User,
     t?: Knex.Transaction
   ) {
-    if (fileUploadIds.length > 0) {
-      await this.raw(
-        /* sql */ `
+    if (fileUploadIds.length === 0) {
+      return [];
+    }
+
+    return await this.raw<FileUpload>(
+      /* sql */ `
         update file_upload set deleted_at = ?, deleted_by = ?
         where id in (${fileUploadIds.map(() => "?").join(", ")})
         and deleted_at is null
@@ -3601,11 +3604,11 @@ export class PetitionRepository extends BaseRepository {
           select id from petition_field_attachment 
           where deleted_at is null 
           and file_upload_id in (${fileUploadIds.map(() => "?").join(", ")})
-          )`,
-        [this.now(), `User:${user.id}`, ...fileUploadIds, ...fileUploadIds],
-        t
-      );
-    }
+          )
+        returning *`,
+      [this.now(), `User:${user.id}`, ...fileUploadIds, ...fileUploadIds],
+      t
+    );
   }
 
   private async removePetitionFieldAttachmentByFieldId(

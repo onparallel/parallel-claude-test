@@ -3,6 +3,8 @@ import { HeadObjectOutput, PresignedPost } from "aws-sdk/clients/s3";
 import contentDisposition from "content-disposition";
 import { injectable } from "inversify";
 import { Readable } from "stream";
+import { unMaybeArray } from "../util/arrays";
+import { MaybeArray } from "../util/types";
 
 export const STORAGE_FACTORY = Symbol.for("FACTORY<STORAGE>");
 
@@ -21,7 +23,7 @@ export interface IStorage {
   ): Promise<string>;
   downloadFile(key: string): Readable;
   getFileMetadata(key: string): Promise<HeadObjectOutput>;
-  deleteFile(key: string): Promise<void>;
+  deleteFile(key: MaybeArray<string>): Promise<void>;
   uploadFile(key: string, contentType: string, body: Buffer | Readable): Promise<HeadObjectOutput>;
 }
 const _4GB = 1024 * 1024 * 1024 * 4;
@@ -81,11 +83,13 @@ export class Storage implements IStorage {
       .promise();
   }
 
-  async deleteFile(key: string) {
+  async deleteFile(keys: MaybeArray<string>) {
     await this.s3
-      .deleteObject({
+      .deleteObjects({
         Bucket: this.bucketName,
-        Key: key,
+        Delete: {
+          Objects: unMaybeArray(keys).map((key) => ({ Key: key })),
+        },
       })
       .promise();
   }
