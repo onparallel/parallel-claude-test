@@ -175,19 +175,6 @@ export type FeatureFlag =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
-/** A file attachment */
-export type FileAttachment = CreatedAt & {
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  file: FileUpload;
-  id: Scalars["GID"];
-};
-
-export type FileAttachmentUploadData = {
-  attachment: FileAttachment;
-  presignedPostData: AWSPresignedPostData;
-};
-
 export type FileUpload = {
   contentType: Scalars["String"];
   filename: Scalars["String"];
@@ -376,10 +363,12 @@ export type Mutation = {
   createOrganizationUser: User;
   /** Create petition. */
   createPetition: PetitionBase;
+  /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
+  createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
   /** Creates a petition field */
   createPetitionField: PetitionBaseAndField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
-  createPetitionFieldAttachmentUploadLink: FileAttachmentUploadData;
+  createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionField;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
@@ -404,8 +393,12 @@ export type Mutation = {
   deleteEventSubscriptions: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
+  /** Remove a petition attachment */
+  deletePetitionAttachment: Result;
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
+  /** Remove a petition field attachment */
+  deletePetitionFieldAttachment: Result;
   /** Delete a petition field comment. */
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
@@ -432,10 +425,14 @@ export type Mutation = {
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
   modifyPetitionCustomProperty: PetitionBase;
+  /** Generates a download link for a petition attachment */
+  petitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  /** Tells the backend that the petition attachment was correctly uploaded to S3 */
+  petitionAttachmentUploadComplete: PetitionAttachment;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
-  petitionFieldAttachmentUploadComplete: FileAttachment;
+  petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -482,8 +479,6 @@ export type Mutation = {
   publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
-  /** Remove a petition field attachment */
-  removePetitionFieldAttachment: Result;
   /** Removes permissions on given petitions and users */
   removePetitionPermission: Array<PetitionBase>;
   /** Removes users from a user group */
@@ -725,6 +720,11 @@ export type MutationcreatePetitionArgs = {
   type?: InputMaybe<PetitionBaseType>;
 };
 
+export type MutationcreatePetitionAttachmentUploadLinkArgs = {
+  data: FileUploadInput;
+  petitionId: Scalars["GID"];
+};
+
 export type MutationcreatePetitionFieldArgs = {
   petitionId: Scalars["GID"];
   position?: InputMaybe<Scalars["Int"]>;
@@ -806,9 +806,20 @@ export type MutationdeletePetitionArgs = {
   petitionId: Scalars["ID"];
 };
 
+export type MutationdeletePetitionAttachmentArgs = {
+  attachmentId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+};
+
 export type MutationdeletePetitionFieldArgs = {
   fieldId: Scalars["GID"];
   force?: InputMaybe<Scalars["Boolean"]>;
+  petitionId: Scalars["GID"];
+};
+
+export type MutationdeletePetitionFieldAttachmentArgs = {
+  attachmentId: Scalars["GID"];
+  fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 };
 
@@ -876,6 +887,16 @@ export type MutationmodifyPetitionCustomPropertyArgs = {
   key: Scalars["String"];
   petitionId: Scalars["GID"];
   value?: InputMaybe<Scalars["String"]>;
+};
+
+export type MutationpetitionAttachmentDownloadLinkArgs = {
+  attachmentId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+};
+
+export type MutationpetitionAttachmentUploadCompleteArgs = {
+  attachmentId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
@@ -1025,12 +1046,6 @@ export type MutationpublicUpdateSimpleReplyArgs = {
 
 export type MutationreactivateAccessesArgs = {
   accessIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-};
-
-export type MutationremovePetitionFieldAttachmentArgs = {
-  attachmentId: Scalars["GID"];
-  fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 };
 
@@ -1604,6 +1619,18 @@ export type PetitionAndPartialFields = {
   petition: Petition;
 };
 
+export type PetitionAttachment = CreatedAt & {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  file: FileUpload;
+  id: Scalars["GID"];
+};
+
+export type PetitionAttachmentUploadData = {
+  attachment: PetitionAttachment;
+  presignedPostData: AWSPresignedPostData;
+};
+
 export type PetitionBase = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -1778,7 +1805,7 @@ export type PetitionField = {
   /** The alias of the petition field. */
   alias: Maybe<Scalars["String"]>;
   /** A list of files attached to this field. */
-  attachments: Array<FileAttachment>;
+  attachments: Array<PetitionFieldAttachment>;
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
@@ -1808,6 +1835,19 @@ export type PetitionField = {
   validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility: Maybe<Scalars["JSONObject"]>;
+};
+
+/** A file attachment on the petition */
+export type PetitionFieldAttachment = CreatedAt & {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  file: FileUpload;
+  id: Scalars["GID"];
+};
+
+export type PetitionFieldAttachmentUploadData = {
+  attachment: PetitionFieldAttachment;
+  presignedPostData: AWSPresignedPostData;
 };
 
 /** A comment on a petition field */
@@ -2275,7 +2315,7 @@ export type PublicPetitionAccess = {
 /** A field within a petition. */
 export type PublicPetitionField = {
   /** A list of files attached to this field. */
-  attachments: Array<FileAttachment>;
+  attachments: Array<PetitionFieldAttachment>;
   commentCount: Scalars["Int"];
   /** The comments for this field. */
   comments: Array<PublicPetitionFieldComment>;

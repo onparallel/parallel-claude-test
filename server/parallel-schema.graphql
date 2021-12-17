@@ -728,9 +728,19 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Remove a petition attachment
+  """
+  deletePetitionAttachment(attachmentId: GID!, petitionId: GID!): Result!
+
+  """
   Deletes a petition field.
   """
   deletePetitionField(fieldId: GID!, force: Boolean = false, petitionId: GID!): PetitionBase!
+
+  """
+  Remove a petition field attachment
+  """
+  deletePetitionFieldAttachment(attachmentId: GID!, fieldId: GID!, petitionId: GID!): Result!
 
   """
   Delete a petition field comment.
@@ -1026,16 +1036,6 @@ type Mutation {
   Reactivates the specified inactive petition accesses.
   """
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
-
-  """
-  Remove a petition attachment
-  """
-  removePetitionAttachment(attachmentId: GID!, petitionId: GID!): Result!
-
-  """
-  Remove a petition field attachment
-  """
-  removePetitionFieldAttachment(attachmentId: GID!, fieldId: GID!, petitionId: GID!): Result!
 
   """
   Removes permissions on given petitions and users

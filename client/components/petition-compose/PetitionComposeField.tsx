@@ -30,7 +30,7 @@ import {
   PetitionComposeField_PetitionFieldAttachmentFragment,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
   PetitionComposeField_PetitionFieldFragment,
-  PetitionComposeField_removePetitionFieldAttachmentDocument,
+  PetitionComposeField_deletePetitionFieldAttachmentDocument,
   PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDoc,
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -144,8 +144,8 @@ const _PetitionComposeField = chakraForwardRef<
   const [petitionFieldAttachmentUploadComplete] = useMutation(
     PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument
   );
-  const [removePetitionFieldAttachment] = useMutation(
-    PetitionComposeField_removePetitionFieldAttachmentDocument
+  const [deletePetitionFieldAttachment] = useMutation(
+    PetitionComposeField_deletePetitionFieldAttachmentDocument
   );
   const [petitionFieldAttachmentDownloadLink] = useMutation(
     PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument
@@ -154,10 +154,10 @@ const _PetitionComposeField = chakraForwardRef<
   const handleRemoveAttachment = async function (attachmentId: string) {
     uploads.current[attachmentId]?.abort();
     delete uploads.current[attachmentId];
-    await removePetitionFieldAttachment({
+    await deletePetitionFieldAttachment({
       variables: { petitionId, fieldId: field.id, attachmentId },
       optimisticResponse: {
-        removePetitionFieldAttachment: "SUCCESS",
+        deletePetitionFieldAttachment: "SUCCESS",
       },
       update(cache, { data }) {
         updateFieldAttachments(cache, field.id, (attachments) =>
@@ -1005,12 +1005,12 @@ const _mutations = [
     ${fragments.PetitionFieldAttachment}
   `,
   gql`
-    mutation PetitionComposeField_removePetitionFieldAttachment(
+    mutation PetitionComposeField_deletePetitionFieldAttachment(
       $petitionId: GID!
       $fieldId: GID!
       $attachmentId: GID!
     ) {
-      removePetitionFieldAttachment(
+      deletePetitionFieldAttachment(
         petitionId: $petitionId
         fieldId: $fieldId
         attachmentId: $attachmentId

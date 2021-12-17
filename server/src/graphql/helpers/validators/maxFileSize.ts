@@ -1,7 +1,7 @@
-import { core } from "nexus";
-import { FieldValidateArgsResolver } from "../validateArgsPlugin";
-import { ArgValidationError, MaxFileSizeExceededError } from "../errors";
 import { FileUpload } from "graphql-upload";
+import { core } from "nexus";
+import { MaxFileSizeExceededError } from "../errors";
+import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function maxFileSize<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => Promise<FileUpload>,
@@ -32,7 +32,7 @@ export function maxFileSize<TypeName extends string, FieldName extends string>(
     });
 
     if (maxSizeExceeded) {
-      throw new ArgValidationError(
+      throw new MaxFileSizeExceededError(
         info,
         argName,
         `File exceeded max size of ${maxSizeBytes} bytes`

@@ -423,8 +423,12 @@ export interface Mutation {
   deleteEventSubscriptions: Result;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
+  /** Remove a petition attachment */
+  deletePetitionAttachment: Result;
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
+  /** Remove a petition field attachment */
+  deletePetitionFieldAttachment: Result;
   /** Delete a petition field comment. */
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
@@ -505,10 +509,6 @@ export interface Mutation {
   publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
-  /** Remove a petition attachment */
-  removePetitionAttachment: Result;
-  /** Remove a petition field attachment */
-  removePetitionFieldAttachment: Result;
   /** Removes permissions on given petitions and users */
   removePetitionPermission: Array<PetitionBase>;
   /** Removes users from a user group */
@@ -836,9 +836,20 @@ export interface MutationdeletePetitionArgs {
   petitionId: Scalars["ID"];
 }
 
+export interface MutationdeletePetitionAttachmentArgs {
+  attachmentId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}
+
 export interface MutationdeletePetitionFieldArgs {
   fieldId: Scalars["GID"];
   force?: InputMaybe<Scalars["Boolean"]>;
+  petitionId: Scalars["GID"];
+}
+
+export interface MutationdeletePetitionFieldAttachmentArgs {
+  attachmentId: Scalars["GID"];
+  fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 }
 
@@ -1065,17 +1076,6 @@ export interface MutationpublicUpdateSimpleReplyArgs {
 
 export interface MutationreactivateAccessesArgs {
   accessIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-}
-
-export interface MutationremovePetitionAttachmentArgs {
-  attachmentId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-}
-
-export interface MutationremovePetitionFieldAttachmentArgs {
-  attachmentId: Scalars["GID"];
-  fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 }
 
@@ -7550,14 +7550,14 @@ export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation =
   };
 };
 
-export type PetitionComposeField_removePetitionFieldAttachmentMutationVariables = Exact<{
+export type PetitionComposeField_deletePetitionFieldAttachmentMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
   attachmentId: Scalars["GID"];
 }>;
 
-export type PetitionComposeField_removePetitionFieldAttachmentMutation = {
-  removePetitionFieldAttachment: Result;
+export type PetitionComposeField_deletePetitionFieldAttachmentMutation = {
+  deletePetitionFieldAttachment: Result;
 };
 
 export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
@@ -19472,21 +19472,21 @@ export const PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument 
   PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteMutationVariables
 >;
-export const PetitionComposeField_removePetitionFieldAttachmentDocument = gql`
-  mutation PetitionComposeField_removePetitionFieldAttachment(
+export const PetitionComposeField_deletePetitionFieldAttachmentDocument = gql`
+  mutation PetitionComposeField_deletePetitionFieldAttachment(
     $petitionId: GID!
     $fieldId: GID!
     $attachmentId: GID!
   ) {
-    removePetitionFieldAttachment(
+    deletePetitionFieldAttachment(
       petitionId: $petitionId
       fieldId: $fieldId
       attachmentId: $attachmentId
     )
   }
 ` as unknown as DocumentNode<
-  PetitionComposeField_removePetitionFieldAttachmentMutation,
-  PetitionComposeField_removePetitionFieldAttachmentMutationVariables
+  PetitionComposeField_deletePetitionFieldAttachmentMutation,
+  PetitionComposeField_deletePetitionFieldAttachmentMutationVariables
 >;
 export const PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PetitionComposeField_petitionFieldAttachmentDownloadLink(

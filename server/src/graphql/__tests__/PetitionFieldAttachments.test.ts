@@ -209,7 +209,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
           },
         },
       });
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("MAX_FILE_SIZE_EXCEEDED_ERROR");
       expect(data).toBeNull();
     });
 
@@ -405,8 +405,8 @@ describe("GraphQL/PetitionFieldAttachments", () => {
     });
   });
 
-  describe("removePetitionFieldAttachment", () => {
-    it("removes the field attachment and its corresponding file", async () => {
+  describe("deletePetitionFieldAttachment", () => {
+    it("deletes the field attachment and its corresponding file", async () => {
       const [file] = await mocks.createRandomFileUpload(1, () => ({
         filename: "image.png",
         content_type: "image/png",
@@ -419,7 +419,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $attachmentId: GID!) {
-            removePetitionFieldAttachment(
+            deletePetitionFieldAttachment(
               petitionId: $petitionId
               fieldId: $fieldId
               attachmentId: $attachmentId
@@ -434,7 +434,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.removePetitionFieldAttachment).toEqual("SUCCESS");
+      expect(data!.deletePetitionFieldAttachment).toEqual("SUCCESS");
 
       const attachments = await mocks.knex
         .from("petition_field_attachment")

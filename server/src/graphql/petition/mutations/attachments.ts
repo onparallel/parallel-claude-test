@@ -92,7 +92,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
   }
 );
 
-export const removePetitionFieldAttachment = mutationField("removePetitionFieldAttachment", {
+export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldAttachment", {
   description: "Remove a petition field attachment",
   type: "Result",
   args: {
@@ -107,7 +107,7 @@ export const removePetitionFieldAttachment = mutationField("removePetitionFieldA
     petitionsAreNotPublicTemplates("petitionId")
   ),
   resolve: async (_, args, ctx) => {
-    const deletedFileUploads = await ctx.petitions.removePetitionFieldAttachment(
+    const deletedFileUploads = await ctx.petitions.deletePetitionFieldAttachment(
       args.attachmentId,
       ctx.user!
     );
@@ -237,7 +237,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
   },
 });
 
-export const removePetitionAttachment = mutationField("removePetitionAttachment", {
+export const deletePetitionAttachment = mutationField("deletePetitionAttachment", {
   description: "Remove a petition attachment",
   type: "Result",
   args: {
@@ -250,7 +250,7 @@ export const removePetitionAttachment = mutationField("removePetitionAttachment"
     petitionsAreNotPublicTemplates("petitionId")
   ),
   resolve: async (_, args, ctx) => {
-    const deletedFileUploads = await ctx.petitions.removePetitionAttachment(
+    const deletedFileUploads = await ctx.petitions.deletePetitionAttachment(
       args.attachmentId,
       ctx.user!
     );

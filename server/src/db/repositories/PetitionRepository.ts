@@ -924,7 +924,7 @@ export class PetitionRepository extends BaseRepository {
             deleted_by: `User:${user.id}`,
           })
           .returning("*"),
-        this.removePetitionAttachmentByPetitionId(petitionIds, user, t),
+        this.deletePetitionAttachmentByPetitionId(petitionIds, user, t),
       ]);
 
       return petitions;
@@ -3606,7 +3606,7 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  async removePetitionAttachment(attachmentId: number, user: User) {
+  async deletePetitionAttachment(attachmentId: number, user: User) {
     return await this.withTransaction(async (t) => {
       const [row] = await this.from("petition_attachment", t)
         .where("id", attachmentId)
@@ -3620,7 +3620,7 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async removePetitionFieldAttachment(attachmentId: number, user: User) {
+  async deletePetitionFieldAttachment(attachmentId: number, user: User) {
     return await this.withTransaction(async (t) => {
       const [row] = await this.from("petition_field_attachment", t)
         .where("id", attachmentId)
@@ -3686,7 +3686,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  private async removePetitionFieldAttachmentByFieldId(
+  private async deletePetitionFieldAttachmentByFieldId(
     petitionFieldId: number,
     user: User,
     t?: Knex.Transaction
@@ -3711,7 +3711,7 @@ export class PetitionRepository extends BaseRepository {
     await this.aws.fileUploads.deleteFile(deletedFileUploads.map((file) => file.path));
   }
 
-  private async removePetitionAttachmentByPetitionId(
+  private async deletePetitionAttachmentByPetitionId(
     petitionIds: number[],
     user: User,
     t?: Knex.Transaction
