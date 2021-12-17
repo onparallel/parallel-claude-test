@@ -14275,6 +14275,15 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       };
     }>;
   }>;
+  organization: {
+    __typename?: "Organization";
+    users: { __typename?: "UserPagination"; totalCount: number };
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+    };
+  };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -14346,6 +14355,15 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       };
     }>;
   }>;
+  organization: {
+    __typename?: "Organization";
+    users: { __typename?: "UserPagination"; totalCount: number };
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+    };
+  };
 };
 
 export type PetitionPreview_PetitionBaseFragment =
@@ -14458,6 +14476,19 @@ export type PetitionPreview_updatePetitionMutation = {
             };
           }>;
         }>;
+        organization: {
+          __typename?: "Organization";
+          users: { __typename?: "UserPagination"; totalCount: number };
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              used: number;
+              limit: number;
+            };
+          };
+        };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -14528,6 +14559,19 @@ export type PetitionPreview_updatePetitionMutation = {
             };
           }>;
         }>;
+        organization: {
+          __typename?: "Organization";
+          users: { __typename?: "UserPagination"; totalCount: number };
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              used: number;
+              limit: number;
+            };
+          };
+        };
       };
 };
 
@@ -14612,6 +14656,19 @@ export type PetitionPreview_petitionQuery = {
             };
           }>;
         }>;
+        organization: {
+          __typename?: "Organization";
+          users: { __typename?: "UserPagination"; totalCount: number };
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              used: number;
+              limit: number;
+            };
+          };
+        };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -14682,6 +14739,19 @@ export type PetitionPreview_petitionQuery = {
             };
           }>;
         }>;
+        organization: {
+          __typename?: "Organization";
+          users: { __typename?: "UserPagination"; totalCount: number };
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              used: number;
+              limit: number;
+            };
+          };
+        };
       }
     | null;
 };
@@ -19754,6 +19824,20 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
     fields {
       id
       ...PreviewPetitionField_PetitionField
+    }
+    organization {
+      users {
+        totalCount
+      }
+      usageLimits {
+        users {
+          limit
+        }
+        petitions {
+          used
+          limit
+        }
+      }
     }
     ...RecipientViewContentsCard_PetitionBase
     ...PetitionLayout_PetitionBase

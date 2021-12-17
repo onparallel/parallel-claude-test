@@ -73,11 +73,20 @@ export function FieldComment({
     setContent(event.target.value);
   }
 
+  const fullName =
+    comment.author?.__typename === "PetitionAccess"
+      ? comment.author.contact?.fullName
+      : comment?.author?.__typename === "PublicContact" ||
+        comment?.author?.__typename === "PublicUser" ||
+        comment?.author?.__typename === "User"
+      ? comment.author.fullName
+      : undefined;
+
   return (
     <Box paddingX={6} paddingY={2} backgroundColor={comment.isUnread ? "purple.50" : "white"}>
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
-          {comment?.author?.fullName ? comment.author.fullName : <DeletedContact />}
+          {fullName ? fullName : <DeletedContact />}
         </Box>
 
         <DateTime color="gray.500" value={comment.createdAt} format={FORMATS.LLL} useRelativeTime />

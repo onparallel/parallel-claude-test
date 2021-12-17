@@ -28,7 +28,7 @@ import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../../common/Divider";
 import { GrowingTextarea } from "../../common/GrowingTextarea";
