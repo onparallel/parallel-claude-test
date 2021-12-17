@@ -252,7 +252,7 @@ export const PublicPetitionField = objectType({
       },
     });
     t.nonNull.list.nonNull.field("attachments", {
-      type: "PetitionFieldAttachment",
+      type: "FileAttachment",
       description: "A list of files attached to this field.",
       resolve: async (o, _, ctx) => {
         return await ctx.petitions.loadFieldAttachmentsByFieldId(o.id);

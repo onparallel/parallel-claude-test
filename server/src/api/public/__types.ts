@@ -150,11 +150,6 @@ export type CreateContactInput = {
   lastName?: InputMaybe<Scalars["String"]>;
 };
 
-export type CreateFileUploadFieldAttachment = {
-  attachment: PetitionFieldAttachment;
-  presignedPostData: AWSPresignedPostData;
-};
-
 export type CreatedAt = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -179,6 +174,19 @@ export type FeatureFlag =
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
+
+/** A file attachment */
+export type FileAttachment = CreatedAt & {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  file: FileUpload;
+  id: Scalars["GID"];
+};
+
+export type FileAttachmentUploadData = {
+  attachment: FileAttachment;
+  presignedPostData: AWSPresignedPostData;
+};
 
 export type FileUpload = {
   contentType: Scalars["String"];
@@ -371,7 +379,7 @@ export type Mutation = {
   /** Creates a petition field */
   createPetitionField: PetitionBaseAndField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
-  createPetitionFieldAttachmentUploadLink: CreateFileUploadFieldAttachment;
+  createPetitionFieldAttachmentUploadLink: FileAttachmentUploadData;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionField;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
@@ -427,7 +435,7 @@ export type Mutation = {
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
-  petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  petitionFieldAttachmentUploadComplete: FileAttachment;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -1770,7 +1778,7 @@ export type PetitionField = {
   /** The alias of the petition field. */
   alias: Maybe<Scalars["String"]>;
   /** A list of files attached to this field. */
-  attachments: Array<PetitionFieldAttachment>;
+  attachments: Array<FileAttachment>;
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
@@ -1800,14 +1808,6 @@ export type PetitionField = {
   validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility: Maybe<Scalars["JSONObject"]>;
-};
-
-/** An attachment on a petition field */
-export type PetitionFieldAttachment = CreatedAt & {
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  file: FileUpload;
-  id: Scalars["GID"];
 };
 
 /** A comment on a petition field */
@@ -2275,7 +2275,7 @@ export type PublicPetitionAccess = {
 /** A field within a petition. */
 export type PublicPetitionField = {
   /** A list of files attached to this field. */
-  attachments: Array<PetitionFieldAttachment>;
+  attachments: Array<FileAttachment>;
   commentCount: Scalars["Int"];
   /** The comments for this field. */
   comments: Array<PublicPetitionFieldComment>;

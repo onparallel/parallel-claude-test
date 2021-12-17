@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { CircularProgress, Flex, IconButton, Text } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment } from "@parallel/graphql/__types";
+import { PetitionComposeFieldAttachment_FileAttachmentFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { FileIcon } from "../common/FileIcon";
 import { FileName } from "../common/FileName";
@@ -10,7 +10,7 @@ import { FileSize } from "../common/FileSize";
 
 interface PetitionComposeFieldAttachmentProps {
   progress?: number;
-  attachment: PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment;
+  attachment: PetitionComposeFieldAttachment_FileAttachmentFragment;
   onDownload: () => void;
   onRemove: () => void;
   isDisabled?: boolean;
@@ -131,8 +131,8 @@ export const PetitionComposeFieldAttachment = Object.assign(
   ),
   {
     fragments: {
-      PetitionFieldAttachment: gql`
-        fragment PetitionComposeFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
+      FileAttachment: gql`
+        fragment PetitionComposeFieldAttachment_FileAttachment on FileAttachment {
           id
           file {
             filename

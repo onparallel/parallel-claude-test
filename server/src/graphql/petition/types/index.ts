@@ -5,4 +5,4 @@ export * from "./events";
 export * from "./comments";
 export * from "./permissions";
 export * from "./signature-request";
-export * from "./field-attachments";
+export * from "./attachments";

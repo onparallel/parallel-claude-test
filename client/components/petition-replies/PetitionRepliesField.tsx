@@ -23,7 +23,7 @@ import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   PetitionFieldReplyStatus,
-  PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment,
+  PetitionRepliesFieldAttachment_FileAttachmentFragment,
   PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
@@ -339,14 +339,14 @@ export const PetitionRepliesField = Object.assign(
             createdAt
           }
           attachments {
-            ...PetitionRepliesFieldAttachment_PetitionFieldAttachment
+            ...PetitionRepliesFieldAttachment_FileAttachment
           }
         }
         fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
           id
           ...PetitionRepliesFieldReply_PetitionFieldReply
         }
-        ${PetitionRepliesFieldAttachment.fragments.PetitionFieldAttachment}
+        ${PetitionRepliesFieldAttachment.fragments.FileAttachment}
         ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
       `,
     },
@@ -374,7 +374,7 @@ function PetitionRepliesFieldAttachments({
   attachments,
   onAttachmentClick,
 }: {
-  attachments: PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment[];
+  attachments: PetitionRepliesFieldAttachment_FileAttachmentFragment[];
   onAttachmentClick: (attachmentId: string) => void;
 }) {
   return (

@@ -1,4 +1,4 @@
-import { mutationField, nonNull, objectType } from "nexus";
+import { mutationField, nonNull } from "nexus";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
@@ -15,15 +15,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
   "createPetitionFieldAttachmentUploadLink",
   {
     description: "Generates and returns a signed url to upload a field attachment to AWS S3",
-    type: objectType({
-      name: "CreateFileUploadFieldAttachment",
-      definition(t) {
-        t.field("presignedPostData", {
-          type: "AWSPresignedPostData",
-        });
-        t.field("attachment", { type: "PetitionFieldAttachment" });
-      },
-    }),
+    type: "FileAttachmentUploadData",
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
@@ -78,11 +70,11 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
   "petitionFieldAttachmentUploadComplete",
   {
     description: "Tells the backend that the field attachment was correctly uploaded to S3",
-    type: "PetitionFieldAttachment",
+    type: "FileAttachment",
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
+      attachmentId: nonNull(globalIdArg("FileAttachment")),
     },
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
@@ -108,7 +100,7 @@ export const removePetitionFieldAttachment = mutationField("removePetitionFieldA
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
-    attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
+    attachmentId: nonNull(globalIdArg("FileAttachment")),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -135,7 +127,7 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
+      attachmentId: nonNull(globalIdArg("FileAttachment")),
     },
     resolve: async (_, args, ctx) => {
       try {

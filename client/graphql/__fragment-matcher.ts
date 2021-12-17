@@ -5,12 +5,7 @@ export interface PossibleTypesResultData {
 }
 const result: PossibleTypesResultData = {
   possibleTypes: {
-    CreatedAt: [
-      "PetitionFieldAttachment",
-      "PetitionMessage",
-      "PetitionReminder",
-      "UserAuthenticationToken",
-    ],
+    CreatedAt: ["FileAttachment", "PetitionMessage", "PetitionReminder", "UserAuthenticationToken"],
     OrgIntegration: [
       "SignatureOrgIntegration",
       "SsoOrgIntegration",

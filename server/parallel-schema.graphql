@@ -177,11 +177,6 @@ input CreateContactInput {
   lastName: String
 }
 
-type CreateFileUploadFieldAttachment {
-  attachment: PetitionFieldAttachment!
-  presignedPostData: AWSPresignedPostData!
-}
-
 interface CreatedAt {
   """
   Time when the resource was created.
@@ -225,6 +220,23 @@ enum FeatureFlag {
   PETITION_PDF_EXPORT
   PETITION_SIGNATURE
   SKIP_FORWARD_SECURITY
+}
+
+"""
+A file attachment
+"""
+type FileAttachment implements CreatedAt {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  file: FileUpload!
+  id: GID!
+}
+
+type FileAttachmentUploadData {
+  attachment: FileAttachment!
+  presignedPostData: AWSPresignedPostData!
 }
 
 type FileUpload {
@@ -610,7 +622,7 @@ type Mutation {
     data: FileUploadInput!
     fieldId: GID!
     petitionId: GID!
-  ): CreateFileUploadFieldAttachment!
+  ): FileAttachmentUploadData!
 
   """
   Create a petition field comment.
@@ -827,7 +839,7 @@ type Mutation {
     attachmentId: GID!
     fieldId: GID!
     petitionId: GID!
-  ): PetitionFieldAttachment!
+  ): FileAttachment!
   publicCheckVerificationCode(code: String!, keycode: ID!, token: ID!): VerificationCodeCheck!
 
   """
@@ -2184,7 +2196,7 @@ type PetitionField {
   """
   A list of files attached to this field.
   """
-  attachments: [PetitionFieldAttachment!]!
+  attachments: [FileAttachment!]!
 
   """
   The comments for this field.
@@ -2256,18 +2268,6 @@ type PetitionField {
   A JSON object representing the conditions for the field to be visible
   """
   visibility: JSONObject
-}
-
-"""
-An attachment on a petition field
-"""
-type PetitionFieldAttachment implements CreatedAt {
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
-  file: FileUpload!
-  id: GID!
 }
 
 """
@@ -3146,7 +3146,7 @@ type PublicPetitionField {
   """
   A list of files attached to this field.
   """
-  attachments: [PetitionFieldAttachment!]!
+  attachments: [FileAttachment!]!
   commentCount: Int!
 
   """
