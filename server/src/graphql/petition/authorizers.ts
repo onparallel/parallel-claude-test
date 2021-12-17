@@ -260,6 +260,26 @@ export function fieldAttachmentBelongsToField<
   };
 }
 
+export function petitionAttachmentBelongsToPetition<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(
+  argNamePetitionId: TArg1,
+  argNameAttachmentId: TArg2
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      return await ctx.petitions.petitionAttachmentBelongsToPetition(
+        args[argNamePetitionId] as unknown as number,
+        unMaybeArray(args[argNameAttachmentId] as unknown as MaybeArray<number>)
+      );
+    } catch {}
+    return false;
+  };
+}
+
 export function repliesBelongsToPetition<
   TypeName extends string,
   FieldName extends string,

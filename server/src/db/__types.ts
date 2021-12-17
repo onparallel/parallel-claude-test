@@ -291,6 +291,7 @@ export interface TableTypes {
   org_integration: OrgIntegration;
   petition: Petition;
   petition_access: PetitionAccess;
+  petition_attachment: PetitionAttachment;
   petition_contact_notification: PetitionContactNotification;
   petition_event: PetitionEvent;
   petition_event_subscription: PetitionEventSubscription;
@@ -333,6 +334,7 @@ export interface TableCreateTypes {
   org_integration: CreateOrgIntegration;
   petition: CreatePetition;
   petition_access: CreatePetitionAccess;
+  petition_attachment: CreatePetitionAttachment;
   petition_contact_notification: CreatePetitionContactNotification;
   petition_event: CreatePetitionEvent;
   petition_event_subscription: CreatePetitionEventSubscription;
@@ -375,6 +377,7 @@ export interface TablePrimaryKeys {
   org_integration: "id";
   petition: "id";
   petition_access: "id";
+  petition_attachment: "id";
   petition_contact_notification: "id";
   petition_event: "id";
   petition_event_subscription: "id";
@@ -722,6 +725,21 @@ export type CreatePetitionAccess = PartialProps<
   | "updated_by"
   | "reminders_opt_out"
   | "delegator_contact_id"
+>;
+
+export interface PetitionAttachment {
+  id: number; // int4
+  petition_id: number; // int4
+  file_upload_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreatePetitionAttachment = PartialProps<
+  Omit<PetitionAttachment, "id">,
+  "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface PetitionContactNotification {

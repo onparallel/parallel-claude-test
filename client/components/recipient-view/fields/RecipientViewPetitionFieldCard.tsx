@@ -156,14 +156,14 @@ RecipientViewPetitionFieldCard.fragments = {
           ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         }
         attachments {
-          ...RecipientViewFieldAttachment_FileAttachment
+          ...RecipientViewFieldAttachment_PetitionFieldAttachment
         }
         commentCount
         unreadCommentCount
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       }
       ${this.PublicPetitionFieldReply}
-      ${RecipientViewFieldAttachment.fragments.FileAttachment}
+      ${RecipientViewFieldAttachment.fragments.PetitionFieldAttachment}
       ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
     `;
   },

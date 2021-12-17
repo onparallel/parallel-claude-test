@@ -314,16 +314,6 @@ export interface NexusGenObjects {
     db.PetitionPermission,
     "petition_id" | "user_id" | "type" | "is_subscribed"
   >;
-  FileAttachment: {
-    id: number;
-    file_upload_id: number;
-    created_at: Date;
-  };
-  FileAttachmentUploadData: {
-    // root type
-    attachment: NexusGenRootTypes["FileAttachment"]; // FileAttachment!
-    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
-  };
   FileUpload: db.FileUpload;
   FileUploadDownloadLinkResult: {
     // root type
@@ -404,6 +394,12 @@ export interface NexusGenObjects {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
+  PetitionAttachment: db.PetitionAttachment;
+  PetitionAttachmentUploadData: {
+    // root type
+    attachment: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
+    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
+  };
   PetitionBasePagination: {
     // root type
     items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
@@ -423,6 +419,12 @@ export interface NexusGenObjects {
   };
   PetitionEventSubscription: db.PetitionEventSubscription;
   PetitionField: db.PetitionField;
+  PetitionFieldAttachment: db.PetitionFieldAttachment;
+  PetitionFieldAttachmentUploadData: {
+    // root type
+    attachment: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
+    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
+  };
   PetitionFieldComment: db.PetitionFieldComment;
   PetitionFieldReply: db.PetitionFieldReply;
   PetitionMessage: db.PetitionMessage;
@@ -732,17 +734,6 @@ export interface NexusGenFieldTypes {
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
   };
-  FileAttachment: {
-    // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    file: NexusGenRootTypes["FileUpload"]; // FileUpload!
-    id: NexusGenScalars["GID"]; // GID!
-  };
-  FileAttachmentUploadData: {
-    // field return type
-    attachment: NexusGenRootTypes["FileAttachment"]; // FileAttachment!
-    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
-  };
   FileUpload: {
     // field return type
     contentType: string; // String!
@@ -883,8 +874,9 @@ export interface NexusGenFieldTypes {
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    createPetitionAttachmentUploadLink: NexusGenRootTypes["PetitionAttachmentUploadData"]; // PetitionAttachmentUploadData!
     createPetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
-    createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["FileAttachmentUploadData"]; // FileAttachmentUploadData!
+    createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
     createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
@@ -911,8 +903,10 @@ export interface NexusGenFieldTypes {
     getTaskResultFileUrl: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
-    petitionFieldAttachmentUploadComplete: NexusGenRootTypes["FileAttachment"]; // FileAttachment!
+    petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateAndSendPetitionFromPublicLink: NexusGenEnums["Result"]; // Result!
@@ -936,6 +930,7 @@ export interface NexusGenFieldTypes {
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    removePetitionAttachment: NexusGenEnums["Result"]; // Result!
     removePetitionFieldAttachment: NexusGenEnums["Result"]; // Result!
     removePetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
@@ -1106,6 +1101,17 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
+  PetitionAttachment: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    file: NexusGenRootTypes["FileUpload"]; // FileUpload!
+    id: NexusGenScalars["GID"]; // GID!
+  };
+  PetitionAttachmentUploadData: {
+    // field return type
+    attachment: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
+    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
+  };
   PetitionBasePagination: {
     // field return type
     items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
@@ -1176,7 +1182,7 @@ export interface NexusGenFieldTypes {
   PetitionField: {
     // field return type
     alias: string | null; // String
-    attachments: NexusGenRootTypes["FileAttachment"][]; // [FileAttachment!]!
+    attachments: NexusGenRootTypes["PetitionFieldAttachment"][]; // [PetitionFieldAttachment!]!
     comments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     description: string | null; // String
     fromPetitionFieldId: NexusGenScalars["GID"] | null; // GID
@@ -1192,6 +1198,17 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     validated: boolean; // Boolean!
     visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
+  };
+  PetitionFieldAttachment: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    file: NexusGenRootTypes["FileUpload"]; // FileUpload!
+    id: NexusGenScalars["GID"]; // GID!
+  };
+  PetitionFieldAttachmentUploadData: {
+    // field return type
+    attachment: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
+    presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
   PetitionFieldComment: {
     // field return type
@@ -1420,7 +1437,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionField: {
     // field return type
-    attachments: NexusGenRootTypes["FileAttachment"][]; // [FileAttachment!]!
+    attachments: NexusGenRootTypes["PetitionFieldAttachment"][]; // [PetitionFieldAttachment!]!
     commentCount: number; // Int!
     comments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     description: string | null; // String
@@ -2000,17 +2017,6 @@ export interface NexusGenFieldTypeNames {
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
   };
-  FileAttachment: {
-    // field return type name
-    createdAt: "DateTime";
-    file: "FileUpload";
-    id: "GID";
-  };
-  FileAttachmentUploadData: {
-    // field return type name
-    attachment: "FileAttachment";
-    presignedPostData: "AWSPresignedPostData";
-  };
   FileUpload: {
     // field return type name
     contentType: "String";
@@ -2151,8 +2157,9 @@ export interface NexusGenFieldTypeNames {
     createOrganization: "SupportMethodResponse";
     createOrganizationUser: "User";
     createPetition: "PetitionBase";
+    createPetitionAttachmentUploadLink: "PetitionAttachmentUploadData";
     createPetitionField: "PetitionBaseAndField";
-    createPetitionFieldAttachmentUploadLink: "FileAttachmentUploadData";
+    createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
     createPetitionFieldComment: "PetitionField";
     createPrintPdfTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
@@ -2179,8 +2186,10 @@ export interface NexusGenFieldTypeNames {
     getTaskResultFileUrl: "FileUploadDownloadLinkResult";
     markSignatureIntegrationAsDefault: "OrgIntegration";
     modifyPetitionCustomProperty: "PetitionBase";
+    petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
+    petitionAttachmentUploadComplete: "PetitionAttachment";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
-    petitionFieldAttachmentUploadComplete: "FileAttachment";
+    petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
     publicCreateAndSendPetitionFromPublicLink: "Result";
@@ -2204,6 +2213,7 @@ export interface NexusGenFieldTypeNames {
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdateSimpleReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
+    removePetitionAttachment: "Result";
     removePetitionFieldAttachment: "Result";
     removePetitionPermission: "PetitionBase";
     removeUsersFromGroup: "UserGroup";
@@ -2374,6 +2384,17 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     petition: "Petition";
   };
+  PetitionAttachment: {
+    // field return type name
+    createdAt: "DateTime";
+    file: "FileUpload";
+    id: "GID";
+  };
+  PetitionAttachmentUploadData: {
+    // field return type name
+    attachment: "PetitionAttachment";
+    presignedPostData: "AWSPresignedPostData";
+  };
   PetitionBasePagination: {
     // field return type name
     items: "PetitionBase";
@@ -2444,7 +2465,7 @@ export interface NexusGenFieldTypeNames {
   PetitionField: {
     // field return type name
     alias: "String";
-    attachments: "FileAttachment";
+    attachments: "PetitionFieldAttachment";
     comments: "PetitionFieldComment";
     description: "String";
     fromPetitionFieldId: "GID";
@@ -2460,6 +2481,17 @@ export interface NexusGenFieldTypeNames {
     type: "PetitionFieldType";
     validated: "Boolean";
     visibility: "JSONObject";
+  };
+  PetitionFieldAttachment: {
+    // field return type name
+    createdAt: "DateTime";
+    file: "FileUpload";
+    id: "GID";
+  };
+  PetitionFieldAttachmentUploadData: {
+    // field return type name
+    attachment: "PetitionFieldAttachment";
+    presignedPostData: "AWSPresignedPostData";
   };
   PetitionFieldComment: {
     // field return type name
@@ -2688,7 +2720,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetitionField: {
     // field return type name
-    attachments: "FileAttachment";
+    attachments: "PetitionFieldAttachment";
     commentCount: "Int";
     comments: "PublicPetitionFieldComment";
     description: "String";
@@ -3317,6 +3349,11 @@ export interface NexusGenArgTypes {
       petitionId?: NexusGenScalars["GID"] | null; // GID
       type: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
+    createPetitionAttachmentUploadLink: {
+      // args
+      data: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     createPetitionField: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -3470,6 +3507,16 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       value?: string | null; // String
     };
+    petitionAttachmentDownloadLink: {
+      // args
+      attachmentId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    petitionAttachmentUploadComplete: {
+      // args
+      attachmentId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     petitionFieldAttachmentDownloadLink: {
       // args
       attachmentId: NexusGenScalars["GID"]; // GID!
@@ -3618,6 +3665,11 @@ export interface NexusGenArgTypes {
     reactivateAccesses: {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    removePetitionAttachment: {
+      // args
+      attachmentId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     removePetitionFieldAttachment: {
@@ -4118,7 +4170,12 @@ export interface NexusGenAbstractTypeMembers {
   UserOrContact: "Contact" | "User";
   UserOrPetitionAccess: "PetitionAccess" | "User";
   UserOrUserGroup: "User" | "UserGroup";
-  CreatedAt: "FileAttachment" | "PetitionMessage" | "PetitionReminder" | "UserAuthenticationToken";
+  CreatedAt:
+    | "PetitionAttachment"
+    | "PetitionFieldAttachment"
+    | "PetitionMessage"
+    | "PetitionReminder"
+    | "UserAuthenticationToken";
   OrgIntegration:
     | "SignatureOrgIntegration"
     | "SsoOrgIntegration"
@@ -4202,7 +4259,6 @@ export interface NexusGenTypeInterfaces {
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";
   Contact: "Timestamps";
-  FileAttachment: "CreatedAt";
   GroupPermissionAddedEvent: "PetitionEvent";
   GroupPermissionEditedEvent: "PetitionEvent";
   GroupPermissionRemovedEvent: "PetitionEvent";
@@ -4215,6 +4271,7 @@ export interface NexusGenTypeInterfaces {
   Petition: "PetitionBase";
   PetitionAccess: "Timestamps";
   PetitionAndField: "PetitionBaseAndField";
+  PetitionAttachment: "CreatedAt";
   PetitionClonedEvent: "PetitionEvent";
   PetitionClosedEvent: "PetitionEvent";
   PetitionClosedNotifiedEvent: "PetitionEvent";
@@ -4222,6 +4279,7 @@ export interface NexusGenTypeInterfaces {
   PetitionCompletedUserNotification: "PetitionUserNotification";
   PetitionCreatedEvent: "PetitionEvent";
   PetitionDeletedEvent: "PetitionEvent";
+  PetitionFieldAttachment: "CreatedAt";
   PetitionFieldReply: "Timestamps";
   PetitionMessage: "CreatedAt";
   PetitionMessageBouncedEvent: "PetitionEvent";

@@ -27,7 +27,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
-  PetitionComposeField_FileAttachmentFragment,
+  PetitionComposeField_PetitionFieldAttachmentFragment,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
   PetitionComposeField_PetitionFieldFragment,
   PetitionComposeField_removePetitionFieldAttachmentDocument,
@@ -945,22 +945,22 @@ const fragments = {
         isReadOnly
         visibility
         attachments {
-          ...PetitionComposeField_FileAttachment
+          ...PetitionComposeField_PetitionFieldAttachment
         }
         ...PetitionFieldOptionsListEditor_PetitionField
         ...PetitionFieldVisibilityEditor_PetitionField
       }
-      ${this.FileAttachment}
+      ${this.PetitionFieldAttachment}
       ${PetitionFieldOptionsListEditor.fragments.PetitionField}
       ${PetitionFieldVisibilityEditor.fragments.PetitionField}
     `;
   },
-  get FileAttachment() {
+  get PetitionFieldAttachment() {
     return gql`
-      fragment PetitionComposeField_FileAttachment on FileAttachment {
-        ...PetitionComposeFieldAttachment_FileAttachment
+      fragment PetitionComposeField_PetitionFieldAttachment on PetitionFieldAttachment {
+        ...PetitionComposeFieldAttachment_PetitionFieldAttachment
       }
-      ${PetitionComposeFieldAttachment.fragments.FileAttachment}
+      ${PetitionComposeFieldAttachment.fragments.PetitionFieldAttachment}
     `;
   },
 };
@@ -981,12 +981,12 @@ const _mutations = [
           ...uploadFile_AWSPresignedPostData
         }
         attachment {
-          ...PetitionComposeField_FileAttachment
+          ...PetitionComposeField_PetitionFieldAttachment
         }
       }
     }
     ${uploadFile.fragments.AWSPresignedPostData}
-    ${fragments.FileAttachment}
+    ${fragments.PetitionFieldAttachment}
   `,
   gql`
     mutation PetitionComposeField_petitionFieldAttachmentUploadComplete(
@@ -999,10 +999,10 @@ const _mutations = [
         fieldId: $fieldId
         attachmentId: $attachmentId
       ) {
-        ...PetitionComposeField_FileAttachment
+        ...PetitionComposeField_PetitionFieldAttachment
       }
     }
-    ${fragments.FileAttachment}
+    ${fragments.PetitionFieldAttachment}
   `,
   gql`
     mutation PetitionComposeField_removePetitionFieldAttachment(
@@ -1203,8 +1203,8 @@ function updateFieldAttachments(
   proxy: DataProxy,
   fieldId: string,
   updateFn: (
-    cached: PetitionComposeField_FileAttachmentFragment[]
-  ) => PetitionComposeField_FileAttachmentFragment[]
+    cached: PetitionComposeField_PetitionFieldAttachmentFragment[]
+  ) => PetitionComposeField_PetitionFieldAttachmentFragment[]
 ) {
   updateFragment(proxy, {
     id: fieldId,
@@ -1221,9 +1221,9 @@ updateFieldAttachments.fragments = {
   PetitionField: gql`
     fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
       attachments {
-        ...PetitionComposeField_FileAttachment
+        ...PetitionComposeField_PetitionFieldAttachment
       }
     }
-    ${fragments.FileAttachment}
+    ${fragments.PetitionFieldAttachment}
   `,
 };

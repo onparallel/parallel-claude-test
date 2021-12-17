@@ -903,7 +903,7 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      attachmentId: nonNull(globalIdArg("FileAttachment")),
+      attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
       preview: booleanArg({
         description: "If true will use content-disposition inline instead of attachment",
       }),

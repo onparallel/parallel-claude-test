@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { PetitionRepliesFieldAttachment_FileAttachmentFragment } from "@parallel/graphql/__types";
+import { PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { FileIcon } from "../common/FileIcon";
 import { FileName } from "../common/FileName";
 import { FileSize } from "../common/FileSize";
 
 interface PetitionRepliesFieldAttachmentProps {
-  attachment: PetitionRepliesFieldAttachment_FileAttachmentFragment;
+  attachment: PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment;
 }
 
 export const PetitionRepliesFieldAttachment = Object.assign(
@@ -55,8 +55,8 @@ export const PetitionRepliesFieldAttachment = Object.assign(
   ),
   {
     fragments: {
-      FileAttachment: gql`
-        fragment PetitionRepliesFieldAttachment_FileAttachment on FileAttachment {
+      PetitionFieldAttachment: gql`
+        fragment PetitionRepliesFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
           id
           file {
             filename

@@ -222,23 +222,6 @@ enum FeatureFlag {
   SKIP_FORWARD_SECURITY
 }
 
-"""
-A file attachment
-"""
-type FileAttachment implements CreatedAt {
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
-  file: FileUpload!
-  id: GID!
-}
-
-type FileAttachmentUploadData {
-  attachment: FileAttachment!
-  presignedPostData: AWSPresignedPostData!
-}
-
 type FileUpload {
   contentType: String!
   filename: String!
@@ -607,6 +590,14 @@ type Mutation {
   ): PetitionBase!
 
   """
+  Generates and returns a signed url to upload a petition attachment to AWS S3
+  """
+  createPetitionAttachmentUploadLink(
+    data: FileUploadInput!
+    petitionId: GID!
+  ): PetitionAttachmentUploadData!
+
+  """
   Creates a petition field
   """
   createPetitionField(
@@ -622,7 +613,7 @@ type Mutation {
     data: FileUploadInput!
     fieldId: GID!
     petitionId: GID!
-  ): FileAttachmentUploadData!
+  ): PetitionFieldAttachmentUploadData!
 
   """
   Create a petition field comment.
@@ -824,6 +815,19 @@ type Mutation {
   modifyPetitionCustomProperty(key: String!, petitionId: GID!, value: String): PetitionBase!
 
   """
+  Generates a download link for a petition attachment
+  """
+  petitionAttachmentDownloadLink(
+    attachmentId: GID!
+    petitionId: GID!
+  ): FileUploadDownloadLinkResult!
+
+  """
+  Tells the backend that the petition attachment was correctly uploaded to S3
+  """
+  petitionAttachmentUploadComplete(attachmentId: GID!, petitionId: GID!): PetitionAttachment!
+
+  """
   Generates a download link for a field attachment
   """
   petitionFieldAttachmentDownloadLink(
@@ -839,7 +843,7 @@ type Mutation {
     attachmentId: GID!
     fieldId: GID!
     petitionId: GID!
-  ): FileAttachment!
+  ): PetitionFieldAttachment!
   publicCheckVerificationCode(code: String!, keycode: ID!, token: ID!): VerificationCodeCheck!
 
   """
@@ -1022,6 +1026,11 @@ type Mutation {
   Reactivates the specified inactive petition accesses.
   """
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
+
+  """
+  Remove a petition attachment
+  """
+  removePetitionAttachment(attachmentId: GID!, petitionId: GID!): Result!
 
   """
   Remove a petition field attachment
@@ -1951,6 +1960,20 @@ type PetitionAndPartialFields {
   petition: Petition!
 }
 
+type PetitionAttachment implements CreatedAt {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  file: FileUpload!
+  id: GID!
+}
+
+type PetitionAttachmentUploadData {
+  attachment: PetitionAttachment!
+  presignedPostData: AWSPresignedPostData!
+}
+
 interface PetitionBase {
   """
   Time when the resource was created.
@@ -2196,7 +2219,7 @@ type PetitionField {
   """
   A list of files attached to this field.
   """
-  attachments: [FileAttachment!]!
+  attachments: [PetitionFieldAttachment!]!
 
   """
   The comments for this field.
@@ -2268,6 +2291,23 @@ type PetitionField {
   A JSON object representing the conditions for the field to be visible
   """
   visibility: JSONObject
+}
+
+"""
+A file attachment on the petition
+"""
+type PetitionFieldAttachment implements CreatedAt {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  file: FileUpload!
+  id: GID!
+}
+
+type PetitionFieldAttachmentUploadData {
+  attachment: PetitionFieldAttachment!
+  presignedPostData: AWSPresignedPostData!
 }
 
 """
@@ -3146,7 +3186,7 @@ type PublicPetitionField {
   """
   A list of files attached to this field.
   """
-  attachments: [FileAttachment!]!
+  attachments: [PetitionFieldAttachment!]!
   commentCount: Int!
 
   """

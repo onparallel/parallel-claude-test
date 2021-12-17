@@ -316,7 +316,7 @@ export const deletePetitions = mutationField("deletePetitions", {
           t
         ),
         //finally, delete only petitions OWNED by me
-        ctx.petitions.deletePetitionById(
+        ctx.petitions.deletePetition(
           ownerPermissions.map((p) => p.petition_id),
           ctx.user!,
           t

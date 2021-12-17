@@ -189,21 +189,6 @@ export type FeatureFlag =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
-/** A file attachment */
-export interface FileAttachment extends CreatedAt {
-  __typename?: "FileAttachment";
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  file: FileUpload;
-  id: Scalars["GID"];
-}
-
-export interface FileAttachmentUploadData {
-  __typename?: "FileAttachmentUploadData";
-  attachment: FileAttachment;
-  presignedPostData: AWSPresignedPostData;
-}
-
 export interface FileUpload {
   __typename?: "FileUpload";
   contentType: Scalars["String"];
@@ -408,10 +393,12 @@ export interface Mutation {
   createOrganizationUser: User;
   /** Create petition. */
   createPetition: PetitionBase;
+  /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
+  createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
   /** Creates a petition field */
   createPetitionField: PetitionBaseAndField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
-  createPetitionFieldAttachmentUploadLink: FileAttachmentUploadData;
+  createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionField;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
@@ -464,10 +451,14 @@ export interface Mutation {
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
   modifyPetitionCustomProperty: PetitionBase;
+  /** Generates a download link for a petition attachment */
+  petitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  /** Tells the backend that the petition attachment was correctly uploaded to S3 */
+  petitionAttachmentUploadComplete: PetitionAttachment;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
-  petitionFieldAttachmentUploadComplete: FileAttachment;
+  petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -514,6 +505,8 @@ export interface Mutation {
   publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
+  /** Remove a petition attachment */
+  removePetitionAttachment: Result;
   /** Remove a petition field attachment */
   removePetitionFieldAttachment: Result;
   /** Removes permissions on given petitions and users */
@@ -757,6 +750,11 @@ export interface MutationcreatePetitionArgs {
   type?: InputMaybe<PetitionBaseType>;
 }
 
+export interface MutationcreatePetitionAttachmentUploadLinkArgs {
+  data: FileUploadInput;
+  petitionId: Scalars["GID"];
+}
+
 export interface MutationcreatePetitionFieldArgs {
   petitionId: Scalars["GID"];
   position?: InputMaybe<Scalars["Int"]>;
@@ -910,6 +908,16 @@ export interface MutationmodifyPetitionCustomPropertyArgs {
   value?: InputMaybe<Scalars["String"]>;
 }
 
+export interface MutationpetitionAttachmentDownloadLinkArgs {
+  attachmentId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}
+
+export interface MutationpetitionAttachmentUploadCompleteArgs {
+  attachmentId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}
+
 export interface MutationpetitionFieldAttachmentDownloadLinkArgs {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -1057,6 +1065,11 @@ export interface MutationpublicUpdateSimpleReplyArgs {
 
 export interface MutationreactivateAccessesArgs {
   accessIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+}
+
+export interface MutationremovePetitionAttachmentArgs {
+  attachmentId: Scalars["GID"];
   petitionId: Scalars["GID"];
 }
 
@@ -1648,6 +1661,20 @@ export interface PetitionAndPartialFields {
   petition: Petition;
 }
 
+export interface PetitionAttachment extends CreatedAt {
+  __typename?: "PetitionAttachment";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  file: FileUpload;
+  id: Scalars["GID"];
+}
+
+export interface PetitionAttachmentUploadData {
+  __typename?: "PetitionAttachmentUploadData";
+  attachment: PetitionAttachment;
+  presignedPostData: AWSPresignedPostData;
+}
+
 export interface PetitionBase {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -1833,7 +1860,7 @@ export interface PetitionField {
   /** The alias of the petition field. */
   alias?: Maybe<Scalars["String"]>;
   /** A list of files attached to this field. */
-  attachments: Array<FileAttachment>;
+  attachments: Array<PetitionFieldAttachment>;
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
@@ -1863,6 +1890,21 @@ export interface PetitionField {
   validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility?: Maybe<Scalars["JSONObject"]>;
+}
+
+/** A file attachment on the petition */
+export interface PetitionFieldAttachment extends CreatedAt {
+  __typename?: "PetitionFieldAttachment";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  file: FileUpload;
+  id: Scalars["GID"];
+}
+
+export interface PetitionFieldAttachmentUploadData {
+  __typename?: "PetitionFieldAttachmentUploadData";
+  attachment: PetitionFieldAttachment;
+  presignedPostData: AWSPresignedPostData;
 }
 
 /** A comment on a petition field */
@@ -2353,7 +2395,7 @@ export interface PublicPetitionAccess {
 export interface PublicPetitionField {
   __typename?: "PublicPetitionField";
   /** A list of files attached to this field. */
-  attachments: Array<FileAttachment>;
+  attachments: Array<PetitionFieldAttachment>;
   commentCount: Scalars["Int"];
   /** The comments for this field. */
   comments: Array<PublicPetitionFieldComment>;
@@ -7436,7 +7478,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
   visibility?: { [key: string]: any } | null;
   options: { [key: string]: any };
   attachments: Array<{
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -7448,8 +7490,8 @@ export type PetitionComposeField_PetitionFieldFragment = {
   }>;
 };
 
-export type PetitionComposeField_FileAttachmentFragment = {
-  __typename?: "FileAttachment";
+export type PetitionComposeField_PetitionFieldAttachmentFragment = {
+  __typename?: "PetitionFieldAttachment";
   id: string;
   file: {
     __typename?: "FileUpload";
@@ -7468,14 +7510,14 @@ export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation
 
 export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation = {
   createPetitionFieldAttachmentUploadLink: {
-    __typename?: "FileAttachmentUploadData";
+    __typename?: "PetitionFieldAttachmentUploadData";
     presignedPostData: {
       __typename?: "AWSPresignedPostData";
       url: string;
       fields: { [key: string]: any };
     };
     attachment: {
-      __typename?: "FileAttachment";
+      __typename?: "PetitionFieldAttachment";
       id: string;
       file: {
         __typename?: "FileUpload";
@@ -7496,7 +7538,7 @@ export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutationVa
 
 export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation = {
   petitionFieldAttachmentUploadComplete: {
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -7534,7 +7576,7 @@ export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation = {
 export type PetitionComposeField_updateFieldAttachments_PetitionFieldFragment = {
   __typename?: "PetitionField";
   attachments: Array<{
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -7546,8 +7588,8 @@ export type PetitionComposeField_updateFieldAttachments_PetitionFieldFragment = 
   }>;
 };
 
-export type PetitionComposeFieldAttachment_FileAttachmentFragment = {
-  __typename?: "FileAttachment";
+export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
+  __typename?: "PetitionFieldAttachment";
   id: string;
   file: {
     __typename?: "FileUpload";
@@ -7573,7 +7615,7 @@ export type PetitionComposeFieldList_PetitionFragment = {
     visibility?: { [key: string]: any } | null;
     options: { [key: string]: any };
     attachments: Array<{
-      __typename?: "FileAttachment";
+      __typename?: "PetitionFieldAttachment";
       id: string;
       file: {
         __typename?: "FileUpload";
@@ -7788,7 +7830,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     createdAt: string;
   }>;
   attachments: Array<{
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -7823,8 +7865,8 @@ export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation = {
   };
 };
 
-export type PetitionRepliesFieldAttachment_FileAttachmentFragment = {
-  __typename?: "FileAttachment";
+export type PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment = {
+  __typename?: "PetitionFieldAttachment";
   id: string;
   file: {
     __typename?: "FileUpload";
@@ -8483,8 +8525,8 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment =
   { __typename?: "PublicPetitionField"; commentCount: number; unreadCommentCount: number };
 
-export type RecipientViewFieldAttachment_FileAttachmentFragment = {
-  __typename?: "FileAttachment";
+export type RecipientViewFieldAttachment_PetitionFieldAttachmentFragment = {
+  __typename?: "PetitionFieldAttachment";
   id: string;
   file: {
     __typename?: "FileUpload";
@@ -8522,7 +8564,7 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
     updatedAt: string;
   }>;
   attachments: Array<{
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -8574,7 +8616,7 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
     updatedAt: string;
   }>;
   attachments: Array<{
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -12285,7 +12327,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     alias?: string | null;
     validated: boolean;
     attachments: Array<{
-      __typename?: "FileAttachment";
+      __typename?: "PetitionFieldAttachment";
       id: string;
       file: {
         __typename?: "FileUpload";
@@ -12355,7 +12397,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     alias?: string | null;
     validated: boolean;
     attachments: Array<{
-      __typename?: "FileAttachment";
+      __typename?: "PetitionFieldAttachment";
       id: string;
       file: {
         __typename?: "FileUpload";
@@ -12451,7 +12493,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   alias?: string | null;
   validated: boolean;
   attachments: Array<{
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -12729,7 +12771,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -12776,7 +12818,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -12826,7 +12868,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -12873,7 +12915,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -12958,7 +13000,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -12996,7 +13038,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -13040,7 +13082,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -13078,7 +13120,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -13221,7 +13263,7 @@ export type PetitionCompose_petitionQuery = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -13294,7 +13336,7 @@ export type PetitionCompose_petitionQuery = {
           alias?: string | null;
           validated: boolean;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -13439,7 +13481,7 @@ export type PetitionReplies_PetitionFragment = {
         | null;
     }>;
     attachments: Array<{
-      __typename?: "FileAttachment";
+      __typename?: "PetitionFieldAttachment";
       id: string;
       file: {
         __typename?: "FileUpload";
@@ -13553,7 +13595,7 @@ export type PetitionReplies_PetitionFieldFragment = {
       | null;
   }>;
   attachments: Array<{
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -13940,7 +13982,7 @@ export type PetitionReplies_petitionQuery = {
               | null;
           }>;
           attachments: Array<{
-            __typename?: "FileAttachment";
+            __typename?: "PetitionFieldAttachment";
             id: string;
             file: {
               __typename?: "FileUpload";
@@ -14815,7 +14857,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
         updatedAt: string;
       }>;
       attachments: Array<{
-        __typename?: "FileAttachment";
+        __typename?: "PetitionFieldAttachment";
         id: string;
         file: {
           __typename?: "FileUpload";
@@ -14909,7 +14951,7 @@ export type RecipientView_PublicPetitionFragment = {
       updatedAt: string;
     }>;
     attachments: Array<{
-      __typename?: "FileAttachment";
+      __typename?: "PetitionFieldAttachment";
       id: string;
       file: {
         __typename?: "FileUpload";
@@ -14971,7 +15013,7 @@ export type RecipientView_PublicPetitionFieldFragment = {
     updatedAt: string;
   }>;
   attachments: Array<{
-    __typename?: "FileAttachment";
+    __typename?: "PetitionFieldAttachment";
     id: string;
     file: {
       __typename?: "FileUpload";
@@ -15032,7 +15074,7 @@ export type RecipientView_publicCompletePetitionMutation = {
         updatedAt: string;
       }>;
       attachments: Array<{
-        __typename?: "FileAttachment";
+        __typename?: "PetitionFieldAttachment";
         id: string;
         file: {
           __typename?: "FileUpload";
@@ -15110,7 +15152,7 @@ export type RecipientView_accessQuery = {
           updatedAt: string;
         }>;
         attachments: Array<{
-          __typename?: "FileAttachment";
+          __typename?: "PetitionFieldAttachment";
           id: string;
           file: {
             __typename?: "FileUpload";
@@ -16377,8 +16419,8 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
     updatedAt
   }
 ` as unknown as DocumentNode<TemplateDetailsModal_PetitionTemplateFragment, unknown>;
-export const PetitionComposeFieldAttachment_FileAttachmentFragmentDoc = gql`
-  fragment PetitionComposeFieldAttachment_FileAttachment on FileAttachment {
+export const PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment PetitionComposeFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
     id
     file {
       filename
@@ -16387,20 +16429,23 @@ export const PetitionComposeFieldAttachment_FileAttachmentFragmentDoc = gql`
       isComplete
     }
   }
-` as unknown as DocumentNode<PetitionComposeFieldAttachment_FileAttachmentFragment, unknown>;
-export const PetitionComposeField_FileAttachmentFragmentDoc = gql`
-  fragment PetitionComposeField_FileAttachment on FileAttachment {
-    ...PetitionComposeFieldAttachment_FileAttachment
+` as unknown as DocumentNode<
+  PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment,
+  unknown
+>;
+export const PetitionComposeField_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment PetitionComposeField_PetitionFieldAttachment on PetitionFieldAttachment {
+    ...PetitionComposeFieldAttachment_PetitionFieldAttachment
   }
-  ${PetitionComposeFieldAttachment_FileAttachmentFragmentDoc}
-` as unknown as DocumentNode<PetitionComposeField_FileAttachmentFragment, unknown>;
+  ${PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc}
+` as unknown as DocumentNode<PetitionComposeField_PetitionFieldAttachmentFragment, unknown>;
 export const PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
     attachments {
-      ...PetitionComposeField_FileAttachment
+      ...PetitionComposeField_PetitionFieldAttachment
     }
   }
-  ${PetitionComposeField_FileAttachmentFragmentDoc}
+  ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionComposeField_updateFieldAttachments_PetitionFieldFragment,
   unknown
@@ -16444,12 +16489,12 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     isReadOnly
     visibility
     attachments {
-      ...PetitionComposeField_FileAttachment
+      ...PetitionComposeField_PetitionFieldAttachment
     }
     ...PetitionFieldOptionsListEditor_PetitionField
     ...PetitionFieldVisibilityEditor_PetitionField
   }
-  ${PetitionComposeField_FileAttachmentFragmentDoc}
+  ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
   ${PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc}
   ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeField_PetitionFieldFragment, unknown>;
@@ -18108,8 +18153,8 @@ export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   }
   ${PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldReplyFragment, unknown>;
-export const PetitionRepliesFieldAttachment_FileAttachmentFragmentDoc = gql`
-  fragment PetitionRepliesFieldAttachment_FileAttachment on FileAttachment {
+export const PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment PetitionRepliesFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
     id
     file {
       filename
@@ -18118,7 +18163,10 @@ export const PetitionRepliesFieldAttachment_FileAttachmentFragmentDoc = gql`
       isComplete
     }
   }
-` as unknown as DocumentNode<PetitionRepliesFieldAttachment_FileAttachmentFragment, unknown>;
+` as unknown as DocumentNode<
+  PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment,
+  unknown
+>;
 export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionField on PetitionField {
     id
@@ -18136,11 +18184,11 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
       createdAt
     }
     attachments {
-      ...PetitionRepliesFieldAttachment_FileAttachment
+      ...PetitionRepliesFieldAttachment_PetitionFieldAttachment
     }
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
-  ${PetitionRepliesFieldAttachment_FileAttachmentFragmentDoc}
+  ${PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldFragment, unknown>;
 export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
@@ -18536,8 +18584,8 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc 
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
   unknown
 >;
-export const RecipientViewFieldAttachment_FileAttachmentFragmentDoc = gql`
-  fragment RecipientViewFieldAttachment_FileAttachment on FileAttachment {
+export const RecipientViewFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment RecipientViewFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
     id
     file {
       filename
@@ -18546,7 +18594,7 @@ export const RecipientViewFieldAttachment_FileAttachmentFragmentDoc = gql`
       isComplete
     }
   }
-` as unknown as DocumentNode<RecipientViewFieldAttachment_FileAttachmentFragment, unknown>;
+` as unknown as DocumentNode<RecipientViewFieldAttachment_PetitionFieldAttachmentFragment, unknown>;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
     id
@@ -18570,14 +18618,14 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
     attachments {
-      ...RecipientViewFieldAttachment_FileAttachment
+      ...RecipientViewFieldAttachment_PetitionFieldAttachment
     }
     commentCount
     unreadCommentCount
     ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-  ${RecipientViewFieldAttachment_FileAttachmentFragmentDoc}
+  ${RecipientViewFieldAttachment_PetitionFieldAttachmentFragmentDoc}
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PublicPetitionFieldFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
@@ -19395,12 +19443,12 @@ export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocumen
         ...uploadFile_AWSPresignedPostData
       }
       attachment {
-        ...PetitionComposeField_FileAttachment
+        ...PetitionComposeField_PetitionFieldAttachment
       }
     }
   }
   ${uploadFile_AWSPresignedPostDataFragmentDoc}
-  ${PetitionComposeField_FileAttachmentFragmentDoc}
+  ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation,
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutationVariables
@@ -19416,10 +19464,10 @@ export const PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument 
       fieldId: $fieldId
       attachmentId: $attachmentId
     ) {
-      ...PetitionComposeField_FileAttachment
+      ...PetitionComposeField_PetitionFieldAttachment
     }
   }
-  ${PetitionComposeField_FileAttachmentFragmentDoc}
+  ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteMutationVariables

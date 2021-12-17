@@ -2,14 +2,14 @@ import { gql } from "@apollo/client";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { RecipientViewFieldAttachment_FileAttachmentFragment } from "@parallel/graphql/__types";
+import { RecipientViewFieldAttachment_PetitionFieldAttachmentFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { FileIcon } from "../../common/FileIcon";
 import { FileName } from "../../common/FileName";
 import { FileSize } from "../../common/FileSize";
 
 interface RecipientViewFieldAttachmentProps {
-  attachment: RecipientViewFieldAttachment_FileAttachmentFragment;
+  attachment: RecipientViewFieldAttachment_PetitionFieldAttachmentFragment;
 }
 
 export const RecipientViewFieldAttachment = Object.assign(
@@ -55,8 +55,8 @@ export const RecipientViewFieldAttachment = Object.assign(
   ),
   {
     fragments: {
-      FileAttachment: gql`
-        fragment RecipientViewFieldAttachment_FileAttachment on FileAttachment {
+      PetitionFieldAttachment: gql`
+        fragment RecipientViewFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
           id
           file {
             filename

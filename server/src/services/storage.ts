@@ -84,14 +84,15 @@ export class Storage implements IStorage {
   }
 
   async deleteFile(keys: MaybeArray<string>) {
-    await this.s3
-      .deleteObjects({
-        Bucket: this.bucketName,
-        Delete: {
-          Objects: unMaybeArray(keys).map((key) => ({ Key: key })),
-        },
-      })
-      .promise();
+    const Objects = unMaybeArray(keys).map((key) => ({ Key: key }));
+    if (Objects.length > 0) {
+      await this.s3
+        .deleteObjects({
+          Bucket: this.bucketName,
+          Delete: { Objects },
+        })
+        .promise();
+    }
   }
 
   async uploadFile(key: string, contentType: string, body: Buffer | Readable) {

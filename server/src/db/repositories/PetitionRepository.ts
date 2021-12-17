@@ -29,6 +29,7 @@ import { CommentCreatedUserNotification, CreatePetitionUserNotification } from "
 import {
   Contact,
   CreatePetitionAccess,
+  CreatePetitionAttachment,
   CreatePetitionContactNotification,
   CreatePetitionField,
   CreatePetitionFieldAttachment,
@@ -209,6 +210,17 @@ export class PetitionRepository extends BaseRepository {
     const [{ count }] = await this.from("petition_field_attachment")
       .where({
         petition_field_id: fieldId,
+        deleted_at: null,
+      })
+      .whereIn("id", attachmentIds)
+      .select(this.count());
+    return count === new Set(attachmentIds).size;
+  }
+
+  async petitionAttachmentBelongsToPetition(petitionId: number, attachmentIds: number[]) {
+    const [{ count }] = await this.from("petition_attachment")
+      .where({
+        petition_id: petitionId,
         deleted_at: null,
       })
       .whereIn("id", attachmentIds)
@@ -852,7 +864,7 @@ export class PetitionRepository extends BaseRepository {
   /**
    * Delete petition, deactivate all accesses and cancel all scheduled messages
    */
-  async deletePetitionById(petitionId: MaybeArray<number>, user: User, t?: Knex.Transaction) {
+  async deletePetition(petitionId: MaybeArray<number>, user: User, t?: Knex.Transaction) {
     const petitionIds = unMaybeArray(petitionId);
     return await this.withTransaction(async (t) => {
       const [accesses, messages] = await Promise.all([
@@ -904,13 +916,18 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
-      return await this.from("petition", t)
-        .whereIn("id", petitionIds)
-        .update({
-          deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
-        })
-        .returning("*");
+      const [petitions] = await Promise.all([
+        this.from("petition", t)
+          .whereIn("id", petitionIds)
+          .update({
+            deleted_at: this.now(),
+            deleted_by: `User:${user.id}`,
+          })
+          .returning("*"),
+        this.removePetitionAttachmentByPetitionId(petitionIds, user, t),
+      ]);
+
+      return petitions;
     }, t);
   }
 
@@ -3553,6 +3570,24 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
+  readonly loadPetitionAttachment = this.buildLoadBy("petition_attachment", "id", (q) =>
+    q.whereNull("deleted_at")
+  );
+
+  readonly loadPetitionAttachmentsByPetitionId = this.buildLoadMultipleBy(
+    "petition_attachment",
+    "petition_id",
+    (q) => q.whereNull("deleted_at")
+  );
+
+  async createPetitionAttachment(data: CreatePetitionAttachment, user: User) {
+    const [row] = await this.insert("petition_attachment", {
+      ...data,
+      created_by: `User:${user.id}`,
+    });
+    return row;
+  }
+
   readonly loadFieldAttachment = this.buildLoadBy("petition_field_attachment", "id", (q) =>
     q.whereNull("deleted_at")
   );
@@ -3571,6 +3606,20 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
+  async removePetitionAttachment(attachmentId: number, user: User) {
+    return await this.withTransaction(async (t) => {
+      const [row] = await this.from("petition_attachment", t)
+        .where("id", attachmentId)
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        })
+        .returning("*");
+
+      return await this.safeDeleteFileUploadPetitionAttachments([row.file_upload_id], user, t);
+    });
+  }
+
   async removePetitionFieldAttachment(attachmentId: number, user: User) {
     return await this.withTransaction(async (t) => {
       const [row] = await this.from("petition_field_attachment", t)
@@ -3581,12 +3630,12 @@ export class PetitionRepository extends BaseRepository {
         })
         .returning("*");
 
-      return await this.safeDeleteFileUploadAttachments([row.file_upload_id], user, t);
+      return await this.safeDeleteFileUploadPetitionFieldAttachments([row.file_upload_id], user, t);
     });
   }
 
   /** delete attached files only if they are not referenced in any other field attachment */
-  private async safeDeleteFileUploadAttachments(
+  private async safeDeleteFileUploadPetitionFieldAttachments(
     fileUploadIds: number[],
     user: User,
     t?: Knex.Transaction
@@ -3602,6 +3651,32 @@ export class PetitionRepository extends BaseRepository {
         and deleted_at is null
         and not exists (
           select id from petition_field_attachment 
+          where deleted_at is null 
+          and file_upload_id in (${fileUploadIds.map(() => "?").join(", ")})
+          )
+        returning *`,
+      [this.now(), `User:${user.id}`, ...fileUploadIds, ...fileUploadIds],
+      t
+    );
+  }
+
+  /** delete attached files only if they are not referenced in any other petition */
+  private async safeDeleteFileUploadPetitionAttachments(
+    fileUploadIds: number[],
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    if (fileUploadIds.length === 0) {
+      return [];
+    }
+
+    return await this.raw<FileUpload>(
+      /* sql */ `
+        update file_upload set deleted_at = ?, deleted_by = ?
+        where id in (${fileUploadIds.map(() => "?").join(", ")})
+        and deleted_at is null
+        and not exists (
+          select id from petition_attachment 
           where deleted_at is null 
           and file_upload_id in (${fileUploadIds.map(() => "?").join(", ")})
           )
@@ -3627,11 +3702,37 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    await this.safeDeleteFileUploadAttachments(
+    const deletedFileUploads = await this.safeDeleteFileUploadPetitionFieldAttachments(
       deletedAttachments.map((a) => a.file_upload_id),
       user,
       t
     );
+
+    await this.aws.fileUploads.deleteFile(deletedFileUploads.map((file) => file.path));
+  }
+
+  private async removePetitionAttachmentByPetitionId(
+    petitionIds: number[],
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    const deletedAttachments = await this.from("petition_attachment", t)
+      .where({
+        deleted_at: null,
+      })
+      .whereIn("petition_id", petitionIds)
+      .update({
+        deleted_at: this.now(),
+        deleted_by: `User:${user.id}`,
+      })
+      .returning("*");
+
+    const deletedFileUploads = await this.safeDeleteFileUploadPetitionAttachments(
+      deletedAttachments.map((a) => a.file_upload_id),
+      user,
+      t
+    );
+    await this.aws.fileUploads.deleteFile(deletedFileUploads.map((file) => file.path));
   }
 
   readonly loadPublicPetitionLink = this.buildLoadBy("public_petition_link", "id");
