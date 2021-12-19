@@ -1,6 +1,6 @@
 # PRIVACY POLICY
 
-_Last modified: November, 2019._
+_Last modified: December, 2021._
 
 Your privacy is important for PARALLEL. This Privacy Policy explains what information we collect about you and why, what we do with that information, and how we handle that information
 At PARALLEL, we care about the confidentiality and privacy of your data and are fully committed to protecting it. This is something that will never change. PARALLEL is not in the business of selling or renting your information. PARALLEL shall not sell your personal data to third parties and shall only share it when necessary for the rendering of the PARALLEL service as stated below.
@@ -16,20 +16,21 @@ At PARALLEL, we care about the confidentiality and privacy of your data and are 
 
 ## 1. Introduction
 
-This Privacy Policy establishes the conditions for the processing of personal data of users (the “User” or “you”) of Parallel service (the “Service”) by PARALLEL SOLUTIONS, S.L. (“PARALLEL” or “we”) as well as the conditions for the processing of personal data by PARALLEL on behalf of Users within the Service.
+This Privacy Policy establishes the conditions for the processing of personal data of users (the “User” or “you”) who visit the site, request for information, participate in commercial activities, or use the services provided (the “Service”) by PARALLEL SOLUTIONS, S.L. (“PARALLEL” or “we”) as well as the conditions for the processing of personal data by PARALLEL on behalf of Users within the Service.
 
 PARALLEL shall process personal data in accordance with European Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regards to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (“GDPR”) and applicable data protection laws.
 
 ## 2. Processing of personal data of Users by PARALLEL (as Controller)
 
-2.1. This Section explains the processing of personal data of Users by PARALLEL as a controller, that is, when PARALLEL decides about the purposes and means for the processing of the data. This only happens regarding the data of the User used by PARALLEL to render the Service (having an account, invoicing…). This does not include the communications sent by the User through the Service and related-data, which shall only be processed in accordance with Section 3 below.
-PARALLEL shall process as controller your personal data to provide you with the Service and to manage and improve the Service, including sending of communications regarding the Service or with information about the Service or PARALLEL.
+2.1. This Section explains the processing of personal data of Users by PARALLEL as a controller, that is, when PARALLEL decides about the purposes and means for the processing of the data. This does not include the communications sent by the User through the Service and related-data, which shall only be processed in accordance with Section 3 below.
 
-2.2. Personal data of Users processed by PARALLEL for the above purposes may include contact information, such as name or email address, language preferences, current location for the proper price/currency displaying, payment data, and other personal data provided by the User in the context of the provision of the Service.
+PARALLEL shall process as controller your personal data to provide you with information that you request, access to the activities that we organize, the Service, and the management and improvement of the Service, including sending of communications or information about the Service or PARALLEL (support, satisfaction surveys, news, commercial communications, etc.).
 
-2.3. The legal basis for the processing of personal data of Users is the contractual relationship between the Users and PARALLEL for the Service and also the legitimate interest of PARALLEL of informing registered Users about the Service and the company, unless they opt out to receive this information.
+2.2. Personal data of Users processed by PARALLEL for the above purposes may include contact information, such as name or email address, language preferences, current location for the proper price/currency displaying, payment data, and other personal data provided by the User.
 
-2.4. Personal data of the Users will be processed by PARALLEL throughout the term of the contractual relationship for the Service and subsequently for the period during which applicable regulations require such personal data be he held thereafter.
+2.3. The legal basis for the processing of personal data of Users is the contractual relationship between the Users and PARALLEL for the Service, the legitimate interest of PARALLEL or the express consent by the User to inform about the Service, content, activities, or the company, unless they opt out to receive this information.
+
+2.4. Personal data of the Users will be processed by PARALLEL throughout the term of the contractual relationship for the Service and subsequently for the period during which applicable regulations require such personal data be he held thereafter. For the data collected from Users with whom there is no contractual relationship, the personal data will be processed by PARALLEL for the time necessary to fulfill the purpose for which they are collected, unless their consent is withdrawn.
 
 2.5. PARALLEL may share the personal data with third parties, some of which may be located outside of the European Economic Area, only for the provision of the Service and at all times subject to the guarantees and requirements provided by applicable data protection laws.
 
@@ -110,33 +111,33 @@ We use industry-standard encryption to protect your data in transit. This is com
 
 We also use AES-256 encryption to protect your files, one of the most secure encryption standards in the industry, and only generate access links to the files that are temporal.
 
-## 6. Frequently asked questions about privacy
+## 5. Frequently asked questions about privacy
 
-**6.1. Does PARALLEL sell or rent my personal data or the content of my emails?**
+**5.1. Does PARALLEL sell or rent my personal data or the content of my emails?**
 
 No, PARALLEL does not sell or rent your personal data.
 
-**6.2. Do you need a data privacy agreement?**
+**5.2. Do you need a data privacy agreement?**
 
 This Privacy Policy constitutes a binding data processing agreement (DPA) in case you need it.
 
-**6.3. Where is my information stored?**
+**5.3. Where is my information stored?**
 
 Information submitted to PARALLEL will be transferred to, processed, and stored in Amazon.com services facilities in Ireland.
 
-**6.4. How can I delete my personal data from the Service?**
+**5.4. How can I delete my personal data from the Service?**
 
 You can remove your Personal Data from the Service at any time by logging into your account, accessing the Account page, and then deleting your account.
 
-**6.5. How safe is my credit card information?**
+**5.5. How safe is my credit card information?**
 
 Your credit card information is safe. PARALLEL does not have access to your credit card information at any point during the transaction, so we do not store your credit card information. We process every payment via Stripe or Paypal, certified Level 1 third party payment processing services.
 
-**6.6 Privacy code of conduct**
+**5.6 Privacy code of conduct**
 
 PARALLEL guarantees that:
 
-- PARALLEL will never send emails on your behalf, we only send the requests from our domain address
-- PARALLEL will never share the content of your emails or your recipients replies with third parties
+- PARALLEL will never send emails on your behalf, we only send the requests from our domain address.
+- PARALLEL will never share the content of your emails or your recipients replies with third parties.
 
-PARALLEL will never share your browsing data with third parties
+PARALLEL will never share your browsing data with third parties.
