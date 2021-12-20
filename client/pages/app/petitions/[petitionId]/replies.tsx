@@ -498,192 +498,186 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petition={petition}
       onUpdatePetition={handleOnUpdatePetition}
       section="replies"
-      scrollBody={false}
-      display="flex"
-      flexDirection="column"
-      minHeight={0}
-      overflow="visible"
+      scrollBody
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
           <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
         </Box>
       }
-    >
-      <Stack direction="row" paddingX={4} paddingY={2}>
-        <IconButtonWithTooltip
-          onClick={() => refetch()}
-          icon={<RepeatIcon />}
-          placement="bottom"
-          variant="outline"
-          label={intl.formatMessage({
-            id: "generic.reload-data",
-            defaultMessage: "Reload",
-          })}
-        />
-
-        <Button
-          data-action="close-petition"
-          hidden={petition.status === "CLOSED"}
-          colorScheme="green"
-          leftIcon={<CheckIcon />}
-          onClick={handleClosePetition}
-        >
-          <FormattedMessage
-            id="petition-replies.finalize-petition.button"
-            defaultMessage="Finish petition"
-          />
-        </Button>
-        <Button
-          hidden={petition.status !== "CLOSED"}
-          colorScheme="blue"
-          leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
-          onClick={async () => {
-            try {
-              await handleFinishPetition({ requiredMessage: true });
-            } catch {}
-          }}
-        >
-          <FormattedMessage
-            id="petition-replies.notify-petition-reviewed.button"
-            defaultMessage="Notify that it is correct"
-          />
-        </Button>
-        {showDownloadAll ? (
-          <ButtonGroup isAttached colorScheme="purple">
+      subHeader={
+        <>
+          <Stack direction="row" paddingX={4} paddingY={2}>
+            <IconButtonWithTooltip
+              onClick={() => refetch()}
+              icon={<RepeatIcon />}
+              placement="bottom"
+              variant="outline"
+              label={intl.formatMessage({
+                id: "generic.reload-data",
+                defaultMessage: "Reload",
+              })}
+            />
             <Button
-              leftIcon={<DownloadIcon fontSize="lg" display="block" />}
-              onClick={handleDownloadAllClick}
+              data-action="close-petition"
+              hidden={petition.status === "CLOSED"}
+              colorScheme="green"
+              leftIcon={<CheckIcon />}
+              onClick={handleClosePetition}
             >
               <FormattedMessage
-                id="petition-replies.export-replies"
-                defaultMessage="Export replies"
+                id="petition-replies.finalize-petition.button"
+                defaultMessage="Finish petition"
               />
             </Button>
-            <Divider isVertical color="purple.600" />
-            <Menu placement="bottom-end">
-              <Tooltip
-                label={intl.formatMessage({
-                  id: "generic.more-options",
-                  defaultMessage: "More options...",
-                })}
-              >
-                <MenuButton
-                  as={IconButton}
-                  icon={<ChevronDownIcon fontSize="lg" />}
-                  aria-label={intl.formatMessage({
-                    id: "generic.more-options",
-                    defaultMessage: "More options...",
-                  })}
-                  minWidth={8}
-                />
-              </Tooltip>
-              <MenuList>
-                <MenuItem
-                  icon={<FilePdfIcon boxSize={5} />}
-                  isDisabled={!me.hasPetitionPdfExport}
-                  onClick={() => handlePrintPdfTask(petition.id)}
-                  maxWidth={"260px"}
+            <Button
+              hidden={petition.status !== "CLOSED"}
+              colorScheme="blue"
+              leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
+              onClick={async () => {
+                try {
+                  await handleFinishPetition({ requiredMessage: true });
+                } catch {}
+              }}
+            >
+              <FormattedMessage
+                id="petition-replies.notify-petition-reviewed.button"
+                defaultMessage="Notify that it is correct"
+              />
+            </Button>
+            {showDownloadAll ? (
+              <ButtonGroup isAttached colorScheme="purple">
+                <Button
+                  leftIcon={<DownloadIcon fontSize="lg" display="block" />}
+                  onClick={handleDownloadAllClick}
                 >
-                  <Text>
-                    <FormattedMessage
-                      id="page.petition-replies.export-pdf"
-                      defaultMessage="Export to PDF"
-                    />
-                  </Text>
-                  {me.hasPetitionPdfExport ? null : (
-                    <Text fontSize="sm">
-                      <FormattedMessage
-                        id="generic.upgrade-to-enable"
-                        defaultMessage="Upgrade to enable this feature."
-                      />
-                    </Text>
-                  )}
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </ButtonGroup>
-        ) : null}
-      </Stack>
-      <Divider />
-      <Box flex="1" overflow="auto">
-        <PaneWithFlyout
-          isFlyoutActive={Boolean(activeFieldId)}
-          alignWith={activeFieldId ? fieldRefs[activeFieldId].current : null}
-          flyout={
-            <Box padding={4} paddingLeft={{ md: 0 }}>
-              {activeFieldId ? (
-                <PetitionRepliesFieldComments
-                  key={activeFieldId!}
-                  petitionId={petition.id}
-                  hasCommentsEnabled={activeField?.options.hasCommentsEnabled}
-                  field={activeField!}
-                  user={me}
-                  onClose={() => setActiveFieldId(null)}
-                  onAddComment={handleAddComment}
-                  onUpdateComment={handleUpdateComment}
-                  onDeleteComment={handleDeleteComment}
-                  onMarkAsUnread={handleMarkAsUnread}
-                />
-              ) : (
-                <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 153px)`}>
-                  <GenericCardHeader
-                    rightAction={
-                      <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
-                    }
+                  <FormattedMessage
+                    id="petition-replies.export-replies"
+                    defaultMessage="Export replies"
+                  />
+                </Button>
+                <Divider isVertical color="purple.600" />
+                <Menu placement="bottom-end">
+                  <Tooltip
+                    label={intl.formatMessage({
+                      id: "generic.more-options",
+                      defaultMessage: "More options...",
+                    })}
                   >
-                    <Text as="span" display="flex" alignItems="center">
-                      <ListIcon fontSize="18px" marginRight={2} />
-                      <FormattedMessage id="petition.contents" defaultMessage="Contents" />
-                    </Text>
-                  </GenericCardHeader>
-                  <Box overflow="auto">
-                    <PetitionContents
-                      fields={petition.fields}
-                      filter={filter}
-                      fieldIndices={indices}
-                      fieldVisibility={fieldVisibility}
-                      onFieldClick={handlePetitionContentsFieldClick}
-                      fieldIndicators={PetitionContentsIndicators}
-                      signatureStatus={petitionSignatureStatus}
-                      signatureEnvironment={petitionSignatureEnvironment}
-                      onSignatureStatusClick={handlePetitionContentsSignatureClick}
+                    <MenuButton
+                      as={IconButton}
+                      icon={<ChevronDownIcon fontSize="lg" />}
+                      aria-label={intl.formatMessage({
+                        id: "generic.more-options",
+                        defaultMessage: "More options...",
+                      })}
+                      minWidth={8}
                     />
-                  </Box>
-                </Card>
-              )}
-            </Box>
-          }
-        >
-          <Box padding={4}>
-            <Stack flex="2" spacing={4} id="petition-replies">
-              {filterPetitionFields(petition.fields, indices, fieldVisibility ?? [], filter).map(
-                (x, index) =>
-                  x.type === "FIELD" ? (
-                    <PetitionRepliesField
-                      ref={fieldRefs[x.field.id]}
-                      id={`field-${x.field.id}`}
-                      key={x.field.id}
-                      petitionId={petition.id}
-                      field={x.field}
-                      isVisible={true}
-                      fieldIndex={x.fieldIndex}
-                      onValidateToggle={() =>
-                        handleValidateToggle([x.field.id], !x.field.validated)
-                      }
-                      onAction={handleAction}
-                      isActive={activeFieldId === x.field.id}
-                      onToggleComments={() =>
-                        setActiveFieldId(activeFieldId === x.field.id ? null : x.field.id)
-                      }
-                      onUpdateReplyStatus={(replyId, status) =>
-                        handleUpdateRepliesStatus(x.field.id, [replyId], status)
-                      }
-                    />
-                  ) : (
-                    <PetitionRepliesFilteredFields key={index} count={x.count} />
-                  )
-              )}
-            </Stack>
+                  </Tooltip>
+                  <MenuList>
+                    <MenuItem
+                      icon={<FilePdfIcon boxSize={5} />}
+                      isDisabled={!me.hasPetitionPdfExport}
+                      onClick={() => handlePrintPdfTask(petition.id)}
+                      maxWidth={"260px"}
+                    >
+                      <Text>
+                        <FormattedMessage
+                          id="page.petition-replies.export-pdf"
+                          defaultMessage="Export to PDF"
+                        />
+                      </Text>
+                      {me.hasPetitionPdfExport ? null : (
+                        <Text fontSize="sm">
+                          <FormattedMessage
+                            id="generic.upgrade-to-enable"
+                            defaultMessage="Upgrade to enable this feature."
+                          />
+                        </Text>
+                      )}
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              </ButtonGroup>
+            ) : null}
+          </Stack>
+          <Divider />
+        </>
+      }
+    >
+      <PaneWithFlyout
+        isFlyoutActive={Boolean(activeFieldId)}
+        alignWith={activeFieldId ? fieldRefs[activeFieldId].current : null}
+        flyout={
+          <Box padding={4} paddingLeft={{ md: 0 }}>
+            {activeFieldId ? (
+              <PetitionRepliesFieldComments
+                key={activeFieldId!}
+                petitionId={petition.id}
+                hasCommentsEnabled={activeField?.options.hasCommentsEnabled}
+                field={activeField!}
+                user={me}
+                onClose={() => setActiveFieldId(null)}
+                onAddComment={handleAddComment}
+                onUpdateComment={handleUpdateComment}
+                onDeleteComment={handleDeleteComment}
+                onMarkAsUnread={handleMarkAsUnread}
+              />
+            ) : (
+              <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 153px)`}>
+                <GenericCardHeader
+                  rightAction={<PetitionRepliesFilterButton value={filter} onChange={setFilter} />}
+                >
+                  <Text as="span" display="flex" alignItems="center">
+                    <ListIcon fontSize="18px" marginRight={2} />
+                    <FormattedMessage id="petition.contents" defaultMessage="Contents" />
+                  </Text>
+                </GenericCardHeader>
+                <Box overflow="auto">
+                  <PetitionContents
+                    fields={petition.fields}
+                    filter={filter}
+                    fieldIndices={indices}
+                    fieldVisibility={fieldVisibility}
+                    onFieldClick={handlePetitionContentsFieldClick}
+                    fieldIndicators={PetitionContentsIndicators}
+                    signatureStatus={petitionSignatureStatus}
+                    signatureEnvironment={petitionSignatureEnvironment}
+                    onSignatureStatusClick={handlePetitionContentsSignatureClick}
+                  />
+                </Box>
+              </Card>
+            )}
+          </Box>
+        }
+      >
+        <Box padding={4}>
+          <Stack flex="2" spacing={4} id="petition-replies">
+            {filterPetitionFields(petition.fields, indices, fieldVisibility ?? [], filter).map(
+              (x, index) =>
+                x.type === "FIELD" ? (
+                  <PetitionRepliesField
+                    ref={fieldRefs[x.field.id]}
+                    id={`field-${x.field.id}`}
+                    key={x.field.id}
+                    petitionId={petition.id}
+                    field={x.field}
+                    isVisible={true}
+                    fieldIndex={x.fieldIndex}
+                    onValidateToggle={() => handleValidateToggle([x.field.id], !x.field.validated)}
+                    onAction={handleAction}
+                    isActive={activeFieldId === x.field.id}
+                    onToggleComments={() =>
+                      setActiveFieldId(activeFieldId === x.field.id ? null : x.field.id)
+                    }
+                    onUpdateReplyStatus={(replyId, status) =>
+                      handleUpdateRepliesStatus(x.field.id, [replyId], status)
+                    }
+                  />
+                ) : (
+                  <PetitionRepliesFilteredFields key={index} count={x.count} />
+                )
+            )}
+          </Stack>
 
             {petition.attachments.length > 0 && (
               <PetitionAttachmentsCard
@@ -705,7 +699,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             />
           </Box>
         </PaneWithFlyout>
-      </Box>
     </PetitionLayout>
   );
 }

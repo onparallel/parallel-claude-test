@@ -190,10 +190,7 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                   leftIcon={<PaperPlaneIcon />}
                   onClick={handleCreatePetition}
                 >
-                  <FormattedMessage
-                    id="component.template-details-modal.use-template"
-                    defaultMessage="Use template"
-                  />
+                  <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
                 </Button>
                 <Divider isVertical color="purple.600" />
                 <Menu placement="bottom-end">

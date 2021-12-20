@@ -193,10 +193,7 @@ export function PetitionTemplateHeader({
         />
         <Spacer minWidth={4} />
         <Button colorScheme="purple" flexShrink={0} onClick={handleUseTemplate}>
-          <FormattedMessage
-            id="component.template-header.use-template"
-            defaultMessage="Use this template"
-          />
+          <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
         </Button>
         <Menu>
           <Tooltip

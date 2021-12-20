@@ -1510,11 +1510,6 @@
     "context": "Share {count, plural, =1{template} other{templates}}"
   },
   {
-    "term": "component.petition-list-header.use-template-label",
-    "definition": "Use template",
-    "context": "Use template"
-  },
-  {
     "term": "component.petition-list-shared-with-filter.add-filter",
     "definition": "Add filter",
     "context": "Add filter"
@@ -3010,11 +3005,6 @@
     "context": "No description provided."
   },
   {
-    "term": "component.template-details-modal.use-template",
-    "definition": "Use template",
-    "context": "Use template"
-  },
-  {
     "term": "component.template-header.clone-label",
     "definition": "Clone template",
     "context": "Clone template"
@@ -3023,11 +3013,6 @@
     "term": "component.template-header.share-label",
     "definition": "Share template",
     "context": "Share template"
-  },
-  {
-    "term": "component.template-header.use-template",
-    "definition": "Use this template",
-    "context": "Use this template"
   },
   {
     "term": "component.test-mode-signature-badge.popover-text",
@@ -4353,6 +4338,11 @@
     "term": "generic.upgrade-to-enable",
     "definition": "Upgrade to enable this feature.",
     "context": "Upgrade to enable this feature."
+  },
+  {
+    "term": "generic.use-template",
+    "definition": "Use template",
+    "context": "Use template"
   },
   {
     "term": "generic.you",

@@ -146,10 +146,7 @@ export function PetitionListHeader({
                   isDisabled={selectedCount !== 1}
                   icon={<PaperPlaneIcon display="block" boxSize={4} />}
                 >
-                  <FormattedMessage
-                    id="component.petition-list-header.use-template-label"
-                    defaultMessage="Use template"
-                  />
+                  <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
                 </MenuItem>
               )}
               <MenuDivider />
