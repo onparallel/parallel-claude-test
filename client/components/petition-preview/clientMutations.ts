@@ -2,10 +2,10 @@ import { DataProxy, gql, useApolloClient, useMutation } from "@apollo/client";
 import {
   PreviewPetitionFieldMutations_createCheckboxReplyDocument,
   PreviewPetitionFieldMutations_createDynamicSelectReplyDocument,
+  PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyDocument,
   PreviewPetitionFieldMutations_createSimpleReplyDocument,
   PreviewPetitionFieldMutations_deletePetitionReplyDocument,
-  PreviewPetitionFieldMutations_fileUploadReplyCompleteDocument,
   PreviewPetitionFieldMutations_updateCheckboxReplyDocument,
   PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument,
   PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment,
@@ -460,12 +460,12 @@ const _createFileUploadReply = gql`
   ${uploadFile.fragments.AWSPresignedPostData}
   ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
 `;
-const _fileUploadReplyComplete = gql`
-  mutation PreviewPetitionFieldMutations_fileUploadReplyComplete(
+const _createFileUploadReplyComplete = gql`
+  mutation PreviewPetitionFieldMutations_createFileUploadReplyComplete(
     $petitionId: GID!
     $replyId: GID!
   ) {
-    fileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
+    createFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
       id
       content
     }
@@ -476,8 +476,8 @@ export function useCreateFileUploadReply() {
   const [createFileUploadReply] = useMutation(
     PreviewPetitionFieldMutations_createFileUploadReplyDocument
   );
-  const [fileUploadReplyComplete] = useMutation(
-    PreviewPetitionFieldMutations_fileUploadReplyCompleteDocument
+  const [createFileUploadReplyComplete] = useMutation(
+    PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument
   );
   const apollo = useApolloClient();
 
@@ -550,7 +550,7 @@ export function useCreateFileUploadReply() {
             },
             async onComplete() {
               delete uploads.current[reply.id];
-              await fileUploadReplyComplete({
+              await createFileUploadReplyComplete({
                 variables: { petitionId, replyId: reply.id },
               });
             },
@@ -558,7 +558,7 @@ export function useCreateFileUploadReply() {
         }
       }
     },
-    [createFileUploadReply, fileUploadReplyComplete]
+    [createFileUploadReply, createFileUploadReplyComplete]
   );
 }
 

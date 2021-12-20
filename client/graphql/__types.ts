@@ -169,15 +169,6 @@ export interface CreateFileUploadFieldAttachment {
   presignedPostData: AWSPresignedPostData;
 }
 
-<<<<<<< master
-=======
-export interface CreateFileUploadReply {
-  __typename?: "CreateFileUploadReply";
-  presignedPostData: AWSPresignedPostData;
-  reply: PetitionFieldReply;
-}
-
->>>>>>> [feat/ch1830] Updated createFileUploadReply and *ReplyComplete
 export interface CreatedAt {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -404,13 +395,9 @@ export interface Mutation {
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
   /** Creates a reply to a file upload field. */
-<<<<<<< master
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
-=======
-  createFileUploadReply: CreateFileUploadReply;
->>>>>>> [feat/ch1830] Updated createFileUploadReply and *ReplyComplete
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -469,8 +456,6 @@ export interface Mutation {
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   /** Edits permissions on given petitions and users */
   editPetitionPermission: Array<Petition>;
-  /** Notifies the backend that the upload is complete. */
-  fileUploadReplyComplete: PetitionFieldReply;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
@@ -754,13 +739,10 @@ export interface MutationcreateExportRepliesTaskArgs {
 export interface MutationcreateFileUploadReplyArgs {
   fieldId: Scalars["GID"];
   file: FileUploadInput;
-<<<<<<< master
   petitionId: Scalars["GID"];
 }
 
 export interface MutationcreateFileUploadReplyCompleteArgs {
-=======
->>>>>>> [feat/ch1830] Updated createFileUploadReply and *ReplyComplete
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
 }
@@ -927,11 +909,6 @@ export interface MutationeditPetitionPermissionArgs {
   petitionIds: Array<Scalars["GID"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
   userIds?: InputMaybe<Array<Scalars["GID"]>>;
-}
-
-export interface MutationfileUploadReplyCompleteArgs {
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
 }
 
 export interface MutationfileUploadReplyDownloadLinkArgs {
@@ -8069,7 +8046,7 @@ export type PreviewPetitionFieldMutations_createFileUploadReplyMutationVariables
 
 export type PreviewPetitionFieldMutations_createFileUploadReplyMutation = {
   createFileUploadReply: {
-    __typename?: "CreateFileUploadReply";
+    __typename?: "FileUploadReplyResponse";
     presignedPostData: {
       __typename?: "AWSPresignedPostData";
       url: string;
@@ -8086,13 +8063,13 @@ export type PreviewPetitionFieldMutations_createFileUploadReplyMutation = {
   };
 };
 
-export type PreviewPetitionFieldMutations_fileUploadReplyCompleteMutationVariables = Exact<{
+export type PreviewPetitionFieldMutations_createFileUploadReplyCompleteMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
 }>;
 
-export type PreviewPetitionFieldMutations_fileUploadReplyCompleteMutation = {
-  fileUploadReplyComplete: {
+export type PreviewPetitionFieldMutations_createFileUploadReplyCompleteMutation = {
+  createFileUploadReplyComplete: {
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
@@ -21388,19 +21365,19 @@ export const PreviewPetitionFieldMutations_createFileUploadReplyDocument = gql`
   PreviewPetitionFieldMutations_createFileUploadReplyMutation,
   PreviewPetitionFieldMutations_createFileUploadReplyMutationVariables
 >;
-export const PreviewPetitionFieldMutations_fileUploadReplyCompleteDocument = gql`
-  mutation PreviewPetitionFieldMutations_fileUploadReplyComplete(
+export const PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument = gql`
+  mutation PreviewPetitionFieldMutations_createFileUploadReplyComplete(
     $petitionId: GID!
     $replyId: GID!
   ) {
-    fileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
+    createFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
       id
       content
     }
   }
 ` as unknown as DocumentNode<
-  PreviewPetitionFieldMutations_fileUploadReplyCompleteMutation,
-  PreviewPetitionFieldMutations_fileUploadReplyCompleteMutationVariables
+  PreviewPetitionFieldMutations_createFileUploadReplyCompleteMutation,
+  PreviewPetitionFieldMutations_createFileUploadReplyCompleteMutationVariables
 >;
 export const PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument = gql`
   query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
