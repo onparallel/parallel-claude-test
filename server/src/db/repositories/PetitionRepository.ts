@@ -1770,6 +1770,21 @@ export class PetitionRepository extends BaseRepository {
               t
             )
           : [],
+        // copy the petition attachments to new petition using same file_upload_id
+        this.raw(
+          /* sql */ `
+        with
+          a as (
+            select file_upload_id
+            from petition_attachment
+            where deleted_at is null
+              and petition_id = ?)
+        insert into petition_attachment (petition_id, file_upload_id, created_by)
+        select ?, file_upload_id, ? from a
+      `,
+          [petitionId, cloned.id, createdBy],
+          t
+        ),
       ]);
 
       return cloned;

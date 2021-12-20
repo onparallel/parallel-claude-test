@@ -3,7 +3,7 @@ import { BreakLines } from "@parallel/components/common/BreakLines";
 import { Linkify } from "@parallel/components/common/Linkify";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
 import { CommentsButton } from "../CommentsButton";
-import { RecipientViewFieldAttachment } from "./RecipientViewFieldAttachment";
+import { RecipientViewFileAttachment } from "./RecipientViewFileAttachment";
 
 export interface RecipientViewPetitionFieldHeadingProps {
   field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
@@ -42,7 +42,7 @@ export function RecipientViewPetitionFieldHeading({
         <Box>
           <Flex flexWrap="wrap" gridGap={2}>
             {field.attachments.map((attachment) => (
-              <RecipientViewFieldAttachment
+              <RecipientViewFileAttachment
                 key={attachment.id}
                 attachment={attachment}
                 onClick={() => onDownloadAttachment(attachment.id)}

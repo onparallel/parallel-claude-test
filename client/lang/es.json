@@ -1095,6 +1095,16 @@
     "context": "Password protection"
   },
   {
+    "term": "component.petition-attachments-card.header",
+    "definition": "Archivos adjuntos",
+    "context": "Attachments"
+  },
+  {
+    "term": "component.petition-attachments-card.no-attachments",
+    "definition": "No se han adjuntado archivos a esta petición.",
+    "context": "No files have been attached to this petition."
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -8008,6 +8018,11 @@
     "term": "public.who-trust-us.title",
     "definition": "Ya confían en nosotros",
     "context": "Already trust us"
+  },
+  {
+    "term": "recipient-view.attachments-header",
+    "definition": "",
+    "context": "Attachments"
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.add-more-signers.button",

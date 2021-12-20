@@ -984,6 +984,19 @@ type Mutation {
   ): PublicPetitionAccess!
 
   """
+  Generates a download link for a petition attachment on a public context.
+  """
+  publicPetitionAttachmentDownloadLink(
+    attachmentId: GID!
+    keycode: ID!
+
+    """
+    If true will use content-disposition inline instead of attachment
+    """
+    preview: Boolean
+  ): FileUploadDownloadLinkResult!
+
+  """
   Generates a download link for a field attachment on a public context.
   """
   publicPetitionFieldAttachmentDownloadLink(
@@ -1705,6 +1718,11 @@ type Petition implements PetitionBase {
   accesses: [PetitionAccess!]!
 
   """
+  The attachments linked to this petition
+  """
+  attachments: [PetitionAttachment!]!
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -1975,6 +1993,11 @@ type PetitionAttachmentUploadData {
 }
 
 interface PetitionBase {
+  """
+  The attachments linked to this petition
+  """
+  attachments: [PetitionAttachment!]!
+
   """
   Time when the resource was created.
   """
@@ -2811,6 +2834,11 @@ A petition template
 """
 type PetitionTemplate implements PetitionBase {
   """
+  The attachments linked to this petition
+  """
+  attachments: [PetitionAttachment!]!
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -3112,6 +3140,11 @@ type PublicOrganization {
 A public view of the petition
 """
 type PublicPetition implements Timestamps {
+  """
+  The attachments linked to this petition
+  """
+  attachments: [PetitionAttachment!]!
+
   """
   Time when the resource was created.
   """

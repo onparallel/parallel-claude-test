@@ -55,6 +55,7 @@ import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
+import { RecipientViewPetitionFileAttachments } from "@parallel/components/recipient-view/RecipientViewPetitionFileAttachments";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
@@ -340,6 +341,12 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                     display={{ base: "none", [breakpoint]: "flex" }}
                   />
                 )}
+                {petition.attachments.length > 0 ? (
+                  <RecipientViewPetitionFileAttachments
+                    keycode={keycode}
+                    attachments={petition.attachments}
+                  />
+                ) : null}
               </Stack>
             </Box>
             <Flex flexDirection="column" flex="2" minWidth={0}>
@@ -437,6 +444,9 @@ RecipientView.fragments = {
       fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
         petition {
           ...RecipientView_PublicPetition
+          attachments {
+            ...RecipientViewPetitionFileAttachments_PetitionAttachment
+          }
         }
         granter {
           ...RecipientView_PublicUser
@@ -451,6 +461,7 @@ RecipientView.fragments = {
         ...RecipientViewPetitionField_PublicPetitionAccess
       }
       ${this.PublicPetition}
+      ${RecipientViewPetitionFileAttachments.fragments.PetitionAttachment}
       ${this.PublicUser}
       ${RecipientViewHeader.fragments.PublicContact}
       ${useCompleteSignerInfoDialog.fragments.PublicContact}

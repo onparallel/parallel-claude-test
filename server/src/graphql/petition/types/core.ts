@@ -175,6 +175,11 @@ export const PetitionBase = interfaceType({
       description: "Custom user properties",
       resolve: (o) => o.custom_properties,
     });
+    t.nonNull.list.field("attachments", {
+      type: "PetitionAttachment",
+      description: "The attachments linked to this petition",
+      resolve: async (o, _, ctx) => await ctx.petitions.loadPetitionAttachmentsByPetitionId(o.id),
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

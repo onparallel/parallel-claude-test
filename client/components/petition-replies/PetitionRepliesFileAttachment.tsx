@@ -1,28 +1,34 @@
 import { gql } from "@apollo/client";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment } from "@parallel/graphql/__types";
+import {
+  PetitionRepliesFileAttachment_PetitionAttachmentFragment,
+  PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment,
+} from "@parallel/graphql/__types";
+
 import { useIntl } from "react-intl";
 import { FileIcon } from "../common/FileIcon";
 import { FileName } from "../common/FileName";
 import { FileSize } from "../common/FileSize";
 
-interface PetitionRepliesFieldAttachmentProps {
-  attachment: PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment;
+interface PetitionRepliesFileAttachmentProps {
+  attachment:
+    | PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment
+    | PetitionRepliesFileAttachment_PetitionAttachmentFragment;
 }
 
-export const PetitionRepliesFieldAttachment = Object.assign(
-  chakraForwardRef<"button", PetitionRepliesFieldAttachmentProps>(
-    function PetitionRepliesFieldAttachment({ attachment, ...props }, ref) {
+export const PetitionRepliesFileAttachment = Object.assign(
+  chakraForwardRef<"button", PetitionRepliesFileAttachmentProps>(
+    function PetitionRepliesFileAttachment({ attachment, ...props }, ref) {
       const intl = useIntl();
       return (
         <Button
           ref={ref as any}
           variant="outline"
           backgroundColor="white"
-          paddingX={2}
           height={8}
           alignItems="center"
+          isDisabled={!attachment.file.isComplete}
           aria-label={intl.formatMessage(
             {
               id: "generic.attached-file",
@@ -56,7 +62,18 @@ export const PetitionRepliesFieldAttachment = Object.assign(
   {
     fragments: {
       PetitionFieldAttachment: gql`
-        fragment PetitionRepliesFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
+        fragment PetitionRepliesFileAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
+          id
+          file {
+            filename
+            contentType
+            size
+            isComplete
+          }
+        }
+      `,
+      PetitionAttachment: gql`
+        fragment PetitionRepliesFileAttachment_PetitionAttachment on PetitionAttachment {
           id
           file {
             filename

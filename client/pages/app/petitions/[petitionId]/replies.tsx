@@ -104,6 +104,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { PetitionAttachmentsCard } from "@parallel/components/petition-replies/PetitionAttachmentsCard";
 
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
@@ -684,6 +685,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               )}
             </Stack>
 
+            {petition.attachments.length > 0 && (
+              <PetitionAttachmentsCard
+                id="attachments"
+                petition={petition}
+                layerStyle="highlightable"
+                marginTop={8}
+              />
+            )}
+
             <PetitionSignaturesCard
               ref={signaturesRef as any}
               id="signatures"
@@ -717,6 +727,7 @@ PetitionReplies.fragments = {
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
+        ...PetitionAttachmentsCard_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
@@ -724,6 +735,7 @@ PetitionReplies.fragments = {
       ${PetitionSignaturesCard.fragments.Petition}
       ${getPetitionSignatureStatus.fragments.Petition}
       ${getPetitionSignatureEnvironment.fragments.Petition}
+      ${PetitionAttachmentsCard.fragments.Petition}
     `;
   },
   get PetitionField() {

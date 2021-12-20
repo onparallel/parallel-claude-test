@@ -1,0 +1,101 @@
+import { gql, useMutation } from "@apollo/client";
+import { Box, Center, HStack, Text } from "@chakra-ui/react";
+import { PaperclipIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
+import {
+  PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument,
+  PetitionAttachmentsCard_PetitionFragment,
+} from "@parallel/graphql/__types";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { FormattedMessage } from "react-intl";
+import { Card, GenericCardHeader } from "../common/Card";
+import { PetitionRepliesFileAttachment } from "./PetitionRepliesFileAttachment";
+
+export interface PetitionAttachmentsCardProps {
+  petition: PetitionAttachmentsCard_PetitionFragment;
+}
+
+const fragments = {
+  get Petition() {
+    return gql`
+      fragment PetitionAttachmentsCard_Petition on Petition {
+        id
+        attachments {
+          ...PetitionRepliesFileAttachment_PetitionAttachment
+        }
+      }
+      ${PetitionRepliesFileAttachment.fragments.PetitionAttachment}
+    `;
+  },
+};
+
+const mutations = [
+  gql`
+    mutation PetitionAttachmentsCard_petitionAttachmentDownloadLink(
+      $petitionId: GID!
+      $attachmentId: GID!
+    ) {
+      petitionAttachmentDownloadLink(petitionId: $petitionId, attachmentId: $attachmentId) {
+        result
+        url
+      }
+    }
+  `,
+];
+
+export const PetitionAttachmentsCard = Object.assign(
+  chakraForwardRef<"section", PetitionAttachmentsCardProps>(function PetitionAttachmentsCard(
+    { petition, ...props },
+    ref
+  ) {
+    const [petitionAttachmentDownloadLink] = useMutation(
+      PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument
+    );
+    async function handleAttachmentClick(attachmentId: string) {
+      openNewWindow(async () => {
+        const { data } = await petitionAttachmentDownloadLink({
+          variables: { petitionId: petition.id, attachmentId },
+        });
+        const { url } = data!.petitionAttachmentDownloadLink;
+        return url!;
+      });
+    }
+    return (
+      <Card ref={ref} {...props}>
+        <GenericCardHeader>
+          <HStack as="span" spacing={2}>
+            <PaperclipIcon fontSize="20px" />
+            <Text as="span">
+              <FormattedMessage
+                id="component.petition-attachments-card.header"
+                defaultMessage="Attachments"
+              />
+            </Text>
+          </HStack>
+        </GenericCardHeader>
+        {petition.attachments.length > 0 ? (
+          <Box padding={2}>
+            {petition.attachments.map((attachment) => (
+              <PetitionRepliesFileAttachment
+                margin={1}
+                key={attachment.id}
+                attachment={attachment}
+                onClick={() => handleAttachmentClick(attachment.id)}
+              />
+            ))}
+          </Box>
+        ) : (
+          <Center flexDirection="column" minHeight={24} textStyle="hint" textAlign="center">
+            <Text>
+              <FormattedMessage
+                id="component.petition-attachments-card.no-attachments"
+                defaultMessage="No files have been attached to this petition."
+              />
+            </Text>
+          </Center>
+        )}
+      </Card>
+    );
+  }),
+  { fragments, mutations }
+);

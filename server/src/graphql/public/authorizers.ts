@@ -173,3 +173,18 @@ export function validPublicPetitionLink<
     return true;
   };
 }
+
+export function petitionAttachmentBelongsToAccess<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>
+>(argAttachmentId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      return await ctx.petitions.petitionAttachmentBelongsToPetition(ctx.access!.petition_id, [
+        args[argAttachmentId] as unknown as number,
+      ]);
+    } catch {}
+    return false;
+  };
+}

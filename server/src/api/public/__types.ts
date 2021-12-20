@@ -465,6 +465,8 @@ export type Mutation = {
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   /** Cancel a reminder for a contact. */
   publicOptOutReminders: PublicPetitionAccess;
+  /** Generates a download link for a petition attachment on a public context. */
+  publicPetitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
@@ -1003,6 +1005,12 @@ export type MutationpublicOptOutRemindersArgs = {
   referer?: InputMaybe<Scalars["String"]>;
 };
 
+export type MutationpublicPetitionAttachmentDownloadLinkArgs = {
+  attachmentId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  preview?: InputMaybe<Scalars["Boolean"]>;
+};
+
 export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -1491,6 +1499,8 @@ export type OwnershipTransferredEvent = PetitionEvent & {
 export type Petition = PetitionBase & {
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
+  /** The attachments linked to this petition */
+  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The current signature request. */
@@ -1632,6 +1642,8 @@ export type PetitionAttachmentUploadData = {
 };
 
 export type PetitionBase = {
+  /** The attachments linked to this petition */
+  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -2111,6 +2123,8 @@ export type PetitionStatus =
 
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {
+  /** The attachments linked to this petition */
+  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -2276,6 +2290,8 @@ export type PublicOrganization = {
 
 /** A public view of the petition */
 export type PublicPetition = Timestamps & {
+  /** The attachments linked to this petition */
+  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The deadline of the petition. */

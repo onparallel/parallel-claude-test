@@ -495,6 +495,8 @@ export interface Mutation {
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   /** Cancel a reminder for a contact. */
   publicOptOutReminders: PublicPetitionAccess;
+  /** Generates a download link for a petition attachment on a public context. */
+  publicPetitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
@@ -1033,6 +1035,12 @@ export interface MutationpublicOptOutRemindersArgs {
   referer?: InputMaybe<Scalars["String"]>;
 }
 
+export interface MutationpublicPetitionAttachmentDownloadLinkArgs {
+  attachmentId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  preview?: InputMaybe<Scalars["Boolean"]>;
+}
+
 export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -1529,6 +1537,8 @@ export interface Petition extends PetitionBase {
   __typename?: "Petition";
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
+  /** The attachments linked to this petition */
+  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The current signature request. */
@@ -1676,6 +1686,8 @@ export interface PetitionAttachmentUploadData {
 }
 
 export interface PetitionBase {
+  /** The attachments linked to this petition */
+  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -2181,6 +2193,8 @@ export type PetitionStatus =
 /** A petition template */
 export interface PetitionTemplate extends PetitionBase {
   __typename?: "PetitionTemplate";
+  /** The attachments linked to this petition */
+  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -2354,6 +2368,8 @@ export interface PublicOrganization {
 /** A public view of the petition */
 export interface PublicPetition extends Timestamps {
   __typename?: "PublicPetition";
+  /** The attachments linked to this petition */
+  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The deadline of the petition. */
@@ -7806,6 +7822,35 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   };
 };
 
+export type PetitionAttachmentsCard_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  attachments: Array<{
+    __typename?: "PetitionAttachment";
+    id: string;
+    file: {
+      __typename?: "FileUpload";
+      filename: string;
+      contentType: string;
+      size: number;
+      isComplete: boolean;
+    };
+  }>;
+};
+
+export type PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
+
+export type PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutation = {
+  petitionAttachmentDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+  };
+};
+
 export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -7862,18 +7907,6 @@ export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation = {
   petitionFieldAttachmentDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     url?: string | null;
-  };
-};
-
-export type PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment = {
-  __typename?: "PetitionFieldAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
   };
 };
 
@@ -7952,6 +7985,30 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   createdAt: string;
   metadata: { [key: string]: any };
   field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+};
+
+export type PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment = {
+  __typename?: "PetitionFieldAttachment";
+  id: string;
+  file: {
+    __typename?: "FileUpload";
+    filename: string;
+    contentType: string;
+    size: number;
+    isComplete: boolean;
+  };
+};
+
+export type PetitionRepliesFileAttachment_PetitionAttachmentFragment = {
+  __typename?: "PetitionAttachment";
+  id: string;
+  file: {
+    __typename?: "FileUpload";
+    filename: string;
+    contentType: string;
+    size: number;
+    isComplete: boolean;
+  };
 };
 
 export type PetitionSignaturesCard_UserFragment = {
@@ -8359,6 +8416,32 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
   };
 };
 
+export type RecipientViewPetitionFileAttachments_PetitionAttachmentFragment = {
+  __typename?: "PetitionAttachment";
+  id: string;
+  file: {
+    __typename?: "FileUpload";
+    filename: string;
+    contentType: string;
+    size: number;
+    isComplete: boolean;
+  };
+};
+
+export type RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkMutationVariables =
+  Exact<{
+    keycode: Scalars["ID"];
+    attachmentId: Scalars["GID"];
+  }>;
+
+export type RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkMutation = {
+  publicPetitionAttachmentDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+  };
+};
+
 export type RecipientViewProgressFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   status: PetitionStatus;
@@ -8525,8 +8608,20 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment =
   { __typename?: "PublicPetitionField"; commentCount: number; unreadCommentCount: number };
 
-export type RecipientViewFieldAttachment_PetitionFieldAttachmentFragment = {
+export type RecipientViewFileAttachment_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
+  id: string;
+  file: {
+    __typename?: "FileUpload";
+    filename: string;
+    contentType: string;
+    size: number;
+    isComplete: boolean;
+  };
+};
+
+export type RecipientViewFileAttachment_PetitionAttachmentFragment = {
+  __typename?: "PetitionAttachment";
   id: string;
   file: {
     __typename?: "FileUpload";
@@ -13547,6 +13642,17 @@ export type PetitionReplies_PetitionFragment = {
       fullName: string;
     }>;
   } | null;
+  attachments: Array<{
+    __typename?: "PetitionAttachment";
+    id: string;
+    file: {
+      __typename?: "FileUpload";
+      filename: string;
+      contentType: string;
+      size: number;
+      isComplete: boolean;
+    };
+  }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -14048,6 +14154,17 @@ export type PetitionReplies_petitionQuery = {
             fullName: string;
           }>;
         } | null;
+        attachments: Array<{
+          __typename?: "PetitionAttachment";
+          id: string;
+          file: {
+            __typename?: "FileUpload";
+            filename: string;
+            contentType: string;
+            size: number;
+            isComplete: boolean;
+          };
+        }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -14834,6 +14951,17 @@ export type RecipientView_PublicPetitionAccessFragment = {
     isRecipientViewContentsHidden: boolean;
     tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
+    attachments: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
+      };
+    }>;
     fields: Array<{
       __typename?: "PublicPetitionField";
       id: string;
@@ -15129,6 +15257,17 @@ export type RecipientView_accessQuery = {
       isRecipientViewContentsHidden: boolean;
       tone: Tone;
       signatureStatus?: PublicSignatureStatus | null;
+      attachments: Array<{
+        __typename?: "PetitionAttachment";
+        id: string;
+        file: {
+          __typename?: "FileUpload";
+          filename: string;
+          contentType: string;
+          size: number;
+          isComplete: boolean;
+        };
+      }>;
       fields: Array<{
         __typename?: "PublicPetitionField";
         id: string;
@@ -16608,6 +16747,17 @@ export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment,
     unknown
   >;
+export const RecipientViewFileAttachment_PetitionAttachmentFragmentDoc = gql`
+  fragment RecipientViewFileAttachment_PetitionAttachment on PetitionAttachment {
+    id
+    file {
+      filename
+      contentType
+      size
+      isComplete
+    }
+  }
+` as unknown as DocumentNode<RecipientViewFileAttachment_PetitionAttachmentFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
     content
@@ -18153,8 +18303,8 @@ export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   }
   ${PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldReplyFragment, unknown>;
-export const PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
-  fragment PetitionRepliesFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
+export const PetitionRepliesFileAttachment_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment PetitionRepliesFileAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
     id
     file {
       filename
@@ -18164,7 +18314,7 @@ export const PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragmentDoc =
     }
   }
 ` as unknown as DocumentNode<
-  PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment,
+  PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment,
   unknown
 >;
 export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
@@ -18184,11 +18334,11 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
       createdAt
     }
     attachments {
-      ...PetitionRepliesFieldAttachment_PetitionFieldAttachment
+      ...PetitionRepliesFileAttachment_PetitionFieldAttachment
     }
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
-  ${PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragmentDoc}
+  ${PetitionRepliesFileAttachment_PetitionFieldAttachmentFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldFragment, unknown>;
 export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
@@ -18335,6 +18485,26 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   ${OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSignaturesCard_PetitionFragment, unknown>;
+export const PetitionRepliesFileAttachment_PetitionAttachmentFragmentDoc = gql`
+  fragment PetitionRepliesFileAttachment_PetitionAttachment on PetitionAttachment {
+    id
+    file {
+      filename
+      contentType
+      size
+      isComplete
+    }
+  }
+` as unknown as DocumentNode<PetitionRepliesFileAttachment_PetitionAttachmentFragment, unknown>;
+export const PetitionAttachmentsCard_PetitionFragmentDoc = gql`
+  fragment PetitionAttachmentsCard_Petition on Petition {
+    id
+    attachments {
+      ...PetitionRepliesFileAttachment_PetitionAttachment
+    }
+  }
+  ${PetitionRepliesFileAttachment_PetitionAttachmentFragmentDoc}
+` as unknown as DocumentNode<PetitionAttachmentsCard_PetitionFragment, unknown>;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
@@ -18350,6 +18520,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     ...PetitionSignaturesCard_Petition
     ...getPetitionSignatureStatus_Petition
     ...getPetitionSignatureEnvironment_Petition
+    ...PetitionAttachmentsCard_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
@@ -18357,6 +18528,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${PetitionSignaturesCard_PetitionFragmentDoc}
   ${getPetitionSignatureStatus_PetitionFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
+  ${PetitionAttachmentsCard_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFragment, unknown>;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {
@@ -18584,8 +18756,8 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc 
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
   unknown
 >;
-export const RecipientViewFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
-  fragment RecipientViewFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
+export const RecipientViewFileAttachment_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment RecipientViewFileAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
     id
     file {
       filename
@@ -18594,7 +18766,7 @@ export const RecipientViewFieldAttachment_PetitionFieldAttachmentFragmentDoc = g
       isComplete
     }
   }
-` as unknown as DocumentNode<RecipientViewFieldAttachment_PetitionFieldAttachmentFragment, unknown>;
+` as unknown as DocumentNode<RecipientViewFileAttachment_PetitionFieldAttachmentFragment, unknown>;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
     id
@@ -18618,14 +18790,14 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
     attachments {
-      ...RecipientViewFieldAttachment_PetitionFieldAttachment
+      ...RecipientViewFileAttachment_PetitionFieldAttachment
     }
     commentCount
     unreadCommentCount
     ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-  ${RecipientViewFieldAttachment_PetitionFieldAttachmentFragmentDoc}
+  ${RecipientViewFileAttachment_PetitionFieldAttachmentFragmentDoc}
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PublicPetitionFieldFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
@@ -18761,6 +18933,20 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionFragment, unknown>;
+export const RecipientViewPetitionFileAttachments_PetitionAttachmentFragmentDoc = gql`
+  fragment RecipientViewPetitionFileAttachments_PetitionAttachment on PetitionAttachment {
+    id
+    file {
+      filename
+      contentType
+      size
+      isComplete
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewPetitionFileAttachments_PetitionAttachmentFragment,
+  unknown
+>;
 export const RecipientViewHeader_PublicUserFragmentDoc = gql`
   fragment RecipientViewHeader_PublicUser on PublicUser {
     id
@@ -18822,6 +19008,9 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
     petition {
       ...RecipientView_PublicPetition
+      attachments {
+        ...RecipientViewPetitionFileAttachments_PetitionAttachment
+      }
     }
     granter {
       ...RecipientView_PublicUser
@@ -18836,6 +19025,7 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
     ...RecipientViewPetitionField_PublicPetitionAccess
   }
   ${RecipientView_PublicPetitionFragmentDoc}
+  ${RecipientViewPetitionFileAttachments_PetitionAttachmentFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
   ${useCompleteSignerInfoDialog_PublicContactFragmentDoc}
@@ -19548,6 +19738,20 @@ export const PetitionListTagFilter_tagsDocument = gql`
   PetitionListTagFilter_tagsQuery,
   PetitionListTagFilter_tagsQueryVariables
 >;
+export const PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument = gql`
+  mutation PetitionAttachmentsCard_petitionAttachmentDownloadLink(
+    $petitionId: GID!
+    $attachmentId: GID!
+  ) {
+    petitionAttachmentDownloadLink(petitionId: $petitionId, attachmentId: $attachmentId) {
+      result
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutation,
+  PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutationVariables
+>;
 export const PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
     $petitionId: GID!
@@ -19744,6 +19948,21 @@ export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   RecipientViewHeader_publicDelegateAccessToContactMutation,
   RecipientViewHeader_publicDelegateAccessToContactMutationVariables
 >;
+export const RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkDocument =
+  gql`
+    mutation RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLink(
+      $keycode: ID!
+      $attachmentId: GID!
+    ) {
+      publicPetitionAttachmentDownloadLink(keycode: $keycode, attachmentId: $attachmentId) {
+        result
+        url
+      }
+    }
+  ` as unknown as DocumentNode<
+    RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkMutation,
+    RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkMutationVariables
+  >;
 export const RecipientViewPetitionFieldCommentsDialog_commentsDocument = gql`
   query RecipientViewPetitionFieldCommentsDialog_comments($keycode: ID!, $petitionFieldId: GID!) {
     petitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {

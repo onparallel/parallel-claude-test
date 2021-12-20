@@ -924,6 +924,7 @@ export interface NexusGenFieldTypes {
     publicFileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicOptOutReminders: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
+    publicPetitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicSendReminder: NexusGenEnums["Result"]; // Result!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
@@ -1038,6 +1039,7 @@ export interface NexusGenFieldTypes {
   Petition: {
     // field return type
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -1321,6 +1323,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionTemplate: {
     // field return type
+    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
@@ -1415,6 +1418,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetition: {
     // field return type
+    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
@@ -1855,6 +1859,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionBase: {
     // field return type
+    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
@@ -2207,6 +2212,7 @@ export interface NexusGenFieldTypeNames {
     publicFileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicOptOutReminders: "PublicPetitionAccess";
+    publicPetitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicSendReminder: "Result";
     publicSendVerificationCode: "VerificationCodeRequest";
@@ -2321,6 +2327,7 @@ export interface NexusGenFieldTypeNames {
   Petition: {
     // field return type name
     accesses: "PetitionAccess";
+    attachments: "PetitionAttachment";
     createdAt: "DateTime";
     currentSignatureRequest: "PetitionSignatureRequest";
     customProperties: "JSONObject";
@@ -2604,6 +2611,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionTemplate: {
     // field return type name
+    attachments: "PetitionAttachment";
     createdAt: "DateTime";
     customProperties: "JSONObject";
     defaultPermissions: "TemplateDefaultPermission";
@@ -2698,6 +2706,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetition: {
     // field return type name
+    attachments: "PetitionAttachment";
     createdAt: "DateTime";
     deadline: "DateTime";
     fields: "PublicPetitionField";
@@ -3138,6 +3147,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionBase: {
     // field return type name
+    attachments: "PetitionAttachment";
     createdAt: "DateTime";
     customProperties: "JSONObject";
     emailBody: "JSON";
@@ -3631,6 +3641,12 @@ export interface NexusGenArgTypes {
       other: string; // String!
       reason: string; // String!
       referer?: string | null; // String
+    };
+    publicPetitionAttachmentDownloadLink: {
+      // args
+      attachmentId: NexusGenScalars["GID"]; // GID!
+      keycode: string; // ID!
+      preview?: boolean | null; // Boolean
     };
     publicPetitionFieldAttachmentDownloadLink: {
       // args

@@ -23,10 +23,10 @@ import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   PetitionFieldReplyStatus,
-  PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment,
   PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
+  PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -36,8 +36,8 @@ import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
 import { Spacer } from "../common/Spacer";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
-import { PetitionRepliesFieldAttachment } from "./PetitionRepliesFieldAttachment";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
+import { PetitionRepliesFileAttachment } from "./PetitionRepliesFileAttachment";
 
 export interface PetitionRepliesFieldProps extends BoxProps {
   petitionId: string;
@@ -339,14 +339,14 @@ export const PetitionRepliesField = Object.assign(
             createdAt
           }
           attachments {
-            ...PetitionRepliesFieldAttachment_PetitionFieldAttachment
+            ...PetitionRepliesFileAttachment_PetitionFieldAttachment
           }
         }
         fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
           id
           ...PetitionRepliesFieldReply_PetitionFieldReply
         }
-        ${PetitionRepliesFieldAttachment.fragments.PetitionFieldAttachment}
+        ${PetitionRepliesFileAttachment.fragments.PetitionFieldAttachment}
         ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
       `,
     },
@@ -374,7 +374,7 @@ function PetitionRepliesFieldAttachments({
   attachments,
   onAttachmentClick,
 }: {
-  attachments: PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment[];
+  attachments: PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment[];
   onAttachmentClick: (attachmentId: string) => void;
 }) {
   return (
@@ -408,7 +408,7 @@ function PetitionRepliesFieldAttachments({
           gridGap={2}
         >
           {attachments.map((attachment) => (
-            <PetitionRepliesFieldAttachment
+            <PetitionRepliesFileAttachment
               key={attachment.id}
               attachment={attachment}
               onClick={() => onAttachmentClick(attachment.id)}

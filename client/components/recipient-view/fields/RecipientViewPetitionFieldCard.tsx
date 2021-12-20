@@ -10,7 +10,7 @@ import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
 import { CommentsButton } from "../CommentsButton";
-import { RecipientViewFieldAttachment } from "./RecipientViewFieldAttachment";
+import { RecipientViewFileAttachment } from "./RecipientViewFileAttachment";
 import { RecipientViewPetitionFieldCommentsDialog } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
 
 export interface RecipientViewPetitionFieldCardProps {
@@ -93,7 +93,7 @@ export function RecipientViewPetitionFieldCard({
       {field.attachments.length ? (
         <Flex flexWrap="wrap" gridGap={2} marginBottom={1}>
           {field.attachments.map((attachment) => (
-            <RecipientViewFieldAttachment
+            <RecipientViewFileAttachment
               key={attachment.id}
               attachment={attachment}
               onClick={() => onDownloadAttachment(attachment.id)}
@@ -156,14 +156,14 @@ RecipientViewPetitionFieldCard.fragments = {
           ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         }
         attachments {
-          ...RecipientViewFieldAttachment_PetitionFieldAttachment
+          ...RecipientViewFileAttachment_PetitionFieldAttachment
         }
         commentCount
         unreadCommentCount
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       }
       ${this.PublicPetitionFieldReply}
-      ${RecipientViewFieldAttachment.fragments.PetitionFieldAttachment}
+      ${RecipientViewFileAttachment.fragments.PetitionFieldAttachment}
       ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
     `;
   },
