@@ -1655,3 +1655,66 @@ export const CreateOrUpdatePetitionCustomProperty = schema({
     },
   },
 } as const);
+
+const _PetitionAttachment = {
+  title: "PetitionAttachment",
+  type: "object",
+  required: ["id", "file", "createdAt"],
+  additionalProperties: false,
+  properties: {
+    id: {
+      type: "string",
+      description: "The ID of the petition attachment",
+      example: toGlobalId("PetitionAttachment", 1),
+    },
+    file: {
+      type: "object",
+      additionalProperties: false,
+      required: ["filename", "contentType", "size", "isComplete"],
+      properties: {
+        filename: {
+          type: "string",
+          description: "The name of the file",
+        },
+        contentType: {
+          type: "string",
+          description: "content-type of the file",
+        },
+        size: {
+          type: "integer",
+          description: "size of the file in bytes",
+        },
+        isComplete: {
+          type: "boolean",
+          description: "Whether this file is correctly uploaded or not",
+        },
+      },
+      example: {
+        filename: "presentation.pdf",
+        contentType: "application/pdf",
+        size: 5614,
+        isComplete: true,
+      },
+    },
+    createdAt: {
+      type: "string",
+      format: "date-time",
+      description: "Creation date of the attachment",
+    },
+  },
+} as const;
+export const PetitionAttachment = schema(_PetitionAttachment);
+export const ListOfPetitionAttachments = ListOf(_PetitionAttachment);
+
+export const FileUpload = schema({
+  title: "FileUpload",
+  type: "object",
+  additionalProperties: false,
+  required: ["file"],
+  properties: {
+    file: {
+      type: "object",
+      format: "binary",
+    },
+  },
+} as const);

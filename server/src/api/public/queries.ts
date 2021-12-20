@@ -1,4 +1,5 @@
 import { gql } from "graphql-request";
+import { PetitionAttachmentFragment } from "./fragments";
 
 gql`
   query UpdateReply_petition($petitionId: GID!) {
@@ -25,4 +26,15 @@ gql`
       }
     }
   }
+`;
+
+gql`
+  query GetPetitionAttachments_petition($id: GID!) {
+    petition(id: $id) {
+      attachments {
+        ...PetitionAttachment
+      }
+    }
+  }
+  ${PetitionAttachmentFragment}
 `;

@@ -52,8 +52,10 @@ import {
   CreateOrUpdatePetitionCustomProperty,
   CreatePetition,
   CreateSubscription,
+  FileUpload,
   ListOfPermissions,
   ListOfPetitionAccesses,
+  ListOfPetitionAttachments,
   ListOfPetitionFieldsWithReplies,
   ListOfSubscriptions,
   PaginatedContacts,
@@ -62,6 +64,7 @@ import {
   PaginatedTemplates,
   PaginatedUsers,
   Petition,
+  PetitionAttachment,
   PetitionCustomProperties,
   PetitionFieldReply,
   SendPetition,
@@ -76,16 +79,20 @@ import {
 import {
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+  CreatePetitionAttachment_createPetitionAttachmentUploadLinkDocument,
+  CreatePetitionAttachment_petitionAttachmentUploadCompleteDocument,
   CreatePetitionRecipients_contactDocument,
   CreatePetitionRecipients_createContactDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_updateContactDocument,
   CreatePetition_petitionDocument,
+  DeletePetitionAttachment_deletePetitionAttachmentDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
+  DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument,
   EventSubscriptions_createSubscriptionDocument,
   EventSubscriptions_deleteSubscriptionDocument,
   EventSubscriptions_getSubscriptionsDocument,
@@ -95,6 +102,7 @@ import {
   GetContact_contactDocument,
   GetOrganizationUsers_usersDocument,
   GetPermissions_permissionsDocument,
+  GetPetitionAttachments_petitionDocument,
   GetPetitionRecipients_petitionAccessesDocument,
   GetPetitions_petitionsDocument,
   GetPetition_petitionDocument,
@@ -127,6 +135,19 @@ import {
   UpdateReply_updateFileUploadReplyDocument,
   UpdateReply_updateSimpleReplyDocument,
 } from "./__types";
+
+const uploadFileMiddleware = multer({
+  storage: multer.diskStorage({
+    destination: callbackify(async function (req: any, file: any) {
+      const path = `/tmp/${random(16)}`;
+      await mkdir(path);
+      return path;
+    }),
+    filename: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  }),
+});
 
 function assert(condition: any): asserts condition {}
 function assertType<T>(value: any): asserts value is T {}
@@ -171,6 +192,7 @@ export const api = new RestApi({
       name: "Endpoints",
       tags: [
         "Petitions",
+        "Attachments",
         "Petition Sharing",
         "Templates",
         "Tags",
@@ -186,6 +208,7 @@ export const api = new RestApi({
       name: "Petitions",
       description: "Petitions are the main entities in Parallel",
     },
+    { name: "Attachments", description: "Attach files to your petitions" },
     {
       name: "Petition Sharing",
       description: "Share your petitions with members of your organization for collaborative work",
@@ -544,6 +567,136 @@ api
   );
 
 api
+  .path("/petitions/:petitionId/attachments", {
+    params: { petitionId },
+  })
+  .get(
+    {
+      operationId: "GetPetitionAttachments",
+      summary: "List the petition attachments",
+      description: "Returns a list with information on files attached to the petition.",
+      responses: {
+        200: SuccessResponse(ListOfPetitionAttachments),
+      },
+      tags: ["Attachments"],
+    },
+    async ({ client, params }) => {
+      const { petition } = await client.request(GetPetitionAttachments_petitionDocument, {
+        id: params.petitionId,
+      });
+
+      return Ok(petition!.attachments);
+    }
+  )
+  .post(
+    {
+      middleware: uploadFileMiddleware.single("file"),
+      operationId: "CreatePetitionAttachment",
+      summary: "Attach a file to the petition",
+      description: "Attaches the provided file to the petition.",
+      responses: {
+        200: SuccessResponse(PetitionAttachment),
+      },
+      body: FormDataBody(FileUpload),
+      tags: ["Attachments"],
+    },
+    async ({ client, params, files }) => {
+      const file = files["file"][0];
+
+      const {
+        createPetitionAttachmentUploadLink: { presignedPostData, attachment },
+      } = await client.request(
+        CreatePetitionAttachment_createPetitionAttachmentUploadLinkDocument,
+        {
+          petitionId: params.petitionId,
+          data: { size: file.size, contentType: file.mimetype, filename: file.originalname },
+        }
+      );
+
+      const uploadResponse = await uploadFile(file, presignedPostData);
+      if (uploadResponse.ok) {
+        await unlink(file.path);
+        const { petitionAttachmentUploadComplete } = await client.request(
+          CreatePetitionAttachment_petitionAttachmentUploadCompleteDocument,
+          {
+            petitionId: params.petitionId,
+            attachmentId: attachment.id,
+          }
+        );
+        return Ok(petitionAttachmentUploadComplete);
+      }
+
+      throw new BadRequestError(uploadResponse.statusText);
+    }
+  );
+
+const attachmentId = idParam({
+  type: "PetitionAttachment",
+  description: "The ID of the petition attachment",
+});
+
+api
+  .path("/petitions/:petitionId/attachments/:attachmentId", {
+    params: { petitionId, attachmentId },
+  })
+  .delete(
+    {
+      operationId: "DeletePetitionAttachment",
+      summary: "Delete an attachment",
+      description: "Removes an attachment from the petition.",
+      responses: {
+        204: SuccessResponse(),
+      },
+      tags: ["Attachments"],
+    },
+    async ({ client, params }) => {
+      await client.request(DeletePetitionAttachment_deletePetitionAttachmentDocument, {
+        petitionId: params.petitionId,
+        attachmentId: params.attachmentId,
+      });
+
+      return NoContent();
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/attachments/:attachmentId/download", {
+    params: { petitionId, attachmentId },
+  })
+  .get(
+    {
+      operationId: "DownloadPetitionAttachment",
+      summary: "Download an attachment",
+      description: outdent`
+        Download the attached file.
+
+        ### Important
+        Note that *there will be a redirect* to a temporary download endpoint on
+        AWS S3 so make sure to configure your HTTP client to follow redirects.
+
+        For example if you were to use curl you would need to provide the
+        \`-L\` flag, e.g.:
+
+        ~~~bash
+        curl -s -L -XGET \\
+          -H 'Authorization: Bearer <your API token>' \\
+          'http://www.onparallel.com/api/v1/petitions/{petitionId}/attachments/{attachmentId}/download' \\
+          > presentation.pdf
+        ~~~
+      `,
+      responses: { 302: RedirectResponse("Redirect to the resource on AWS S3") },
+      tags: ["Attachments"],
+    },
+    async ({ client, params }) => {
+      const { petitionAttachmentDownloadLink } = await client.request(
+        DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument,
+        { petitionId: params.petitionId, attachmentId: params.attachmentId }
+      );
+      return Redirect(petitionAttachmentDownloadLink.url!);
+    }
+  );
+
+api
   .path("/petitions/:petitionId/properties", {
     params: { petitionId },
   })
@@ -897,19 +1050,6 @@ const replyId = idParam({
 const fieldId = idParam({
   type: "PetitionField",
   description: "The ID of the petition field",
-});
-
-const uploadFileMiddleware = multer({
-  storage: multer.diskStorage({
-    destination: callbackify(async function (req: any, file: any) {
-      const path = `/tmp/${random(16)}`;
-      await mkdir(path);
-      return path;
-    }),
-    filename: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  }),
 });
 
 api

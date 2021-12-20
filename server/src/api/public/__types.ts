@@ -3180,6 +3180,12 @@ export type VerificationCodeRequest = {
 
 export type AWSPresignedPostDataFragment = { fields: { [key: string]: any }; url: string };
 
+export type PetitionAttachmentFragment = {
+  id: string;
+  createdAt: string;
+  file: { filename: string; contentType: string; size: number; isComplete: boolean };
+};
+
 export type UserFragment = {
   id: string;
   fullName: string | null;
@@ -4422,6 +4428,53 @@ export type UpdateReply_updateFileUploadReplyCompleteMutation = {
   };
 };
 
+export type CreatePetitionAttachment_createPetitionAttachmentUploadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  data: FileUploadInput;
+}>;
+
+export type CreatePetitionAttachment_createPetitionAttachmentUploadLinkMutation = {
+  createPetitionAttachmentUploadLink: {
+    presignedPostData: { fields: { [key: string]: any }; url: string };
+    attachment: {
+      id: string;
+      createdAt: string;
+      file: { filename: string; contentType: string; size: number; isComplete: boolean };
+    };
+  };
+};
+
+export type CreatePetitionAttachment_petitionAttachmentUploadCompleteMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
+
+export type CreatePetitionAttachment_petitionAttachmentUploadCompleteMutation = {
+  petitionAttachmentUploadComplete: {
+    id: string;
+    createdAt: string;
+    file: { filename: string; contentType: string; size: number; isComplete: boolean };
+  };
+};
+
+export type DeletePetitionAttachment_deletePetitionAttachmentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
+
+export type DeletePetitionAttachment_deletePetitionAttachmentMutation = {
+  deletePetitionAttachment: Result;
+};
+
+export type DownloadPetitionAttachment_petitionAttachmentDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
+
+export type DownloadPetitionAttachment_petitionAttachmentDownloadLinkMutation = {
+  petitionAttachmentDownloadLink: { url: string | null };
+};
+
 export type UpdateReply_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -4458,12 +4511,47 @@ export type SubmitReply_petitionQuery = {
     | null;
 };
 
+export type GetPetitionAttachments_petitionQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type GetPetitionAttachments_petitionQuery = {
+  petition:
+    | {
+        attachments: Array<{
+          id: string;
+          createdAt: string;
+          file: { filename: string; contentType: string; size: number; isComplete: boolean };
+        }>;
+      }
+    | {
+        attachments: Array<{
+          id: string;
+          createdAt: string;
+          file: { filename: string; contentType: string; size: number; isComplete: boolean };
+        }>;
+      }
+    | null;
+};
+
 export const AWSPresignedPostDataFragmentDoc = gql`
   fragment AWSPresignedPostData on AWSPresignedPostData {
     fields
     url
   }
 ` as unknown as DocumentNode<AWSPresignedPostDataFragment, unknown>;
+export const PetitionAttachmentFragmentDoc = gql`
+  fragment PetitionAttachment on PetitionAttachment {
+    id
+    file {
+      filename
+      contentType
+      size
+      isComplete
+    }
+    createdAt
+  }
+` as unknown as DocumentNode<PetitionAttachmentFragment, unknown>;
 export const ContactFragmentDoc = gql`
   fragment Contact on Contact {
     id
@@ -5278,6 +5366,64 @@ export const UpdateReply_updateFileUploadReplyCompleteDocument = gql`
   UpdateReply_updateFileUploadReplyCompleteMutation,
   UpdateReply_updateFileUploadReplyCompleteMutationVariables
 >;
+export const CreatePetitionAttachment_createPetitionAttachmentUploadLinkDocument = gql`
+  mutation CreatePetitionAttachment_createPetitionAttachmentUploadLink(
+    $petitionId: GID!
+    $data: FileUploadInput!
+  ) {
+    createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data) {
+      presignedPostData {
+        ...AWSPresignedPostData
+      }
+      attachment {
+        ...PetitionAttachment
+      }
+    }
+  }
+  ${AWSPresignedPostDataFragmentDoc}
+  ${PetitionAttachmentFragmentDoc}
+` as unknown as DocumentNode<
+  CreatePetitionAttachment_createPetitionAttachmentUploadLinkMutation,
+  CreatePetitionAttachment_createPetitionAttachmentUploadLinkMutationVariables
+>;
+export const CreatePetitionAttachment_petitionAttachmentUploadCompleteDocument = gql`
+  mutation CreatePetitionAttachment_petitionAttachmentUploadComplete(
+    $petitionId: GID!
+    $attachmentId: GID!
+  ) {
+    petitionAttachmentUploadComplete(petitionId: $petitionId, attachmentId: $attachmentId) {
+      ...PetitionAttachment
+    }
+  }
+  ${PetitionAttachmentFragmentDoc}
+` as unknown as DocumentNode<
+  CreatePetitionAttachment_petitionAttachmentUploadCompleteMutation,
+  CreatePetitionAttachment_petitionAttachmentUploadCompleteMutationVariables
+>;
+export const DeletePetitionAttachment_deletePetitionAttachmentDocument = gql`
+  mutation DeletePetitionAttachment_deletePetitionAttachment(
+    $petitionId: GID!
+    $attachmentId: GID!
+  ) {
+    deletePetitionAttachment(petitionId: $petitionId, attachmentId: $attachmentId)
+  }
+` as unknown as DocumentNode<
+  DeletePetitionAttachment_deletePetitionAttachmentMutation,
+  DeletePetitionAttachment_deletePetitionAttachmentMutationVariables
+>;
+export const DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument = gql`
+  mutation DownloadPetitionAttachment_petitionAttachmentDownloadLink(
+    $petitionId: GID!
+    $attachmentId: GID!
+  ) {
+    petitionAttachmentDownloadLink(petitionId: $petitionId, attachmentId: $attachmentId) {
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  DownloadPetitionAttachment_petitionAttachmentDownloadLinkMutation,
+  DownloadPetitionAttachment_petitionAttachmentDownloadLinkMutationVariables
+>;
 export const UpdateReply_petitionDocument = gql`
   query UpdateReply_petition($petitionId: GID!) {
     petition(id: $petitionId) {
@@ -5303,3 +5449,16 @@ export const SubmitReply_petitionDocument = gql`
     }
   }
 ` as unknown as DocumentNode<SubmitReply_petitionQuery, SubmitReply_petitionQueryVariables>;
+export const GetPetitionAttachments_petitionDocument = gql`
+  query GetPetitionAttachments_petition($id: GID!) {
+    petition(id: $id) {
+      attachments {
+        ...PetitionAttachment
+      }
+    }
+  }
+  ${PetitionAttachmentFragmentDoc}
+` as unknown as DocumentNode<
+  GetPetitionAttachments_petitionQuery,
+  GetPetitionAttachments_petitionQueryVariables
+>;
