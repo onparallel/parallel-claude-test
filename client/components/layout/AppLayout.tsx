@@ -25,6 +25,7 @@ import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
 import { Zendesk } from "../scripts/Zendesk";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
+import * as Sentry from "@sentry/node";
 
 export interface AppLayoutProps {
   title: string;
@@ -104,6 +105,14 @@ export const AppLayout = Object.assign(
           signed_up_at: user.createdAt,
         });
       }
+    }, [user.id]);
+
+    // Identify user in Sentry
+    useEffect(() => {
+      Sentry.setUser({ id: user.id, email: user.email });
+      return () => {
+        Sentry.setUser(null);
+      };
     }, [user.id]);
 
     function handleHelpCenterClick() {

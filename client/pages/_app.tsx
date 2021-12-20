@@ -1,14 +1,15 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
-import { init as initSentry } from "@parallel/utils/sentry";
+import { initSentry } from "@parallel/utils/sentry";
 import { AnimateSharedLayout } from "framer-motion";
 import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect } from "react";
-type MyAppProps = AppProps & I18nProps;
 
 initSentry();
+
+type MyAppProps = AppProps & I18nProps;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
