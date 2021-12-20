@@ -53,8 +53,8 @@ export function SettingsLayout({
           backgroundColor="white"
           borderRight="1px solid"
           borderRightColor="gray.100"
-          flex="1"
-          maxWidth={{ base: "auto", md: 64 }}
+          width={{ base: "auto", md: 64 }}
+          flexShrink={0}
           display={{ base: isBase ? "block" : "none", md: "block" }}
         >
           <Flex
@@ -81,6 +81,7 @@ export function SettingsLayout({
           }}
           direction="column"
           flex="1"
+          minWidth={0}
           backgroundColor="white"
         >
           {isBase ? null : (
