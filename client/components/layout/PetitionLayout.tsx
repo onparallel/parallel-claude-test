@@ -19,6 +19,7 @@ export interface PetitionLayoutProps extends BoxProps {
   section: "compose" | "preview" | "replies" | "activity";
   scrollBody: boolean;
   headerActions?: ReactNode;
+  subHeader?: ReactNode;
 }
 
 export function PetitionLayout({
@@ -29,6 +30,7 @@ export function PetitionLayout({
   onUpdatePetition,
   headerActions,
   children,
+  subHeader,
   ...props
 }: PetitionLayoutProps) {
   const intl = useIntl();
@@ -94,6 +96,7 @@ export function PetitionLayout({
           onUpdatePetition={onUpdatePetition}
         />
       ) : null}
+      {subHeader ? <Box>{subHeader}</Box> : null}
       <Box flex="1" overflow="auto" {...props}>
         {children}
       </Box>

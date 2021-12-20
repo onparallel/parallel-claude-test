@@ -2501,11 +2501,13 @@ export type Query = {
   petition: Maybe<PetitionBase>;
   petitionAuthToken: Maybe<Petition>;
   /** The comments for this field. */
-  petitionFieldComments: Array<PublicPetitionFieldComment>;
+  petitionFieldComments: Array<PetitionFieldComment>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
+  /** The comments for this field. */
+  publicPetitionFieldComments: Array<PublicPetitionFieldComment>;
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
@@ -2598,8 +2600,8 @@ export type QuerypetitionAuthTokenArgs = {
 };
 
 export type QuerypetitionFieldCommentsArgs = {
-  keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type QuerypetitionsArgs = {
@@ -2616,6 +2618,11 @@ export type QuerypetitionsByIdArgs = {
 
 export type QuerypublicOrgLogoUrlArgs = {
   id: Scalars["GID"];
+};
+
+export type QuerypublicPetitionFieldCommentsArgs = {
+  keycode: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
 };
 
 export type QuerypublicPetitionLinkBySlugArgs = {

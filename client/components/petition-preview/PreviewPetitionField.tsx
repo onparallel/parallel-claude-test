@@ -36,10 +36,7 @@ import {
   useUpdateDynamicSelectReply,
   useUpdateSimpleReply,
 } from "./clientMutations";
-import {
-  PreviewPetitionFieldCommentsDialog,
-  usePreviewPetitionFieldCommentsDialog,
-} from "./dialogs/PreviewPetitionFieldCommentsDialog";
+import { usePreviewPetitionFieldCommentsDialog } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -89,6 +86,7 @@ export function PreviewPetitionField({
       await showFieldComments({
         petitionId,
         field,
+        isTemplate: isCacheOnly,
       });
     } catch {}
   }
@@ -309,12 +307,10 @@ PreviewPetitionField.fragments = {
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
-      ...PreviewPetitionFieldCommentsDialog_PetitionField
       previewReplies @client {
         ...RecipientViewPetitionFieldCard_PetitionFieldReply
       }
     }
-    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
   `,

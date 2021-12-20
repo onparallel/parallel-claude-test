@@ -14,7 +14,7 @@ export const accessQuery = queryField("access", {
   },
 });
 
-export const commentsQuery = queryField("petitionFieldComments", {
+export const publicPetitionFieldCommentsQuery = queryField("publicPetitionFieldComments", {
   type: list(nonNull("PublicPetitionFieldComment")),
   authorize: chain(authenticatePublicAccess("keycode"), fieldBelongsToAccess("petitionFieldId")),
   args: {

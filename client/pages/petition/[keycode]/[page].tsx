@@ -324,6 +324,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               minWidth={0}
               marginRight={{ base: 0, [breakpoint]: 4 }}
               marginBottom={4}
+              display={{ base: "none", [breakpoint]: "block" }}
             >
               <Stack
                 spacing={4}
@@ -331,11 +332,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                 top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
               >
                 {petition.isRecipientViewContentsHidden ? null : (
-                  <RecipientViewContentsCard
-                    currentPage={currentPage}
-                    petition={petition}
-                    display={{ base: "none", [breakpoint]: "flex" }}
-                  />
+                  <RecipientViewContentsCard currentPage={currentPage} petition={petition} />
                 )}
               </Stack>
             </Box>

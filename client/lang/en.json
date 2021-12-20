@@ -1930,6 +1930,11 @@
     "context": "Press # to add replaceable placeholders"
   },
   {
+    "term": "component.preview-comments-dialog.template-no-comments-added",
+    "definition": "<b>Preview only</b> - comments are disabled.",
+    "context": "<b>Preview only</b> - comments are disabled."
+  },
+  {
     "term": "component.pricing-table.compare-plans",
     "definition": "Compare plans",
     "context": "Compare plans"

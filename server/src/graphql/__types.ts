@@ -1530,10 +1530,11 @@ export interface NexusGenFieldTypes {
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
-    petitionFieldComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    petitionFieldComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     publicOrgLogoUrl: string | null; // String
+    publicPetitionFieldComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
     publicTemplateCategories: string[]; // [String!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
@@ -2818,10 +2819,11 @@ export interface NexusGenFieldTypeNames {
     organizations: "OrganizationPagination";
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
-    petitionFieldComments: "PublicPetitionFieldComment";
+    petitionFieldComments: "PetitionFieldComment";
     petitions: "PetitionBasePagination";
     petitionsById: "PetitionBase";
     publicOrgLogoUrl: "String";
+    publicPetitionFieldComments: "PublicPetitionFieldComment";
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";
     publicTemplateCategories: "String";
     searchUsers: "UserOrUserGroup";
@@ -4097,8 +4099,8 @@ export interface NexusGenArgTypes {
     };
     petitionFieldComments: {
       // args
-      keycode: string; // ID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     petitions: {
       // args
@@ -4115,6 +4117,11 @@ export interface NexusGenArgTypes {
     publicOrgLogoUrl: {
       // args
       id: NexusGenScalars["GID"]; // GID!
+    };
+    publicPetitionFieldComments: {
+      // args
+      keycode: string; // ID!
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
     publicPetitionLinkBySlug: {
       // args

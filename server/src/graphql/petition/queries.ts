@@ -13,11 +13,15 @@ import {
 } from "nexus";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
-import { authenticate, authenticateAnd, or } from "../helpers/authorize";
+import { and, authenticate, authenticateAnd, chain, or } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
-import { petitionsArePublicTemplates, userHasAccessToPetitions } from "./authorizers";
+import {
+  fieldsBelongsToPetition,
+  petitionsArePublicTemplates,
+  userHasAccessToPetitions,
+} from "./authorizers";
 import { validateAuthTokenPayload, validatePublicPetitionLinkSlug } from "./validations";
 
 export const petitionsQuery = queryField((t) => {
@@ -249,4 +253,26 @@ export const isValidPublicPetitionLinkSlug = queryField("isValidPublicPetitionLi
   authorize: authenticate(),
   validateArgs: validatePublicPetitionLinkSlug((args) => args.slug, "slug"),
   resolve: () => true,
+});
+
+export const petitionFieldCommentsQuery = queryField("petitionFieldComments", {
+  type: list(nonNull("PetitionFieldComment")),
+  authorize: chain(
+    authenticate(),
+    and(
+      userHasAccessToPetitions("petitionId"),
+      fieldsBelongsToPetition("petitionId", "petitionFieldId")
+    )
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    petitionFieldId: nonNull(globalIdArg("PetitionField")),
+  },
+  description: "The comments for this field.",
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.loadPetitionFieldCommentsForField({
+      petitionId: args.petitionId,
+      petitionFieldId: args.petitionFieldId,
+    });
+  },
 });

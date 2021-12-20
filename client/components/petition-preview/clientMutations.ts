@@ -497,8 +497,7 @@ export function useCreateFileUploadReply() {
     }) {
       if (isCacheOnly) {
         for (const file of content) {
-          const random = Math.floor(1000000 + Math.random() * 9000000);
-          const id = `${fieldId}-${random}`;
+          const id = `${fieldId}-${getRandomId()}`;
           updatePreviewFieldReplies(apollo, fieldId, (replies) => [
             ...(replies ?? []),
             {

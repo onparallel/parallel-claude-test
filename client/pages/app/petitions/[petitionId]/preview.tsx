@@ -9,8 +9,12 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
+import {
+  AddPetitionAccessDialog,
+  useAddPetitionAccessDialog,
+} from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { useTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
+import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
@@ -283,6 +287,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     [petition.fields, visibility, router, query]
   );
 
+  const displayPetitionLimitReachedAlert =
+    me.organization.usageLimits.petitions.limit <= me.organization.usageLimits.petitions.used &&
+    isPetition &&
+    petition.status === "DRAFT";
+
   return (
     <ToneProvider value={petition.tone}>
       <PetitionLayout
@@ -293,7 +302,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         section="preview"
         scrollBody
         headerActions={
-          petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
+          isPetition && petition.status === "DRAFT" ? (
             <ResponsiveButtonIcon
               data-action="compose-next"
               id="petition-next"
@@ -307,18 +316,25 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             />
           ) : null
         }
+        subHeader={
+          <>
+            {!isPetition ? (
+              <Alert status="info">
+                <AlertIcon />
+                <Text>
+                  <FormattedMessage
+                    id="page.preview.template-only-cache-alert"
+                    defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>Use template</b>."
+                  />
+                </Text>
+              </Alert>
+            ) : null}
+            {displayPetitionLimitReachedAlert ? (
+              <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+            ) : null}
+          </>
+        }
       >
-        {!isPetition ? (
-          <Alert status="info">
-            <AlertIcon />
-            <Text>
-              <FormattedMessage
-                id="page.preview.template-only-cache-alert"
-                defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>Use template</b>."
-              />
-            </Text>
-          </Alert>
-        ) : null}
         <Flex backgroundColor="gray.50" minHeight="100%" flexDirection="column" alignItems="center">
           <Flex
             flex="1"
@@ -333,17 +349,14 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               minWidth={0}
               marginRight={{ base: 0, [breakpoint]: 4 }}
               marginBottom={4}
+              display={{ base: "none", [breakpoint]: "block" }}
             >
               <Stack
                 spacing={4}
                 position={{ base: "relative", [breakpoint]: "sticky" }}
                 top={{ base: 0, [breakpoint]: 6 }}
               >
-                <RecipientViewContentsCard
-                  currentPage={currentPage}
-                  petition={petition}
-                  display={{ base: "none", [breakpoint]: "flex" }}
-                />
+                <RecipientViewContentsCard currentPage={currentPage} petition={petition} />
               </Stack>
             </Box>
             <Flex flexDirection="column" flex="2" minWidth={0}>
@@ -394,6 +407,7 @@ PetitionPreview.fragments = {
       id
       tone
       ... on Petition {
+        ...AddPetitionAccessDialog_Petition
         status
         signatureConfig {
           integration {
@@ -424,6 +438,7 @@ PetitionPreview.fragments = {
       ...PetitionLayout_PetitionBase
       ...RecipientViewProgressFooter_Petition
     }
+    ${AddPetitionAccessDialog.fragments.Petition}
     ${PreviewPetitionField.fragments.PetitionField}
     ${RecipientViewContentsCard.fragments.PetitionBase}
     ${RecipientViewProgressFooter.fragments.Petition}

@@ -3566,7 +3566,7 @@ type Query {
   """
   The comments for this field.
   """
-  petitionFieldComments(keycode: ID!, petitionFieldId: GID!): [PublicPetitionFieldComment!]!
+  petitionFieldComments(petitionFieldId: GID!, petitionId: GID!): [PetitionFieldComment!]!
 
   """
   The petitions of the user
@@ -3596,6 +3596,11 @@ type Query {
   ): PetitionBasePagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
   publicOrgLogoUrl(id: GID!): String
+
+  """
+  The comments for this field.
+  """
+  publicPetitionFieldComments(keycode: ID!, petitionFieldId: GID!): [PublicPetitionFieldComment!]!
   publicPetitionLinkBySlug(slug: ID!): PublicPublicPetitionLink
   publicTemplateCategories: [String!]!
 

@@ -1,12 +1,17 @@
-import { DataProxy, gql, useMutation } from "@apollo/client";
+import { DataProxy, gql, useMutation, useQuery } from "@apollo/client";
 import {
+  Alert,
+  AlertIcon,
+  Box,
   Button,
+  Center,
   Flex,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -19,12 +24,12 @@ import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
-  PreviewPetitionFieldCommentsDialog_PetitionFieldFragment,
-  PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc,
+  PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment,
+  PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
   PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
   PreviewPetitionField_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import { updateFragment } from "@parallel/utils/apollo/updateFragment";
+import { updateQuery } from "@parallel/utils/apollo/updateQuery";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
@@ -36,16 +41,24 @@ import { GrowingTextarea } from "../../common/GrowingTextarea";
 interface PreviewPetitionFieldCommentsDialogProps {
   petitionId: string;
   field: PreviewPetitionField_PetitionFieldFragment;
+  isTemplate?: boolean;
 }
 
 export function PreviewPetitionFieldCommentsDialog({
   petitionId,
   field,
+  isTemplate,
   ...props
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
 
-  const comments = field.comments;
+  const { data, loading } = useQuery(
+    PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
+    {
+      variables: { petitionId, petitionFieldId: field.id },
+    }
+  );
+  const comments = data?.petitionFieldComments ?? [];
 
   const [draft, setDraft] = useState("");
   const [inputFocused, inputFocusBind] = useFocus({
@@ -58,6 +71,7 @@ export function PreviewPetitionFieldCommentsDialog({
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
   async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (isTemplate) return;
     const content = draft.trim();
     if (isMetaReturn(event) && content) {
       event.preventDefault();
@@ -78,6 +92,7 @@ export function PreviewPetitionFieldCommentsDialog({
   }
 
   async function handleSubmitClick() {
+    if (isTemplate) return;
     try {
       await createPetitionFieldComment({
         petitionId,
@@ -97,6 +112,7 @@ export function PreviewPetitionFieldCommentsDialog({
 
   const updatePetitionFieldComment = useUpdatePetitionFieldComment();
   async function handleEditCommentContent(commentId: string, content: string) {
+    if (isTemplate) return;
     try {
       await updatePetitionFieldComment({
         petitionId,
@@ -109,6 +125,7 @@ export function PreviewPetitionFieldCommentsDialog({
 
   const deletePetitionFieldComment = useDeletePetitionFieldComment();
   async function handleDeleteClick(commentId: string) {
+    if (isTemplate) return;
     try {
       await deletePetitionFieldComment({
         petitionId,
@@ -145,7 +162,17 @@ export function PreviewPetitionFieldCommentsDialog({
           flexDirection="column-reverse"
           minHeight="0"
         >
-          {comments.length === 0 ? (
+          {loading ? (
+            <Center minHeight={64}>
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="purple.500"
+                size="xl"
+              />
+            </Center>
+          ) : comments.length === 0 ? (
             <Flex
               flexDirection="column"
               paddingX={4}
@@ -174,6 +201,19 @@ export function PreviewPetitionFieldCommentsDialog({
               ))}
             </Stack>
           )}
+          {isTemplate ? (
+            <Box padding={2}>
+              <Alert status="info" borderRadius="md">
+                <AlertIcon />
+                <Text>
+                  <FormattedMessage
+                    id="component.preview-comments-dialog.template-no-comments-added"
+                    defaultMessage="<b>Preview only</b> - comments are disabled."
+                  />
+                </Text>
+              </Alert>
+            </Box>
+          ) : null}
         </ModalBody>
         <Divider />
         <ModalFooter display="block">
@@ -201,7 +241,7 @@ export function PreviewPetitionFieldCommentsDialog({
               <Button
                 size="sm"
                 colorScheme="purple"
-                isDisabled={draft.trim().length === 0}
+                isDisabled={draft.trim().length === 0 || isTemplate}
                 onClick={handleSubmitClick}
               >
                 <FormattedMessage id="generic.submit" defaultMessage="Submit" />
@@ -259,6 +299,20 @@ PreviewPetitionFieldCommentsDialog.fragments = {
     `;
   },
 };
+
+PreviewPetitionFieldCommentsDialog.queries = [
+  gql`
+    query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
+      $petitionId: GID!
+      $petitionFieldId: GID!
+    ) {
+      petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+        ...PreviewPetitionFieldCommentsDialog_PetitionFieldComment
+      }
+    }
+    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionFieldComment}
+  `,
+];
 
 PreviewPetitionFieldCommentsDialog.mutations = [
   gql`
@@ -332,6 +386,7 @@ function useCreatePetitionFieldComment() {
           if (data) {
             updatePetitionFieldComments(
               cache,
+              variables.petitionId,
               variables.petitionFieldId,
               () => data!.createPetitionFieldComment.comments
             );
@@ -359,6 +414,7 @@ function useUpdatePetitionFieldComment() {
           if (data) {
             updatePetitionFieldComments(
               cache,
+              variables.petitionId,
               variables.petitionFieldId,
               () => data!.updatePetitionFieldComment.comments
             );
@@ -386,6 +442,7 @@ function useDeletePetitionFieldComment() {
           if (data) {
             updatePetitionFieldComments(
               cache,
+              variables.petitionId,
               variables.petitionFieldId,
               () => data!.deletePetitionFieldComment.comments
             );
@@ -399,12 +456,17 @@ function useDeletePetitionFieldComment() {
 
 function updatePetitionFieldComments(
   proxy: DataProxy,
+  petitionId: string,
   petitionFieldId: string,
-  updateFn: () => PreviewPetitionFieldCommentsDialog_PetitionFieldFragment["comments"]
+  updateFn: (
+    cached: PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment[]
+  ) => PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment[]
 ) {
-  updateFragment(proxy, {
-    id: petitionFieldId,
-    fragment: PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc,
-    data: (cached) => ({ ...cached!, comments: updateFn() }),
+  return updateQuery(proxy, {
+    query: PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
+    variables: { petitionId, petitionFieldId },
+    data: (cached) => ({
+      petitionFieldComments: updateFn(cached!.petitionFieldComments),
+    }),
   });
 }

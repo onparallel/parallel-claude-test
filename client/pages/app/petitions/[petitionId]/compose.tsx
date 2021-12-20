@@ -554,10 +554,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             />
           ) : null
         }
+        subHeader={
+          displayPetitionLimitReachedAlert ? (
+            <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+          ) : null
+        }
       >
-        {displayPetitionLimitReachedAlert ? (
-          <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
-        ) : null}
         <PaneWithFlyout
           isFlyoutActive={Boolean(activeField)}
           alignWith={activeField ? activeFieldElement : null}

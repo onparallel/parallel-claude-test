@@ -58,7 +58,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   const { data, loading } = useQuery(RecipientViewPetitionFieldCommentsDialog_commentsDocument, {
     variables: { keycode, petitionFieldId: field.id },
   });
-  const comments = data?.petitionFieldComments ?? [];
+  const comments = data?.publicPetitionFieldComments ?? [];
 
   const [draft, setDraft] = useState("");
   const [inputFocused, inputFocusBind] = useFocus({
@@ -316,7 +316,7 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
 RecipientViewPetitionFieldCommentsDialog.queries = [
   gql`
     query RecipientViewPetitionFieldCommentsDialog_comments($keycode: ID!, $petitionFieldId: GID!) {
-      petitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {
+      publicPetitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
       }
     }
@@ -499,7 +499,7 @@ function useDeletePetitionFieldComment() {
               variables.petitionFieldId,
               (comments) => comments.filter((c) => c.id !== variables.petitionFieldCommentId)
             );
-            const removed = previous?.petitionFieldComments?.find(
+            const removed = previous?.publicPetitionFieldComments?.find(
               (c) => c.id === variables.petitionFieldCommentId
             );
             if (removed) {
@@ -528,7 +528,7 @@ function updatePetitionFieldComments(
     query: RecipientViewPetitionFieldCommentsDialog_commentsDocument,
     variables: { keycode, petitionFieldId },
     data: (cached) => ({
-      petitionFieldComments: updateFn(cached!.petitionFieldComments),
+      publicPetitionFieldComments: updateFn(cached!.publicPetitionFieldComments),
     }),
   });
 }
