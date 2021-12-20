@@ -243,7 +243,7 @@ export const publicDeletePetitionReply = mutationField("publicDeletePetitionRepl
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   resolve: async (_, args, ctx) => {
-    await ctx.petitions.deletePetitionFieldReply(args.replyId, `Contact:${ctx.contact!.id}`);
+    await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.access!);
     return RESULT.SUCCESS;
   },
 });

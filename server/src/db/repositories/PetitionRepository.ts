@@ -1417,7 +1417,10 @@ export class PetitionRepository extends BaseRepository {
     ]);
   }
 
-  async deletePetitionFieldReply(replyId: number, deletedBy: string) {
+  async deletePetitionFieldReply(replyId: number, deleter: User | PetitionAccess) {
+    const isContact = "keycode" in deleter;
+    const deletedBy = isContact ? `Contact:${deleter.contact_id}` : `User:${deleter.id}`;
+
     const reply = await this.loadFieldReply(replyId);
     const field = await this.loadField(reply!.petition_field_id);
     if (!field) {
@@ -1452,7 +1455,7 @@ export class PetitionRepository extends BaseRepository {
         type: "REPLY_DELETED",
         petition_id: field!.petition_id,
         data: {
-          petition_access_id: reply.petition_access_id!,
+          ...(isContact ? { petition_access_id: deleter.id } : { user_id: deleter.id }),
           petition_field_id: reply.petition_field_id,
           petition_field_reply_id: reply.id,
         },

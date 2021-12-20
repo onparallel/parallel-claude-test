@@ -409,7 +409,7 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     replyCanBeUpdated("replyId")
   ),
   resolve: async (_, args, ctx) => {
-    await ctx.petitions.deletePetitionFieldReply(args.replyId, `User:${ctx.user!.id}`);
+    await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
     return RESULT.SUCCESS;
   },
 });
