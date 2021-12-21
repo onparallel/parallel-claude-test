@@ -192,6 +192,7 @@ export const api = new RestApi({
       name: "Endpoints",
       tags: [
         "Petitions",
+        "Petition replies",
         "Attachments",
         "Petition Sharing",
         "Templates",
@@ -207,6 +208,10 @@ export const api = new RestApi({
     {
       name: "Petitions",
       description: "Petitions are the main entities in Parallel",
+    },
+    {
+      name: "Petition replies",
+      description: "See what your clients replied in your petitions",
     },
     { name: "Attachments", description: "Attach files to your petitions" },
     {
@@ -1018,7 +1023,7 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
     description: outdent`
       Returns a list of the petition fields with their submitted replies.
     `,
-    tags: ["Petitions"],
+    tags: ["Petition replies"],
     responses: {
       200: SuccessResponse(ListOfPetitionFieldsWithReplies),
     },
@@ -1075,7 +1080,7 @@ api
         400: ErrorResponse({ description: "Invalid parameters" }),
         409: ErrorResponse({ description: "The field does not accept more replies." }),
       },
-      tags: ["Petitions"],
+      tags: ["Petition replies"],
     },
     async ({ client, body, params, files }) => {
       const { petition } = await client.request(SubmitReply_petitionDocument, {
@@ -1223,7 +1228,7 @@ api
         400: ErrorResponse({ description: "Invalid parameters" }),
         409: ErrorResponse({ description: "The reply cannot be updated." }),
       },
-      tags: ["Petitions"],
+      tags: ["Petition replies"],
       body: FormDataBody(UpdateReply),
     },
     async ({ client, body, params, files }) => {
@@ -1351,7 +1356,7 @@ api
         204: SuccessResponse(),
         409: ErrorResponse({ description: "The reply can't be deleted" }),
       },
-      tags: ["Petitions"],
+      tags: ["Petition replies"],
     },
     async ({ client, params }) => {
       try {
@@ -1382,29 +1387,59 @@ api
   );
 
 api
-  .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId/status", {
+  .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId/approve", {
     params: { petitionId, fieldId, replyId },
   })
-  .put(
+  .post(
     {
-      operationId: "UpdateReplyStatus",
-      summary: "Update a reply status",
-      description: "Updates the `status` of a previously submitted reply.",
+      operationId: "ApproveReply",
+      summary: "Approve a reply",
+      description:
+        "Updates the reply status to `APPROVED`. Approved replies can't be updated or deleted.",
       responses: {
         201: SuccessResponse(PetitionFieldReply),
         400: ErrorResponse({ description: "Invalid parameters" }),
       },
-      tags: ["Petitions"],
-      body: JsonBody(UpdateReplyStatus),
+      tags: ["Petition replies"],
     },
-    async ({ client, params, body }) => {
+    async ({ client, params }) => {
       const { updatePetitionFieldRepliesStatus } = await client.request(
         UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
         {
           petitionId: params.petitionId,
           fieldId: params.fieldId,
           replyId: params.replyId,
-          status: body.status,
+          status: "APPROVED",
+        }
+      );
+      const updatedReply = updatePetitionFieldRepliesStatus.replies[0];
+      return Ok(mapReplyResponse(updatedReply));
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/fields/:fieldId/replies/:replyId/reject", {
+    params: { petitionId, fieldId, replyId },
+  })
+  .post(
+    {
+      operationId: "RejectReply",
+      summary: "Reject a reply",
+      description: "Updates the reply status to `REJECTED`.",
+      responses: {
+        201: SuccessResponse(PetitionFieldReply),
+        400: ErrorResponse({ description: "Invalid parameters" }),
+      },
+      tags: ["Petition replies"],
+    },
+    async ({ client, params }) => {
+      const { updatePetitionFieldRepliesStatus } = await client.request(
+        UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
+        {
+          petitionId: params.petitionId,
+          fieldId: params.fieldId,
+          replyId: params.replyId,
+          status: "REJECTED",
         }
       );
       const updatedReply = updatePetitionFieldRepliesStatus.replies[0];
@@ -1437,7 +1472,7 @@ api
           > image.png
         ~~~
       `,
-      tags: ["Petitions"],
+      tags: ["Petition replies"],
       responses: {
         302: RedirectResponse("Redirect to the resource on AWS S3"),
         400: ErrorResponse({
@@ -1503,7 +1538,7 @@ api
           description: "The format of the export.",
         }),
       },
-      tags: ["Petitions"],
+      tags: ["Petition replies"],
       responses: {
         302: RedirectResponse("Redirect to the resource on AWS S3"),
         409: ErrorResponse({ description: "You can't export the replies of a draft petition" }),
