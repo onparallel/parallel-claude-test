@@ -3338,6 +3338,14 @@ export type ContactSelect_ContactFragment = {
   hasBouncedEmail: boolean;
 };
 
+export type FileAttachmentButton_FileUploadFragment = {
+  __typename?: "FileUpload";
+  filename: string;
+  contentType: string;
+  size: number;
+  isComplete: boolean;
+};
+
 export type PetitionFieldSelect_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -7977,14 +7985,6 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
 };
 
-export type PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragment = {
-  __typename?: "FileUpload";
-  filename: string;
-  contentType: string;
-  size: number;
-  isComplete: boolean;
-};
-
 export type PetitionSignaturesCard_UserFragment = {
   __typename?: "User";
   hasPetitionSignature: boolean;
@@ -8555,18 +8555,6 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment =
   { __typename?: "PublicPetitionField"; commentCount: number; unreadCommentCount: number };
-
-export type RecipientViewFileAttachment_PetitionFieldAttachmentFragment = {
-  __typename?: "PetitionFieldAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
-  };
-};
 
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
@@ -18206,17 +18194,14 @@ export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   }
   ${PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldReplyFragment, unknown>;
-export const PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragmentDoc = gql`
-  fragment PetitionRepliesFileAttachment_PetitionAttachmentFileUpload on FileUpload {
+export const FileAttachmentButton_FileUploadFragmentDoc = gql`
+  fragment FileAttachmentButton_FileUpload on FileUpload {
     filename
     contentType
     size
     isComplete
   }
-` as unknown as DocumentNode<
-  PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragment,
-  unknown
->;
+` as unknown as DocumentNode<FileAttachmentButton_FileUploadFragment, unknown>;
 export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionField on PetitionField {
     id
@@ -18236,12 +18221,12 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     attachments {
       id
       file {
-        ...PetitionRepliesFileAttachment_PetitionAttachmentFileUpload
+        ...FileAttachmentButton_FileUpload
       }
     }
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
-  ${PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragmentDoc}
+  ${FileAttachmentButton_FileUploadFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldFragment, unknown>;
 export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
@@ -18394,11 +18379,11 @@ export const PetitionAttachmentsCard_PetitionFragmentDoc = gql`
     attachments {
       id
       file {
-        ...PetitionRepliesFileAttachment_PetitionAttachmentFileUpload
+        ...FileAttachmentButton_FileUpload
       }
     }
   }
-  ${PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragmentDoc}
+  ${FileAttachmentButton_FileUploadFragmentDoc}
 ` as unknown as DocumentNode<PetitionAttachmentsCard_PetitionFragment, unknown>;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
@@ -18651,17 +18636,6 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc 
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
   unknown
 >;
-export const RecipientViewFileAttachment_PetitionFieldAttachmentFragmentDoc = gql`
-  fragment RecipientViewFileAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
-    id
-    file {
-      filename
-      contentType
-      size
-      isComplete
-    }
-  }
-` as unknown as DocumentNode<RecipientViewFileAttachment_PetitionFieldAttachmentFragment, unknown>;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
     id
@@ -18685,14 +18659,17 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
     attachments {
-      ...RecipientViewFileAttachment_PetitionFieldAttachment
+      id
+      file {
+        ...FileAttachmentButton_FileUpload
+      }
     }
     commentCount
     unreadCommentCount
     ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-  ${RecipientViewFileAttachment_PetitionFieldAttachmentFragmentDoc}
+  ${FileAttachmentButton_FileUploadFragmentDoc}
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PublicPetitionFieldFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`

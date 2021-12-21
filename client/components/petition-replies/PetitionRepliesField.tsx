@@ -36,7 +36,7 @@ import { BreakLines } from "../common/BreakLines";
 import { Spacer } from "../common/Spacer";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
-import { PetitionRepliesFileAttachment } from "./PetitionRepliesFileAttachment";
+import { FileAttachmentButton } from "../common/FileAttachmentButton";
 
 export interface PetitionRepliesFieldProps extends BoxProps {
   petitionId: string;
@@ -340,7 +340,7 @@ export const PetitionRepliesField = Object.assign(
           attachments {
             id
             file {
-              ...PetitionRepliesFileAttachment_PetitionAttachmentFileUpload
+              ...FileAttachmentButton_FileUpload
             }
           }
         }
@@ -348,7 +348,7 @@ export const PetitionRepliesField = Object.assign(
           id
           ...PetitionRepliesFieldReply_PetitionFieldReply
         }
-        ${PetitionRepliesFileAttachment.fragments.FileUpload}
+        ${FileAttachmentButton.fragments.FileUpload}
         ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
       `,
     },
@@ -410,7 +410,7 @@ function PetitionRepliesFieldAttachments({
           gridGap={2}
         >
           {attachments.map((attachment) => (
-            <PetitionRepliesFileAttachment
+            <FileAttachmentButton
               key={attachment.id}
               file={attachment.file}
               onClick={() => onAttachmentClick(attachment.id)}

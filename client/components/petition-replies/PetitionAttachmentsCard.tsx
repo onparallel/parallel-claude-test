@@ -9,7 +9,7 @@ import {
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FormattedMessage } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
-import { PetitionRepliesFileAttachment } from "./PetitionRepliesFileAttachment";
+import { FileAttachmentButton } from "../common/FileAttachmentButton";
 
 export interface PetitionAttachmentsCardProps {
   petition: PetitionAttachmentsCard_PetitionFragment;
@@ -23,11 +23,11 @@ const fragments = {
         attachments {
           id
           file {
-            ...PetitionRepliesFileAttachment_PetitionAttachmentFileUpload
+            ...FileAttachmentButton_FileUpload
           }
         }
       }
-      ${PetitionRepliesFileAttachment.fragments.FileUpload}
+      ${FileAttachmentButton.fragments.FileUpload}
     `;
   },
 };
@@ -79,7 +79,7 @@ export const PetitionAttachmentsCard = Object.assign(
         {petition.attachments.length > 0 ? (
           <Box padding={2}>
             {petition.attachments.map((attachment) => (
-              <PetitionRepliesFileAttachment
+              <FileAttachmentButton
                 margin={1}
                 key={attachment.id}
                 file={attachment.file}

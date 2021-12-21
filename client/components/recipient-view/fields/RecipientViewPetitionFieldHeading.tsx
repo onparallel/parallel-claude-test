@@ -1,9 +1,9 @@
 import { Box, Flex, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { BreakLines } from "@parallel/components/common/BreakLines";
+import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { Linkify } from "@parallel/components/common/Linkify";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
 import { CommentsButton } from "../CommentsButton";
-import { RecipientViewFileAttachment } from "./RecipientViewFileAttachment";
 
 export interface RecipientViewPetitionFieldHeadingProps {
   field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
@@ -42,9 +42,10 @@ export function RecipientViewPetitionFieldHeading({
         <Box>
           <Flex flexWrap="wrap" gridGap={2}>
             {field.attachments.map((attachment) => (
-              <RecipientViewFileAttachment
+              <FileAttachmentButton
+                showDownloadIcon
                 key={attachment.id}
-                attachment={attachment}
+                file={attachment.file}
                 onClick={() => onDownloadAttachment(attachment.id)}
               />
             ))}

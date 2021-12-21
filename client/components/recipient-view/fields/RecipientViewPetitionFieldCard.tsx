@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Center, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Linkify } from "@parallel/components/common/Linkify";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
@@ -10,7 +11,6 @@ import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
 import { CommentsButton } from "../CommentsButton";
-import { RecipientViewFileAttachment } from "./RecipientViewFileAttachment";
 import { RecipientViewPetitionFieldCommentsDialog } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
 
 export interface RecipientViewPetitionFieldCardProps {
@@ -93,9 +93,10 @@ export function RecipientViewPetitionFieldCard({
       {field.attachments.length ? (
         <Flex flexWrap="wrap" gridGap={2} marginBottom={1}>
           {field.attachments.map((attachment) => (
-            <RecipientViewFileAttachment
+            <FileAttachmentButton
+              showDownloadIcon
               key={attachment.id}
-              attachment={attachment}
+              file={attachment.file}
               onClick={() => onDownloadAttachment(attachment.id)}
             />
           ))}
@@ -156,14 +157,17 @@ RecipientViewPetitionFieldCard.fragments = {
           ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         }
         attachments {
-          ...RecipientViewFileAttachment_PetitionFieldAttachment
+          id
+          file {
+            ...FileAttachmentButton_FileUpload
+          }
         }
         commentCount
         unreadCommentCount
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       }
       ${this.PublicPetitionFieldReply}
-      ${RecipientViewFileAttachment.fragments.PetitionFieldAttachment}
+      ${FileAttachmentButton.fragments.FileUpload}
       ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
     `;
   },
