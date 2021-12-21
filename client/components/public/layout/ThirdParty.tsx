@@ -16,14 +16,11 @@ import {
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
-import { Hubspot } from "@parallel/components/scripts/Hubspot";
 import { Segment } from "@parallel/components/scripts/Segment";
 import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { serialize as serializeCookie } from "cookie";
-import { Router } from "next/router";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -154,30 +151,11 @@ export function ThirdParty() {
         window.analytics?.load(process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY, { integrations });
       }
     } catch {}
-
-    // if no analytics or advertising place the do not track hubspot cookie
-    if (!cookiePreferences?.ANALYTICS || !cookiePreferences.ADVERTISING) {
-      const expires = new Date();
-      expires.setFullYear(expires.getFullYear() + 1);
-      document.cookie = serializeCookie("__hs_do_not_track", "yes", {
-        expires,
-        sameSite: "lax",
-        path: "/",
-      });
-    } else {
-      document.cookie = serializeCookie("__hs_do_not_track", "", { expires: new Date() });
-    }
   }
 
   useEffect(() => {
     enableThirdParty(cookiePreferences).then();
   }, []);
-
-  function handleHubspotLoad() {
-    Router.events.on("routeChangeComplete", () => {
-      window.HubSpotConversations?.widget.refresh();
-    });
-  }
 
   function handleSavePreferences() {
     setCookiePreferences({
@@ -203,17 +181,7 @@ export function ThirdParty() {
 
   return (
     <>
-      {process.env.NODE_ENV === "production" ? (
-        <>
-          <Segment />
-          {rehydrated ? (
-            <>
-              {/* Load only after giving consent */}
-              {cookiePreferences?.FUNCTIONAL ? <Hubspot onLoad={handleHubspotLoad} /> : null}
-            </>
-          ) : null}
-        </>
-      ) : null}
+      {process.env.NODE_ENV === "production" ? <Segment /> : null}
       <Portal>
         <Modal
           size="xl"

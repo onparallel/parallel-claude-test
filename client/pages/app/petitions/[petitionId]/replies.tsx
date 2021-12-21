@@ -151,15 +151,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   useEffect(() => {
     if (activeFieldId) {
-      document.body.classList.add("hide-hubspot");
-    } else {
-      document.body.classList.remove("hide-hubspot");
-    }
-    return () => document.body.classList.remove("hide-hubspot");
-  }, [Boolean(activeFieldId)]);
-
-  useEffect(() => {
-    if (activeFieldId) {
       const timeout = setTimeout(async () => {
         const petitionFieldCommentIds = activeField!.comments
           .filter((c) => c.isUnread)

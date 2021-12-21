@@ -4,13 +4,6 @@ interface Zendesk {
   hide?: () => void;
 }
 
-interface HubSpotConversations {
-  widget: {
-    refresh();
-  };
-}
-
 declare interface Window {
   zE?: Zendesk;
-  HubSpotConversations?: HubSpotConversations;
 }
