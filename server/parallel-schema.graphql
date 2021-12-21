@@ -3141,11 +3141,6 @@ A public view of the petition
 """
 type PublicPetition implements Timestamps {
   """
-  The attachments linked to this petition
-  """
-  attachments: [PetitionAttachment!]!
-
-  """
   Time when the resource was created.
   """
   createdAt: DateTime!

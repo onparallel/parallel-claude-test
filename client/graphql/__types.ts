@@ -2368,8 +2368,6 @@ export interface PublicOrganization {
 /** A public view of the petition */
 export interface PublicPetition extends Timestamps {
   __typename?: "PublicPetition";
-  /** The attachments linked to this petition */
-  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The deadline of the petition. */
@@ -8413,32 +8411,6 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
         email: string;
       }>;
     } | null;
-  };
-};
-
-export type RecipientViewPetitionFileAttachments_PetitionAttachmentFragment = {
-  __typename?: "PetitionAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
-  };
-};
-
-export type RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    attachmentId: Scalars["GID"];
-  }>;
-
-export type RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkMutation = {
-  publicPetitionAttachmentDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
   };
 };
 
@@ -14951,17 +14923,6 @@ export type RecipientView_PublicPetitionAccessFragment = {
     isRecipientViewContentsHidden: boolean;
     tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
-    attachments: Array<{
-      __typename?: "PetitionAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
     fields: Array<{
       __typename?: "PublicPetitionField";
       id: string;
@@ -15257,17 +15218,6 @@ export type RecipientView_accessQuery = {
       isRecipientViewContentsHidden: boolean;
       tone: Tone;
       signatureStatus?: PublicSignatureStatus | null;
-      attachments: Array<{
-        __typename?: "PetitionAttachment";
-        id: string;
-        file: {
-          __typename?: "FileUpload";
-          filename: string;
-          contentType: string;
-          size: number;
-          isComplete: boolean;
-        };
-      }>;
       fields: Array<{
         __typename?: "PublicPetitionField";
         id: string;
@@ -18933,20 +18883,6 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionFragment, unknown>;
-export const RecipientViewPetitionFileAttachments_PetitionAttachmentFragmentDoc = gql`
-  fragment RecipientViewPetitionFileAttachments_PetitionAttachment on PetitionAttachment {
-    id
-    file {
-      filename
-      contentType
-      size
-      isComplete
-    }
-  }
-` as unknown as DocumentNode<
-  RecipientViewPetitionFileAttachments_PetitionAttachmentFragment,
-  unknown
->;
 export const RecipientViewHeader_PublicUserFragmentDoc = gql`
   fragment RecipientViewHeader_PublicUser on PublicUser {
     id
@@ -19008,9 +18944,6 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
     petition {
       ...RecipientView_PublicPetition
-      attachments {
-        ...RecipientViewPetitionFileAttachments_PetitionAttachment
-      }
     }
     granter {
       ...RecipientView_PublicUser
@@ -19025,7 +18958,6 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
     ...RecipientViewPetitionField_PublicPetitionAccess
   }
   ${RecipientView_PublicPetitionFragmentDoc}
-  ${RecipientViewPetitionFileAttachments_PetitionAttachmentFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
   ${useCompleteSignerInfoDialog_PublicContactFragmentDoc}
@@ -19948,21 +19880,6 @@ export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   RecipientViewHeader_publicDelegateAccessToContactMutation,
   RecipientViewHeader_publicDelegateAccessToContactMutationVariables
 >;
-export const RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkDocument =
-  gql`
-    mutation RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLink(
-      $keycode: ID!
-      $attachmentId: GID!
-    ) {
-      publicPetitionAttachmentDownloadLink(keycode: $keycode, attachmentId: $attachmentId) {
-        result
-        url
-      }
-    }
-  ` as unknown as DocumentNode<
-    RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkMutation,
-    RecipientViewPetitionFileAttachments_publicPetitionAttachmentDownloadLinkMutationVariables
-  >;
 export const RecipientViewPetitionFieldCommentsDialog_commentsDocument = gql`
   query RecipientViewPetitionFieldCommentsDialog_comments($keycode: ID!, $petitionFieldId: GID!) {
     petitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {

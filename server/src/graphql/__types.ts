@@ -1418,7 +1418,6 @@ export interface NexusGenFieldTypes {
   };
   PublicPetition: {
     // field return type
-    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
@@ -2706,7 +2705,6 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetition: {
     // field return type name
-    attachments: "PetitionAttachment";
     createdAt: "DateTime";
     deadline: "DateTime";
     fields: "PublicPetitionField";

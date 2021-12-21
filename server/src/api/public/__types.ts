@@ -2290,8 +2290,6 @@ export type PublicOrganization = {
 
 /** A public view of the petition */
 export type PublicPetition = Timestamps & {
-  /** The attachments linked to this petition */
-  attachments: Array<PetitionAttachment>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The deadline of the petition. */

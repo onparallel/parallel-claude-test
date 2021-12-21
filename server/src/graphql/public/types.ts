@@ -146,11 +146,6 @@ export const PublicPetition = objectType({
         return org.preferred_tone;
       },
     });
-    t.nonNull.list.field("attachments", {
-      type: "PetitionAttachment",
-      description: "The attachments linked to this petition",
-      resolve: async (o, _, ctx) => await ctx.petitions.loadPetitionAttachmentsByPetitionId(o.id),
-    });
   },
 });
 
