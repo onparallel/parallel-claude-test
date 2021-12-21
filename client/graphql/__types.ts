@@ -3882,6 +3882,7 @@ export type PetitionTemplateHeader_UserFragment = {
   __typename?: "User";
   id: string;
   role: OrganizationRole;
+  hasPetitionPdfExport: boolean;
 };
 
 export type SettingsLayout_UserFragment = {
@@ -17438,6 +17439,7 @@ export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
     role
+    hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
   }
 ` as unknown as DocumentNode<PetitionTemplateHeader_UserFragment, unknown>;
 export const PetitionUserNotification_PetitionUserNotificationFragmentDoc = gql`

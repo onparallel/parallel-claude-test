@@ -232,8 +232,18 @@ export function PetitionHeader({
                 (petition.status === "DRAFT" ? 40 + 8 : 0) +
                 40 /* more options button width */
               }px)`,
-              md: `calc((100vw - ${
-                96 /* left navbar width */ + 350 /* petition navigation tabs width */
+              md: `calc(100vw - ${
+                96 /* left navbar width */ +
+                32 /* heading padding l+r */ +
+                24 /* petition status icon width */ +
+                8 /* locale badge margin left */ +
+                24 /* locale badge width */ +
+                16 /* petition name padding l+r */ +
+                (petition.status === "DRAFT" ? 138 : 10) +
+                40 /* more options button width */
+              }px)`,
+              lg: `calc((100vw - ${
+                96 /* left navbar width */ + 500 /* petition navigation tabs width */
               }px)/2 - ${
                 32 /* heading padding l+r */ +
                 24 /* petition status icon width */ +
@@ -289,6 +299,17 @@ export function PetitionHeader({
                       defaultMessage="Share petition"
                     />
                   </MenuItem>
+                  {user.hasPetitionPdfExport ? (
+                    <MenuItem
+                      onClick={() => handlePrintPdfTask(petition.id)}
+                      icon={<DownloadIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.export-pdf"
+                        defaultMessage="Export to PDF"
+                      />
+                    </MenuItem>
+                  ) : null}
                   <MenuItem
                     onClick={handleCloneClick}
                     icon={<CopyIcon display="block" boxSize={4} />}
@@ -318,17 +339,7 @@ export function PetitionHeader({
                       defaultMessage="Reopen petition"
                     />
                   </MenuItem>
-                  {user.hasPetitionPdfExport ? (
-                    <MenuItem
-                      onClick={() => handlePrintPdfTask(petition.id)}
-                      icon={<DownloadIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="component.petition-header.export-pdf"
-                        defaultMessage="Export to PDF"
-                      />
-                    </MenuItem>
-                  ) : null}
+
                   <MenuDivider />
                   <MenuOptionGroup
                     type="radio"

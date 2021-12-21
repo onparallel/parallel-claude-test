@@ -11,10 +11,10 @@ export const PetitionHeaderTabs = chakraForwardRef<"ul">(function PetitionHeader
       display="flex"
       alignItems="stretch"
       justifyContent="center"
-      position={{ base: "relative", md: "absolute" }}
-      height={{ base: "40px", md: "64px" }}
-      transform={{ base: "none", md: "translate(-50%)" }}
-      left={{ base: 0, md: "50%" }}
+      position={{ base: "relative", lg: "absolute" }}
+      height={{ base: "40px", lg: "64px" }}
+      transform={{ base: "none", lg: "translate(-50%)" }}
+      left={{ base: 0, lg: "50%" }}
       bottom="0"
       {...props}
     >

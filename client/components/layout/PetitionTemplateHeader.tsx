@@ -18,6 +18,7 @@ import {
 import {
   CopyIcon,
   DeleteIcon,
+  DownloadIcon,
   LockClosedIcon,
   MoreVerticalIcon,
   UserArrowIcon,
@@ -32,6 +33,7 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
+import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -136,6 +138,8 @@ export function PetitionTemplateHeader({
     [petition.isRestricted, intl.locale]
   );
 
+  const handlePrintPdfTask = usePrintPdfTask();
+
   return (
     <Box
       backgroundColor="white"
@@ -176,6 +180,14 @@ export function PetitionTemplateHeader({
               40 /* more options button width */ +
               16 /* more options button margin left */ +
               16 /* heading padding right */
+            }px)`,
+            lg: `calc((100vw - ${
+              96 /* left navbar width */ + 350 /* petition navigation tabs width */
+            }px)/2 - ${
+              32 /* heading padding l+r */ +
+              24 /* petition status icon width */ +
+              8 /* locale badge margin left */ +
+              24 /* locale badge width */
             }px)`,
           }}
           placeholder={
@@ -226,6 +238,17 @@ export function PetitionTemplateHeader({
                   defaultMessage="Share template"
                 />
               </MenuItem>
+              {user.hasPetitionPdfExport ? (
+                <MenuItem
+                  onClick={() => handlePrintPdfTask(petition.id)}
+                  icon={<DownloadIcon display="block" boxSize={4} />}
+                >
+                  <FormattedMessage
+                    id="component.petition-header.export-pdf"
+                    defaultMessage="Export to PDF"
+                  />
+                </MenuItem>
+              ) : null}
               <MenuItem
                 onClick={handleCloneClick}
                 icon={<CopyIcon display="block" boxSize={4} />}
@@ -285,6 +308,7 @@ PetitionTemplateHeader.fragments = {
     fragment PetitionTemplateHeader_User on User {
       id
       role
+      hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
     }
   `,
 };

@@ -16,6 +16,7 @@ import {
 import { useTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
+import { CompleteSignerInfoDialogResult } from "@parallel/components/recipient-view/dialogs/CompleteSignerInfoDialog";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
@@ -264,6 +265,45 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         );
         if (canFinalize) {
           // TODO: Handle finalize in preview petition
+          let completeSignerInfoData: CompleteSignerInfoDialogResult | null = null;
+          if (isPetition && petition.signatureConfig?.review === false) {
+            // completeSignerInfoData = await showCompleteSignerInfoDialog({
+            //   recipientCanAddSigners: petition.signatureConfig.letRecipientsChooseSigners,
+            //   signers,
+            //   keycode,
+            //   organization: granter.organization.name,
+            //   contact,
+            //   tone,
+            // });
+          }
+          // await publicCompletePetition({
+          //   variables: {
+          //     keycode,
+          //     additionalSigners: completeSignerInfoData?.additionalSigners,
+          //     message: completeSignerInfoData?.message,
+          //   },
+          // });
+          if (isPetition && petition.signatureConfig?.review) {
+            // await showReviewBeforeSigningDialog({ granter, tone });
+          }
+          if (!toast.isActive("petition-completed-toast")) {
+            toast({
+              id: "petition-completed-toast",
+              title: intl.formatMessage({
+                id: "recipient-view.completed-petition.toast-title",
+                defaultMessage: "Petition completed!",
+              }),
+              description: intl.formatMessage(
+                {
+                  id: "recipient-view.completed-petition.toast-description",
+                  defaultMessage: "{name} will be notified for its revision.",
+                },
+                { name: "Some name Granter" }
+              ),
+              status: "success",
+              isClosable: true,
+            });
+          }
         } else {
           // go to first repliable field without replies
           let page = 1;

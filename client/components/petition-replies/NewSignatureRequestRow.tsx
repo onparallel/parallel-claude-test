@@ -76,7 +76,7 @@ export function NewSignatureRequestRow({
         </Box>
       </Box>
       <Box padding={2} paddingRight={4}>
-        {petition.status === "PENDING" ? (
+        {petition.status === "PENDING" || petition.status === "DRAFT" ? (
           <Button width="24" colorScheme="red" onClick={() => onUpdateConfig(null)}>
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
           </Button>
