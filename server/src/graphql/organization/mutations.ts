@@ -35,11 +35,16 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
       `User:${ctx.user!.id}`
     );
 
-    return await ctx.organizations.updateOrganization(
-      ctx.user!.org_id,
-      { logo_public_file_id: logoFile.id },
-      `User:${ctx.user!.id}`
-    );
+    const [org] = await Promise.all([
+      ctx.organizations.updateOrganization(
+        ctx.user!.org_id,
+        { logo_public_file_id: logoFile.id },
+        `User:${ctx.user!.id}`
+      ),
+      ctx.integrations.removeSignaturitBrandingIds(ctx.user!.org_id, `User:${ctx.user!.id}`),
+    ]);
+
+    return org;
   },
 });
 
