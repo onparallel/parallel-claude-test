@@ -984,19 +984,6 @@ type Mutation {
   ): PublicPetitionAccess!
 
   """
-  Generates a download link for a petition attachment on a public context.
-  """
-  publicPetitionAttachmentDownloadLink(
-    attachmentId: GID!
-    keycode: ID!
-
-    """
-    If true will use content-disposition inline instead of attachment
-    """
-    preview: Boolean
-  ): FileUploadDownloadLinkResult!
-
-  """
   Generates a download link for a field attachment on a public context.
   """
   publicPetitionFieldAttachmentDownloadLink(

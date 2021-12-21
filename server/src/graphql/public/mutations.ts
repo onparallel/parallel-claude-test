@@ -43,7 +43,6 @@ import {
   fetchPetitionAccess,
   fieldBelongsToAccess,
   getContactAuthCookieValue,
-  petitionAttachmentBelongsToAccess,
   replyBelongsToAccess,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
@@ -915,57 +914,6 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
 
         if (!attachment) {
           throw new Error(`Can't load PetitionFieldAttachment with id ${args.attachmentId}`);
-        }
-
-        const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
-        if (!file) {
-          throw new Error(`FileUpload not found with id ${attachment.file_upload_id}`);
-        }
-        if (!file.upload_complete) {
-          await ctx.aws.fileUploads.getFileMetadata(file!.path);
-          await ctx.files.markFileUploadComplete(file.id, `Contact:${ctx.access!.contact_id}`);
-        }
-        return {
-          result: RESULT.SUCCESS,
-          file: file.upload_complete
-            ? file
-            : await ctx.files.loadFileUpload(file.id, { refresh: true }),
-          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
-            file!.path,
-            file!.filename,
-            args.preview ? "inline" : "attachment"
-          ),
-        };
-      } catch {
-        return {
-          result: RESULT.FAILURE,
-        };
-      }
-    },
-  }
-);
-
-export const publicPetitionAttachmentDownloadLink = mutationField(
-  "publicPetitionAttachmentDownloadLink",
-  {
-    description: "Generates a download link for a petition attachment on a public context.",
-    type: "FileUploadDownloadLinkResult",
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      and(petitionAttachmentBelongsToAccess("attachmentId"))
-    ),
-    args: {
-      keycode: nonNull(idArg()),
-      attachmentId: nonNull(globalIdArg("PetitionAttachment")),
-      preview: booleanArg({
-        description: "If true will use content-disposition inline instead of attachment",
-      }),
-    },
-    resolve: async (_, args, ctx) => {
-      try {
-        const attachment = await ctx.petitions.loadPetitionAttachment(args.attachmentId);
-        if (!attachment) {
-          throw new Error(`Can't load PetitionAttachment with id ${args.attachmentId}`);
         }
 
         const file = await ctx.files.loadFileUpload(attachment.file_upload_id);

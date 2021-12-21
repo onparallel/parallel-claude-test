@@ -465,8 +465,6 @@ export type Mutation = {
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   /** Cancel a reminder for a contact. */
   publicOptOutReminders: PublicPetitionAccess;
-  /** Generates a download link for a petition attachment on a public context. */
-  publicPetitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
@@ -1003,12 +1001,6 @@ export type MutationpublicOptOutRemindersArgs = {
   other: Scalars["String"];
   reason: Scalars["String"];
   referer?: InputMaybe<Scalars["String"]>;
-};
-
-export type MutationpublicPetitionAttachmentDownloadLinkArgs = {
-  attachmentId: Scalars["GID"];
-  keycode: Scalars["ID"];
-  preview?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {

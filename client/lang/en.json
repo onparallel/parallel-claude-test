@@ -8020,11 +8020,6 @@
     "context": "Already trust us"
   },
   {
-    "term": "recipient-view.attachments-header",
-    "definition": "Attachments",
-    "context": "Attachments"
-  },
-  {
     "term": "recipient-view.complete-signer-info-dialog.add-more-signers.button",
     "definition": "Add more signers",
     "context": "Add more signers"

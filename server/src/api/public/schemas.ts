@@ -840,21 +840,6 @@ export const UpdateReply = schema({
   },
 } as const);
 
-export const UpdateReplyStatus = schema({
-  title: "UpdateReplyStatus",
-  type: "object",
-  additionalProperties: false,
-  required: ["status"],
-  properties: {
-    status: {
-      type: "string",
-      description: "The new status for the reply. `APPROVED` replies can't be updated or deleted",
-      enum: ["PENDING", "APPROVED", "REJECTED"],
-      example: "APPROVED",
-    },
-  },
-} as const);
-
 export const ListOfPermissions = ListOf(_Permission);
 
 export const ListOfPetitionFieldsWithReplies = ListOf(_PetitionFieldWithReplies);

@@ -495,8 +495,6 @@ export interface Mutation {
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   /** Cancel a reminder for a contact. */
   publicOptOutReminders: PublicPetitionAccess;
-  /** Generates a download link for a petition attachment on a public context. */
-  publicPetitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
@@ -1033,12 +1031,6 @@ export interface MutationpublicOptOutRemindersArgs {
   other: Scalars["String"];
   reason: Scalars["String"];
   referer?: InputMaybe<Scalars["String"]>;
-}
-
-export interface MutationpublicPetitionAttachmentDownloadLinkArgs {
-  attachmentId: Scalars["GID"];
-  keycode: Scalars["ID"];
-  preview?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
@@ -8582,18 +8574,6 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentC
 
 export type RecipientViewFileAttachment_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
-  };
-};
-
-export type RecipientViewFileAttachment_PetitionAttachmentFragment = {
-  __typename?: "PetitionAttachment";
   id: string;
   file: {
     __typename?: "FileUpload";
@@ -16697,17 +16677,6 @@ export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment,
     unknown
   >;
-export const RecipientViewFileAttachment_PetitionAttachmentFragmentDoc = gql`
-  fragment RecipientViewFileAttachment_PetitionAttachment on PetitionAttachment {
-    id
-    file {
-      filename
-      contentType
-      size
-      isComplete
-    }
-  }
-` as unknown as DocumentNode<RecipientViewFileAttachment_PetitionAttachmentFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
     content

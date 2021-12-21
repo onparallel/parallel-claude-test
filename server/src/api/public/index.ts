@@ -74,7 +74,6 @@ import {
   Template,
   UpdatePetition,
   UpdateReply,
-  UpdateReplyStatus,
 } from "./schemas";
 import {
   CreateContact_contactDocument,
