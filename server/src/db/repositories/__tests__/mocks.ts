@@ -30,6 +30,7 @@ import {
   OrgIntegration,
   Petition,
   PetitionAccess,
+  PetitionAttachment,
   PetitionEventSubscription,
   PetitionField,
   PetitionFieldAttachment,
@@ -257,6 +258,18 @@ export class Mocks {
         fileUploads.map((file) => ({
           file_upload_id: file.id,
           petition_field_id: fieldId,
+        }))
+      )
+      .returning("*");
+  }
+
+  async createPetitionAttachment(petitionId: number, amount?: number, files?: FileUpload[]) {
+    const fileUploads = files ?? (await this.createRandomFileUpload(amount));
+    return await this.knex<PetitionAttachment>("petition_attachment")
+      .insert(
+        fileUploads.map((file) => ({
+          file_upload_id: file.id,
+          petition_id: petitionId,
         }))
       )
       .returning("*");

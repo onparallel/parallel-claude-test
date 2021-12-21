@@ -21,10 +21,13 @@ const fragments = {
       fragment PetitionAttachmentsCard_Petition on Petition {
         id
         attachments {
-          ...PetitionRepliesFileAttachment_PetitionAttachment
+          id
+          file {
+            ...PetitionRepliesFileAttachment_PetitionAttachmentFileUpload
+          }
         }
       }
-      ${PetitionRepliesFileAttachment.fragments.PetitionAttachment}
+      ${PetitionRepliesFileAttachment.fragments.FileUpload}
     `;
   },
 };
@@ -79,7 +82,7 @@ export const PetitionAttachmentsCard = Object.assign(
               <PetitionRepliesFileAttachment
                 margin={1}
                 key={attachment.id}
-                attachment={attachment}
+                file={attachment.file}
                 onClick={() => handleAttachmentClick(attachment.id)}
               />
             ))}

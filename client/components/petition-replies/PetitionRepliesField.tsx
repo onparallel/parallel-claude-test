@@ -26,7 +26,6 @@ import {
   PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
-  PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -339,14 +338,17 @@ export const PetitionRepliesField = Object.assign(
             createdAt
           }
           attachments {
-            ...PetitionRepliesFileAttachment_PetitionFieldAttachment
+            id
+            file {
+              ...PetitionRepliesFileAttachment_PetitionAttachmentFileUpload
+            }
           }
         }
         fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
           id
           ...PetitionRepliesFieldReply_PetitionFieldReply
         }
-        ${PetitionRepliesFileAttachment.fragments.PetitionFieldAttachment}
+        ${PetitionRepliesFileAttachment.fragments.FileUpload}
         ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
       `,
     },
@@ -374,7 +376,7 @@ function PetitionRepliesFieldAttachments({
   attachments,
   onAttachmentClick,
 }: {
-  attachments: PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment[];
+  attachments: PetitionRepliesField_PetitionFieldFragment["attachments"];
   onAttachmentClick: (attachmentId: string) => void;
 }) {
   return (
@@ -410,7 +412,7 @@ function PetitionRepliesFieldAttachments({
           {attachments.map((attachment) => (
             <PetitionRepliesFileAttachment
               key={attachment.id}
-              attachment={attachment}
+              file={attachment.file}
               onClick={() => onAttachmentClick(attachment.id)}
             />
           ))}

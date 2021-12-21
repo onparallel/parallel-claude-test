@@ -7977,28 +7977,12 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
 };
 
-export type PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment = {
-  __typename?: "PetitionFieldAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
-  };
-};
-
-export type PetitionRepliesFileAttachment_PetitionAttachmentFragment = {
-  __typename?: "PetitionAttachment";
-  id: string;
-  file: {
-    __typename?: "FileUpload";
-    filename: string;
-    contentType: string;
-    size: number;
-    isComplete: boolean;
-  };
+export type PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragment = {
+  __typename?: "FileUpload";
+  filename: string;
+  contentType: string;
+  size: number;
+  isComplete: boolean;
 };
 
 export type PetitionSignaturesCard_UserFragment = {
@@ -18222,18 +18206,15 @@ export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   }
   ${PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldReplyFragment, unknown>;
-export const PetitionRepliesFileAttachment_PetitionFieldAttachmentFragmentDoc = gql`
-  fragment PetitionRepliesFileAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
-    id
-    file {
-      filename
-      contentType
-      size
-      isComplete
-    }
+export const PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragmentDoc = gql`
+  fragment PetitionRepliesFileAttachment_PetitionAttachmentFileUpload on FileUpload {
+    filename
+    contentType
+    size
+    isComplete
   }
 ` as unknown as DocumentNode<
-  PetitionRepliesFileAttachment_PetitionFieldAttachmentFragment,
+  PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragment,
   unknown
 >;
 export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
@@ -18253,11 +18234,14 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
       createdAt
     }
     attachments {
-      ...PetitionRepliesFileAttachment_PetitionFieldAttachment
+      id
+      file {
+        ...PetitionRepliesFileAttachment_PetitionAttachmentFileUpload
+      }
     }
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
-  ${PetitionRepliesFileAttachment_PetitionFieldAttachmentFragmentDoc}
+  ${PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFieldFragment, unknown>;
 export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
@@ -18404,25 +18388,17 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   ${OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSignaturesCard_PetitionFragment, unknown>;
-export const PetitionRepliesFileAttachment_PetitionAttachmentFragmentDoc = gql`
-  fragment PetitionRepliesFileAttachment_PetitionAttachment on PetitionAttachment {
-    id
-    file {
-      filename
-      contentType
-      size
-      isComplete
-    }
-  }
-` as unknown as DocumentNode<PetitionRepliesFileAttachment_PetitionAttachmentFragment, unknown>;
 export const PetitionAttachmentsCard_PetitionFragmentDoc = gql`
   fragment PetitionAttachmentsCard_Petition on Petition {
     id
     attachments {
-      ...PetitionRepliesFileAttachment_PetitionAttachment
+      id
+      file {
+        ...PetitionRepliesFileAttachment_PetitionAttachmentFileUpload
+      }
     }
   }
-  ${PetitionRepliesFileAttachment_PetitionAttachmentFragmentDoc}
+  ${PetitionRepliesFileAttachment_PetitionAttachmentFileUploadFragmentDoc}
 ` as unknown as DocumentNode<PetitionAttachmentsCard_PetitionFragment, unknown>;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
