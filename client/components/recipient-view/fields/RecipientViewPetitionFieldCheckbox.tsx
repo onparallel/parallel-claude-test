@@ -53,18 +53,16 @@ export function RecipientViewPetitionFieldCheckbox({
 
   const { type = "UNLIMITED", max = 1 } = limit ?? {};
 
-  const isRejected = field.replies[0]?.status === "REJECTED" ?? false;
+  const reply = field.replies[0];
+  const isRejected = reply?.status === "REJECTED" ?? false;
   const showRadio = max === 1 && type !== "UNLIMITED";
-  const replyId = field.replies[0]?.id;
 
-  const [checkedItems, setCheckedItems] = useState<string[]>(
-    field.replies[0]?.content?.choices ?? []
-  );
+  const [checkedItems, setCheckedItems] = useState<string[]>(reply?.content?.choices ?? []);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleUpdate = async (value: string[]) => {
     setIsSaving(true);
-    await onUpdateReply(replyId, value);
+    await onUpdateReply(reply!.id, value);
     setIsSaving(false);
   };
 
@@ -76,7 +74,7 @@ export function RecipientViewPetitionFieldCheckbox({
 
   const handleDelete = async () => {
     setIsSaving(true);
-    await onDeleteReply(replyId);
+    await onDeleteReply(reply!.id);
     setIsSaving(false);
   };
 
@@ -104,7 +102,7 @@ export function RecipientViewPetitionFieldCheckbox({
       if (
         haveChanges({
           checked: filteredChecked,
-          choices: field.replies[0].content.choices,
+          choices: reply.content.choices,
           max: type === "UNLIMITED" ? values.length : max,
         })
       ) {
@@ -167,7 +165,7 @@ export function RecipientViewPetitionFieldCheckbox({
           <Flex alignItems="center" boxSize={6}>
             <RecipientViewPetitionFieldReplyStatusIndicator
               isSaving={isSaving}
-              reply={field.replies[0]}
+              reply={reply}
               showSavedIcon={false}
             />
           </Flex>
@@ -177,7 +175,7 @@ export function RecipientViewPetitionFieldCheckbox({
           <Checkbox
             key={index}
             isInvalid={isRejected}
-            isDisabled={isDisabled}
+            isDisabled={isDisabled || reply.status === "APPROVED"}
             isChecked={checkedItems.includes(option)}
             onChange={(e) => {
               e.preventDefault();
