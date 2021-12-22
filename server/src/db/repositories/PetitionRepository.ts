@@ -416,7 +416,7 @@ export class PetitionRepository extends BaseRepository {
                 );
                 q.orderBy("last_used_at", order);
               } else if (column === "sent_at") {
-                q.orderByRaw(`sent_at ${order}, created_at ${order}`);
+                q.orderByRaw(`sent_at ${order}, status asc, created_at ${order}`);
               } else {
                 q.orderBy(`petition.${column}`, order);
               }

@@ -293,13 +293,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 id: "recipient-view.completed-petition.toast-title",
                 defaultMessage: "Petition completed!",
               }),
-              description: intl.formatMessage(
-                {
-                  id: "recipient-view.completed-petition.toast-description",
-                  defaultMessage: "{name} will be notified for its revision.",
-                },
-                { name: "Some name Granter" }
-              ),
               status: "success",
               isClosable: true,
             });

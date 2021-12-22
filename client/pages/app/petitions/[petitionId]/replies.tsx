@@ -679,26 +679,26 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             )}
           </Stack>
 
-            {petition.attachments.length > 0 && (
-              <PetitionAttachmentsCard
-                id="attachments"
-                petition={petition}
-                layerStyle="highlightable"
-                marginTop={8}
-              />
-            )}
-
-            <PetitionSignaturesCard
-              ref={signaturesRef as any}
-              id="signatures"
+          {petition.attachments.length > 0 && (
+            <PetitionAttachmentsCard
+              id="attachments"
               petition={petition}
-              user={me}
               layerStyle="highlightable"
               marginTop={8}
-              onRefetchPetition={refetch}
             />
-          </Box>
-        </PaneWithFlyout>
+          )}
+
+          <PetitionSignaturesCard
+            ref={signaturesRef as any}
+            id="signatures"
+            petition={petition}
+            user={me}
+            layerStyle="highlightable"
+            marginTop={8}
+            onRefetchPetition={refetch}
+          />
+        </Box>
+      </PaneWithFlyout>
     </PetitionLayout>
   );
 }

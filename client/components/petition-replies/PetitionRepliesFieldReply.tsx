@@ -158,7 +158,7 @@ export function PetitionRepliesFieldReply({
                           defaultMessage: "You",
                         })
                       : reply.updatedBy.fullName
-                  },`
+                  }, `
                 : null}
               <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
             </Text>

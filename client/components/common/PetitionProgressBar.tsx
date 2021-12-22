@@ -35,7 +35,7 @@ export function PetitionProgressBar({
     <SmallPopover
       placement="left"
       content={
-        status === "DRAFT" ? (
+        status === "DRAFT" && !replied && !validated && !optional ? (
           <Box textAlign="center" fontSize="sm">
             <Text fontStyle="italic">
               <FormattedMessage
@@ -126,19 +126,15 @@ export function PetitionProgressBar({
           value={validated! + replied!}
           {...STYLES["EMPTY"]}
         >
-          {status !== "DRAFT" ? (
-            <>
-              <ProgressIndicator
-                min={0}
-                max={total!}
-                value={validated!}
-                backgroundColor="green.400"
-                {...STYLES["VALIDATED"]}
-              />
-              <ProgressIndicator min={0} max={total!} value={replied!} {...STYLES["REPLIED"]} />
-              <ProgressIndicator min={0} max={total!} value={optional!} {...STYLES["OPTIONAL"]} />
-            </>
-          ) : null}
+          <ProgressIndicator
+            min={0}
+            max={total!}
+            value={validated!}
+            backgroundColor="green.400"
+            {...STYLES["VALIDATED"]}
+          />
+          <ProgressIndicator min={0} max={total!} value={replied!} {...STYLES["REPLIED"]} />
+          <ProgressIndicator min={0} max={total!} value={optional!} {...STYLES["OPTIONAL"]} />
         </ProgressTrack>
       </Box>
     </SmallPopover>
