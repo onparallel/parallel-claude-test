@@ -351,7 +351,7 @@
   },
   {
     "term": "component.confirm-signature-config-changed.body",
-    "definition": "Haz hecho cambios a la configuración de firma digital. Si continúas, el proceso será cancelado.",
+    "definition": "Has hecho cambios en la configuración de la firma digital. Si continúas, se cancelará la firma en marcha.",
     "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
   },
   {
@@ -8241,7 +8241,7 @@
   },
   {
     "term": "recipient-view.petition-signature-request-sent-alert.unknown-signer",
-    "definition": "<b>Hemos enviado el documento a firmar</b> a a la persona indicada para finalizar la petición.",
+    "definition": "<b>Hemos enviado el documento a firmar</b> a la persona indicada para finalizar la petición.",
     "context": "<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
   },
   {
