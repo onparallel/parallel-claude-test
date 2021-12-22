@@ -4,7 +4,6 @@ import { FileAttachmentButton } from "@parallel/components/common/FileAttachment
 import { Linkify } from "@parallel/components/common/Linkify";
 import { countBy } from "remeda";
 import { CommentsButton } from "../CommentsButton";
-import { RecipientViewFieldAttachment } from "./RecipientViewFieldAttachment";
 import { RecipientViewPetitionFieldCard_PetitionFieldSelection } from "./RecipientViewPetitionFieldCard";
 
 export interface RecipientViewPetitionFieldHeadingProps {

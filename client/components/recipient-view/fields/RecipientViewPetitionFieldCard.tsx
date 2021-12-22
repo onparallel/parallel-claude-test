@@ -14,10 +14,10 @@ import {
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { countBy } from "remeda";
 import { BreakLines } from "../../common/BreakLines";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewPetitionFieldCommentsDialog } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
-import { countBy } from "remeda";
 
 export type RecipientViewPetitionFieldCard_PetitionFieldSelection =
   | RecipientViewPetitionFieldCard_PublicPetitionFieldFragment
@@ -180,7 +180,10 @@ RecipientViewPetitionFieldCard.fragments = {
           ...RecipientViewPetitionFieldCard_PetitionFieldReply
         }
         attachments {
-          ...RecipientViewFieldAttachment_PetitionFieldAttachment
+          id
+          file {
+            ...FileAttachmentButton_FileUpload
+          }
         }
         comments {
           id
@@ -189,7 +192,7 @@ RecipientViewPetitionFieldCard.fragments = {
         ...RecipientViewPetitionFieldCommentsDialog_PetitionField
       }
       ${this.PetitionFieldReply}
-      ${RecipientViewFieldAttachment.fragments.PetitionFieldAttachment}
+      ${FileAttachmentButton.fragments.FileUpload}
       ${RecipientViewPetitionFieldCommentsDialog.fragments.PetitionField}
     `;
   },

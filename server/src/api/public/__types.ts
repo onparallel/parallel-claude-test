@@ -150,11 +150,6 @@ export type CreateContactInput = {
   lastName?: InputMaybe<Scalars["String"]>;
 };
 
-export type CreateFileUploadFieldAttachment = {
-  attachment: PetitionFieldAttachment;
-  presignedPostData: AWSPresignedPostData;
-};
-
 export type CreatedAt = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -1900,7 +1895,7 @@ export type PetitionFieldReply = Timestamps & {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The last updater of the field reply. */
-  updatedBy: UserOrContact;
+  updatedBy: Maybe<UserOrContact>;
 };
 
 /** The status of a petition. */

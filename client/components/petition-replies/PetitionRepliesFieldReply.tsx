@@ -150,13 +150,17 @@ export function PetitionRepliesFieldReply({
             </Text>
           ) : (
             <Text color="gray.500">
-              {reply.updatedBy.id === me.id
-                ? intl.formatMessage({
-                    id: "generic.you",
-                    defaultMessage: "You",
-                  })
-                : reply.updatedBy.fullName}
-              , <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
+              {reply.updatedBy
+                ? `${
+                    reply.updatedBy.id === me.id
+                      ? intl.formatMessage({
+                          id: "generic.you",
+                          defaultMessage: "You",
+                        })
+                      : reply.updatedBy.fullName
+                  },`
+                : null}
+              <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
             </Text>
           )}
         </Box>
