@@ -396,7 +396,12 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
-      { content: { text: args.value }, status: "PENDING" },
+      {
+        petition_access_id: ctx.access!.id,
+        user_id: null,
+        content: { text: args.value },
+        status: "PENDING",
+      },
       ctx.access!
     );
   },
@@ -467,6 +472,8 @@ export const publicUpdateCheckboxReply = mutationField("publicUpdateCheckboxRepl
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {
+        petition_access_id: ctx.access!.id,
+        user_id: null,
         content: { choices: args.values },
         status: "PENDING",
       },
@@ -540,6 +547,8 @@ export const publicUpdateDynamicSelectReply = mutationField("publicUpdateDynamic
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {
+        petition_access_id: ctx.access!.id,
+        user_id: null,
         content: { columns: args.value },
         status: "PENDING",
       },

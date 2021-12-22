@@ -1899,6 +1899,7 @@ export type PetitionFieldReply = Timestamps & {
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+  /** The last updater of the field reply. */
   updatedBy: UserOrContact;
 };
 

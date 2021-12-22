@@ -2408,7 +2408,11 @@ type PetitionFieldReply implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
-  updatedBy: UserOrContact!
+
+  """
+  The last updater of the field reply.
+  """
+  updatedBy: UserOrContact
 }
 
 """

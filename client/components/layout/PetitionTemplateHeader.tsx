@@ -89,7 +89,7 @@ export function PetitionTemplateHeader({
       const petitionId = await createPetition({
         petitionId: petition.id,
       });
-      goToPetition(petitionId, "compose");
+      goToPetition(petitionId, "preview");
     } catch {}
   };
 

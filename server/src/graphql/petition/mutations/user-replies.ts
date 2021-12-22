@@ -81,7 +81,12 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
-      { content: { text: args.reply }, status: "PENDING" },
+      {
+        petition_access_id: null,
+        user_id: ctx.user!.id,
+        content: { text: args.reply },
+        status: "PENDING",
+      },
       ctx.user!
     );
   },
@@ -203,6 +208,8 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
       ctx.petitions.updatePetitionFieldReply(
         args.replyId,
         {
+          petition_access_id: null,
+          user_id: ctx.user!.id,
           content: {
             file_upload_id: newFile.id,
             old_file_upload_id: oldReply.content["file_upload_id"], // old file_upload_id will be removed and the file deleted once updatefileUploadReplyComplete has been called
@@ -249,6 +256,8 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {
+        petition_access_id: null,
+        user_id: ctx.user!.id,
         content: { file_upload_id: reply.content["file_upload_id"] }, // rewrite content to remove old_file_upload_id reference
       },
       ctx.user!
@@ -318,6 +327,8 @@ export const updateCheckboxReply = mutationField("updateCheckboxReply", {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {
+        petition_access_id: null,
+        user_id: ctx.user!.id,
         content: { choices: args.values },
         status: "PENDING",
       },
@@ -388,6 +399,8 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {
+        petition_access_id: null,
+        user_id: ctx.user!.id,
         content: { columns: args.value },
         status: "PENDING",
       },

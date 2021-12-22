@@ -152,7 +152,7 @@ function Petitions() {
         const petitionId = await createPetition({
           petitionId: selected[0],
         });
-        goToPetition(petitionId, "compose");
+        goToPetition(petitionId, "preview");
       } catch {}
     },
     [petitions, selected]

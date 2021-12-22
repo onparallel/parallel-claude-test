@@ -2015,10 +2015,14 @@ export class PetitionRepository extends BaseRepository {
     updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">
   ) {
     const event = await this.getLastEventForPetitionId(petitionId);
+
     if (
       event &&
       (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
       event.data.petition_field_reply_id === reply.id &&
+      ((isDefined(updater.user_id) && event.data.user_id === updater.user_id) ||
+        (isDefined(updater.petition_access_id) &&
+          event.data.petition_access_id === updater.petition_access_id)) &&
       differenceInSeconds(new Date(), event.created_at) < 60
     ) {
       await this.updateEvent(event.id, { created_at: new Date() });

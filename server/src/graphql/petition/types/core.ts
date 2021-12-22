@@ -692,17 +692,18 @@ export const PetitionFieldReply = objectType({
       description: "Metadata for this reply.",
       resolve: (o) => o.metadata,
     });
-    t.field("updatedBy", {
+    t.nullable.field("updatedBy", {
       type: "UserOrContact",
+      description: "The last updater of the field reply.",
       resolve: async (root, _, ctx) => {
         const userId = root.user_id;
         if (userId) {
           const user = await ctx.users.loadUser(userId);
-          return { __type: "User", ...user };
+          return user && { __type: "User", ...user };
         } else {
           const access = await ctx.petitions.loadAccess(root.petition_access_id!);
           const contact = await ctx.contacts.loadContact(access!.contact_id);
-          return { __type: "Contact", ...contact };
+          return contact && { __type: "Contact", ...contact };
         }
       },
     });
