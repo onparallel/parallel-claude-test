@@ -9,11 +9,11 @@ interface UserOrContactReferenceProps extends TextProps {
   userOrAccess?: Maybe<UserOrContactReference_UserOrPetitionAccessFragment>;
 }
 export function UserOrContactReference({ userOrAccess, ...props }: UserOrContactReferenceProps) {
-  return userOrAccess?.__typename === "User" ? (
-    <UserReference user={userOrAccess} />
-  ) : userOrAccess?.__typename === "PetitionAccess" ? (
+  return userOrAccess?.__typename === "PetitionAccess" ? (
     <ContactReference contact={userOrAccess.contact} {...props} />
-  ) : null;
+  ) : (
+    <UserReference user={userOrAccess?.__typename === "User" ? userOrAccess : null} />
+  );
 }
 
 UserOrContactReference.fragments = {
