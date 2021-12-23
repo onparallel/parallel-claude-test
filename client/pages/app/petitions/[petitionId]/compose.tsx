@@ -313,7 +313,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const showErrorDialog = useErrorDialog();
   const validPetitionFields = async () => {
-    if (!petition) return false;
     const { error, errorMessage, field } = validatePetitionFields(petition.fields);
     if (error) {
       setShowErrors(true);

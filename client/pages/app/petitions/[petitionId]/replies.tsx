@@ -263,7 +263,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showErrorDialog = useErrorDialog();
   const validPetitionFields = async () => {
-    if (!petition) return false;
     const { error, errorMessage, field } = validatePetitionFields(petition.fields);
     if (error) {
       await withError(showErrorDialog({ message: errorMessage }));

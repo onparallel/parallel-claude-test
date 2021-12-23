@@ -77,7 +77,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const showErrorDialog = useErrorDialog();
   const _validatePetitionFields = async () => {
-    if (!petition) return false;
     const { error, errorMessage, field } = validatePetitionFields(petition.fields);
     if (error) {
       await withError(showErrorDialog({ message: errorMessage }));
@@ -320,7 +319,6 @@ PetitionPreview.fragments = {
         ...RecipientViewProgressFooter_Petition
       }
       fields {
-        id
         ...PreviewPetitionField_PetitionField
       }
       signatureConfig {

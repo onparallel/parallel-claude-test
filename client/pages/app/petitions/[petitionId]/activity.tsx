@@ -83,7 +83,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const showErrorDialog = useErrorDialog();
   const _validatePetitionFields = async () => {
-    if (!petition) return false;
     const { error, errorMessage, field } = validatePetitionFields(petition.fields);
     if (error) {
       await withError(showErrorDialog({ message: errorMessage }));

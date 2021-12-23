@@ -4965,14 +4965,9 @@
     "context": "Petition access control"
   },
   {
-    "term": "petition-access.no-access-added",
-    "definition": "No se ha añadido ningún acceso todavía.",
-    "context": "No access has been added yet."
-  },
-  {
     "term": "petition-access.send-request-or-add-access",
-    "definition": "<a>Envía la petición</a> para incluir destinatarios o hazlo desde el botón de <b>Añadir acceso</b> de esta tabla.",
-    "context": "<a>Send the request</a> to include recipients or do it from the <b>Add access</b> button of this table."
+    "definition": "Todavía no has enviado esta petición. Haz clic <a>aquí</a> para enviarla.",
+    "context": "You haven't sent this petition yet. Click <a>here</a> to send it."
   },
   {
     "term": "petition-access.status-active",

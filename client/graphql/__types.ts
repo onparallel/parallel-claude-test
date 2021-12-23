@@ -19892,7 +19892,6 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       ...RecipientViewProgressFooter_Petition
     }
     fields {
-      id
       ...PreviewPetitionField_PetitionField
     }
     signatureConfig {

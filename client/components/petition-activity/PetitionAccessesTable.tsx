@@ -165,14 +165,8 @@ export function PetitionAccessesTable({
               <Stack>
                 <Text>
                   <FormattedMessage
-                    id="petition-access.no-access-added"
-                    defaultMessage="No access has been added yet."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
                     id="petition-access.send-request-or-add-access"
-                    defaultMessage="<a>Send the request</a> to include recipients or do it from the <b>Add access</b> button of this table."
+                    defaultMessage="You haven't sent this petition yet. Click <a>here</a> to send it."
                     values={{
                       a: (chunks: any) => (
                         <NormalLink onClick={onPetitionSend}>{chunks}</NormalLink>
