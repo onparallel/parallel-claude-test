@@ -4711,8 +4711,8 @@
   },
   {
     "term": "page.preview.template-only-cache-alert",
-    "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se guardarán. Para completar y enviar esta plantilla dale a <b>Utilizar plantilla</b>.",
-    "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>Use template</b>."
+    "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se guardarán. Para completar y enviar esta plantilla dale a <b>{button}</b>.",
+    "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
   },
   {
     "term": "page.pricing.activity-log",

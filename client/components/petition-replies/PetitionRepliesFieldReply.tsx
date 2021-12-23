@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import { Box, Flex, List, ListItem, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
 import {
   CheckIcon,
@@ -11,9 +11,8 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionFieldReplyStatus,
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
-  PetitionRepliesFieldReply_userDocument,
 } from "@parallel/graphql/__types";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
+import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { FORMATS } from "@parallel/utils/dates";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
@@ -42,9 +41,8 @@ export function PetitionRepliesFieldReply({
   const intl = useIntl();
   const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(reply.field!.type);
 
-  const {
-    data: { me },
-  } = useAssertQueryOrPreviousData(PetitionRepliesFieldReply_userDocument);
+  const apollo = useApolloClient();
+  const myId = getMyId(apollo);
 
   return (
     <Flex>
@@ -152,7 +150,7 @@ export function PetitionRepliesFieldReply({
             <Text color="gray.500">
               {reply.updatedBy
                 ? `${
-                    reply.updatedBy.id === me.id
+                    reply.updatedBy.id === myId
                       ? intl.formatMessage({
                           id: "generic.you",
                           defaultMessage: "You",
@@ -221,16 +219,6 @@ PetitionRepliesFieldReply.fragments = {
     }
   `,
 };
-
-PetitionRepliesFieldReply.queries = [
-  gql`
-    query PetitionRepliesFieldReply_user {
-      me {
-        id
-      }
-    }
-  `,
-];
 
 const ReplyDownloadButton = chakraForwardRef<
   "button",

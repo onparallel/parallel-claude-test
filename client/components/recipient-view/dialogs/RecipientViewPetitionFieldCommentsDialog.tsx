@@ -24,8 +24,8 @@ import {
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
   RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
-  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
-  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc,
+  FieldComment_PublicPetitionFieldCommentFragment,
+  FieldComment_PublicPetitionFieldCommentFragmentDoc,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragmentDoc,
@@ -211,7 +211,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
                 <FieldComment
                   key={comment.id}
                   comment={comment}
-                  contactId={access.contact!.id}
+                  isAuthor={access.contact!.id === comment.author?.id}
                   onEdit={(content) => handleEditCommentContent(comment.id, content)}
                   onDelete={() => handleDeleteClick(comment.id)}
                 />
@@ -291,36 +291,16 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
       }
     `;
   },
-  get PublicPetitionFieldComment() {
-    return gql`
-      fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment on PublicPetitionFieldComment {
-        id
-        author {
-          ... on PublicUser {
-            id
-            fullName
-          }
-          ... on PublicContact {
-            id
-            fullName
-          }
-        }
-        content
-        createdAt
-        isUnread
-      }
-    `;
-  },
 };
 
 RecipientViewPetitionFieldCommentsDialog.queries = [
   gql`
     query RecipientViewPetitionFieldCommentsDialog_comments($keycode: ID!, $petitionFieldId: GID!) {
       publicPetitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {
-        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+        ...FieldComment_PublicPetitionFieldComment
       }
     }
-    ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionFieldComment}
+    ${FieldComment.fragments.PublicPetitionFieldComment}
   `,
 ];
 
@@ -350,10 +330,10 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
         petitionFieldId: $petitionFieldId
         content: $content
       ) {
-        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+        ...FieldComment_PublicPetitionFieldComment
       }
     }
-    ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionFieldComment}
+    ${FieldComment.fragments.PublicPetitionFieldComment}
   `,
   gql`
     mutation RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment(
@@ -368,10 +348,10 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
         petitionFieldCommentId: $petitionFieldCommentId
         content: $content
       ) {
-        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+        ...FieldComment_PublicPetitionFieldComment
       }
     }
-    ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionFieldComment}
+    ${FieldComment.fragments.PublicPetitionFieldComment}
   `,
   gql`
     mutation RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment(
@@ -462,8 +442,7 @@ function useUpdatePetitionFieldComment() {
         variables,
         optimisticResponse: () => {
           const comment = apollo.readFragment({
-            fragment:
-              RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc,
+            fragment: FieldComment_PublicPetitionFieldCommentFragmentDoc,
             id: variables.petitionFieldCommentId,
           });
           return {
@@ -521,8 +500,8 @@ function updatePetitionFieldComments(
   keycode: string,
   petitionFieldId: string,
   updateFn: (
-    cached: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment[]
-  ) => RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment[]
+    cached: FieldComment_PublicPetitionFieldCommentFragment[]
+  ) => FieldComment_PublicPetitionFieldCommentFragment[]
 ) {
   return updateQuery(proxy, {
     query: RecipientViewPetitionFieldCommentsDialog_commentsDocument,

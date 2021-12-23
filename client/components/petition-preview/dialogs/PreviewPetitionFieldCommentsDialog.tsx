@@ -1,4 +1,4 @@
-import { DataProxy, gql, useMutation, useQuery } from "@apollo/client";
+import { DataProxy, gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -22,13 +22,14 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { FieldComment } from "@parallel/components/common/FieldComment";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
+  FieldComment_PetitionFieldCommentFragment,
   PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
-  PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment,
   PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
   PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
   PreviewPetitionField_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
+import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { updateQuery } from "@parallel/utils/apollo/updateQuery";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
@@ -51,6 +52,9 @@ export function PreviewPetitionFieldCommentsDialog({
   ...props
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
+
+  const apollo = useApolloClient();
+  const myId = getMyId(apollo);
 
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
@@ -194,7 +198,7 @@ export function PreviewPetitionFieldCommentsDialog({
                 <FieldComment
                   key={comment.id}
                   comment={comment}
-                  contactId={comment.author?.id ?? ""}
+                  isAuthor={myId === comment.author?.id}
                   onEdit={(content) => handleEditCommentContent(comment.id, content)}
                   onDelete={() => handleDeleteClick(comment.id)}
                 />
@@ -259,43 +263,16 @@ export function usePreviewPetitionFieldCommentsDialog() {
 }
 
 PreviewPetitionFieldCommentsDialog.fragments = {
-  get PetitionFieldComment() {
-    return gql`
-      fragment PreviewPetitionFieldCommentsDialog_PetitionFieldComment on PetitionFieldComment {
-        id
-        createdAt
-        content
-        isUnread
-        author {
-          ... on User {
-            id
-            fullName
-          }
-          ... on PetitionAccess {
-            id
-            granter {
-              id
-              fullName
-            }
-            contact {
-              id
-              fullName
-            }
-          }
-        }
-      }
-    `;
-  },
   get PetitionField() {
     return gql`
       fragment PreviewPetitionFieldCommentsDialog_PetitionField on PetitionField {
         id
         title
         comments {
-          ...PreviewPetitionFieldCommentsDialog_PetitionFieldComment
+          ...FieldComment_PetitionFieldComment
         }
       }
-      ${this.PetitionFieldComment}
+      ${FieldComment.fragments.PetitionFieldComment}
     `;
   },
 };
@@ -307,10 +284,10 @@ PreviewPetitionFieldCommentsDialog.queries = [
       $petitionFieldId: GID!
     ) {
       petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-        ...PreviewPetitionFieldCommentsDialog_PetitionFieldComment
+        ...FieldComment_PetitionFieldComment
       }
     }
-    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionFieldComment}
+    ${FieldComment.fragments.PetitionFieldComment}
   `,
 ];
 
@@ -459,8 +436,8 @@ function updatePetitionFieldComments(
   petitionId: string,
   petitionFieldId: string,
   updateFn: (
-    cached: PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment[]
-  ) => PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment[]
+    cached: FieldComment_PetitionFieldCommentFragment[]
+  ) => FieldComment_PetitionFieldCommentFragment[]
 ) {
   return updateQuery(proxy, {
     query: PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,

@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -13,8 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { MoreVerticalIcon } from "@parallel/chakra/icons";
 import {
-  PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment,
-  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
+  FieldComment_PetitionFieldCommentFragment,
+  FieldComment_PublicPetitionFieldCommentFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -27,14 +28,14 @@ import { GrowingTextarea } from "./GrowingTextarea";
 
 export function FieldComment({
   comment,
-  contactId,
+  isAuthor,
   onDelete,
   onEdit,
 }: {
   comment:
-    | RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
-    | PreviewPetitionFieldCommentsDialog_PetitionFieldCommentFragment;
-  contactId: string;
+    | FieldComment_PublicPetitionFieldCommentFragment
+    | FieldComment_PetitionFieldCommentFragment;
+  isAuthor: boolean;
   onDelete: () => void;
   onEdit: (content: string) => void;
 }) {
@@ -91,7 +92,7 @@ export function FieldComment({
 
         <DateTime color="gray.500" value={comment.createdAt} format={FORMATS.LLL} useRelativeTime />
         <Spacer />
-        {contactId === comment.author?.id ? (
+        {isAuthor ? (
           <Menu placement="bottom-end">
             <Tooltip
               label={intl.formatMessage({
@@ -154,3 +155,49 @@ export function FieldComment({
     </Box>
   );
 }
+
+FieldComment.fragments = {
+  get PublicPetitionFieldComment() {
+    return gql`
+      fragment FieldComment_PublicPetitionFieldComment on PublicPetitionFieldComment {
+        id
+        content
+        createdAt
+        isUnread
+        author {
+          ... on PublicUser {
+            id
+            fullName
+          }
+          ... on PublicContact {
+            id
+            fullName
+          }
+        }
+      }
+    `;
+  },
+  get PetitionFieldComment() {
+    return gql`
+      fragment FieldComment_PetitionFieldComment on PetitionFieldComment {
+        id
+        createdAt
+        content
+        isUnread
+        author {
+          ... on User {
+            id
+            fullName
+          }
+          ... on PetitionAccess {
+            id
+            contact {
+              id
+              fullName
+            }
+          }
+        }
+      }
+    `;
+  },
+};

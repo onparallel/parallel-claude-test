@@ -41,12 +41,7 @@ import { usePreviewPetitionFieldCommentsDialog } from "./dialogs/PreviewPetition
 export interface PreviewPetitionFieldProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
-    | "children"
-    | "showAddNewReply"
-    | "onAddNewReply"
-    | "onDownloadAttachment"
-    | "field"
-    | "petitionId"
+    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
   field: PreviewPetitionField_PetitionFieldFragment;
   petitionId: string;

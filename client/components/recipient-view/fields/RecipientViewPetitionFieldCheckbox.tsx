@@ -129,32 +129,25 @@ export function RecipientViewPetitionFieldCheckbox({
           ) : null}
           {!isSaving ? (
             <Text fontSize="sm" mr={2} color={isInvalid ? "red.600" : "gray.500"}>
-              {checkedResponse?.length ? (
+              {checkedItems?.length ? (
                 <>
                   {showRadio ? null : "("}
                   {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
                     <FormattedMessage
                       id="component.recipient-view-petition-field-card.replies-submitted-checkbox"
                       defaultMessage="Reply submitted"
-                      values={{ count: checkedResponse.length }}
-                    />
-                  ) : type === "UNLIMITED" ? (
-                    <FormattedMessage
-                      id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
-                      defaultMessage="{count} submitted"
-                      values={{ count: checkedResponse.length }}
                     />
                   ) : type === "EXACT" ? (
                     <FormattedMessage
                       id="component.recipient-view-petition-field-card.replies-submitted-checkbox-exact"
                       defaultMessage="{count}/{total} submitted"
-                      values={{ count: checkedResponse.length, total: max }}
+                      values={{ count: checkedItems.length, total: max }}
                     />
                   ) : (
                     <FormattedMessage
                       id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
                       defaultMessage="{count} submitted"
-                      values={{ count: checkedResponse.length }}
+                      values={{ count: checkedItems.length }}
                     />
                   )}
                   {showRadio ? null : ")"}
