@@ -2135,14 +2135,14 @@ type PetitionClosedNotifiedEvent implements PetitionEvent {
 }
 
 type PetitionCompletedEvent implements PetitionEvent {
-  completedBy: UserOrPetitionAccess!
+  completedBy: UserOrPetitionAccess
   createdAt: DateTime!
   id: GID!
   type: PetitionEventType!
 }
 
 type PetitionCompletedUserNotification implements PetitionUserNotification {
-  completedBy: UserOrPetitionAccess!
+  completedBy: UserOrPetitionAccess
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!

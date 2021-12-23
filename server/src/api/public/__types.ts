@@ -1724,14 +1724,14 @@ export type PetitionClosedNotifiedEvent = PetitionEvent & {
 };
 
 export type PetitionCompletedEvent = PetitionEvent & {
-  completedBy: UserOrPetitionAccess;
+  completedBy: Maybe<UserOrPetitionAccess>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   type: PetitionEventType;
 };
 
 export type PetitionCompletedUserNotification = PetitionUserNotification & {
-  completedBy: UserOrPetitionAccess;
+  completedBy: Maybe<UserOrPetitionAccess>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];

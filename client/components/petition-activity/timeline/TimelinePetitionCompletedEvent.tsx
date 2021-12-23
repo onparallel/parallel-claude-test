@@ -24,7 +24,7 @@ export function TimelinePetitionCompletedEvent({
         id="timeline.petition-completed-description"
         defaultMessage="{same, select, true {You} other {{name}}} completed the petition {timeAgo}"
         values={{
-          same: event.completedBy.__typename === "User" && event.completedBy.id === userId,
+          same: event.completedBy?.__typename === "User" && event.completedBy.id === userId,
           name: <UserOrContactReference userOrAccess={event.completedBy} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

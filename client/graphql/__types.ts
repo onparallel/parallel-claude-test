@@ -1773,7 +1773,7 @@ export interface PetitionClosedNotifiedEvent extends PetitionEvent {
 
 export interface PetitionCompletedEvent extends PetitionEvent {
   __typename?: "PetitionCompletedEvent";
-  completedBy: UserOrPetitionAccess;
+  completedBy?: Maybe<UserOrPetitionAccess>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   type: PetitionEventType;
@@ -1781,7 +1781,7 @@ export interface PetitionCompletedEvent extends PetitionEvent {
 
 export interface PetitionCompletedUserNotification extends PetitionUserNotification {
   __typename?: "PetitionCompletedUserNotification";
-  completedBy: UserOrPetitionAccess;
+  completedBy?: Maybe<UserOrPetitionAccess>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
@@ -3982,7 +3982,7 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNo
     id: string;
     createdAt: string;
     isRead: boolean;
-    completedBy:
+    completedBy?:
       | {
           __typename?: "PetitionAccess";
           contact?: {
@@ -3992,7 +3992,8 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNo
             email: string;
           } | null;
         }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | null;
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
       | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
@@ -4170,7 +4171,7 @@ export type NotificationsDrawer_notificationsQuery = {
             id: string;
             createdAt: string;
             isRead: boolean;
-            completedBy:
+            completedBy?:
               | {
                   __typename?: "PetitionAccess";
                   contact?: {
@@ -4180,7 +4181,8 @@ export type NotificationsDrawer_notificationsQuery = {
                     email: string;
                   } | null;
                 }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+              | null;
             petition:
               | { __typename?: "Petition"; id: string; name?: string | null }
               | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
@@ -4339,7 +4341,7 @@ export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNoti
     id: string;
     createdAt: string;
     isRead: boolean;
-    completedBy:
+    completedBy?:
       | {
           __typename?: "PetitionAccess";
           contact?: {
@@ -4349,7 +4351,8 @@ export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNoti
             email: string;
           } | null;
         }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | null;
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
       | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
@@ -4516,7 +4519,7 @@ export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationF
   id: string;
   createdAt: string;
   isRead: boolean;
-  completedBy:
+  completedBy?:
     | {
         __typename?: "PetitionAccess";
         contact?: {
@@ -4526,7 +4529,8 @@ export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationF
           email: string;
         } | null;
       }
-    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
   petition:
     | { __typename?: "Petition"; id: string; name?: string | null }
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
@@ -5134,7 +5138,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "PetitionCompletedEvent";
           id: string;
           createdAt: string;
-          completedBy:
+          completedBy?:
             | {
                 __typename?: "PetitionAccess";
                 contact?: {
@@ -5144,7 +5148,8 @@ export type PetitionActivityTimeline_PetitionFragment = {
                   email: string;
                 } | null;
               }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+            | null;
         }
       | {
           __typename?: "PetitionCreatedEvent";
@@ -5673,7 +5678,7 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
   __typename?: "PetitionCompletedEvent";
   id: string;
   createdAt: string;
-  completedBy:
+  completedBy?:
     | {
         __typename?: "PetitionAccess";
         contact?: {
@@ -5683,7 +5688,8 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
           email: string;
         } | null;
       }
-    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
@@ -6333,7 +6339,7 @@ export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragm
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   __typename?: "PetitionCompletedEvent";
   createdAt: string;
-  completedBy:
+  completedBy?:
     | {
         __typename?: "PetitionAccess";
         contact?: {
@@ -6343,7 +6349,8 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
           email: string;
         } | null;
       }
-    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
 };
 
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
@@ -10556,7 +10563,7 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "PetitionCompletedEvent";
           id: string;
           createdAt: string;
-          completedBy:
+          completedBy?:
             | {
                 __typename?: "PetitionAccess";
                 contact?: {
@@ -10566,7 +10573,8 @@ export type PetitionActivity_PetitionFragment = {
                   email: string;
                 } | null;
               }
-            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
+            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+            | null;
         }
       | {
           __typename?: "PetitionCreatedEvent";
@@ -11257,7 +11265,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "PetitionCompletedEvent";
                 id: string;
                 createdAt: string;
-                completedBy:
+                completedBy?:
                   | {
                       __typename?: "PetitionAccess";
                       contact?: {
@@ -11272,7 +11280,8 @@ export type PetitionActivity_updatePetitionMutation = {
                       id: string;
                       fullName?: string | null;
                       status: UserStatus;
-                    };
+                    }
+                  | null;
               }
             | {
                 __typename?: "PetitionCreatedEvent";
@@ -12038,7 +12047,7 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "PetitionCompletedEvent";
                 id: string;
                 createdAt: string;
-                completedBy:
+                completedBy?:
                   | {
                       __typename?: "PetitionAccess";
                       contact?: {
@@ -12053,7 +12062,8 @@ export type PetitionActivity_petitionQuery = {
                       id: string;
                       fullName?: string | null;
                       status: UserStatus;
-                    };
+                    }
+                  | null;
               }
             | {
                 __typename?: "PetitionCreatedEvent";

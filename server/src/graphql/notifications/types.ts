@@ -1,5 +1,5 @@
 import { core, enumType, interfaceType, nonNull, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { userOrPetitionAccessResolver } from "..";
 
 export const PetitionUserNotificationFilter = enumType({
   name: "PetitionUserNotificationFilter",
@@ -81,24 +81,9 @@ export const CommentCreatedUserNotification = createPetitionUserNotification(
 export const PetitionCompletedUserNotification = createPetitionUserNotification(
   "PetitionCompletedUserNotification",
   (t) => {
-    t.field("completedBy", {
+    t.nullable.field("completedBy", {
       type: "UserOrPetitionAccess",
-      resolve: async (root, _, ctx) => {
-        if (!isDefined(root.data.petition_access_id) && !isDefined(root.data.user_id)) {
-          throw new Error(
-            `Either petition_access_id or user_id must be defined in PetitionCompletedUserNotification:${root.id}`
-          );
-        }
-        return isDefined(root.data.petition_access_id)
-          ? {
-              ...(await ctx.petitions.loadAccess(root.data.petition_access_id))!,
-              __type: "PetitionAccess",
-            }
-          : {
-              ...(await ctx.users.loadUser(root.data.user_id!))!,
-              __type: "User",
-            };
-      },
+      resolve: userOrPetitionAccessResolver,
     });
   }
 );

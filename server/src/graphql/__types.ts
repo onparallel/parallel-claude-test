@@ -1140,14 +1140,14 @@ export interface NexusGenFieldTypes {
   };
   PetitionCompletedEvent: {
     // field return type
-    completedBy: NexusGenRootTypes["UserOrPetitionAccess"]; // UserOrPetitionAccess!
+    completedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   PetitionCompletedUserNotification: {
     // field return type
-    completedBy: NexusGenRootTypes["UserOrPetitionAccess"]; // UserOrPetitionAccess!
+    completedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
