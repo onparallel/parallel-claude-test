@@ -109,13 +109,13 @@ export type PetitionSignatureConfig = {
 
 export type PetitionSignatureRequestCancelData<CancelReason extends PetitionSignatureCancelReason> =
   {
-    CANCELLED_BY_USER: { canceller_id: number };
+    CANCELLED_BY_USER: { user_id: number };
     DECLINED_BY_SIGNER: {
       canceller: Maybe<{ firstName: string; lastName: string; email: string }>;
       decline_reason?: string;
     };
     REQUEST_ERROR: { error: any; file?: string };
-    REQUEST_RESTARTED: { canceller_id: number }; // id of the contact that restarted the signature request (modify replies and finish petition)
+    REQUEST_RESTARTED: { petition_access_id?: number; user_id?: number }; // id of the contact or user that restarted the signature request (modify replies and finish petition)
   }[CancelReason];
 
 @injectable()
@@ -1495,7 +1495,13 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async completePetition(petitionId: number, accessId: number) {
+  async completePetition(
+    petitionId: number,
+    userOrAccess: User | PetitionAccess,
+    t?: Knex.Transaction
+  ) {
+    const isAccess = "keycode" in userOrAccess;
+    const updatedBy = `${isAccess ? "PetitionAccess" : "User"}:${userOrAccess.id}`;
     const [petition, fields] = await Promise.all([
       this.loadPetition(petitionId),
       this.loadFieldsForPetition(petitionId),
@@ -1526,24 +1532,25 @@ export class PetitionRepository extends BaseRepository {
     if (canComplete) {
       const petition = await this.withTransaction(async (t) => {
         await this.updateRemindersForPetition(petitionId, null, t);
-        const [updated] = await this.from("petition", t)
-          .where("id", petitionId)
-          .update(
-            {
-              status: "COMPLETED",
-              updated_at: this.now(),
-              updated_by: `PetitionAccess:${accessId}`,
-            },
-            "*"
-          );
+        await this.createEvent(
+          {
+            type: "PETITION_COMPLETED",
+            petition_id: petitionId,
+            data: isAccess ? { petition_access_id: userOrAccess.id } : { user_id: userOrAccess.id },
+          },
+          t
+        );
 
+        const [updated] = await this.from("petition", t).where("id", petitionId).update(
+          {
+            status: "COMPLETED",
+            updated_at: this.now(),
+            updated_by: updatedBy,
+          },
+          "*"
+        );
         return updated;
-      });
-      await this.createEvent({
-        type: "PETITION_COMPLETED",
-        petition_id: petitionId,
-        data: { petition_access_id: accessId },
-      });
+      }, t);
       return petition;
     } else {
       throw new Error("Can't transition status to COMPLETED");
@@ -1883,7 +1890,7 @@ export class PetitionRepository extends BaseRepository {
         .where("petition_id", petitionId)
         .orderBy([
           { column: "created_at", order: "desc" },
-          { column: "id", order: "asc" },
+          { column: "id", order: "desc" },
         ])
         .select("*"),
       opts
@@ -3399,7 +3406,11 @@ export class PetitionRepository extends BaseRepository {
   readonly loadPetitionSignaturesByPetitionId = this.buildLoadMultipleBy(
     "petition_signature_request",
     "petition_id",
-    (q) => q.orderBy("created_at", "desc")
+    (q) =>
+      q.orderBy([
+        { column: "created_at", order: "desc" },
+        { column: "id", order: "desc" },
+      ])
   );
 
   readonly loadLatestPetitionSignatureByPetitionId = fromDataLoader(
@@ -3433,11 +3444,19 @@ export class PetitionRepository extends BaseRepository {
       .whereNull("deleted_at");
   }
 
-  async createPetitionSignature(petitionId: number, config: PetitionSignatureConfig) {
-    const [row] = await this.insert("petition_signature_request", {
-      petition_id: petitionId,
-      signature_config: config,
-    }).returning("*");
+  async createPetitionSignature(
+    petitionId: number,
+    config: PetitionSignatureConfig,
+    t?: Knex.Transaction
+  ) {
+    const [row] = await this.insert(
+      "petition_signature_request",
+      {
+        petition_id: petitionId,
+        signature_config: config,
+      },
+      t
+    ).returning("*");
 
     return row;
   }
@@ -3475,9 +3494,10 @@ export class PetitionRepository extends BaseRepository {
   async cancelPetitionSignatureRequest<CancelReason extends PetitionSignatureCancelReason>(
     petitionSignatureIds: MaybeArray<number>,
     reason: CancelReason,
-    cancelData: PetitionSignatureRequestCancelData<CancelReason>
+    cancelData: PetitionSignatureRequestCancelData<CancelReason>,
+    t?: Knex.Transaction
   ) {
-    const [row] = await this.from("petition_signature_request")
+    const [row] = await this.from("petition_signature_request", t)
       .whereIn("id", unMaybeArray(petitionSignatureIds))
       .update({
         status: "CANCELLED",

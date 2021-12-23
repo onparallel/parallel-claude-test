@@ -21,13 +21,9 @@ getPetitionSignatureStatus.fragments = {
       status
       currentSignatureRequest {
         status
-        environment
       }
       signatureConfig {
         review
-        integration {
-          environment
-        }
       }
     }
   `,

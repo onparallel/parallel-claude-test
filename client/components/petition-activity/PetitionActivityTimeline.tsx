@@ -62,7 +62,7 @@ export function PetitionActivityTimeline({
             {event.__typename === "PetitionCreatedEvent" ? (
               <TimelinePetitionCreatedEvent event={event} userId={userId} />
             ) : event.__typename === "PetitionCompletedEvent" ? (
-              <TimelinePetitionCompletedEvent event={event} />
+              <TimelinePetitionCompletedEvent event={event} userId={userId} />
             ) : event.__typename === "AccessActivatedEvent" ? (
               <TimelineAccessActivatedEvent event={event} userId={userId} />
             ) : event.__typename === "AccessDeactivatedEvent" ? (

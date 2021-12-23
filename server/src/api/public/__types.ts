@@ -343,6 +343,11 @@ export type Mutation = {
   clonePetitions: Array<PetitionBase>;
   /** Clones the user group with all its members */
   cloneUserGroup: Array<UserGroup>;
+  /**
+   * Marks a petition as COMPLETED.
+   * If the petition has a signature configured and does not require a review, starts the signing process.
+   */
+  completePetition: Petition;
   /** Creates a reply to a checkbox field. */
   createCheckboxReply: PetitionFieldReply;
   /** Create a contact. */
@@ -661,6 +666,12 @@ export type MutationclonePetitionsArgs = {
 export type MutationcloneUserGroupArgs = {
   locale?: InputMaybe<Scalars["String"]>;
   userGroupIds: Array<Scalars["GID"]>;
+};
+
+export type MutationcompletePetitionArgs = {
+  additionalSignersContactIds?: InputMaybe<Array<Scalars["GID"]>>;
+  message?: InputMaybe<Scalars["String"]>;
+  petitionId: Scalars["GID"];
 };
 
 export type MutationcreateCheckboxReplyArgs = {
@@ -1555,11 +1566,6 @@ export type Petition = PetitionBase & {
 };
 
 /** A petition */
-export type PetitioncurrentSignatureRequestArgs = {
-  token?: InputMaybe<Scalars["String"]>;
-};
-
-/** A petition */
 export type PetitioneventsArgs = {
   limit?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
@@ -1718,14 +1724,14 @@ export type PetitionClosedNotifiedEvent = PetitionEvent & {
 };
 
 export type PetitionCompletedEvent = PetitionEvent & {
-  access: PetitionAccess;
+  completedBy: UserOrPetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   type: PetitionEventType;
 };
 
 export type PetitionCompletedUserNotification = PetitionUserNotification & {
-  access: PetitionAccess;
+  completedBy: UserOrPetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
@@ -2766,12 +2772,12 @@ export type SendPetitionResult = {
 
 export type SignatureCancelledEvent = PetitionEvent & {
   cancelType: PetitionSignatureCancelReason;
+  cancelledBy: Maybe<UserOrPetitionAccess>;
   canceller: Maybe<PetitionSigner>;
   cancellerReason: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   type: PetitionEventType;
-  user: Maybe<User>;
 };
 
 export type SignatureCancelledUserNotification = PetitionUserNotification & {
@@ -3098,8 +3104,6 @@ export type UserNotifications_Pagination = {
   /** The requested slice of items. */
   items: Array<PetitionUserNotification>;
 };
-
-export type UserOrContact = Contact | User;
 
 export type UserOrPetitionAccess = PetitionAccess | User;
 

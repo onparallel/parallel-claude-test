@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Circle } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { ContactReference } from "@parallel/components/common/ContactReference";
+import { UserOrContactReference } from "@parallel/components/petition-activity/UserOrContactReference";
 import { PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";
@@ -32,10 +32,10 @@ export const PetitionCompletedUserNotification = Object.assign(
             defaultMessage="{name} completed the petition."
             values={{
               name: (
-                <ContactReference
+                <UserOrContactReference
+                  userOrAccess={notification.completedBy}
                   draggable="false"
                   tabIndex={-1}
-                  contact={notification.access.contact}
                 />
               ),
             }}
@@ -49,14 +49,12 @@ export const PetitionCompletedUserNotification = Object.assign(
       PetitionCompletedUserNotification: gql`
         fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
           ...PetitionUserNotification_PetitionUserNotification
-          access {
-            contact {
-              ...ContactReference_Contact
-            }
+          completedBy {
+            ...UserOrContactReference_UserOrPetitionAccess
           }
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
-        ${ContactReference.fragments.Contact}
+        ${UserOrContactReference.fragments.UserOrPetitionAccess}
       `,
     },
   }

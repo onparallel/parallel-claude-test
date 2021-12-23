@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
 import { datatype, internet, lorem } from "faker";
-import { Knex } from "knex";
+import knex, { Knex } from "knex";
 import { sortBy } from "remeda";
+import { PetitionEvent } from "../../db/events";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
@@ -13,6 +14,7 @@ import {
   PetitionField,
   PetitionFieldType,
   PetitionPermission,
+  PetitionSignatureRequest,
   Tag,
   User,
   UserGroup,
@@ -3205,6 +3207,234 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+  });
+
+  describe("completePetition", () => {
+    let petitions: Petition[];
+    let signatureIntegration: OrgIntegration;
+    let contacts: Contact[];
+    let otherOrgContact: Contact;
+
+    beforeAll(async () => {
+      contacts = await mocks.createRandomContacts(organization.id, 2, () => ({
+        email: internet.email(undefined, undefined, "onparallel.com"),
+      }));
+
+      [otherOrgContact] = await mocks.createRandomContacts(otherOrg.id, 1);
+
+      [signatureIntegration] = await mocks.createOrgIntegration({
+        org_id: organization.id,
+        provider: "SIGNATURIT",
+        type: "SIGNATURE",
+        is_enabled: true,
+        settings: {
+          API_KEY: "<APIKEY>",
+          ENVIRONMENT: "sandbox",
+        },
+      });
+
+      petitions = await mocks.createRandomPetitions(organization.id, sessionUser.id, 2, (i) => ({
+        status: "DRAFT",
+        signature_config:
+          i === 1
+            ? {
+                orgIntegrationId: signatureIntegration.id,
+                signersInfo: [],
+                timezone: "Europe/Madrid",
+                title: "Signature!",
+                review: false,
+                letRecipientsChooseSigners: false,
+              }
+            : null,
+      }));
+    });
+
+    it("completes the petition as a user if it doesn't have a signature configured", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!) {
+            completePetition(petitionId: $petitionId) {
+              id
+              status
+              events(limit: 100, offset: 0) {
+                totalCount
+                items {
+                  type
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[0].id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.completePetition).toEqual({
+        id: toGlobalId("Petition", petitions[0].id),
+        status: "COMPLETED",
+        events: { totalCount: 1, items: [{ type: "PETITION_COMPLETED" }] },
+      });
+
+      const petitionEvents = await mocks.knex
+        .from<PetitionEvent>("petition_event")
+        .where("petition_id", petitions[0].id)
+        .select("petition_id", "type", "data");
+      expect(petitionEvents).toEqual([
+        {
+          petition_id: petitions[0].id,
+          type: "PETITION_COMPLETED",
+          data: { user_id: sessionUser.id },
+        },
+      ]);
+    });
+
+    it("sends error if trying to complete the petition with signature configured and no signers info", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!) {
+            completePetition(petitionId: $petitionId) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("REQUIRED_SIGNER_INFO_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if some of the contacts passed as signers are invalid", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]) {
+            completePetition(petitionId: $petitionId, additionalSignersContactIds: $contactIds) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+          contactIds: contacts.concat(otherOrgContact).map((c) => toGlobalId("Contact", c.id)),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("completes the petition as a user and starts a signature request", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]) {
+            completePetition(petitionId: $petitionId, additionalSignersContactIds: $contactIds) {
+              id
+              status
+              currentSignatureRequest {
+                id
+                environment
+                status
+              }
+              events(limit: 100, offset: 0) {
+                totalCount
+                items {
+                  type
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+          contactIds: contacts.map((c) => toGlobalId("Contact", c.id)),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.completePetition).toMatchObject({
+        id: toGlobalId("Petition", petitions[1].id),
+        status: "COMPLETED",
+        currentSignatureRequest: {
+          environment: "DEMO",
+          status: "ENQUEUED",
+        },
+        events: {
+          totalCount: 2,
+          items: [{ type: "SIGNATURE_STARTED" }, { type: "PETITION_COMPLETED" }],
+        },
+      });
+
+      // update enqueued signature request to have status "PROCESSING" (skip ENQUEUED cancel check error)
+      await mocks.knex
+        .from<PetitionSignatureRequest>("petition_signature_request")
+        .where(
+          "id",
+          fromGlobalId(
+            data!.completePetition.currentSignatureRequest.id,
+            "PetitionSignatureRequest"
+          ).id
+        )
+        .update("status", "PROCESSING");
+    });
+
+    it("cancels the pending signature process when completing a second time", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!], $message: String) {
+            completePetition(
+              petitionId: $petitionId
+              additionalSignersContactIds: $contactIds
+              message: $message
+            ) {
+              id
+              status
+              signatureRequests {
+                status
+              }
+              currentSignatureRequest {
+                status
+              }
+              events(limit: 100, offset: 0) {
+                totalCount
+                items {
+                  type
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+          contactIds: [toGlobalId("Contact", contacts[0].id)],
+          message: "email body",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data?.completePetition).toEqual({
+        id: toGlobalId("Petition", petitions[1].id),
+        status: "COMPLETED",
+        signatureRequests: [{ status: "ENQUEUED" }, { status: "CANCELLED" }],
+        currentSignatureRequest: { status: "ENQUEUED" },
+        events: {
+          totalCount: 5,
+          items: [
+            { type: "SIGNATURE_STARTED" },
+            { type: "SIGNATURE_CANCELLED" },
+            { type: "PETITION_COMPLETED" },
+            { type: "SIGNATURE_STARTED" },
+            { type: "PETITION_COMPLETED" },
+          ],
+        },
+      });
     });
   });
 });

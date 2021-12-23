@@ -360,8 +360,10 @@ describe("GraphQL - PetitionUserNotifications", () => {
           updatePetitionUserNotificationReadStatus(isRead: $isRead, filter: $filter) {
             id
             ... on PetitionCompletedUserNotification {
-              access {
-                id
+              completedBy {
+                ... on PetitionAccess {
+                  id
+                }
               }
             }
           }
@@ -376,7 +378,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data?.updatePetitionUserNotificationReadStatus).toEqual([
       {
         id: toGlobalId("PetitionUserNotification", notifications[2].id),
-        access: { id: toGlobalId("PetitionAccess", petitionAccess.id) },
+        completedBy: { id: toGlobalId("PetitionAccess", petitionAccess.id) },
       },
       { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
     ]);

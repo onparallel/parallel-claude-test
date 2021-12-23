@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server-core";
 import {
   arg,
   booleanArg,
@@ -62,6 +63,7 @@ import { validRichTextContent } from "../../helpers/validators/validRichTextCont
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
 import { orgHasAvailablePetitionSendCredits } from "../../organization/authorizers";
 import { contextUserHasRole } from "../../users/authorizers";
+import { startSignatureRequest } from "../../utils";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
@@ -346,39 +348,41 @@ export const deletePetitions = mutationField("deletePetitions", {
         await ctx.petitions.loadPetitionSignaturesByPetitionId(deletedPetitions.map((p) => p.id))
       ).flat();
 
-      await Promise.all([
-        ctx.petitions.cancelPetitionSignatureRequest(
-          pendingSignatureRequests.map((s) => s.id),
-          "CANCELLED_BY_USER",
-          { canceller_id: ctx.user!.id }
-        ),
-        ctx.petitions.createEvent(
-          pendingSignatureRequests.map((s) => ({
-            type: "SIGNATURE_CANCELLED",
-            petition_id: s.petition_id,
-            data: {
-              petition_signature_request_id: s.id,
-              cancel_reason: "CANCELLED_BY_USER",
-              cancel_data: {
-                canceller_id: ctx.user!.id,
-              },
-            },
-          }))
-        ),
-        ctx.aws.enqueueMessages(
-          "signature-worker",
-          pendingSignatureRequests
-            .filter((s) => s.status === "PROCESSING")
-            .map((s) => ({
-              id: `signature-${toGlobalId("Petition", s.petition_id)}`,
-              groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
-              body: {
-                type: "cancel-signature-process",
-                payload: { petitionSignatureRequestId: s.id },
+      if (pendingSignatureRequests.length > 0) {
+        await Promise.all([
+          ctx.petitions.cancelPetitionSignatureRequest(
+            pendingSignatureRequests.map((s) => s.id),
+            "CANCELLED_BY_USER",
+            { user_id: ctx.user!.id }
+          ),
+          ctx.petitions.createEvent(
+            pendingSignatureRequests.map((s) => ({
+              type: "SIGNATURE_CANCELLED",
+              petition_id: s.petition_id,
+              data: {
+                petition_signature_request_id: s.id,
+                cancel_reason: "CANCELLED_BY_USER",
+                cancel_data: {
+                  user_id: ctx.user!.id,
+                },
               },
             }))
-        ),
-      ]);
+          ),
+          ctx.aws.enqueueMessages(
+            "signature-worker",
+            pendingSignatureRequests
+              .filter((s) => s.status === "PROCESSING")
+              .map((s) => ({
+                id: `signature-${toGlobalId("Petition", s.petition_id)}`,
+                groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
+                body: {
+                  type: "cancel-signature-process",
+                  payload: { petitionSignatureRequestId: s.id },
+                },
+              }))
+          ),
+        ]);
+      }
     });
 
     return RESULT.SUCCESS;
@@ -1895,5 +1899,54 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
       value ?? null,
       `User:${ctx.user!.id}`
     );
+  },
+});
+
+export const completePetition = mutationField("completePetition", {
+  description: `
+    Marks a petition as COMPLETED.
+    If the petition has a signature configured and does not require a review, starts the signing process.`,
+  type: "Petition",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    additionalSignersContactIds: list(nonNull(globalIdArg("Contact"))),
+    message: nullable("String"),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    userHasAccessToContacts("additionalSignersContactIds" as never)
+  ),
+  resolve: async (_, args, ctx) => {
+    try {
+      return await ctx.petitions.withTransaction(async (t) => {
+        let petition = await ctx.petitions.completePetition(args.petitionId, ctx.user!, t);
+        if (petition.signature_config?.review === false) {
+          const contacts = await ctx.contacts.loadContact(args.additionalSignersContactIds ?? []);
+          const updatedPetition = await startSignatureRequest(
+            petition,
+            contacts.map((c) => ({
+              contactId: c!.id,
+              email: c!.email,
+              firstName: c!.first_name!,
+              lastName: c!.last_name!,
+            })),
+            args.message ?? null,
+            ctx.user!,
+            ctx,
+            t
+          );
+          petition = updatedPetition ?? petition;
+        }
+        return petition;
+      });
+    } catch (error: any) {
+      if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
+        throw new ApolloError(
+          "Can't complete the petition without signers information",
+          "REQUIRED_SIGNER_INFO_ERROR"
+        );
+      }
+      throw error;
+    }
   },
 });

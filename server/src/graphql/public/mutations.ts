@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server-core";
 import { differenceInDays } from "date-fns";
 import {
   booleanArg,
@@ -9,11 +10,8 @@ import {
   objectType,
   stringArg,
 } from "nexus";
-import { countBy, isDefined, omit } from "remeda";
+import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
-import { ApiContext } from "../../context";
-import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
-import { Petition } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { random } from "../../util/token";
@@ -36,7 +34,11 @@ import {
   replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../petition/authorizers";
-import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
+import {
+  startSignatureRequest,
+  validateCheckboxReplyValues,
+  validateDynamicSelectReplyValues,
+} from "../utils";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -558,22 +560,40 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   },
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (_, args, ctx) => {
-    let petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!.id);
+    try {
+      return await ctx.petitions.withTransaction(async (t) => {
+        let petition = await ctx.petitions.completePetition(
+          ctx.access!.petition_id,
+          ctx.access!,
+          t
+        );
 
-    if (petition.signature_config?.review === false) {
-      const updatedPetition = await publicStartSignatureRequest(
-        petition,
-        args.additionalSigners ?? [],
-        args.message ?? null,
-        ctx
-      );
-      petition = updatedPetition ?? petition;
-    } else {
-      await ctx.emails.sendPetitionCompletedEmail(petition.id, {
-        accessId: ctx.access!.id,
+        if (petition.signature_config?.review === false) {
+          const updatedPetition = await startSignatureRequest(
+            petition,
+            args.additionalSigners ?? [],
+            args.message ?? null,
+            ctx.access!,
+            ctx,
+            t
+          );
+          petition = updatedPetition ?? petition;
+        } else {
+          await ctx.emails.sendPetitionCompletedEmail(petition.id, {
+            accessId: ctx.access!.id,
+          });
+        }
+        return petition;
       });
+    } catch (error: any) {
+      if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
+        throw new ApolloError(
+          "Can't complete the petition without signers information",
+          "REQUIRED_SIGNER_INFO_ERROR"
+        );
+      }
+      throw error;
     }
-    return petition;
   },
 });
 
@@ -787,109 +807,6 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     }
   },
 });
-
-async function publicStartSignatureRequest(
-  petition: Petition,
-  additionalSignersInfo: Omit<PetitionSignatureConfigSigner, "contactId">[], // additional signers don't have a contactId
-  message: string | null,
-  ctx: ApiContext
-) {
-  let updatedPetition = null;
-  const userSigners = petition.signature_config.signersInfo as PetitionSignatureConfigSigner[];
-
-  if (userSigners.length === 0 && additionalSignersInfo.length === 0) {
-    throw new Error(`Can't complete Petition:${petition.id}. Signer info is not specified.`);
-  }
-
-  if (additionalSignersInfo.length > 0 && isDefined(petition.signature_config)) {
-    [updatedPetition] = await ctx.petitions.updatePetition(
-      petition.id,
-      {
-        signature_config: {
-          ...petition.signature_config,
-          // save the signer info specified by the recipient, so we can show this later on recipient view
-          additionalSignersInfo,
-        },
-      },
-      `Contact:${ctx.contact!.id}`
-    );
-  }
-
-  const previousSignatureRequests = await ctx.petitions.loadPetitionSignaturesByPetitionId(
-    petition.id
-  );
-
-  // avoid recipients restarting the signature process too many times
-  if (countBy(previousSignatureRequests, (r) => r.cancel_reason === "REQUEST_RESTARTED") >= 20) {
-    throw new Error(`Signature request on Petition:${petition.id} was restarted too many times`);
-  }
-
-  const enqueuedSignatureRequest = previousSignatureRequests.find((r) => r.status === "ENQUEUED");
-  // ENQUEUED signature requests cannot be cancelled because those still don't have an external_id
-  if (enqueuedSignatureRequest) {
-    throw new WhitelistedError(
-      `Can't cancel enqueued PetitionSignatureRequest:${enqueuedSignatureRequest.id}`,
-      "CANCEL_ENQUEUED_SIGNATURE_REQUEST_ERROR"
-    );
-  }
-  const pendingSignatureRequest = previousSignatureRequests.find((r) => r.status === "PROCESSING");
-
-  // cancel pending signature request before starting a new one
-  if (pendingSignatureRequest) {
-    await Promise.all([
-      ctx.petitions.cancelPetitionSignatureRequest(
-        pendingSignatureRequest.id,
-        "REQUEST_RESTARTED",
-        {
-          canceller_id: ctx.contact!.id,
-        }
-      ),
-      ctx.petitions.createEvent({
-        type: "SIGNATURE_CANCELLED",
-        petition_id: petition.id,
-        data: {
-          petition_signature_request_id: pendingSignatureRequest.id,
-          cancel_reason: "REQUEST_RESTARTED",
-          cancel_data: {
-            canceller_id: ctx.contact!.id,
-          },
-        },
-      }),
-      ctx.aws.enqueueMessages("signature-worker", {
-        groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
-        body: {
-          type: "cancel-signature-process",
-          payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
-        },
-      }),
-    ]);
-  }
-
-  const signatureRequest = await ctx.petitions.createPetitionSignature(petition.id, {
-    ...(omit(petition.signature_config, ["additionalSignersInfo"]) as any),
-    signersInfo: userSigners.concat(additionalSignersInfo),
-    message,
-  });
-
-  await Promise.all([
-    ctx.aws.enqueueMessages("signature-worker", {
-      groupId: `signature-${toGlobalId("Petition", petition.id)}`,
-      body: {
-        type: "start-signature-process",
-        payload: { petitionSignatureRequestId: signatureRequest.id },
-      },
-    }),
-    ctx.petitions.createEvent({
-      type: "SIGNATURE_STARTED",
-      petition_id: petition.id,
-      data: {
-        petition_signature_request_id: signatureRequest.id,
-      },
-    }),
-  ]);
-
-  return updatedPetition;
-}
 
 export const publicPetitionFieldAttachmentDownloadLink = mutationField(
   "publicPetitionFieldAttachmentDownloadLink",

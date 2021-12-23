@@ -135,7 +135,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
           ctx.petitions.cancelPetitionSignatureRequest(
             pendingSignatures.map((s) => s.id),
             "CANCELLED_BY_USER",
-            { canceller_id: ctx.user!.id }
+            { user_id: ctx.user!.id }
           ),
           ctx.petitions.createEvent(
             pendingSignatures.map((s) => ({
@@ -145,7 +145,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
                 petition_signature_request_id: s.id,
                 cancel_reason: "CANCELLED_BY_USER",
                 cancel_data: {
-                  canceller_id: ctx.user!.id,
+                  user_id: ctx.user!.id,
                 },
               },
             }))

@@ -1085,15 +1085,15 @@ describe("GraphQL/Petition Permissions", () => {
           events: {
             totalCount: 4,
             items: [
-              ...userGroupMembers.map((u) => ({
-                __typename: "UserPermissionAddedEvent",
-                permissionType: "READ",
-                permissionUser: { id: toGlobalId("User", u.id) },
-              })),
-              ...groups.map((g) => ({
+              ...groups.reverse().map((g) => ({
                 __typename: "GroupPermissionAddedEvent",
                 permissionType: "READ",
                 permissionGroup: { id: toGlobalId("UserGroup", g.id) },
+              })),
+              ...userGroupMembers.reverse().map((u) => ({
+                __typename: "UserPermissionAddedEvent",
+                permissionType: "READ",
+                permissionUser: { id: toGlobalId("User", u.id) },
               })),
             ],
           },
@@ -1731,12 +1731,12 @@ describe("GraphQL/Petition Permissions", () => {
             totalCount: 2,
             items: [
               {
-                __typename: "UserPermissionRemovedEvent",
-                permissionUser: { id: toGlobalId("User", orgUsers[1].id) },
-              },
-              {
                 __typename: "GroupPermissionRemovedEvent",
                 permissionGroup: { id: toGlobalId("UserGroup", userGroup.id) },
+              },
+              {
+                __typename: "UserPermissionRemovedEvent",
+                permissionUser: { id: toGlobalId("User", orgUsers[1].id) },
               },
             ],
           },

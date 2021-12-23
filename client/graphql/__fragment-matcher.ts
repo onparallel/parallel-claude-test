@@ -90,7 +90,6 @@ const result: PossibleTypesResultData = {
       "User",
       "UserGroup",
     ],
-    UserOrContact: ["Contact", "User"],
     UserOrPetitionAccess: ["PetitionAccess", "User"],
     UserOrUserGroup: ["User", "UserGroup"],
   },

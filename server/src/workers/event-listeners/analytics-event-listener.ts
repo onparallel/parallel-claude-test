@@ -176,20 +176,24 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const [contact, user] = await Promise.all([
-    loadContactByAccessId(event.data.petition_access_id, ctx),
+  const [completedBy, owner] = await Promise.all([
+    event.data.petition_access_id
+      ? loadContactByAccessId(event.data.petition_access_id!, ctx)
+      : loadUser(event.data.user_id!, ctx),
     loadPetitionOwner(event.petition_id, ctx),
   ]);
 
   await ctx.analytics.trackEvent({
     type: "PETITION_COMPLETED",
-    user_id: user.id,
+    user_id: owner.id,
     data: {
-      petition_access_id: event.data.petition_access_id,
-      org_id: user.org_id,
+      ...(isDefined(event.data.petition_access_id)
+        ? { petition_access_id: event.data.petition_access_id }
+        : { user_id: event.data.user_id! }),
+      org_id: owner.org_id,
       petition_id: event.petition_id,
       requires_signature: isDefined(petition.signature_config),
-      same_domain: user.email.split("@")[1] === contact.email.split("@")[1],
+      same_domain: owner.email.split("@")[1] === completedBy.email.split("@")[1],
     },
   });
 }

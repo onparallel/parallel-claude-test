@@ -620,9 +620,6 @@ export interface NexusGenUnions {
   PublicUserOrContact:
     | ({ __type: "Contact" } & NexusGenRootTypes["Contact"])
     | ({ __type: "User" } & NexusGenRootTypes["User"]);
-  UserOrContact:
-    | ({ __type: "User" } & NexusGenRootTypes["User"])
-    | ({ __type: "Contact" } & NexusGenRootTypes["Contact"]);
   UserOrPetitionAccess:
     | ({ __type: "User" } & NexusGenRootTypes["User"])
     | ({ __type: "PetitionAccess" } & NexusGenRootTypes["PetitionAccess"]);
@@ -864,6 +861,7 @@ export interface NexusGenFieldTypes {
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     cloneUserGroup: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
+    completePetition: NexusGenRootTypes["Petition"]; // Petition!
     createCheckboxReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createDynamicSelectReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -1142,14 +1140,14 @@ export interface NexusGenFieldTypes {
   };
   PetitionCompletedEvent: {
     // field return type
-    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    completedBy: NexusGenRootTypes["UserOrPetitionAccess"]; // UserOrPetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   PetitionCompletedUserNotification: {
     // field return type
-    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    completedBy: NexusGenRootTypes["UserOrPetitionAccess"]; // UserOrPetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
@@ -1628,12 +1626,12 @@ export interface NexusGenFieldTypes {
   SignatureCancelledEvent: {
     // field return type
     cancelType: NexusGenEnums["PetitionSignatureCancelReason"]; // PetitionSignatureCancelReason!
+    cancelledBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     canceller: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
     cancellerReason: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
-    user: NexusGenRootTypes["User"] | null; // User
   };
   SignatureCancelledUserNotification: {
     // field return type
@@ -2150,6 +2148,7 @@ export interface NexusGenFieldTypeNames {
     clonePetitionField: "PetitionBaseAndField";
     clonePetitions: "PetitionBase";
     cloneUserGroup: "UserGroup";
+    completePetition: "Petition";
     createCheckboxReply: "PetitionFieldReply";
     createContact: "Contact";
     createDynamicSelectReply: "PetitionFieldReply";
@@ -2428,14 +2427,14 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionCompletedEvent: {
     // field return type name
-    access: "PetitionAccess";
+    completedBy: "UserOrPetitionAccess";
     createdAt: "DateTime";
     id: "GID";
     type: "PetitionEventType";
   };
   PetitionCompletedUserNotification: {
     // field return type name
-    access: "PetitionAccess";
+    completedBy: "UserOrPetitionAccess";
     createdAt: "DateTime";
     id: "GID";
     isRead: "Boolean";
@@ -2914,12 +2913,12 @@ export interface NexusGenFieldTypeNames {
   SignatureCancelledEvent: {
     // field return type name
     cancelType: "PetitionSignatureCancelReason";
+    cancelledBy: "UserOrPetitionAccess";
     canceller: "PetitionSigner";
     cancellerReason: "String";
     createdAt: "DateTime";
     id: "GID";
     type: "PetitionEventType";
-    user: "User";
   };
   SignatureCancelledUserNotification: {
     // field return type name
@@ -3297,6 +3296,12 @@ export interface NexusGenArgTypes {
       // args
       locale?: string | null; // String
       userGroupIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    completePetition: {
+      // args
+      additionalSignersContactIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      message?: string | null; // String
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     createCheckboxReply: {
       // args
@@ -4005,10 +4010,6 @@ export interface NexusGenArgTypes {
     };
   };
   Petition: {
-    currentSignatureRequest: {
-      // args
-      token?: string | null; // String
-    };
     events: {
       // args
       limit?: number | null; // Int
@@ -4173,7 +4174,6 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractTypeMembers {
   PublicUserOrContact: "PublicContact" | "PublicUser";
-  UserOrContact: "Contact" | "User";
   UserOrPetitionAccess: "PetitionAccess" | "User";
   UserOrUserGroup: "User" | "UserGroup";
   CreatedAt:
@@ -4355,7 +4355,6 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "PublicUserOrContact"
   | "TemplateDefaultPermission"
   | "Timestamps"
-  | "UserOrContact"
   | "UserOrPetitionAccess"
   | "UserOrUserGroup";
 

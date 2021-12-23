@@ -8606,8 +8606,8 @@
   },
   {
     "term": "timeline.petition-completed-description",
-    "definition": "{contact} completed the petition {timeAgo}",
-    "context": "{contact} completed the petition {timeAgo}"
+    "definition": "{same, select, true {You} other {{name}}} completed the petition {timeAgo}",
+    "context": "{same, select, true {You} other {{name}}} completed the petition {timeAgo}"
   },
   {
     "term": "timeline.petition-correct-notified-description",
@@ -8686,8 +8686,8 @@
   },
   {
     "term": "timeline.signature-cancelled-by-user.description",
-    "definition": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}"
+    "definition": "{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}",
+    "context": "{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
   },
   {
     "term": "timeline.signature-cancelled-request-error.description",

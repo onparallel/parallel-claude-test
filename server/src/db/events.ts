@@ -11,7 +11,7 @@ import {
 
 export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_CREATED: { user_id: number };
-  PETITION_COMPLETED: { petition_access_id: number };
+  PETITION_COMPLETED: { petition_access_id?: number; user_id?: number }; //id of the User or PetitionAccess that completed the petition. Only one will be defined
   ACCESS_ACTIVATED: { petition_access_id: number; user_id: number };
   ACCESS_DEACTIVATED: { petition_access_id: number; user_id: number };
   ACCESS_OPENED: { petition_access_id: number };

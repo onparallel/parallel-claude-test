@@ -1,3 +1,4 @@
+import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import {
   AccessActivatedFromPublicPetitionLinkEvent,
@@ -20,11 +21,17 @@ async function createPetitionCompletedUserNotifications(
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
+  let users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
+  // if a user completed it, avoid creating a notification for that user
+  if (isDefined(event.data.user_id)) {
+    users = users.filter((u) => u.id !== event.data.user_id!);
+  }
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
       type: "PETITION_COMPLETED",
-      data: { petition_access_id: event.data.petition_access_id },
+      data: isDefined(event.data.petition_access_id)
+        ? { petition_access_id: event.data.petition_access_id }
+        : { user_id: event.data.user_id! },
       petition_id: event.petition_id,
       user_id: user.id,
       is_read: false,
@@ -175,7 +182,12 @@ async function createSignatureCancelledUserNotifications(
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
+  let users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
+  // if a user cancelled the signature, avoid creating a notification for that user
+  if (event.data.cancel_reason === "CANCELLED_BY_USER") {
+    users = users.filter((u) => u.id !== event.data.cancel_data.user_id!);
+  }
+
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
       type: "SIGNATURE_CANCELLED",

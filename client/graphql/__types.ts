@@ -373,6 +373,11 @@ export interface Mutation {
   clonePetitions: Array<PetitionBase>;
   /** Clones the user group with all its members */
   cloneUserGroup: Array<UserGroup>;
+  /**
+   * Marks a petition as COMPLETED.
+   * If the petition has a signature configured and does not require a review, starts the signing process.
+   */
+  completePetition: Petition;
   /** Creates a reply to a checkbox field. */
   createCheckboxReply: PetitionFieldReply;
   /** Create a contact. */
@@ -691,6 +696,12 @@ export interface MutationclonePetitionsArgs {
 export interface MutationcloneUserGroupArgs {
   locale?: InputMaybe<Scalars["String"]>;
   userGroupIds: Array<Scalars["GID"]>;
+}
+
+export interface MutationcompletePetitionArgs {
+  additionalSignersContactIds?: InputMaybe<Array<Scalars["GID"]>>;
+  message?: InputMaybe<Scalars["String"]>;
+  petitionId: Scalars["GID"];
 }
 
 export interface MutationcreateCheckboxReplyArgs {
@@ -1593,11 +1604,6 @@ export interface Petition extends PetitionBase {
 }
 
 /** A petition */
-export interface PetitioncurrentSignatureRequestArgs {
-  token?: InputMaybe<Scalars["String"]>;
-}
-
-/** A petition */
 export interface PetitioneventsArgs {
   limit?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
@@ -1767,7 +1773,7 @@ export interface PetitionClosedNotifiedEvent extends PetitionEvent {
 
 export interface PetitionCompletedEvent extends PetitionEvent {
   __typename?: "PetitionCompletedEvent";
-  access: PetitionAccess;
+  completedBy: UserOrPetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   type: PetitionEventType;
@@ -1775,7 +1781,7 @@ export interface PetitionCompletedEvent extends PetitionEvent {
 
 export interface PetitionCompletedUserNotification extends PetitionUserNotification {
   __typename?: "PetitionCompletedUserNotification";
-  access: PetitionAccess;
+  completedBy: UserOrPetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
@@ -2865,12 +2871,12 @@ export interface SendPetitionResult {
 export interface SignatureCancelledEvent extends PetitionEvent {
   __typename?: "SignatureCancelledEvent";
   cancelType: PetitionSignatureCancelReason;
+  cancelledBy?: Maybe<UserOrPetitionAccess>;
   canceller?: Maybe<PetitionSigner>;
   cancellerReason?: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   type: PetitionEventType;
-  user?: Maybe<User>;
 }
 
 export interface SignatureCancelledUserNotification extends PetitionUserNotification {
@@ -3216,8 +3222,6 @@ export interface UserNotifications_Pagination {
   /** The requested slice of items. */
   items: Array<PetitionUserNotification>;
 }
-
-export type UserOrContact = Contact | User;
 
 export type UserOrPetitionAccess = PetitionAccess | User;
 
@@ -3978,15 +3982,17 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNo
     id: string;
     createdAt: string;
     isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
-    };
+    completedBy:
+      | {
+          __typename?: "PetitionAccess";
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null;
+            email: string;
+          } | null;
+        }
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
       | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
@@ -4164,15 +4170,17 @@ export type NotificationsDrawer_notificationsQuery = {
             id: string;
             createdAt: string;
             isRead: boolean;
-            access: {
-              __typename?: "PetitionAccess";
-              contact?: {
-                __typename?: "Contact";
-                id: string;
-                fullName?: string | null;
-                email: string;
-              } | null;
-            };
+            completedBy:
+              | {
+                  __typename?: "PetitionAccess";
+                  contact?: {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName?: string | null;
+                    email: string;
+                  } | null;
+                }
+              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
             petition:
               | { __typename?: "Petition"; id: string; name?: string | null }
               | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
@@ -4331,15 +4339,17 @@ export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNoti
     id: string;
     createdAt: string;
     isRead: boolean;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
-    };
+    completedBy:
+      | {
+          __typename?: "PetitionAccess";
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null;
+            email: string;
+          } | null;
+        }
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
       | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
@@ -4506,15 +4516,17 @@ export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationF
   id: string;
   createdAt: string;
   isRead: boolean;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
-  };
+  completedBy:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: {
+          __typename?: "Contact";
+          id: string;
+          fullName?: string | null;
+          email: string;
+        } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
   petition:
     | { __typename?: "Petition"; id: string; name?: string | null }
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
@@ -5122,15 +5134,17 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "PetitionCompletedEvent";
           id: string;
           createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName?: string | null;
-              email: string;
-            } | null;
-          };
+          completedBy:
+            | {
+                __typename?: "PetitionAccess";
+                contact?: {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null;
+                  email: string;
+                } | null;
+              }
+            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
         }
       | {
           __typename?: "PetitionCreatedEvent";
@@ -5297,12 +5311,18 @@ export type PetitionActivityTimeline_PetitionFragment = {
           cancelType: PetitionSignatureCancelReason;
           cancellerReason?: string | null;
           createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
+          cancelledBy?:
+            | {
+                __typename?: "PetitionAccess";
+                contact?: {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null;
+                  email: string;
+                } | null;
+              }
+            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+            | null;
           canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
@@ -5653,15 +5673,17 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
   __typename?: "PetitionCompletedEvent";
   id: string;
   createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
-  };
+  completedBy:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: {
+          __typename?: "Contact";
+          id: string;
+          fullName?: string | null;
+          email: string;
+        } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
 };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
@@ -5833,7 +5855,18 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragm
   cancelType: PetitionSignatureCancelReason;
   cancellerReason?: string | null;
   createdAt: string;
-  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  cancelledBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: {
+          __typename?: "Contact";
+          id: string;
+          fullName?: string | null;
+          email: string;
+        } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
   canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
 };
 
@@ -5945,6 +5978,22 @@ export type PetitionFieldReference_PetitionFieldFragment = {
   __typename?: "PetitionField";
   title?: string | null;
 };
+
+export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
+  __typename?: "PetitionAccess";
+  contact?: { __typename?: "Contact"; id: string; fullName?: string | null; email: string } | null;
+};
+
+export type UserOrContactReference_UserOrPetitionAccess_User_Fragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  status: UserStatus;
+};
+
+export type UserOrContactReference_UserOrPetitionAccessFragment =
+  | UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment
+  | UserOrContactReference_UserOrPetitionAccess_User_Fragment;
 
 export type UserReference_UserFragment = {
   __typename?: "User";
@@ -6284,15 +6333,17 @@ export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragm
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   __typename?: "PetitionCompletedEvent";
   createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
-  };
+  completedBy:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: {
+          __typename?: "Contact";
+          id: string;
+          fullName?: string | null;
+          email: string;
+        } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
 };
 
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
@@ -6448,7 +6499,18 @@ export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   cancelType: PetitionSignatureCancelReason;
   cancellerReason?: string | null;
   createdAt: string;
-  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  cancelledBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: {
+          __typename?: "Contact";
+          id: string;
+          fullName?: string | null;
+          email: string;
+        } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
   canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
 };
 
@@ -10494,15 +10556,17 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "PetitionCompletedEvent";
           id: string;
           createdAt: string;
-          access: {
-            __typename?: "PetitionAccess";
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName?: string | null;
-              email: string;
-            } | null;
-          };
+          completedBy:
+            | {
+                __typename?: "PetitionAccess";
+                contact?: {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null;
+                  email: string;
+                } | null;
+              }
+            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
         }
       | {
           __typename?: "PetitionCreatedEvent";
@@ -10669,12 +10733,18 @@ export type PetitionActivity_PetitionFragment = {
           cancelType: PetitionSignatureCancelReason;
           cancellerReason?: string | null;
           createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
+          cancelledBy?:
+            | {
+                __typename?: "PetitionAccess";
+                contact?: {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName?: string | null;
+                  email: string;
+                } | null;
+              }
+            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+            | null;
           canceller?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
@@ -11187,15 +11257,22 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "PetitionCompletedEvent";
                 id: string;
                 createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: string | null;
-                    email: string;
-                  } | null;
-                };
+                completedBy:
+                  | {
+                      __typename?: "PetitionAccess";
+                      contact?: {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null;
+                        email: string;
+                      } | null;
+                    }
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    };
               }
             | {
                 __typename?: "PetitionCreatedEvent";
@@ -11377,12 +11454,23 @@ export type PetitionActivity_updatePetitionMutation = {
                 cancelType: PetitionSignatureCancelReason;
                 cancellerReason?: string | null;
                 createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
+                cancelledBy?:
+                  | {
+                      __typename?: "PetitionAccess";
+                      contact?: {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null;
+                        email: string;
+                      } | null;
+                    }
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    }
+                  | null;
                 canceller?: {
                   __typename?: "PetitionSigner";
                   email: string;
@@ -11950,15 +12038,22 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "PetitionCompletedEvent";
                 id: string;
                 createdAt: string;
-                access: {
-                  __typename?: "PetitionAccess";
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: string | null;
-                    email: string;
-                  } | null;
-                };
+                completedBy:
+                  | {
+                      __typename?: "PetitionAccess";
+                      contact?: {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null;
+                        email: string;
+                      } | null;
+                    }
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    };
               }
             | {
                 __typename?: "PetitionCreatedEvent";
@@ -12140,12 +12235,23 @@ export type PetitionActivity_petitionQuery = {
                 cancelType: PetitionSignatureCancelReason;
                 cancellerReason?: string | null;
                 createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
+                cancelledBy?:
+                  | {
+                      __typename?: "PetitionAccess";
+                      contact?: {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName?: string | null;
+                        email: string;
+                      } | null;
+                    }
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    }
+                  | null;
                 canceller?: {
                   __typename?: "PetitionSigner";
                   email: string;
@@ -15711,16 +15817,8 @@ export type getPetitionSignatureStatus_PetitionFragment = {
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     status: PetitionSignatureRequestStatus;
-    environment: SignatureOrgIntegrationEnvironment;
   } | null;
-  signatureConfig?: {
-    __typename?: "SignatureConfig";
-    review: boolean;
-    integration?: {
-      __typename?: "SignatureOrgIntegration";
-      environment: SignatureOrgIntegrationEnvironment;
-    } | null;
-  } | null;
+  signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null;
 };
 
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
@@ -16187,17 +16285,29 @@ export const ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotifi
     ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment,
     unknown
   >;
-export const PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragmentDoc = gql`
-  fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
-    ...PetitionUserNotification_PetitionUserNotification
-    access {
+export const UserOrContactReference_UserOrPetitionAccessFragmentDoc = gql`
+  fragment UserOrContactReference_UserOrPetitionAccess on UserOrPetitionAccess {
+    ... on User {
+      ...UserReference_User
+    }
+    ... on PetitionAccess {
       contact {
         ...ContactReference_Contact
       }
     }
   }
-  ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
+  ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<UserOrContactReference_UserOrPetitionAccessFragment, unknown>;
+export const PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragmentDoc = gql`
+  fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
+    ...PetitionUserNotification_PetitionUserNotification
+    completedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+  }
+  ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment,
   unknown
@@ -16803,13 +16913,9 @@ export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
     status
     currentSignatureRequest {
       status
-      environment
     }
     signatureConfig {
       review
-      integration {
-        environment
-      }
     }
   }
 ` as unknown as DocumentNode<getPetitionSignatureStatus_PetitionFragment, unknown>;
@@ -17085,14 +17191,12 @@ export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
 ` as unknown as DocumentNode<TimelinePetitionCreatedEvent_PetitionCreatedEventFragment, unknown>;
 export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = gql`
   fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
-    access {
-      contact {
-        ...ContactReference_Contact
-      }
+    completedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
     }
     createdAt
   }
-  ${ContactReference_ContactFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<
   TimelinePetitionCompletedEvent_PetitionCompletedEventFragment,
   unknown
@@ -17495,8 +17599,8 @@ export const SignerReference_PetitionSignerFragmentDoc = gql`
 ` as unknown as DocumentNode<SignerReference_PetitionSignerFragment, unknown>;
 export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc = gql`
   fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
-    user {
-      ...UserReference_User
+    cancelledBy {
+      ...UserOrContactReference_UserOrPetitionAccess
     }
     canceller {
       ...SignerReference_PetitionSigner
@@ -17505,7 +17609,7 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
     cancellerReason
     createdAt
   }
-  ${UserReference_UserFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
   ${SignerReference_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<
   TimelineSignatureCancelledEvent_SignatureCancelledEventFragment,
@@ -18942,7 +19046,7 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
       logoUrl
     }
     fromTemplateId
-    currentSignatureRequest(token: $token) {
+    currentSignatureRequest {
       signatureConfig {
         signers {
           fullName

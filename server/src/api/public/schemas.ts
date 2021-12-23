@@ -1105,11 +1105,17 @@ export const AnyPetitionEvent = {
       },
     },
     PETITION_COMPLETED: {
-      description: "A petition was completed by the recipient",
+      description:
+        "A petition was completed. If a user completed it, `userId` will be set in the event data. Else, `petitionAccessId` will be set.",
       properties: {
+        userId: {
+          description: "The ID of the user that completed the petition",
+          type: ["string", "null"],
+          example: toGlobalId("User", 1),
+        },
         petitionAccessId: {
           description: "The ID of the petition access linked to the recipient",
-          type: "string",
+          type: ["string", "null"],
           example: toGlobalId("PetitionAccess", 1),
         },
       },
@@ -1243,15 +1249,15 @@ export const AnyPetitionEvent = {
             userId: {
               type: ["string", "null"],
               description: outdent`
-                The ID of the user that cancelled the request.  
-                Only set if cancelReason is \`CANCELLED_BY_USER\`.
+                The ID of the user that cancelled or restarted the signature.  
+                Only set if cancelReason is \`CANCELLED_BY_USER\` or \`REQUEST_RESTARTED\`.
               `,
               example: toGlobalId("User", 2),
             },
-            contactId: {
+            petitionAccessId: {
               type: ["string", "null"],
               description: outdent`
-                The ID of the contact that restarted the signature.  
+                The ID of the petition access linked to the recipient that restarted the signature.
                 Only set if cancelReason is \`REQUEST_RESTARTED\`.
               `,
               example: null,

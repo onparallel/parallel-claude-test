@@ -83,9 +83,11 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   PETITION_COMPLETED: {
     petition_id: number;
     org_id: number;
-    petition_access_id: number;
     requires_signature: boolean;
     same_domain: boolean;
+    // either a petition_access or user completed the petition
+    petition_access_id?: number;
+    user_id?: number;
   };
   /** User logs in */
   USER_LOGGED_IN: { user_id: number; email: string; org_id: number };

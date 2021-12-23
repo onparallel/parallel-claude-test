@@ -1,5 +1,5 @@
 import { extension } from "mime-types";
-import { enumType, inputObjectType, interfaceType, nullable, objectType, stringArg } from "nexus";
+import { enumType, inputObjectType, interfaceType, objectType } from "nexus";
 import { minBy } from "remeda";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
@@ -223,9 +223,6 @@ export const Petition = objectType({
     t.nullable.field("currentSignatureRequest", {
       type: "PetitionSignatureRequest",
       description: "The current signature request.",
-      args: {
-        token: nullable(stringArg()),
-      },
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(root.id);
       },

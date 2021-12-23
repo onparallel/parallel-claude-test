@@ -108,7 +108,7 @@ PetitionPdf.fragments = {
           logoUrl
         }
         fromTemplateId
-        currentSignatureRequest(token: $token) {
+        currentSignatureRequest {
           signatureConfig {
             signers {
               fullName

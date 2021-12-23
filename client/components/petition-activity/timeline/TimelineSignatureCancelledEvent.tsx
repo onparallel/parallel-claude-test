@@ -7,7 +7,7 @@ import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from 
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { useDeclinedSignatureReasonDialog } from "../dialogs/DeclinedSignatureReasonDialog";
-import { UserReference } from "../UserReference";
+import { UserOrContactReference } from "../UserOrContactReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineSignatureCancelledEventProps = {
@@ -38,10 +38,10 @@ export function TimelineSignatureCancelledEvent({
           {event.cancelType === "CANCELLED_BY_USER" && (
             <FormattedMessage
               id="timeline.signature-cancelled-by-user.description"
-              defaultMessage="{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}"
+              defaultMessage="{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
               values={{
-                same: userId === event.user?.id,
-                user: <UserReference user={event.user} />,
+                same: event.cancelledBy?.__typename === "User" && userId === event.cancelledBy.id,
+                name: <UserOrContactReference userOrAccess={event.cancelledBy} />,
                 timeAgo: (
                   <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
@@ -99,8 +99,8 @@ export function TimelineSignatureCancelledEvent({
 TimelineSignatureCancelledEvent.fragments = {
   SignatureCancelledEvent: gql`
     fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
-      user {
-        ...UserReference_User
+      cancelledBy {
+        ...UserOrContactReference_UserOrPetitionAccess
       }
       canceller {
         ...SignerReference_PetitionSigner
@@ -109,7 +109,7 @@ TimelineSignatureCancelledEvent.fragments = {
       cancellerReason
       createdAt
     }
-    ${UserReference.fragments.User}
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${SignerReference.fragments.PetitionSigner}
   `,
 };

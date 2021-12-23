@@ -137,10 +137,25 @@ export const PetitionCreatedEvent = createPetitionEvent("PetitionCreatedEvent", 
 });
 
 export const PetitionCompletedEvent = createPetitionEvent("PetitionCompletedEvent", (t) => {
-  t.field("access", {
-    type: "PetitionAccess",
+  t.field("completedBy", {
+    type: "UserOrPetitionAccess",
     resolve: async (root, _, ctx) => {
-      return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      if (!isDefined(root.data.petition_access_id) && !isDefined(root.data.user_id)) {
+        throw new Error(
+          `Either petition_access_id or user_id must be defined in PetitionEvent:${root.id}`
+        );
+      }
+      return (
+        isDefined(root.data.petition_access_id)
+          ? {
+              ...(await ctx.petitions.loadAccess(root.data.petition_access_id!))!,
+              __type: "PetitionAccess",
+            }
+          : {
+              ...(await ctx.users.loadUser(root.data.user_id!))!,
+              __type: "User",
+            }
+      )!;
     },
   });
 });
@@ -509,12 +524,23 @@ export const SignatureCompletedEvent = createPetitionEvent("SignatureCompletedEv
  * Triggered when a signature request on the petition is cancelled.
  */
 export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEvent", (t) => {
-  t.nullable.field("user", {
-    type: "User",
+  t.nullable.field("cancelledBy", {
+    type: "UserOrPetitionAccess",
     resolve: async ({ data }, _, ctx) => {
-      const cancellerId = data.cancel_data?.canceller_id;
-      if (data.cancel_reason === "CANCELLED_BY_USER" && cancellerId) {
-        return await ctx.users.loadUser(cancellerId);
+      if (data.cancel_reason === "CANCELLED_BY_USER") {
+        return { __type: "User", ...(await ctx.users.loadUser(data.cancel_data.user_id))! };
+      } else {
+        if (data.cancel_reason === "REQUEST_RESTARTED") {
+          const isAccess = isDefined(data.cancel_data.petition_access_id);
+          if (isAccess) {
+            return {
+              __type: "PetitionAccess",
+              ...(await ctx.petitions.loadAccess(data.cancel_data.petition_access_id))!,
+            };
+          } else {
+            return { __type: "User", ...(await ctx.users.loadUser(data.cancel_data.user_id))! };
+          }
+        }
       }
       return null;
     },

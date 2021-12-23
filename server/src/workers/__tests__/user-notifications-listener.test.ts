@@ -285,8 +285,7 @@ describe("Worker - User Notifications Listener", () => {
           petition_signature_request_id: 1,
           cancel_reason: "CANCELLED_BY_USER",
           cancel_data: {
-            canceller_id: users[1].id,
-            canceller_reason: "this is my reason",
+            user_id: users[1].id,
           },
         },
       },
@@ -298,16 +297,18 @@ describe("Worker - User Notifications Listener", () => {
       .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
-      users.map((user) => ({
-        is_read: false,
-        processed_at: null,
-        petition_id: petition.id,
-        type: "SIGNATURE_CANCELLED",
-        user_id: user.id,
-        data: {
-          petition_signature_request_id: 1,
-        },
-      }))
+      users
+        .filter((u) => u.id !== users[1].id)
+        .map((user) => ({
+          is_read: false,
+          processed_at: null,
+          petition_id: petition.id,
+          type: "SIGNATURE_CANCELLED",
+          user_id: user.id,
+          data: {
+            petition_signature_request_id: 1,
+          },
+        }))
     );
   });
 

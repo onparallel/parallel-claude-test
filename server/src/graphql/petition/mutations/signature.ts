@@ -104,7 +104,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
 
     const [signatureRequest] = await Promise.all([
       ctx.petitions.cancelPetitionSignatureRequest(signature.id, "CANCELLED_BY_USER", {
-        canceller_id: ctx.user!.id,
+        user_id: ctx.user!.id,
       }),
       signature.status === "PROCESSING"
         ? ctx.aws.enqueueMessages("signature-worker", {
@@ -121,9 +121,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
         data: {
           petition_signature_request_id: signature.id,
           cancel_reason: "CANCELLED_BY_USER",
-          cancel_data: {
-            canceller_id: ctx.user!.id,
-          },
+          cancel_data: { user_id: ctx.user!.id },
         },
       }),
     ]);

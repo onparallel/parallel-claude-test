@@ -16,7 +16,9 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
     petition_access_id: number;
   };
   PETITION_COMPLETED: {
-    petition_access_id: number;
+    // one or the other, depending on who completed
+    user_id?: number;
+    petition_access_id?: number;
   };
   PETITION_SHARED: {
     owner_id: number;

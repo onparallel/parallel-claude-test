@@ -1,26 +1,31 @@
 import { gql } from "@apollo/client";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionCompletedEvent_PetitionCompletedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserOrContactReference } from "../UserOrContactReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelinePetitionCompletedEventProps = {
   event: TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
+  userId: string;
 };
 
-export function TimelinePetitionCompletedEvent({ event }: TimelinePetitionCompletedEventProps) {
+export function TimelinePetitionCompletedEvent({
+  event,
+  userId,
+}: TimelinePetitionCompletedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={<CheckIcon />} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
         id="timeline.petition-completed-description"
-        defaultMessage="{contact} completed the petition {timeAgo}"
+        defaultMessage="{same, select, true {You} other {{name}}} completed the petition {timeAgo}"
         values={{
-          contact: <ContactReference contact={event.access.contact} />,
+          same: event.completedBy.__typename === "User" && event.completedBy.id === userId,
+          name: <UserOrContactReference userOrAccess={event.completedBy} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
@@ -33,13 +38,11 @@ export function TimelinePetitionCompletedEvent({ event }: TimelinePetitionComple
 TimelinePetitionCompletedEvent.fragments = {
   PetitionCompletedEvent: gql`
     fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
-      access {
-        contact {
-          ...ContactReference_Contact
-        }
+      completedBy {
+        ...UserOrContactReference_UserOrPetitionAccess
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
   `,
 };

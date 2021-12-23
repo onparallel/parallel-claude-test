@@ -1,21 +1,5 @@
-import { core, enumType, interfaceType, nonNull, objectType, unionType } from "nexus";
-
-export const UserOrContact = unionType({
-  name: "UserOrContact",
-  definition(t) {
-    t.members("User", "Contact");
-  },
-  resolveType: (o) => {
-    if (["User", "Contact"].includes(o.__type)) {
-      return o.__type;
-    }
-    throw new Error("Missing __type on UserOrContact");
-  },
-  sourceType: /* ts */ `
-    | ({__type: "User"} & NexusGenRootTypes["User"])
-    | ({__type: "Contact"} & NexusGenRootTypes["Contact"])
-  `,
-});
+import { core, enumType, interfaceType, nonNull, objectType } from "nexus";
+import { isDefined } from "remeda";
 
 export const PetitionUserNotificationFilter = enumType({
   name: "PetitionUserNotificationFilter",
@@ -97,10 +81,23 @@ export const CommentCreatedUserNotification = createPetitionUserNotification(
 export const PetitionCompletedUserNotification = createPetitionUserNotification(
   "PetitionCompletedUserNotification",
   (t) => {
-    t.field("access", {
-      type: "PetitionAccess",
+    t.field("completedBy", {
+      type: "UserOrPetitionAccess",
       resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+        if (!isDefined(root.data.petition_access_id) && !isDefined(root.data.user_id)) {
+          throw new Error(
+            `Either petition_access_id or user_id must be defined in PetitionCompletedUserNotification:${root.id}`
+          );
+        }
+        return isDefined(root.data.petition_access_id)
+          ? {
+              ...(await ctx.petitions.loadAccess(root.data.petition_access_id))!,
+              __type: "PetitionAccess",
+            }
+          : {
+              ...(await ctx.users.loadUser(root.data.user_id!))!,
+              __type: "User",
+            };
       },
     });
   }

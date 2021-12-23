@@ -1,3 +1,4 @@
+import { isDefined } from "remeda";
 import { PetitionEvent } from "../../db/events";
 import { toGlobalId } from "../../util/globalId";
 
@@ -85,9 +86,11 @@ function mapEventPayload(event: PetitionEvent) {
       };
     }
     case "PETITION_COMPLETED": {
-      return {
-        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
-      };
+      return isDefined(event.data.user_id)
+        ? {
+            userId: toGlobalId("User", event.data.user_id),
+          }
+        : { petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id!) };
     }
     case "PETITION_CREATED": {
       return {
@@ -140,10 +143,7 @@ function mapEventPayload(event: PetitionEvent) {
       switch (cancelReason) {
         case "CANCELLED_BY_USER":
           cancelData = {
-            userId:
-              event.data.cancel_data?.canceller_id !== undefined
-                ? toGlobalId("User", event.data.cancel_data.canceller_id)
-                : undefined,
+            userId: toGlobalId("User", event.data.cancel_data.user_id),
           };
           break;
         case "DECLINED_BY_SIGNER":
@@ -158,12 +158,14 @@ function mapEventPayload(event: PetitionEvent) {
           };
           break;
         case "REQUEST_RESTARTED":
-          cancelData = {
-            contactId:
-              event.data.cancel_data?.canceller_id !== undefined
-                ? toGlobalId("Contact", event.data.cancel_data.canceller_id)
-                : undefined,
-          };
+          cancelData = isDefined(event.data.cancel_data.petition_access_id)
+            ? {
+                petitionAccessId: toGlobalId(
+                  "PetitionAccess",
+                  event.data.cancel_data.petition_access_id
+                ),
+              }
+            : { userId: toGlobalId("User", event.data.cancel_data.user_id!) };
           break;
         default:
           break;
