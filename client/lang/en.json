@@ -5420,11 +5420,6 @@
     "context": "Contents"
   },
   {
-    "term": "petition.continue-with-signature",
-    "definition": "Continue with eSignature",
-    "context": "Continue with eSignature"
-  },
-  {
     "term": "petition.deadline-label",
     "definition": "Deadline",
     "context": "Deadline"
@@ -8081,8 +8076,8 @@
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle.with-signers",
-    "definition": "{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and} other{After you click on <b>Continue with eSignature</b>,}} we will send an email with information on how to complete the process to the following people:",
-    "context": "{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and} other{After you click on <b>Continue with eSignature</b>,}} we will send an email with information on how to complete the process to the following people:"
+    "definition": "{tone, select, INFORMAL{Click on <b>{button}</b> and} other{After you click on <b>{button}</b>,}} we will send an email with information on how to complete the process to the following people:",
+    "context": "{tone, select, INFORMAL{Click on <b>{button}</b> and} other{After you click on <b>{button}</b>,}} we will send an email with information on how to complete the process to the following people:"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",

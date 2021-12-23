@@ -148,8 +148,16 @@ function CompleteSignerInfoDialog({
                   <Text>
                     <FormattedMessage
                       id="recipient-view.complete-signer-info-dialog.subtitle.with-signers"
-                      defaultMessage="{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and} other{After you click on <b>Continue with eSignature</b>,}} we will send an email with information on how to complete the process to the following people:"
-                      values={{ tone }}
+                      defaultMessage="{tone, select, INFORMAL{Click on <b>{button}</b> and} other{After you click on <b>{button}</b>,}} we will send an email with information on how to complete the process to the following people:"
+                      values={{
+                        tone,
+                        button: (
+                          <FormattedMessage
+                            id="component.signature-config-dialog.confirm-start"
+                            defaultMessage="Start signature"
+                          />
+                        ),
+                      }}
                     />
                   </Text>
                   {recipientCanAddSigners ? (
@@ -261,8 +269,8 @@ function CompleteSignerInfoDialog({
           isDisabled={signers.length === 0 && additionalSigners.length === 0 && !recipientWillSign}
         >
           <FormattedMessage
-            id="petition.continue-with-signature"
-            defaultMessage="Continue with eSignature"
+            id="component.signature-config-dialog.confirm-start"
+            defaultMessage="Start signature"
           />
         </Button>
       }

@@ -5420,11 +5420,6 @@
     "context": "Contents"
   },
   {
-    "term": "petition.continue-with-signature",
-    "definition": "Continuar con firma digital",
-    "context": "Continue with eSignature"
-  },
-  {
     "term": "petition.deadline-label",
     "definition": "Vencimiento:",
     "context": "Deadline"
@@ -8081,8 +8076,8 @@
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle.with-signers",
-    "definition": "{tone, select, INFORMAL{Clica en <b>Continuar con firma digital</b> y enviaremos un email con información sobre cómo completarla a las siguientes personas:} other{Al hacer click en <b>Continuar con firma digital</b>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:}}",
-    "context": "{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and} other{After you click on <b>Continue with eSignature</b>,}} we will send an email with information on how to complete the process to the following people:"
+    "definition": "{tone, select, INFORMAL{Clica en <b>{button}</b> y enviaremos un email con información sobre cómo completarla a las siguientes personas:} other{Al hacer click en <b>{button}</b>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:}}",
+    "context": "{tone, select, INFORMAL{Click on <b>{button}</b> and} other{After you click on <b>{button}</b>,}} we will send an email with information on how to complete the process to the following people:"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",

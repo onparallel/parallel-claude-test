@@ -76,7 +76,7 @@ function PetitionPreviewSignerInfoDialog({
               id="recipient-view.complete-signer-info-dialog.subtitle"
               defaultMessage="{tone, select, INFORMAL{An <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
               values={{
-                tone: "FORMAL",
+                tone: "INFORMAL",
               }}
             />
           </Text>
@@ -85,9 +85,15 @@ function PetitionPreviewSignerInfoDialog({
               <Text>
                 <FormattedMessage
                   id="recipient-view.complete-signer-info-dialog.subtitle.with-signers"
-                  defaultMessage="{tone, select, INFORMAL{Click on <b>Continue with eSignature</b> and} other{After you click on <b>Continue with eSignature</b>,}} we will send an email with information on how to complete the process to the following people:"
+                  defaultMessage="{tone, select, INFORMAL{Click on <b>{button}</b> and} other{After you click on <b>{button}</b>,}} we will send an email with information on how to complete the process to the following people:"
                   values={{
-                    tone: "FORMAL",
+                    tone: "INFORMAL",
+                    button: (
+                      <FormattedMessage
+                        id="component.signature-config-dialog.confirm-start"
+                        defaultMessage="Start signature"
+                      />
+                    ),
                   }}
                 />
               </Text>
