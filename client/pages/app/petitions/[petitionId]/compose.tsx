@@ -1,19 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Box,
-  Progress,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import { ArrowForwardIcon, ListIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { useBlockingDialog } from "@parallel/components/common/dialogs/BlockingDialog";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
@@ -22,18 +10,15 @@ import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import {
-  AddPetitionAccessDialog,
-  useAddPetitionAccessDialog,
-} from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
+import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionSettings } from "@parallel/components/petition-common/PetitionSettings";
+import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/dialogs/CompletedPetitionDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
 import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
-import { useTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
@@ -41,7 +26,6 @@ import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petit
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import {
-  PetitionCompose_batchSendPetitionDocument,
   PetitionCompose_changePetitionFieldTypeDocument,
   PetitionCompose_clonePetitionFieldDocument,
   PetitionCompose_createPetitionFieldDocument,
@@ -57,9 +41,7 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
-import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
   PetitionFieldVisibility,
@@ -68,12 +50,9 @@ import {
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
-import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
@@ -84,9 +63,7 @@ type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getI
 type FieldSelection = PetitionCompose_PetitionFieldFragment;
 
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
-  const router = useRouter();
   const intl = useIntl();
-  const toast = useToast();
   const {
     data: { me },
   } = useAssertQuery(PetitionCompose_userDocument);
@@ -334,6 +311,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
+  const showErrorDialog = useErrorDialog();
   const validPetitionFields = async () => {
     if (!petition) return false;
     const { error, errorMessage, field } = validatePetitionFields(petition.fields);
@@ -351,154 +329,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return true;
   };
 
-  const [showTestSignatureDialogUserPreference, setShowTestSignatureDialogUserPreference] =
-    useUserPreference("show-test-signature-dialog", true);
-  const showTestSignatureDialog = useTestSignatureDialog();
-
-  const showErrorDialog = useErrorDialog();
-  const [batchSendPetition] = useMutation(PetitionCompose_batchSendPetitionDocument);
-  const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
-  const showLongBatchSendDialog = useBlockingDialog();
-  const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
-  const handleNextClick = useCallback(async () => {
-    if (petition?.__typename !== "Petition") {
-      throw new Error("Can't send a template");
-    }
-
-    const isFieldsValid = await validPetitionFields();
-    if (!isFieldsValid) return;
-
-    try {
-      if (
-        showTestSignatureDialogUserPreference &&
-        petition.signatureConfig?.integration?.environment === "DEMO"
-      ) {
-        const { dontShow } = await showTestSignatureDialog({
-          integrationName: petition.signatureConfig.integration.name,
-        });
-        if (dontShow) {
-          setShowTestSignatureDialogUserPreference(false);
-        }
-      }
-
-      const {
-        recipientIdGroups,
-        subject,
-        body,
-        remindersConfig,
-        scheduledAt,
-        batchSendSigningMode,
-      } = await showAddPetitionAccessDialog({
-        petition,
-        onUpdatePetition: handleUpdatePetition,
-        canAddRecipientGroups: true,
-      });
-      const task = batchSendPetition({
-        variables: {
-          petitionId: petition.id,
-          contactIdGroups: recipientIdGroups,
-          subject,
-          body,
-          remindersConfig,
-          scheduledAt: scheduledAt?.toISOString() ?? null,
-          batchSendSigningMode,
-        },
-      });
-      if (recipientIdGroups.length > 20) {
-        await withError(
-          showLongBatchSendDialog({
-            task,
-            header: (
-              <FormattedMessage
-                id="petition.long-batch-send-dialog.header"
-                defaultMessage="Sending petitions"
-              />
-            ),
-            body: (
-              <Stack spacing={4}>
-                <Text>
-                  <FormattedMessage
-                    id="petition.long-batch-send-dialog.message"
-                    defaultMessage="We are sending your petitions. It might take a little bit, please wait."
-                  />
-                </Text>
-                <Progress isIndeterminate size="sm" borderRadius="full" />
-              </Stack>
-            ),
-          })
-        );
-      }
-      const { data } = await task;
-      if (data?.batchSendPetition.some((r) => r.result !== "SUCCESS")) {
-        toast({
-          isClosable: true,
-          status: "error",
-          title: intl.formatMessage({
-            id: "petition.petition-send-error.title",
-            defaultMessage: "Error",
-          }),
-          description: intl.formatMessage({
-            id: "petition.petition-send-error.description",
-            defaultMessage:
-              "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
-          }),
-        });
-        return;
-      }
-      if (scheduledAt) {
-        toast({
-          isClosable: true,
-          status: "info",
-          title: intl.formatMessage(
-            {
-              id: "petition.petition-scheduled-toast.title",
-              defaultMessage: "{count, plural, =1{Petition} other{Petitions}} scheduled",
-            },
-            { count: recipientIdGroups.length }
-          ),
-          description: intl.formatMessage(
-            {
-              id: "petition.petition-scheduled-toast.description",
-              defaultMessage:
-                "Your {count, plural, =1{petition} other{petitions}} will be sent on {date}.",
-            },
-            {
-              count: recipientIdGroups.length,
-              date: intl.formatTime(scheduledAt!, FORMATS.LLL),
-            }
-          ),
-        });
-      } else {
-        toast({
-          isClosable: true,
-          status: "success",
-          title: intl.formatMessage(
-            {
-              id: "petition.petition-sent-toast.title",
-              defaultMessage: "{count, plural, =1{Petition} other{Petitions}} sent",
-            },
-            { count: recipientIdGroups.length }
-          ),
-          description: intl.formatMessage(
-            {
-              id: "petition.petition-sent-toast.description",
-              defaultMessage:
-                "Your {count, plural, =1{petition is on its} other{petitions are on their}} way.",
-            },
-            { count: recipientIdGroups.length }
-          ),
-        });
-      }
-      router.push("/app/petitions");
-    } catch (e) {
-      if (
-        isApolloError(e) &&
-        e.graphQLErrors[0]?.extensions?.code === "PETITION_SEND_CREDITS_ERROR"
-      ) {
-        await withError(showPetitionLimitReachedErrorDialog());
-      }
-    }
-  }, [petition, showPetitionLimitReachedErrorDialog, showTestSignatureDialogUserPreference]);
+  const handleNextClick = useSendPetitionHandler(
+    petition,
+    handleUpdatePetition,
+    validPetitionFields
+  );
 
   const handleIndexFieldClick = useCallback(async (fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
@@ -685,7 +520,7 @@ PetitionCompose.fragments = {
       fragment PetitionCompose_PetitionBase on PetitionBase {
         id
         ...PetitionLayout_PetitionBase
-        ...AddPetitionAccessDialog_Petition
+        ...useSendPetitionHandler_PetitionBase
         ...PetitionTemplateComposeMessageEditor_Petition
         ...PetitionSettings_PetitionBase
         tone
@@ -706,9 +541,9 @@ PetitionCompose.fragments = {
           isPublic
         }
       }
+      ${useSendPetitionHandler.fragments.PetitionBase}
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionSettings.fragments.PetitionBase}
-      ${AddPetitionAccessDialog.fragments.Petition}
       ${PetitionTemplateComposeMessageEditor.fragments.Petition}
       ${this.PetitionField}
     `;
@@ -888,33 +723,6 @@ PetitionCompose.mutations = [
       }
     }
     ${PetitionCompose.fragments.PetitionField}
-  `,
-  gql`
-    mutation PetitionCompose_batchSendPetition(
-      $petitionId: GID!
-      $contactIdGroups: [[GID!]!]!
-      $subject: String!
-      $body: JSON!
-      $remindersConfig: RemindersConfigInput
-      $scheduledAt: DateTime
-      $batchSendSigningMode: BatchSendSigningMode
-    ) {
-      batchSendPetition(
-        petitionId: $petitionId
-        contactIdGroups: $contactIdGroups
-        subject: $subject
-        body: $body
-        remindersConfig: $remindersConfig
-        scheduledAt: $scheduledAt
-        batchSendSigningMode: $batchSendSigningMode
-      ) {
-        result
-        petition {
-          id
-          status
-        }
-      }
-    }
   `,
 ];
 

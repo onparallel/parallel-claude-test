@@ -1,7 +1,6 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Alert, AlertIcon, Box, Button, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import {
-  ContactSelect,
   ContactSelectProps,
   ContactSelectSelection,
 } from "@parallel/components/common/ContactSelect";
@@ -15,7 +14,6 @@ import {
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/dialogs/ScheduleMessageDialog";
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
-  AddPetitionAccessDialog_contactsByEmailDocument,
   AddPetitionAccessDialog_PetitionFragment,
   RemindersConfig,
   UpdatePetitionInput,
@@ -27,6 +25,7 @@ import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types"
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
+import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
 import { useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { noop, omit } from "remeda";
@@ -310,29 +309,6 @@ AddPetitionAccessDialog.fragments = {
   `,
 };
 
-AddPetitionAccessDialog.queries = {
-  contactsByEmail: gql`
-    query AddPetitionAccessDialog_contactsByEmail($emails: [String!]!) {
-      contactsByEmail(emails: $emails) {
-        ...ContactSelect_Contact
-      }
-    }
-    ${ContactSelect.fragments.Contact}
-  `,
-};
-
 export function useAddPetitionAccessDialog() {
   return useDialog(AddPetitionAccessDialog);
-}
-
-function useSearchContactsByEmail() {
-  const apollo = useApolloClient();
-  return useCallback(async function (emails: string[]) {
-    const result = await apollo.query({
-      query: AddPetitionAccessDialog_contactsByEmailDocument,
-      variables: { emails },
-      fetchPolicy: "no-cache",
-    });
-    return result.data.contactsByEmail;
-  }, []);
 }

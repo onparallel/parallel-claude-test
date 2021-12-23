@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
+  ArrowForwardIcon,
   CheckIcon,
   ChevronDownIcon,
   CommentIcon,
@@ -105,6 +106,11 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { PetitionAttachmentsCard } from "@parallel/components/petition-replies/PetitionAttachmentsCard";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
+import { useRouter } from "next/router";
+import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
@@ -114,6 +120,10 @@ const QUERY_STATE = {
 
 function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const intl = useIntl();
+
+  const router = useRouter();
+  const { query } = router;
+
   const {
     data: { me },
   } = useAssertQuery(PetitionReplies_userDocument);
@@ -169,12 +179,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const wrapper = usePetitionStateWrapper();
   const [updatePetition] = useMutation(PetitionReplies_updatePetitionDocument);
-  const [validatePetitionFields] = useMutation(PetitionReplies_validatePetitionFieldsDocument);
+  const [_validatePetitionFields] = useMutation(PetitionReplies_validatePetitionFieldsDocument);
   const downloadReplyFile = useDownloadReplyFile();
 
   const handleValidateToggle = useCallback(
     async (fieldIds: string[], value: boolean, validateRepliesWith?: PetitionFieldReplyStatus) => {
-      await validatePetitionFields({
+      await _validatePetitionFields({
         variables: {
           petitionId: petition.id,
           fieldIds,
@@ -244,11 +254,33 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     );
   }
 
-  const handleOnUpdatePetition = useCallback(
+  const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
+  );
+
+  const showErrorDialog = useErrorDialog();
+  const validPetitionFields = async () => {
+    if (!petition) return false;
+    const { error, errorMessage, field } = validatePetitionFields(petition.fields);
+    if (error) {
+      await withError(showErrorDialog({ message: errorMessage }));
+      if (field) {
+        router.push(`/app/petitions/${query.petitionId}/compose#field-${field.id}`);
+      } else {
+        router.push(`/app/petitions/${query.petitionId}/compose`);
+      }
+      return false;
+    }
+    return true;
+  };
+
+  const handleNextClick = useSendPetitionHandler(
+    petition,
+    handleUpdatePetition,
+    validPetitionFields
   );
 
   const handleAction: PetitionRepliesFieldProps["onAction"] = async function (action, reply) {
@@ -496,13 +528,27 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       key={petition.id}
       user={me}
       petition={petition}
-      onUpdatePetition={handleOnUpdatePetition}
+      onUpdatePetition={handleUpdatePetition}
       section="replies"
       scrollBody
       headerActions={
-        <Box display={{ base: "none", lg: "block" }}>
-          <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
-        </Box>
+        petition.status === "DRAFT" ? (
+          <ResponsiveButtonIcon
+            data-action="compose-next"
+            id="petition-next"
+            colorScheme="purple"
+            icon={<ArrowForwardIcon fontSize="18px" />}
+            label={intl.formatMessage({
+              id: "generic.next",
+              defaultMessage: "Next",
+            })}
+            onClick={handleNextClick}
+          />
+        ) : (
+          <Box display={{ base: "none", lg: "block" }}>
+            <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
+          </Box>
+        )
       }
       subHeader={
         <>
@@ -721,7 +767,9 @@ PetitionReplies.fragments = {
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
         ...PetitionAttachmentsCard_Petition
+        ...useSendPetitionHandler_PetitionBase
       }
+      ${useSendPetitionHandler.fragments.PetitionBase}
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
       ${ShareButton.fragments.PetitionBase}

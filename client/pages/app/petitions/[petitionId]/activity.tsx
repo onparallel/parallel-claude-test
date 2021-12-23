@@ -1,6 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, useToast } from "@chakra-ui/react";
+import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
@@ -16,6 +19,7 @@ import { useConfirmSendReminderDialog } from "@parallel/components/petition-acti
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
+import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionActivity_cancelScheduledMessageDocument,
@@ -30,8 +34,8 @@ import {
   PetitionsActivity_sendPetitionDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
@@ -39,6 +43,8 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
+import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
+import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -48,6 +54,9 @@ type PetitionActivityProps = UnwrapPromise<ReturnType<typeof PetitionActivity.ge
 function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const intl = useIntl();
   const toast = useToast();
+  const router = useRouter();
+  const { query } = router;
+
   const {
     data: { me },
   } = useAssertQuery(PetitionActivity_userDocument);
@@ -65,11 +74,33 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const wrapper = usePetitionStateWrapper();
 
   const [updatePetition] = useMutation(PetitionActivity_updatePetitionDocument);
-  const handleOnUpdatePetition = useCallback(
+  const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
+  );
+
+  const showErrorDialog = useErrorDialog();
+  const _validatePetitionFields = async () => {
+    if (!petition) return false;
+    const { error, errorMessage, field } = validatePetitionFields(petition.fields);
+    if (error) {
+      await withError(showErrorDialog({ message: errorMessage }));
+      if (field) {
+        router.push(`/app/petitions/${query.petitionId}/compose#field-${field.id}`);
+      } else {
+        router.push(`/app/petitions/${query.petitionId}/compose`);
+      }
+      return false;
+    }
+    return true;
+  };
+
+  const handleNextClick = useSendPetitionHandler(
+    petition,
+    handleUpdatePetition,
+    _validatePetitionFields
   );
 
   const showNoRemindersLeftToast = (petitionAccessId?: string) => {
@@ -329,13 +360,27 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       key={petition.id}
       user={me}
       petition={petition}
-      onUpdatePetition={handleOnUpdatePetition}
+      onUpdatePetition={handleUpdatePetition}
       section="activity"
       scrollBody
       headerActions={
-        <Box display={{ base: "none", lg: "block" }}>
-          <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
-        </Box>
+        petition.status === "DRAFT" ? (
+          <ResponsiveButtonIcon
+            data-action="compose-next"
+            id="petition-next"
+            colorScheme="purple"
+            icon={<ArrowForwardIcon fontSize="18px" />}
+            label={intl.formatMessage({
+              id: "generic.next",
+              defaultMessage: "Next",
+            })}
+            onClick={handleNextClick}
+          />
+        ) : (
+          <Box display={{ base: "none", lg: "block" }}>
+            <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
+          </Box>
+        )
       }
     >
       <PetitionAccessesTable
@@ -348,6 +393,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         onDeactivateAccess={handleDeactivateAccess}
         onConfigureReminders={handleConfigureReminders}
         onPetitionShare={handlePetitionSharingClick}
+        onPetitionSend={handleNextClick}
       />
       <Box margin={4}>
         <PetitionActivityTimeline
@@ -370,12 +416,18 @@ PetitionActivity.fragments = {
       ...PetitionActivityTimeline_Petition
       ...ShareButton_PetitionBase
       ...AddPetitionAccessDialog_Petition
+      ...useSendPetitionHandler_PetitionBase
+      fields {
+        ...validatePetitionFields_PetitionField
+      }
     }
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionAccessesTable.fragments.Petition}
     ${PetitionActivityTimeline.fragments.Petition}
     ${ShareButton.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
+    ${useSendPetitionHandler.fragments.PetitionBase}
+    ${validatePetitionFields.fragments.PetitionField}
   `,
   User: gql`
     fragment PetitionActivity_User on User {

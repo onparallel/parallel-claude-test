@@ -48,6 +48,7 @@ export interface PetitionAccessesTable extends BoxProps {
   onDeactivateAccess: (accessId: string) => void;
   onConfigureReminders: (selected: PetitionAccessTable_PetitionAccessFragment[]) => void;
   onPetitionShare: () => void;
+  onPetitionSend: () => void;
 }
 
 export function PetitionAccessesTable({
@@ -58,6 +59,7 @@ export function PetitionAccessesTable({
   onDeactivateAccess,
   onConfigureReminders,
   onPetitionShare,
+  onPetitionSend,
   ...props
 }: PetitionAccessesTable) {
   const intl = useIntl();
@@ -173,7 +175,7 @@ export function PetitionAccessesTable({
                     defaultMessage="<a>Send the request</a> to include recipients or do it from the <b>Add access</b> button of this table."
                     values={{
                       a: (chunks: any) => (
-                        <NormalLink onClick={onPetitionShare}>{chunks}</NormalLink>
+                        <NormalLink onClick={onPetitionSend}>{chunks}</NormalLink>
                       ),
                     }}
                   />

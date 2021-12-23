@@ -1605,9 +1605,9 @@
     "context": "{count} {count, plural, =1{field} other {fields}} without replies."
   },
   {
-    "term": "component.petition-progress-bar.not-sent",
-    "definition": "You haven't sent this petition to anyone yet.",
-    "context": "You haven't sent this petition to anyone yet."
+    "term": "component.petition-progress-bar.not-replies",
+    "definition": "No replies have been added yet",
+    "context": "No replies have been added yet"
   },
   {
     "term": "component.petition-progress-bar.optional",
@@ -5095,6 +5095,21 @@
     "context": "Editor"
   },
   {
+    "term": "petition-preview.completed-petition.toast-description",
+    "definition": "Check that everything is OK to close the petition.",
+    "context": "Check that everything is OK to close the petition."
+  },
+  {
+    "term": "petition-preview.completed-petition.toast-description-check-signature",
+    "definition": "Review the replies and send the signature to close the petition.",
+    "context": "Review the replies and send the signature to close the petition."
+  },
+  {
+    "term": "petition-preview.signature-sended.toast-description",
+    "definition": "Your signature is on its way.",
+    "context": "Your signature is on its way."
+  },
+  {
     "term": "petition-replies.export-replies",
     "definition": "Export replies",
     "context": "Export replies"
@@ -8303,6 +8318,11 @@
     "term": "recipient-view.send-code",
     "definition": "Send verification code",
     "context": "Send verification code"
+  },
+  {
+    "term": "recipient-view.signature-sended.toast-title",
+    "definition": "Signature sended",
+    "context": "Signature sended"
   },
   {
     "term": "recipient-view.submit-and-sign-button-short",

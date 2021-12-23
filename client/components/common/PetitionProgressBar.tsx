@@ -39,8 +39,8 @@ export function PetitionProgressBar({
           <Box textAlign="center" fontSize="sm">
             <Text fontStyle="italic">
               <FormattedMessage
-                id="component.petition-progress-bar.not-sent"
-                defaultMessage="You haven't sent this petition to anyone yet."
+                id="component.petition-progress-bar.not-replies"
+                defaultMessage="No replies have been added yet"
               />
             </Text>
           </Box>

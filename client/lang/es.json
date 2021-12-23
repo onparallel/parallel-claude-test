@@ -1605,9 +1605,9 @@
     "context": "{count} {count, plural, =1{field} other {fields}} without replies."
   },
   {
-    "term": "component.petition-progress-bar.not-sent",
-    "definition": "No has enviado esta petición a nadie todavía",
-    "context": "You haven't sent this petition to anyone yet."
+    "term": "component.petition-progress-bar.not-replies",
+    "definition": "No se han añadido respuestas todavía",
+    "context": "No replies have been added yet"
   },
   {
     "term": "component.petition-progress-bar.optional",
@@ -5095,6 +5095,21 @@
     "context": "Editor"
   },
   {
+    "term": "petition-preview.completed-petition.toast-description",
+    "definition": "Comprueba que esté todo bien para cerrar la petición.",
+    "context": "Check that everything is OK to close the petition."
+  },
+  {
+    "term": "petition-preview.completed-petition.toast-description-check-signature",
+    "definition": "Revisa las respuestas y envía la firma para cerrar la petición.",
+    "context": "Review the replies and send the signature to close the petition."
+  },
+  {
+    "term": "petition-preview.signature-sended.toast-description",
+    "definition": "Tu firma está en camino.",
+    "context": "Your signature is on its way."
+  },
+  {
     "term": "petition-replies.export-replies",
     "definition": "Exportar respuestas",
     "context": "Export replies"
@@ -8303,6 +8318,11 @@
     "term": "recipient-view.send-code",
     "definition": "Enviar código de verificación",
     "context": "Send verification code"
+  },
+  {
+    "term": "recipient-view.signature-sended.toast-title",
+    "definition": "Firma enviada",
+    "context": "Signature sended"
   },
   {
     "term": "recipient-view.submit-and-sign-button-short",
