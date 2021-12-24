@@ -158,9 +158,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
           fields: {
             options: { merge: false },
             replies: { merge: false },
-            attachments: {
-              merge: mergeArraysBy(["id"]),
-            },
+            attachments: { merge: false },
             previewReplies: {
               merge: false,
               read(value) {

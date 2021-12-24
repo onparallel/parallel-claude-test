@@ -64,6 +64,7 @@ type FieldSelection = PetitionCompose_PetitionFieldFragment;
 
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const intl = useIntl();
+
   const {
     data: { me },
   } = useAssertQuery(PetitionCompose_userDocument);
@@ -112,6 +113,18 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   useEffect(() => {
     setShowErrors(isSharedByLink);
   }, [setShowErrors, isSharedByLink]);
+
+  useEffect(() => {
+    // Validate and focus fields when have "tags" in url, because provably comes from other page when validates petition fields
+    const hash = window.location.hash;
+    if (hash) {
+      const { error, field } = validatePetitionFields(petition.fields);
+      if (error && field) {
+        setShowErrors(true);
+        focusFieldTitle(field.id);
+      }
+    }
+  }, []);
 
   const [updatePetition] = useMutation(PetitionCompose_updatePetitionDocument);
   const handleUpdatePetition = useCallback(
