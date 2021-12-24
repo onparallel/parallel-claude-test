@@ -8,7 +8,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { usePetitionPreviewSignerInfoDialog } from "@parallel/components/petition-common/dialogs/PetitionPreviewSignerInfoDialog";
+import { usePetitionPreviewSignerInfoDialog } from "@parallel/components/petition-preview/dialogs/PetitionPreviewSignerInfoDialog";
 import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/PetitionPreviewOnlyAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";

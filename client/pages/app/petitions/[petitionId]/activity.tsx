@@ -391,7 +391,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         onReactivateAccess={handleReactivateAccess}
         onDeactivateAccess={handleDeactivateAccess}
         onConfigureReminders={handleConfigureReminders}
-        onPetitionShare={handlePetitionSharingClick}
         onPetitionSend={handleNextClick}
       />
       <Box margin={4}>

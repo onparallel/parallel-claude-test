@@ -361,8 +361,8 @@ describe("GraphQL/Petition Field Replies", () => {
         type: "TEXT",
         created_by: `Contact:${contact.id}`,
         updated_by: `User:${user.id}`,
-        user_id: null,
-        petition_access_id: petitionAccess.id,
+        user_id: user.id,
+        petition_access_id: null,
       });
     });
 

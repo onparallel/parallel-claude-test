@@ -47,7 +47,6 @@ export interface PetitionAccessesTable extends BoxProps {
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
   onConfigureReminders: (selected: PetitionAccessTable_PetitionAccessFragment[]) => void;
-  onPetitionShare: () => void;
   onPetitionSend: () => void;
 }
 
@@ -58,7 +57,6 @@ export function PetitionAccessesTable({
   onReactivateAccess,
   onDeactivateAccess,
   onConfigureReminders,
-  onPetitionShare,
   onPetitionSend,
   ...props
 }: PetitionAccessesTable) {
@@ -138,14 +136,14 @@ export function PetitionAccessesTable({
             ) : null}
             <Button leftIcon={<UserPlusIcon fontSize="18px" />} onClick={onAddPetitionAccess}>
               {intl.formatMessage({
-                id: "petition.add-contact-button",
-                defaultMessage: "Add access",
+                id: "petition.add-recipient-button",
+                defaultMessage: "Add recipient",
               })}
             </Button>
           </Stack>
         }
       >
-        <FormattedMessage id="petition-access.header" defaultMessage="Petition access control" />
+        <FormattedMessage id="petition-access.header" defaultMessage="Recipients" />
       </GenericCardHeader>
       <Box overflowX="auto">
         {petition.accesses.length ? (
@@ -161,12 +159,18 @@ export function PetitionAccessesTable({
         ) : (
           <>
             <Divider />
-            <Center minHeight="60px" textAlign="center" padding={3} color="gray.400">
-              <Stack>
+            <Center minHeight="60px" textAlign="center" padding={4} color="gray.400">
+              <Stack spacing={1}>
                 <Text>
                   <FormattedMessage
-                    id="petition-access.send-request-or-add-access"
-                    defaultMessage="You haven't sent this petition yet. Click <a>here</a> to send it."
+                    id="petition-access.havent-sent-petition"
+                    defaultMessage="You haven't sent this petition yet."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="petition-access.click-here-to-send"
+                    defaultMessage="Click <a>here</a> to send it."
                     values={{
                       a: (chunks: any) => (
                         <NormalLink onClick={onPetitionSend}>{chunks}</NormalLink>

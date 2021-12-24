@@ -4960,14 +4960,19 @@
     "context": "<b>Upgrade your plan</b> to access signature integration."
   },
   {
-    "term": "petition-access.header",
-    "definition": "Petition access control",
-    "context": "Petition access control"
+    "term": "petition-access.click-here-to-send",
+    "definition": "Click <a>here</a> to send it.",
+    "context": "Click <a>here</a> to send it."
   },
   {
-    "term": "petition-access.send-request-or-add-access",
-    "definition": "You haven't sent this petition yet. Click <a>here</a> to send it.",
-    "context": "You haven't sent this petition yet. Click <a>here</a> to send it."
+    "term": "petition-access.havent-sent-petition",
+    "definition": "You haven't sent this petition yet.",
+    "context": "You haven't sent this petition yet."
+  },
+  {
+    "term": "petition-access.header",
+    "definition": "Recipients",
+    "context": "Recipients"
   },
   {
     "term": "petition-access.status-active",
@@ -5300,14 +5305,14 @@
     "context": "Add another field"
   },
   {
-    "term": "petition.add-contact-button",
-    "definition": "Add access",
-    "context": "Add access"
-  },
-  {
     "term": "petition.add-field-button",
     "definition": "Add field",
     "context": "Add field"
+  },
+  {
+    "term": "petition.add-recipient-button",
+    "definition": "Add recipient",
+    "context": "Add recipient"
   },
   {
     "term": "petition.already-sent",
