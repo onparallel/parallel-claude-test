@@ -450,9 +450,14 @@ type Mutation {
   autoSendTemplate(name: String!, templateId: GID!): String!
 
   """
+  Load contacts from an excel file, creating the ones not found on database
+  """
+  bulkCreateContacts(file: Upload!): [Contact!]!
+
+  """
   Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages
   """
-  batchSendPetition(
+  bulkSendPetition(
     batchSendSigningMode: BatchSendSigningMode
     body: JSON!
     contactIdGroups: [[GID!]!]!
@@ -461,11 +466,6 @@ type Mutation {
     scheduledAt: DateTime
     subject: String!
   ): [SendPetitionResult!]!
-
-  """
-  Load contacts from an excel file, creating the ones not found on database
-  """
-  bulkCreateContacts(file: Upload!): [Contact!]!
 
   """
   Cancels a scheduled petition message.

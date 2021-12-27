@@ -246,9 +246,10 @@ export class OrganizationRepository extends BaseRepository {
   async updateOrganizationCurrentUsageLimitCredits(
     orgId: number,
     limitName: OrganizationUsageLimitName,
-    creditsSpent: number
+    creditsSpent: number,
+    t?: Knex.Transaction
   ) {
-    return await this.from("organization_usage_limit")
+    await this.from("organization_usage_limit", t)
       .where({
         period_end_date: null,
         limit_name: limitName,

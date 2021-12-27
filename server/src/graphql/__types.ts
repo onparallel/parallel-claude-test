@@ -852,8 +852,8 @@ export interface NexusGenFieldTypes {
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     autoSendTemplate: string; // String!
-    batchSendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     bulkCreateContacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    bulkSendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
@@ -2141,8 +2141,8 @@ export interface NexusGenFieldTypeNames {
     addUsersToUserGroup: "UserGroup";
     assignPetitionToUser: "SupportMethodResponse";
     autoSendTemplate: "String";
-    batchSendPetition: "SendPetitionResult";
     bulkCreateContacts: "Contact";
+    bulkSendPetition: "SendPetitionResult";
     cancelScheduledMessage: "PetitionMessage";
     cancelSignatureRequest: "PetitionSignatureRequest";
     changePassword: "ChangePasswordResult";
@@ -3252,7 +3252,11 @@ export interface NexusGenArgTypes {
       name: string; // String!
       templateId: NexusGenScalars["GID"]; // GID!
     };
-    batchSendPetition: {
+    bulkCreateContacts: {
+      // args
+      file: NexusGenScalars["Upload"]; // Upload!
+    };
+    bulkSendPetition: {
       // args
       batchSendSigningMode?: NexusGenEnums["BatchSendSigningMode"] | null; // BatchSendSigningMode
       body: NexusGenScalars["JSON"]; // JSON!
@@ -3261,10 +3265,6 @@ export interface NexusGenArgTypes {
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
       subject: string; // String!
-    };
-    bulkCreateContacts: {
-      // args
-      file: NexusGenScalars["Upload"]; // Upload!
     };
     cancelScheduledMessage: {
       // args

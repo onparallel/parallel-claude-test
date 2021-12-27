@@ -72,15 +72,12 @@ export function orgHasAvailablePetitionSendCredits<
   FieldName extends string
 >(
   petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  contactIdGroupsProp: (args: core.ArgsValue<TypeName, FieldName>) => number[][]
+  numberOfGroups: (args: core.ArgsValue<TypeName, FieldName>) => number
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const petitionId = petitionIdProp(args);
-
     const needed = await getRequiredPetitionSendCredits(
-      petitionId,
-      contactIdGroupsProp(args),
-      ctx.user!,
+      petitionIdProp(args),
+      numberOfGroups(args),
       ctx
     );
 

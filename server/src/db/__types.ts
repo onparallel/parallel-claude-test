@@ -659,6 +659,7 @@ export interface Petition {
   restricted_at: Maybe<Date>; // timestamptz
   restricted_password_hash: Maybe<string>; // varchar
   restricted_password_salt: Maybe<string>; // varchar
+  credits_used: number; // int4
 }
 
 export type CreatePetition = PartialProps<
@@ -692,6 +693,7 @@ export type CreatePetition = PartialProps<
   | "restricted_at"
   | "restricted_password_hash"
   | "restricted_password_salt"
+  | "credits_used"
 >;
 
 export interface PetitionAccess {

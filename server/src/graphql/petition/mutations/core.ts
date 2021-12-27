@@ -1105,7 +1105,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
   },
 });
 
-export const batchSendPetition = mutationField("batchSendPetition", {
+export const bulkSendPetition = mutationField("bulkSendPetition", {
   description:
     "Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages",
   type: nonNull(list(nonNull("SendPetitionResult"))),
@@ -1115,7 +1115,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     userHasAccessToContactGroups("contactIdGroups"),
     orgHasAvailablePetitionSendCredits(
       (args) => args.petitionId,
-      (args) => args.contactIdGroups
+      (args) => args.contactIdGroups.length
     )
   ),
   args: {
@@ -1153,9 +1153,10 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
   ),
   resolve: async (_, args, ctx) => {
-    const [petition, owner] = await Promise.all([
+    const [petition, owner, requiredCredits] = await Promise.all([
       ctx.petitions.loadPetition(args.petitionId),
       ctx.petitions.loadPetitionOwner(args.petitionId),
+      getRequiredPetitionSendCredits(args.petitionId, args.contactIdGroups.length, ctx),
     ]);
 
     if (!petition) {
@@ -1223,17 +1224,11 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       ctx
     );
 
-    const usedCredits = await getRequiredPetitionSendCredits(
-      args.petitionId,
-      args.contactIdGroups,
-      ctx.user!,
-      ctx
-    );
-    if (usedCredits > 0) {
+    if (requiredCredits > 0) {
       await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
         ctx.user!.org_id,
         "PETITION_SEND",
-        usedCredits
+        requiredCredits
       );
     }
 
@@ -1250,7 +1245,7 @@ export const sendPetition = mutationField("sendPetition", {
     petitionHasRepliableFields("petitionId"),
     orgHasAvailablePetitionSendCredits(
       (args) => args.petitionId,
-      (args) => [args.contactIds]
+      () => 1
     )
   ),
   args: {
@@ -1272,7 +1267,10 @@ export const sendPetition = mutationField("sendPetition", {
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
   ),
   resolve: async (_, args, ctx) => {
-    const petition = await ctx.petitions.loadPetition(args.petitionId);
+    const [petition, requiredCredits] = await Promise.all([
+      ctx.petitions.loadPetition(args.petitionId),
+      getRequiredPetitionSendCredits(args.petitionId, 1, ctx),
+    ]);
     if (!petition) {
       throw new Error("Petition not available");
     }
@@ -1282,6 +1280,7 @@ export const sendPetition = mutationField("sendPetition", {
     if (!isDefined(subject) || !isDefined(body)) {
       throw new WhitelistedError("Missing email subject or email body", "MISSING_SUBJECT_OR_BODY");
     }
+
     const [{ result, error, accesses, messages, petition: updatedPetition }] =
       await presendPetition(
         [[petition, args.contactIds]],
@@ -1309,17 +1308,11 @@ export const sendPetition = mutationField("sendPetition", {
       );
     }
 
-    const usedCredits = await getRequiredPetitionSendCredits(
-      args.petitionId,
-      [args.contactIds],
-      ctx.user!,
-      ctx
-    );
-    if (usedCredits > 0) {
+    if (requiredCredits > 0) {
       await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
         ctx.user!.org_id,
         "PETITION_SEND",
-        usedCredits
+        requiredCredits
       );
     }
 

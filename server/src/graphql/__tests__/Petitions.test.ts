@@ -2820,7 +2820,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            batchSendPetition(
+            bulkSendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -2850,9 +2850,9 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
-    it("sending a petition to myself should not consume credits", async () => {
+    it("doing a normal send should consume 1 credit", async () => {
       await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
-        used: 10,
+        used: 9,
         limit: 10,
       });
 
@@ -2923,7 +2923,7 @@ describe("GraphQL/Petitions", () => {
         .where("id", usageLimit.id)
         .select("id", "used", "limit");
 
-      expect(firstSendUsageLimits).toEqual([{ id: usageLimit.id, used: 0, limit: 1 }]);
+      expect(firstSendUsageLimits).toEqual([{ id: usageLimit.id, used: 1, limit: 1 }]);
 
       const { errors: errors2, data: data2 } = await testClient.mutate({
         mutation: gql`
@@ -3026,9 +3026,9 @@ describe("GraphQL/Petitions", () => {
       expect(secondSendUsageLimits).toEqual([{ id: usageLimit.id, used: 1, limit: 1 }]);
     });
 
-    it("doing a batch send with only me in a group should reduce the amount of credits needed", async () => {
+    it("doing a batch send with 2 groups should consume 2 credits", async () => {
       await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
-        used: 9,
+        used: 8,
         limit: 10,
       });
 
@@ -3040,7 +3040,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            batchSendPetition(
+            bulkSendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3062,7 +3062,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.batchSendPetition).toEqual([{ result: "SUCCESS" }, { result: "SUCCESS" }]);
+      expect(data?.bulkSendPetition).toEqual([{ result: "SUCCESS" }, { result: "SUCCESS" }]);
 
       const organizationCurrentUsageLimit = await mocks.knex
         .from("organization_usage_limit")

@@ -357,7 +357,7 @@ export interface Mutation {
   /** Creates a petition from a template and send */
   autoSendTemplate: Scalars["String"];
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
-  batchSendPetition: Array<SendPetitionResult>;
+  bulkSendPetition: Array<SendPetitionResult>;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
   /** Cancels a scheduled petition message. */
@@ -649,7 +649,7 @@ export interface MutationautoSendTemplateArgs {
   templateId: Scalars["GID"];
 }
 
-export interface MutationbatchSendPetitionArgs {
+export interface MutationbulkSendPetitionArgs {
   batchSendSigningMode?: InputMaybe<BatchSendSigningMode>;
   body: Scalars["JSON"];
   contactIdGroups: Array<Array<Scalars["GID"]>>;
