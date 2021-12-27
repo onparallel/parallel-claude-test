@@ -1880,12 +1880,21 @@ export const completePetition = mutationField("completePetition", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    userHasAccessToContacts("additionalSignersContactIds" as never)
+    userHasAccessToContacts("additionalSignersContactIds" as never),
+    orgHasAvailablePetitionSendCredits(
+      (args) => args.petitionId,
+      () => 1
+    )
   ),
   resolve: async (_, args, ctx) => {
     try {
       return await ctx.petitions.withTransaction(async (t) => {
-        let petition = await ctx.petitions.completePetition(args.petitionId, ctx.user!, t);
+        let petition = await ctx.petitions.completePetition(
+          args.petitionId,
+          ctx.user!,
+          { credits_used: 1 },
+          t
+        );
         if (petition.signature_config?.review === false) {
           const contacts = await ctx.contacts.loadContact(args.additionalSignersContactIds ?? []);
           const updatedPetition = await startSignatureRequest(
@@ -1903,6 +1912,12 @@ export const completePetition = mutationField("completePetition", {
           );
           petition = updatedPetition ?? petition;
         }
+        await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+          ctx.user!.org_id,
+          "PETITION_SEND",
+          1,
+          t
+        );
         return petition;
       });
     } catch (error: any) {

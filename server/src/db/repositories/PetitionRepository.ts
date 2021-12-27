@@ -1517,6 +1517,7 @@ export class PetitionRepository extends BaseRepository {
   async completePetition(
     petitionId: number,
     userOrAccess: User | PetitionAccess,
+    extraData: Partial<Petition>,
     t?: Knex.Transaction
   ) {
     const isAccess = "keycode" in userOrAccess;
@@ -1560,14 +1561,17 @@ export class PetitionRepository extends BaseRepository {
           t
         );
 
-        const [updated] = await this.from("petition", t).where("id", petitionId).update(
-          {
-            status: "COMPLETED",
-            updated_at: this.now(),
-            updated_by: updatedBy,
-          },
-          "*"
-        );
+        const [updated] = await this.from("petition", t)
+          .where("id", petitionId)
+          .update(
+            {
+              status: "COMPLETED",
+              updated_at: this.now(),
+              updated_by: updatedBy,
+              ...extraData,
+            },
+            "*"
+          );
         return updated;
       }, t);
       return petition;

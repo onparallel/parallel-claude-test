@@ -574,6 +574,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         let petition = await ctx.petitions.completePetition(
           ctx.access!.petition_id,
           ctx.access!,
+          {},
           t
         );
 
