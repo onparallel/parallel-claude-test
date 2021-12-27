@@ -2412,7 +2412,7 @@ type PetitionFieldReply implements Timestamps {
   """
   The last updater of the field reply.
   """
-  updatedBy: UserOrContact
+  updatedBy: UserOrPetitionAccess
 }
 
 """

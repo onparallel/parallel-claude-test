@@ -1955,7 +1955,7 @@ export interface PetitionFieldReply extends Timestamps {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The last updater of the field reply. */
-  updatedBy?: Maybe<UserOrContact>;
+  updatedBy?: Maybe<UserOrPetitionAccess>;
 }
 
 /** The status of a petition. */
@@ -6892,19 +6892,6 @@ export type TestModeSignatureBadge_UserFragment = {
   hasPetitionSignature: boolean;
 };
 
-export type usePetitionPreviewSignerInfoDialog_PetitionSignerFragment = {
-  __typename?: "PetitionSigner";
-  fullName: string;
-  email: string;
-};
-
-export type usePetitionPreviewSignerInfoDialog_ContactFragment = {
-  __typename?: "Contact";
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-};
-
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -8198,6 +8185,26 @@ export type PreviewPetitionFieldMutations_updatePetitionStatus_PetitionFragment 
   status: PetitionStatus;
 };
 
+export type usePetitionPreviewSignerInfoDialog_PetitionSignerFragment = {
+  __typename?: "PetitionSigner";
+  fullName: string;
+  email: string;
+};
+
+export type usePetitionPreviewSignerInfoDialog_UserFragment = {
+  __typename?: "User";
+  id: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  fullName?: string | null;
+};
+
+export type usePetitionPreviewSignerInfoDialog_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  name: string;
+};
+
 export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -8417,7 +8424,11 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     metadata: { [key: string]: any };
     field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
     updatedBy?:
-      | { __typename?: "Contact"; id: string; fullName?: string | null }
+      | {
+          __typename?: "PetitionAccess";
+          id: string;
+          contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+        }
       | { __typename?: "User"; id: string; fullName?: string | null }
       | null;
   }>;
@@ -8449,7 +8460,11 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   metadata: { [key: string]: any };
   field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
   updatedBy?:
-    | { __typename?: "Contact"; id: string; fullName?: string | null }
+    | {
+        __typename?: "PetitionAccess";
+        id: string;
+        contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+      }
     | { __typename?: "User"; id: string; fullName?: string | null }
     | null;
 };
@@ -8543,7 +8558,11 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   metadata: { [key: string]: any };
   field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
   updatedBy?:
-    | { __typename?: "Contact"; id: string; fullName?: string | null }
+    | {
+        __typename?: "PetitionAccess";
+        id: string;
+        contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+      }
     | { __typename?: "User"; id: string; fullName?: string | null }
     | null;
 };
@@ -10884,13 +10903,6 @@ export type PetitionActivity_PetitionFragment = {
   deadline?: string | null;
   isRestricted: boolean;
   updatedAt: string;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    title?: string | null;
-    type: PetitionFieldType;
-    options: { [key: string]: any };
-  }>;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -10914,6 +10926,13 @@ export type PetitionActivity_PetitionFragment = {
       timezone: string;
       weekdaysOnly: boolean;
     } | null;
+  }>;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    title?: string | null;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
   }>;
   events: {
     __typename?: "PetitionEventPagination";
@@ -11589,13 +11608,6 @@ export type PetitionActivity_updatePetitionMutation = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          title?: string | null;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-        }>;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -11619,6 +11631,13 @@ export type PetitionActivity_updatePetitionMutation = {
             timezone: string;
             weekdaysOnly: boolean;
           } | null;
+        }>;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          title?: string | null;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
         }>;
         events: {
           __typename?: "PetitionEventPagination";
@@ -12384,13 +12403,6 @@ export type PetitionActivity_petitionQuery = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          title?: string | null;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-        }>;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -12414,6 +12426,13 @@ export type PetitionActivity_petitionQuery = {
             timezone: string;
             weekdaysOnly: boolean;
           } | null;
+        }>;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          title?: string | null;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
         }>;
         events: {
           __typename?: "PetitionEventPagination";
@@ -13136,6 +13155,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   emailSubject?: string | null;
   emailBody?: any | null;
   updatedAt: string;
+  accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title: string;
@@ -14055,6 +14075,11 @@ export type PetitionCompose_petitionQuery = {
         emailSubject?: string | null;
         emailBody?: any | null;
         updatedAt: string;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+        }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title: string;
@@ -14271,6 +14296,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   deadline?: string | null;
   isRestricted: boolean;
   updatedAt: string;
+  accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -14410,9 +14436,9 @@ export type PetitionPreview_PetitionBaseFragment =
 export type PetitionPreview_UserFragment = {
   __typename?: "User";
   id: string;
-  fullName?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  fullName?: string | null;
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
@@ -14451,6 +14477,11 @@ export type PetitionPreview_updatePetitionMutation = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+        }>;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -14587,6 +14618,101 @@ export type PetitionPreview_updatePetitionMutation = {
       };
 };
 
+export type PetitionPreview_completePetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  additionalSignersContactIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  message?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type PetitionPreview_completePetitionMutation = {
+  completePetition: {
+    __typename?: "Petition";
+    id: string;
+    tone: Tone;
+    status: PetitionStatus;
+    name?: string | null;
+    emailSubject?: string | null;
+    emailBody?: any | null;
+    locale: PetitionLocale;
+    deadline?: string | null;
+    isRestricted: boolean;
+    updatedAt: string;
+    accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+    fields: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      optional: boolean;
+      validated: boolean;
+      isReadOnly: boolean;
+      title?: string | null;
+      options: { [key: string]: any };
+      description?: string | null;
+      multiple: boolean;
+      visibility?: { [key: string]: any } | null;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        createdAt: string;
+        updatedAt: string;
+      }>;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        status: PetitionFieldReplyStatus;
+        content: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+      comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+      attachments: Array<{
+        __typename?: "PetitionFieldAttachment";
+        id: string;
+        file: {
+          __typename?: "FileUpload";
+          filename: string;
+          contentType: string;
+          size: number;
+          isComplete: boolean;
+        };
+      }>;
+    }>;
+    signatureConfig?: {
+      __typename?: "SignatureConfig";
+      letRecipientsChooseSigners: boolean;
+      review: boolean;
+      signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        id: string;
+        environment: SignatureOrgIntegrationEnvironment;
+        name: string;
+      } | null;
+    } | null;
+    remindersConfig?: {
+      __typename?: "RemindersConfig";
+      offset: number;
+      time: string;
+      timezone: string;
+      weekdaysOnly: boolean;
+    } | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      isSubscribed: boolean;
+    } | null;
+  };
+};
+
 export type PetitionPreview_petitionQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
@@ -14605,6 +14731,11 @@ export type PetitionPreview_petitionQuery = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+        }>;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -14748,9 +14879,9 @@ export type PetitionPreview_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
+    fullName?: string | null;
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
@@ -14782,6 +14913,7 @@ export type PetitionReplies_PetitionFragment = {
   emailSubject?: string | null;
   emailBody?: any | null;
   updatedAt: string;
+  accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
   fields: Array<{
     __typename?: "PetitionField";
     isReadOnly: boolean;
@@ -14802,7 +14934,11 @@ export type PetitionReplies_PetitionFragment = {
       metadata: { [key: string]: any };
       field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
       updatedBy?:
-        | { __typename?: "Contact"; id: string; fullName?: string | null }
+        | {
+            __typename?: "PetitionAccess";
+            id: string;
+            contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+          }
         | { __typename?: "User"; id: string; fullName?: string | null }
         | null;
     }>;
@@ -14951,7 +15087,11 @@ export type PetitionReplies_PetitionFieldFragment = {
     metadata: { [key: string]: any };
     field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
     updatedBy?:
-      | { __typename?: "Contact"; id: string; fullName?: string | null }
+      | {
+          __typename?: "PetitionAccess";
+          id: string;
+          contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+        }
       | { __typename?: "User"; id: string; fullName?: string | null }
       | null;
   }>;
@@ -15330,6 +15470,11 @@ export type PetitionReplies_petitionQuery = {
         emailSubject?: string | null;
         emailBody?: any | null;
         updatedAt: string;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+        }>;
         fields: Array<{
           __typename?: "PetitionField";
           isReadOnly: boolean;
@@ -15350,7 +15495,11 @@ export type PetitionReplies_petitionQuery = {
             metadata: { [key: string]: any };
             field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
             updatedBy?:
-              | { __typename?: "Contact"; id: string; fullName?: string | null }
+              | {
+                  __typename?: "PetitionAccess";
+                  id: string;
+                  contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+                }
               | { __typename?: "User"; id: string; fullName?: string | null }
               | null;
           }>;
@@ -17849,13 +17998,6 @@ export const PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc = g
   }
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_updatePetitionLink_PetitionTemplateFragment, unknown>;
-export const usePetitionPreviewSignerInfoDialog_ContactFragmentDoc = gql`
-  fragment usePetitionPreviewSignerInfoDialog_Contact on Contact {
-    firstName
-    lastName
-    email
-  }
-` as unknown as DocumentNode<usePetitionPreviewSignerInfoDialog_ContactFragment, unknown>;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
     id
@@ -19438,6 +19580,10 @@ export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
 export const PetitionActivity_PetitionFragmentDoc = gql`
   fragment PetitionActivity_Petition on Petition {
     id
+    accesses {
+      id
+      status
+    }
     ...PetitionLayout_PetitionBase
     ...PetitionAccessTable_Petition
     ...PetitionActivityTimeline_Petition
@@ -19674,6 +19820,10 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
       ...PetitionCompose_PetitionField
     }
     ... on Petition {
+      accesses {
+        id
+        status
+      }
       status
       signatureConfig {
         integration {
@@ -19889,6 +20039,10 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
     id
     tone
     ... on Petition {
+      accesses {
+        id
+        status
+      }
       ...RecipientViewProgressFooter_Petition
     }
     fields {
@@ -19912,6 +20066,20 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${RecipientViewContentsCard_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_PetitionBaseFragment, unknown>;
+export const usePetitionPreviewSignerInfoDialog_OrganizationFragmentDoc = gql`
+  fragment usePetitionPreviewSignerInfoDialog_Organization on Organization {
+    id
+    name
+  }
+` as unknown as DocumentNode<usePetitionPreviewSignerInfoDialog_OrganizationFragment, unknown>;
+export const usePetitionPreviewSignerInfoDialog_UserFragmentDoc = gql`
+  fragment usePetitionPreviewSignerInfoDialog_User on User {
+    id
+    firstName
+    lastName
+    fullName
+  }
+` as unknown as DocumentNode<usePetitionPreviewSignerInfoDialog_UserFragment, unknown>;
 export const PetitionPreview_UserFragmentDoc = gql`
   fragment PetitionPreview_User on User {
     organization {
@@ -19922,10 +20090,14 @@ export const PetitionPreview_UserFragmentDoc = gql`
           limit
         }
       }
+      ...usePetitionPreviewSignerInfoDialog_Organization
     }
     ...PetitionLayout_User
+    ...usePetitionPreviewSignerInfoDialog_User
   }
+  ${usePetitionPreviewSignerInfoDialog_OrganizationFragmentDoc}
   ${PetitionLayout_UserFragmentDoc}
+  ${usePetitionPreviewSignerInfoDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_UserFragment, unknown>;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -19942,9 +20114,12 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
         id
         fullName
       }
-      ... on Contact {
+      ... on PetitionAccess {
         id
-        fullName
+        contact {
+          id
+          fullName
+        }
       }
     }
   }
@@ -20130,6 +20305,10 @@ export const PetitionAttachmentsCard_PetitionFragmentDoc = gql`
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
+    accesses {
+      id
+      status
+    }
     ...PetitionLayout_PetitionBase
     fields {
       ...PetitionReplies_PetitionField
@@ -22877,6 +23056,25 @@ export const PetitionPreview_updatePetitionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionPreview_updatePetitionMutation,
   PetitionPreview_updatePetitionMutationVariables
+>;
+export const PetitionPreview_completePetitionDocument = gql`
+  mutation PetitionPreview_completePetition(
+    $petitionId: GID!
+    $additionalSignersContactIds: [GID!]
+    $message: String
+  ) {
+    completePetition(
+      petitionId: $petitionId
+      additionalSignersContactIds: $additionalSignersContactIds
+      message: $message
+    ) {
+      ...PetitionPreview_PetitionBase
+    }
+  }
+  ${PetitionPreview_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionPreview_completePetitionMutation,
+  PetitionPreview_completePetitionMutationVariables
 >;
 export const PetitionPreview_petitionDocument = gql`
   query PetitionPreview_petition($id: GID!) {

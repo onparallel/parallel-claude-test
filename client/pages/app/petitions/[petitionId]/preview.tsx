@@ -8,15 +8,21 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { usePetitionPreviewSignerInfoDialog } from "@parallel/components/petition-preview/dialogs/PetitionPreviewSignerInfoDialog";
 import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/PetitionPreviewOnlyAlert";
+import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
+import { useTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import {
+  PetitionPreviewSignerInfoDialogResult,
+  usePetitionPreviewSignerInfoDialog,
+} from "@parallel/components/petition-preview/dialogs/PetitionPreviewSignerInfoDialog";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
+  PetitionPreview_completePetitionDocument,
   PetitionPreview_PetitionBaseFragment,
   PetitionPreview_petitionDocument,
   PetitionPreview_updatePetitionDocument,
@@ -30,6 +36,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
@@ -96,7 +103,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     _validatePetitionFields
   );
 
+  const [showTestSignatureDialogUserPreference, setShowTestSignatureDialogUserPreference] =
+    useUserPreference("show-test-signature-dialog", true);
+  const showTestSignatureDialog = useTestSignatureDialog();
+
   const showCompleteSignerInfoDialog = usePetitionPreviewSignerInfoDialog();
+  const [completePetition] = useMutation(PetitionPreview_completePetitionDocument);
 
   const handleFinalize = useCallback(
     async function () {
@@ -111,24 +123,37 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             f.isReadOnly
         );
         if (canFinalize && isPetition) {
-          // TODO: Handle finalize in preview petition
-          // let completeSignerInfoData: CompleteSignerInfoDialogResult | null = null;
-          console.log("petition.signatureConfig: ", petition.signatureConfig);
+          let completeSignerInfoData: PetitionPreviewSignerInfoDialogResult | null = null;
+
           if (petition.signatureConfig?.review === false) {
-            await showCompleteSignerInfoDialog({
+            completeSignerInfoData = await showCompleteSignerInfoDialog({
               recipientCanAddSigners: petition.signatureConfig?.letRecipientsChooseSigners,
               signers: petition!.signatureConfig?.signers ?? [],
               petitionId,
+              organization: me.organization,
+              user: me,
             });
           }
 
-          // await publicCompletePetition({
-          //   variables: {
-          //     keycode,
-          //     additionalSigners: completeSignerInfoData?.additionalSigners,
-          //     message: completeSignerInfoData?.message,
-          //   },
-          // });
+          if (
+            showTestSignatureDialogUserPreference &&
+            petition.signatureConfig?.integration?.environment === "DEMO"
+          ) {
+            const { dontShow } = await showTestSignatureDialog({
+              integrationName: petition.signatureConfig.integration.name,
+            });
+            if (dontShow) {
+              setShowTestSignatureDialogUserPreference(false);
+            }
+          }
+
+          await completePetition({
+            variables: {
+              petitionId,
+              additionalSignersContactIds: completeSignerInfoData?.additionalSignersContactIds,
+              message: completeSignerInfoData?.message,
+            },
+          });
 
           if (!petition.signatureConfig) {
             if (!toast.isActive("petition-completed-toast")) {
@@ -221,7 +246,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         section="preview"
         scrollBody
         headerActions={
-          isPetition && petition.status === "DRAFT" ? (
+          isPetition && !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
             <ResponsiveButtonIcon
               data-action="compose-next"
               id="petition-next"
@@ -240,6 +265,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             {!isPetition ? <PetitionPreviewOnlyAlert /> : null}
             {displayPetitionLimitReachedAlert ? (
               <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+            ) : null}
+            {isPetition && petition.status === "COMPLETED" && petition.signatureConfig?.review ? (
+              <PetitionPreviewSignatureReviewAlert />
             ) : null}
           </>
         }
@@ -316,6 +344,10 @@ PetitionPreview.fragments = {
       id
       tone
       ... on Petition {
+        accesses {
+          id
+          status
+        }
         ...RecipientViewProgressFooter_Petition
       }
       fields {
@@ -349,9 +381,13 @@ PetitionPreview.fragments = {
             limit
           }
         }
+        ...usePetitionPreviewSignerInfoDialog_Organization
       }
       ...PetitionLayout_User
+      ...usePetitionPreviewSignerInfoDialog_User
     }
+    ${usePetitionPreviewSignerInfoDialog.fragments.Organization}
+    ${usePetitionPreviewSignerInfoDialog.fragments.User}
     ${PetitionLayout.fragments.User}
   `,
 };
@@ -360,6 +396,22 @@ PetitionPreview.mutations = [
   gql`
     mutation PetitionPreview_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
+        ...PetitionPreview_PetitionBase
+      }
+    }
+    ${PetitionPreview.fragments.PetitionBase}
+  `,
+  gql`
+    mutation PetitionPreview_completePetition(
+      $petitionId: GID!
+      $additionalSignersContactIds: [GID!]
+      $message: String
+    ) {
+      completePetition(
+        petitionId: $petitionId
+        additionalSignersContactIds: $additionalSignersContactIds
+        message: $message
+      ) {
         ...PetitionPreview_PetitionBase
       }
     }

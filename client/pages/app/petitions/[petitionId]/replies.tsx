@@ -531,7 +531,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       section="replies"
       scrollBody
       headerActions={
-        petition.status === "DRAFT" ? (
+        !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
           <ResponsiveButtonIcon
             data-action="compose-next"
             id="petition-next"
@@ -753,6 +753,10 @@ PetitionReplies.fragments = {
     return gql`
       fragment PetitionReplies_Petition on Petition {
         id
+        accesses {
+          id
+          status
+        }
         ...PetitionLayout_PetitionBase
         fields {
           ...PetitionReplies_PetitionField

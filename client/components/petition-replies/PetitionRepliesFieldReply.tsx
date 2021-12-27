@@ -44,6 +44,26 @@ export function PetitionRepliesFieldReply({
   const apollo = useApolloClient();
   const myId = getMyId(apollo);
 
+  const getUpdatedBy = (reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment) => {
+    const updatedBy =
+      reply.updatedBy?.__typename === "User"
+        ? reply.updatedBy
+        : reply.updatedBy?.__typename === "PetitionAccess"
+        ? reply.updatedBy.contact
+        : null;
+
+    if (!updatedBy) return null;
+
+    if (updatedBy.id === myId) {
+      return `${intl.formatMessage({
+        id: "generic.you",
+        defaultMessage: "You",
+      })}, `;
+    } else {
+      return `${updatedBy.fullName}, `;
+    }
+  };
+
   return (
     <Flex>
       <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
@@ -148,16 +168,7 @@ export function PetitionRepliesFieldReply({
             </Text>
           ) : (
             <Text color="gray.500">
-              {reply.updatedBy
-                ? `${
-                    reply.updatedBy.id === myId
-                      ? intl.formatMessage({
-                          id: "generic.you",
-                          defaultMessage: "You",
-                        })
-                      : reply.updatedBy.fullName
-                  }, `
-                : null}
+              {getUpdatedBy(reply)}
               <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
             </Text>
           )}
@@ -211,9 +222,12 @@ PetitionRepliesFieldReply.fragments = {
           id
           fullName
         }
-        ... on Contact {
+        ... on PetitionAccess {
           id
-          fullName
+          contact {
+            id
+            fullName
+          }
         }
       }
     }

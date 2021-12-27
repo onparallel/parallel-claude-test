@@ -363,7 +363,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       section="activity"
       scrollBody
       headerActions={
-        petition.status === "DRAFT" ? (
+        !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
           <ResponsiveButtonIcon
             data-action="compose-next"
             id="petition-next"
@@ -409,6 +409,10 @@ PetitionActivity.fragments = {
   Petition: gql`
     fragment PetitionActivity_Petition on Petition {
       id
+      accesses {
+        id
+        status
+      }
       ...PetitionLayout_PetitionBase
       ...PetitionAccessTable_Petition
       ...PetitionActivityTimeline_Petition

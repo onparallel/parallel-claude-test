@@ -1228,7 +1228,7 @@ export interface NexusGenFieldTypes {
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
-    updatedBy: NexusGenRootTypes["UserOrContact"] | null; // UserOrContact
+    updatedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
   };
   PetitionMessage: {
     // field return type
@@ -2517,7 +2517,7 @@ export interface NexusGenFieldTypeNames {
     metadata: "JSONObject";
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
-    updatedBy: "UserOrContact";
+    updatedBy: "UserOrPetitionAccess";
   };
   PetitionMessage: {
     // field return type name

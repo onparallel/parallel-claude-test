@@ -4710,6 +4710,16 @@
     "context": "Export to PDF"
   },
   {
+    "term": "page.preview.signature-required",
+    "definition": "Esta petición requiere de <b>firma digital</b> para ser completada.",
+    "context": "This petition requires an <b>eSignature</b> to be completed."
+  },
+  {
+    "term": "page.preview.signature-review",
+    "definition": "Puedes revisar las respuestas e iniciar la firma desde la pestaña de Respuestas.",
+    "context": "You can review the replies and initiate the signature from the Replies tab."
+  },
+  {
     "term": "page.preview.template-only-cache-alert",
     "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se guardarán. Para completar y enviar esta plantilla dale a <b>{button}</b>.",
     "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."

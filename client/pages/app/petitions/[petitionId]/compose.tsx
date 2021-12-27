@@ -387,7 +387,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         section="compose"
         scrollBody
         headerActions={
-          petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
+          petition?.__typename === "Petition" &&
+          !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
             <ResponsiveButtonIcon
               data-action="compose-next"
               id="petition-next"
@@ -541,6 +542,10 @@ PetitionCompose.fragments = {
           ...PetitionCompose_PetitionField
         }
         ... on Petition {
+          accesses {
+            id
+            status
+          }
           status
           signatureConfig {
             integration {

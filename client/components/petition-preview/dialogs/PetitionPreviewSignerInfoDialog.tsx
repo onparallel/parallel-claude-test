@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   Button,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   ListItem,
   Stack,
@@ -11,21 +12,29 @@ import {
 import { ContactSelect, ContactSelectSelection } from "@parallel/components/common/ContactSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { usePetitionPreviewSignerInfoDialog_PetitionSignerFragment } from "@parallel/graphql/__types";
+import {
+  PetitionLocale,
+  usePetitionPreviewSignerInfoDialog_OrganizationFragment,
+  usePetitionPreviewSignerInfoDialog_PetitionSignerFragment,
+  usePetitionPreviewSignerInfoDialog_UserFragment,
+} from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe } from "@parallel/utils/types";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
+import { outdent } from "outdent";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 type PetitionPreviewSignerInfoDialogProps = {
-  signers: usePetitionPreviewSignerInfoDialog_PetitionSignerFragment[];
   petitionId: string;
+  signers: usePetitionPreviewSignerInfoDialog_PetitionSignerFragment[];
   recipientCanAddSigners: boolean;
+  user: usePetitionPreviewSignerInfoDialog_UserFragment;
+  organization: usePetitionPreviewSignerInfoDialog_OrganizationFragment;
 };
 
 export type PetitionPreviewSignerInfoDialogResult = {
-  additionalSigners: ContactSelectSelection[];
+  additionalSignersContactIds: Maybe<string | string[]>;
   message: Maybe<string>;
 };
 
@@ -33,22 +42,30 @@ function PetitionPreviewSignerInfoDialog({
   petitionId,
   signers,
   recipientCanAddSigners,
+  user,
+  organization,
   ...props
 }: DialogProps<PetitionPreviewSignerInfoDialogProps, PetitionPreviewSignerInfoDialogResult>) {
+  const intl = useIntl();
+
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ contacts: ContactSelectSelection[] }>({
+  } = useForm<{ contacts: ContactSelectSelection[]; message: string }>({
     mode: "onChange",
     defaultValues: {
       contacts: [],
+      message: (messages[intl.locale as PetitionLocale] ?? messages["en"])(
+        organization.name,
+        user.fullName ?? ""
+      ),
     },
   });
 
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
-  const intl = useIntl();
+
   return (
     <ConfirmDialog
       {...props}
@@ -56,10 +73,10 @@ function PetitionPreviewSignerInfoDialog({
       hasCloseButton
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ contacts }) => {
+        onSubmit: handleSubmit(({ contacts, message }) => {
           props.onResolve({
-            additionalSigners: contacts,
-            message: "message",
+            additionalSignersContactIds: contacts.map((c) => c.id),
+            message,
           });
         }),
       }}
@@ -146,6 +163,12 @@ function PetitionPreviewSignerInfoDialog({
                   />
                 )}
               />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.required-field-error"
+                  defaultMessage="The field is required"
+                />
+              </FormErrorMessage>
             </FormControl>
           ) : null}
         </Stack>
@@ -162,6 +185,25 @@ function PetitionPreviewSignerInfoDialog({
   );
 }
 
+const messages: Record<PetitionLocale, (organization: string, userName: string) => string> = {
+  en: (organization, userName) => outdent`
+  Hello,
+
+  I have completed this document requested by ${organization} through Parallel. Could you please sign it?
+
+  Thanks,
+  ${userName}.
+`,
+  es: (organization, userName) => outdent`
+  Hola,
+
+  He completado este documento que nos han pedido de ${organization} a través de Parallel. ¿Podrías por favor firmarlo?
+  
+  Gracias,
+  ${userName}.
+`,
+};
+
 usePetitionPreviewSignerInfoDialog.fragments = {
   PetitionSigner: gql`
     fragment usePetitionPreviewSignerInfoDialog_PetitionSigner on PetitionSigner {
@@ -169,11 +211,18 @@ usePetitionPreviewSignerInfoDialog.fragments = {
       email
     }
   `,
-  Contact: gql`
-    fragment usePetitionPreviewSignerInfoDialog_Contact on Contact {
+  User: gql`
+    fragment usePetitionPreviewSignerInfoDialog_User on User {
+      id
       firstName
       lastName
-      email
+      fullName
+    }
+  `,
+  Organization: gql`
+    fragment usePetitionPreviewSignerInfoDialog_Organization on Organization {
+      id
+      name
     }
   `,
 };

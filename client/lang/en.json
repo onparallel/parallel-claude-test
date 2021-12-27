@@ -4710,6 +4710,16 @@
     "context": "Export to PDF"
   },
   {
+    "term": "page.preview.signature-required",
+    "definition": "This petition requires an <b>eSignature</b> to be completed.",
+    "context": "This petition requires an <b>eSignature</b> to be completed."
+  },
+  {
+    "term": "page.preview.signature-review",
+    "definition": "You can review the replies and initiate the signature from the Replies tab.",
+    "context": "You can review the replies and initiate the signature from the Replies tab."
+  },
+  {
     "term": "page.preview.template-only-cache-alert",
     "definition": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>.",
     "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
