@@ -20,6 +20,7 @@ import { PetitionAccessesTable } from "@parallel/components/petition-activity/Pe
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
+import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionActivity_cancelScheduledMessageDocument,
@@ -354,6 +355,11 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     } catch {}
   };
 
+  const displayPetitionLimitReachedAlert =
+    me.organization.usageLimits.petitions.limit <= me.organization.usageLimits.petitions.used &&
+    petition.__typename === "Petition" &&
+    petition.status === "DRAFT";
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -380,6 +386,11 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
             <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
           </Box>
         )
+      }
+      subHeader={
+        displayPetitionLimitReachedAlert ? (
+          <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+        ) : null
       }
     >
       <PetitionAccessesTable
@@ -433,6 +444,15 @@ PetitionActivity.fragments = {
   `,
   User: gql`
     fragment PetitionActivity_User on User {
+      organization {
+        name
+        usageLimits {
+          petitions {
+            used
+            limit
+          }
+        }
+      }
       ...PetitionLayout_User
       ...useUpdateIsReadNotification_User
     }

@@ -11582,10 +11582,11 @@ export type PetitionActivity_UserFragment = {
   hasPetitionPdfExport: boolean;
   organization: {
     __typename?: "Organization";
+    name: string;
     id: string;
     usageLimits: {
       __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
     };
   };
 };
@@ -13131,10 +13132,11 @@ export type PetitionActivity_userQuery = {
     hasPetitionPdfExport: boolean;
     organization: {
       __typename?: "Organization";
+      name: string;
       id: string;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
       };
     };
   };
@@ -15154,7 +15156,12 @@ export type PetitionReplies_UserFragment = {
   hasExportCuatrecasas: boolean;
   organization: {
     __typename?: "Organization";
+    name: string;
     id: string;
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+    };
     signatureIntegrations: {
       __typename?: "OrgIntegrationPagination";
       items: Array<
@@ -15168,10 +15175,6 @@ export type PetitionReplies_UserFragment = {
         | { __typename?: "SsoOrgIntegration" }
         | { __typename?: "UserProvisioningOrgIntegration" }
       >;
-    };
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
 };
@@ -15429,7 +15432,12 @@ export type PetitionReplies_userQuery = {
     hasExportCuatrecasas: boolean;
     organization: {
       __typename?: "Organization";
+      name: string;
       id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+      };
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         items: Array<
@@ -15443,10 +15451,6 @@ export type PetitionReplies_userQuery = {
           | { __typename?: "SsoOrgIntegration" }
           | { __typename?: "UserProvisioningOrgIntegration" }
         >;
-      };
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
   };
@@ -19625,6 +19629,15 @@ export const useUpdateIsReadNotification_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<useUpdateIsReadNotification_UserFragment, unknown>;
 export const PetitionActivity_UserFragmentDoc = gql`
   fragment PetitionActivity_User on User {
+    organization {
+      name
+      usageLimits {
+        petitions {
+          used
+          limit
+        }
+      }
+    }
     ...PetitionLayout_User
     ...useUpdateIsReadNotification_User
   }
@@ -20362,6 +20375,15 @@ export const PetitionSignaturesCard_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionSignaturesCard_UserFragment, unknown>;
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
+    organization {
+      name
+      usageLimits {
+        petitions {
+          used
+          limit
+        }
+      }
+    }
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
     hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
     ...PetitionLayout_User

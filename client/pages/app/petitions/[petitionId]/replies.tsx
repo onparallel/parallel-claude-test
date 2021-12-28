@@ -33,14 +33,18 @@ import {
   useDialog,
   withDialogs,
 } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
+import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
+import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
 import {
@@ -50,6 +54,7 @@ import {
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/dialogs/SolveUnreviewedRepliesDialog";
+import { PetitionAttachmentsCard } from "@parallel/components/petition-replies/PetitionAttachmentsCard";
 import {
   PetitionRepliesField,
   PetitionRepliesFieldProps,
@@ -78,8 +83,8 @@ import {
   PetitionStatus,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
@@ -101,16 +106,12 @@ import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
+import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { PetitionAttachmentsCard } from "@parallel/components/petition-replies/PetitionAttachmentsCard";
-import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
-import { useRouter } from "next/router";
-import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
@@ -522,6 +523,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const petitionSignatureStatus = getPetitionSignatureStatus(petition);
   const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
 
+  const displayPetitionLimitReachedAlert =
+    me.organization.usageLimits.petitions.limit <= me.organization.usageLimits.petitions.used &&
+    petition.__typename === "Petition" &&
+    petition.status === "DRAFT";
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -551,6 +557,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       }
       subHeader={
         <>
+          {displayPetitionLimitReachedAlert ? (
+            <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+          ) : null}
           <Stack direction="row" paddingX={4} paddingY={2}>
             <IconButtonWithTooltip
               onClick={() => refetch()}
@@ -802,6 +811,15 @@ PetitionReplies.fragments = {
   get User() {
     return gql`
       fragment PetitionReplies_User on User {
+        organization {
+          name
+          usageLimits {
+            petitions {
+              used
+              limit
+            }
+          }
+        }
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
         ...PetitionLayout_User

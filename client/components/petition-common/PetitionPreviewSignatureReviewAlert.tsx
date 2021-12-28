@@ -3,8 +3,8 @@ import { FormattedMessage } from "react-intl";
 
 export function PetitionPreviewSignatureReviewAlert(props: AlertProps) {
   return (
-    <Alert status="warning" backgroundColor="yellow.100" {...props}>
-      <AlertIcon color="yellow.400" />
+    <Alert status="warning" {...props}>
+      <AlertIcon color="yellow.500" />
       <Stack spacing={0.5}>
         <Text>
           <FormattedMessage
