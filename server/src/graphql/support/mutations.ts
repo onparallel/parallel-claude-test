@@ -33,7 +33,7 @@ export const assignPetitionToUser = mutationField("assignPetitionToUser", {
       if (!user) {
         throw new Error(`User ${args.userId} not found`);
       }
-      const newPetition = await ctx.petitions.clonePetition(petitionId, user, {});
+      const newPetition = await ctx.petitions.clonePetition(petitionId, user);
 
       return {
         result: RESULT.SUCCESS,

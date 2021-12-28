@@ -1179,6 +1179,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
           args.petitionId,
           owner, // set the owner of the original petition as owner of the cloned ones
           {},
+          true, // also clone the petition replies
           `User:${ctx.user!.id}`
         ),
       { concurrency: 5 }

@@ -1763,6 +1763,41 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("petition replies should not be cloned", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+      }));
+      await mocks.createRandomTextReply(field.id, 0, 1, () => ({
+        petition_access_id: null,
+        user_id: sessionUser.id,
+      }));
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              fields {
+                replies {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", petition.id)],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitions).toEqual([
+        {
+          fields: [{ replies: [] }],
+        },
+      ]);
+    });
   });
 
   describe("deletePetitions", () => {
@@ -2674,6 +2709,7 @@ describe("GraphQL/Petitions", () => {
 
   describe("sendPetition", () => {
     let petition: Petition;
+    let field: PetitionField;
     let usageLimit: OrganizationUsageLimit;
     let contacts: Contact[];
     beforeAll(async () => {
@@ -2684,7 +2720,7 @@ describe("GraphQL/Petitions", () => {
     });
     beforeEach(async () => {
       [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
-      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+      [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "TEXT",
         title: "Text reply",
       }));
@@ -3034,6 +3070,62 @@ describe("GraphQL/Petitions", () => {
         .select("id", "used", "limit");
 
       expect(organizationCurrentUsageLimit).toEqual([{ id: usageLimit.id, used: 10, limit: 10 }]);
+    });
+
+    it("bulk sends should also copy the petition replies", async () => {
+      await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
+        used: 8,
+        limit: 10,
+      });
+
+      const reply = await mocks.createRandomTextReply(field.id, 0, 2, () => ({
+        petition_access_id: null,
+        user_id: sessionUser.id,
+      }));
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $contactIdGroups: [[GID!]!]!
+            $subject: String!
+            $body: JSON!
+          ) {
+            batchSendPetition(
+              petitionId: $petitionId
+              contactIdGroups: $contactIdGroups
+              subject: $subject
+              body: $body
+            ) {
+              petition {
+                id
+                fields {
+                  id
+                  replies {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIdGroups: [
+            [toGlobalId("Contact", contacts[0].id)],
+            [toGlobalId("Contact", contacts[1].id)],
+          ],
+          subject: "petition send subject",
+          body: [],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(
+        data?.batchSendPetition.every((result: any) =>
+          result.petition.fields.every((f: any) => f.replies.length === 2)
+        )
+      ).toEqual(true);
     });
   });
 

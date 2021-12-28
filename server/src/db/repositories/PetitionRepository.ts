@@ -1577,7 +1577,8 @@ export class PetitionRepository extends BaseRepository {
   async clonePetition(
     petitionId: number,
     owner: User,
-    data: Partial<TableTypes["petition"]>,
+    data: Partial<TableTypes["petition"]> = {},
+    cloneReplies = false,
     createdBy = `User:${owner.id}`,
     t?: Knex.Transaction
   ) {
@@ -1719,6 +1720,19 @@ export class PetitionRepository extends BaseRepository {
           sortBy(clonedFields, (f) => f.position).map((f) => f.id)
         )
       );
+
+      if (cloneReplies) {
+        // insert petition replies into cloned fields
+        const replies = (await this.loadRepliesForField(fields.map((f) => f.id))).flat();
+        if (replies.length > 0) {
+          await this.from("petition_field_reply", t).insert(
+            replies.map((r) => ({
+              ...omit(r, ["id"]),
+              petition_field_id: newIds[r.petition_field_id],
+            }))
+          );
+        }
+      }
 
       const toUpdate = clonedFields.filter((f) => f.visibility);
       await Promise.all([
