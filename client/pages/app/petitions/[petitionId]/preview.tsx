@@ -11,7 +11,7 @@ import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/PetitionPreviewOnlyAlert";
 import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
-import { useTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
+import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import {
   PetitionPreviewSignerInfoDialogResult,
@@ -36,7 +36,6 @@ import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
@@ -103,12 +102,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     _validatePetitionFields
   );
 
-  const [showTestSignatureDialogUserPreference, setShowTestSignatureDialogUserPreference] =
-    useUserPreference("show-test-signature-dialog", true);
-  const showTestSignatureDialog = useTestSignatureDialog();
-
   const showCompleteSignerInfoDialog = usePetitionPreviewSignerInfoDialog();
   const [completePetition] = useMutation(PetitionPreview_completePetitionDocument);
+  const showTestSignatureDialog = useHandledTestSignatureDialog();
 
   const handleFinalize = useCallback(
     async function () {
@@ -135,17 +131,10 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             });
           }
 
-          if (
-            showTestSignatureDialogUserPreference &&
-            petition.signatureConfig?.integration?.environment === "DEMO"
-          ) {
-            const { dontShow } = await showTestSignatureDialog({
-              integrationName: petition.signatureConfig.integration.name,
-            });
-            if (dontShow) {
-              setShowTestSignatureDialogUserPreference(false);
-            }
-          }
+          await showTestSignatureDialog(
+            petition.signatureConfig?.integration?.environment,
+            petition.signatureConfig?.integration?.name
+          );
 
           await completePetition({
             variables: {
@@ -330,7 +319,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             </Flex>
           </Flex>
           {isPetition && petition.status !== "CLOSED" && (
-            <RecipientViewProgressFooter petition={petition} onFinalize={handleFinalize} />
+            <RecipientViewProgressFooter
+              petition={petition}
+              onFinalize={handleFinalize}
+              isDisabled={displayPetitionLimitReachedAlert}
+            />
           )}
         </Flex>
       </PetitionLayout>

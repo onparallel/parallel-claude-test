@@ -5,7 +5,7 @@ import {
   AddPetitionAccessDialog,
   useAddPetitionAccessDialog,
 } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
-import { useTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
+import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import {
   UpdatePetitionInput,
   useSendPetitionHandler_batchSendPetitionDocument,
@@ -15,7 +15,6 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -29,14 +28,11 @@ export function useSendPetitionHandler(
   const router = useRouter();
   const toast = useToast();
 
-  const [showTestSignatureDialogUserPreference, setShowTestSignatureDialogUserPreference] =
-    useUserPreference("show-test-signature-dialog", true);
-  const showTestSignatureDialog = useTestSignatureDialog();
-
   const [batchSendPetition] = useMutation(useSendPetitionHandler_batchSendPetitionDocument);
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
   const showLongBatchSendDialog = useBlockingDialog();
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
+  const showTestSignatureDialog = useHandledTestSignatureDialog();
 
   return useCallback(async () => {
     if (petition?.__typename !== "Petition") {
@@ -46,17 +42,10 @@ export function useSendPetitionHandler(
     if (!(await validator())) return;
 
     try {
-      if (
-        showTestSignatureDialogUserPreference &&
-        petition.signatureConfig?.integration?.environment === "DEMO"
-      ) {
-        const { dontShow } = await showTestSignatureDialog({
-          integrationName: petition.signatureConfig.integration.name,
-        });
-        if (dontShow) {
-          setShowTestSignatureDialogUserPreference(false);
-        }
-      }
+      await showTestSignatureDialog(
+        petition.signatureConfig?.integration?.environment,
+        petition.signatureConfig?.integration?.name
+      );
 
       const {
         recipientIdGroups,
@@ -180,7 +169,7 @@ export function useSendPetitionHandler(
     onUpdatePetition,
     validator,
     showPetitionLimitReachedErrorDialog,
-    showTestSignatureDialogUserPreference,
+    showTestSignatureDialog,
   ]);
 }
 

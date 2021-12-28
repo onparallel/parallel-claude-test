@@ -3,6 +3,9 @@ import { Checkbox } from "@chakra-ui/checkbox";
 import { Stack, Text } from "@chakra-ui/layout";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { SignatureOrgIntegrationEnvironment } from "@parallel/graphql/__types";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
@@ -63,4 +66,31 @@ function TestSignatureDialog({
 
 export function useTestSignatureDialog() {
   return useDialog(TestSignatureDialog);
+}
+
+export function useHandledTestSignatureDialog() {
+  const [showTestSignatureDialogUserPreference, setShowTestSignatureDialogUserPreference] =
+    useUserPreference("show-test-signature-dialog", true);
+  const showTestSignatureDialog = useTestSignatureDialog();
+
+  return useCallback(
+    async (
+      environment: SignatureOrgIntegrationEnvironment | undefined,
+      integrationName: string | undefined
+    ) => {
+      try {
+        if (showTestSignatureDialogUserPreference && environment === "DEMO") {
+          const { dontShow } = await showTestSignatureDialog({
+            integrationName: integrationName ?? "",
+          });
+          if (dontShow) {
+            setShowTestSignatureDialogUserPreference(false);
+          }
+        }
+      } catch (e) {
+        throw e;
+      }
+    },
+    [showTestSignatureDialog, showTestSignatureDialogUserPreference]
+  );
 }

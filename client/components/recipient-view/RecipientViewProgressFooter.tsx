@@ -40,11 +40,13 @@ type PetitionFieldSelection =
 export interface RecipientViewProgressFooterProps extends CardProps {
   petition: PetitionSelection;
   onFinalize: () => void;
+  isDisabled: boolean;
 }
 
 export function RecipientViewProgressFooter({
   petition: { status, fields, signatureConfig },
   onFinalize,
+  isDisabled,
   ...props
 }: RecipientViewProgressFooterProps) {
   const visibility = useFieldVisibility(fields);
@@ -80,6 +82,7 @@ export function RecipientViewProgressFooter({
       borderRadius={0}
       borderX="none"
       zIndex={1}
+      {...props}
     >
       <Heading display="flex" as="h3" fontSize="md" fontWeight="normal" alignItems="center">
         <Text as="span">
@@ -125,7 +128,12 @@ export function RecipientViewProgressFooter({
         autoFocus={false}
       >
         <PopoverTrigger>
-          <Button colorScheme="purple" size="sm" isDisabled={isCompleted} onClick={onFinalize}>
+          <Button
+            colorScheme="purple"
+            size="sm"
+            isDisabled={isCompleted || isDisabled}
+            onClick={onFinalize}
+          >
             {signatureConfig?.review === false ? (
               <FormattedMessage
                 id="recipient-view.submit-and-sign-button-short"
