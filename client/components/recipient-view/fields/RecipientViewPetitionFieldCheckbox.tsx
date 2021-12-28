@@ -53,7 +53,7 @@ export function RecipientViewPetitionFieldCheckbox({
 
   const { type = "UNLIMITED", max = 1 } = limit ?? {};
 
-  const reply = field.replies[0];
+  const reply = field.replies.length > 0 ? field.replies[0] : undefined;
   const isRejected = reply?.status === "REJECTED" ?? false;
   const showRadio = max === 1 && type !== "UNLIMITED";
 
@@ -96,9 +96,9 @@ export function RecipientViewPetitionFieldCheckbox({
     // make sure we only submit existing options
     const filteredChecked = newCheckedItems.filter((c) => values.includes(c));
 
-    if (!filteredChecked.length && field.replies.length) {
+    if (!filteredChecked.length && reply) {
       handleDelete();
-    } else if (field.replies.length) {
+    } else if (reply) {
       if (
         haveChanges({
           checked: filteredChecked,
@@ -175,7 +175,7 @@ export function RecipientViewPetitionFieldCheckbox({
           <Checkbox
             key={index}
             isInvalid={isRejected}
-            isDisabled={isDisabled || reply.status === "APPROVED"}
+            isDisabled={isDisabled || reply?.status === "APPROVED"}
             isChecked={checkedItems.includes(option)}
             onChange={(e) => {
               e.preventDefault();
