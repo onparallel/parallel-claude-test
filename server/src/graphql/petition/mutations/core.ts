@@ -1569,19 +1569,14 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
 export const reopenPetition = mutationField("reopenPetition", {
   description: "Reopens the petition",
   type: "Petition",
-  authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
       const [[petition]] = await Promise.all([
-        ctx.petitions.updatePetition(
-          args.petitionId,
-          { status: "PENDING" },
-          `User:${ctx.user!.id}`,
-          t
-        ),
+        ctx.petitions.reopenPetition(args.petitionId, `User:${ctx.user!.id}`, false, t),
         ctx.petitions.createEvent(
           {
             type: "PETITION_REOPENED",

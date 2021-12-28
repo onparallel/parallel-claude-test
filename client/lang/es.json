@@ -30,11 +30,6 @@
     "context": "Add members to group"
   },
   {
-    "term": "component.add-petition-access-dialog.limit-reached.subtext",
-    "definition": "Recuerda que las peticiones enviadas a tu propia casilla de correo no restarán envíos.",
-    "context": "Remember that petitions sent to your own email address do not count towards the limit."
-  },
-  {
     "term": "component.add-petition-access-dialog.petition-limit-near.text",
     "definition": "Puedes enviar {left, plural, =1{# petición} other{# peticiones}} más.",
     "context": "You can send {left, plural, =1{# more petition} other{# more petitions}}."

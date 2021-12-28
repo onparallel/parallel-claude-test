@@ -2726,6 +2726,10 @@ describe("GraphQL/Petitions", () => {
       }));
     });
 
+    afterAll(async () => {
+      await mocks.knex.from("organization_usage_limit").delete();
+    });
+
     it("updates the organization usage limit after sending a petition", async () => {
       await mocks.knex
         .from("organization_usage_limit")
@@ -3405,8 +3409,11 @@ describe("GraphQL/Petitions", () => {
     let signatureIntegration: OrgIntegration;
     let contacts: Contact[];
     let otherOrgContact: Contact;
+    let limit: OrganizationUsageLimit;
 
     beforeAll(async () => {
+      limit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 10);
+
       contacts = await mocks.createRandomContacts(organization.id, 2, () => ({
         email: internet.email(undefined, undefined, "onparallel.com"),
       }));
@@ -3438,6 +3445,39 @@ describe("GraphQL/Petitions", () => {
               }
             : null,
       }));
+    });
+
+    beforeEach(async () => {
+      await mocks.knex.from("organization_usage_limit").where("id", limit.id).update({
+        limit: 10,
+        used: 0,
+      });
+    });
+
+    afterAll(async () => {
+      await mocks.knex.from("organization_usage_limit").delete();
+    });
+
+    it("sends error if the user is out of send credits", async () => {
+      await mocks.knex.from("organization_usage_limit").where("id", limit.id).update({
+        limit: 10,
+        used: 10,
+      });
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!) {
+            completePetition(petitionId: $petitionId) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[0].id),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("PETITION_SEND_CREDITS_ERROR");
+      expect(data).toBeNull();
     });
 
     it("completes the petition as a user if it doesn't have a signature configured", async () => {
@@ -3624,6 +3664,66 @@ describe("GraphQL/Petitions", () => {
             { type: "PETITION_COMPLETED" },
           ],
         },
+      });
+    });
+  });
+
+  describe("reopenPetition", () => {
+    let petitions: Petition[];
+
+    beforeEach(async () => {
+      const [contact] = await mocks.createRandomContacts(organization.id, 1);
+      petitions = await mocks.createRandomPetitions(organization.id, sessionUser.id, 2, () => ({
+        status: "COMPLETED",
+      }));
+
+      await mocks.createPetitionAccess(
+        petitions[1].id,
+        sessionUser.id,
+        [contact.id],
+        sessionUser.id
+      );
+    });
+
+    it("reopening a petition without recipients should set it in DRAFT", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!) {
+            reopenPetition(petitionId: $petitionId) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[0].id),
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.reopenPetition).toEqual({
+        id: toGlobalId("Petition", petitions[0].id),
+        status: "DRAFT",
+      });
+    });
+
+    it("reopening a petition with recipients should set it in PENDING", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!) {
+            reopenPetition(petitionId: $petitionId) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.reopenPetition).toEqual({
+        id: toGlobalId("Petition", petitions[1].id),
+        status: "PENDING",
       });
     });
   });

@@ -1356,13 +1356,7 @@ export class PetitionRepository extends BaseRepository {
         updated_by: `${createdBy}:${creator.id}`,
         created_by: `${createdBy}:${creator.id}`,
       }),
-      this.from("petition")
-        .update({
-          status: "PENDING",
-          updated_at: this.now(),
-          updated_by: `${createdBy}:${creator.id}`,
-        })
-        .where({ id: field.petition_id, status: "COMPLETED" }),
+      this.reopenPetition(field.petition_id, `${createdBy}:${creator.id}`),
     ]);
     await this.createEvent({
       type: "REPLY_CREATED",
@@ -1402,9 +1396,7 @@ export class PetitionRepository extends BaseRepository {
           },
           "*"
         ),
-      this.from("petition")
-        .update({ status: "PENDING" })
-        .where({ id: field.petition_id, status: "COMPLETED" }),
+      this.reopenPetition(field.petition_id, updatedBy),
     ]);
 
     await this.createOrUpdateReplyEvent(
@@ -1480,13 +1472,7 @@ export class PetitionRepository extends BaseRepository {
           deleted_by: deletedBy,
         })
         .where("id", replyId),
-      this.from("petition")
-        .update({
-          status: "PENDING",
-          updated_at: this.now(),
-          updated_by: deletedBy,
-        })
-        .where({ id: field.petition_id, status: "COMPLETED" }),
+      this.reopenPetition(field.petition_id, deletedBy),
       this.createEvent({
         type: "REPLY_DELETED",
         petition_id: field!.petition_id,
@@ -1497,6 +1483,29 @@ export class PetitionRepository extends BaseRepository {
         },
       }),
     ]);
+  }
+
+  public async reopenPetition(
+    petitionId: number,
+    updatedBy: string,
+    ifCompleted = true,
+    t?: Knex.Transaction
+  ) {
+    return await this.raw<Petition>(
+      /* sql */ `
+      update petition set "status" = (
+        case when id in (
+          select distinct(pa.petition_id) from petition_access pa where pa.petition_id = ?
+        ) then 'PENDING'::petition_status else 'DRAFT'::petition_status 
+        end),
+        updated_at = NOW(),
+        updated_by = ?
+      where id = ? ${ifCompleted ? /* sql*/ `and status = 'COMPLETED'` : ""} 
+      returning *;
+    `,
+      [petitionId, updatedBy, petitionId],
+      t
+    );
   }
 
   async updatePetitionFieldRepliesStatus(

@@ -229,11 +229,6 @@ export function AddPetitionAccessDialog({
                   values={{ left: limit - used }}
                 />
               )}
-              <br />
-              <FormattedMessage
-                id="component.add-petition-access-dialog.limit-reached.subtext"
-                defaultMessage="Remember that petitions sent to your own email address do not count towards the limit."
-              />
             </Alert>
           ) : null}
           <RecipientSelectGroups

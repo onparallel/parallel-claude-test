@@ -30,11 +30,6 @@
     "context": "Add members to group"
   },
   {
-    "term": "component.add-petition-access-dialog.limit-reached.subtext",
-    "definition": "Remember that petitions sent to your own email address do not count towards the limit.",
-    "context": "Remember that petitions sent to your own email address do not count towards the limit."
-  },
-  {
     "term": "component.add-petition-access-dialog.petition-limit-near.text",
     "definition": "You can send {left, plural, =1{# more petition} other{# more petitions}}.",
     "context": "You can send {left, plural, =1{# more petition} other{# more petitions}}."
