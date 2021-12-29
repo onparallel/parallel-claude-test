@@ -1105,6 +1105,11 @@
     "context": "No files have been attached to this petition."
   },
   {
+    "term": "component.petition-completed-alert.description",
+    "definition": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>.",
+    "context": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>."
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -1583,6 +1588,16 @@
     "term": "component.petition-list-tag-filter.without-tags",
     "definition": "Without tags",
     "context": "Without tags"
+  },
+  {
+    "term": "component.petition-preview-signature-review-alert.signature-required",
+    "definition": "<b>Pending eSignature</b>, you can start it from the Replies tab.",
+    "context": "<b>Pending eSignature</b>, you can start it from the Replies tab."
+  },
+  {
+    "term": "component.petition-preview-signature-review-alert.signature-review",
+    "definition": "If you make any changes, don't forget to click the <b>Finish</b> button again.",
+    "context": "If you make any changes, don't forget to click the <b>Finish</b> button again."
   },
   {
     "term": "component.petition-progress-bar.all-pending",
@@ -4710,16 +4725,6 @@
     "context": "Export to PDF"
   },
   {
-    "term": "page.preview.signature-required",
-    "definition": "This petition requires an <b>eSignature</b> to be completed.",
-    "context": "This petition requires an <b>eSignature</b> to be completed."
-  },
-  {
-    "term": "page.preview.signature-review",
-    "definition": "You can review the replies and initiate the signature from the Replies tab.",
-    "context": "You can review the replies and initiate the signature from the Replies tab."
-  },
-  {
     "term": "page.preview.template-only-cache-alert",
     "definition": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>.",
     "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
@@ -5331,8 +5336,8 @@
   },
   {
     "term": "petition.completed-petition-dialog.body",
-    "definition": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again.",
-    "context": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again."
+    "definition": "This petition was already completed. If you make any changes to the fields you will have to finish the petition again.",
+    "context": "This petition was already completed. If you make any changes to the fields you will have to finish the petition again."
   },
   {
     "term": "petition.completed-petition-dialog.header",

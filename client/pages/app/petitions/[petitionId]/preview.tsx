@@ -8,6 +8,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
 import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/PetitionPreviewOnlyAlert";
 import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
@@ -252,11 +253,16 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         subHeader={
           <>
             {!isPetition ? <PetitionPreviewOnlyAlert /> : null}
+            {isPetition && petition.status === "COMPLETED" && petition.signatureConfig?.review ? (
+              <PetitionPreviewSignatureReviewAlert />
+            ) : null}
             {displayPetitionLimitReachedAlert ? (
               <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
             ) : null}
-            {isPetition && petition.status === "COMPLETED" && petition.signatureConfig?.review ? (
-              <PetitionPreviewSignatureReviewAlert />
+            {isPetition &&
+            !petition.signatureConfig?.review &&
+            ["COMPLETED", "CLOSED"].includes(petition.status) ? (
+              <PetitionCompletedAlert />
             ) : null}
           </>
         }

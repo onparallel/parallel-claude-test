@@ -11,10 +11,10 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
+import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionSettings } from "@parallel/components/petition-common/PetitionSettings";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
-import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/dialogs/CompletedPetitionDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
@@ -98,13 +98,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, [activeFieldId]);
 
   const showPublicTemplateDialog = usePublicTemplateDialog();
-  // When the petition is completed show a dialog to avoid unintended changes
-  const completedDialog = useCompletedPetitionDialog();
   useEffect(() => {
-    if (petition?.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status)) {
-      completedDialog({});
-    }
-
     if (isPublicTemplate) {
       showPublicTemplateDialog({});
     }
@@ -403,9 +397,15 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           ) : null
         }
         subHeader={
-          displayPetitionLimitReachedAlert ? (
-            <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
-          ) : null
+          <>
+            {displayPetitionLimitReachedAlert ? (
+              <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+            ) : null}
+            {petition?.__typename === "Petition" &&
+            ["COMPLETED", "CLOSED"].includes(petition.status) ? (
+              <PetitionCompletedAlert />
+            ) : null}
+          </>
         }
       >
         <PaneWithFlyout

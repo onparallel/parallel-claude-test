@@ -1105,6 +1105,11 @@
     "context": "No files have been attached to this petition."
   },
   {
+    "term": "component.petition-completed-alert.description",
+    "definition": "<b>Petición completada,</b> si realizas cualquier cambio, se deberá <b>finalizar la petición</b> de nuevo.",
+    "context": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>."
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -1583,6 +1588,16 @@
     "term": "component.petition-list-tag-filter.without-tags",
     "definition": "Sin etiquetas",
     "context": "Without tags"
+  },
+  {
+    "term": "component.petition-preview-signature-review-alert.signature-required",
+    "definition": "<b>Firma pendiente</b>, puedes iniciarla desde la pestaña de Respuestas.",
+    "context": "<b>Pending eSignature</b>, you can start it from the Replies tab."
+  },
+  {
+    "term": "component.petition-preview-signature-review-alert.signature-review",
+    "definition": "Si realizas cualquier cambio, no olvides hacer click de nuevo en el botón de <b>Finalizar</b>.",
+    "context": "If you make any changes, don't forget to click the <b>Finish</b> button again."
   },
   {
     "term": "component.petition-progress-bar.all-pending",
@@ -4710,16 +4725,6 @@
     "context": "Export to PDF"
   },
   {
-    "term": "page.preview.signature-required",
-    "definition": "Esta petición requiere de <b>firma digital</b> para ser completada.",
-    "context": "This petition requires an <b>eSignature</b> to be completed."
-  },
-  {
-    "term": "page.preview.signature-review",
-    "definition": "Puedes revisar las respuestas e iniciar la firma desde la pestaña de Respuestas.",
-    "context": "You can review the replies and initiate the signature from the Replies tab."
-  },
-  {
     "term": "page.preview.template-only-cache-alert",
     "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se guardarán. Para completar y enviar esta plantilla dale a <b>{button}</b>.",
     "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
@@ -5331,8 +5336,8 @@
   },
   {
     "term": "petition.completed-petition-dialog.body",
-    "definition": "Esta petición ya fue completada por el destinatario. Si realiza cualquier cambio a los campos, el destinatario deberá finalizar la petición de nuevo.",
-    "context": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again."
+    "definition": "Esta petición ya fue completada. Si realiza cualquier cambio a los campos se deberá finalizar la petición de nuevo.",
+    "context": "This petition was already completed. If you make any changes to the fields you will have to finish the petition again."
   },
   {
     "term": "petition.completed-petition-dialog.header",

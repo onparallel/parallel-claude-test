@@ -8,14 +8,14 @@ export function PetitionPreviewSignatureReviewAlert(props: AlertProps) {
       <Stack spacing={0.5}>
         <Text>
           <FormattedMessage
-            id="page.preview.signature-required"
-            defaultMessage="This petition requires an <b>eSignature</b> to be completed."
+            id="component.petition-preview-signature-review-alert.signature-required"
+            defaultMessage="<b>Pending eSignature</b>, you can start it from the Replies tab."
           />
         </Text>
         <Text>
           <FormattedMessage
-            id="page.preview.signature-review"
-            defaultMessage="You can review the replies and initiate the signature from the Replies tab."
+            id="component.petition-preview-signature-review-alert.signature-review"
+            defaultMessage="If you make any changes, don't forget to click the <b>Finish</b> button again."
           />
         </Text>
       </Stack>
