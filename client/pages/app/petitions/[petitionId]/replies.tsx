@@ -391,6 +391,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           petitionName: petition.name ?? null,
           hasPetitionPdfExport: me.hasPetitionPdfExport,
           requiredMessage,
+          showNotify: petition.accesses.length > 0,
         });
         message = data.message;
         pdfExportTitle = data.pdfExportTitle;
@@ -541,7 +542,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               />
             </Button>
             <Button
-              hidden={petition.status !== "CLOSED"}
+              hidden={petition.status !== "CLOSED" || petition.accesses.length === 0}
               colorScheme="blue"
               leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
               onClick={async () => {
