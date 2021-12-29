@@ -1656,6 +1656,16 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
+      // insert PETITION_CREATED events for cloned petitions
+      await this.createEvent(
+        {
+          type: "PETITION_CREATED",
+          data: { user_id: owner.id },
+          petition_id: cloned.id,
+        },
+        t
+      );
+
       const fields = await this.loadFieldsForPetition(petitionId);
       const [clonedFields] = await Promise.all([
         fields.length === 0
@@ -1733,6 +1743,21 @@ export class PetitionRepository extends BaseRepository {
               ...omit(r, ["id"]),
               petition_field_id: newIds[r.petition_field_id],
             }))
+          );
+        }
+        // also clone REPLY_* petition events into new petition
+        const replyEvents = await this.getPetitionEventsByType(petitionId, [
+          "REPLY_CREATED",
+          "REPLY_UPDATED",
+          "REPLY_DELETED",
+        ]);
+        if (replyEvents.length > 0) {
+          await this.from("petition_event", t).insert(
+            replyEvents.map((e) => ({
+              data: e.data,
+              petition_id: cloned.id,
+              type: e.type,
+            })) as any[]
           );
         }
       }
@@ -1936,11 +1961,11 @@ export class PetitionRepository extends BaseRepository {
 
   async getPetitionEventsByType<T extends PetitionEventType>(
     petitionId: number,
-    eventType: T
+    eventType: T[]
   ): Promise<GenericPetitionEvent<T>[]> {
     const events = await this.from("petition_event")
       .where("petition_id", petitionId)
-      .where("type", eventType)
+      .whereIn("type", eventType)
       .select("*");
     return events as any;
   }

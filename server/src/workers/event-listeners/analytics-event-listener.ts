@@ -351,7 +351,7 @@ async function trackFirstReplyCreatedEvent(event: ReplyCreatedEvent, ctx: Worker
   if (!petition) return;
 
   const [replyCreatedEvents, petitionOwner] = await Promise.all([
-    ctx.petitions.getPetitionEventsByType(event.petition_id, "REPLY_CREATED"),
+    ctx.petitions.getPetitionEventsByType(event.petition_id, ["REPLY_CREATED"]),
     loadPetitionOwner(event.petition_id, ctx),
   ]);
 

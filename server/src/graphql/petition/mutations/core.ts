@@ -173,15 +173,15 @@ export const createPetition = mutationField("createPetition", {
         },
         ctx.user!
       );
-    }
 
-    await ctx.petitions.createEvent({
-      type: "PETITION_CREATED",
-      petition_id: petition.id,
-      data: {
-        user_id: ctx.user!.id,
-      },
-    });
+      await ctx.petitions.createEvent({
+        type: "PETITION_CREATED",
+        petition_id: petition.id,
+        data: {
+          user_id: ctx.user!.id,
+        },
+      });
+    }
     return petition;
   },
 });
@@ -208,23 +208,16 @@ export const clonePetitions = mutationField("clonePetitions", {
           name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
         });
 
-        await ctx.petitions.createEvent([
-          {
-            type: "PETITION_CREATED",
-            petition_id: cloned.id,
-            data: { user_id: ctx.user!.id },
+        await ctx.petitions.createEvent({
+          type: "PETITION_CLONED",
+          petition_id: petitionId,
+          data: {
+            new_petition_id: cloned.id,
+            org_id: cloned.org_id,
+            user_id: ctx.user!.id,
+            type: cloned.is_template ? "TEMPLATE" : "PETITION",
           },
-          {
-            type: "PETITION_CLONED",
-            petition_id: petitionId,
-            data: {
-              new_petition_id: cloned.id,
-              org_id: cloned.org_id,
-              user_id: ctx.user!.id,
-              type: cloned.is_template ? "TEMPLATE" : "PETITION",
-            },
-          },
-        ]);
+        });
 
         return cloned;
       },
@@ -1207,24 +1200,12 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     }
 
     if (clonedPetitions.length > 0) {
-      await Promise.all([
-        // insert PETITION_CREATED events for cloned petitions
-        ctx.petitions.createEvent(
-          clonedPetitions.map((p) => ({
-            type: "PETITION_CREATED",
-            data: {
-              user_id: ctx.user!.id,
-            },
-            petition_id: p.id,
-          }))
-        ),
-        // clone the permissions of the original petition to the cloned ones
-        ctx.petitions.clonePetitionPermissions(
-          args.petitionId,
-          clonedPetitions.map((p) => p.id),
-          `User:${ctx.user!.id}`
-        ),
-      ]);
+      // clone the permissions of the original petition to the cloned ones
+      await ctx.petitions.clonePetitionPermissions(
+        args.petitionId,
+        clonedPetitions.map((p) => p.id),
+        `User:${ctx.user!.id}`
+      );
     }
 
     const results = await presendPetition(
@@ -1799,24 +1780,15 @@ export const autoSendTemplate = mutationField("autoSendTemplate", {
       );
     }
 
-    await ctx.petitions.createEvent([
-      {
-        type: "TEMPLATE_USED",
-        petition_id: template.id,
-        data: {
-          new_petition_id: petition.id,
-          org_id: ctx.user!.org_id,
-          user_id: ctx.user!.id,
-        },
+    await ctx.petitions.createEvent({
+      type: "TEMPLATE_USED",
+      petition_id: template.id,
+      data: {
+        new_petition_id: petition.id,
+        org_id: ctx.user!.org_id,
+        user_id: ctx.user!.id,
       },
-      {
-        type: "PETITION_CREATED",
-        petition_id: petition.id,
-        data: {
-          user_id: ctx.user!.id,
-        },
-      },
-    ]);
+    });
 
     const [contact] = await ctx.contacts.loadOrCreate(
       {
