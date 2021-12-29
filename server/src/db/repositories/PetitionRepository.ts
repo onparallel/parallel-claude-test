@@ -1699,7 +1699,10 @@ export class PetitionRepository extends BaseRepository {
             )
           : [],
         // clone default permissions if source petition is from same org
-        sourcePetition?.org_id === owner.org_id && sourcePetition.is_template
+        // and we are creating a template from another template
+        sourcePetition?.org_id === owner.org_id &&
+        sourcePetition.is_template &&
+        (data.is_template === undefined || data.is_template === true)
           ? this.raw(
               /* sql */ `
               insert into template_default_permission (
