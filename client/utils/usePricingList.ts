@@ -38,8 +38,22 @@ export function usePricingList(): PricingListCategory[] {
           },
           {
             label: intl.formatMessage({
+              id: "page.pricing.pdf-export",
+              defaultMessage: "PDF export",
+            }),
+            plan: "FREE",
+          },
+          {
+            label: intl.formatMessage({
               id: "page.pricing.automatic-reminders",
               defaultMessage: "Automatic reminders",
+            }),
+            plan: "FREE",
+          },
+          {
+            label: intl.formatMessage({
+              id: "page.pricing.activity-log",
+              defaultMessage: "Activity log",
             }),
             plan: "FREE",
           },
@@ -52,25 +66,12 @@ export function usePricingList(): PricingListCategory[] {
           },
           {
             label: intl.formatMessage({
-              id: "page.pricing.activity-log",
-              defaultMessage: "Activity log",
-            }),
-            plan: "BASIC",
-          },
-          {
-            label: intl.formatMessage({
               id: "page.pricing.user-groups",
               defaultMessage: "User groups",
             }),
             plan: "PROFESSIONAL",
           },
-          {
-            label: intl.formatMessage({
-              id: "page.pricing.pdf-export",
-              defaultMessage: "PDF export",
-            }),
-            plan: "PROFESSIONAL",
-          },
+
           {
             label: intl.formatMessage({
               id: "page.pricing.reporting",

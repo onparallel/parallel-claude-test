@@ -56,7 +56,7 @@ export function PublicPricingCards({
 
   const plans = {
     free: {
-      users: 1,
+      users: 2,
       petitions: 20,
       price: {
         monthly: 0,
@@ -64,7 +64,7 @@ export function PublicPricingCards({
       },
     },
     basic: {
-      users: 3,
+      users: 5,
       petitions: 40,
       price: {
         monthly: 40,
@@ -72,7 +72,7 @@ export function PublicPricingCards({
       },
     },
     professional: {
-      users: 5,
+      users: 10,
       petitions: 70,
       price: {
         monthly: 100,
