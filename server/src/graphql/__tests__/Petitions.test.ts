@@ -3112,7 +3112,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            batchSendPetition(
+            bulkSendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
