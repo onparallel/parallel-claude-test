@@ -1,9 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, useToast } from "@chakra-ui/react";
-import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
@@ -369,23 +367,9 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       section="activity"
       scrollBody
       headerActions={
-        !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
-          <ResponsiveButtonIcon
-            data-action="compose-next"
-            id="petition-next"
-            colorScheme="purple"
-            icon={<ArrowForwardIcon fontSize="18px" />}
-            label={intl.formatMessage({
-              id: "generic.next",
-              defaultMessage: "Next",
-            })}
-            onClick={handleNextClick}
-          />
-        ) : (
-          <Box display={{ base: "none", lg: "block" }}>
-            <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
-          </Box>
-        )
+        <Box display={{ base: "none", lg: "block" }}>
+          <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
+        </Box>
       }
       subHeader={
         displayPetitionLimitReachedAlert ? (

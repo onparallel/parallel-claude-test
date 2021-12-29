@@ -1,14 +1,10 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
   ButtonGroup,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Heading,
   IconButton,
-  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -30,29 +26,21 @@ import {
   CopyIcon,
   EditIcon,
   LinkIcon,
-  PaperPlaneArrowIcon,
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import {
   TemplateDetailsModal_PetitionTemplateFragment,
   TemplateDetailsModal_UserFragment,
-  TemplateDetailsModal_autoSendTemplateDocument,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
-import { useRef } from "react";
-import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { usePetitionSharingDialog } from "./PetitionSharingDialog";
@@ -108,18 +96,6 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
 
   const handleEditTemplate = async () => {
     goToPetition(template.id, "compose");
-  };
-
-  const confirmPetitionName = useDialog(PetitionNameDialog);
-  const [autoSendTemplate] = useMutation(TemplateDetailsModal_autoSendTemplateDocument);
-  const handleAutoSendPetition = async () => {
-    try {
-      const name = await confirmPetitionName({ defaultValue: template.name ?? "" });
-      await openNewWindow(async () => {
-        const { data } = await autoSendTemplate({ variables: { templateId: template.id, name } });
-        return data!.autoSendTemplate;
-      });
-    } catch {}
   };
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
@@ -213,18 +189,6 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                   </Tooltip>
                   <Portal>
                     <MenuList minWidth={0}>
-                      {me.hasAutoSendTemplate ? (
-                        <MenuItem
-                          justifyContent="left"
-                          icon={<PaperPlaneArrowIcon display="block" boxSize={4} />}
-                          onClick={() => handleAutoSendPetition()}
-                        >
-                          <FormattedMessage
-                            id="component.template-details-modal.auto-send"
-                            defaultMessage="Auto-send template"
-                          />
-                        </MenuItem>
-                      ) : null}
                       {template.publicLink?.isActive && (
                         <MenuItem
                           justifyContent="left"
@@ -383,58 +347,3 @@ TemplateDetailsModal.fragments = {
     }
   `,
 };
-
-function PetitionNameDialog({
-  defaultValue,
-  ...props
-}: DialogProps<{ defaultValue: string }, string>) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<{ name: string }>({
-    defaultValues: {
-      name: defaultValue,
-    },
-  });
-  const inputRef = useRef<HTMLInputElement>(null);
-  const inputProps = useRegisterWithRef(inputRef, register, "name", { required: true });
-  return (
-    <ConfirmDialog
-      {...props}
-      initialFocusRef={inputRef}
-      content={{
-        as: "form",
-        onSubmit: handleSubmit((data) => props.onResolve(data.name)),
-      }}
-      header={
-        <FormattedMessage
-          id="component.template-details-modal.auto-send-header"
-          defaultMessage="Petition name"
-        />
-      }
-      body={
-        <FormControl isInvalid={!!errors.name}>
-          <FormLabel>
-            <FormattedMessage
-              id="component.template-details-modal.auto-send-label"
-              defaultMessage="Enter a name for the petition"
-            />
-          </FormLabel>
-          <Input {...inputProps} />
-          <FormErrorMessage>
-            <FormattedMessage
-              id="generic.required-field-error"
-              defaultMessage="The field is required"
-            />
-          </FormErrorMessage>
-        </FormControl>
-      }
-      confirm={
-        <Button type="submit" colorScheme="purple">
-          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
-        </Button>
-      }
-    />
-  );
-}

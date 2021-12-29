@@ -40,7 +40,7 @@ type PetitionFieldSelection =
 export interface RecipientViewProgressFooterProps extends CardProps {
   petition: PetitionSelection;
   onFinalize: () => void;
-  isDisabled: boolean;
+  isDisabled?: boolean;
 }
 
 export function RecipientViewProgressFooter({

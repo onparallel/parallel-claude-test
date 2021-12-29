@@ -2975,21 +2975,6 @@
     "context": "About this template"
   },
   {
-    "term": "component.template-details-modal.auto-send",
-    "definition": "Auto-send template",
-    "context": "Auto-send template"
-  },
-  {
-    "term": "component.template-details-modal.auto-send-header",
-    "definition": "Petition name",
-    "context": "Petition name"
-  },
-  {
-    "term": "component.template-details-modal.auto-send-label",
-    "definition": "Enter a name for the petition",
-    "context": "Enter a name for the petition"
-  },
-  {
     "term": "component.template-details-modal.clone-template",
     "definition": "Clone template",
     "context": "Clone template"
@@ -5333,16 +5318,6 @@
     "term": "petition.already-sent",
     "definition": "This petition has already been sent.",
     "context": "This petition has already been sent."
-  },
-  {
-    "term": "petition.completed-petition-dialog.body",
-    "definition": "This petition was already completed. If you make any changes to the fields you will have to finish the petition again.",
-    "context": "This petition was already completed. If you make any changes to the fields you will have to finish the petition again."
-  },
-  {
-    "term": "petition.completed-petition-dialog.header",
-    "definition": "This petition is completed",
-    "context": "This petition is completed"
   },
   {
     "term": "petition.confirm-activate-access-message.body",

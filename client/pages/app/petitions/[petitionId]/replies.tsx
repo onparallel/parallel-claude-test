@@ -15,7 +15,6 @@ import {
 } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
-  ArrowForwardIcon,
   CheckIcon,
   ChevronDownIcon,
   CommentIcon,
@@ -33,10 +32,8 @@ import {
   useDialog,
   withDialogs,
 } from "@parallel/components/common/dialogs/DialogProvider";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
@@ -106,8 +103,6 @@ import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
-import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
-import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -121,9 +116,6 @@ const QUERY_STATE = {
 
 function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const intl = useIntl();
-
-  const router = useRouter();
-  const { query } = router;
 
   const {
     data: { me },
@@ -260,27 +252,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       return await updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
-  );
-
-  const showErrorDialog = useErrorDialog();
-  const validPetitionFields = async () => {
-    const { error, errorMessage, field } = validatePetitionFields(petition.fields);
-    if (error) {
-      await withError(showErrorDialog({ message: errorMessage }));
-      if (field) {
-        router.push(`/app/petitions/${query.petitionId}/compose#field-${field.id}`);
-      } else {
-        router.push(`/app/petitions/${query.petitionId}/compose`);
-      }
-      return false;
-    }
-    return true;
-  };
-
-  const handleNextClick = useSendPetitionHandler(
-    petition,
-    handleUpdatePetition,
-    validPetitionFields
   );
 
   const handleAction: PetitionRepliesFieldProps["onAction"] = async function (action, reply) {
@@ -537,23 +508,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       section="replies"
       scrollBody
       headerActions={
-        !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
-          <ResponsiveButtonIcon
-            data-action="compose-next"
-            id="petition-next"
-            colorScheme="purple"
-            icon={<ArrowForwardIcon fontSize="18px" />}
-            label={intl.formatMessage({
-              id: "generic.next",
-              defaultMessage: "Next",
-            })}
-            onClick={handleNextClick}
-          />
-        ) : (
-          <Box display={{ base: "none", lg: "block" }}>
-            <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
-          </Box>
-        )
+        <Box display={{ base: "none", lg: "block" }}>
+          <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
+        </Box>
       }
       subHeader={
         <>
