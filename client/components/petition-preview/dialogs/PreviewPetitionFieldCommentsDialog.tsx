@@ -151,7 +151,7 @@ export function PreviewPetitionFieldCommentsDialog({
             defaultMessage: "Close",
           })}
         />
-        <ModalHeader>
+        <ModalHeader paddingRight={12}>
           {field.title || (
             <Text fontWeight="normal" textStyle="hint">
               <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />

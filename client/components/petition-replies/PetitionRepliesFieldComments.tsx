@@ -33,6 +33,7 @@ import { BreakLines } from "../common/BreakLines";
 import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
 import { Divider } from "../common/Divider";
+import { FieldComment } from "../common/FieldComment";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { HelpPopover } from "../common/HelpPopover";
 import { Link } from "../common/Link";
@@ -125,7 +126,7 @@ export function PetitionRepliesFieldComments({
       >
         {field.comments.map((comment, index) => (
           <Fragment key={comment.id}>
-            <FieldComment
+            <RepliesFieldComment
               comment={comment}
               userId={user.id}
               onEdit={(content) => onUpdateComment(comment.id, content)}
@@ -243,7 +244,7 @@ export function PetitionRepliesFieldComments({
   );
 }
 
-function FieldComment({
+function RepliesFieldComment({
   comment: { createdAt, author, isUnread, isEdited, content: _content, isInternal },
   userId,
   onDelete,
@@ -461,9 +462,11 @@ PetitionRepliesFieldComments.fragments = {
         isUnread
         isEdited
         isInternal @include(if: $hasInternalComments)
+        ...FieldComment_PetitionFieldComment
       }
       ${UserReference.fragments.User}
       ${ContactReference.fragments.Contact}
+      ${FieldComment.fragments.PetitionFieldComment}
     `;
   },
 };
