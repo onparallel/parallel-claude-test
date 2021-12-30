@@ -1745,19 +1745,36 @@ export class PetitionRepository extends BaseRepository {
             }))
           );
         }
-        // also clone REPLY_* petition events into new petition
-        const replyEvents = await this.getPetitionEventsByType(petitionId, [
+        // clone some petition events into new petition
+        const events = await this.getPetitionEventsByType(petitionId, [
           "REPLY_CREATED",
           "REPLY_UPDATED",
           "REPLY_DELETED",
+          "COMMENT_DELETED",
+          "COMMENT_PUBLISHED",
         ]);
-        if (replyEvents.length > 0) {
+        if (events.length > 0) {
           await this.from("petition_event", t).insert(
-            replyEvents.map((e) => ({
+            events.map((e) => ({
               data: e.data,
               petition_id: cloned.id,
               type: e.type,
             })) as any[]
+          );
+        }
+        // clone petition field comments into new petition
+        const fieldComments = (
+          await this.loadPetitionFieldCommentsForField(
+            fields.map((f) => ({ petitionFieldId: f.id, petitionId: f.petition_id }))
+          )
+        ).flat();
+        if (fieldComments.length > 0) {
+          await this.from("petition_field_comment", t).insert(
+            fieldComments.map((c) => ({
+              ...omit(c, ["id"]),
+              petition_field_id: newIds[c.petition_field_id],
+              petition_id: cloned.id,
+            }))
           );
         }
       }

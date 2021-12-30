@@ -3072,16 +3072,33 @@ describe("GraphQL/Petitions", () => {
       expect(organizationCurrentUsageLimit).toEqual([{ id: usageLimit.id, used: 10, limit: 10 }]);
     });
 
-    it("bulk sends should also copy the petition replies", async () => {
+    it("bulk sends should also copy the petition replies, events and comments", async () => {
       await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
         used: 8,
         limit: 10,
       });
 
-      const reply = await mocks.createRandomTextReply(field.id, 0, 2, () => ({
+      const [reply] = await mocks.createRandomTextReply(field.id, 0, 1, () => ({
         petition_access_id: null,
         user_id: sessionUser.id,
       }));
+
+      await mocks.knex("petition_event").insert({
+        type: "REPLY_CREATED",
+        petition_id: petition.id,
+        data: {
+          user_id: sessionUser.id,
+          petition_field_id: field.id,
+          petition_field_reply_id: reply.id,
+        },
+      });
+
+      const [comment] = await mocks.createRandomCommentsFromUser(
+        sessionUser.id,
+        field.id,
+        petition.id,
+        1
+      );
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -3098,11 +3115,32 @@ describe("GraphQL/Petitions", () => {
               body: $body
             ) {
               petition {
-                id
+                events(limit: 10, offset: 0) {
+                  totalCount
+                  items {
+                    type
+                  }
+                }
                 fields {
-                  id
+                  comments {
+                    content
+                    isUnread
+                    isEdited
+                    isInternal
+                    author {
+                      ... on User {
+                        id
+                      }
+                    }
+                  }
                   replies {
-                    id
+                    content
+                    updatedBy {
+                      __typename
+                      ... on User {
+                        id
+                      }
+                    }
                   }
                 }
               }
@@ -3121,11 +3159,71 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(
-        data?.batchSendPetition.every((result: any) =>
-          result.petition.fields.every((f: any) => f.replies.length === 2)
-        )
-      ).toEqual(true);
+      expect(data?.batchSendPetition).toEqual([
+        {
+          petition: {
+            events: {
+              totalCount: 3,
+              items: [
+                { type: "MESSAGE_SENT" },
+                { type: "ACCESS_ACTIVATED" },
+                { type: "REPLY_CREATED" },
+              ],
+            },
+            fields: [
+              {
+                comments: [
+                  {
+                    content: comment.content,
+                    isUnread: false,
+                    isEdited: false,
+                    isInternal: false,
+                    author: { id: toGlobalId("User", sessionUser.id) },
+                  },
+                ],
+                replies: [
+                  {
+                    content: reply.content,
+                    updatedBy: { __typename: "User", id: toGlobalId("User", sessionUser.id) },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          petition: {
+            events: {
+              totalCount: 4,
+              items: [
+                { type: "MESSAGE_SENT" },
+                { type: "ACCESS_ACTIVATED" },
+                { type: "REPLY_CREATED" },
+                { type: "PETITION_CREATED" },
+              ],
+            },
+            fields: [
+              {
+                comments: [
+                  {
+                    content: comment.content,
+                    isUnread: false,
+                    isEdited: false,
+                    isInternal: false,
+                    author: { id: toGlobalId("User", sessionUser.id) },
+                  },
+                ],
+                replies: [
+                  {
+                    content: reply.content,
+                    updatedBy: { __typename: "User", id: toGlobalId("User", sessionUser.id) },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ]);
     });
   });
 
