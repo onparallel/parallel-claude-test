@@ -8306,8 +8306,8 @@
   },
   {
     "term": "recipient-view.signature-sended.toast-title",
-    "definition": "Signature sended",
-    "context": "Signature sended"
+    "definition": "Signature sent",
+    "context": "Signature sent"
   },
   {
     "term": "recipient-view.submit-and-sign-button-short",

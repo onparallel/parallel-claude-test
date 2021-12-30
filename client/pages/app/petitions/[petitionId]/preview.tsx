@@ -37,6 +37,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
+import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
@@ -97,11 +98,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     return true;
   };
 
-  const handleNextClick = useSendPetitionHandler(
-    petition,
-    handleUpdatePetition,
-    _validatePetitionFields
-  );
+  const handleNextClick = isPetition
+    ? useSendPetitionHandler(petition, handleUpdatePetition, _validatePetitionFields)
+    : () => {};
 
   const showCompleteSignerInfoDialog = usePetitionPreviewSignerInfoDialog();
   const [completePetition] = useMutation(PetitionPreview_completePetitionDocument);
@@ -186,7 +185,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 id: "petition-completed-signature-sended-toast",
                 title: intl.formatMessage({
                   id: "recipient-view.signature-sended.toast-title",
-                  defaultMessage: "Signature sended",
+                  defaultMessage: "Signature sent",
                 }),
                 description: intl.formatMessage({
                   id: "petition-preview.signature-sended.toast-description",
@@ -222,9 +221,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   );
 
   const displayPetitionLimitReachedAlert =
-    me.organization.usageLimits.petitions.limit <= me.organization.usageLimits.petitions.used &&
-    isPetition &&
-    petition.status === "DRAFT";
+    isUsageLimitsReached(me.organization) && isPetition && petition.status === "DRAFT";
 
   return (
     <ToneProvider value={petition.tone}>
@@ -348,6 +345,7 @@ PetitionPreview.fragments = {
           status
         }
         ...RecipientViewProgressFooter_Petition
+        ...useSendPetitionHandler_Petition
       }
       fields {
         ...PreviewPetitionField_PetitionField
@@ -359,13 +357,12 @@ PetitionPreview.fragments = {
           ...usePetitionPreviewSignerInfoDialog_PetitionSigner
         }
       }
-      ...useSendPetitionHandler_PetitionBase
       ...RecipientViewContentsCard_PetitionBase
       ...PetitionLayout_PetitionBase
     }
     ${usePetitionPreviewSignerInfoDialog.fragments.PetitionSigner}
     ${RecipientViewProgressFooter.fragments.Petition}
-    ${useSendPetitionHandler.fragments.PetitionBase}
+    ${useSendPetitionHandler.fragments.Petition}
     ${RecipientViewContentsCard.fragments.PetitionBase}
     ${PetitionLayout.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionField}
@@ -374,17 +371,13 @@ PetitionPreview.fragments = {
     fragment PetitionPreview_User on User {
       organization {
         name
-        usageLimits {
-          petitions {
-            used
-            limit
-          }
-        }
+        ...isUsageLimitsReached_Organization
         ...usePetitionPreviewSignerInfoDialog_Organization
       }
       ...PetitionLayout_User
       ...usePetitionPreviewSignerInfoDialog_User
     }
+    ${isUsageLimitsReached.fragments.Organization}
     ${usePetitionPreviewSignerInfoDialog.fragments.Organization}
     ${usePetitionPreviewSignerInfoDialog.fragments.User}
     ${PetitionLayout.fragments.User}

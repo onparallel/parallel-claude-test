@@ -8307,7 +8307,7 @@
   {
     "term": "recipient-view.signature-sended.toast-title",
     "definition": "Firma enviada",
-    "context": "Signature sended"
+    "context": "Signature sent"
   },
   {
     "term": "recipient-view.submit-and-sign-button-short",

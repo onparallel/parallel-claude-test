@@ -103,6 +103,7 @@ import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
+import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -496,7 +497,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
 
   const displayPetitionLimitReachedAlert =
-    me.organization.usageLimits.petitions.limit <= me.organization.usageLimits.petitions.used &&
+    isUsageLimitsReached(me.organization) &&
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
 
@@ -737,9 +738,9 @@ PetitionReplies.fragments = {
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
         ...PetitionAttachmentsCard_Petition
-        ...useSendPetitionHandler_PetitionBase
+        ...useSendPetitionHandler_Petition
       }
-      ${useSendPetitionHandler.fragments.PetitionBase}
+      ${useSendPetitionHandler.fragments.Petition}
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
       ${ShareButton.fragments.PetitionBase}
@@ -771,12 +772,7 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_User on User {
         organization {
           name
-          usageLimits {
-            petitions {
-              used
-              limit
-            }
-          }
+          ...isUsageLimitsReached_Organization
         }
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
@@ -791,6 +787,7 @@ PetitionReplies.fragments = {
       ${ExportRepliesDialog.fragments.User}
       ${PetitionSignaturesCard.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
+      ${isUsageLimitsReached.fragments.Organization}
     `;
   },
 };

@@ -159,11 +159,11 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     [updateCheckboxReply, updateLastSaved]
   );
 
-  const createChekcboxReply = useCreateCheckboxReply();
+  const createCheckboxReply = useCreateCheckboxReply();
   const handleCreateCheckboxReply = useCallback(
     async (values: CheckboxValue) => {
       try {
-        await createChekcboxReply({
+        await createCheckboxReply({
           petitionId: props.petitionId,
           fieldId: props.field.id,
           keycode: props.keycode,
@@ -172,7 +172,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         updateLastSaved();
       } catch {}
     },
-    [createChekcboxReply, updateLastSaved]
+    [createCheckboxReply, updateLastSaved]
   );
 
   const updateDynamicSelectReply = useUpdateDynamicSelectReply();
@@ -228,7 +228,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   );
   const showFailure = useFailureGeneratingLinkDialog();
   const apollo = useApolloClient();
-  const handleDonwloadFileUploadReply = useCallback(
+  const handleDownloadFileUploadReply = useCallback(
     async (replyId: string) => {
       try {
         openNewWindow(async () => {
@@ -283,7 +283,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
       {...commonProps}
       onDeleteReply={handleDeletePetitionReply}
       onCreateReply={handleCreateFileUploadReply}
-      onDownloadReply={handleDonwloadFileUploadReply}
+      onDownloadReply={handleDownloadFileUploadReply}
     />
   ) : props.field.type === "DYNAMIC_SELECT" ? (
     <RecipientViewPetitionFieldDynamicSelect

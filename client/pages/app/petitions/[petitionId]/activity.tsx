@@ -42,6 +42,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
+import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -354,7 +355,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   };
 
   const displayPetitionLimitReachedAlert =
-    me.organization.usageLimits.petitions.limit <= me.organization.usageLimits.petitions.used &&
+    isUsageLimitsReached(me.organization) &&
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
 
@@ -413,7 +414,7 @@ PetitionActivity.fragments = {
       ...PetitionActivityTimeline_Petition
       ...ShareButton_PetitionBase
       ...AddPetitionAccessDialog_Petition
-      ...useSendPetitionHandler_PetitionBase
+      ...useSendPetitionHandler_Petition
       fields {
         ...validatePetitionFields_PetitionField
       }
@@ -423,25 +424,21 @@ PetitionActivity.fragments = {
     ${PetitionActivityTimeline.fragments.Petition}
     ${ShareButton.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
-    ${useSendPetitionHandler.fragments.PetitionBase}
+    ${useSendPetitionHandler.fragments.Petition}
     ${validatePetitionFields.fragments.PetitionField}
   `,
   User: gql`
     fragment PetitionActivity_User on User {
       organization {
         name
-        usageLimits {
-          petitions {
-            used
-            limit
-          }
-        }
+        ...isUsageLimitsReached_Organization
       }
       ...PetitionLayout_User
       ...useUpdateIsReadNotification_User
     }
     ${PetitionLayout.fragments.User}
     ${useUpdateIsReadNotification.fragments.User}
+    ${isUsageLimitsReached.fragments.Organization}
   `,
 };
 

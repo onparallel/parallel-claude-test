@@ -39,6 +39,7 @@ export interface RecipientViewPetitionFieldFileUploadProps
   onDeleteReply: (replyId: string) => void;
   onCreateReply: (content: File[]) => void;
   onDownloadReply: (replyId: string) => void;
+  isCacheOnly?: boolean;
 }
 
 export function RecipientViewPetitionFieldFileUpload({
@@ -51,6 +52,7 @@ export function RecipientViewPetitionFieldFileUpload({
   onCreateReply,
   onDownloadReply,
   onCommentsButtonClick,
+  isCacheOnly,
 }: RecipientViewPetitionFieldFileUploadProps) {
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
@@ -91,6 +93,7 @@ export function RecipientViewPetitionFieldFileUpload({
                     })
                   }
                   onDownload={onDownloadReply}
+                  isDownloadDisabled={isCacheOnly}
                 />
               </motion.li>
             ))}
@@ -113,6 +116,7 @@ interface RecipientViewPetitionFieldReplyFileUploadProps {
   isDisabled: boolean;
   onRemove: () => void;
   onDownload: (replyId: string) => void;
+  isDownloadDisabled?: boolean;
 }
 
 export function RecipientViewPetitionFieldReplyFileUpload({
@@ -120,6 +124,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
   isDisabled,
   onRemove,
   onDownload,
+  isDownloadDisabled,
 }: RecipientViewPetitionFieldReplyFileUploadProps) {
   const intl = useIntl();
 
@@ -206,7 +211,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         </Center>
       ) : null}
       <IconButtonWithTooltip
-        isDisabled={uploadHasFailed || reply.content!.progress < 1}
+        isDisabled={uploadHasFailed || reply.content!.progress < 1 || isDownloadDisabled}
         onClick={() => onDownload(reply.id)}
         variant="ghost"
         icon={<DownloadIcon />}

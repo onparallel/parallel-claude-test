@@ -9,7 +9,7 @@ import { useHandledTestSignatureDialog } from "@parallel/components/petition-com
 import {
   UpdatePetitionInput,
   useSendPetitionHandler_batchSendPetitionDocument,
-  useSendPetitionHandler_PetitionBaseFragment,
+  useSendPetitionHandler_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
@@ -20,7 +20,7 @@ import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export function useSendPetitionHandler(
-  petition: useSendPetitionHandler_PetitionBaseFragment,
+  petition: useSendPetitionHandler_PetitionFragment,
   onUpdatePetition: (data: UpdatePetitionInput) => Promise<any>,
   validator: () => Promise<boolean>
 ) {
@@ -174,19 +174,17 @@ export function useSendPetitionHandler(
 }
 
 useSendPetitionHandler.fragments = {
-  PetitionBase: gql`
-    fragment useSendPetitionHandler_PetitionBase on PetitionBase {
+  Petition: gql`
+    fragment useSendPetitionHandler_Petition on Petition {
       id
-      ... on Petition {
-        signatureConfig {
-          integration {
-            id
-            environment
-            name
-          }
+      signatureConfig {
+        integration {
+          id
+          environment
+          name
         }
-        ...AddPetitionAccessDialog_Petition
       }
+      ...AddPetitionAccessDialog_Petition
     }
     ${AddPetitionAccessDialog.fragments.Petition}
   `,

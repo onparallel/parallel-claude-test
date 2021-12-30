@@ -52,6 +52,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
+import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -335,11 +336,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return true;
   };
 
-  const handleNextClick = useSendPetitionHandler(
-    petition,
-    handleUpdatePetition,
-    validPetitionFields
-  );
+  const handleNextClick =
+    petition?.__typename === "Petition"
+      ? useSendPetitionHandler(petition, handleUpdatePetition, validPetitionFields)
+      : () => {};
 
   const handleIndexFieldClick = useCallback(async (fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
@@ -367,7 +367,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   } as const;
 
   const displayPetitionLimitReachedAlert =
-    me.organization.usageLimits.petitions.limit <= me.organization.usageLimits.petitions.used &&
+    isUsageLimitsReached(me.organization) &&
     petition?.__typename === "Petition" &&
     petition.status === "DRAFT";
 
@@ -533,7 +533,6 @@ PetitionCompose.fragments = {
       fragment PetitionCompose_PetitionBase on PetitionBase {
         id
         ...PetitionLayout_PetitionBase
-        ...useSendPetitionHandler_PetitionBase
         ...PetitionTemplateComposeMessageEditor_Petition
         ...PetitionSettings_PetitionBase
         tone
@@ -553,12 +552,13 @@ PetitionCompose.fragments = {
               name
             }
           }
+          ...useSendPetitionHandler_Petition
         }
         ... on PetitionTemplate {
           isPublic
         }
       }
-      ${useSendPetitionHandler.fragments.PetitionBase}
+      ${useSendPetitionHandler.fragments.Petition}
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionSettings.fragments.PetitionBase}
       ${PetitionTemplateComposeMessageEditor.fragments.Petition}
@@ -585,25 +585,13 @@ PetitionCompose.fragments = {
         ...PetitionSettings_User
         ...useUpdateIsReadNotification_User
         organization {
-          ...PetitionCompose_Organization
+          ...isUsageLimitsReached_Organization
         }
       }
       ${PetitionLayout.fragments.User}
       ${PetitionSettings.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
-      ${this.Organization}
-    `;
-  },
-  get Organization() {
-    return gql`
-      fragment PetitionCompose_Organization on Organization {
-        usageLimits {
-          petitions {
-            limit
-            used
-          }
-        }
-      }
+      ${isUsageLimitsReached.fragments.Organization}
     `;
   },
 };

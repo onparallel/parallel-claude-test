@@ -7573,7 +7573,7 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
   } | null;
 };
 
-export type useSendPetitionHandler_PetitionBase_Petition_Fragment = {
+export type useSendPetitionHandler_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   emailSubject?: string | null;
@@ -7604,15 +7604,6 @@ export type useSendPetitionHandler_PetitionBase_Petition_Fragment = {
     };
   };
 };
-
-export type useSendPetitionHandler_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-  id: string;
-};
-
-export type useSendPetitionHandler_PetitionBaseFragment =
-  | useSendPetitionHandler_PetitionBase_Petition_Fragment
-  | useSendPetitionHandler_PetitionBase_PetitionTemplate_Fragment;
 
 export type useSendPetitionHandler_batchSendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -11586,7 +11577,7 @@ export type PetitionActivity_UserFragment = {
     id: string;
     usageLimits: {
       __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
 };
@@ -13136,7 +13127,7 @@ export type PetitionActivity_userQuery = {
       id: string;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
   };
@@ -13213,10 +13204,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   } | null;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  } | null;
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
@@ -13232,6 +13219,10 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    isSubscribed: boolean;
+  } | null;
 };
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
@@ -13415,14 +13406,6 @@ export type PetitionCompose_UserFragment = {
       __typename?: "OrganizationUsageLimit";
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
-  };
-};
-
-export type PetitionCompose_OrganizationFragment = {
-  __typename?: "Organization";
-  usageLimits: {
-    __typename?: "OrganizationUsageLimit";
-    petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
   };
 };
 
@@ -14137,10 +14120,6 @@ export type PetitionCompose_petitionQuery = {
           id: string;
           status: PetitionSignatureRequestStatus;
         } | null;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        } | null;
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
@@ -14160,6 +14139,10 @@ export type PetitionCompose_petitionQuery = {
             };
           };
         };
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          isSubscribed: boolean;
+        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -14455,7 +14438,7 @@ export type PetitionPreview_UserFragment = {
     id: string;
     usageLimits: {
       __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
 };
@@ -14898,7 +14881,7 @@ export type PetitionPreview_userQuery = {
       id: string;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
   };
@@ -15158,10 +15141,6 @@ export type PetitionReplies_UserFragment = {
     __typename?: "Organization";
     name: string;
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
-    };
     signatureIntegrations: {
       __typename?: "OrgIntegrationPagination";
       items: Array<
@@ -15175,6 +15154,10 @@ export type PetitionReplies_UserFragment = {
         | { __typename?: "SsoOrgIntegration" }
         | { __typename?: "UserProvisioningOrgIntegration" }
       >;
+    };
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
 };
@@ -15434,10 +15417,6 @@ export type PetitionReplies_userQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
-      };
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         items: Array<
@@ -15451,6 +15430,10 @@ export type PetitionReplies_userQuery = {
           | { __typename?: "SsoOrgIntegration" }
           | { __typename?: "UserProvisioningOrgIntegration" }
         >;
+      };
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
   };
@@ -17274,6 +17257,14 @@ export type getPetitionSignatureStatus_PetitionFragment = {
     status: PetitionSignatureRequestStatus;
   } | null;
   signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null;
+};
+
+export type isUsageLimitsReached_OrganizationFragment = {
+  __typename?: "Organization";
+  usageLimits: {
+    __typename?: "OrganizationUsageLimit";
+    petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+  };
 };
 
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
@@ -19557,22 +19548,20 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
   }
   ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<AddPetitionAccessDialog_PetitionFragment, unknown>;
-export const useSendPetitionHandler_PetitionBaseFragmentDoc = gql`
-  fragment useSendPetitionHandler_PetitionBase on PetitionBase {
+export const useSendPetitionHandler_PetitionFragmentDoc = gql`
+  fragment useSendPetitionHandler_Petition on Petition {
     id
-    ... on Petition {
-      signatureConfig {
-        integration {
-          id
-          environment
-          name
-        }
+    signatureConfig {
+      integration {
+        id
+        environment
+        name
       }
-      ...AddPetitionAccessDialog_Petition
     }
+    ...AddPetitionAccessDialog_Petition
   }
   ${AddPetitionAccessDialog_PetitionFragmentDoc}
-` as unknown as DocumentNode<useSendPetitionHandler_PetitionBaseFragment, unknown>;
+` as unknown as DocumentNode<useSendPetitionHandler_PetitionFragment, unknown>;
 export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
   fragment validatePetitionFields_PetitionField on PetitionField {
     id
@@ -19593,7 +19582,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
     ...PetitionActivityTimeline_Petition
     ...ShareButton_PetitionBase
     ...AddPetitionAccessDialog_Petition
-    ...useSendPetitionHandler_PetitionBase
+    ...useSendPetitionHandler_Petition
     fields {
       ...validatePetitionFields_PetitionField
     }
@@ -19603,9 +19592,19 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
   ${PetitionActivityTimeline_PetitionFragmentDoc}
   ${ShareButton_PetitionBaseFragmentDoc}
   ${AddPetitionAccessDialog_PetitionFragmentDoc}
-  ${useSendPetitionHandler_PetitionBaseFragmentDoc}
+  ${useSendPetitionHandler_PetitionFragmentDoc}
   ${validatePetitionFields_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_PetitionFragment, unknown>;
+export const isUsageLimitsReached_OrganizationFragmentDoc = gql`
+  fragment isUsageLimitsReached_Organization on Organization {
+    usageLimits {
+      petitions {
+        used
+        limit
+      }
+    }
+  }
+` as unknown as DocumentNode<isUsageLimitsReached_OrganizationFragment, unknown>;
 export const PetitionHeader_UserFragmentDoc = gql`
   fragment PetitionHeader_User on User {
     id
@@ -19631,16 +19630,12 @@ export const PetitionActivity_UserFragmentDoc = gql`
   fragment PetitionActivity_User on User {
     organization {
       name
-      usageLimits {
-        petitions {
-          used
-          limit
-        }
-      }
+      ...isUsageLimitsReached_Organization
     }
     ...PetitionLayout_User
     ...useUpdateIsReadNotification_User
   }
+  ${isUsageLimitsReached_OrganizationFragmentDoc}
   ${PetitionLayout_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_UserFragment, unknown>;
@@ -19824,7 +19819,6 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
     id
     ...PetitionLayout_PetitionBase
-    ...useSendPetitionHandler_PetitionBase
     ...PetitionTemplateComposeMessageEditor_Petition
     ...PetitionSettings_PetitionBase
     tone
@@ -19844,16 +19838,17 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
           name
         }
       }
+      ...useSendPetitionHandler_Petition
     }
     ... on PetitionTemplate {
       isPublic
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
-  ${useSendPetitionHandler_PetitionBaseFragmentDoc}
   ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
   ${PetitionSettings_PetitionBaseFragmentDoc}
   ${PetitionCompose_PetitionFieldFragmentDoc}
+  ${useSendPetitionHandler_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_PetitionBaseFragment, unknown>;
 export const TestModeSignatureBadge_UserFragmentDoc = gql`
   fragment TestModeSignatureBadge_User on User {
@@ -19880,16 +19875,6 @@ export const PetitionSettings_UserFragmentDoc = gql`
   ${TestModeSignatureBadge_UserFragmentDoc}
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_UserFragment, unknown>;
-export const PetitionCompose_OrganizationFragmentDoc = gql`
-  fragment PetitionCompose_Organization on Organization {
-    usageLimits {
-      petitions {
-        limit
-        used
-      }
-    }
-  }
-` as unknown as DocumentNode<PetitionCompose_OrganizationFragment, unknown>;
 export const PetitionCompose_UserFragmentDoc = gql`
   fragment PetitionCompose_User on User {
     id
@@ -19897,13 +19882,13 @@ export const PetitionCompose_UserFragmentDoc = gql`
     ...PetitionSettings_User
     ...useUpdateIsReadNotification_User
     organization {
-      ...PetitionCompose_Organization
+      ...isUsageLimitsReached_Organization
     }
   }
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionSettings_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
-  ${PetitionCompose_OrganizationFragmentDoc}
+  ${isUsageLimitsReached_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_UserFragment, unknown>;
 export const useFieldVisibility_PetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PetitionField on PetitionField {
@@ -20057,6 +20042,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
         status
       }
       ...RecipientViewProgressFooter_Petition
+      ...useSendPetitionHandler_Petition
     }
     fields {
       ...PreviewPetitionField_PetitionField
@@ -20068,14 +20054,13 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
         ...usePetitionPreviewSignerInfoDialog_PetitionSigner
       }
     }
-    ...useSendPetitionHandler_PetitionBase
     ...RecipientViewContentsCard_PetitionBase
     ...PetitionLayout_PetitionBase
   }
   ${RecipientViewProgressFooter_PetitionFragmentDoc}
+  ${useSendPetitionHandler_PetitionFragmentDoc}
   ${PreviewPetitionField_PetitionFieldFragmentDoc}
   ${usePetitionPreviewSignerInfoDialog_PetitionSignerFragmentDoc}
-  ${useSendPetitionHandler_PetitionBaseFragmentDoc}
   ${RecipientViewContentsCard_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_PetitionBaseFragment, unknown>;
@@ -20097,17 +20082,13 @@ export const PetitionPreview_UserFragmentDoc = gql`
   fragment PetitionPreview_User on User {
     organization {
       name
-      usageLimits {
-        petitions {
-          used
-          limit
-        }
-      }
+      ...isUsageLimitsReached_Organization
       ...usePetitionPreviewSignerInfoDialog_Organization
     }
     ...PetitionLayout_User
     ...usePetitionPreviewSignerInfoDialog_User
   }
+  ${isUsageLimitsReached_OrganizationFragmentDoc}
   ${usePetitionPreviewSignerInfoDialog_OrganizationFragmentDoc}
   ${PetitionLayout_UserFragmentDoc}
   ${usePetitionPreviewSignerInfoDialog_UserFragmentDoc}
@@ -20335,7 +20316,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     ...getPetitionSignatureStatus_Petition
     ...getPetitionSignatureEnvironment_Petition
     ...PetitionAttachmentsCard_Petition
-    ...useSendPetitionHandler_PetitionBase
+    ...useSendPetitionHandler_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
@@ -20344,7 +20325,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${getPetitionSignatureStatus_PetitionFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
   ${PetitionAttachmentsCard_PetitionFragmentDoc}
-  ${useSendPetitionHandler_PetitionBaseFragmentDoc}
+  ${useSendPetitionHandler_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFragment, unknown>;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {
@@ -20377,12 +20358,7 @@ export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
     organization {
       name
-      usageLimits {
-        petitions {
-          used
-          limit
-        }
-      }
+      ...isUsageLimitsReached_Organization
     }
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
     hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
@@ -20392,6 +20368,7 @@ export const PetitionReplies_UserFragmentDoc = gql`
     ...PetitionSignaturesCard_User
     ...useUpdateIsReadNotification_User
   }
+  ${isUsageLimitsReached_OrganizationFragmentDoc}
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionRepliesFieldComments_UserFragmentDoc}
   ${ExportRepliesDialog_UserFragmentDoc}

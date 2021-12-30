@@ -78,17 +78,13 @@ export function useHandledTestSignatureDialog() {
       environment: SignatureOrgIntegrationEnvironment | undefined,
       integrationName: string | undefined
     ) => {
-      try {
-        if (showTestSignatureDialogUserPreference && environment === "DEMO") {
-          const { dontShow } = await showTestSignatureDialog({
-            integrationName: integrationName ?? "",
-          });
-          if (dontShow) {
-            setShowTestSignatureDialogUserPreference(false);
-          }
+      if (showTestSignatureDialogUserPreference && environment === "DEMO") {
+        const { dontShow } = await showTestSignatureDialog({
+          integrationName: integrationName ?? "",
+        });
+        if (dontShow) {
+          setShowTestSignatureDialogUserPreference(false);
         }
-      } catch (e) {
-        throw e;
       }
     },
     [showTestSignatureDialog, showTestSignatureDialogUserPreference]

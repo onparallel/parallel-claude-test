@@ -13,7 +13,7 @@ import {
 } from "nexus";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
-import { and, authenticate, authenticateAnd, chain, or } from "../helpers/authorize";
+import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -257,12 +257,9 @@ export const isValidPublicPetitionLinkSlug = queryField("isValidPublicPetitionLi
 
 export const petitionFieldCommentsQuery = queryField("petitionFieldComments", {
   type: list(nonNull("PetitionFieldComment")),
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "petitionFieldId")
-    )
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "petitionFieldId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

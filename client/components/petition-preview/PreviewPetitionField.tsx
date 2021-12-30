@@ -153,11 +153,11 @@ export function PreviewPetitionField({
     [updateCheckboxReply]
   );
 
-  const createChekcboxReply = useCreateCheckboxReply();
+  const createCheckboxReply = useCreateCheckboxReply();
   const handleCreateCheckboxReply = useCallback(
     async (values: CheckboxValue) => {
       try {
-        await createChekcboxReply({
+        await createCheckboxReply({
           petitionId,
           fieldId,
           values,
@@ -165,7 +165,7 @@ export function PreviewPetitionField({
         });
       } catch {}
     },
-    [createChekcboxReply]
+    [createCheckboxReply]
   );
 
   const updateDynamicSelectReply = useUpdateDynamicSelectReply();
@@ -219,7 +219,7 @@ export function PreviewPetitionField({
   );
   const showFailure = useFailureGeneratingLinkDialog();
   const apollo = useApolloClient();
-  const handleDonwloadFileUploadReply = useCallback(
+  const handleDownloadFileUploadReply = useCallback(
     async (replyId: string) => {
       try {
         if (isCacheOnly) return;
@@ -277,7 +277,8 @@ export function PreviewPetitionField({
       {...commonProps}
       onDeleteReply={handleDeletePetitionReply}
       onCreateReply={handleCreateFileUploadReply}
-      onDownloadReply={handleDonwloadFileUploadReply}
+      onDownloadReply={handleDownloadFileUploadReply}
+      isCacheOnly={isCacheOnly}
     />
   ) : field.type === "DYNAMIC_SELECT" ? (
     <RecipientViewPetitionFieldDynamicSelect
