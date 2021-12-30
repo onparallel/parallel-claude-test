@@ -1426,12 +1426,31 @@ export class PetitionRepository extends BaseRepository {
     return reply;
   }
 
-  async deleteFileUpload(fileUploadId: number, deletedBy: string) {
-    const file = await this.files.loadFileUpload(fileUploadId);
-    await Promise.all([
-      this.files.deleteFileUpload(file!.id, deletedBy),
-      this.aws.fileUploads.deleteFile(file!.path),
-    ]);
+  /**
+   * deletes a file_upload.
+   * also deletes its entry in S3 if the same file_upload.path is not found in any other file_upload
+   */
+  async safeDeleteFileUpload(
+    fileUploadIds: MaybeArray<number>,
+    deletedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const ids = unMaybeArray(fileUploadIds);
+    const files = await this.files.loadFileUpload(ids);
+    if (files.some((f) => !f)) {
+      return;
+    }
+
+    const filesByPath = (await this.files.loadFileUploadsByPath(files.map((f) => f!.path))).flat();
+    // there can be multiple file_uploads with same path (e.g. when doing massive sends of a petition with submitted file replies)
+    // so we need to make sure to only delete the entry in S3 if there are no other files referencing to that object
+    await pMap(files, async (f) => {
+      const samePathFiles = filesByPath.filter((file) => file.path === f!.path);
+      await Promise.all([
+        this.files.deleteFileUpload(f!.id, deletedBy, t),
+        samePathFiles.length === 1 ? this.aws.fileUploads.deleteFile(samePathFiles[0].path) : null,
+      ]);
+    });
   }
 
   async deletePetitionFieldReply(replyId: number, deleter: User | PetitionAccess) {
@@ -1451,7 +1470,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (reply.type === "FILE_UPLOAD") {
-      await this.deleteFileUpload(reply.content["file_upload_id"], deletedBy);
+      await this.safeDeleteFileUpload(reply.content["file_upload_id"], deletedBy);
     }
 
     await Promise.all([
@@ -1735,48 +1754,30 @@ export class PetitionRepository extends BaseRepository {
       );
 
       if (cloneReplies) {
-        // insert petition replies into cloned fields
-        const replies = (await this.loadRepliesForField(fields.map((f) => f.id))).flat();
-        if (replies.length > 0) {
-          await this.from("petition_field_reply", t).insert(
-            replies.map((r) => ({
-              ...omit(r, ["id"]),
-              petition_field_id: newIds[r.petition_field_id],
-            }))
-          );
-        }
-        // clone some petition events into new petition
-        const events = await this.getPetitionEventsByType(petitionId, [
-          "REPLY_CREATED",
-          "REPLY_UPDATED",
-          "REPLY_DELETED",
-          "COMMENT_DELETED",
-          "COMMENT_PUBLISHED",
+        await Promise.all([
+          // insert petition replies into cloned fields
+          this.clonePetitionReplies(newIds, t),
+          // clone some petition events into new petition
+          this.clonePetitionEvents(
+            petitionId,
+            cloned.id,
+            [
+              "REPLY_CREATED",
+              "REPLY_UPDATED",
+              "REPLY_DELETED",
+              "COMMENT_DELETED",
+              "COMMENT_PUBLISHED",
+            ],
+            t
+          ),
+          // clone petition field comments into new petition
+          this.cloneFieldComments(
+            fields.map((f) => ({ petitionFieldId: f.id, petitionId: f.petition_id })),
+            newIds,
+            cloned.id,
+            t
+          ),
         ]);
-        if (events.length > 0) {
-          await this.from("petition_event", t).insert(
-            events.map((e) => ({
-              data: e.data,
-              petition_id: cloned.id,
-              type: e.type,
-            })) as any[]
-          );
-        }
-        // clone petition field comments into new petition
-        const fieldComments = (
-          await this.loadPetitionFieldCommentsForField(
-            fields.map((f) => ({ petitionFieldId: f.id, petitionId: f.petition_id }))
-          )
-        ).flat();
-        if (fieldComments.length > 0) {
-          await this.from("petition_field_comment", t).insert(
-            fieldComments.map((c) => ({
-              ...omit(c, ["id"]),
-              petition_field_id: newIds[c.petition_field_id],
-              petition_id: cloned.id,
-            }))
-          );
-        }
       }
 
       const toUpdate = clonedFields.filter((f) => f.visibility);
@@ -1809,37 +1810,95 @@ export class PetitionRepository extends BaseRepository {
               t
             )
           : [],
-        // copy field attachments to new fields, using the original file_upload_id
-        fields.length > 0
-          ? this.raw(
-              /* sql */ `
-            with
-              pfa as (
-                select petition_field_id, file_upload_id
-                from petition_field_attachment
-                where deleted_at is null
-                  and petition_field_id in (${fields.map(() => "?").join(",")})),
-              new_id_map as (
-                select petition_field_id, new_petition_field_id
-                from (
-                  values ${fields.map(() => "(?::int, ?::int)").join(",")}
-                ) as t(petition_field_id, new_petition_field_id)
-              )
-            insert into petition_field_attachment (petition_field_id, file_upload_id, created_by)
-            select new_id_map.new_petition_field_id, pfa.file_upload_id, ? from pfa join new_id_map on pfa.petition_field_id = new_id_map.petition_field_id
-          `,
-              [
-                ...fields.map((f) => f.id),
-                ...fields.flatMap((f) => [f.id, newIds[f.id]]),
-                createdBy,
-              ],
-              t
-            )
-          : [],
+        // copy field attachments to new fields, making a copy of the file_upload
+        fields.length > 0 ? this.cloneFieldAttachments(fields, newIds, t) : [],
       ]);
 
       return cloned;
     }, t);
+  }
+
+  private async clonePetitionReplies(newFieldsMap: Record<string, number>, t?: Knex.Transaction) {
+    const replies = (
+      await this.loadRepliesForField(Object.keys(newFieldsMap).map((v) => parseInt(v)))
+    ).flat();
+    if (replies.length > 0) {
+      const [fileReplies, otherReplies] = partition(replies, (r) => r.type === "FILE_UPLOAD");
+      // for FILE_UPLOAD replies, we have to make a copy of the file_upload entry
+      const newFileReplies = await pMap(fileReplies, async (r) => ({
+        ...r,
+        content: {
+          file_upload_id: (await this.files.cloneFileUpload(r.content["file_upload_id"], t)).id,
+        },
+      }));
+
+      await this.from("petition_field_reply", t).insert(
+        [...newFileReplies, ...otherReplies].map((r) => ({
+          ...omit(r, ["id"]),
+          petition_field_id: newFieldsMap[r.petition_field_id],
+        }))
+      );
+    }
+  }
+
+  private async clonePetitionEvents(
+    fromPetitionId: number,
+    toPetitionId: number,
+    types: PetitionEventType[],
+    t?: Knex.Transaction
+  ) {
+    const events = await this.getPetitionEventsByType(fromPetitionId, types);
+    if (events.length > 0) {
+      await this.from("petition_event", t).insert(
+        events.map((e) => ({
+          data: e.data,
+          petition_id: toPetitionId,
+          type: e.type,
+        })) as any[]
+      );
+    }
+  }
+
+  private async cloneFieldComments(
+    fieldIds: { petitionFieldId: number; petitionId: number }[],
+    newFieldsMap: Record<string, number>,
+    toPetitionId: number,
+    t?: Knex.Transaction
+  ) {
+    const fieldComments = (
+      await this.loadPetitionFieldCommentsForField(
+        fieldIds.map((f) => ({ ...f, loadInternalComments: true }))
+      )
+    ).flat();
+    if (fieldComments.length > 0) {
+      await this.from("petition_field_comment", t).insert(
+        fieldComments.map((c) => ({
+          ...omit(c, ["id"]),
+          petition_field_id: newFieldsMap[c.petition_field_id],
+          petition_id: toPetitionId,
+        }))
+      );
+    }
+  }
+
+  private async cloneFieldAttachments(
+    fields: PetitionField[],
+    newIds: Record<string, number>,
+    t?: Knex.Transaction
+  ) {
+    const attachmentsByFieldId = (
+      await this.loadFieldAttachmentsByFieldId(fields.map((f) => f.id))
+    ).flat();
+
+    await pMap(attachmentsByFieldId, async (attachment) => {
+      // for each existing attachment, clone its file_upload and insert a new field_attachment on the new field
+      const fileUploadCopy = await this.files.cloneFileUpload(attachment.file_upload_id);
+      await this.from("petition_field_attachment", t).insert({
+        ...omit(attachment, ["id"]),
+        file_upload_id: fileUploadCopy.id,
+        petition_field_id: newIds[attachment.petition_field_id],
+      });
+    });
   }
 
   private async getDefaultSignatureOrgIntegration(
@@ -3699,7 +3758,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .returning("*");
 
-      return await this.safeDeleteFileUploadPetitionAttachments([row.file_upload_id], user, t);
+      return await this.safeDeleteFileUpload(row.file_upload_id, `User:${user.id}`, t);
     });
   }
 
@@ -3713,60 +3772,8 @@ export class PetitionRepository extends BaseRepository {
         })
         .returning("*");
 
-      return await this.safeDeleteFileUploadPetitionFieldAttachments([row.file_upload_id], user, t);
+      return await this.safeDeleteFileUpload(row.file_upload_id, `User:${user.id}`, t);
     });
-  }
-
-  /** delete attached files only if they are not referenced in any other field attachment */
-  private async safeDeleteFileUploadPetitionFieldAttachments(
-    fileUploadIds: number[],
-    user: User,
-    t?: Knex.Transaction
-  ) {
-    if (fileUploadIds.length === 0) {
-      return [];
-    }
-
-    return await this.raw<FileUpload>(
-      /* sql */ `
-        update file_upload set deleted_at = ?, deleted_by = ?
-        where id in (${fileUploadIds.map(() => "?").join(", ")})
-        and deleted_at is null
-        and not exists (
-          select id from petition_field_attachment 
-          where deleted_at is null 
-          and file_upload_id in (${fileUploadIds.map(() => "?").join(", ")})
-          )
-        returning *`,
-      [this.now(), `User:${user.id}`, ...fileUploadIds, ...fileUploadIds],
-      t
-    );
-  }
-
-  /** delete attached files only if they are not referenced in any other petition */
-  private async safeDeleteFileUploadPetitionAttachments(
-    fileUploadIds: number[],
-    user: User,
-    t?: Knex.Transaction
-  ) {
-    if (fileUploadIds.length === 0) {
-      return [];
-    }
-
-    return await this.raw<FileUpload>(
-      /* sql */ `
-        update file_upload set deleted_at = ?, deleted_by = ?
-        where id in (${fileUploadIds.map(() => "?").join(", ")})
-        and deleted_at is null
-        and not exists (
-          select id from petition_attachment 
-          where deleted_at is null 
-          and file_upload_id in (${fileUploadIds.map(() => "?").join(", ")})
-          )
-        returning *`,
-      [this.now(), `User:${user.id}`, ...fileUploadIds, ...fileUploadIds],
-      t
-    );
   }
 
   private async deletePetitionFieldAttachmentByFieldId(
@@ -3785,13 +3792,11 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    const deletedFileUploads = await this.safeDeleteFileUploadPetitionFieldAttachments(
+    await this.safeDeleteFileUpload(
       deletedAttachments.map((a) => a.file_upload_id),
-      user,
+      `User:${user.id}`,
       t
     );
-
-    await this.aws.fileUploads.deleteFile(deletedFileUploads.map((file) => file.path));
   }
 
   private async deletePetitionAttachmentByPetitionId(
@@ -3810,12 +3815,11 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    const deletedFileUploads = await this.safeDeleteFileUploadPetitionAttachments(
+    await this.safeDeleteFileUpload(
       deletedAttachments.map((a) => a.file_upload_id),
-      user,
+      `User:${user.id}`,
       t
     );
-    await this.aws.fileUploads.deleteFile(deletedFileUploads.map((file) => file.path));
   }
 
   readonly loadPublicPetitionLink = this.buildLoadBy("public_petition_link", "id");

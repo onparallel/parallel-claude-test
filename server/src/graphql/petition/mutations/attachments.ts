@@ -107,12 +107,7 @@ export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldA
     petitionsAreNotPublicTemplates("petitionId")
   ),
   resolve: async (_, args, ctx) => {
-    const deletedFileUploads = await ctx.petitions.deletePetitionFieldAttachment(
-      args.attachmentId,
-      ctx.user!
-    );
-
-    await ctx.aws.fileUploads.deleteFile(deletedFileUploads.map((file) => file.path));
+    await ctx.petitions.deletePetitionFieldAttachment(args.attachmentId, ctx.user!);
     return RESULT.SUCCESS;
   },
 });
@@ -250,11 +245,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
     petitionsAreNotPublicTemplates("petitionId")
   ),
   resolve: async (_, args, ctx) => {
-    const deletedFileUploads = await ctx.petitions.deletePetitionAttachment(
-      args.attachmentId,
-      ctx.user!
-    );
-    await ctx.aws.fileUploads.deleteFile(deletedFileUploads.map((file) => file.path));
+    await ctx.petitions.deletePetitionAttachment(args.attachmentId, ctx.user!);
     return RESULT.SUCCESS;
   },
 });

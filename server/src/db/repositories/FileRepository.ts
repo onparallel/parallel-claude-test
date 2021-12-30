@@ -6,6 +6,7 @@ import {
   CreateFileUpload,
   CreatePublicFileUpload,
   CreateTemporaryFile,
+  FileUpload,
   PublicFileUpload,
 } from "../__types";
 
@@ -16,6 +17,9 @@ export class FileRepository extends BaseRepository {
   }
 
   readonly loadFileUpload = this.buildLoadBy("file_upload", "id", (q) => q.whereNull("deleted_at"));
+  readonly loadFileUploadsByPath = this.buildLoadMultipleBy("file_upload", "path", (q) =>
+    q.whereNull("deleted_at")
+  );
 
   async createFileUpload(data: CreateFileUpload, createdBy: string) {
     const rows = await this.insert("file_upload", {
@@ -24,6 +28,20 @@ export class FileRepository extends BaseRepository {
       updated_by: createdBy,
     }).returning("*");
     return rows[0];
+  }
+
+  async cloneFileUpload(id: number, t?: Knex.Transaction) {
+    const [file] = await this.raw<FileUpload>(
+      /* sql */ `
+      insert into file_upload(path, filename, size, content_type, upload_complete, created_at, created_by, updated_at, updated_by)
+      select path, filename, size, content_type, upload_complete, created_at, created_by, updated_at, updated_by
+      from file_upload where id = ?
+      returning *
+      `,
+      [id],
+      t
+    );
+    return file;
   }
 
   async markFileUploadComplete(id: number, updatedBy: string) {
@@ -39,8 +57,8 @@ export class FileRepository extends BaseRepository {
       .where({ id: id, upload_complete: false });
   }
 
-  async deleteFileUpload(id: number, deletedBy: string) {
-    await this.from("file_upload")
+  async deleteFileUpload(id: number, deletedBy: string, t?: Knex.Transaction) {
+    await this.from("file_upload", t)
       .update(
         {
           deleted_at: this.now(),

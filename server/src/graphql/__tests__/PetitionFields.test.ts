@@ -763,6 +763,12 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("deletes the linked attachments and uploaded files when deleting a field", async () => {
+      // TODO try to spy on publicFiles.deleteFile()
+      // const awsDeleteFileSpy = jest.spyOn(
+      //   testClient.container.get<IAws>(AWS_SERVICE),
+      //   "publicFiles"
+      // );
+
       const [newField] = await mocks.createRandomPetitionFields(userPetition.id, 1);
 
       const [attachment] = await mocks.createPetitionFieldAttachment(newField.id, 1);
@@ -796,54 +802,63 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(attachments).toHaveLength(0);
       expect(attachedFiles).toHaveLength(0);
+      // expect(awsDeleteFileSpy).toHaveBeenCalledTimes(1);
     });
 
-    it("don't delete the attached file if its being used as attachment in other field", async () => {
-      const newFields = await mocks.createRandomPetitionFields(userPetition.id, 2);
+    it("don't delete the attached file on S3 if its being used as attachment in other field", async () => {
+      // TODO try to spy on publicFiles.deleteFile()
+      // const awsDeleteFileSpy = jest.spyOn(
+      //   testClient.container.get<IAws>(AWS_SERVICE),
+      //   "publicFiles"
+      // );
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const newFields = await mocks.createRandomPetitionFields(petition.id, 2);
 
-      const [file] = await mocks.createRandomFileUpload(1);
+      const files = await mocks.createRandomFileUpload(2, () => ({ path: "same-path" }));
 
       // set two attachments with the same file_upload on two different fields
       const [firstAttachment] = await mocks.createPetitionFieldAttachment(newFields[0].id, 1, [
-        file,
+        files[0],
       ]);
       const [secondAttachment] = await mocks.createPetitionFieldAttachment(newFields[1].id, 1, [
-        file,
+        files[1],
       ]);
 
-      const { errors } = await testClient.mutate({
+      const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
               fields {
                 id
+                attachments {
+                  id
+                }
               }
             }
           }
         `,
         variables: {
-          petitionId: toGlobalId("Petition", userPetition.id),
+          petitionId: toGlobalId("Petition", petition.id),
           fieldId: toGlobalId("PetitionField", newFields[0].id),
         },
       });
       expect(errors).toBeUndefined();
+      expect(data?.deletePetitionField).toEqual({
+        fields: [
+          {
+            id: toGlobalId("PetitionField", newFields[1].id),
+            attachments: [{ id: toGlobalId("PetitionFieldAttachment", secondAttachment.id) }],
+          },
+        ],
+      });
 
-      const fieldAttachments = await mocks
-        .knex<PetitionFieldAttachment>("petition_field_attachment")
-        .where({
-          deleted_at: null,
-          file_upload_id: firstAttachment.file_upload_id,
-        })
-        .select("*");
-
-      expect(fieldAttachments).toEqual([secondAttachment]);
-
-      const [uploadedFile] = await mocks
+      const uploadedFiles = await mocks
         .knex<FileUpload>("file_upload")
-        .where({ deleted_at: null, id: secondAttachment.file_upload_id })
+        .where({ deleted_at: null, path: "same-path" })
         .select("*");
 
-      expect(uploadedFile).toBeDefined();
+      expect(uploadedFiles).toHaveLength(1);
+      // expect(awsDeleteFileSpy).toHaveBeenCalledTimes(0);
     });
   });
 
