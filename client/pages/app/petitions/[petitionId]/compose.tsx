@@ -336,10 +336,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return true;
   };
 
-  const handleNextClick =
-    petition?.__typename === "Petition"
-      ? useSendPetitionHandler(petition, handleUpdatePetition, validPetitionFields)
-      : () => {};
+  const handleNextClick = useSendPetitionHandler(
+    petition?.__typename === "Petition" ? petition : null,
+    handleUpdatePetition,
+    validPetitionFields
+  );
 
   const handleIndexFieldClick = useCallback(async (fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);

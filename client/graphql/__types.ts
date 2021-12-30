@@ -14895,8 +14895,6 @@ export type PetitionReplies_PetitionFragment = {
   locale: PetitionLocale;
   deadline?: string | null;
   isRestricted: boolean;
-  emailSubject?: string | null;
-  emailBody?: any | null;
   updatedAt: string;
   accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
   fields: Array<{
@@ -15035,21 +15033,6 @@ export type PetitionReplies_PetitionFragment = {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
   } | null;
-  remindersConfig?: {
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  } | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
 };
 
 export type PetitionReplies_PetitionFieldFragment = {
@@ -15454,8 +15437,6 @@ export type PetitionReplies_petitionQuery = {
         locale: PetitionLocale;
         deadline?: string | null;
         isRestricted: boolean;
-        emailSubject?: string | null;
-        emailBody?: any | null;
         updatedAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
@@ -15598,25 +15579,6 @@ export type PetitionReplies_petitionQuery = {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
         } | null;
-        remindersConfig?: {
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          timezone: string;
-          weekdaysOnly: boolean;
-        } | null;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
-            };
-          };
-        };
       }
     | { __typename?: "PetitionTemplate" }
     | null;
@@ -20316,7 +20278,6 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     ...getPetitionSignatureStatus_Petition
     ...getPetitionSignatureEnvironment_Petition
     ...PetitionAttachmentsCard_Petition
-    ...useSendPetitionHandler_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
@@ -20325,7 +20286,6 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${getPetitionSignatureStatus_PetitionFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
   ${PetitionAttachmentsCard_PetitionFragmentDoc}
-  ${useSendPetitionHandler_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFragment, unknown>;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {

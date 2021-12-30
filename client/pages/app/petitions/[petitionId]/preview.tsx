@@ -50,7 +50,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const intl = useIntl();
   const router = useRouter();
   const { query } = router;
-
   const toast = useToast();
 
   const {
@@ -98,9 +97,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     return true;
   };
 
-  const handleNextClick = isPetition
-    ? useSendPetitionHandler(petition, handleUpdatePetition, _validatePetitionFields)
-    : () => {};
+  const handleNextClick = useSendPetitionHandler(
+    isPetition ? petition : null,
+    handleUpdatePetition,
+    _validatePetitionFields
+  );
 
   const showCompleteSignerInfoDialog = usePetitionPreviewSignerInfoDialog();
   const [completePetition] = useMutation(PetitionPreview_completePetitionDocument);

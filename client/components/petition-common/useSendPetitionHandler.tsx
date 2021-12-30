@@ -20,7 +20,7 @@ import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export function useSendPetitionHandler(
-  petition: useSendPetitionHandler_PetitionFragment,
+  petition: useSendPetitionHandler_PetitionFragment | null,
   onUpdatePetition: (data: UpdatePetitionInput) => Promise<any>,
   validator: () => Promise<boolean>
 ) {
@@ -35,11 +35,7 @@ export function useSendPetitionHandler(
   const showTestSignatureDialog = useHandledTestSignatureDialog();
 
   return useCallback(async () => {
-    if (petition?.__typename !== "Petition") {
-      throw new Error("Can't send a template");
-    }
-
-    if (!(await validator())) return;
+    if (!petition || !(await validator())) return;
 
     try {
       await showTestSignatureDialog(

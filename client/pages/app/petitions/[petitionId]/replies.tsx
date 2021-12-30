@@ -40,7 +40,6 @@ import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
-import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
@@ -738,9 +737,7 @@ PetitionReplies.fragments = {
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
         ...PetitionAttachmentsCard_Petition
-        ...useSendPetitionHandler_Petition
       }
-      ${useSendPetitionHandler.fragments.Petition}
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
       ${ShareButton.fragments.PetitionBase}
