@@ -2,23 +2,21 @@ import { gql } from "@apollo/client";
 import { Button, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { CopySignatureConfigDialog_PetitionSignerFragment } from "@parallel/graphql/__types";
+import {
+  BulkSendSigningMode,
+  CopySignatureConfigDialog_PetitionSignerFragment,
+} from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
-
-export type BatchSendSigningMode =
-  | "COPY_SIGNATURE_SETTINGS"
-  | "LET_RECIPIENT_CHOOSE"
-  | "DISABLE_SIGNATURE";
 
 export function CopySignatureConfigDialog({
   signers,
   ...props
 }: DialogProps<
   { signers: CopySignatureConfigDialog_PetitionSignerFragment[] },
-  BatchSendSigningMode
+  BulkSendSigningMode
 >) {
-  const [option, setOption] = useState<BatchSendSigningMode>();
+  const [option, setOption] = useState<BulkSendSigningMode>();
 
   return (
     <ConfirmDialog

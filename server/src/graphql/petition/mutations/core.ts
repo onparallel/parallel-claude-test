@@ -1125,9 +1125,9 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
     body: nonNull(jsonArg()),
     scheduledAt: datetimeArg(),
     remindersConfig: arg({ type: "RemindersConfigInput" }),
-    batchSendSigningMode: arg({
+    bulkSendSigningMode: arg({
       type: enumType({
-        name: "BatchSendSigningMode",
+        name: "BulkSendSigningMode",
         members: [
           {
             name: "COPY_SIGNATURE_SETTINGS",
@@ -1180,14 +1180,14 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
     );
 
     if (
-      isDefined(args.batchSendSigningMode) &&
-      args.batchSendSigningMode !== "COPY_SIGNATURE_SETTINGS"
+      isDefined(args.bulkSendSigningMode) &&
+      args.bulkSendSigningMode !== "COPY_SIGNATURE_SETTINGS"
     ) {
       await ctx.petitions.updatePetition(
         [petition.id, ...clonedPetitions.map((p) => p.id)],
         {
           signature_config:
-            args.batchSendSigningMode === "LET_RECIPIENT_CHOOSE"
+            args.bulkSendSigningMode === "LET_RECIPIENT_CHOOSE"
               ? {
                   ...petition.signature_config!,
                   signersInfo: [],

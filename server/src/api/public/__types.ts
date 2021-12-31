@@ -75,7 +75,7 @@ export type AccessOpenedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
-export type BatchSendSigningMode =
+export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
   /** Disable eSignature on every petition of this batch. */
@@ -326,10 +326,10 @@ export type Mutation = {
   assignPetitionToUser: SupportMethodResponse;
   /** Creates a petition from a template and send */
   autoSendTemplate: Scalars["String"];
-  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
-  bulkSendPetition: Array<SendPetitionResult>;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
+  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
+  bulkSendPetition: Array<SendPetitionResult>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -619,18 +619,18 @@ export type MutationautoSendTemplateArgs = {
   templateId: Scalars["GID"];
 };
 
+export type MutationbulkCreateContactsArgs = {
+  file: Scalars["Upload"];
+};
+
 export type MutationbulkSendPetitionArgs = {
-  batchSendSigningMode?: InputMaybe<BatchSendSigningMode>;
   body: Scalars["JSON"];
+  bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
   contactIdGroups: Array<Array<Scalars["GID"]>>;
   petitionId: Scalars["GID"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
-};
-
-export type MutationbulkCreateContactsArgs = {
-  file: Scalars["Upload"];
 };
 
 export type MutationcancelScheduledMessageArgs = {

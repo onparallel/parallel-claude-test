@@ -3163,7 +3163,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.batchSendPetition).toEqual([
+      expect(data?.bulkSendPetition).toEqual([
         {
           petition: {
             events: {

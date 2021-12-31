@@ -83,7 +83,7 @@ export interface AccessOpenedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
-export type BatchSendSigningMode =
+export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
   /** Disable eSignature on every petition of this batch. */
@@ -356,10 +356,10 @@ export interface Mutation {
   assignPetitionToUser: SupportMethodResponse;
   /** Creates a petition from a template and send */
   autoSendTemplate: Scalars["String"];
-  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
-  bulkSendPetition: Array<SendPetitionResult>;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
+  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
+  bulkSendPetition: Array<SendPetitionResult>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -649,18 +649,18 @@ export interface MutationautoSendTemplateArgs {
   templateId: Scalars["GID"];
 }
 
+export interface MutationbulkCreateContactsArgs {
+  file: Scalars["Upload"];
+}
+
 export interface MutationbulkSendPetitionArgs {
-  batchSendSigningMode?: InputMaybe<BatchSendSigningMode>;
   body: Scalars["JSON"];
+  bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
   contactIdGroups: Array<Array<Scalars["GID"]>>;
   petitionId: Scalars["GID"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
-}
-
-export interface MutationbulkCreateContactsArgs {
-  file: Scalars["Upload"];
 }
 
 export interface MutationcancelScheduledMessageArgs {
@@ -7605,7 +7605,7 @@ export type useSendPetitionHandler_PetitionFragment = {
   };
 };
 
-export type useSendPetitionHandler_batchSendPetitionMutationVariables = Exact<{
+export type useSendPetitionHandler_bulkSendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   contactIdGroups:
     | Array<Array<Scalars["GID"]> | Scalars["GID"]>
@@ -7615,11 +7615,11 @@ export type useSendPetitionHandler_batchSendPetitionMutationVariables = Exact<{
   body: Scalars["JSON"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-  batchSendSigningMode?: InputMaybe<BatchSendSigningMode>;
+  bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
 }>;
 
-export type useSendPetitionHandler_batchSendPetitionMutation = {
-  batchSendPetition: Array<{
+export type useSendPetitionHandler_bulkSendPetitionMutation = {
+  bulkSendPetition: Array<{
     __typename?: "SendPetitionResult";
     result: Result;
     petition?: { __typename?: "Petition"; id: string; status: PetitionStatus } | null;
@@ -8495,6 +8495,7 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
     author?:
       | {
           __typename?: "PetitionAccess";
+          id: string;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -8529,6 +8530,7 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   author?:
     | {
         __typename?: "PetitionAccess";
+        id: string;
         contact?: {
           __typename?: "Contact";
           id: string;
@@ -14936,6 +14938,7 @@ export type PetitionReplies_PetitionFragment = {
       author?:
         | {
             __typename?: "PetitionAccess";
+            id: string;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -15074,6 +15077,7 @@ export type PetitionReplies_PetitionFieldFragment = {
     author?:
       | {
           __typename?: "PetitionAccess";
+          id: string;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -15240,6 +15244,7 @@ export type PetitionReplies_createPetitionFieldCommentMutation = {
       author?:
         | {
             __typename?: "PetitionAccess";
+            id: string;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -15283,6 +15288,7 @@ export type PetitionReplies_updatePetitionFieldCommentMutation = {
       author?:
         | {
             __typename?: "PetitionAccess";
+            id: string;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -15325,6 +15331,7 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
       author?:
         | {
             __typename?: "PetitionAccess";
+            id: string;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -15482,6 +15489,7 @@ export type PetitionReplies_petitionQuery = {
             author?:
               | {
                   __typename?: "PetitionAccess";
+                  id: string;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -20131,9 +20139,11 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
     isUnread
     isEdited
     isInternal @include(if: $hasInternalComments)
+    ...FieldComment_PetitionFieldComment
   }
   ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
+  ${FieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesFieldComments_PetitionFieldCommentFragment, unknown>;
 export const PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
@@ -21352,24 +21362,24 @@ export const TemplateDetailsModal_autoSendTemplateDocument = gql`
   TemplateDetailsModal_autoSendTemplateMutation,
   TemplateDetailsModal_autoSendTemplateMutationVariables
 >;
-export const useSendPetitionHandler_batchSendPetitionDocument = gql`
-  mutation useSendPetitionHandler_batchSendPetition(
+export const useSendPetitionHandler_bulkSendPetitionDocument = gql`
+  mutation useSendPetitionHandler_bulkSendPetition(
     $petitionId: GID!
     $contactIdGroups: [[GID!]!]!
     $subject: String!
     $body: JSON!
     $remindersConfig: RemindersConfigInput
     $scheduledAt: DateTime
-    $batchSendSigningMode: BatchSendSigningMode
+    $bulkSendSigningMode: BulkSendSigningMode
   ) {
-    batchSendPetition(
+    bulkSendPetition(
       petitionId: $petitionId
       contactIdGroups: $contactIdGroups
       subject: $subject
       body: $body
       remindersConfig: $remindersConfig
       scheduledAt: $scheduledAt
-      batchSendSigningMode: $batchSendSigningMode
+      bulkSendSigningMode: $bulkSendSigningMode
     ) {
       result
       petition {
@@ -21379,8 +21389,8 @@ export const useSendPetitionHandler_batchSendPetitionDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  useSendPetitionHandler_batchSendPetitionMutation,
-  useSendPetitionHandler_batchSendPetitionMutationVariables
+  useSendPetitionHandler_bulkSendPetitionMutation,
+  useSendPetitionHandler_bulkSendPetitionMutationVariables
 >;
 export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument = gql`
   mutation PetitionComposeField_createPetitionFieldAttachmentUploadLink(

@@ -201,7 +201,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  BatchSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
+  BulkSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
   ChangePasswordResult: "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD" | "SUCCESS";
   EntityType: "Contact" | "Organization" | "Petition" | "User";
   FeatureFlag: db.FeatureFlagName;
@@ -3258,8 +3258,8 @@ export interface NexusGenArgTypes {
     };
     bulkSendPetition: {
       // args
-      batchSendSigningMode?: NexusGenEnums["BatchSendSigningMode"] | null; // BatchSendSigningMode
       body: NexusGenScalars["JSON"]; // JSON!
+      bulkSendSigningMode?: NexusGenEnums["BulkSendSigningMode"] | null; // BulkSendSigningMode
       contactIdGroups: NexusGenScalars["GID"][][]; // [[GID!]!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput

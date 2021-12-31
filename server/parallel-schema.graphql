@@ -55,7 +55,7 @@ type AccessOpenedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
-enum BatchSendSigningMode {
+enum BulkSendSigningMode {
   """
   Allow configured signer(s) to sign every petition on the batch
   """
@@ -458,8 +458,8 @@ type Mutation {
   Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages
   """
   bulkSendPetition(
-    batchSendSigningMode: BatchSendSigningMode
     body: JSON!
+    bulkSendSigningMode: BulkSendSigningMode
     contactIdGroups: [[GID!]!]!
     petitionId: GID!
     remindersConfig: RemindersConfigInput

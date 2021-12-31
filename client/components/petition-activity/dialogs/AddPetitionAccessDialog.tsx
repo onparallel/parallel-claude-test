@@ -7,7 +7,6 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
-  BatchSendSigningMode,
   CopySignatureConfigDialog,
   useCopySignatureConfigDialog,
 } from "@parallel/components/petition-compose/dialogs/CopySignatureConfigDialog";
@@ -15,6 +14,7 @@ import { useScheduleMessageDialog } from "@parallel/components/petition-compose/
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
   AddPetitionAccessDialog_PetitionFragment,
+  BulkSendSigningMode,
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
@@ -48,7 +48,7 @@ export type AddPetitionAccessDialogResult = {
   body: RichTextEditorValue;
   remindersConfig: Maybe<RemindersConfig>;
   scheduledAt: Maybe<Date>;
-  batchSendSigningMode?: BatchSendSigningMode;
+  bulkSendSigningMode?: BulkSendSigningMode;
 };
 
 export function AddPetitionAccessDialog({
@@ -123,7 +123,7 @@ export function AddPetitionAccessDialog({
 
       // if the petition has signer contacts configured,
       // ask user if they want that contact(s) to sign all the petitions
-      let batchSendSigningMode: BatchSendSigningMode | undefined;
+      let bulkSendSigningMode: BulkSendSigningMode | undefined;
       if (
         petition.signatureConfig &&
         petition.signatureConfig.signers.length > 0 &&
@@ -133,7 +133,7 @@ export function AddPetitionAccessDialog({
           signers: petition.signatureConfig.signers,
         });
 
-        batchSendSigningMode = option;
+        bulkSendSigningMode = option;
       }
 
       props.onResolve({
@@ -142,7 +142,7 @@ export function AddPetitionAccessDialog({
         body,
         remindersConfig,
         scheduledAt,
-        batchSendSigningMode,
+        bulkSendSigningMode,
       });
     } catch {}
   };

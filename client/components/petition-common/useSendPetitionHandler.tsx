@@ -8,7 +8,7 @@ import {
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import {
   UpdatePetitionInput,
-  useSendPetitionHandler_batchSendPetitionDocument,
+  useSendPetitionHandler_bulkSendPetitionDocument,
   useSendPetitionHandler_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -28,9 +28,9 @@ export function useSendPetitionHandler(
   const router = useRouter();
   const toast = useToast();
 
-  const [batchSendPetition] = useMutation(useSendPetitionHandler_batchSendPetitionDocument);
+  const [bulkSendPetition] = useMutation(useSendPetitionHandler_bulkSendPetitionDocument);
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
-  const showLongBatchSendDialog = useBlockingDialog();
+  const showLongBulkSendDialog = useBlockingDialog();
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
   const showTestSignatureDialog = useHandledTestSignatureDialog();
 
@@ -49,13 +49,13 @@ export function useSendPetitionHandler(
         body,
         remindersConfig,
         scheduledAt,
-        batchSendSigningMode,
+        bulkSendSigningMode,
       } = await showAddPetitionAccessDialog({
         petition,
         onUpdatePetition,
         canAddRecipientGroups: true,
       });
-      const task = batchSendPetition({
+      const task = bulkSendPetition({
         variables: {
           petitionId: petition.id,
           contactIdGroups: recipientIdGroups,
@@ -63,12 +63,12 @@ export function useSendPetitionHandler(
           body,
           remindersConfig,
           scheduledAt: scheduledAt?.toISOString() ?? null,
-          batchSendSigningMode,
+          bulkSendSigningMode,
         },
       });
       if (recipientIdGroups.length > 20) {
         await withError(
-          showLongBatchSendDialog({
+          showLongBulkSendDialog({
             task,
             header: (
               <FormattedMessage
@@ -91,7 +91,7 @@ export function useSendPetitionHandler(
         );
       }
       const { data } = await task;
-      if (data?.batchSendPetition.some((r) => r.result !== "SUCCESS")) {
+      if (data?.bulkSendPetition.some((r) => r.result !== "SUCCESS")) {
         toast({
           isClosable: true,
           status: "error",
@@ -188,23 +188,23 @@ useSendPetitionHandler.fragments = {
 
 useSendPetitionHandler.mutations = [
   gql`
-    mutation useSendPetitionHandler_batchSendPetition(
+    mutation useSendPetitionHandler_bulkSendPetition(
       $petitionId: GID!
       $contactIdGroups: [[GID!]!]!
       $subject: String!
       $body: JSON!
       $remindersConfig: RemindersConfigInput
       $scheduledAt: DateTime
-      $batchSendSigningMode: BatchSendSigningMode
+      $bulkSendSigningMode: BulkSendSigningMode
     ) {
-      batchSendPetition(
+      bulkSendPetition(
         petitionId: $petitionId
         contactIdGroups: $contactIdGroups
         subject: $subject
         body: $body
         remindersConfig: $remindersConfig
         scheduledAt: $scheduledAt
-        batchSendSigningMode: $batchSendSigningMode
+        bulkSendSigningMode: $bulkSendSigningMode
       ) {
         result
         petition {
