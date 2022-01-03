@@ -1774,20 +1774,7 @@ export class PetitionRepository extends BaseRepository {
           this.clonePetitionEvents(
             petitionId,
             cloned.id,
-            [
-              "REPLY_CREATED",
-              "REPLY_UPDATED",
-              "REPLY_DELETED",
-              "COMMENT_DELETED",
-              "COMMENT_PUBLISHED",
-            ],
-            t
-          ),
-          // clone petition field comments into new petition
-          this.cloneFieldComments(
-            fields.map((f) => ({ petitionFieldId: f.id, petitionId: f.petition_id })),
-            newIds,
-            cloned.id,
+            ["REPLY_CREATED", "REPLY_UPDATED", "REPLY_DELETED"],
             t
           ),
         ]);
@@ -1868,28 +1855,6 @@ export class PetitionRepository extends BaseRepository {
           petition_id: toPetitionId,
           type: e.type,
         })) as any[]
-      );
-    }
-  }
-
-  private async cloneFieldComments(
-    fieldIds: { petitionFieldId: number; petitionId: number }[],
-    newFieldsMap: Record<string, number>,
-    toPetitionId: number,
-    t?: Knex.Transaction
-  ) {
-    const fieldComments = (
-      await this.loadPetitionFieldCommentsForField(
-        fieldIds.map((f) => ({ ...f, loadInternalComments: true }))
-      )
-    ).flat();
-    if (fieldComments.length > 0) {
-      await this.from("petition_field_comment", t).insert(
-        fieldComments.map((c) => ({
-          ...omit(c, ["id"]),
-          petition_field_id: newFieldsMap[c.petition_field_id],
-          petition_id: toPetitionId,
-        }))
       );
     }
   }

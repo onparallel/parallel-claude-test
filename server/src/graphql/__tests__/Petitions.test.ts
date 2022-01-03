@@ -3076,7 +3076,7 @@ describe("GraphQL/Petitions", () => {
       expect(organizationCurrentUsageLimit).toEqual([{ id: usageLimit.id, used: 10, limit: 10 }]);
     });
 
-    it("bulk sends should also copy the petition replies, events and comments", async () => {
+    it("bulk sends should also copy the petition replies and events", async () => {
       await mocks.knex.from("organization_usage_limit").where("id", usageLimit.id).update({
         used: 8,
         limit: 10,
@@ -3208,15 +3208,7 @@ describe("GraphQL/Petitions", () => {
             },
             fields: [
               {
-                comments: [
-                  {
-                    content: comment.content,
-                    isUnread: false,
-                    isEdited: false,
-                    isInternal: false,
-                    author: { id: toGlobalId("User", sessionUser.id) },
-                  },
-                ],
+                comments: [],
                 replies: [
                   {
                     content: reply.content,
