@@ -131,7 +131,7 @@ export function PetitionTemplateHeader({
         section: "preview",
         label: intl.formatMessage({
           id: "petition.header.preview-tab",
-          defaultMessage: "Fill",
+          defaultMessage: "Input",
         }),
       },
     ],

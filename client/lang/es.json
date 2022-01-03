@@ -5477,7 +5477,7 @@
   {
     "term": "petition.header.preview-tab",
     "definition": "Completar",
-    "context": "Fill"
+    "context": "Input"
   },
   {
     "term": "petition.header.replies-tab",

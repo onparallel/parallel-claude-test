@@ -45,7 +45,7 @@ export function PetitionLayout({
               }),
               preview: intl.formatMessage({
                 id: "petition.header.preview-tab",
-                defaultMessage: "Fill",
+                defaultMessage: "Input",
               }),
               replies: intl.formatMessage({
                 id: "petition.header.replies-tab",
