@@ -37,12 +37,6 @@ export const ResponsiveButtonIcon = chakraForwardRef<"button", ResponsiveButtonI
         ref={ref}
       >
         <chakra.span
-          marginRight={hideIconOnDesktop ? 0 : 2}
-          display={{ base: "none", [breakpoint]: "inline" }}
-        >
-          {label}
-        </chakra.span>
-        <chakra.span
           display={hideIconOnDesktop ? { base: "inherit", [breakpoint]: "none" } : "inherit"}
         >
           {isValidElement(icon)
@@ -51,6 +45,12 @@ export const ResponsiveButtonIcon = chakraForwardRef<"button", ResponsiveButtonI
                 focusable: false,
               })
             : icon}
+        </chakra.span>
+        <chakra.span
+          marginLeft={hideIconOnDesktop ? 0 : 2}
+          display={{ base: "none", [breakpoint]: "inline" }}
+        >
+          {label}
         </chakra.span>
       </Button>
     </Tooltip>

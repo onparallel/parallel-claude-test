@@ -45,11 +45,11 @@ export function PetitionLayout({
               }),
               preview: intl.formatMessage({
                 id: "petition.header.preview-tab",
-                defaultMessage: "Preview",
+                defaultMessage: "Fill",
               }),
               replies: intl.formatMessage({
                 id: "petition.header.replies-tab",
-                defaultMessage: "Replies",
+                defaultMessage: "Review",
               }),
               activity: intl.formatMessage({
                 id: "petition.header.activity-tab",

@@ -156,14 +156,14 @@ export function PetitionHeader({
         section: "preview",
         label: intl.formatMessage({
           id: "petition.header.preview-tab",
-          defaultMessage: "Preview",
+          defaultMessage: "Fill",
         }),
       },
       {
         section: "replies",
         label: intl.formatMessage({
           id: "petition.header.replies-tab",
-          defaultMessage: "Replies",
+          defaultMessage: "Review",
         }),
       },
       {

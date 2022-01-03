@@ -7563,6 +7563,10 @@ export type useSendPetitionHandler_PetitionFragment = {
   id: string;
   emailSubject?: string | null;
   emailBody?: any | null;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    contact?: { __typename?: "Contact"; id: string } | null;
+  }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     integration?: {
@@ -12341,19 +12345,6 @@ export type PetitionActivity_cancelScheduledMessageMutation = {
   } | null;
 };
 
-export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  contactIds: Array<Scalars["GID"]> | Scalars["GID"];
-  subject: Scalars["String"];
-  body: Scalars["JSON"];
-  remindersConfig?: InputMaybe<RemindersConfigInput>;
-  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-}>;
-
-export type PetitionsActivity_sendPetitionMutation = {
-  sendPetition: { __typename?: "SendPetitionResult"; result: Result };
-};
-
 export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
   start: Scalars["Boolean"];
   petitionId: Scalars["GID"];
@@ -13135,7 +13126,12 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   emailSubject?: string | null;
   emailBody?: any | null;
   updatedAt: string;
-  accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: { __typename?: "Contact"; id: string } | null;
+  }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title: string;
@@ -14051,6 +14047,7 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          contact?: { __typename?: "Contact"; id: string } | null;
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -14268,7 +14265,12 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   deadline?: string | null;
   isRestricted: boolean;
   updatedAt: string;
-  accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: { __typename?: "Contact"; id: string } | null;
+  }>;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -14453,6 +14455,7 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          contact?: { __typename?: "Contact"; id: string } | null;
         }>;
         fields: Array<{
           __typename?: "PetitionField";
@@ -14609,7 +14612,12 @@ export type PetitionPreview_completePetitionMutation = {
     deadline?: string | null;
     isRestricted: boolean;
     updatedAt: string;
-    accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+    accesses: Array<{
+      __typename?: "PetitionAccess";
+      id: string;
+      status: PetitionAccessStatus;
+      contact?: { __typename?: "Contact"; id: string } | null;
+    }>;
     fields: Array<{
       __typename?: "PetitionField";
       id: string;
@@ -14707,6 +14715,7 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          contact?: { __typename?: "Contact"; id: string } | null;
         }>;
         fields: Array<{
           __typename?: "PetitionField";
@@ -19504,6 +19513,11 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
 export const useSendPetitionHandler_PetitionFragmentDoc = gql`
   fragment useSendPetitionHandler_Petition on Petition {
     id
+    accesses {
+      contact {
+        id
+      }
+    }
     signatureConfig {
       integration {
         id
@@ -22750,30 +22764,6 @@ export const PetitionActivity_cancelScheduledMessageDocument = gql`
 ` as unknown as DocumentNode<
   PetitionActivity_cancelScheduledMessageMutation,
   PetitionActivity_cancelScheduledMessageMutationVariables
->;
-export const PetitionsActivity_sendPetitionDocument = gql`
-  mutation PetitionsActivity_sendPetition(
-    $petitionId: GID!
-    $contactIds: [GID!]!
-    $subject: String!
-    $body: JSON!
-    $remindersConfig: RemindersConfigInput
-    $scheduledAt: DateTime
-  ) {
-    sendPetition(
-      petitionId: $petitionId
-      contactIds: $contactIds
-      subject: $subject
-      body: $body
-      remindersConfig: $remindersConfig
-      scheduledAt: $scheduledAt
-    ) {
-      result
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionsActivity_sendPetitionMutation,
-  PetitionsActivity_sendPetitionMutationVariables
 >;
 export const PetitionActivity_switchAutomaticRemindersDocument = gql`
   mutation PetitionActivity_switchAutomaticReminders(

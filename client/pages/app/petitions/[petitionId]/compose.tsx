@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
-import { ArrowForwardIcon, ListIcon, SettingsIcon } from "@parallel/chakra/icons";
+import { ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
@@ -47,12 +47,12 @@ import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityCondition,
 } from "@parallel/utils/fieldVisibility/types";
+import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -388,10 +388,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               data-action="compose-next"
               id="petition-next"
               colorScheme="purple"
-              icon={<ArrowForwardIcon fontSize="18px" />}
+              icon={<PaperPlaneIcon fontSize="18px" />}
               label={intl.formatMessage({
-                id: "generic.next",
-                defaultMessage: "Next",
+                id: "generic.send-to",
+                defaultMessage: "Send to...",
               })}
               onClick={handleNextClick}
             />

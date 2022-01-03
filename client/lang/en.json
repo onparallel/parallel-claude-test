@@ -4035,11 +4035,6 @@
     "context": "Never used"
   },
   {
-    "term": "generic.next",
-    "definition": "Next",
-    "context": "Next"
-  },
-  {
     "term": "generic.next-page",
     "definition": "Next page",
     "context": "Next page"
@@ -4188,6 +4183,11 @@
     "term": "generic.send",
     "definition": "Send",
     "context": "Send"
+  },
+  {
+    "term": "generic.send-to",
+    "definition": "Send to...",
+    "context": "Send to..."
   },
   {
     "term": "generic.sent-at",
@@ -5476,13 +5476,13 @@
   },
   {
     "term": "petition.header.preview-tab",
-    "definition": "Preview",
-    "context": "Preview"
+    "definition": "Fill",
+    "context": "Fill"
   },
   {
     "term": "petition.header.replies-tab",
-    "definition": "Replies",
-    "context": "Replies"
+    "definition": "Review",
+    "context": "Review"
   },
   {
     "term": "petition.long-batch-send-dialog.header",

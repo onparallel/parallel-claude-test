@@ -15,14 +15,18 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
+import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { noop } from "remeda";
 
 export function useSendPetitionHandler(
   petition: useSendPetitionHandler_PetitionFragment | null,
   onUpdatePetition: (data: UpdatePetitionInput) => Promise<any>,
-  validator: () => Promise<boolean>
+  validator: () => Promise<boolean>,
+  onRefetch: () => void = noop,
+  options: { redirect: boolean } = { redirect: true }
 ) {
   const intl = useIntl();
   const router = useRouter();
@@ -33,11 +37,16 @@ export function useSendPetitionHandler(
   const showLongBulkSendDialog = useBlockingDialog();
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
   const showTestSignatureDialog = useHandledTestSignatureDialog();
+  const handleSearchContacts = useSearchContacts();
 
   return useCallback(async () => {
     if (!petition || !(await validator())) return;
 
     try {
+      const currentRecipientIds = petition.accesses
+        .filter((a) => a.contact)
+        .map((a) => a.contact!.id);
+
       await showTestSignatureDialog(
         petition.signatureConfig?.integration?.environment,
         petition.signatureConfig?.integration?.name
@@ -53,7 +62,9 @@ export function useSendPetitionHandler(
       } = await showAddPetitionAccessDialog({
         petition,
         onUpdatePetition,
-        canAddRecipientGroups: true,
+        canAddRecipientGroups: currentRecipientIds.length === 0, // can only do a bulk send if the petition has no accesses yet
+        onSearchContacts: async (search: string, exclude: string[]) =>
+          await handleSearchContacts(search, [...exclude, ...currentRecipientIds]),
       });
       const task = bulkSendPetition({
         variables: {
@@ -151,7 +162,10 @@ export function useSendPetitionHandler(
           ),
         });
       }
-      router.push("/app/petitions");
+      if (options.redirect) {
+        router.push("/app/petitions");
+      }
+      onRefetch();
     } catch (e) {
       if (
         isApolloError(e) &&
@@ -173,6 +187,11 @@ useSendPetitionHandler.fragments = {
   Petition: gql`
     fragment useSendPetitionHandler_Petition on Petition {
       id
+      accesses {
+        contact {
+          id
+        }
+      }
       signatureConfig {
         integration {
           id

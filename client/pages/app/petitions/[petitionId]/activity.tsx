@@ -5,10 +5,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import {
-  AddPetitionAccessDialog,
-  useAddPetitionAccessDialog,
-} from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
+import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/dialogs/ConfigureRemindersDialog";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/dialogs/ConfirmCancelScheduledMessageDialog";
 import { useConfirmDeactivateAccessDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDeactivateAccessDialog";
@@ -30,19 +27,16 @@ import {
   PetitionActivity_switchAutomaticRemindersDocument,
   PetitionActivity_updatePetitionDocument,
   PetitionActivity_userDocument,
-  PetitionsActivity_sendPetitionDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
-import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -96,11 +90,8 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     return true;
   };
 
-  const handleNextClick = useSendPetitionHandler(
-    petition,
-    handleUpdatePetition,
-    _validatePetitionFields
-  );
+  const handleNextClick = (opts: { redirect: boolean }) =>
+    useSendPetitionHandler(petition, handleUpdatePetition, _validatePetitionFields, refetch, opts);
 
   const showNoRemindersLeftToast = (petitionAccessId?: string) => {
     const access = petition.accesses.find((a) => a.id === petitionAccessId)!;
@@ -171,50 +162,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     },
     [petitionId, petition.accesses]
   );
-
-  const addPetitionAccessDialog = useAddPetitionAccessDialog();
-  const handleSearchContacts = useSearchContacts();
-  const [sendPetition] = useMutation(PetitionsActivity_sendPetitionDocument);
-  const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
-
-  const handleAddPetitionAccess = useCallback(async () => {
-    try {
-      const currentRecipientIds = petition.accesses
-        .filter((a) => a.contact)
-        .map((a) => a.contact!.id);
-      const {
-        recipientIdGroups: [contactIds],
-        subject,
-        body,
-        scheduledAt,
-        remindersConfig,
-      } = await addPetitionAccessDialog({
-        petition,
-        onSearchContacts: async (search: string, exclude: string[]) => {
-          return await handleSearchContacts(search, [...exclude, ...currentRecipientIds]);
-        },
-      });
-      await sendPetition({
-        variables: {
-          petitionId,
-          contactIds,
-          subject,
-          body,
-          scheduledAt: scheduledAt?.toISOString() ?? null,
-          remindersConfig,
-        },
-      });
-      await refetch();
-    } catch (e) {
-      if (
-        isApolloError(e) &&
-        e.graphQLErrors[0]?.extensions?.code === "PETITION_SEND_CREDITS_ERROR"
-      ) {
-        await withError(showPetitionLimitReachedErrorDialog());
-      }
-    }
-  }, [petitionId, petition.accesses, showPetitionLimitReachedErrorDialog]);
-
   const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
   const [cancelScheduledMessage] = useMutation(PetitionActivity_cancelScheduledMessageDocument);
   const handleCancelScheduledMessage = useCallback(
@@ -230,13 +177,13 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     [petitionId]
   );
 
-  const confirmRectivateAccess = useConfirmReactivateAccessDialog();
+  const confirmReactivateAccess = useConfirmReactivateAccessDialog();
   const [reactivateAccess] = useMutation(PetitionActivity_reactivateAccessesDocument);
   const handleReactivateAccess = useCallback(
     async (accessId: string) => {
       const { contact } = petition.accesses.find((a) => a.id === accessId)!;
       try {
-        await confirmRectivateAccess({
+        await confirmReactivateAccess({
           nameOrEmail: contact?.fullName ?? contact?.email ?? "",
         });
       } catch {
@@ -383,11 +330,11 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         margin={4}
         petition={petition}
         onSendReminders={handleSendReminders}
-        onAddPetitionAccess={handleAddPetitionAccess}
+        onAddPetitionAccess={handleNextClick({ redirect: false })}
         onReactivateAccess={handleReactivateAccess}
         onDeactivateAccess={handleDeactivateAccess}
         onConfigureReminders={handleConfigureReminders}
-        onPetitionSend={handleNextClick}
+        onPetitionSend={handleNextClick({ redirect: true })}
       />
       <Box margin={4}>
         <PetitionActivityTimeline
@@ -477,27 +424,6 @@ PetitionActivity.mutations = [
       cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
         id
         status
-      }
-    }
-  `,
-  gql`
-    mutation PetitionsActivity_sendPetition(
-      $petitionId: GID!
-      $contactIds: [GID!]!
-      $subject: String!
-      $body: JSON!
-      $remindersConfig: RemindersConfigInput
-      $scheduledAt: DateTime
-    ) {
-      sendPetition(
-        petitionId: $petitionId
-        contactIds: $contactIds
-        subject: $subject
-        body: $body
-        remindersConfig: $remindersConfig
-        scheduledAt: $scheduledAt
-      ) {
-        result
       }
     }
   `,

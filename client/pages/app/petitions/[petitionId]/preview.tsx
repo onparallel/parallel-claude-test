@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, Flex, Stack, useToast } from "@chakra-ui/react";
-import { ArrowForwardIcon } from "@parallel/chakra/icons";
+import { PaperPlaneIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
@@ -33,11 +33,11 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
+import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
-import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
@@ -239,10 +239,10 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               data-action="compose-next"
               id="petition-next"
               colorScheme="purple"
-              icon={<ArrowForwardIcon fontSize="18px" />}
+              icon={<PaperPlaneIcon fontSize="18px" />}
               label={intl.formatMessage({
-                id: "generic.next",
-                defaultMessage: "Next",
+                id: "generic.send-to",
+                defaultMessage: "Send to...",
               })}
               onClick={handleNextClick}
             />

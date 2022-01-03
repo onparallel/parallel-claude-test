@@ -192,7 +192,7 @@ function Petitions() {
       row.__typename === "Petition"
         ? (
             {
-              DRAFT: "compose",
+              DRAFT: "preview",
               PENDING: "replies",
               COMPLETED: "replies",
               CLOSED: "replies",
