@@ -81,7 +81,6 @@ import {
   repliesBelongsToPetition,
   templateDoesNotHavePublicPetitionLink,
   userHasAccessToPetitions,
-  userHasFeatureFlag,
 } from "../authorizers";
 import {
   petitionAccessesNotOptedOut,
@@ -1715,114 +1714,6 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
       publicPetitionLinkData,
       `User:${ctx.user!.id}`
     );
-  },
-});
-
-export const autoSendTemplate = mutationField("autoSendTemplate", {
-  type: "String",
-  description: "Creates a petition from a template and send",
-  authorize: authenticateAnd(
-    userHasFeatureFlag("AUTO_SEND_TEMPLATE"),
-    or(userHasAccessToPetitions("templateId"), petitionsArePublicTemplates("templateId")),
-    petitionHasRepliableFields("templateId")
-  ),
-  args: {
-    templateId: nonNull(globalIdArg("Petition")),
-    name: nonNull(stringArg()),
-  },
-  validateArgs: validateAnd(notEmptyString((args) => args.name, "name")),
-  resolve: async (_, args, ctx) => {
-    const template = await ctx.petitions.loadPetition(args.templateId);
-    if (!template || !template.is_template) {
-      throw new Error("Invalid template");
-    }
-
-    const petitionSendUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
-      ctx.user!.org_id,
-      "PETITION_SEND"
-    );
-
-    if (!petitionSendUsageLimit || petitionSendUsageLimit.used + 1 > petitionSendUsageLimit.limit) {
-      throw new WhitelistedError(
-        `Not enough credits to send the petition`,
-        "PETITION_SEND_CREDITS_ERROR",
-        {
-          needed: 1,
-          used: petitionSendUsageLimit?.used || 0,
-          limit: petitionSendUsageLimit?.limit || 0,
-        }
-      );
-    }
-
-    const petition = await ctx.petitions.clonePetition(template.id, ctx.user!, {
-      is_template: false,
-      status: "DRAFT",
-      name: args.name,
-    });
-
-    if (template.org_id === ctx.user!.org_id) {
-      await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
-        petition.id,
-        template.id,
-        `User:${ctx.user!.id}`
-      );
-    }
-
-    await ctx.petitions.createEvent({
-      type: "TEMPLATE_USED",
-      petition_id: template.id,
-      data: {
-        new_petition_id: petition.id,
-        org_id: ctx.user!.org_id,
-        user_id: ctx.user!.id,
-      },
-    });
-
-    const [contact] = await ctx.contacts.loadOrCreate(
-      {
-        email: ctx.user!.email,
-        firstName: ctx.user!.first_name,
-        lastName: ctx.user!.last_name,
-        orgId: ctx.user!.org_id,
-      },
-      `User:${ctx.user!.id}`
-    );
-
-    const [{ result, error, accesses, messages }] = await presendPetition(
-      [[petition, [contact.id]]],
-      {
-        subject: args.name,
-        body: template.email_body ? JSON.parse(template.email_body) : [],
-        remindersConfig: petition.reminders_config ?? null,
-      },
-      ctx.user!,
-      false,
-      ctx
-    );
-
-    if (result === "FAILURE" && error.constraint === "petition_access__petition_id_contact_id") {
-      throw new WhitelistedError(
-        "This petition was already sent to some of the contacts",
-        "PETITION_ALREADY_SENT_ERROR"
-      );
-    }
-
-    if (result === "SUCCESS") {
-      await sendPetitionMessageEmails(messages ?? [], ctx);
-    }
-
-    await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-      ctx.user!.org_id,
-      "PETITION_SEND",
-      1
-    );
-
-    const org = await ctx.organizations.loadOrg(ctx.user!.org_id);
-    const customHost = org!.custom_host;
-    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-    const url = customHost ? `${protocol}://${customHost}` : ctx.config.misc.parallelUrl;
-
-    return `${url}/${petition!.locale}/petition/${accesses![0].keycode}`;
   },
 });
 

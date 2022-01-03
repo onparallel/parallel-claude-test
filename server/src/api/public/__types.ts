@@ -324,8 +324,6 @@ export type Mutation = {
   addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
-  /** Creates a petition from a template and send */
-  autoSendTemplate: Scalars["String"];
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
@@ -612,11 +610,6 @@ export type MutationaddUsersToUserGroupArgs = {
 export type MutationassignPetitionToUserArgs = {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];
-};
-
-export type MutationautoSendTemplateArgs = {
-  name: Scalars["String"];
-  templateId: Scalars["GID"];
 };
 
 export type MutationbulkCreateContactsArgs = {

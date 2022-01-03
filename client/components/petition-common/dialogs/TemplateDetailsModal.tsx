@@ -299,20 +299,11 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
   );
 }
 
-TemplateDetailsModal.mutations = [
-  gql`
-    mutation TemplateDetailsModal_autoSendTemplate($templateId: GID!, $name: String!) {
-      autoSendTemplate(templateId: $templateId, name: $name)
-    }
-  `,
-];
-
 TemplateDetailsModal.fragments = {
   User: gql`
     fragment TemplateDetailsModal_User on User {
       id
       role
-      hasAutoSendTemplate: hasFeatureFlag(featureFlag: AUTO_SEND_TEMPLATE)
     }
   `,
   PetitionTemplate: gql`

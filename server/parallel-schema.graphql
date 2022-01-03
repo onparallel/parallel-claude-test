@@ -445,11 +445,6 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
-  Creates a petition from a template and send
-  """
-  autoSendTemplate(name: String!, templateId: GID!): String!
-
-  """
   Load contacts from an excel file, creating the ones not found on database
   """
   bulkCreateContacts(file: Upload!): [Contact!]!

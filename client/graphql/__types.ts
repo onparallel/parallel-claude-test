@@ -354,8 +354,6 @@ export interface Mutation {
   addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
-  /** Creates a petition from a template and send */
-  autoSendTemplate: Scalars["String"];
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
@@ -642,11 +640,6 @@ export interface MutationaddUsersToUserGroupArgs {
 export interface MutationassignPetitionToUserArgs {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];
-}
-
-export interface MutationautoSendTemplateArgs {
-  name: Scalars["String"];
-  templateId: Scalars["GID"];
 }
 
 export interface MutationbulkCreateContactsArgs {
@@ -7527,18 +7520,10 @@ export type TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment =
   | TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment
   | TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserPermission_Fragment;
 
-export type TemplateDetailsModal_autoSendTemplateMutationVariables = Exact<{
-  templateId: Scalars["GID"];
-  name: Scalars["String"];
-}>;
-
-export type TemplateDetailsModal_autoSendTemplateMutation = { autoSendTemplate: string };
-
 export type TemplateDetailsModal_UserFragment = {
   __typename?: "User";
   id: string;
   role: OrganizationRole;
-  hasAutoSendTemplate: boolean;
 };
 
 export type TemplateDetailsModal_PetitionTemplateFragment = {
@@ -15942,7 +15927,6 @@ export type NewPetition_UserFragment = {
   isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
-  hasAutoSendTemplate: boolean;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -16002,7 +15986,6 @@ export type NewPetition_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasAutoSendTemplate: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -20460,7 +20443,6 @@ export const TemplateDetailsModal_UserFragmentDoc = gql`
   fragment TemplateDetailsModal_User on User {
     id
     role
-    hasAutoSendTemplate: hasFeatureFlag(featureFlag: AUTO_SEND_TEMPLATE)
   }
 ` as unknown as DocumentNode<TemplateDetailsModal_UserFragment, unknown>;
 export const NewPetition_UserFragmentDoc = gql`
@@ -21353,14 +21335,6 @@ export const PublicLinkSettingsDialog_isValidSlugDocument = gql`
 ` as unknown as DocumentNode<
   PublicLinkSettingsDialog_isValidSlugQuery,
   PublicLinkSettingsDialog_isValidSlugQueryVariables
->;
-export const TemplateDetailsModal_autoSendTemplateDocument = gql`
-  mutation TemplateDetailsModal_autoSendTemplate($templateId: GID!, $name: String!) {
-    autoSendTemplate(templateId: $templateId, name: $name)
-  }
-` as unknown as DocumentNode<
-  TemplateDetailsModal_autoSendTemplateMutation,
-  TemplateDetailsModal_autoSendTemplateMutationVariables
 >;
 export const useSendPetitionHandler_bulkSendPetitionDocument = gql`
   mutation useSendPetitionHandler_bulkSendPetition(
