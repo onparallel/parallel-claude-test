@@ -130,8 +130,8 @@ export function PetitionTemplateHeader({
       {
         section: "preview",
         label: intl.formatMessage({
-          id: "petition.header.preview-tab",
-          defaultMessage: "Input",
+          id: "template.header.preview-tab",
+          defaultMessage: "Preview",
         }),
       },
     ],

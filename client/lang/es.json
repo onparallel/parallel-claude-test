@@ -8505,6 +8505,11 @@
     "context": "Write a short description of this template."
   },
   {
+    "term": "template.header.preview-tab",
+    "definition": "Previsualizar",
+    "context": "Preview"
+  },
+  {
     "term": "template.message-settings.header",
     "definition": "Email a enviar junto con la plantilla",
     "context": "Email to send with the template"
