@@ -57,6 +57,7 @@ import {
   ListOfPetitionAccesses,
   ListOfPetitionAttachments,
   ListOfPetitionFieldsWithReplies,
+  ListOfSignatureRequests,
   ListOfSubscriptions,
   PaginatedContacts,
   PaginatedPetitions,
@@ -92,6 +93,8 @@ import {
   DeleteTemplate_deletePetitionsDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
   DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument,
+  DownloadSignedDocument_downloadAuditTrailDocument,
+  DownloadSignedDocument_downloadSignedDocDocument,
   EventSubscriptions_createSubscriptionDocument,
   EventSubscriptions_deleteSubscriptionDocument,
   EventSubscriptions_getSubscriptionsDocument,
@@ -105,6 +108,7 @@ import {
   GetPetitionRecipients_petitionAccessesDocument,
   GetPetitions_petitionsDocument,
   GetPetition_petitionDocument,
+  GetSignatures_petitionSignaturesDocument,
   GetTags_tagsDocument,
   GetTemplates_templatesDocument,
   GetTemplate_templateDocument,
@@ -193,6 +197,7 @@ export const api = new RestApi({
         "Petitions",
         "Petition replies",
         "Attachments",
+        "Signatures",
         "Petition Sharing",
         "Templates",
         "Tags",
@@ -213,6 +218,11 @@ export const api = new RestApi({
       description: "See what your clients replied in your petitions",
     },
     { name: "Attachments", description: "Attach files to your petitions" },
+    {
+      name: "Signatures",
+      description:
+        "Request a digital signature on your petitions with our eSignature integrations.",
+    },
     {
       name: "Petition Sharing",
       description: "Share your petitions with members of your organization for collaborative work",
@@ -278,6 +288,52 @@ const petitionIncludeParam = {
     values: ["recipients", "fields", "tags"],
   }),
 };
+
+const templateIncludeParam = {
+  include: enumParam({
+    description: "Include optional fields in the response",
+    array: true,
+    required: false,
+    values: ["fields", "tags"],
+  }),
+};
+
+const petitionId = idParam({
+  type: "Petition",
+  description: "The ID of the petition",
+});
+const attachmentId = idParam({
+  type: "PetitionAttachment",
+  description: "The ID of the petition attachment",
+});
+const replyId = idParam({
+  type: "PetitionFieldReply",
+  description: "The ID of the reply",
+});
+const fieldId = idParam({
+  type: "PetitionField",
+  description: "The ID of the petition field",
+});
+const userId = idParam({
+  type: "User",
+  description: "The ID of the user",
+});
+const userGroupId = idParam({
+  type: "UserGroup",
+  description: "The ID of the user group",
+});
+const templateId = idParam({
+  type: "Petition",
+  description: "The ID of the template",
+});
+const subscriptionId = idParam({
+  type: "PetitionEventSubscription",
+  description: "The ID of the subscription",
+});
+const signatureId = idParam({
+  type: "PetitionSignatureRequest",
+  description: "The ID of the signature request",
+});
 
 api.path("/tags").get(
   {
@@ -432,11 +488,6 @@ api
       return Created(mapPetition(result.createPetition));
     }
   );
-
-const petitionId = idParam({
-  type: "Petition",
-  description: "The ID of the petition",
-});
 
 api
   .path("/petitions/:petitionId", { params: { petitionId } })
@@ -633,11 +684,6 @@ api
       throw new BadRequestError(uploadResponse.statusText);
     }
   );
-
-const attachmentId = idParam({
-  type: "PetitionAttachment",
-  description: "The ID of the petition attachment",
-});
 
 api
   .path("/petitions/:petitionId/attachments/:attachmentId", {
@@ -1045,16 +1091,6 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
     return Ok(mapPetition(result.petition!).fields);
   }
 );
-
-const replyId = idParam({
-  type: "PetitionFieldReply",
-  description: "The ID of the reply",
-});
-
-const fieldId = idParam({
-  type: "PetitionField",
-  description: "The ID of the petition field",
-});
 
 api
   .path("/petitions/:petitionId/fields/:fieldId/replies", {
@@ -1692,11 +1728,6 @@ api
     }
   );
 
-const userId = idParam({
-  type: "User",
-  description: "The ID of the user",
-});
-
 api
   .path("/petitions/:petitionId/permissions/user/:userId", {
     params: { petitionId, userId },
@@ -1726,11 +1757,6 @@ api
       return NoContent();
     }
   );
-
-const userGroupId = idParam({
-  type: "UserGroup",
-  description: "The ID of the user group",
-});
 
 api
   .path("/petitions/:petitionId/permissions/group/:userGroupId", {
@@ -1804,14 +1830,155 @@ api
     }
   );
 
-const templateIncludeParam = {
-  include: enumParam({
-    description: "Include optional fields in the response",
-    array: true,
-    required: false,
-    values: ["fields", "tags"],
-  }),
-};
+api.path("/petitions/:petitionId/signatures", { params: { petitionId } }).get(
+  {
+    operationId: "GetSignatures",
+    summary: "List petition signatures",
+    description: "List every signature request linked with your petition.",
+    responses: { 204: SuccessResponse(ListOfSignatureRequests) },
+    tags: ["Signatures"],
+  },
+  async ({ client, params }) => {
+    gql`
+      query GetSignatures_petitionSignatures($petitionId: GID!) {
+        petition(id: $petitionId) {
+          __typename
+          ... on Petition {
+            signatureRequests {
+              id
+              status
+              environment
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      }
+    `;
+    const data = await client.request(GetSignatures_petitionSignaturesDocument, params);
+
+    if (data.petition?.__typename === "PetitionTemplate") {
+      return Ok([]);
+    } else {
+      return Ok(data.petition?.signatureRequests ?? []);
+    }
+  }
+);
+
+api
+  .path("/petitions/:petitionId/signatures/:signatureId/document", {
+    params: { petitionId, signatureId },
+  })
+  .get(
+    {
+      operationId: "DownloadSignedDocument",
+      summary: "Download the signed document",
+      description: outdent`
+        Download the signed document.
+
+        ### Important
+        Note that *there will be a redirect* to a temporary download endpoint on
+        AWS S3 so make sure to configure your HTTP client to follow redirects.
+
+        For example if you were to use curl you would need to provide the
+        \`-L\` flag, e.g.:
+
+        ~~~bash
+        curl -s -L -XGET \\
+          -H 'Authorization: Bearer <your API token>' \\
+          'http://www.onparallel.com/api/v1/petitions/{petitionId}/signatures/{signatureId}/document' \\
+          > signed.pdf
+        ~~~
+      `,
+      responses: {
+        302: RedirectResponse("Redirect to the resource on AWS S3"),
+        400: ErrorResponse({
+          description: "The signed document is not yet ready to be downloaded",
+        }),
+      },
+      tags: ["Signatures"],
+    },
+    async ({ client, params }) => {
+      gql`
+        mutation DownloadSignedDocument_downloadSignedDoc($signatureId: GID!) {
+          signedPetitionDownloadLink(petitionSignatureRequestId: $signatureId) {
+            result
+            url
+          }
+        }
+      `;
+      const { signedPetitionDownloadLink } = await client.request(
+        DownloadSignedDocument_downloadSignedDocDocument,
+        {
+          signatureId: params.signatureId,
+        }
+      );
+      if (signedPetitionDownloadLink.result === "FAILURE") {
+        throw new BadRequestError("The signed document is not yet ready to be downloaded");
+      } else {
+        return Redirect(signedPetitionDownloadLink.url!);
+      }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/signatures/:signatureId/audit", {
+    params: { petitionId, signatureId },
+  })
+  .get(
+    {
+      operationId: "DownloadAuditTrail",
+      summary: "Download the audit trail",
+      description: outdent`
+      Download the audit trail.
+
+      ### Important
+      Note that *there will be a redirect* to a temporary download endpoint on
+      AWS S3 so make sure to configure your HTTP client to follow redirects.
+
+      For example if you were to use curl you would need to provide the
+      \`-L\` flag, e.g.:
+
+      ~~~bash
+      curl -s -L -XGET \\
+        -H 'Authorization: Bearer <your API token>' \\
+        'http://www.onparallel.com/api/v1/petitions/{petitionId}/signatures/{signatureId}/audit' \\
+        > audit-trail.pdf
+      ~~~
+    `,
+      responses: {
+        302: RedirectResponse("Redirect to the resource on AWS S3"),
+        400: ErrorResponse({
+          description: "The document is not yet ready to be downloaded",
+        }),
+      },
+      tags: ["Signatures"],
+    },
+    async ({ client, params }) => {
+      gql`
+        mutation DownloadSignedDocument_downloadAuditTrail($signatureId: GID!) {
+          signedPetitionDownloadLink(
+            petitionSignatureRequestId: $signatureId
+            downloadAuditTrail: true
+          ) {
+            result
+            url
+          }
+        }
+      `;
+      const { signedPetitionDownloadLink } = await client.request(
+        DownloadSignedDocument_downloadAuditTrailDocument,
+        {
+          signatureId: params.signatureId,
+        }
+      );
+      if (signedPetitionDownloadLink.result === "FAILURE") {
+        throw new BadRequestError("The document is not yet ready to be downloaded");
+      } else {
+        return Redirect(signedPetitionDownloadLink.url!);
+      }
+    }
+  );
 
 api.path("/templates").get(
   {
@@ -1882,11 +2049,6 @@ api.path("/templates").get(
     return Ok({ items: items.map((t) => mapTemplate(t)), totalCount });
   }
 );
-
-const templateId = idParam({
-  type: "Petition",
-  description: "The ID of the template",
-});
 
 api
   .path("/templates/:templateId", {
@@ -2202,11 +2364,6 @@ api.path("/users").get(
     return Ok(result.me.organization.users);
   }
 );
-
-const subscriptionId = idParam({
-  type: "PetitionEventSubscription",
-  description: "The ID of the subscription",
-});
 
 api
   .path("/subscriptions")

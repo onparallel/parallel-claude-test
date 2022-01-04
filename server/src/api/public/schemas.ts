@@ -1709,3 +1709,42 @@ export const FileUpload = schema({
     },
   },
 } as const);
+
+const _SignatureRequest = {
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "environment", "createdAt", "updatedAt", "status"],
+  properties: {
+    id: {
+      type: "string",
+      description: "The ID of the petition signature request",
+      example: toGlobalId("PetitionSignatureRequest", 1),
+    },
+    environment: {
+      description:
+        "The environment of the used signature integration. DEMO signatures have no legal validity.",
+      type: "string",
+      enum: ["DEMO", "PRODUCTION"],
+      example: "PRODUCTION",
+    },
+    createdAt: {
+      description: "Creation date of the signature request",
+      type: "string",
+      format: "date-time",
+      example: new Date(2021, 1, 15).toISOString(),
+    },
+    updatedAt: {
+      description: "Date and time of the last event on the signature request",
+      type: "string",
+      format: "date-time",
+      example: new Date(2021, 2, 15).toISOString(),
+    },
+    status: {
+      type: "string",
+      enum: ["ENQUEUED", "PROCESSING", "CANCELLED", "COMPLETED"],
+      description: "Current status of the signature request",
+      example: "COMPLETED",
+    },
+  },
+} as const;
+export const ListOfSignatureRequests = ListOf(_SignatureRequest);

@@ -4050,6 +4050,42 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
   >;
 };
 
+export type GetSignatures_petitionSignaturesQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type GetSignatures_petitionSignaturesQuery = {
+  petition:
+    | {
+        __typename: "Petition";
+        signatureRequests: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+        }> | null;
+      }
+    | { __typename: "PetitionTemplate" }
+    | null;
+};
+
+export type DownloadSignedDocument_downloadSignedDocMutationVariables = Exact<{
+  signatureId: Scalars["GID"];
+}>;
+
+export type DownloadSignedDocument_downloadSignedDocMutation = {
+  signedPetitionDownloadLink: { result: Result; url: string | null };
+};
+
+export type DownloadSignedDocument_downloadAuditTrailMutationVariables = Exact<{
+  signatureId: Scalars["GID"];
+}>;
+
+export type DownloadSignedDocument_downloadAuditTrailMutation = {
+  signedPetitionDownloadLink: { result: Result; url: string | null };
+};
+
 export type GetTemplates_templatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -5067,6 +5103,47 @@ export const TransferPetition_transferPetitionOwnershipDocument = gql`
 ` as unknown as DocumentNode<
   TransferPetition_transferPetitionOwnershipMutation,
   TransferPetition_transferPetitionOwnershipMutationVariables
+>;
+export const GetSignatures_petitionSignaturesDocument = gql`
+  query GetSignatures_petitionSignatures($petitionId: GID!) {
+    petition(id: $petitionId) {
+      __typename
+      ... on Petition {
+        signatureRequests {
+          id
+          status
+          environment
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  GetSignatures_petitionSignaturesQuery,
+  GetSignatures_petitionSignaturesQueryVariables
+>;
+export const DownloadSignedDocument_downloadSignedDocDocument = gql`
+  mutation DownloadSignedDocument_downloadSignedDoc($signatureId: GID!) {
+    signedPetitionDownloadLink(petitionSignatureRequestId: $signatureId) {
+      result
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  DownloadSignedDocument_downloadSignedDocMutation,
+  DownloadSignedDocument_downloadSignedDocMutationVariables
+>;
+export const DownloadSignedDocument_downloadAuditTrailDocument = gql`
+  mutation DownloadSignedDocument_downloadAuditTrail($signatureId: GID!) {
+    signedPetitionDownloadLink(petitionSignatureRequestId: $signatureId, downloadAuditTrail: true) {
+      result
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  DownloadSignedDocument_downloadAuditTrailMutation,
+  DownloadSignedDocument_downloadAuditTrailMutationVariables
 >;
 export const GetTemplates_templatesDocument = gql`
   query GetTemplates_templates(
