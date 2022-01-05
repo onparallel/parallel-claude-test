@@ -6596,13 +6596,18 @@
   },
   {
     "term": "public.home.hero-subtitle",
-    "definition": "With Parallel you can easily automate forms with documents and make it an agile and safe process.",
-    "context": "With Parallel you can easily automate forms with documents and make it an agile and safe process."
+    "definition": "Accelerate by 80% your processes.",
+    "context": "Accelerate by 80% your processes."
+  },
+  {
+    "term": "public.home.hero-subtitle2",
+    "definition": "Eliminate errors by automating time-consuming back-office and legal tasks.",
+    "context": "Eliminate errors by automating time-consuming back-office and legal tasks."
   },
   {
     "term": "public.home.hero-title",
-    "definition": "Automate your workflows with clients",
-    "context": "Automate your workflows with clients"
+    "definition": "Collaborative process management software for back-office and sales teams",
+    "context": "Collaborative process management software for back-office and sales teams"
   },
   {
     "term": "public.home.title",
@@ -7025,74 +7030,74 @@
     "context": "Opt out from emails"
   },
   {
-    "term": "public.parallel-use-cases.aml-description",
-    "definition": "Close your know your customers processes faster.",
-    "context": "Close your know your customers processes faster."
+    "term": "public.parallel-use-cases.compliance-description",
+    "definition": "Complete KYC processes faster.",
+    "context": "Complete KYC processes faster."
   },
   {
-    "term": "public.parallel-use-cases.aml-title",
-    "definition": "Anti Money Laundering",
-    "context": "Anti Money Laundering"
+    "term": "public.parallel-use-cases.compliance-title",
+    "definition": "Compliance",
+    "context": "Compliance"
   },
   {
-    "term": "public.parallel-use-cases.corporate-description",
-    "definition": "Make it easier to manage your investors information.",
-    "context": "Make it easier to manage your investors information."
+    "term": "public.parallel-use-cases.finance-description",
+    "definition": "Get faster your customer details to bill earlier.",
+    "context": "Get faster your customer details to bill earlier."
   },
   {
-    "term": "public.parallel-use-cases.corporate-title",
-    "definition": "Corporate",
-    "context": "Corporate"
+    "term": "public.parallel-use-cases.finance-title",
+    "definition": "Finance",
+    "context": "Finance"
   },
   {
-    "term": "public.parallel-use-cases.litigation-description",
-    "definition": "Collect precedents on time and focus on solving the case.",
-    "context": "Collect precedents on time and focus on solving the case."
+    "term": "public.parallel-use-cases.hr-description",
+    "definition": "Get all the documentation you need from your employees.",
+    "context": "Get all the documentation you need from your employees."
   },
   {
-    "term": "public.parallel-use-cases.litigation-title",
-    "definition": "Litigation",
-    "context": "Litigation"
+    "term": "public.parallel-use-cases.hr-title",
+    "definition": "HR",
+    "context": "HR"
   },
   {
-    "term": "public.parallel-use-cases.other-contact",
-    "definition": "Contact us",
-    "context": "Contact us"
+    "term": "public.parallel-use-cases.legal-description",
+    "definition": "Implement legal processes effortlessly.",
+    "context": "Implement legal processes effortlessly."
+  },
+  {
+    "term": "public.parallel-use-cases.legal-title",
+    "definition": "Legal",
+    "context": "Legal"
+  },
+  {
+    "term": "public.parallel-use-cases.other-templates",
+    "definition": "See our templates",
+    "context": "See our templates"
   },
   {
     "term": "public.parallel-use-cases.other-title",
-    "definition": "Can't find your use case?",
-    "context": "Can't find your use case?"
+    "definition": "Looking for more use cases?",
+    "context": "Looking for more use cases?"
   },
   {
-    "term": "public.parallel-use-cases.real-estate-description",
-    "definition": "Obtain the documents to close real estate transactions faster.",
-    "context": "Obtain the documents to close real estate transactions faster."
+    "term": "public.parallel-use-cases.sales-description",
+    "definition": "Get everything you need to close a contract in 5 minutes.",
+    "context": "Get everything you need to close a contract in 5 minutes."
   },
   {
-    "term": "public.parallel-use-cases.real-estate-title",
-    "definition": "Real Estate",
-    "context": "Real Estate"
+    "term": "public.parallel-use-cases.sales-title",
+    "definition": "Sales",
+    "context": "Sales"
   },
   {
     "term": "public.parallel-use-cases.subtitle",
-    "definition": "We are a flexible tool able to solve complex processes",
-    "context": "We are a flexible tool able to solve complex processes"
-  },
-  {
-    "term": "public.parallel-use-cases.tax-description",
-    "definition": "Manage the documents of your tax returns campaigns.",
-    "context": "Manage the documents of your tax returns campaigns."
-  },
-  {
-    "term": "public.parallel-use-cases.tax-title",
-    "definition": "Tax",
-    "context": "Tax"
+    "definition": "Parallel is a flexible tool with the ability to manage complex processes",
+    "context": "Parallel is a flexible tool with the ability to manage complex processes"
   },
   {
     "term": "public.parallel-use-cases.title",
-    "definition": "What Parallel can do for you",
-    "context": "What Parallel can do for you"
+    "definition": "Processes that you can make more efficient",
+    "context": "Processes that you can make more efficient"
   },
   {
     "term": "public.people.hero-title",

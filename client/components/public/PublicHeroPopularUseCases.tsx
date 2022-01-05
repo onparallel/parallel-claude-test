@@ -18,13 +18,13 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
       <Heading as="h2" size="xl" fontWeight="bold">
         <FormattedMessage
           id="public.parallel-use-cases.title"
-          defaultMessage="What Parallel can do for you"
+          defaultMessage="Processes that you can make more efficient"
         />
       </Heading>
       <Heading as="h3" size="md" fontWeight="light" marginTop={4}>
         <FormattedMessage
           id="public.parallel-use-cases.subtitle"
-          defaultMessage="We are a flexible tool able to solve complex processes"
+          defaultMessage="Parallel is a flexible tool with the ability to manage complex processes"
         />
       </Heading>
       <Grid
@@ -38,99 +38,96 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         }}
       >
         <Feature
+          url="/templates/sales"
           image={
             <Image
               role="presentation"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-aml.svg`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-sales.svg`}
             />
           }
           header={
-            <FormattedMessage
-              id="public.parallel-use-cases.aml-title"
-              defaultMessage="Anti Money Laundering"
-            />
+            <FormattedMessage id="public.parallel-use-cases.sales-title" defaultMessage="Sales" />
           }
           description={
             <FormattedMessage
-              id="public.parallel-use-cases.aml-description"
-              defaultMessage="Close your know your customers processes faster."
+              id="public.parallel-use-cases.sales-description"
+              defaultMessage="Get everything you need to close a contract in 5 minutes."
             />
           }
         />
         <Feature
+          url="/templates/legal"
           image={
             <Image
               role="presentation"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-tax.svg`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-legal.svg`}
             />
           }
           header={
-            <FormattedMessage id="public.parallel-use-cases.tax-title" defaultMessage="Tax" />
+            <FormattedMessage id="public.parallel-use-cases.legal-title" defaultMessage="Legal" />
           }
           description={
             <FormattedMessage
-              id="public.parallel-use-cases.tax-description"
-              defaultMessage="Manage the documents of your tax returns campaigns."
+              id="public.parallel-use-cases.legal-description"
+              defaultMessage="Implement legal processes effortlessly."
             />
           }
         />
         <Feature
+          url="/templates/compliance"
           image={
             <Image
               role="presentation"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-real-estate.svg`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-compliance.svg`}
             />
           }
           header={
             <FormattedMessage
-              id="public.parallel-use-cases.real-estate-title"
-              defaultMessage="Real Estate"
+              id="public.parallel-use-cases.compliance-title"
+              defaultMessage="Compliance"
             />
           }
           description={
             <FormattedMessage
-              id="public.parallel-use-cases.real-estate-description"
-              defaultMessage="Obtain the documents to close real estate transactions faster."
+              id="public.parallel-use-cases.compliance-description"
+              defaultMessage="Complete KYC processes faster."
             />
           }
         />
         <Feature
+          url="/templates/hr"
           image={
             <Image
               role="presentation"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-corporate.svg`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-hr.svg`}
             />
           }
-          header={
-            <FormattedMessage
-              id="public.parallel-use-cases.corporate-title"
-              defaultMessage="Corporate"
-            />
-          }
+          header={<FormattedMessage id="public.parallel-use-cases.hr-title" defaultMessage="HR" />}
           description={
             <FormattedMessage
-              id="public.parallel-use-cases.corporate-description"
-              defaultMessage="Make it easier to manage your investors information."
+              id="public.parallel-use-cases.hr-description"
+              defaultMessage="Get all the documentation you need from your employees."
             />
           }
         />
         <Feature
+          url="/templates/finance"
           image={
             <Image
               role="presentation"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-litigation.svg`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-finance.svg`}
             />
           }
           header={
             <FormattedMessage
-              id="public.parallel-use-cases.litigation-title"
-              defaultMessage="Litigation"
+              id="public.parallel-use-cases.finance-title"
+              defaultMessage="Finance"
             />
           }
           description={
             <FormattedMessage
-              id="public.parallel-use-cases.litigation-description"
-              defaultMessage="Collect precedents on time and focus on solving the case."
+              id="public.parallel-use-cases.finance-description"
+              defaultMessage="Get faster your customer details to bill earlier."
             />
           }
         />
@@ -148,14 +145,14 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
             <Heading size="sm" marginBottom={2}>
               <FormattedMessage
                 id="public.parallel-use-cases.other-title"
-                defaultMessage="Can't find your use case?"
+                defaultMessage="Looking for more use cases?"
               />
             </Heading>
-            <NakedLink href="mailto:support@onparallel.com">
+            <NakedLink href="/templates">
               <Button as="a" colorScheme="purple">
                 <FormattedMessage
-                  id="public.parallel-use-cases.other-contact"
-                  defaultMessage="Contact us"
+                  id="public.parallel-use-cases.other-templates"
+                  defaultMessage="See our templates"
                 />
               </Button>
             </NakedLink>
@@ -168,14 +165,17 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
 
 interface FeatureProps extends BoxProps {
   image: ReactNode;
+  url: string;
   header: ReactNode;
   description: ReactNode;
 }
 
-function Feature({ image, header, description, ...props }: FeatureProps) {
+function Feature({ image, header, description, url, ...props }: FeatureProps) {
   return (
     <Box padding={5} textAlign="left" {...props}>
-      {image}
+      <NakedLink href={url}>
+        <Box as="a">{image}</Box>
+      </NakedLink>
       <Heading as="h4" marginTop={2} size="sm">
         {header}
       </Heading>

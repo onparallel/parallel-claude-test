@@ -1,4 +1,14 @@
-import { AspectRatio, Box, BoxProps, Button, Center, Flex, Heading, Stack } from "@chakra-ui/react";
+import {
+  AspectRatio,
+  Box,
+  BoxProps,
+  Button,
+  Center,
+  Flex,
+  Heading,
+  Stack,
+  Image,
+} from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
 
@@ -8,6 +18,7 @@ export interface PublicHeroProps extends BoxProps {
   ratio: number;
   title: string;
   subtitle: string;
+  subtitle2: string;
   buttonText: string;
   url: string;
   sectionTitle?: string;
@@ -19,6 +30,7 @@ export function PublicHero({
   ratio,
   title,
   subtitle,
+  subtitle2,
   buttonText,
   url,
   sectionTitle,
@@ -62,6 +74,9 @@ export function PublicHero({
           <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="150%">
             {subtitle}
           </Heading>
+          <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="150%">
+            {subtitle2}
+          </Heading>
           <Stack
             direction={{ base: "column-reverse", sm: "row" }}
             spacing={3}
@@ -78,6 +93,20 @@ export function PublicHero({
               <Button as="a" colorScheme="purple" size="lg" onClick={trackCTAClick}>
                 <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
               </Button>
+            </NakedLink>
+          </Stack>
+          <Stack
+            spacing={3}
+            paddingTop={{ base: 8, [breakpoint]: 16 }}
+            marginRight={{ base: 0, [breakpoint]: 2 }}
+          >
+            <NakedLink href="https://www.capterra.com/reviews/236724/Parallel?utm_source=vendor&utm_medium=badge&utm_campaign=capterra_reviews_badge">
+              <Box as="a">
+                <Image
+                  htmlWidth={150}
+                  src="https://assets.capterra.com/badge/5b8a84543b954403684b7b8ba854282d.svg?v=2198650&p=236724"
+                />
+              </Box>
             </NakedLink>
           </Stack>
         </Flex>

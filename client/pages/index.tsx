@@ -23,12 +23,15 @@ export default function Home() {
     ratio: 1426 / 1140,
     title: intl.formatMessage({
       id: "public.home.hero-title",
-      defaultMessage: "Automate your workflows with clients",
+      defaultMessage: "Collaborative process management software for back-office and sales teams",
     }),
     subtitle: intl.formatMessage({
       id: "public.home.hero-subtitle",
-      defaultMessage:
-        "With Parallel you can easily automate forms with documents and make it an agile and safe process.",
+      defaultMessage: "Accelerate by 80% your processes.",
+    }),
+    subtitle2: intl.formatMessage({
+      id: "public.home.hero-subtitle2",
+      defaultMessage: "Eliminate errors by automating time-consuming back-office and legal tasks.",
     }),
     buttonText: intl.formatMessage({
       id: "public.book-demo-button",

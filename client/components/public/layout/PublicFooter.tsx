@@ -53,7 +53,7 @@ export function PublicFooter(props: BoxProps) {
         templateColumns={{
           base: "1fr",
           sm: "repeat(2, 1fr)",
-          md: "repeat(4, 1fr)",
+          md: "repeat(5, 1fr)",
         }}
         gridGap={8}
         sx={{
@@ -161,6 +161,19 @@ export function PublicFooter(props: BoxProps) {
             </ListItem>
           </List>
         </PublicFooterBox>
+        <Flex as="section" flexDirection="column" align="center">
+          <NormalLink
+            href="https://www.capterra.com/reviews/236724/Parallel?utm_source=vendor&utm_medium=badge&utm_campaign=capterra_reviews_badge"
+            isExternal
+          >
+            <Image
+              alt="Cuatrecasas Acelera"
+              width="150px"
+              loading="lazy"
+              src="https://assets.capterra.com/badge/5b8a84543b954403684b7b8ba854282d.svg?v=2198650&p=236724"
+            />
+          </NormalLink>
+        </Flex>
       </Grid>
       <Divider marginY={8} />
       <Stack direction={{ base: "column", md: "row" }} spacing={8}>
