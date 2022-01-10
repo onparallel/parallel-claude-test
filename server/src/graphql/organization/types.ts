@@ -60,10 +60,10 @@ export const Organization = objectType({
         return ssoIntegrations.length > 0;
       },
     });
-    t.int("userCount", {
-      description: "The total number of users",
+    t.int("activeUserCount", {
+      description: "The total number of active users",
       authorize: isOwnOrgOrSuperAdmin(),
-      resolve: async (root, _, ctx) => await ctx.organizations.loadUserCount(root.id),
+      resolve: async (root, _, ctx) => await ctx.organizations.loadActiveUserCount(root.id),
     });
     t.paginationField("users", {
       type: "User",

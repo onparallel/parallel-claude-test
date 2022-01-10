@@ -1418,6 +1418,8 @@ export interface Organization extends Timestamps {
   __typename?: "Organization";
   /** @deprecated Temporal solution for support methods, don't use */
   _id: Scalars["Int"];
+  /** The total number of active users */
+  activeUserCount: Scalars["Int"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1439,8 +1441,6 @@ export interface Organization extends Timestamps {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   usageLimits: OrganizationUsageLimit;
-  /** The total number of users */
-  userCount: Scalars["Int"];
   /** The users in the organization. */
   users: UserPagination;
 }
@@ -9639,7 +9639,7 @@ export type AdminOrganizations_OrganizationFragment = {
   _id: number;
   name: string;
   status: OrganizationStatus;
-  userCount: number;
+  activeUserCount: number;
   createdAt: string;
   usageLimits: {
     __typename?: "OrganizationUsageLimit";
@@ -9689,7 +9689,7 @@ export type AdminOrganizations_organizationsQuery = {
       _id: number;
       name: string;
       status: OrganizationStatus;
-      userCount: number;
+      activeUserCount: number;
       createdAt: string;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -10744,7 +10744,7 @@ export type OrganizationUsage_userQuery = {
     organization: {
       __typename?: "Organization";
       id: string;
-      userCount: number;
+      activeUserCount: number;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
@@ -10848,6 +10848,7 @@ export type OrganizationUsers_userQuery = {
       __typename?: "Organization";
       id: string;
       hasSsoProvider: boolean;
+      activeUserCount: number;
       users: {
         __typename?: "UserPagination";
         totalCount: number;
@@ -18330,7 +18331,7 @@ export const AdminOrganizations_OrganizationFragmentDoc = gql`
     _id
     name
     status
-    userCount
+    activeUserCount
     createdAt
     usageLimits {
       users {
@@ -22612,7 +22613,7 @@ export const OrganizationUsage_userDocument = gql`
       ...SettingsLayout_User
       organization {
         id
-        userCount
+        activeUserCount
         usageLimits {
           users {
             limit
@@ -22687,6 +22688,7 @@ export const OrganizationUsers_userDocument = gql`
       organization {
         id
         hasSsoProvider
+        activeUserCount
         users(
           offset: $offset
           limit: $limit

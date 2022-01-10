@@ -230,6 +230,26 @@ export const updateUserStatus = mutationField("updateUserStatus", {
           }
         }
       )
+    ),
+    validateIf(
+      (args) => args.status === "ACTIVE",
+      validateAnd(async (_, { userIds }, ctx, info) => {
+        const [org, activeUserCount] = await Promise.all([
+          ctx.organizations.loadOrg(ctx.user!.org_id),
+          ctx.organizations.loadActiveUserCount(ctx.user!.org_id),
+        ]);
+
+        if (org!.usage_details.USER_LIMIT < activeUserCount + userIds.length) {
+          throw new ArgValidationError(
+            info,
+            `User limit reached for this organization`,
+            "USER_LIMIT_ERROR",
+            {
+              userLimit: org!.usage_details.USER_LIMIT,
+            }
+          );
+        }
+      })
     )
   ),
   args: {

@@ -1386,6 +1386,8 @@ export type OrgIntegrationPagination = {
 export type Organization = Timestamps & {
   /** @deprecated Temporal solution for support methods, don't use */
   _id: Scalars["Int"];
+  /** The total number of active users */
+  activeUserCount: Scalars["Int"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1407,8 +1409,6 @@ export type Organization = Timestamps & {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   usageLimits: OrganizationUsageLimit;
-  /** The total number of users */
-  userCount: Scalars["Int"];
   /** The users in the organization. */
   users: UserPagination;
 };
@@ -3182,15 +3182,6 @@ export type PetitionAttachmentFragment = {
   file: { filename: string; contentType: string; size: number; isComplete: boolean };
 };
 
-export type UserFragment = {
-  id: string;
-  fullName: string | null;
-  firstName: string | null;
-  lastName: string | null;
-};
-
-export type UserGroupFragment = { id: string; name: string };
-
 export type ContactFragment = {
   id: string;
   email: string;
@@ -3199,6 +3190,13 @@ export type ContactFragment = {
   lastName: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type UserFragment = {
+  id: string;
+  fullName: string | null;
+  firstName: string | null;
+  lastName: string | null;
 };
 
 export type PetitionAccessFragment = {
@@ -3337,6 +3335,8 @@ export type TemplateFragment = {
   }>;
   tags?: Array<{ id: string; name: string }>;
 };
+
+export type UserGroupFragment = { id: string; name: string };
 
 export type Permission_PetitionUserGroupPermission_Fragment = {
   permissionType: PetitionPermissionType;

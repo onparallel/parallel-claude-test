@@ -197,7 +197,7 @@ function useOrganizationColumns() {
         ),
       },
       {
-        key: "userCount",
+        key: "activeUserCount",
         header: intl.formatMessage({
           id: "organizations.header.user-count",
           defaultMessage: "Users",
@@ -208,7 +208,7 @@ function useOrganizationColumns() {
         align: "right",
         CellContent: ({ row }) => (
           <>
-            <FormattedNumber value={row.userCount} />/
+            <FormattedNumber value={row.activeUserCount} />/
             <FormattedNumber value={row.usageLimits.users.limit} />
           </>
         ),
@@ -257,7 +257,7 @@ AdminOrganizations.fragments = {
         _id
         name
         status
-        userCount
+        activeUserCount
         createdAt
         usageLimits {
           users {

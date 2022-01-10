@@ -990,6 +990,7 @@ export interface NexusGenFieldTypes {
   Organization: {
     // field return type
     _id: number; // Int!
+    activeUserCount: number; // Int!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
@@ -1001,7 +1002,6 @@ export interface NexusGenFieldTypes {
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     usageLimits: NexusGenRootTypes["OrganizationUsageLimit"]; // OrganizationUsageLimit!
-    userCount: number; // Int!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
   };
   OrganizationPagination: {
@@ -2278,6 +2278,7 @@ export interface NexusGenFieldTypeNames {
   Organization: {
     // field return type name
     _id: "Int";
+    activeUserCount: "Int";
     createdAt: "DateTime";
     customHost: "String";
     hasSsoProvider: "Boolean";
@@ -2289,7 +2290,6 @@ export interface NexusGenFieldTypeNames {
     status: "OrganizationStatus";
     updatedAt: "DateTime";
     usageLimits: "OrganizationUsageLimit";
-    userCount: "Int";
     users: "UserPagination";
   };
   OrganizationPagination: {

@@ -106,7 +106,10 @@ export function OrganizationUsersListTableHeader({
               <Portal>
                 <MenuList minWidth="160px">
                   <MenuItem
-                    isDisabled={selectedUsers.every((u) => u.status === "ACTIVE")}
+                    isDisabled={
+                      selectedUsers.every((u) => u.status === "ACTIVE") ||
+                      isCreateUserButtonDisabled
+                    }
                     onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
                     icon={<UserCheckIcon display="block" boxSize={4} />}
                   >

@@ -32,7 +32,7 @@ function OrganizationUsage() {
   const { organization } = me;
 
   const {
-    userCount,
+    activeUserCount,
     usageLimits: { petitions, users },
   } = organization;
 
@@ -67,7 +67,7 @@ function OrganizationUsage() {
               id: "organizations.header.user-count",
               defaultMessage: "Users",
             })}
-            usage={userCount}
+            usage={activeUserCount}
             limit={users.limit}
           />
           <UsageCard
@@ -123,7 +123,7 @@ OrganizationUsage.queries = [
         ...SettingsLayout_User
         organization {
           id
-          userCount
+          activeUserCount
           usageLimits {
             users {
               limit

@@ -53,12 +53,12 @@ export function orgCanCreateNewUser<
   FieldName extends string
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
-    const [org, userCount] = await Promise.all([
+    const [org, activeUserCount] = await Promise.all([
       ctx.organizations.loadOrg(ctx.user!.org_id),
-      ctx.organizations.loadUserCount(ctx.user!.org_id),
+      ctx.organizations.loadActiveUserCount(ctx.user!.org_id),
     ]);
 
-    if (org!.usage_details.USER_LIMIT <= userCount) {
+    if (org!.usage_details.USER_LIMIT <= activeUserCount) {
       throw new WhitelistedError(`User limit reached for this organization`, "USER_LIMIT_ERROR", {
         userLimit: org!.usage_details.USER_LIMIT,
       });

@@ -97,8 +97,8 @@ export class OrganizationRepository extends BaseRepository {
     );
   }
 
-  readonly loadUserCount = this.buildLoadCountBy("user", "org_id", (q) =>
-    q.whereNull("deleted_at")
+  readonly loadActiveUserCount = this.buildLoadCountBy("user", "org_id", (q) =>
+    q.whereNull("deleted_at").andWhere("status", "ACTIVE")
   );
 
   async updateOrganization(
