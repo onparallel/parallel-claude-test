@@ -3363,6 +3363,7 @@ export type FieldComment_PetitionFieldCommentFragment = {
   createdAt: string;
   content: string;
   isUnread: boolean;
+  isInternal: boolean;
   author?:
     | {
         __typename?: "PetitionAccess";
@@ -7953,7 +7954,12 @@ export type PreviewPetitionField_PetitionFieldFragment = {
       isComplete: boolean;
     };
   }>;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+  comments: Array<{
+    __typename?: "PetitionFieldComment";
+    id: string;
+    isUnread: boolean;
+    isInternal: boolean;
+  }>;
 };
 
 export type PreviewPetitionField_PetitionFieldReplyFragment = {
@@ -8195,6 +8201,7 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
     createdAt: string;
     content: string;
     isUnread: boolean;
+    isInternal: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -8218,6 +8225,7 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQuery = {
     createdAt: string;
     content: string;
     isUnread: boolean;
+    isInternal: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -8247,6 +8255,7 @@ export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutatio
       createdAt: string;
       content: string;
       isUnread: boolean;
+      isInternal: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -8277,6 +8286,7 @@ export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutatio
       createdAt: string;
       content: string;
       isUnread: boolean;
+      isInternal: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -8306,6 +8316,7 @@ export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutatio
       createdAt: string;
       content: string;
       isUnread: boolean;
+      isInternal: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -8480,7 +8491,7 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
     createdAt: string;
     isUnread: boolean;
     isEdited: boolean;
-    isInternal?: boolean;
+    isInternal: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -8515,7 +8526,7 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   createdAt: string;
   isUnread: boolean;
   isEdited: boolean;
-  isInternal?: boolean;
+  isInternal: boolean;
   author?:
     | {
         __typename?: "PetitionAccess";
@@ -8930,7 +8941,12 @@ export type RecipientViewContentsCard_PetitionBase_Petition_Fragment = {
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
     }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+    comments: Array<{
+      __typename?: "PetitionFieldComment";
+      id: string;
+      isUnread: boolean;
+      isInternal: boolean;
+    }>;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -8957,7 +8973,12 @@ export type RecipientViewContentsCard_PetitionBase_PetitionTemplate_Fragment = {
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
     }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+    comments: Array<{
+      __typename?: "PetitionFieldComment";
+      id: string;
+      isUnread: boolean;
+      isInternal: boolean;
+    }>;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -8986,7 +9007,12 @@ export type RecipientViewContentsCard_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     content: { [key: string]: any };
   }>;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+  comments: Array<{
+    __typename?: "PetitionFieldComment";
+    id: string;
+    isUnread: boolean;
+    isInternal: boolean;
+  }>;
   previewReplies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -9329,7 +9355,12 @@ export type RecipientViewPetitionFieldCard_PetitionFieldFragment = {
       isComplete: boolean;
     };
   }>;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+  comments: Array<{
+    __typename?: "PetitionFieldComment";
+    id: string;
+    isUnread: boolean;
+    isInternal: boolean;
+  }>;
 };
 
 export type RecipientViewPetitionFieldCard_PetitionFieldReplyFragment = {
@@ -14300,7 +14331,12 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       createdAt: string;
       updatedAt: string;
     }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+    comments: Array<{
+      __typename?: "PetitionFieldComment";
+      id: string;
+      isUnread: boolean;
+      isInternal: boolean;
+    }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -14383,7 +14419,12 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       createdAt: string;
       updatedAt: string;
     }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+    comments: Array<{
+      __typename?: "PetitionFieldComment";
+      id: string;
+      isUnread: boolean;
+      isInternal: boolean;
+    }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -14486,7 +14527,12 @@ export type PetitionPreview_updatePetitionMutation = {
             createdAt: string;
             updatedAt: string;
           }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+          comments: Array<{
+            __typename?: "PetitionFieldComment";
+            id: string;
+            isUnread: boolean;
+            isInternal: boolean;
+          }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -14572,7 +14618,12 @@ export type PetitionPreview_updatePetitionMutation = {
             createdAt: string;
             updatedAt: string;
           }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+          comments: Array<{
+            __typename?: "PetitionFieldComment";
+            id: string;
+            isUnread: boolean;
+            isInternal: boolean;
+          }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -14647,7 +14698,12 @@ export type PetitionPreview_completePetitionMutation = {
         createdAt: string;
         updatedAt: string;
       }>;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+      comments: Array<{
+        __typename?: "PetitionFieldComment";
+        id: string;
+        isUnread: boolean;
+        isInternal: boolean;
+      }>;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
         id: string;
@@ -14746,7 +14802,12 @@ export type PetitionPreview_petitionQuery = {
             createdAt: string;
             updatedAt: string;
           }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+          comments: Array<{
+            __typename?: "PetitionFieldComment";
+            id: string;
+            isUnread: boolean;
+            isInternal: boolean;
+          }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -14832,7 +14893,12 @@ export type PetitionPreview_petitionQuery = {
             createdAt: string;
             updatedAt: string;
           }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
+          comments: Array<{
+            __typename?: "PetitionFieldComment";
+            id: string;
+            isUnread: boolean;
+            isInternal: boolean;
+          }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -14929,7 +14995,7 @@ export type PetitionReplies_PetitionFragment = {
       createdAt: string;
       content: string;
       isEdited: boolean;
-      isInternal?: boolean;
+      isInternal: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -15068,7 +15134,7 @@ export type PetitionReplies_PetitionFieldFragment = {
     createdAt: string;
     content: string;
     isEdited: boolean;
-    isInternal?: boolean;
+    isInternal: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -15235,7 +15301,7 @@ export type PetitionReplies_createPetitionFieldCommentMutation = {
       createdAt: string;
       isUnread: boolean;
       isEdited: boolean;
-      isInternal?: boolean;
+      isInternal: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -15279,7 +15345,7 @@ export type PetitionReplies_updatePetitionFieldCommentMutation = {
       createdAt: string;
       isUnread: boolean;
       isEdited: boolean;
-      isInternal?: boolean;
+      isInternal: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -15322,7 +15388,7 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
       createdAt: string;
       isUnread: boolean;
       isEdited: boolean;
-      isInternal?: boolean;
+      isInternal: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -15480,7 +15546,7 @@ export type PetitionReplies_petitionQuery = {
             createdAt: string;
             content: string;
             isEdited: boolean;
-            isInternal?: boolean;
+            isInternal: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -18208,6 +18274,7 @@ export const FieldComment_PetitionFieldCommentFragmentDoc = gql`
     createdAt
     content
     isUnread
+    isInternal
     author {
       ... on User {
         id
@@ -19948,6 +20015,7 @@ export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
     comments {
       id
       isUnread
+      isInternal
     }
     ...RecipientViewPetitionFieldCommentsDialog_PetitionField
   }
@@ -19987,6 +20055,7 @@ export const RecipientViewContentsCard_PetitionFieldFragmentDoc = gql`
     comments {
       id
       isUnread
+      isInternal
     }
     ...useFieldVisibility_PetitionField
   }

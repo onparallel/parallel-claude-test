@@ -116,7 +116,7 @@ export function RecipientViewContentsCard({
                         ? field
                         : field.__typename === "PetitionField"
                         ? {
-                            commentCount: field.comments.length,
+                            commentCount: countBy(field.comments, (c) => !c.isInternal),
                             unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
                           }
                         : (null as never);
@@ -320,6 +320,7 @@ RecipientViewContentsCard.fragments = {
         comments {
           id
           isUnread
+          isInternal
         }
         ...useFieldVisibility_PetitionField
       }

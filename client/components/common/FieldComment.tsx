@@ -184,6 +184,7 @@ FieldComment.fragments = {
         createdAt
         content
         isUnread
+        isInternal
         author {
           ... on User {
             id

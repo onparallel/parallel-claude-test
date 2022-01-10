@@ -62,7 +62,7 @@ export function PreviewPetitionFieldCommentsDialog({
       variables: { petitionId, petitionFieldId: field.id },
     }
   );
-  const comments = data?.petitionFieldComments ?? [];
+  const comments = data?.petitionFieldComments.filter((c) => !c.isInternal) ?? [];
 
   const [draft, setDraft] = useState("");
   const [inputFocused, inputFocusBind] = useFocus({
