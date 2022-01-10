@@ -36,7 +36,7 @@
   },
   {
     "term": "component.add-petition-access-dialog.petition-limit-reached.text",
-    "definition": "Haz alcanzado el límite de peticiones enviadas.",
+    "definition": "Has alcanzado el límite de peticiones enviadas.",
     "context": "You reached the limit of petitions sent."
   },
   {
@@ -1461,7 +1461,7 @@
   },
   {
     "term": "component.petition-limit-reached-alert.title",
-    "definition": "Parece que haz alcanzado el límite de {limit} peticiones, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "definition": "Parece que has alcanzado el límite de {limit} peticiones, <a>contacta con nosotros para mejorar tu plan.</a>",
     "context": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
   },
   {
@@ -1471,7 +1471,7 @@
   },
   {
     "term": "component.petition-limit-reached-error-dialog.message",
-    "definition": "Haz alcanzado el límite de peticiones enviadas, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "definition": "Has alcanzado el límite de peticiones enviadas, <a>contacta con nosotros para mejorar tu plan.</a>",
     "context": "You have reached your limit of petitions sent, <a>reach out to us to upgrade your plan.</a>"
   },
   {
@@ -4386,7 +4386,7 @@
   },
   {
     "term": "navbar.petitions-link.limit-reached.warning",
-    "definition": "Parece que haz alcanzado el límite de {limit} peticiones, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "definition": "Parece que has alcanzado el límite de {limit} peticiones, <a>contacta con nosotros para mejorar tu plan.</a>",
     "context": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
   },
   {
@@ -4526,7 +4526,7 @@
   },
   {
     "term": "organization-users.max-limit-reached",
-    "definition": "Haz alcanzado la cantidad máxima de usuarios que puedes crear, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "definition": "Has alcanzado la cantidad máxima de usuarios que puedes crear, <a>contacta con nosotros para mejorar tu plan.</a>",
     "context": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
   },
   {
