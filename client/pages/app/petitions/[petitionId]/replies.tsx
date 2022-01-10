@@ -41,6 +41,11 @@ import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import {
+  useCreatePetitionFieldComment,
+  useDeletePetitionFieldComment,
+  useUpdatePetitionFieldComment,
+} from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldCommentsDialog";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
 import {
@@ -63,15 +68,12 @@ import { RecipientViewCommentsBadge } from "@parallel/components/recipient-view/
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
-  PetitionReplies_createPetitionFieldCommentDocument,
-  PetitionReplies_deletePetitionFieldCommentDocument,
   PetitionReplies_fileUploadReplyDownloadLinkDocument,
   PetitionReplies_petitionDocument,
   PetitionReplies_PetitionFieldFragment,
   PetitionReplies_PetitionFragment,
   PetitionReplies_sendPetitionClosedNotificationDocument,
   PetitionReplies_updatePetitionDocument,
-  PetitionReplies_updatePetitionFieldCommentDocument,
   PetitionReplies_updatePetitionFieldRepliesStatusDocument,
   PetitionReplies_userDocument,
   PetitionReplies_validatePetitionFieldsDocument,
@@ -91,6 +93,7 @@ import {
 } from "@parallel/utils/filterPetitionFields";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
+import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -102,7 +105,6 @@ import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
-import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -302,47 +304,32 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const handlePrintPdfTask = usePrintPdfTask();
 
-  const [createPetitionFieldComment] = useMutation(
-    PetitionReplies_createPetitionFieldCommentDocument
-  );
+  const createPetitionFieldComment = useCreatePetitionFieldComment();
   async function handleAddComment(content: string, isInternal?: boolean) {
     await createPetitionFieldComment({
-      variables: {
-        petitionId,
-        petitionFieldId: activeFieldId!,
-        content,
-        isInternal,
-        hasInternalComments: me.hasInternalComments,
-      },
+      petitionId,
+      petitionFieldId: activeFieldId!,
+      content,
+      isInternal,
     });
   }
 
-  const [updatePetitionFieldComment] = useMutation(
-    PetitionReplies_updatePetitionFieldCommentDocument
-  );
+  const updatePetitionFieldComment = useUpdatePetitionFieldComment();
   async function handleUpdateComment(petitionFieldCommentId: string, content: string) {
     await updatePetitionFieldComment({
-      variables: {
-        petitionId,
-        petitionFieldId: activeFieldId!,
-        petitionFieldCommentId,
-        content,
-        hasInternalComments: me.hasInternalComments,
-      },
+      petitionId,
+      petitionFieldId: activeFieldId!,
+      petitionFieldCommentId,
+      content,
     });
   }
 
-  const [deletePetitionFieldComment] = useMutation(
-    PetitionReplies_deletePetitionFieldCommentDocument
-  );
+  const deletePetitionFieldComment = useDeletePetitionFieldComment();
   async function handleDeleteComment(petitionFieldCommentId: string) {
     await deletePetitionFieldComment({
-      variables: {
-        petitionId,
-        petitionFieldId: activeFieldId!,
-        petitionFieldCommentId,
-        hasInternalComments: me.hasInternalComments,
-      },
+      petitionId,
+      petitionFieldId: activeFieldId!,
+      petitionFieldCommentId,
     });
   }
 
@@ -837,61 +824,6 @@ PetitionReplies.mutations = [
         url
       }
     }
-  `,
-  gql`
-    mutation PetitionReplies_createPetitionFieldComment(
-      $petitionId: GID!
-      $petitionFieldId: GID!
-      $content: String!
-      $isInternal: Boolean
-      $hasInternalComments: Boolean!
-    ) {
-      createPetitionFieldComment(
-        petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
-        content: $content
-        isInternal: $isInternal
-      ) {
-        ...PetitionRepliesFieldComments_PetitionField
-      }
-    }
-    ${PetitionRepliesFieldComments.fragments.PetitionField}
-  `,
-  gql`
-    mutation PetitionReplies_updatePetitionFieldComment(
-      $petitionId: GID!
-      $petitionFieldId: GID!
-      $petitionFieldCommentId: GID!
-      $content: String!
-      $hasInternalComments: Boolean!
-    ) {
-      updatePetitionFieldComment(
-        petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
-        petitionFieldCommentId: $petitionFieldCommentId
-        content: $content
-      ) {
-        ...PetitionRepliesFieldComments_PetitionField
-      }
-    }
-    ${PetitionRepliesFieldComments.fragments.PetitionField}
-  `,
-  gql`
-    mutation PetitionReplies_deletePetitionFieldComment(
-      $petitionId: GID!
-      $petitionFieldId: GID!
-      $petitionFieldCommentId: GID!
-      $hasInternalComments: Boolean!
-    ) {
-      deletePetitionFieldComment(
-        petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
-        petitionFieldCommentId: $petitionFieldCommentId
-      ) {
-        ...PetitionRepliesFieldComments_PetitionField
-      }
-    }
-    ${PetitionRepliesFieldComments.fragments.PetitionField}
   `,
   gql`
     mutation PetitionReplies_updatePetitionFieldRepliesStatus(

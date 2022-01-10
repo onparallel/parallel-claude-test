@@ -346,7 +346,7 @@ PreviewPetitionFieldCommentsDialog.mutations = [
   `,
 ];
 
-function useCreatePetitionFieldComment() {
+export function useCreatePetitionFieldComment() {
   const [createPetitionFieldComment] = useMutation(
     PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
   );
@@ -375,7 +375,7 @@ function useCreatePetitionFieldComment() {
   );
 }
 
-function useUpdatePetitionFieldComment() {
+export function useUpdatePetitionFieldComment() {
   const [updatePetitionFieldComment] = useMutation(
     PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
   );
@@ -403,7 +403,7 @@ function useUpdatePetitionFieldComment() {
   );
 }
 
-function useDeletePetitionFieldComment() {
+export function useDeletePetitionFieldComment() {
   const [deletePetitionFieldComment] = useMutation(
     PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument
   );
@@ -442,8 +442,12 @@ function updatePetitionFieldComments(
   return updateQuery(proxy, {
     query: PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
     variables: { petitionId, petitionFieldId },
-    data: (cached) => ({
-      petitionFieldComments: updateFn(cached!.petitionFieldComments),
-    }),
+    data: (cached) => {
+      return {
+        petitionFieldComments: cached?.petitionFieldComments
+          ? updateFn(cached!.petitionFieldComments)
+          : [],
+      };
+    },
   });
 }
