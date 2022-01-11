@@ -1775,6 +1775,7 @@ export const completePetition = mutationField("completePetition", {
   resolve: async (_, args, ctx) => {
     try {
       return await ctx.petitions.withTransaction(async (t) => {
+        const requiredCredits = await getRequiredPetitionSendCredits(args.petitionId, 1, ctx);
         let petition = await ctx.petitions.completePetition(
           args.petitionId,
           ctx.user!,
@@ -1801,7 +1802,7 @@ export const completePetition = mutationField("completePetition", {
         await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
           ctx.user!.org_id,
           "PETITION_SEND",
-          1,
+          requiredCredits,
           t
         );
         return petition;

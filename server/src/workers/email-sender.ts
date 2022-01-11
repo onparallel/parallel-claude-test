@@ -51,7 +51,7 @@ createQueueWorker("email-sender", async (payload: EmailSenderWorkerPayload, cont
   for (const email of unMaybeArray(emails)) {
     if (email) {
       if (
-        process.env.NODE_ENV !== "production" &&
+        process.env.NODE_ENV === "development" &&
         !context.config.development.whitelistedEmails.includes(email.to)
       ) {
         context.logger.warn(

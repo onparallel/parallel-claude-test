@@ -3402,9 +3402,16 @@ describe("GraphQL/Petitions", () => {
     let contacts: Contact[];
     let otherOrgContact: Contact;
     let limit: OrganizationUsageLimit;
+    let signatureLimit: OrganizationUsageLimit;
+    let sharedSignaturitIntegration: OrgIntegration;
 
     beforeAll(async () => {
       limit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 10);
+      signatureLimit = await mocks.createOrganizationUsageLimit(
+        organization.id,
+        "SIGNATURIT_SHARED_APIKEY",
+        10
+      );
 
       contacts = await mocks.createRandomContacts(organization.id, 2, () => ({
         email: internet.email(undefined, undefined, "onparallel.com"),
@@ -3422,8 +3429,17 @@ describe("GraphQL/Petitions", () => {
           ENVIRONMENT: "sandbox",
         },
       });
+      [sharedSignaturitIntegration] = await mocks.createOrgIntegration({
+        org_id: organization.id,
+        provider: "SIGNATURIT",
+        type: "SIGNATURE",
+        is_enabled: true,
+        settings: {
+          API_KEY: "SHARED_PRODUCTION_APIKEY",
+        },
+      });
 
-      petitions = await mocks.createRandomPetitions(organization.id, sessionUser.id, 2, (i) => ({
+      petitions = await mocks.createRandomPetitions(organization.id, sessionUser.id, 3, (i) => ({
         status: "DRAFT",
         signature_config:
           i === 1
@@ -3435,15 +3451,27 @@ describe("GraphQL/Petitions", () => {
                 review: false,
                 letRecipientsChooseSigners: false,
               }
+            : i === 2
+            ? {
+                orgIntegrationId: sharedSignaturitIntegration.id,
+                signersInfo: [],
+                timezone: "Europe/Madrid",
+                title: "Signature!",
+                review: false,
+                letRecipientsChooseSigners: false,
+              }
             : null,
       }));
     });
 
     beforeEach(async () => {
-      await mocks.knex.from("organization_usage_limit").where("id", limit.id).update({
-        limit: 10,
-        used: 0,
-      });
+      await mocks.knex
+        .from("organization_usage_limit")
+        .whereIn("id", [limit.id, signatureLimit.id])
+        .update({
+          limit: 10,
+          used: 0,
+        });
     });
 
     afterAll(async () => {
@@ -3656,6 +3684,176 @@ describe("GraphQL/Petitions", () => {
             { type: "PETITION_COMPLETED" },
           ],
         },
+      });
+    });
+
+    it("when using our shared apiKey and signature usage reached limit, complete anyways but don't start signature", async () => {
+      await mocks.knex("petition_signature_request").delete();
+      await mocks
+        .knex("organization_usage_limit")
+        .update({ limit: 10, used: 10 })
+        .where("id", signatureLimit.id);
+      const petition = petitions[2];
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $contactId: GID!) {
+            completePetition(petitionId: $petitionId, additionalSignersContactIds: [$contactId]) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactId: toGlobalId("Contact", contacts[0].id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.completePetition).toEqual({
+        id: toGlobalId("Petition", petition.id),
+        status: "COMPLETED",
+      });
+      // make sure signature didn't start
+      const [signatureRequest] = await mocks
+        .knex("petition_signature_request")
+        .where("petition_id", petition.id)
+        .select("*");
+      expect(signatureRequest).toBeUndefined();
+
+      const [event] = await mocks
+        .knex("petition_event")
+        .where("petition_id", petition.id)
+        .where("type", "SIGNATURE_CANCELLED")
+        .select("*");
+
+      expect(event).toMatchObject({
+        type: "SIGNATURE_CANCELLED",
+        data: {
+          cancel_reason: "REQUEST_ERROR",
+          cancel_data: {
+            error: "The signature request could not be started due to lack of signature credits",
+            error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
+          },
+        },
+        petition_id: petition.id,
+      });
+    });
+
+    it("don't use credits when sending a signature with a personal apiKey", async () => {
+      await mocks.knex("petition_signature_request").delete();
+      await mocks.knex.from("organization_usage_limit").where("id", signatureLimit.id).update({
+        limit: 10,
+        used: 10,
+      });
+      await mocks
+        .knex("petition")
+        .update({
+          signature_config: {
+            orgIntegrationId: signatureIntegration.id,
+            signersInfo: [
+              { firstName: "Mariano", lastName: "Rodriguez", email: "mariano@onparallel.com" },
+            ],
+            timezone: "Europe/Madrid",
+            title: "Signature!",
+            review: false,
+            letRecipientsChooseSigners: false,
+          },
+        })
+        .where("id", petitions[1].id);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!) {
+            completePetition(petitionId: $petitionId) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.completePetition).toEqual({
+        id: toGlobalId("Petition", petitions[1].id),
+        status: "COMPLETED",
+      });
+
+      const [newLimit] = await mocks
+        .knex("organization_usage_limit")
+        .where("id", signatureLimit.id)
+        .select("*");
+
+      expect(newLimit).toMatchObject({
+        used: 10,
+        limit: 10,
+      });
+    });
+
+    it("completing the petition more than once should not consume more than 1 PETITION_SEND credit", async () => {
+      const [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ status: "DRAFT" })
+      );
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+        optional: true,
+      }));
+      const { errors: errors1, data: data1 } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!) {
+            completePetition(petitionId: $petitionId) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+        },
+      });
+      expect(errors1).toBeUndefined();
+      expect(data1?.completePetition).toEqual({
+        id: toGlobalId("Petition", petition.id),
+        status: "COMPLETED",
+      });
+
+      await mocks.knex("petition").where("id", petition.id).update("status", "PENDING");
+
+      const { errors: errors2, data: data2 } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!) {
+            completePetition(petitionId: $petitionId) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+        },
+      });
+
+      expect(errors2).toBeUndefined();
+      expect(data2?.completePetition).toEqual({
+        id: toGlobalId("Petition", petition.id),
+        status: "COMPLETED",
+      });
+
+      const [newLimits] = await mocks
+        .knex("organization_usage_limit")
+        .where("id", limit.id)
+        .select("*");
+      expect(newLimits).toMatchObject({
+        limit_name: "PETITION_SEND",
+        used: 1,
+        limit: 10,
       });
     });
   });

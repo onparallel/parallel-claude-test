@@ -4,10 +4,14 @@ import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { PetitionAccess, PetitionField, PetitionFieldReply } from "../../db/__types";
-import { AWS_SERVICE, IAws } from "../../services/aws";
+import {
+  Organization,
+  OrganizationUsageLimit,
+  PetitionAccess,
+  PetitionField,
+  PetitionFieldReply,
+} from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
-import { IStorage, STORAGE_FACTORY } from "../../services/storage";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -18,26 +22,55 @@ describe("GraphQL/Public", () => {
   let contactRepository: ContactRepository;
   let access: PetitionAccess;
   let fields: PetitionField[];
+  let org: Organization;
+  let limit: OrganizationUsageLimit;
 
   beforeAll(async () => {
     testClient = await initServer();
     knex = testClient.container.get<Knex>(KNEX);
     contactRepository = testClient.container.get<ContactRepository>(ContactRepository);
     mocks = new Mocks(knex);
-    const [org] = await mocks.createRandomOrganizations(1, () => ({
+    [org] = await mocks.createRandomOrganizations(1, () => ({
       name: "Parallel",
       status: "DEV",
     }));
+
+    const [signatureIntegration] = await mocks.createOrgIntegration({
+      org_id: org.id,
+      provider: "SIGNATURIT",
+      type: "SIGNATURE",
+      is_enabled: true,
+      name: "SIGNATURIT TEST",
+      settings: {
+        API_KEY: "SHARED_PRODUCTION_APIKEY",
+      },
+    });
+
+    limit = await mocks.createOrganizationUsageLimit(org.id, "SIGNATURIT_SHARED_APIKEY", 10);
+
     const [user] = await mocks.createRandomUsers(org.id, 1);
     const [contact] = await mocks.createRandomContacts(org.id, 1);
-    const [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
+    const [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
+      status: "DRAFT",
+      signature_config: {
+        review: false,
+        orgIntegrationId: signatureIntegration.id,
+        signersInfo: [
+          { firstName: "Mariano", lastName: "Rodriguez", email: "mariano@onparallel.com" },
+        ],
+        timezone: "Europe/Madrid",
+        title: "sign this!",
+      },
+    }));
     fields = await mocks.createRandomPetitionFields(
       petition.id,
       3,
       (i) =>
-        [{ type: "HEADING", is_fixed: true }, { type: "TEXT" }, { type: "FILE_UPLOAD" }][
-          i
-        ] as Partial<PetitionField>
+        [
+          { type: "HEADING", is_fixed: true },
+          { type: "TEXT", optional: true },
+          { type: "FILE_UPLOAD", optional: true },
+        ][i] as Partial<PetitionField>
     );
     [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
   });
@@ -346,6 +379,7 @@ describe("GraphQL/Public", () => {
           1,
           () => ({
             type: "CHECKBOX",
+            optional: true,
           })
         );
 
@@ -371,6 +405,7 @@ describe("GraphQL/Public", () => {
         checkboxField = (
           await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
             type: "CHECKBOX",
+            optional: true,
             options: { values: ["Option 1", "Option 2"], limit: { type: "RANGE", min: 1, max: 2 } },
           }))
         )[0];
@@ -453,6 +488,7 @@ describe("GraphQL/Public", () => {
             type: i === 0 ? "TEXT" : i === 1 ? "SHORT_TEXT" : "SELECT",
             options: i === 2 ? { values: ["a", "b", "c"] } : {},
             multiple: i !== 1,
+            optional: true,
           })
         );
       });
@@ -591,6 +627,7 @@ describe("GraphQL/Public", () => {
       it("creates a REPLY_CREATED event with petition_access_id on payload", async () => {
         const [newField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
           type: "TEXT",
+          optional: true,
         }));
         const { errors, data } = await testClient.mutate({
           mutation: gql`
@@ -642,6 +679,7 @@ describe("GraphQL/Public", () => {
             type: i === 1 ? "SELECT" : "TEXT",
             options: i === 1 ? { values: ["1", "2"] } : {},
             validated: i === 2,
+            optional: true,
           }));
 
         [textReply] = await mocks.createRandomTextReply(textField.id, access.id, 1);
@@ -792,6 +830,7 @@ describe("GraphQL/Public", () => {
           await mocks.createRandomPetitionFields(access.petition_id, 3, (i) => ({
             validated: i === 1,
             multiple: i !== 2,
+            optional: true,
             type: "DYNAMIC_SELECT",
             options: {
               labels: ["Comunidad autónoma", "Provincia"],
@@ -943,6 +982,7 @@ describe("GraphQL/Public", () => {
           1,
           () => ({
             type: "DYNAMIC_SELECT",
+            optional: true,
             options: {
               labels: ["Comunidad autónoma", "Provincia"],
               values: [
@@ -1110,7 +1150,7 @@ describe("GraphQL/Public", () => {
         const [fileUploadField] = await mocks.createRandomPetitionFields(
           access.petition_id,
           1,
-          () => ({ type: "FILE_UPLOAD" })
+          () => ({ type: "FILE_UPLOAD", optional: true })
         );
 
         const [validatedField] = await mocks.createRandomPetitionFields(
@@ -1119,6 +1159,7 @@ describe("GraphQL/Public", () => {
           () => ({
             type: "TEXT",
             validated: true,
+            optional: true,
           })
         );
 
@@ -1211,6 +1252,7 @@ describe("GraphQL/Public", () => {
       beforeAll(async () => {
         [fileUploadField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
           type: "FILE_UPLOAD",
+          optional: true,
         }));
       });
 
@@ -1310,6 +1352,59 @@ describe("GraphQL/Public", () => {
             uploadComplete: true,
           },
           status: "PENDING",
+        });
+      });
+    });
+
+    describe("publicCompletePetition", () => {
+      it("when using our shared apiKey and usage reached limit, complete anyways but don't start signature", async () => {
+        await mocks
+          .knex("organization_usage_limit")
+          .update({ limit: 10, used: 10 })
+          .where("id", limit.id);
+
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!) {
+              publicCompletePetition(keycode: $keycode) {
+                id
+                status
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+          },
+        });
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicCompletePetition).toEqual({
+          id: toGlobalId("Petition", access.petition_id),
+          status: "COMPLETED",
+        });
+        // make sure signature didn't start
+        const [signatureRequest] = await mocks
+          .knex("petition_signature_request")
+          .where("petition_id", access.petition_id)
+          .select("*");
+        expect(signatureRequest).toBeUndefined();
+
+        const [event] = await mocks
+          .knex("petition_event")
+          .where("petition_id", access.petition_id)
+          .where("type", "SIGNATURE_CANCELLED")
+          .select("*");
+
+        expect(event).toMatchObject({
+          type: "SIGNATURE_CANCELLED",
+          data: {
+            cancel_reason: "REQUEST_ERROR",
+            cancel_data: {
+              error: "The signature request could not be started due to lack of signature credits",
+              error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
+            },
+          },
+          petition_id: access.petition_id,
         });
       });
     });

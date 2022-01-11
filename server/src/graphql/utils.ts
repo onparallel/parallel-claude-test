@@ -70,7 +70,7 @@ export async function startSignatureRequest(
     []) as PetitionSignatureConfigSigner[];
 
   const allSigners = [...userSigners, ...additionalSignersInfo].map((s) => s.email);
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "development") {
     if (!allSigners.every((email) => ctx.config.development.whitelistedEmails.includes(email))) {
       throw new Error("DEVELOPMENT: Every recipient email must be whitelisted in .development.env");
     }
