@@ -101,10 +101,7 @@ function PublicPetitionLink({
         showErrorToast();
       }
     } catch (error) {
-      if (
-        isApolloError(error) &&
-        error.graphQLErrors[0]?.extensions?.code === "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
-      ) {
+      if (isApolloError(error, "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR")) {
         setStep("EMAIL_EXISTS");
       } else {
         showErrorToast();

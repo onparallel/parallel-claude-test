@@ -398,10 +398,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         if (isDialogError(error)) {
           throw error;
         }
-        if (
-          isApolloError(error) &&
-          error.graphQLErrors[0]?.extensions?.code === "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
-        ) {
+        if (isApolloError(error, "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR")) {
           await petitionAlreadyNotifiedDialog({});
           await sendPetitionClosedNotification({
             variables: {

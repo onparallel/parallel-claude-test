@@ -92,7 +92,6 @@ function IntegrationsSignature() {
       refetch();
     } catch (error) {
       if (isApolloError(error)) {
-        console.log("error: ", error.graphQLErrors[0]?.extensions?.code);
         if (error.graphQLErrors[0]?.extensions?.code === "INVALID_APIKEY_ERROR") {
           toast({
             title: intl.formatMessage({
@@ -124,10 +123,7 @@ function IntegrationsSignature() {
       await removeSignatureToken({});
       await deleteSignatureIntegration({ variables: { id } });
     } catch (error) {
-      if (
-        isApolloError(error) &&
-        error.graphQLErrors[0]?.extensions?.code === "SIGNATURE_INTEGRATION_IN_USE_ERROR"
-      ) {
+      if (isApolloError(error, "SIGNATURE_INTEGRATION_IN_USE_ERROR")) {
         try {
           await confirmRemoveSignatureToken({
             pendingSignaturesCount: error.graphQLErrors[0].extensions

@@ -13,14 +13,17 @@ import {
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { Link } from "../common/Link";
+import { Link, NormalLink } from "../common/Link";
 import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
@@ -179,11 +182,35 @@ export const PetitionSignaturesCard = Object.assign(
       [updateSignatureConfig, cancelSignatureRequest]
     );
 
+    const showErrorDialog = useErrorDialog();
+
     const handleStartSignatureProcess = useCallback(async () => {
-      await startSignatureRequest({
-        variables: { petitionId: petition.id },
-      });
-      await onRefetchPetition();
+      try {
+        await startSignatureRequest({
+          variables: { petitionId: petition.id },
+        });
+      } catch (error: any) {
+        if (isApolloError(error, "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED")) {
+          await withError(
+            showErrorDialog({
+              message: intl.formatMessage(
+                {
+                  id: "component.petition-signatures-card.no-credits-left.error",
+                  defaultMessage:
+                    "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits.",
+                },
+                {
+                  a: (chunks: any) => (
+                    <NormalLink href="mailto:support@onparallel.com">{chunks}</NormalLink>
+                  ),
+                }
+              ),
+            })
+          );
+        } else {
+          await onRefetchPetition();
+        }
+      }
     }, [startSignatureRequest, petition]);
 
     const handleDownloadSignedDoc = useCallback(

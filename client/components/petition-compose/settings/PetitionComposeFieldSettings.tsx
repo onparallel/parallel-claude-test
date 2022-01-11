@@ -48,10 +48,7 @@ export function PetitionComposeFieldSettings({
         await onFieldEdit(fieldId, data);
         if (aliasIsInvalid) setAliasIsInvalid(false);
       } catch (error) {
-        if (
-          isApolloError(error) &&
-          error.graphQLErrors[0]?.extensions?.code === "ALIAS_ALREADY_EXISTS"
-        ) {
+        if (isApolloError(error, "ALIAS_ALREADY_EXISTS")) {
           setAliasIsInvalid(true);
         }
       }

@@ -105,7 +105,7 @@ function Contacts() {
       await createContact({});
       refetch();
     } catch (error) {
-      if (isApolloError(error) && error.graphQLErrors[0]?.extensions?.code === "EXISTING_CONTACT") {
+      if (isApolloError(error, "EXISTING_CONTACT")) {
         errorToast();
       }
     }

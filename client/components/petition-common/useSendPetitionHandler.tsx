@@ -167,10 +167,7 @@ export function useSendPetitionHandler(
       }
       onRefetch();
     } catch (e) {
-      if (
-        isApolloError(e) &&
-        e.graphQLErrors[0]?.extensions?.code === "PETITION_SEND_CREDITS_ERROR"
-      ) {
+      if (isApolloError(e, "PETITION_SEND_CREDITS_ERROR")) {
         await withError(showPetitionLimitReachedErrorDialog());
       }
     }
