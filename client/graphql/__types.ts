@@ -2659,7 +2659,6 @@ export interface QuerypetitionAuthTokenArgs {
 }
 
 export interface QuerypetitionFieldCommentsArgs {
-  loadInternalComments?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 }
@@ -8227,7 +8226,6 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
 };
 
 export type PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQueryVariables = Exact<{
-  loadInternalComments?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
 }>;
@@ -21630,15 +21628,10 @@ export const PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument
 >;
 export const PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument = gql`
   query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
-    $loadInternalComments: Boolean
     $petitionId: GID!
     $petitionFieldId: GID!
   ) {
-    petitionFieldComments(
-      loadInternalComments: $loadInternalComments
-      petitionId: $petitionId
-      petitionFieldId: $petitionFieldId
-    ) {
+    petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
       ...FieldComment_PetitionFieldComment
     }
   }

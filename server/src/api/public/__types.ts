@@ -2570,7 +2570,6 @@ export type QuerypetitionAuthTokenArgs = {
 };
 
 export type QuerypetitionFieldCommentsArgs = {
-  loadInternalComments?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 };

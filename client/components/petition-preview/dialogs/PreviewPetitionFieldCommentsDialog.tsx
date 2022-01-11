@@ -62,7 +62,7 @@ export function PreviewPetitionFieldCommentsDialog({
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
     {
-      variables: { loadInternalComments: true, petitionId, petitionFieldId: field.id },
+      variables: { petitionId, petitionFieldId: field.id },
     }
   );
   const comments = data?.petitionFieldComments ?? [];
@@ -336,15 +336,10 @@ PreviewPetitionFieldCommentsDialog.fragments = {
 PreviewPetitionFieldCommentsDialog.queries = [
   gql`
     query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
-      $loadInternalComments: Boolean
       $petitionId: GID!
       $petitionFieldId: GID!
     ) {
-      petitionFieldComments(
-        loadInternalComments: $loadInternalComments
-        petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
-      ) {
+      petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
         ...FieldComment_PetitionFieldComment
       }
     }

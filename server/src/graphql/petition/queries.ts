@@ -262,14 +262,13 @@ export const petitionFieldCommentsQuery = queryField("petitionFieldComments", {
     fieldsBelongsToPetition("petitionId", "petitionFieldId")
   ),
   args: {
-    loadInternalComments: nullable(booleanArg()),
     petitionId: nonNull(globalIdArg("Petition")),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
   },
   description: "The comments for this field.",
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.loadPetitionFieldCommentsForField({
-      loadInternalComments: args.loadInternalComments || false,
+      loadInternalComments: true,
       petitionId: args.petitionId,
       petitionFieldId: args.petitionFieldId,
     });
