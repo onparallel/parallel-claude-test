@@ -170,6 +170,11 @@
     "context": "Action required"
   },
   {
+    "term": "generic.action-required.org-almost-out-of-signature-credits",
+    "definition": "You have used {percent}% of your signature credits.",
+    "context": "You have used {percent}% of your signature credits."
+  },
+  {
     "term": "generic.complete-information-button",
     "definition": "Complete the information",
     "context": "Complete the information"
@@ -283,6 +288,16 @@
     "term": "new-petition.text",
     "definition": "{senderName} ({senderEmail}) has sent you the following petition:",
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"
+  },
+  {
+    "term": "org-almost-out-of-signature-credits.intro-text",
+    "definition": "We notify you that at the time this email was sent, you had {remaining} signature credits remaining, {remainingPercent}% of the contracted credits. Remember that each eSignature sent means one credit.",
+    "context": "We notify you that at the time this email was sent, you had {remaining} signature credits remaining, {remainingPercent}% of the contracted credits. Remember that each eSignature sent means one credit."
+  },
+  {
+    "term": "org-almost-out-of-signature-credits.subject",
+    "definition": "Credit alert: {percent}% of eSignature credits have been consumed.",
+    "context": "Credit alert: {percent}% of eSignature credits have been consumed."
   },
   {
     "term": "petition-closed-notification.subject",
@@ -438,6 +453,26 @@
     "term": "reminder.text",
     "definition": "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted.",
     "context": "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
+  },
+  {
+    "term": "shared-signature-out-of-credits.contact-org-user",
+    "definition": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits.",
+    "context": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits."
+  },
+  {
+    "term": "shared-signature-out-of-credits.contact-us",
+    "definition": "Please contact us at <a>support@onparallel.com</a> to get more credits.",
+    "context": "Please contact us at <a>support@onparallel.com</a> to get more credits."
+  },
+  {
+    "term": "shared-signature-out-of-credits.intro-text",
+    "definition": "The following signing process sent through Signaturit could not be started due to lack of credits.",
+    "context": "The following signing process sent through Signaturit could not be started due to lack of credits."
+  },
+  {
+    "term": "shared-signature-out-of-credits.subject",
+    "definition": "eSignature couldn’t start due to lack of credits",
+    "context": "eSignature couldn’t start due to lack of credits"
   },
   {
     "term": "signature-cancelled.subject",

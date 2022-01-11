@@ -68,6 +68,8 @@ export class MockEmailsService implements IEmailsService {
   async sendPetitionMessageBouncedEmail() {}
   async sendContactAuthenticationRequestEmail() {}
   async sendPublicPetitionLinkAccessEmail() {}
+  async sendOrgAlmostOutOfSignatureCreditsEmail() {}
+  async sendOutOfSignatureCreditsEmail() {}
 }
 
 @injectable()

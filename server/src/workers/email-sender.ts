@@ -12,6 +12,8 @@ import { contactAuthenticationRequest } from "./emails/contact-authentication-re
 import { petitionAccessDelegated } from "./emails/petition-access-delegated";
 import { developerWebhookFailed } from "./emails/developer-webhook-failed";
 import { publicPetitionLinkAccess } from "./emails/public-petition-link-access";
+import { sharedSignatureOutOfCredits } from "./emails/shared-signature-out-of-credits";
+import { orgAlmostOutOfSignatureCredits } from "./emails/org-almost-out-of-signature-credits";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -26,6 +28,8 @@ const builders = {
   "petition-access-delegated": petitionAccessDelegated,
   "developer-webhook-failed": developerWebhookFailed,
   "public-petition-link-access": publicPetitionLinkAccess,
+  "shared-signature-out-of-credits": sharedSignatureOutOfCredits,
+  "org-almost-out-of-signature-credits": orgAlmostOutOfSignatureCredits,
 };
 
 export type EmailType = keyof typeof builders;

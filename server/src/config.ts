@@ -53,6 +53,7 @@ export function buildConfig() {
     },
     signature: {
       signaturitSandboxApiKey: process.env.SIGNATURIT_SANDBOX_API_KEY!,
+      signaturitSharedProductionApiKey: process.env.SIGNATURIT_SHARED_PRODUCTION_API_KEY!,
     },
     recaptcha: {
       secretKey: process.env.RECAPTCHA_SECRET_KEY!,

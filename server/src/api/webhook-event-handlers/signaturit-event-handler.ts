@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
-import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
+import {
+  PetitionSignatureConfigSigner,
+  PetitionSignatureRequestCancelData,
+} from "../../db/repositories/PetitionRepository";
 import { toGlobalId } from "../../util/globalId";
 
 export async function validateSignaturitRequest(
@@ -189,13 +192,16 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
     );
   }
 
+  const cancelData: PetitionSignatureRequestCancelData<"REQUEST_ERROR"> = {
+    error: data.reason ?? `email ${data.document.email} bounced`,
+    error_code: "EMAIL_BOUNCED",
+  };
+
   await Promise.all([
     ctx.petitions.cancelPetitionSignatureRequestByExternalId(
       `SIGNATURIT/${data.document.signature.id}`,
       "REQUEST_ERROR",
-      {
-        error: data.reason ?? `email ${data.document.email} bounced`,
-      }
+      cancelData
     ),
     ctx.petitions.createEvent({
       type: "SIGNATURE_CANCELLED",
@@ -203,7 +209,7 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
       data: {
         petition_signature_request_id: signature.id,
         cancel_reason: "REQUEST_ERROR",
-        cancel_data: { error: data.reason ?? `email ${data.document.email} bounced` },
+        cancel_data: cancelData,
       },
     }),
     appendEventLogs(ctx, data),

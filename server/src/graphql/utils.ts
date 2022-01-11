@@ -1,6 +1,7 @@
 import { Knex } from "knex";
 import { countBy, difference, isDefined, omit } from "remeda";
 import { ApiContext } from "../context";
+import { IntegrationSettings } from "../db/repositories/IntegrationRepository";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { Petition, PetitionAccess, PetitionField, User } from "../db/__types";
 import { toGlobalId } from "../util/globalId";
@@ -59,6 +60,8 @@ export async function startSignatureRequest(
   ctx: ApiContext,
   t?: Knex.Transaction
 ) {
+  await verifySignatureIntegration(petition.signature_config.orgIntegrationId, petition.id, ctx);
+
   const isAccess = "keycode" in starter;
   const updatedBy = isAccess ? `Contact:${starter.contact_id}` : `User:${starter.id}`;
 
@@ -172,5 +175,35 @@ export async function startSignatureRequest(
     ),
   ]);
 
-  return updatedPetition;
+  return { petition: updatedPetition, signatureRequest };
+}
+/**
+ *
+ * checks that the signature integration exists and is valid.
+ * also checks the usage limit if the integration uses our shared sandbox API_KEY
+ */
+async function verifySignatureIntegration(
+  orgIntegrationId: number | undefined,
+  petitionId: number,
+  ctx: ApiContext
+) {
+  if (orgIntegrationId === undefined) {
+    throw new Error(`undefined orgIntegrationId on signature_config. Petition:${petitionId}`);
+  }
+  const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
+  if (!integration || integration.type !== "SIGNATURE") {
+    throw new Error(
+      `Couldn't find an enabled signature integration for OrgIntegration:${orgIntegrationId}`
+    );
+  }
+  const settings = integration.settings as IntegrationSettings<"SIGNATURE">;
+  if (settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey) {
+    const sharedKeyUsage = await ctx.organizations.getOrganizationCurrentUsageLimit(
+      integration.org_id,
+      "SIGNATURIT_SHARED_APIKEY"
+    );
+    if (sharedKeyUsage && sharedKeyUsage.used >= sharedKeyUsage.limit) {
+      throw new Error("SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED");
+    }
+  }
 }

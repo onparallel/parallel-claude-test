@@ -1,7 +1,7 @@
+import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
-import { WhitelistedError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
@@ -10,6 +10,7 @@ import {
   userHasAccessToSignatureRequest,
   userHasEnabledIntegration,
 } from "../authorizers";
+import { startSignatureRequest as _startSignatureRequest } from "./../../utils";
 
 export const startSignatureRequest = mutationField("startSignatureRequest", {
   type: "PetitionSignatureRequest",
@@ -21,53 +22,38 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
   ),
   resolve: async (_, { petitionId }, ctx) => {
-    const [petition] = await ctx.petitions.updatePetition(
-      petitionId,
-      { status: "COMPLETED" },
-      `User:${ctx.user!.id}`
-    );
-    if (!petition) {
-      throw new Error(`Petition with id ${petitionId} not found`);
-    }
-    if (!petition.signature_config) {
-      throw new Error(`Signature configuration not found for petition with id ${petitionId}`);
-    }
-    if (process.env.NODE_ENV !== "production") {
-      if (
-        !petition.signature_config.signersInfo.every(({ email }) =>
-          email.endsWith("@onparallel.com")
-        )
-      ) {
-        throw new WhitelistedError(
-          "DEVELOPMENT: All recipients must have a parallel email.",
-          "403"
+    try {
+      return await ctx.petitions.withTransaction(async (t) => {
+        const [petition] = await ctx.petitions.updatePetition(
+          petitionId,
+          { status: "COMPLETED" },
+          `User:${ctx.user!.id}`,
+          t
+        );
+        if (!petition) {
+          throw new Error(`Petition with id ${petitionId} not found`);
+        }
+
+        const { signatureRequest } = await _startSignatureRequest(
+          petition,
+          [],
+          null,
+          ctx.user!,
+          ctx,
+          t
+        );
+        return signatureRequest;
+      });
+    } catch (error: any) {
+      if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
+        // in this case, just throw the error without creating a SIGNATURE_CANCELLED event. We will inform in the front-end with an error dialog
+        throw new ApolloError(
+          "You reached the limit of uses for our signature API_KEY",
+          "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED"
         );
       }
+      throw error;
     }
-
-    const signatureRequest = await ctx.petitions.createPetitionSignature(
-      petitionId,
-      petition!.signature_config
-    );
-
-    await Promise.all([
-      ctx.aws.enqueueMessages("signature-worker", {
-        groupId: `signature-${toGlobalId("Petition", petitionId)}`,
-        body: {
-          type: "start-signature-process",
-          payload: { petitionSignatureRequestId: signatureRequest.id },
-        },
-      }),
-      ctx.petitions.createEvent({
-        type: "SIGNATURE_STARTED",
-        petition_id: petition.id,
-        data: {
-          petition_signature_request_id: signatureRequest.id,
-        },
-      }),
-    ]);
-
-    return signatureRequest;
   },
 });
 

@@ -98,7 +98,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_signature_request_id: number;
   };
   SIGNATURE_CANCELLED: {
-    petition_signature_request_id: number;
+    petition_signature_request_id?: number; // if signature was cancelled because of lack of credits, the petition_signature_request_id will be undefined
     cancel_reason: PetitionSignatureCancelReason;
     cancel_data?: any; // cancel_data structure varies with cancel_reason. see PetitionRepository.PetitionSignatureRequestCancelData
   };

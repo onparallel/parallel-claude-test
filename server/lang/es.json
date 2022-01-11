@@ -170,6 +170,11 @@
     "context": "Action required"
   },
   {
+    "term": "generic.action-required.org-almost-out-of-signature-credits",
+    "definition": "Has consumido el {percent}% de tus créditos de firma.",
+    "context": "You have used {percent}% of your signature credits."
+  },
+  {
     "term": "generic.complete-information-button",
     "definition": "{tone, select, INFORMAL{Completar la información} other{Complete aquí la información}}",
     "context": "Complete the information"
@@ -283,6 +288,16 @@
     "term": "new-petition.text",
     "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) te ha compartido un acceso a Parallel:} other{{senderName} ({senderEmail}) le ha compartido un acceso a Parallel:}}",
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"
+  },
+  {
+    "term": "org-almost-out-of-signature-credits.intro-text",
+    "definition": "Te informamos de que, en el momento en el que se envió este correo, te quedaban {remaining} créditos de firma, un {remainingPercent}% de los créditos contratados. Recuerda que cada firma enviada supone un crédito.",
+    "context": "We notify you that at the time this email was sent, you had {remaining} signature credits remaining, {remainingPercent}% of the contracted credits. Remember that each eSignature sent means one credit."
+  },
+  {
+    "term": "org-almost-out-of-signature-credits.subject",
+    "definition": "Alerta de créditos: Has consumido un {percent}% de tus créditos de firma.",
+    "context": "Credit alert: {percent}% of eSignature credits have been consumed."
   },
   {
     "term": "petition-closed-notification.subject",
@@ -438,6 +453,26 @@
     "term": "reminder.text",
     "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le envió una petición de la que queda información pendiente de completar.}}",
     "context": "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
+  },
+  {
+    "term": "shared-signature-out-of-credits.contact-org-user",
+    "definition": "Por favor, ponte en contact con {orgContactName} (<a>{orgContactEmail}</a>) para conseguir más créditos.",
+    "context": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits."
+  },
+  {
+    "term": "shared-signature-out-of-credits.contact-us",
+    "definition": "Por favor, ponte en contacto con nosotros en <a>support@onparallel.com</a> para conseguir más créditos.",
+    "context": "Please contact us at <a>support@onparallel.com</a> to get more credits."
+  },
+  {
+    "term": "shared-signature-out-of-credits.intro-text",
+    "definition": "No se ha podido iniciar el siguiente proceso de firma enviado a través de Signaturit por falta de créditos.",
+    "context": "The following signing process sent through Signaturit could not be started due to lack of credits."
+  },
+  {
+    "term": "shared-signature-out-of-credits.subject",
+    "definition": "Firma no iniciada por falta de créditos",
+    "context": "eSignature couldn’t start due to lack of credits"
   },
   {
     "term": "signature-cancelled.subject",

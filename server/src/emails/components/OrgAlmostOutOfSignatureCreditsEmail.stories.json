@@ -1,0 +1,31 @@
+{
+  "title": "Org Almost Out Of Signature Credits",
+  "stories": [
+    {
+      "name": "Org Almost Out Of Signature Credits",
+      "parameters": {
+        "server": {
+          "id": "OrgAlmostOutOfSignatureCreditsEmail"
+        }
+      },
+      "args": {
+        "senderName": "Santi",
+        "total": 100,
+        "used": 90,
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "senderName": { "control": { "type": "text" } },
+        "total": { "control": { "type": "number" } },
+        "used": { "control": { "type": "number" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

@@ -44,6 +44,8 @@ export interface IEmailsService {
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
   sendContactAuthenticationRequestEmail(requestId: number): Promise<void>;
   sendPublicPetitionLinkAccessEmail(messageIds: MaybeArray<number>): Promise<void>;
+  sendOrgAlmostOutOfSignatureCreditsEmail(orgUsageLimitId: number): Promise<void>;
+  sendOutOfSignatureCreditsEmail(petitionId: number): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -227,5 +229,19 @@ export class EmailsService implements IEmailsService {
         petition_message_id: messageId,
       }))
     );
+  }
+
+  async sendOrgAlmostOutOfSignatureCreditsEmail(orgId: number) {
+    return await this.enqueueEmail("org-almost-out-of-signature-credits", {
+      id: this.buildQueueId("Organization", orgId),
+      org_id: orgId,
+    });
+  }
+
+  async sendOutOfSignatureCreditsEmail(petitionId: number) {
+    return await this.enqueueEmail("shared-signature-out-of-credits", {
+      id: this.buildQueueId("Petition", petitionId),
+      petition_id: petitionId,
+    });
   }
 }

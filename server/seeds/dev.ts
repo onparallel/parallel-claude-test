@@ -40,6 +40,10 @@ export async function seed(knex: Knex): Promise<any> {
           limit: 5000,
           period: "1 month",
         },
+        SIGNATURIT_SHARED_APIKEY: {
+          limit: 5000,
+          period: "1 month",
+        },
       },
     },
   ];
@@ -95,13 +99,22 @@ export async function seed(knex: Knex): Promise<any> {
       updated_by: `User:${userIds[0]}`,
     });
 
-  await knex<OrganizationUsageLimit>("organization_usage_limit").insert({
-    org_id: orgIds[0],
-    limit_name: "PETITION_SEND",
-    limit: 5000,
-    period: "1 month",
-    used: 0,
-  });
+  await knex<OrganizationUsageLimit>("organization_usage_limit").insert([
+    {
+      org_id: orgIds[0],
+      limit_name: "PETITION_SEND",
+      limit: 5000,
+      period: "1 month",
+      used: 0,
+    },
+    {
+      org_id: orgIds[0],
+      limit_name: "SIGNATURIT_SHARED_APIKEY",
+      limit: 5000,
+      period: "1 month",
+      used: 0,
+    },
+  ]);
 
   const contacts: CreateContact[] = [
     {

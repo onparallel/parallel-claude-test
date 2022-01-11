@@ -1783,7 +1783,7 @@ export const completePetition = mutationField("completePetition", {
         );
         if (petition.signature_config?.review === false) {
           const contacts = await ctx.contacts.loadContact(args.additionalSignersContactIds ?? []);
-          const updatedPetition = await startSignatureRequest(
+          const { petition: updatedPetition } = await startSignatureRequest(
             petition,
             contacts.map((c) => ({
               contactId: c!.id,
@@ -1812,8 +1812,45 @@ export const completePetition = mutationField("completePetition", {
           "Can't complete the petition without signers information",
           "REQUIRED_SIGNER_INFO_ERROR"
         );
+      } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
+        // complete the petition anyways and send signature_cancelled event for later notification to the user
+        const completedPetition = await ctx.petitions.withTransaction(async (t) => {
+          const requiredCredits = await getRequiredPetitionSendCredits(args.petitionId, 1, ctx);
+          const [petition] = await Promise.all([
+            ctx.petitions.completePetition(
+              args.petitionId,
+              ctx.user!,
+              {
+                credits_used: 1,
+              },
+              t
+            ),
+            ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+              ctx.user!.org_id,
+              "PETITION_SEND",
+              requiredCredits,
+              t
+            ),
+          ]);
+          return petition;
+        });
+
+        await ctx.petitions.createEvent({
+          type: "SIGNATURE_CANCELLED",
+          data: {
+            cancel_reason: "REQUEST_ERROR",
+            cancel_data: {
+              error: "The signature request could not be started due to lack of signature credits",
+              error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
+            },
+          },
+          petition_id: args.petitionId,
+        });
+
+        return completedPetition;
+      } else {
+        throw error;
       }
-      throw error;
     }
   },
 });

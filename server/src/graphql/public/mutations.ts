@@ -579,7 +579,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         );
 
         if (petition.signature_config?.review === false) {
-          const updatedPetition = await startSignatureRequest(
+          const { petition: updatedPetition } = await startSignatureRequest(
             petition,
             args.additionalSigners ?? [],
             args.message ?? null,
@@ -601,8 +601,24 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
           "Can't complete the petition without signers information",
           "REQUIRED_SIGNER_INFO_ERROR"
         );
+      } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
+        // complete the petition anyways and send signature_cancelled event for later notification to the user
+        await ctx.petitions.createEvent({
+          type: "SIGNATURE_CANCELLED",
+          data: {
+            cancel_reason: "REQUEST_ERROR",
+            cancel_data: {
+              error: "The signature request could not be started due to lack of signature credits",
+              error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
+            },
+          },
+          petition_id: ctx.access!.petition_id,
+        });
+
+        return await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!, {});
+      } else {
+        throw error;
       }
-      throw error;
     }
   },
 });

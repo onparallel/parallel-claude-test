@@ -25,6 +25,11 @@ export type OrganizationUsageDetails = {
     limit: number;
     period: string; //pg interval
   };
+  // limits the number of uses of the signature sandbox service with our shared API_KEY
+  SIGNATURIT_SHARED_APIKEY: {
+    limit: number;
+    period: string;
+  };
 };
 
 @injectable()
@@ -39,9 +44,20 @@ export class OrganizationRepository extends BaseRepository {
       limit: 20,
       period: "1 month",
     },
+    SIGNATURIT_SHARED_APIKEY: {
+      limit: 10,
+      period: "1 year",
+    },
   };
 
   readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
+
+  readonly loadOwnerAndAdmins = this.buildLoadMultipleBy("user", "org_id", (q) =>
+    q
+      .whereNull("deleted_at")
+      .whereIn("organization_role", ["OWNER", "ADMIN"])
+      .where("status", "ACTIVE")
+  );
 
   async loadOrgUsers(
     orgId: number,
@@ -134,11 +150,17 @@ export class OrganizationRepository extends BaseRepository {
       // set default usage limits for new organizations
       this.createOrganizationUsageLimit(
         org.id,
-        {
-          limit_name: "PETITION_SEND",
-          limit: this.defaultOrganizationUsageDetails["PETITION_SEND"].limit,
-          period: this.defaultOrganizationUsageDetails["PETITION_SEND"].period,
-        },
+        [
+          {
+            limit_name: "PETITION_SEND",
+            ...this.defaultOrganizationUsageDetails["PETITION_SEND"],
+          },
+          {
+            limit_name: "SIGNATURIT_SHARED_APIKEY",
+            ...this.defaultOrganizationUsageDetails["SIGNATURIT_SHARED_APIKEY"],
+          },
+        ],
+
         t
       ),
       this.createSandboxSignatureIntegration(org.id, createdBy, t),
@@ -249,13 +271,14 @@ export class OrganizationRepository extends BaseRepository {
     creditsSpent: number,
     t?: Knex.Transaction
   ) {
-    await this.from("organization_usage_limit", t)
+    const [limit] = await this.from("organization_usage_limit", t)
       .where({
         period_end_date: null,
         limit_name: limitName,
         org_id: orgId,
       })
-      .update({ used: this.knex.raw(`used + ?`, [creditsSpent]) });
+      .update({ used: this.knex.raw(`used + ?`, [creditsSpent]) }, "*");
+    return limit;
   }
 
   async createSandboxSignatureIntegration(orgId: number, createdBy?: string, t?: Knex.Transaction) {

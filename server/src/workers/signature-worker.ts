@@ -3,7 +3,11 @@ import { tmpdir } from "os";
 import { resolve } from "path";
 import { URLSearchParams } from "url";
 import { WorkerContext } from "../context";
-import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
+import { IntegrationSettings } from "../db/repositories/IntegrationRepository";
+import {
+  PetitionSignatureConfigSigner,
+  PetitionSignatureRequestCancelData,
+} from "../db/repositories/PetitionRepository";
 import { SignatureResponse } from "../services/signature";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
@@ -45,7 +49,7 @@ async function startSignatureProcess(
 
   try {
     const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
-
+    const settings = signatureIntegration.settings as IntegrationSettings<"SIGNATURE">;
     const recipients = signersInfo.map((signer) => ({
       name: fullName(signer.firstName, signer.lastName),
       email: signer.email,
@@ -105,13 +109,32 @@ async function startSignatureProcess(
       },
       status: "PROCESSING",
     });
+
+    // when reaching this part, we can be sure the org has at least 1 signature credit available
+    if (settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey) {
+      // sets used signature credits += 1
+      const signatureLimit = await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+        signatureIntegration.org_id,
+        "SIGNATURIT_SHARED_APIKEY",
+        1
+      );
+      // if usage reached 80% of total credits in the period, send warning email to owner and admins
+      // later uses will not trigger more of this emails
+      if (signatureLimit.used === Math.round(signatureLimit.limit * 0.8)) {
+        await ctx.emails.sendOrgAlmostOutOfSignatureCreditsEmail(signatureIntegration.org_id);
+      }
+      // if this request was sent with the last signature credit, send warning email to petition owner
+      else if (signatureLimit.limit === signatureLimit.used) {
+        await ctx.emails.sendOutOfSignatureCreditsEmail(petition.id);
+      }
+    }
   } catch (error: any) {
-    const cancelData = { error: error.stack ?? JSON.stringify(error) } as {
-      error: any;
-      file?: string;
-    };
+    const cancelData = {
+      error: error.stack ?? JSON.stringify(error),
+    } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
     if (error.message === "MALFORMED_PDF_ERROR") {
       cancelData.file = tmpPdfPath;
+      cancelData.error_code = "MALFORMED_PDF_ERROR";
       removeGeneratedPdf = false;
     }
     await Promise.all([

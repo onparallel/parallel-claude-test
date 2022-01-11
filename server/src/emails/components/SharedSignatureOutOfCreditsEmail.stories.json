@@ -1,0 +1,33 @@
+{
+  "title": "Shared Signature Out Of Credits",
+  "stories": [
+    {
+      "name": "Shared Signature Out Of Credits",
+      "parameters": {
+        "server": {
+          "id": "SharedSignatureOutOfCreditsEmail"
+        }
+      },
+      "args": {
+        "senderName": "Santi",
+        "orgContactName": "Derek Lou",
+        "orgContactEmail": "derek@onparallel.com",
+        "petitionName": "Know your Client",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "senderName": { "control": { "type": "text" } },
+        "petitionName": { "control": { "type": "text" } },
+        "orgContactName": { "control": { "type": "text" } },
+        "orgContactEmail": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

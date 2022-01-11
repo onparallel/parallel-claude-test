@@ -42,9 +42,12 @@ export const OrganizationStatusValues = [
   "ROOT",
 ] as OrganizationStatus[];
 
-export type OrganizationUsageLimitName = "PETITION_SEND";
+export type OrganizationUsageLimitName = "PETITION_SEND" | "SIGNATURIT_SHARED_APIKEY";
 
-export const OrganizationUsageLimitNameValues = ["PETITION_SEND"] as OrganizationUsageLimitName[];
+export const OrganizationUsageLimitNameValues = [
+  "PETITION_SEND",
+  "SIGNATURIT_SHARED_APIKEY",
+] as OrganizationUsageLimitName[];
 
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 

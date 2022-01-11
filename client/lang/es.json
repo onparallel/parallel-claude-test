@@ -1880,6 +1880,11 @@
     "context": "Petition eSignature"
   },
   {
+    "term": "component.petition-signatures-card.no-credits-left.error",
+    "definition": "No se ha podido iniciar el proceso de firma digital por falta de créditos de firma. Por favor, <a>contacta con soporte</a> para obtener más créditos.",
+    "context": "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits."
+  },
+  {
     "term": "component.petition-signatures-card.no-signature-configured",
     "definition": "No se ha configurado la firma para esta petición",
     "context": "No signature has been configured for this petition."

@@ -27,7 +27,7 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
     user_group_id?: number;
   };
   SIGNATURE_CANCELLED: {
-    petition_signature_request_id: number;
+    petition_signature_request_id?: number;
   };
   SIGNATURE_COMPLETED: {
     petition_signature_request_id: number;
@@ -45,7 +45,10 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
 type GenericPetitionUserNotification<
   TType extends PetitionUserNotificationType,
   IsCreate extends boolean = false
-> = Omit<DbPetitionUserNotification, "type" | "data" | If<IsCreate, "id" | "created_at">> & {
+> = Omit<
+  DbPetitionUserNotification,
+  "type" | "data" | If<IsCreate, "id" | "created_at" | "is_read" | "processed_at">
+> & {
   type: TType;
   data: PetitionUserNotificationPayload<TType>;
 };

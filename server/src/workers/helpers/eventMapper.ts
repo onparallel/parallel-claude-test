@@ -155,6 +155,7 @@ function mapEventPayload(event: PetitionEvent) {
         case "REQUEST_ERROR":
           cancelData = {
             error: event.data.cancel_data?.error,
+            errorCode: event.data.cancel_data?.error_code,
           };
           break;
         case "REQUEST_RESTARTED":
@@ -173,10 +174,10 @@ function mapEventPayload(event: PetitionEvent) {
       return {
         cancelData,
         cancelReason,
-        petitionSignatureRequestId: toGlobalId(
-          "PetitionSignatureRequest",
-          event.data.petition_signature_request_id
-        ),
+        petitionSignatureRequestId:
+          event.data.petition_signature_request_id !== undefined
+            ? toGlobalId("PetitionSignatureRequest", event.data.petition_signature_request_id)
+            : undefined,
       };
     }
     case "SIGNATURE_COMPLETED": {

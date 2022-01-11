@@ -119,7 +119,8 @@ export class Aws implements IAws {
               MessageGroupId: this.hash(groupId),
             })),
           })
-          .promise();
+          .promise()
+          .catch((err) => this.logger.error(err));
       }
     } else {
       await this.sqs
@@ -128,7 +129,8 @@ export class Aws implements IAws {
           MessageBody: JSON.stringify(messages.body),
           MessageGroupId: messages.groupId,
         })
-        .promise();
+        .promise()
+        .catch((err) => this.logger.error(err));
     }
   }
 
@@ -142,7 +144,7 @@ export class Aws implements IAws {
           groupId: `event-processor-${event.id}`,
           body: event,
         }))
-      );
+      ).catch((err) => this.logger.error(err));
     }
   }
 

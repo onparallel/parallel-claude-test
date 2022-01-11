@@ -1232,8 +1232,9 @@ export const AnyPetitionEvent = {
       description: "An eSignature request on the petition was cancelled.",
       properties: {
         petitionSignatureRequestId: {
-          description: "The ID of the eSignature request",
-          type: "string",
+          description:
+            "The ID of the eSignature request. Only set if the request was already started when the cancellation happens.",
+          type: ["string", "null"],
           example: toGlobalId("PetitionSignatureRequest", 1),
         },
         cancelReason: {
@@ -1286,6 +1287,14 @@ export const AnyPetitionEvent = {
             error: {
               description: outdent`
                 The server error that cancelled the signature.
+                Only set of cancelReason is \`REQUEST_ERROR\`.
+              `,
+              type: ["string", "null"],
+              example: null,
+            },
+            errorCode: {
+              description: outdent`
+                The error code of the cancelled the signature.
                 Only set of cancelReason is \`REQUEST_ERROR\`.
               `,
               type: ["string", "null"],

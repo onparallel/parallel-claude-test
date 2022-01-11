@@ -34,8 +34,6 @@ async function createPetitionCompletedUserNotifications(
         : { user_id: event.data.user_id! },
       petition_id: event.petition_id,
       user_id: user.id,
-      is_read: false,
-      processed_at: null,
     }))
   );
 }
@@ -73,8 +71,6 @@ async function createCommentPublishedUserNotifications(
         type: "COMMENT_CREATED",
         petition_id: comment.petition_id,
         user_id: userId,
-        is_read: false,
-        processed_at: null,
         data: {
           petition_field_id: comment.petition_field_id,
           petition_field_comment_id: comment.id,
@@ -113,8 +109,6 @@ async function createPetitionMessageBouncedUserNotifications(
   await ctx.petitions.createPetitionUserNotification([
     {
       type: "MESSAGE_EMAIL_BOUNCED",
-      is_read: false,
-      processed_at: null,
       user_id: sender.id,
       petition_id: event.petition_id,
       data: {
@@ -142,8 +136,6 @@ async function createPetitionReminderBouncedUserNotifications(
   await ctx.petitions.createPetitionUserNotification([
     {
       type: "REMINDER_EMAIL_BOUNCED",
-      is_read: false,
-      processed_at: null,
       user_id: sender.id,
       petition_id: event.petition_id,
       data: {
@@ -164,8 +156,6 @@ async function createSignatureCompletedUserNotifications(
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
       type: "SIGNATURE_COMPLETED",
-      is_read: false,
-      processed_at: null,
       petition_id: event.petition_id,
       user_id: user.id,
       data: {
@@ -191,8 +181,6 @@ async function createSignatureCancelledUserNotifications(
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
       type: "SIGNATURE_CANCELLED",
-      is_read: false,
-      processed_at: null,
       petition_id: event.petition_id,
       user_id: user.id,
       data: {
@@ -213,8 +201,6 @@ async function createPetitionSharedUserNotifications(
     await ctx.petitions.createPetitionUserNotification([
       {
         type: "PETITION_SHARED",
-        is_read: false,
-        processed_at: null,
         petition_id: event.petition_id,
         user_id: event.data.permission_user_id,
         data: {
@@ -229,8 +215,6 @@ async function createPetitionSharedUserNotifications(
     await ctx.petitions.createPetitionUserNotification(
       members.map((m) => ({
         type: "PETITION_SHARED",
-        is_read: false,
-        processed_at: null,
         petition_id: event.petition_id,
         user_id: m.user_id,
         data: {
@@ -253,8 +237,6 @@ async function createRemindersOptOutNotifications(event: RemindersOptOutEvent, c
       type: "REMINDERS_OPT_OUT",
       petition_id: event.petition_id,
       user_id: user.id,
-      is_read: false,
-      processed_at: null,
       data: {
         petition_access_id: event.data.petition_access_id,
         reason: event.data.reason,
@@ -277,8 +259,6 @@ async function createAccessActivatedFromPublicPetitionLinkUserNotifications(
       type: "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
       petition_id: event.petition_id,
       user_id: user.id,
-      is_read: false,
-      processed_at: null,
       data: {
         petition_access_id: event.data.petition_access_id,
       },
