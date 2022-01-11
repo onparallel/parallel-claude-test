@@ -22,7 +22,7 @@ export function RecipientViewPetitionFieldHeading({
       ? field
       : field.__typename === "PetitionField"
       ? {
-          commentCount: countBy(field.comments, (c) => !c.isInternal),
+          commentCount: field.comments.length,
           unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
         }
       : (null as never);

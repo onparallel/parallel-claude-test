@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  Badge,
   Box,
   Button,
   IconButton,
@@ -10,6 +11,7 @@ import {
   Portal,
   Spacer,
   Stack,
+  Text,
   Tooltip,
 } from "@chakra-ui/react";
 import { MoreVerticalIcon } from "@parallel/chakra/icons";
@@ -21,16 +23,20 @@ import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { UserReference } from "../petition-activity/UserReference";
 import { BreakLines } from "./BreakLines";
+import { ContactReference } from "./ContactReference";
 import { DateTime } from "./DateTime";
 import { DeletedContact } from "./DeletedContact";
 import { GrowingTextarea } from "./GrowingTextarea";
+import { SmallPopover } from "./SmallPopover";
 
 export function FieldComment({
   comment,
   isAuthor,
   onDelete,
   onEdit,
+  onMarkAsUnread,
 }: {
   comment:
     | FieldComment_PublicPetitionFieldCommentFragment
@@ -38,11 +44,15 @@ export function FieldComment({
   isAuthor: boolean;
   onDelete: () => void;
   onEdit: (content: string) => void;
+  onMarkAsUnread?: () => void;
 }) {
   const intl = useIntl();
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const isInternal = comment.__typename === "PetitionFieldComment" ? comment.isInternal : false;
+  const isEdited = comment.__typename === "PetitionFieldComment" ? comment.isEdited : false;
 
   function handleEditClick() {
     setContent(comment.content);
@@ -84,15 +94,56 @@ export function FieldComment({
       : undefined;
 
   return (
-    <Box paddingX={6} paddingY={2} backgroundColor={comment.isUnread ? "purple.50" : "white"}>
+    <Box
+      paddingX={6}
+      paddingY={2}
+      backgroundColor={comment.isUnread ? "purple.50" : isInternal ? "gray.50" : "white"}
+    >
       <Box fontSize="sm" display="flex" alignItems="center">
-        <Box as="strong" marginRight={2}>
-          {fullName ? fullName : <DeletedContact />}
+        <Box paddingRight={2}>
+          {isAuthor ? (
+            <Text as="strong" fontStyle="italic">
+              <FormattedMessage id="generic.you" defaultMessage="You" />
+            </Text>
+          ) : comment.__typename === "PetitionFieldComment" ? (
+            comment.author?.__typename === "PetitionAccess" ? (
+              <ContactReference contact={comment.author.contact} fontWeight="bold" />
+            ) : comment.author?.__typename === "User" ? (
+              <UserReference user={comment.author} />
+            ) : (
+              <DeletedContact />
+            )
+          ) : (
+            <Text as="strong">{fullName}</Text>
+          )}
         </Box>
-
+        {isInternal && (
+          <SmallPopover
+            content={
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="petition-replies.internal-comment-popover"
+                  defaultMessage="This comment is only visible for people in your organization."
+                />
+              </Text>
+            }
+          >
+            <Badge colorScheme="gray" variant="outline" cursor="default" marginRight={2}>
+              <FormattedMessage
+                id="petition-replies.internal-comment.badge"
+                defaultMessage="Internal"
+              />
+            </Badge>
+          </SmallPopover>
+        )}
         <DateTime color="gray.500" value={comment.createdAt} format={FORMATS.LLL} useRelativeTime />
+        {isEdited ? (
+          <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
+            <FormattedMessage id="generic.edited-comment-indicator" defaultMessage="Edited" />
+          </Text>
+        ) : null}
         <Spacer />
-        {isAuthor ? (
+        {isAuthor || comment.__typename === "PetitionFieldComment" ? (
           <Menu placement="bottom-end">
             <Tooltip
               label={intl.formatMessage({
@@ -113,9 +164,21 @@ export function FieldComment({
             </Tooltip>
             <Portal>
               <MenuList minWidth="160px">
-                <MenuItem onClick={handleEditClick}>
-                  <FormattedMessage id="generic.edit" defaultMessage="Edit" />
-                </MenuItem>
+                {isAuthor ? (
+                  <MenuItem onClick={handleEditClick}>
+                    <FormattedMessage id="generic.edit" defaultMessage="Edit" />
+                  </MenuItem>
+                ) : null}
+                {!comment.isUnread &&
+                ((comment.author?.__typename === "User" && !isAuthor) ||
+                  comment.author?.__typename === "PetitionAccess") ? (
+                  <MenuItem onClick={onMarkAsUnread}>
+                    <FormattedMessage
+                      id="component.replies-field-comment.mark-as-unread"
+                      defaultMessage="Mark as unread"
+                    />
+                  </MenuItem>
+                ) : null}
                 <MenuItem onClick={onDelete}>
                   <FormattedMessage id="generic.delete" defaultMessage="Delete" />
                 </MenuItem>
@@ -185,20 +248,21 @@ FieldComment.fragments = {
         content
         isUnread
         isInternal
+        isEdited
         author {
           ... on User {
-            id
-            fullName
+            ...UserReference_User
           }
           ... on PetitionAccess {
             id
             contact {
-              id
-              fullName
+              ...ContactReference_Contact
             }
           }
         }
       }
+      ${UserReference.fragments.User}
+      ${ContactReference.fragments.Contact}
     `;
   },
 };

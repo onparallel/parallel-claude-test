@@ -3565,7 +3565,11 @@ type Query {
   """
   The comments for this field.
   """
-  petitionFieldComments(petitionFieldId: GID!, petitionId: GID!): [PetitionFieldComment!]!
+  petitionFieldComments(
+    loadInternalComments: Boolean
+    petitionFieldId: GID!
+    petitionId: GID!
+  ): [PetitionFieldComment!]!
 
   """
   The petitions of the user

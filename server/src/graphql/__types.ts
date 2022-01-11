@@ -4092,6 +4092,7 @@ export interface NexusGenArgTypes {
     };
     petitionFieldComments: {
       // args
+      loadInternalComments?: boolean | null; // Boolean
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };

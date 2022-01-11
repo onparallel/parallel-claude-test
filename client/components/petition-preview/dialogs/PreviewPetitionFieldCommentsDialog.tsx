@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Center,
+  Checkbox,
   Flex,
   ModalBody,
   ModalCloseButton,
@@ -20,6 +21,7 @@ import { CommentIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FieldComment } from "@parallel/components/common/FieldComment";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   FieldComment_PetitionFieldCommentFragment,
@@ -32,9 +34,10 @@ import {
 import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { updateQuery } from "@parallel/utils/apollo/updateQuery";
 import { isMetaReturn } from "@parallel/utils/keys";
+import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
-import { ChangeEvent, KeyboardEvent, useCallback, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../../common/Divider";
 import { GrowingTextarea } from "../../common/GrowingTextarea";
@@ -59,19 +62,44 @@ export function PreviewPetitionFieldCommentsDialog({
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
     {
-      variables: { petitionId, petitionFieldId: field.id },
+      variables: { loadInternalComments: true, petitionId, petitionFieldId: field.id },
     }
   );
-  const comments = data?.petitionFieldComments.filter((c) => !c.isInternal) ?? [];
+  const comments = data?.petitionFieldComments ?? [];
 
   const [draft, setDraft] = useState("");
   const [inputFocused, inputFocusBind] = useFocus({
     onBlurDelay: 300,
   });
 
+  const [isInternalComment, setInternalComment] = useState(false);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  const updateIsReadNotification = useUpdateIsReadNotification();
+  async function handleMarkAsUnread(commentId: string) {
+    await updateIsReadNotification({
+      petitionFieldCommentIds: [commentId],
+      isRead: false,
+    });
+  }
+
+  useEffect(() => {
+    if (comments.length) {
+      const timeout = setTimeout(async () => {
+        const petitionFieldCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
+        if (petitionFieldCommentIds.length > 0) {
+          await updateIsReadNotification({
+            petitionFieldCommentIds,
+            isRead: true,
+          });
+        }
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [field.id, comments.length]);
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
   async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
@@ -84,7 +112,7 @@ export function PreviewPetitionFieldCommentsDialog({
           petitionId,
           petitionFieldId: field.id,
           content,
-          isInternal: false,
+          isInternal: isInternalComment,
         });
       } catch {}
       setNativeValue(textareaRef.current!, "");
@@ -102,7 +130,7 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionId,
         petitionFieldId: field.id,
         content: draft.trim(),
-        isInternal: false,
+        isInternal: isInternalComment,
       });
     } catch {}
     setNativeValue(textareaRef.current!, "");
@@ -201,6 +229,7 @@ export function PreviewPetitionFieldCommentsDialog({
                   isAuthor={myId === comment.author?.id}
                   onEdit={(content) => handleEditCommentContent(comment.id, content)}
                   onDelete={() => handleDeleteClick(comment.id)}
+                  onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
                 />
               ))}
             </Stack>
@@ -238,18 +267,45 @@ export function PreviewPetitionFieldCommentsDialog({
             {...inputFocusBind}
           />
           <PaddedCollapse in={isExpanded}>
-            <Stack direction="row" justifyContent="flex-end" paddingTop={2}>
-              <Button size="sm" onClick={handleCancelClick}>
-                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-              </Button>
-              <Button
-                size="sm"
-                colorScheme="purple"
-                isDisabled={draft.trim().length === 0 || isTemplate}
-                onClick={handleSubmitClick}
-              >
-                <FormattedMessage id="generic.submit" defaultMessage="Submit" />
-              </Button>
+            <Stack
+              direction="row"
+              justifyContent={true ? "space-between" : "flex-end"}
+              paddingTop={2}
+            >
+              {true && (
+                <Stack display="flex" alignItems="center" direction="row">
+                  <Checkbox
+                    marginLeft={1}
+                    colorScheme="purple"
+                    isChecked={isInternalComment}
+                    onChange={() => setInternalComment(!isInternalComment)}
+                  >
+                    <FormattedMessage
+                      id="petition-replies.internal-comment-check.label"
+                      defaultMessage="Internal comment"
+                    />
+                  </Checkbox>
+                  <HelpPopover>
+                    <FormattedMessage
+                      id="petition-replies.internal-comment-check.help"
+                      defaultMessage="By checking this field, the comment will be visible only to users in your organization."
+                    />
+                  </HelpPopover>
+                </Stack>
+              )}
+              <Stack direction="row">
+                <Button size="sm" onClick={handleCancelClick}>
+                  <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+                </Button>
+                <Button
+                  size="sm"
+                  colorScheme="purple"
+                  isDisabled={draft.trim().length === 0 || isTemplate}
+                  onClick={handleSubmitClick}
+                >
+                  <FormattedMessage id="generic.submit" defaultMessage="Submit" />
+                </Button>
+              </Stack>
             </Stack>
           </PaddedCollapse>
         </ModalFooter>
@@ -280,10 +336,15 @@ PreviewPetitionFieldCommentsDialog.fragments = {
 PreviewPetitionFieldCommentsDialog.queries = [
   gql`
     query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
+      $loadInternalComments: Boolean
       $petitionId: GID!
       $petitionFieldId: GID!
     ) {
-      petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+      petitionFieldComments(
+        loadInternalComments: $loadInternalComments
+        petitionId: $petitionId
+        petitionFieldId: $petitionFieldId
+      ) {
         ...FieldComment_PetitionFieldComment
       }
     }
