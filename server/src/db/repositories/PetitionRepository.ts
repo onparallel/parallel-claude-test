@@ -1567,15 +1567,6 @@ export class PetitionRepository extends BaseRepository {
     if (canComplete) {
       const petition = await this.withTransaction(async (t) => {
         await this.updateRemindersForPetition(petitionId, null, t);
-        await this.createEvent(
-          {
-            type: "PETITION_COMPLETED",
-            petition_id: petitionId,
-            data: isAccess ? { petition_access_id: userOrAccess.id } : { user_id: userOrAccess.id },
-          },
-          t
-        );
-
         const [updated] = await this.from("petition", t)
           .where("id", petitionId)
           .update(

@@ -189,6 +189,7 @@ export const PetitionSignaturesCard = Object.assign(
         await startSignatureRequest({
           variables: { petitionId: petition.id },
         });
+        await onRefetchPetition();
       } catch (error: any) {
         if (isApolloError(error, "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED")) {
           await withError(
@@ -207,8 +208,6 @@ export const PetitionSignaturesCard = Object.assign(
               ),
             })
           );
-        } else {
-          await onRefetchPetition();
         }
       }
     }, [startSignatureRequest, petition]);

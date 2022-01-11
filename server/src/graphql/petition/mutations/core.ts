@@ -1805,6 +1805,14 @@ export const completePetition = mutationField("completePetition", {
           requiredCredits,
           t
         );
+        await ctx.petitions.createEvent(
+          {
+            type: "PETITION_COMPLETED",
+            petition_id: args.petitionId,
+            data: { user_id: ctx.user!.id },
+          },
+          t
+        );
         return petition;
       });
     } catch (error: any) {
@@ -1833,6 +1841,11 @@ export const completePetition = mutationField("completePetition", {
               t
             ),
           ]);
+          await ctx.petitions.createEvent({
+            type: "PETITION_COMPLETED",
+            petition_id: petition.id,
+            data: { user_id: ctx.user!.id },
+          });
           return petition;
         });
 
