@@ -15,7 +15,7 @@ import {
   authenticateAnd,
   ifArgDefined,
 } from "../helpers/authorize";
-import { ArgValidationError, WhitelistedError } from "../helpers/errors";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/upload";
@@ -240,7 +240,8 @@ export const updateUserStatus = mutationField("updateUserStatus", {
         ]);
 
         if (org!.usage_details.USER_LIMIT < activeUserCount + userIds.length) {
-          throw new WhitelistedError(
+          throw new ArgValidationError(
+            info,
             `User limit reached for this organization`,
             "USER_LIMIT_ERROR",
             {

@@ -83,19 +83,26 @@ describe("GraphQL/Users", () => {
 
   describe("updateUserStatus", () => {
     let activeUsers: User[];
-    let inactiveUser: User;
+    let inactiveUsers: User[];
     let user0Petition: Petition;
     let user1Petitions: Petition[];
 
     let otherOrg: Organization;
     let otherOrgUser: User;
 
+    beforeAll(async () => {
+      await mocks.knex
+        .from("organization")
+        .where("id", organization.id)
+        .update({ usage_details: { USER_LIMIT: 9 } });
+    });
+
     beforeEach(async () => {
       activeUsers = await mocks.createRandomUsers(organization.id, 3, () => ({
         status: "ACTIVE",
       }));
 
-      [inactiveUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
+      inactiveUsers = await mocks.createRandomUsers(organization.id, 2, () => ({
         status: "INACTIVE",
       }));
 
@@ -231,7 +238,7 @@ describe("GraphQL/Users", () => {
           }
         `,
         variables: {
-          userIds: [toGlobalId("User", inactiveUser.id)],
+          userIds: [toGlobalId("User", inactiveUsers[0].id)],
           status: "ACTIVE",
         },
       });
@@ -239,7 +246,7 @@ describe("GraphQL/Users", () => {
       expect(errors).toBeUndefined();
       expect(data!.updateUserStatus).toEqual([
         {
-          id: toGlobalId("User", inactiveUser.id),
+          id: toGlobalId("User", inactiveUsers[0].id),
           status: "ACTIVE",
         },
       ]);
@@ -316,6 +323,26 @@ describe("GraphQL/Users", () => {
       ]);
     });
 
+    it("sends error when trying to update status to active when reached the user limit", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($userIds: [GID!]!, $status: UserStatus!) {
+            updateUserStatus(userIds: $userIds, status: $status) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          userIds: [toGlobalId("User", inactiveUsers[0].id)],
+          status: "ACTIVE",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("sends error when trying to update status of a user in another organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -353,7 +380,7 @@ describe("GraphQL/Users", () => {
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
           status: "INACTIVE",
-          transferToUserId: toGlobalId("User", inactiveUser.id),
+          transferToUserId: toGlobalId("User", inactiveUsers[0].id),
         },
       });
 
@@ -641,11 +668,6 @@ describe("GraphQL/Users", () => {
         .whereNot("id", sessionUser.id)
         .update("deleted_at", mocks.knex.raw("CURRENT_TIMESTAMP"));
 
-      await mocks.knex
-        .from("organization")
-        .where("id", organization.id)
-        .update({ usage_details: { USER_LIMIT: 3 } });
-
       [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
         organization_role: "NORMAL",
       }));
@@ -653,6 +675,11 @@ describe("GraphQL/Users", () => {
         "normal-token",
         normalUser.id
       ));
+
+      await mocks.knex
+        .from("organization")
+        .where("id", organization.id)
+        .update({ usage_details: { USER_LIMIT: 3 } });
     });
 
     it("normal users should not be able to create new users", async () => {
