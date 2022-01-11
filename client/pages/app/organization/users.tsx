@@ -24,7 +24,6 @@ import {
   User,
   UserStatus,
 } from "@parallel/graphql/__types";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
@@ -219,27 +218,15 @@ function OrganizationUsers() {
         duration: 5000,
         isClosable: true,
       });
-    } catch (e) {
-      if (isApolloError(e) && e.graphQLErrors[0]?.extensions?.code === "USER_LIMIT_ERROR") {
-        toast({
-          title: intl.formatMessage({
-            id: "organization.user-limit-error.toast-title",
-            defaultMessage: "Error",
-          }),
-          description: intl.formatMessage({
-            id: "organization.user-limit-error.toast-description",
-            defaultMessage: "User limit has been exceeded.",
-          }),
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    }
+    } catch {}
   };
 
   const isUserLimitReached =
     me.organization.activeUserCount >= me.organization.usageLimits.users.limit;
+
+  const isActivateUserButtonDisabled =
+    me.organization.activeUserCount + selectedUsers.filter((u) => u.status === "INACTIVE").length >=
+    me.organization.usageLimits.users.limit;
 
   return (
     <SettingsLayout
@@ -292,6 +279,7 @@ function OrganizationUsers() {
               selectedUsers={selectedUsers}
               hasSsoProvider={hasSsoProvider}
               isCreateUserButtonDisabled={isUserLimitReached}
+              isActivateUserButtonDisabled={isActivateUserButtonDisabled}
               onCreateUser={handleCreateUser}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}

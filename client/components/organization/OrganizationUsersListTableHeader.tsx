@@ -12,13 +12,13 @@ import {
   OrganizationUsers_UserFragment,
   UserStatus,
 } from "@parallel/graphql/__types";
-import { isAdmin } from "@parallel/utils/roles";
 import { withError } from "@parallel/utils/promises/withError";
+import { isAdmin } from "@parallel/utils/roles";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 
 export type OrganizationUsersListTableHeaderProps = {
   me: OrganizationUsersListTableHeader_UserFragment;
@@ -26,6 +26,7 @@ export type OrganizationUsersListTableHeaderProps = {
   selectedUsers: OrganizationUsers_UserFragment[];
   hasSsoProvider: boolean;
   isCreateUserButtonDisabled?: boolean;
+  isActivateUserButtonDisabled?: boolean;
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onCreateUser: () => void;
@@ -38,6 +39,7 @@ export function OrganizationUsersListTableHeader({
   selectedUsers,
   hasSsoProvider,
   isCreateUserButtonDisabled,
+  isActivateUserButtonDisabled,
   onSearchChange,
   onReload,
   onCreateUser,
@@ -108,7 +110,7 @@ export function OrganizationUsersListTableHeader({
                   <MenuItem
                     isDisabled={
                       selectedUsers.every((u) => u.status === "ACTIVE") ||
-                      isCreateUserButtonDisabled
+                      isActivateUserButtonDisabled
                     }
                     onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
                     icon={<UserCheckIcon display="block" boxSize={4} />}

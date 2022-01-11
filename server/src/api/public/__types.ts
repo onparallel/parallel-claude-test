@@ -3182,6 +3182,15 @@ export type PetitionAttachmentFragment = {
   file: { filename: string; contentType: string; size: number; isComplete: boolean };
 };
 
+export type UserFragment = {
+  id: string;
+  fullName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+export type UserGroupFragment = { id: string; name: string };
+
 export type ContactFragment = {
   id: string;
   email: string;
@@ -3190,13 +3199,6 @@ export type ContactFragment = {
   lastName: string | null;
   createdAt: string;
   updatedAt: string;
-};
-
-export type UserFragment = {
-  id: string;
-  fullName: string | null;
-  firstName: string | null;
-  lastName: string | null;
 };
 
 export type PetitionAccessFragment = {
@@ -3335,8 +3337,6 @@ export type TemplateFragment = {
   }>;
   tags?: Array<{ id: string; name: string }>;
 };
-
-export type UserGroupFragment = { id: string; name: string };
 
 export type Permission_PetitionUserGroupPermission_Fragment = {
   permissionType: PetitionPermissionType;
