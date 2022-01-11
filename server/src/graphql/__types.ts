@@ -1631,12 +1631,14 @@ export interface NexusGenFieldTypes {
     canceller: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
     cancellerReason: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    errorCode: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SignatureCancelledUserNotification: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    errorCode: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -2919,12 +2921,14 @@ export interface NexusGenFieldTypeNames {
     canceller: "PetitionSigner";
     cancellerReason: "String";
     createdAt: "DateTime";
+    errorCode: "String";
     id: "GID";
     type: "PetitionEventType";
   };
   SignatureCancelledUserNotification: {
     // field return type name
     createdAt: "DateTime";
+    errorCode: "String";
     id: "GID";
     isRead: "Boolean";
     petition: "PetitionBase";

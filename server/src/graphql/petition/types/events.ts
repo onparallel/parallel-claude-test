@@ -546,6 +546,12 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
       return data.cancel_reason;
     },
   });
+  t.nullable.field("errorCode", {
+    type: "String",
+    resolve: ({ data }) => {
+      return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.error_code ?? null : null;
+    },
+  });
 });
 
 export const SignatureReminderEvent = createPetitionEvent("SignatureReminderEvent", (t) => {

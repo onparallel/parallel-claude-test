@@ -71,17 +71,36 @@ export function TimelineSignatureCancelledEvent({
               }}
             />
           )}
-          {event.cancelType === "REQUEST_ERROR" && (
-            <FormattedMessage
-              id="timeline.signature-cancelled-request-error.description"
-              defaultMessage="The eSignature process has been cancelled due to an unknown error {timeAgo}"
-              values={{
-                timeAgo: (
-                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-                ),
-              }}
-            />
-          )}
+          {event.cancelType === "REQUEST_ERROR" &&
+            (event.errorCode === "INSUFFICIENT_SIGNATURE_CREDITS" ? (
+              <FormattedMessage
+                id="timeline.signature-cancelled-request-error.insufficient-credits.description"
+                defaultMessage="The eSignature could not be started due to lack of signature credits {timeAgo}"
+                values={{
+                  timeAgo: (
+                    <DateTime
+                      value={event.createdAt}
+                      format={FORMATS.LLL}
+                      useRelativeTime="always"
+                    />
+                  ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="timeline.signature-cancelled-request-error.unknown.description"
+                defaultMessage="The eSignature process has been cancelled due to an unknown error {timeAgo}"
+                values={{
+                  timeAgo: (
+                    <DateTime
+                      value={event.createdAt}
+                      format={FORMATS.LLL}
+                      useRelativeTime="always"
+                    />
+                  ),
+                }}
+              />
+            ))}
         </Box>
         {event.cancelType === "DECLINED_BY_SIGNER" && event.cancellerReason && (
           <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
@@ -106,6 +125,7 @@ TimelineSignatureCancelledEvent.fragments = {
         ...SignerReference_PetitionSigner
       }
       cancelType
+      errorCode
       cancellerReason
       createdAt
     }

@@ -73,14 +73,16 @@ async function processCommentCreatedContactNotification(
 }
 
 /*
- * this worker reads from tables `petition_user_notification` and `petition_contact_notification`
+ * this reads from tables `petition_user_notification` and `petition_contact_notification`
  * loads every unread and unprocessed entries and tries to process those.
- * For now it only processes COMMENT_CREATED type notifications.
  */
-createCronWorker("petition-notifications", async (context, config) => {
+async function processCommentNotifications(
+  context: WorkerContext,
+  config: Config["cronWorkers"]["petition-notifications"]
+) {
   const [unprocessedUserNotifications, unprocessedContactNotifications] = await Promise.all([
-    context.petitions.loadUnprocessedCommentCreatedUserNotifications(),
-    context.petitions.loadUnprocessedCommentCreatedContactNotifications(),
+    context.petitions.loadUnprocessedUserNotificationsOfType("COMMENT_CREATED"),
+    context.petitions.loadUnprocessedContactNotificationsOfType("COMMENT_CREATED"),
   ]);
 
   if (unprocessedUserNotifications.length > 0) {
@@ -102,4 +104,31 @@ createCronWorker("petition-notifications", async (context, config) => {
       await processCommentCreatedContactNotification(group, context, config);
     }
   }
+}
+
+async function processSingatureCancelledNoCreditsLeftUserNotifications(context: WorkerContext) {
+  const signatureCancelledUserNotifications =
+    await context.petitions.loadUnprocessedUserNotificationsOfType("SIGNATURE_CANCELLED");
+
+  const noCreditsLeftUserNotifications = signatureCancelledUserNotifications.filter(
+    (n) =>
+      n.data.cancel_reason === "REQUEST_ERROR" &&
+      n.data.cancel_data.error_code === "INSUFFICIENT_SIGNATURE_CREDITS"
+  );
+
+  const notificationsByPetition = groupBy(noCreditsLeftUserNotifications, (n) => n.petition_id);
+  for (const byPetition of Object.values(notificationsByPetition)) {
+    await context.emails.sendSignatureCancelledNoCreditsLeftEmail(byPetition[0].petition_id);
+  }
+
+  if (signatureCancelledUserNotifications.length > 0) {
+    await context.petitions.updatePetitionUserNotificationsProcessedAt(
+      signatureCancelledUserNotifications.map((n) => n.id)
+    );
+  }
+}
+
+createCronWorker("petition-notifications", async (context, config) => {
+  await processCommentNotifications(context, config);
+  await processSingatureCancelledNoCreditsLeftUserNotifications(context);
 });

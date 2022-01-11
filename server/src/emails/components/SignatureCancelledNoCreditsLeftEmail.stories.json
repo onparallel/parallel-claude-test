@@ -1,11 +1,11 @@
 {
-  "title": "Shared Signature Out Of Credits",
+  "title": "Signature Cancelled No Credits Left",
   "stories": [
     {
-      "name": "Shared Signature Out Of Credits",
+      "name": "Signature Cancelled No Credits Left",
       "parameters": {
         "server": {
-          "id": "SharedSignatureOutOfCreditsEmail"
+          "id": "SignatureCancelledNoCreditsLeftEmail"
         }
       },
       "args": {

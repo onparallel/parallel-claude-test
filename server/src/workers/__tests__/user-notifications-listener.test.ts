@@ -307,6 +307,10 @@ describe("Worker - User Notifications Listener", () => {
           user_id: user.id,
           data: {
             petition_signature_request_id: 1,
+            cancel_reason: "CANCELLED_BY_USER",
+            cancel_data: {
+              user_id: users[1].id,
+            },
           },
         }))
     );

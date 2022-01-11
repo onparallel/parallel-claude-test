@@ -1,13 +1,14 @@
 import { gql } from "@apollo/client";
 import { Circle } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
+import { SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface SignatureCancelledUserNotificationProps {
   isFirst?: boolean;
-  notification: any;
+  notification: SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment;
 }
 
 export const SignatureCancelledUserNotification = Object.assign(
@@ -23,12 +24,19 @@ export const SignatureCancelledUserNotification = Object.assign(
               <SignatureIcon color="white" fontSize="1rem" />
             </Circle>
           }
-          path={`/replies#signatures`}
+          path={"/replies#signatures"}
         >
-          <FormattedMessage
-            id="component.notification-signature-cancelled.body"
-            defaultMessage="The eSignature has been cancelled."
-          />
+          {notification.errorCode === "INSUFFICIENT_SIGNATURE_CREDITS" ? (
+            <FormattedMessage
+              id="component.notification-signature-cancelled.no-credits-left.body"
+              defaultMessage="The eSignature could not be started due to lack of signature credits."
+            />
+          ) : (
+            <FormattedMessage
+              id="component.notification-signature-cancelled.generic.body"
+              defaultMessage="The eSignature has been cancelled."
+            />
+          )}
         </PetitionUserNotification>
       );
     }
@@ -37,6 +45,7 @@ export const SignatureCancelledUserNotification = Object.assign(
     fragments: {
       SignatureCancelledUserNotification: gql`
         fragment SignatureCancelledUserNotification_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
+          errorCode
           ...PetitionUserNotification_PetitionUserNotification
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}

@@ -119,13 +119,12 @@ async function startSignatureProcess(
         1
       );
       // if usage reached 80% of total credits in the period, send warning email to owner and admins
-      // later uses will not trigger more of this emails
       if (signatureLimit.used === Math.round(signatureLimit.limit * 0.8)) {
-        await ctx.emails.sendOrgAlmostOutOfSignatureCreditsEmail(signatureIntegration.org_id);
+        await ctx.emails.sendOrgAlmostOutOfSignatureCreditsEmail(petition.org_id);
       }
-      // if this request was sent with the last signature credit, send warning email to petition owner
+      // if this request was sent with the last signature credit, send warning email to owner and admins
       else if (signatureLimit.limit === signatureLimit.used) {
-        await ctx.emails.sendOutOfSignatureCreditsEmail(petition.id);
+        await ctx.emails.sendLastSignatureCreditUsedEmail(petition.org_id);
       }
     }
   } catch (error: any) {

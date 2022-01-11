@@ -95,7 +95,14 @@ export const SignatureCompletedUserNotification = createPetitionUserNotification
 
 export const SignatureCancelledUserNotification = createPetitionUserNotification(
   "SignatureCancelledUserNotification",
-  () => {}
+  (t) => {
+    t.nullable.field("errorCode", {
+      type: "String",
+      resolve: ({ data }) => {
+        return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.error_code ?? null : null;
+      },
+    });
+  }
 );
 
 export const PetitionSharedUserNotification = createPetitionUserNotification(

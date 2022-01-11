@@ -2879,6 +2879,7 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   canceller?: Maybe<PetitionSigner>;
   cancellerReason?: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
+  errorCode?: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   type: PetitionEventType;
 }
@@ -2886,6 +2887,7 @@ export interface SignatureCancelledEvent extends PetitionEvent {
 export interface SignatureCancelledUserNotification extends PetitionUserNotification {
   __typename?: "SignatureCancelledUserNotification";
   createdAt: Scalars["DateTime"];
+  errorCode?: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
   petition: PetitionBase;
@@ -4100,6 +4102,7 @@ export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotifica
 export type NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
   {
     __typename?: "SignatureCancelledUserNotification";
+    errorCode?: string | null;
     id: string;
     createdAt: string;
     isRead: boolean;
@@ -4288,6 +4291,7 @@ export type NotificationsDrawer_notificationsQuery = {
           }
         | {
             __typename?: "SignatureCancelledUserNotification";
+            errorCode?: string | null;
             id: string;
             createdAt: string;
             isRead: boolean;
@@ -4459,6 +4463,7 @@ export type NotificationsList_PetitionUserNotification_RemindersOptOutNotificati
 export type NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
   {
     __typename?: "SignatureCancelledUserNotification";
+    errorCode?: string | null;
     id: string;
     createdAt: string;
     isRead: boolean;
@@ -4745,6 +4750,7 @@ export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
 
 export type SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment = {
   __typename?: "SignatureCancelledUserNotification";
+  errorCode?: string | null;
   id: string;
   createdAt: string;
   isRead: boolean;
@@ -5356,6 +5362,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "SignatureCancelledEvent";
           id: string;
           cancelType: PetitionSignatureCancelReason;
+          errorCode?: string | null;
           cancellerReason?: string | null;
           createdAt: string;
           cancelledBy?:
@@ -5901,6 +5908,7 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragm
   __typename?: "SignatureCancelledEvent";
   id: string;
   cancelType: PetitionSignatureCancelReason;
+  errorCode?: string | null;
   cancellerReason?: string | null;
   createdAt: string;
   cancelledBy?:
@@ -6530,6 +6538,7 @@ export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
   cancelType: PetitionSignatureCancelReason;
+  errorCode?: string | null;
   cancellerReason?: string | null;
   createdAt: string;
   cancelledBy?:
@@ -11434,6 +11443,7 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "SignatureCancelledEvent";
           id: string;
           cancelType: PetitionSignatureCancelReason;
+          errorCode?: string | null;
           cancellerReason?: string | null;
           createdAt: string;
           cancelledBy?:
@@ -12170,6 +12180,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
                 cancelType: PetitionSignatureCancelReason;
+                errorCode?: string | null;
                 cancellerReason?: string | null;
                 createdAt: string;
                 cancelledBy?:
@@ -12952,6 +12963,7 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
                 cancelType: PetitionSignatureCancelReason;
+                errorCode?: string | null;
                 cancellerReason?: string | null;
                 createdAt: string;
                 cancelledBy?:
@@ -17685,6 +17697,7 @@ export const PetitionSharedUserNotification_PetitionSharedUserNotificationFragme
 >;
 export const SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragmentDoc = gql`
   fragment SignatureCancelledUserNotification_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
+    errorCode
     ...PetitionUserNotification_PetitionUserNotification
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
@@ -19012,6 +19025,7 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
       ...SignerReference_PetitionSigner
     }
     cancelType
+    errorCode
     cancellerReason
     createdAt
   }

@@ -7,14 +7,14 @@ import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, greetingUser } from "../common/texts";
 
-export type SharedSignatureOutOfCreditsEmailProps = {
+export type SignatureCancelledNoCredtisLeftEmailProps = {
   senderName: string | null;
   orgContactName: string;
   orgContactEmail: string;
   petitionName: string | null;
 } & LayoutProps;
 
-const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
+const email: Email<SignatureCancelledNoCredtisLeftEmailProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
@@ -23,7 +23,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
   },
   subject(_, intl: IntlShape) {
     return intl.formatMessage({
-      id: "shared-signature-out-of-credits.subject",
+      id: "signature-cancelled-no-credits-left.subject",
       defaultMessage: "eSignature couldn’t start due to lack of credits",
     });
   },
@@ -33,7 +33,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
       petitionName,
       orgContactEmail,
       orgContactName,
-    }: SharedSignatureOutOfCreditsEmailProps,
+    }: SignatureCancelledNoCredtisLeftEmailProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -47,7 +47,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
       ${greetingUser({ name: senderName }, intl)}
 
       ${intl.formatMessage({
-        id: "shared-signature-out-of-credits.intro-text",
+        id: "signature-cancelled-no-credits-left.intro-text",
         defaultMessage:
           "The following signing process sent through Signaturit could not be started due to lack of credits.",
       })}
@@ -59,7 +59,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
 
       ${intl.formatMessage(
         {
-          id: "shared-signature-out-of-credits.contact-org-user",
+          id: "signature-cancelled-no-credits-left.contact-org-user",
           defaultMessage:
             "Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits.",
         },
@@ -78,7 +78,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-  }: SharedSignatureOutOfCreditsEmailProps) {
+  }: SignatureCancelledNoCredtisLeftEmailProps) {
     return (
       <Layout
         assetsUrl={assetsUrl}
@@ -100,7 +100,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
             <GreetingUser name={senderName} />
             <MjmlText>
               <FormattedMessage
-                id="shared-signature-out-of-credits.intro-text"
+                id="signature-cancelled-no-credits-left.intro-text"
                 defaultMessage="The following signing process sent through Signaturit could not be started due to lack of credits."
               />
             </MjmlText>
@@ -122,7 +122,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
             </MjmlText>
             <MjmlText>
               <FormattedMessage
-                id="shared-signature-out-of-credits.contact-org-user"
+                id="signature-cancelled-no-credits-left.contact-org-user"
                 defaultMessage="Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits."
                 values={{
                   a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,

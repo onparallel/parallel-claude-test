@@ -1000,9 +1000,14 @@
     "context": "{name} has opted out from receiving reminders: {reason}"
   },
   {
-    "term": "component.notification-signature-cancelled.body",
+    "term": "component.notification-signature-cancelled.generic.body",
     "definition": "Se ha cancelado la firma digital.",
     "context": "The eSignature has been cancelled."
+  },
+  {
+    "term": "component.notification-signature-cancelled.no-credits-left.body",
+    "definition": "No se ha podido iniciar el proceso de firma digital por falta de créditos de firma.",
+    "context": "The eSignature could not be started due to lack of signature credits."
   },
   {
     "term": "component.notification-signature-completed.body",
@@ -8710,7 +8715,12 @@
     "context": "{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
   },
   {
-    "term": "timeline.signature-cancelled-request-error.description",
+    "term": "timeline.signature-cancelled-request-error.insufficient-credits.description",
+    "definition": "No se ha podido iniciar el proceso de firma digital por falta de créditos de firma {timeAgo}",
+    "context": "The eSignature could not be started due to lack of signature credits {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-cancelled-request-error.unknown.description",
     "definition": "El proceso de firma digital ha sido cancelado debido a un error desconocido {timeAgo}",
     "context": "The eSignature process has been cancelled due to an unknown error {timeAgo}"
   },

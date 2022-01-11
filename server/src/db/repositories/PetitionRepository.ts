@@ -25,7 +25,11 @@ import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpe
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { CommentCreatedUserNotification, CreatePetitionUserNotification } from "../notifications";
+import {
+  CommentCreatedUserNotification,
+  CreatePetitionUserNotification,
+  GenericPetitionUserNotification,
+} from "../notifications";
 import {
   Contact,
   CreatePetitionAccess,
@@ -42,6 +46,7 @@ import {
   Petition,
   PetitionAccess,
   PetitionContactNotification,
+  PetitionContactNotificationType,
   PetitionEventType,
   PetitionField,
   PetitionFieldComment,
@@ -53,6 +58,7 @@ import {
   PetitionSignatureCancelReason,
   PetitionSignatureRequest,
   PetitionStatus,
+  PetitionUserNotificationType,
   PublicPetitionLink,
   TemplateDefaultPermission,
   User,
@@ -2185,24 +2191,20 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async loadUnprocessedCommentCreatedUserNotifications() {
-    return await this.raw<CommentCreatedUserNotification>(/* sql */ `
-      SELECT * from petition_user_notification 
-      where processed_at is null
-      and is_read = false
-      and type = 'COMMENT_CREATED'
-      order by created_at desc
-    `);
+  async loadUnprocessedUserNotificationsOfType<Type extends PetitionUserNotificationType>(
+    type: Type
+  ) {
+    return await this.knex<GenericPetitionUserNotification<Type>>("petition_user_notification")
+      .where({ processed_at: null, is_read: false, type })
+      .orderBy("created_at", "desc")
+      .select("*");
   }
 
-  async loadUnprocessedCommentCreatedContactNotifications() {
-    return await this.raw<PetitionContactNotification>(/* sql */ `
-      SELECT * from petition_contact_notification 
-      where processed_at is null
-      and is_read = false
-      and type = 'COMMENT_CREATED'
-      order by created_at desc
-    `);
+  async loadUnprocessedContactNotificationsOfType(type: PetitionContactNotificationType) {
+    return await this.from("petition_contact_notification")
+      .where({ processed_at: null, is_read: false, type })
+      .orderBy("created_at", "desc")
+      .select("*");
   }
 
   readonly loadPetitionUserNotifications = this.buildLoadBy("petition_user_notification", "id");

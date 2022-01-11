@@ -21,23 +21,35 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
     });
   },
   subject({ used, total }, intl: IntlShape) {
-    return intl.formatMessage(
-      {
-        id: "org-almost-out-of-signature-credits.subject",
-        defaultMessage: "Credit alert: {percent}% of eSignature credits have been consumed.",
-      },
-      { percent: Math.round((used / total) * 100) }
-    );
+    return used === total
+      ? intl.formatMessage({
+          id: "org-last-signature-credit-used.subject",
+          defaultMessage: "Credit alert: All of your eSignature credits have been consumed.",
+        })
+      : intl.formatMessage(
+          {
+            id: "org-almost-out-of-signature-credits.subject",
+            defaultMessage: "Credit alert: {percent}% of eSignature credits have been consumed.",
+          },
+          { percent: Math.round((used / total) * 100) }
+        );
   },
   text({ senderName, used, total }: SharedSignatureOutOfCreditsEmailProps, intl: IntlShape) {
     return outdent`
-      **${intl.formatMessage(
-        {
-          id: "generic.action-required.org-almost-out-of-signature-credits",
-          defaultMessage: "You have used {percent}% of your signature credits.",
-        },
-        { percent: Math.round((used / total) * 100) }
-      )}**
+      **${
+        used === total
+          ? intl.formatMessage({
+              id: "generic.action-required.org-last-signature-credit-used",
+              defaultMessage: "You have used all of your signature credits.",
+            })
+          : intl.formatMessage(
+              {
+                id: "generic.action-required.org-almost-out-of-signature-credits",
+                defaultMessage: "You have used {percent}% of your signature credits.",
+              },
+              { percent: Math.round((used / total) * 100) }
+            )
+      }**
 
       ${greetingUser({ name: senderName }, intl)}
 
@@ -55,7 +67,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
 
       ${intl.formatMessage(
         {
-          id: "shared-signature-out-of-credits.contact-us",
+          id: "org-almost-out-of-signature-credits.contact-us",
           defaultMessage: "Please contact us at <a>support@onparallel.com</a> to get more credits.",
         },
         { a: () => "support@onparallel.com" }
@@ -83,11 +95,18 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
           <MjmlSection backgroundColor="#3182CE" borderRadius="5px" padding="10px 0">
             <MjmlColumn>
               <MjmlText align="center" color="white" fontWeight={600}>
-                <FormattedMessage
-                  id="generic.action-required.org-almost-out-of-signature-credits"
-                  defaultMessage="You have used {percent}% of your signature credits."
-                  values={{ percent: Math.round((used / total) * 100) }}
-                />
+                {used === total ? (
+                  <FormattedMessage
+                    id="generic.action-required.org-last-signature-credit-used"
+                    defaultMessage="You have used all of your signature credits."
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="generic.action-required.org-almost-out-of-signature-credits"
+                    defaultMessage="You have used {percent}% of your signature credits."
+                    values={{ percent: Math.round((used / total) * 100) }}
+                  />
+                )}
               </MjmlText>
             </MjmlColumn>
           </MjmlSection>
@@ -108,7 +127,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
             </MjmlText>
             <MjmlText>
               <FormattedMessage
-                id="shared-signature-out-of-credits.contact-us"
+                id="org-almost-out-of-signature-credits.contact-us"
                 defaultMessage="Please contact us at <a>support@onparallel.com</a> to get more credits."
                 values={{
                   a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,

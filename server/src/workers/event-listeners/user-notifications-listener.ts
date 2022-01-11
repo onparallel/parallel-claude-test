@@ -172,10 +172,10 @@ async function createSignatureCancelledUserNotifications(
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  let users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
-  // if a user cancelled the signature, avoid creating a notification for that user
+  let users = await ctx.petitions.loadUsersOnPetition(petition.id);
   if (event.data.cancel_reason === "CANCELLED_BY_USER") {
-    users = users.filter((u) => u.id !== event.data.cancel_data.user_id!);
+    // if a user cancelled the signature, avoid creating a notification for that user
+    users = users.filter(({ id }) => id !== event.data.cancel_data.user_id!);
   }
 
   await ctx.petitions.createPetitionUserNotification(
@@ -184,6 +184,8 @@ async function createSignatureCancelledUserNotifications(
       petition_id: event.petition_id,
       user_id: user.id,
       data: {
+        cancel_reason: event.data.cancel_reason,
+        cancel_data: event.data.cancel_data,
         petition_signature_request_id: event.data.petition_signature_request_id,
       },
     }))

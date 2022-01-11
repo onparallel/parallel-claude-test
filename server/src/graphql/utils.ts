@@ -202,7 +202,7 @@ async function verifySignatureIntegration(
       integration.org_id,
       "SIGNATURIT_SHARED_APIKEY"
     );
-    if (sharedKeyUsage && sharedKeyUsage.used >= sharedKeyUsage.limit) {
+    if (!sharedKeyUsage || sharedKeyUsage.used >= sharedKeyUsage.limit) {
       throw new Error("SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED");
     }
   }

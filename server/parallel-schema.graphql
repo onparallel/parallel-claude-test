@@ -3876,12 +3876,14 @@ type SignatureCancelledEvent implements PetitionEvent {
   canceller: PetitionSigner
   cancellerReason: String
   createdAt: DateTime!
+  errorCode: String
   id: GID!
   type: PetitionEventType!
 }
 
 type SignatureCancelledUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
+  errorCode: String
   id: GID!
   isRead: Boolean!
   petition: PetitionBase!

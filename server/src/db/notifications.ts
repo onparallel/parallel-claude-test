@@ -1,5 +1,6 @@
 import { If } from "../util/types";
 import {
+  PetitionSignatureCancelReason,
   PetitionUserNotification as DbPetitionUserNotification,
   PetitionUserNotificationType,
 } from "./__types";
@@ -28,6 +29,8 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
   };
   SIGNATURE_CANCELLED: {
     petition_signature_request_id?: number;
+    cancel_reason?: PetitionSignatureCancelReason;
+    cancel_data?: any;
   };
   SIGNATURE_COMPLETED: {
     petition_signature_request_id: number;
@@ -42,7 +45,7 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
   };
 }[TType];
 
-type GenericPetitionUserNotification<
+export type GenericPetitionUserNotification<
   TType extends PetitionUserNotificationType,
   IsCreate extends boolean = false
 > = Omit<

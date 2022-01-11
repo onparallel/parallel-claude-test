@@ -44,8 +44,9 @@ export interface IEmailsService {
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
   sendContactAuthenticationRequestEmail(requestId: number): Promise<void>;
   sendPublicPetitionLinkAccessEmail(messageIds: MaybeArray<number>): Promise<void>;
-  sendOrgAlmostOutOfSignatureCreditsEmail(orgUsageLimitId: number): Promise<void>;
-  sendOutOfSignatureCreditsEmail(petitionId: number): Promise<void>;
+  sendOrgAlmostOutOfSignatureCreditsEmail(orgId: number): Promise<void>;
+  sendLastSignatureCreditUsedEmail(orgId: number): Promise<void>;
+  sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -231,6 +232,10 @@ export class EmailsService implements IEmailsService {
     );
   }
 
+  /**
+   * notify org owner and admins that they have 20% of signature credits left.
+   * "contact with support"
+   */
   async sendOrgAlmostOutOfSignatureCreditsEmail(orgId: number) {
     return await this.enqueueEmail("org-almost-out-of-signature-credits", {
       id: this.buildQueueId("Organization", orgId),
@@ -238,8 +243,22 @@ export class EmailsService implements IEmailsService {
     });
   }
 
-  async sendOutOfSignatureCreditsEmail(petitionId: number) {
-    return await this.enqueueEmail("shared-signature-out-of-credits", {
+  /**
+   * notify org owner and admins that their last signature credit was just used
+   * "contact with support"
+   */
+  async sendLastSignatureCreditUsedEmail(orgId: number) {
+    return await this.enqueueEmail("last-signature-credit-used", {
+      id: this.buildQueueId("Organization", orgId),
+      org_id: orgId,
+    });
+  }
+
+  /**
+   * notify users subscribed to petition that the signature request was cancelled due to lack of signature credits
+   */
+  async sendSignatureCancelledNoCreditsLeftEmail(petitionId: number) {
+    return await this.enqueueEmail("signature-cancelled-no-credits-left", {
       id: this.buildQueueId("Petition", petitionId),
       petition_id: petitionId,
     });
