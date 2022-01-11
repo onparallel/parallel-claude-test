@@ -14,6 +14,7 @@ export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
   handler: (context: WorkerContext, config: Config["cronWorkers"][Q]) => Promise<void>
 ) {
   loadEnv(`.${name}.env`);
+  loadEnv(".development.env");
   const container = createContainer();
   const config = container.get<Config>(CONFIG);
   yargs

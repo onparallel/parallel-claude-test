@@ -66,17 +66,14 @@ export async function startSignatureRequest(
   const userSigners = (petition.signature_config?.signersInfo ??
     []) as PetitionSignatureConfigSigner[];
 
+  const allSigners = [...userSigners, ...additionalSignersInfo].map((s) => s.email);
   if (process.env.NODE_ENV !== "production") {
-    if (
-      ![...userSigners, ...additionalSignersInfo].every(({ email }) =>
-        email.endsWith("@onparallel.com")
-      )
-    ) {
-      throw new Error("DEVELOPMENT: All recipients must have a parallel email.");
+    if (!allSigners.every((email) => ctx.config.development.whitelistedEmails.includes(email))) {
+      throw new Error("DEVELOPMENT: Every recipient email must be whitelisted in .development.env");
     }
   }
 
-  if (userSigners.length === 0 && additionalSignersInfo.length === 0) {
+  if (allSigners.length === 0) {
     throw new Error(`REQUIRED_SIGNER_INFO_ERROR`);
   }
 

@@ -106,6 +106,9 @@ export function buildConfig() {
       emailFrom: process.env.EMAIL_FROM!,
       clientServerToken: process.env.CLIENT_SERVER_TOKEN!,
     },
+    development: {
+      whitelistedEmails: (process.env.EMAILS_WHITELIST ?? "").split(","),
+    },
   });
 }
 

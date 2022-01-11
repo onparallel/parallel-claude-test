@@ -1,9 +1,13 @@
-import path from "path";
+import { resolve } from "path";
 import { config } from "dotenv";
+import { existsSync } from "fs";
 
 export function loadEnv(overrides?: string) {
   if (overrides) {
-    config({ path: path.resolve(process.cwd(), overrides) });
+    const path = resolve(process.cwd(), overrides);
+    if (existsSync(path)) {
+      config({ path });
+    }
   }
   config();
 }

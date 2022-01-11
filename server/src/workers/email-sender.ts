@@ -46,6 +46,15 @@ createQueueWorker("email-sender", async (payload: EmailSenderWorkerPayload, cont
   const emails = await builder(payload.payload as any, context);
   for (const email of unMaybeArray(emails)) {
     if (email) {
+      if (
+        process.env.NODE_ENV !== "production" &&
+        !context.config.development.whitelistedEmails.includes(email.to)
+      ) {
+        context.logger.warn(
+          `DEVELOPMENT: ${email.to} is not whitelisted in .development.env. Skipping...`
+        );
+        continue;
+      }
       const attachments = await context.emailLogs.getEmailAttachments(email.id);
       const result = await context.smtp.sendEmail({
         from: email.from,

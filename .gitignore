@@ -6,5 +6,6 @@ client/public/static/lang
 server/dist
 server/bin/localtunnel-dev.url
 server/lang/compiled
+server/.development.env
 
 .DS_Store
