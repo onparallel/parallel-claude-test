@@ -34,7 +34,7 @@ export class OrganizationRepository extends BaseRepository {
   }
 
   readonly defaultOrganizationUsageDetails: OrganizationUsageDetails = {
-    USER_LIMIT: 1,
+    USER_LIMIT: 2,
     PETITION_SEND: {
       limit: 20,
       period: "1 month",

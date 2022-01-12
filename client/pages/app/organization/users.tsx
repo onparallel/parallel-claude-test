@@ -225,7 +225,7 @@ function OrganizationUsers() {
     me.organization.activeUserCount >= me.organization.usageLimits.users.limit;
 
   const isActivateUserButtonDisabled =
-    me.organization.activeUserCount + selectedUsers.filter((u) => u.status === "INACTIVE").length >=
+    me.organization.activeUserCount + selectedUsers.filter((u) => u.status === "INACTIVE").length >
     me.organization.usageLimits.users.limit;
 
   return (

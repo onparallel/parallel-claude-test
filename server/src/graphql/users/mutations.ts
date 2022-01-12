@@ -233,7 +233,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     ),
     validateIf(
       (args) => args.status === "ACTIVE",
-      validateAnd(async (_, { userIds }, ctx, info) => {
+      async (_, { userIds }, ctx, info) => {
         const [org, activeUserCount] = await Promise.all([
           ctx.organizations.loadOrg(ctx.user!.org_id),
           ctx.organizations.loadActiveUserCount(ctx.user!.org_id),
@@ -249,7 +249,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
             }
           );
         }
-      })
+      }
     )
   ),
   args: {
