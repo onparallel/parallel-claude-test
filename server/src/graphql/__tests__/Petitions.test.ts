@@ -3617,7 +3617,7 @@ describe("GraphQL/Petitions", () => {
         },
         events: {
           totalCount: 2,
-          items: [{ type: "SIGNATURE_STARTED" }, { type: "PETITION_COMPLETED" }],
+          items: [{ type: "PETITION_COMPLETED" }, { type: "SIGNATURE_STARTED" }],
         },
       });
 
@@ -3677,11 +3677,11 @@ describe("GraphQL/Petitions", () => {
         events: {
           totalCount: 5,
           items: [
+            { type: "PETITION_COMPLETED" },
             { type: "SIGNATURE_STARTED" },
             { type: "SIGNATURE_CANCELLED" },
             { type: "PETITION_COMPLETED" },
             { type: "SIGNATURE_STARTED" },
-            { type: "PETITION_COMPLETED" },
           ],
         },
       });
