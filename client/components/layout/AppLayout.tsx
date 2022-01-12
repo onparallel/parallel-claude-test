@@ -7,6 +7,7 @@ import {
   Circle,
   Flex,
   Spinner,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
@@ -115,7 +116,12 @@ export const AppLayout = Object.assign(
       };
     }, [user.id]);
 
+    const isMobile = useBreakpointValue({ base: true, sm: false });
     function handleHelpCenterClick() {
+      window.analytics?.track("Help Center Clicked", {
+        userId: user.id,
+        from: isMobile ? "mobile" : "desktop",
+      });
       window.zE?.activate?.({ hideOnClose: true });
     }
 
