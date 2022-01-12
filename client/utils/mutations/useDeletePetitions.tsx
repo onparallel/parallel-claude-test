@@ -106,7 +106,14 @@ export function useDeletePetitions() {
                 />
                 <UnorderedList paddingLeft={2} py={2}>
                   {cachedPetitions.map((petition) => (
-                    <ListItem key={petition.id}>{petition.name}</ListItem>
+                    <ListItem key={petition.id} textStyle={petition!.name ? undefined : "hint"}>
+                      {petition.name
+                        ? petition.name
+                        : intl.formatMessage({
+                            id: "generic.untitled-petition",
+                            defaultMessage: "Untitled petition",
+                          })}
+                    </ListItem>
                   ))}
                 </UnorderedList>
                 <FormattedMessage
