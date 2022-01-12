@@ -71,10 +71,9 @@ export function PublicHero({
           >
             {title}
           </Heading>
-          <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="150%">
+          <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="160%">
             {subtitle}
-          </Heading>
-          <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="150%">
+            <br />
             {subtitle2}
           </Heading>
           <Stack
