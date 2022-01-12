@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  BoxProps,
   Button,
   Flex,
   Heading,
@@ -24,7 +25,6 @@ import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisi
 import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { zip } from "remeda";
-import { Card, CardProps } from "../common/Card";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { Spacer } from "../common/Spacer";
 import { useTone } from "../common/ToneProvider";
@@ -37,7 +37,7 @@ type PetitionFieldSelection =
   | RecipientViewProgressFooter_PublicPetitionFieldFragment
   | RecipientViewProgressFooter_PetitionFieldFragment;
 
-export interface RecipientViewProgressFooterProps extends CardProps {
+export interface RecipientViewProgressFooterProps extends BoxProps {
   petition: PetitionSelection;
   onFinalize: () => void;
   isDisabled?: boolean;
@@ -70,8 +70,13 @@ export function RecipientViewProgressFooter({
 
   const isCompleted = status === "COMPLETED";
   return (
-    <Card
+    <Box
+      as="section"
+      backgroundColor="white"
+      boxShadow="short"
       display="flex"
+      borderTop="1px solid"
+      borderTopColor="gray.200"
       width="100%"
       paddingY={2}
       paddingX={{ base: 2, sm: 4 }}
@@ -157,7 +162,7 @@ export function RecipientViewProgressFooter({
           </PopoverBody>
         </PopoverContent>
       </Popover>
-    </Card>
+    </Box>
   );
 }
 
