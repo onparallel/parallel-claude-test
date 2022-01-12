@@ -476,8 +476,8 @@
   },
   {
     "term": "signature-cancelled-no-credits-left.intro-text",
-    "definition": "The following signing process sent through Signaturit could not be started due to lack of credits.",
-    "context": "The following signing process sent through Signaturit could not be started due to lack of credits."
+    "definition": "The following signing process sent through {signatureProvider} could not be started due to lack of credits.",
+    "context": "The following signing process sent through {signatureProvider} could not be started due to lack of credits."
   },
   {
     "term": "signature-cancelled-no-credits-left.subject",

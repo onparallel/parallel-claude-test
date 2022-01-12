@@ -1,4 +1,5 @@
 import { WorkerContext } from "../../context";
+import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledNoCreditsLeftEmail from "../../emails/components/SignatureCancelledNoCreditsLeftEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
@@ -15,6 +16,9 @@ export async function signatureCancelledNoCreditsLeft(
   ]);
 
   if (!petition) return;
+
+  const config = petition.signature_config as PetitionSignatureConfig;
+  const signatureIntegration = await context.integrations.loadIntegration(config.orgIntegrationId);
 
   const orgOwner = (await context.organizations.loadOwnerAndAdmins(petition.org_id)).find(
     (u) => u.organization_role === "OWNER"
@@ -36,6 +40,7 @@ export async function signatureCancelledNoCreditsLeft(
         orgContactName: fullName(orgOwner.first_name, orgOwner.last_name),
         senderName: user.first_name!,
         petitionName: petition.name,
+        signatureProvider: signatureIntegration!.name,
         ...layoutProps,
       },
       { locale: petition.locale }

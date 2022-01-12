@@ -7,14 +7,15 @@ import { GreetingUser } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, greetingUser } from "../common/texts";
 
-export type SignatureCancelledNoCredtisLeftEmailProps = {
+export type SignatureCancelledNoCreditsLeftEmailProps = {
   senderName: string | null;
   orgContactName: string;
   orgContactEmail: string;
   petitionName: string | null;
+  signatureProvider: string;
 } & LayoutProps;
 
-const email: Email<SignatureCancelledNoCredtisLeftEmailProps> = {
+const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
@@ -33,7 +34,8 @@ const email: Email<SignatureCancelledNoCredtisLeftEmailProps> = {
       petitionName,
       orgContactEmail,
       orgContactName,
-    }: SignatureCancelledNoCredtisLeftEmailProps,
+      signatureProvider,
+    }: SignatureCancelledNoCreditsLeftEmailProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -46,11 +48,14 @@ const email: Email<SignatureCancelledNoCredtisLeftEmailProps> = {
 
       ${greetingUser({ name: senderName }, intl)}
 
-      ${intl.formatMessage({
-        id: "signature-cancelled-no-credits-left.intro-text",
-        defaultMessage:
-          "The following signing process sent through Signaturit could not be started due to lack of credits.",
-      })}
+      ${intl.formatMessage(
+        {
+          id: "signature-cancelled-no-credits-left.intro-text",
+          defaultMessage:
+            "The following signing process sent through {signatureProvider} could not be started due to lack of credits.",
+        },
+        { signatureProvider }
+      )}
 
       - ${
         petitionName ||
@@ -74,11 +79,12 @@ const email: Email<SignatureCancelledNoCredtisLeftEmailProps> = {
     orgContactEmail,
     orgContactName,
     petitionName,
+    signatureProvider,
     parallelUrl,
     assetsUrl,
     logoUrl,
     logoAlt,
-  }: SignatureCancelledNoCredtisLeftEmailProps) {
+  }: SignatureCancelledNoCreditsLeftEmailProps) {
     return (
       <Layout
         assetsUrl={assetsUrl}
@@ -101,7 +107,8 @@ const email: Email<SignatureCancelledNoCredtisLeftEmailProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-cancelled-no-credits-left.intro-text"
-                defaultMessage="The following signing process sent through Signaturit could not be started due to lack of credits."
+                defaultMessage="The following signing process sent through {signatureProvider} could not be started due to lack of credits."
+                values={{ signatureProvider }}
               />
             </MjmlText>
             <MjmlText padding="0 20px 0 50px" lineHeight="24px">

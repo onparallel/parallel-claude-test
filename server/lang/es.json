@@ -176,7 +176,7 @@
   },
   {
     "term": "generic.action-required.org-last-signature-credit-used",
-    "definition": "Has consumido el total de tos créditos de firma.",
+    "definition": "Has consumido el total de tus créditos de firma.",
     "context": "You have used all of your signature credits."
   },
   {
@@ -471,13 +471,13 @@
   },
   {
     "term": "signature-cancelled-no-credits-left.contact-org-user",
-    "definition": "Por favor, ponte en contact con {orgContactName} (<a>{orgContactEmail}</a>) para conseguir más créditos.",
+    "definition": "Por favor, ponte en contacto con {orgContactName} (<a>{orgContactEmail}</a>) para conseguir más créditos.",
     "context": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits."
   },
   {
     "term": "signature-cancelled-no-credits-left.intro-text",
-    "definition": "No se ha podido iniciar el siguiente proceso de firma enviado a través de Signaturit por falta de créditos.",
-    "context": "The following signing process sent through Signaturit could not be started due to lack of credits."
+    "definition": "No se ha podido iniciar el siguiente proceso de firma enviado a través de {signatureProvider} por falta de créditos.",
+    "context": "The following signing process sent through {signatureProvider} could not be started due to lack of credits."
   },
   {
     "term": "signature-cancelled-no-credits-left.subject",
@@ -491,7 +491,7 @@
   },
   {
     "term": "signature-cancelled.text",
-    "definition": "{tone, select, INFORMAL{Tu remitente ha cancelado el proceso de firma enviado a través de Signaturit.} other{El proceso de firma enviado a través de {signatureProvider} ha sido cancelado por el remitente.}}",
+    "definition": "{tone, select, INFORMAL{Tu remitente ha cancelado el proceso de firma enviado a través de {signatureProvider}.} other{El proceso de firma enviado a través de {signatureProvider} ha sido cancelado por el remitente.}}",
     "context": "The signing process sent through {signatureProvider} has been cancelled by the sender."
   },
   {
