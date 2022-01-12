@@ -247,10 +247,11 @@ FieldComment.fragments = {
         createdAt
         content
         isUnread
-        isInternal
+        isInternal @include(if: $hasInternalComments)
         isEdited
         author {
           ... on User {
+            id
             ...UserReference_User
           }
           ... on PetitionAccess {

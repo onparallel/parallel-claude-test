@@ -98,7 +98,7 @@ export function RecipientViewPetitionFieldCard({
             )}
           </Heading>
         </Box>
-        {hasCommentsEnabled ? (
+        {hasCommentsEnabled || field.__typename === "PetitionField" ? (
           <CommentsButton
             commentCount={commentCount}
             hasUnreadComments={unreadCommentCount > 0}

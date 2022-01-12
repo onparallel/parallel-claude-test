@@ -52,6 +52,10 @@ export function RecipientViewContentsCard({
     // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
     .slice(fields[0].title ? 1 : 0) as typeof fields;
 
+  const showCommentsCount = (field: PetitionFieldSelection) => {
+    return field.__typename === "PetitionField" ? true : field.options.hasCommentsEnabled;
+  };
+
   return (
     <Card display="flex" flexDirection="column" {...props}>
       <CardHeader as="h3" size="sm">
@@ -164,7 +168,7 @@ export function RecipientViewContentsCard({
                                   />
                                 )}
                               </Box>
-                              {commentCount ? (
+                              {commentCount && showCommentsCount(field) ? (
                                 <RecipientViewContentsIndicators
                                   hasUnreadComments={!!unreadCommentCount}
                                   commentCount={commentCount}
@@ -320,7 +324,6 @@ RecipientViewContentsCard.fragments = {
         comments {
           id
           isUnread
-          isInternal
         }
         ...useFieldVisibility_PetitionField
       }

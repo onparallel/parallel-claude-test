@@ -1,45 +1,23 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Checkbox,
-  Flex,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
-import { AlertCircleIcon, CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
+import { Box, Button, Checkbox, Flex, Stack, Text } from "@chakra-ui/react";
+import { AlertCircleIcon, CommentIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
-  PetitionRepliesFieldComments_PetitionFieldCommentFragment,
   PetitionRepliesFieldComments_PetitionFieldFragment,
   PetitionReplies_UserFragment,
 } from "@parallel/graphql/__types";
-import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { usePreviousValue } from "beautiful-react-hooks";
 import { ChangeEvent, Fragment, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { BreakLines } from "../common/BreakLines";
-import { ContactReference } from "../common/ContactReference";
-import { DateTime } from "../common/DateTime";
 import { Divider } from "../common/Divider";
+import { FieldComment } from "../common/FieldComment";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { HelpPopover } from "../common/HelpPopover";
 import { Link } from "../common/Link";
 import { PaddedCollapse } from "../common/PaddedCollapse";
-import { SmallPopover } from "../common/SmallPopover";
-import { Spacer } from "../common/Spacer";
-import { UserReference } from "../petition-activity/UserReference";
 
 export type PetitionRepliesFieldCommentsProps = {
   petitionId: string;
@@ -125,9 +103,9 @@ export function PetitionRepliesFieldComments({
       >
         {field.comments.map((comment, index) => (
           <Fragment key={comment.id}>
-            <RepliesFieldComment
+            <FieldComment
               comment={comment}
-              userId={user.id}
+              isAuthor={user.id === comment.author?.id}
               onEdit={(content) => onUpdateComment(comment.id, content)}
               onDelete={() => onDeleteComment(comment.id)}
               onMarkAsUnread={() => onMarkAsUnread(comment.id)}
@@ -243,178 +221,6 @@ export function PetitionRepliesFieldComments({
   );
 }
 
-function RepliesFieldComment({
-  comment: { createdAt, author, isUnread, isEdited, content: _content, isInternal },
-  userId,
-  onDelete,
-  onEdit,
-  onMarkAsUnread,
-}: {
-  comment: PetitionRepliesFieldComments_PetitionFieldCommentFragment;
-  userId: string;
-  onDelete: () => void;
-  onEdit: (content: string) => void;
-  onMarkAsUnread: () => void;
-}) {
-  const intl = useIntl();
-  const [isEditing, setIsEditing] = useState(false);
-  const [content, setContent] = useState(_content);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  function handleEditClick() {
-    setContent(_content);
-    setIsEditing(true);
-    setTimeout(() => {
-      textareaRef.current!.focus();
-      textareaRef.current!.select();
-    });
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (isMetaReturn(event)) {
-      event.preventDefault();
-      setIsEditing(false);
-      onEdit(content);
-    }
-  }
-
-  function handleCancelClick() {
-    setIsEditing(false);
-  }
-
-  function handleSaveClick() {
-    setIsEditing(false);
-    onEdit(content.trim());
-  }
-
-  function handleContentChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setContent(event.target.value);
-  }
-
-  return (
-    <Box
-      paddingX={4}
-      paddingY={2}
-      backgroundColor={isUnread ? "purple.50" : isInternal ? "gray.50" : "white"}
-    >
-      <Box fontSize="sm" display="flex" alignItems="center">
-        <Box paddingRight={2}>
-          {author?.__typename === "User" && author?.id === userId ? (
-            <Text as="strong" fontStyle="italic">
-              <FormattedMessage id="generic.you" defaultMessage="You" />
-            </Text>
-          ) : author?.__typename === "PetitionAccess" ? (
-            <ContactReference contact={author.contact} fontWeight="bold" />
-          ) : author?.__typename === "User" ? (
-            <UserReference user={author} />
-          ) : null}
-        </Box>
-        {isInternal && (
-          <SmallPopover
-            content={
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="petition-replies.internal-comment-popover"
-                  defaultMessage="This comment is only visible for people in your organization."
-                />
-              </Text>
-            }
-          >
-            <Badge colorScheme="gray" variant="outline" cursor="default" marginRight={2}>
-              <FormattedMessage
-                id="petition-replies.internal-comment.badge"
-                defaultMessage="Internal"
-              />
-            </Badge>
-          </SmallPopover>
-        )}
-        <DateTime color="gray.500" value={createdAt} format={FORMATS["L+LT"]} useRelativeTime />
-        {isEdited ? (
-          <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
-            <FormattedMessage id="generic.edited-comment-indicator" defaultMessage="Edited" />
-          </Text>
-        ) : null}
-        <Spacer />
-        <Menu placement="bottom-end">
-          <Tooltip
-            placement="bottom-end"
-            label={intl.formatMessage({
-              id: "generic.more-options",
-              defaultMessage: "More options...",
-            })}
-          >
-            <MenuButton
-              as={IconButton}
-              variant="ghost"
-              size="xs"
-              icon={<MoreVerticalIcon />}
-              aria-label={intl.formatMessage({
-                id: "generic.more-options",
-                defaultMessage: "More options...",
-              })}
-            />
-          </Tooltip>
-          <Portal>
-            <MenuList minWidth="160px">
-              {author?.__typename === "User" && author?.id === userId ? (
-                <MenuItem onClick={handleEditClick}>
-                  <FormattedMessage id="generic.edit" defaultMessage="Edit" />
-                </MenuItem>
-              ) : null}
-              {!isUnread &&
-              ((author?.__typename === "User" && author.id !== userId) ||
-                author?.__typename === "PetitionAccess") ? (
-                <MenuItem onClick={onMarkAsUnread}>
-                  <FormattedMessage
-                    id="component.replies-field-comment.mark-as-unread"
-                    defaultMessage="Mark as unread"
-                  />
-                </MenuItem>
-              ) : null}
-              <MenuItem onClick={onDelete}>
-                <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-              </MenuItem>
-            </MenuList>
-          </Portal>
-        </Menu>
-      </Box>
-      {isEditing ? (
-        <Box marginTop={1} marginX={-2}>
-          <GrowingTextarea
-            ref={textareaRef}
-            height="20px"
-            size="sm"
-            borderRadius="md"
-            paddingX={2}
-            minHeight={0}
-            rows={1}
-            value={content}
-            onKeyDown={handleKeyDown as any}
-            onChange={handleContentChange as any}
-          />
-          <Stack direction="row" justifyContent="flex-end" marginTop={2}>
-            <Button size="sm" onClick={handleCancelClick}>
-              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-            </Button>
-            <Button
-              size="sm"
-              colorScheme="purple"
-              onClick={handleSaveClick}
-              isDisabled={content.trim().length === 0}
-            >
-              <FormattedMessage id="generic.save" defaultMessage="Save" />
-            </Button>
-          </Stack>
-        </Box>
-      ) : (
-        <Box fontSize="sm">
-          <BreakLines>{content}</BreakLines>
-        </Box>
-      )}
-    </Box>
-  );
-}
-
 PetitionRepliesFieldComments.fragments = {
   User: gql`
     fragment PetitionRepliesFieldComments_User on User {
@@ -429,7 +235,7 @@ PetitionRepliesFieldComments.fragments = {
         title
         type
         comments {
-          ...PetitionRepliesFieldComments_PetitionFieldComment
+          ...FieldComment_PetitionFieldComment
         }
         replies {
           ...PetitionRepliesFieldComments_PetitionFieldReply
@@ -439,31 +245,7 @@ PetitionRepliesFieldComments.fragments = {
         id
         content
       }
-      ${this.PetitionFieldComment}
-    `;
-  },
-  get PetitionFieldComment() {
-    return gql`
-      fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
-        id
-        author {
-          ... on User {
-            ...UserReference_User
-          }
-          ... on PetitionAccess {
-            contact {
-              ...ContactReference_Contact
-            }
-          }
-        }
-        content
-        createdAt
-        isUnread
-        isEdited
-        isInternal @include(if: $hasInternalComments)
-      }
-      ${UserReference.fragments.User}
-      ${ContactReference.fragments.Contact}
+      ${FieldComment.fragments.PetitionFieldComment}
     `;
   },
 };

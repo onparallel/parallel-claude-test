@@ -311,6 +311,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petitionFieldId: activeFieldId!,
       content,
       isInternal,
+      hasInternalComments: me.hasInternalComments,
     });
   }
 
@@ -321,6 +322,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petitionFieldId: activeFieldId!,
       petitionFieldCommentId,
       content,
+      hasInternalComments: me.hasInternalComments,
     });
   }
 
@@ -330,6 +332,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petitionId,
       petitionFieldId: activeFieldId!,
       petitionFieldCommentId,
+      hasInternalComments: me.hasInternalComments,
     });
   }
 

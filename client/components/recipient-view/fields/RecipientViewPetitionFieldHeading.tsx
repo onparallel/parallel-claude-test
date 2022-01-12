@@ -30,7 +30,7 @@ export function RecipientViewPetitionFieldHeading({
     <Stack as="header" id={`field-${field.id}`} spacing={1} paddingX={2} paddingY={2}>
       <HStack alignItems="flex-start">
         <Box flex="1">{field.title ? <Heading size="md">{field.title}</Heading> : null}</Box>
-        {field.options.hasCommentsEnabled ? (
+        {field.options.hasCommentsEnabled || field.__typename === "PetitionField" ? (
           <Box paddingRight={2}>
             <CommentsButton
               commentCount={commentCount}

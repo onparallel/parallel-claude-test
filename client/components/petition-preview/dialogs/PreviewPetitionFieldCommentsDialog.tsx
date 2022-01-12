@@ -1,4 +1,4 @@
-import { DataProxy, gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { DataProxy, gql, useMutation, useQuery } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -29,9 +29,9 @@ import {
   PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
   PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
+  PreviewPetitionFieldCommentsDialog_userDocument,
   PreviewPetitionField_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { updateQuery } from "@parallel/utils/apollo/updateQuery";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -56,15 +56,18 @@ export function PreviewPetitionFieldCommentsDialog({
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
 
-  const apollo = useApolloClient();
-  const myId = getMyId(apollo);
+  const { data: userData } = useQuery(PreviewPetitionFieldCommentsDialog_userDocument);
+
+  const myId = userData?.me.id;
+  const hasInternalComments = userData?.me.hasInternalComments ?? false;
 
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
     {
-      variables: { petitionId, petitionFieldId: field.id },
+      variables: { petitionId, petitionFieldId: field.id, hasInternalComments },
     }
   );
+
   const comments = data?.petitionFieldComments ?? [];
 
   const [draft, setDraft] = useState("");
@@ -72,7 +75,9 @@ export function PreviewPetitionFieldCommentsDialog({
     onBlurDelay: 300,
   });
 
-  const [isInternalComment, setInternalComment] = useState(false);
+  const [isInternalComment, setInternalComment] = useState(
+    field.options.hasCommentsEnabled ? false : true
+  );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -113,6 +118,7 @@ export function PreviewPetitionFieldCommentsDialog({
           petitionFieldId: field.id,
           content,
           isInternal: isInternalComment,
+          hasInternalComments,
         });
       } catch {}
       setNativeValue(textareaRef.current!, "");
@@ -131,6 +137,7 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionFieldId: field.id,
         content: draft.trim(),
         isInternal: isInternalComment,
+        hasInternalComments,
       });
     } catch {}
     setNativeValue(textareaRef.current!, "");
@@ -151,6 +158,7 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionFieldId: field.id,
         petitionFieldCommentId: commentId,
         content,
+        hasInternalComments,
       });
     } catch {}
   }
@@ -163,6 +171,7 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionId,
         petitionFieldId: field.id,
         petitionFieldCommentId: commentId,
+        hasInternalComments,
       });
     } catch {}
   }
@@ -269,15 +278,16 @@ export function PreviewPetitionFieldCommentsDialog({
           <PaddedCollapse in={isExpanded}>
             <Stack
               direction="row"
-              justifyContent={true ? "space-between" : "flex-end"}
+              justifyContent={hasInternalComments ? "space-between" : "flex-end"}
               paddingTop={2}
             >
-              {true && (
+              {hasInternalComments && (
                 <Stack display="flex" alignItems="center" direction="row">
                   <Checkbox
                     marginLeft={1}
                     colorScheme="purple"
                     isChecked={isInternalComment}
+                    isDisabled={!field.options.hasCommentsEnabled}
                     onChange={() => setInternalComment(!isInternalComment)}
                   >
                     <FormattedMessage
@@ -335,9 +345,18 @@ PreviewPetitionFieldCommentsDialog.fragments = {
 
 PreviewPetitionFieldCommentsDialog.queries = [
   gql`
+    query PreviewPetitionFieldCommentsDialog_user {
+      me {
+        id
+        hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
+      }
+    }
+  `,
+  gql`
     query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
       $petitionId: GID!
       $petitionFieldId: GID!
+      $hasInternalComments: Boolean!
     ) {
       petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
         ...FieldComment_PetitionFieldComment
@@ -354,6 +373,7 @@ PreviewPetitionFieldCommentsDialog.mutations = [
       $petitionFieldId: GID!
       $content: String!
       $isInternal: Boolean
+      $hasInternalComments: Boolean!
     ) {
       createPetitionFieldComment(
         petitionId: $petitionId
@@ -372,6 +392,7 @@ PreviewPetitionFieldCommentsDialog.mutations = [
       $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
       $content: String!
+      $hasInternalComments: Boolean!
     ) {
       updatePetitionFieldComment(
         petitionId: $petitionId
@@ -389,6 +410,7 @@ PreviewPetitionFieldCommentsDialog.mutations = [
       $petitionId: GID!
       $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
+      $hasInternalComments: Boolean!
     ) {
       deletePetitionFieldComment(
         petitionId: $petitionId
@@ -421,6 +443,7 @@ export function useCreatePetitionFieldComment() {
               cache,
               variables.petitionId,
               variables.petitionFieldId,
+              variables.hasInternalComments,
               () => data!.createPetitionFieldComment.comments
             );
           }
@@ -449,6 +472,7 @@ export function useUpdatePetitionFieldComment() {
               cache,
               variables.petitionId,
               variables.petitionFieldId,
+              variables.hasInternalComments,
               () => data!.updatePetitionFieldComment.comments
             );
           }
@@ -477,6 +501,7 @@ export function useDeletePetitionFieldComment() {
               cache,
               variables.petitionId,
               variables.petitionFieldId,
+              variables.hasInternalComments,
               () => data!.deletePetitionFieldComment.comments
             );
           }
@@ -491,13 +516,14 @@ function updatePetitionFieldComments(
   proxy: DataProxy,
   petitionId: string,
   petitionFieldId: string,
+  hasInternalComments: boolean,
   updateFn: (
     cached: FieldComment_PetitionFieldCommentFragment[]
   ) => FieldComment_PetitionFieldCommentFragment[]
 ) {
   return updateQuery(proxy, {
     query: PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
-    variables: { petitionId, petitionFieldId },
+    variables: { petitionId, petitionFieldId, hasInternalComments },
     data: (cached) => {
       return {
         petitionFieldComments: cached?.petitionFieldComments
