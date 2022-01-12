@@ -38,7 +38,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         }}
       >
         <Feature
-          url="/templates/sales"
+          url="/templates/categories/sales"
           image={
             <Image
               role="presentation"
@@ -56,7 +56,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
           }
         />
         <Feature
-          url="/templates/legal"
+          url="/templates/categories/legal"
           image={
             <Image
               role="presentation"
@@ -74,7 +74,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
           }
         />
         <Feature
-          url="/templates/compliance"
+          url="/templates/categories/compliance"
           image={
             <Image
               role="presentation"
@@ -95,7 +95,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
           }
         />
         <Feature
-          url="/templates/hr"
+          url="/templates/categories/hr"
           image={
             <Image
               role="presentation"
@@ -111,7 +111,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
           }
         />
         <Feature
-          url="/templates/finance"
+          url="/templates/categories/finance"
           image={
             <Image
               role="presentation"
@@ -174,7 +174,9 @@ function Feature({ image, header, description, url, ...props }: FeatureProps) {
   return (
     <Box padding={5} textAlign="left" {...props}>
       <NakedLink href={url}>
-        <Box as="a">{image}</Box>
+        <Box as="a" display="inline-block">
+          {image}
+        </Box>
       </NakedLink>
       <Heading as="h4" marginTop={2} size="sm">
         {header}

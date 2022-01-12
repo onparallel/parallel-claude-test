@@ -95,11 +95,7 @@ export function PublicHero({
               </Button>
             </NakedLink>
           </Stack>
-          <Stack
-            spacing={3}
-            paddingTop={{ base: 8, [breakpoint]: 16 }}
-            marginRight={{ base: 0, [breakpoint]: 2 }}
-          >
+          <Stack spacing={3} paddingTop={{ base: 8, [breakpoint]: 16 }} marginRight="auto">
             <NakedLink href="https://www.capterra.com/reviews/236724/Parallel?utm_source=vendor&utm_medium=badge&utm_campaign=capterra_reviews_badge">
               <Box as="a">
                 <Image
