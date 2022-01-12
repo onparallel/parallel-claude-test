@@ -8530,28 +8530,6 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   id: string;
   title?: string | null;
   type: PetitionFieldType;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    createdAt: string;
-    content: string;
-    isUnread: boolean;
-    isInternal?: boolean;
-    isEdited: boolean;
-    author?:
-      | {
-          __typename?: "PetitionAccess";
-          id: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
-        }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-      | null;
-  }>;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -15001,22 +14979,6 @@ export type PetitionReplies_PetitionFragment = {
       id: string;
       isUnread: boolean;
       createdAt: string;
-      content: string;
-      isInternal?: boolean;
-      isEdited: boolean;
-      author?:
-        | {
-            __typename?: "PetitionAccess";
-            id: string;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName?: string | null;
-              email: string;
-            } | null;
-          }
-        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-        | null;
     }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -15140,22 +15102,6 @@ export type PetitionReplies_PetitionFieldFragment = {
     id: string;
     isUnread: boolean;
     createdAt: string;
-    content: string;
-    isInternal?: boolean;
-    isEdited: boolean;
-    author?:
-      | {
-          __typename?: "PetitionAccess";
-          id: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
-        }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-      | null;
   }>;
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
@@ -15369,7 +15315,6 @@ export type PetitionReplies_userQuery = {
 
 export type PetitionReplies_petitionQueryVariables = Exact<{
   id: Scalars["GID"];
-  hasInternalComments: Scalars["Boolean"];
 }>;
 
 export type PetitionReplies_petitionQuery = {
@@ -15421,22 +15366,6 @@ export type PetitionReplies_petitionQuery = {
             id: string;
             isUnread: boolean;
             createdAt: string;
-            content: string;
-            isInternal?: boolean;
-            isEdited: boolean;
-            author?:
-              | {
-                  __typename?: "PetitionAccess";
-                  id: string;
-                  contact?: {
-                    __typename?: "Contact";
-                    id: string;
-                    fullName?: string | null;
-                    email: string;
-                  } | null;
-                }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-              | null;
           }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -20077,14 +20006,10 @@ export const PetitionRepliesFieldComments_PetitionFieldFragmentDoc = gql`
     id
     title
     type
-    comments {
-      ...FieldComment_PetitionFieldComment
-    }
     replies {
       ...PetitionRepliesFieldComments_PetitionFieldReply
     }
   }
-  ${FieldComment_PetitionFieldCommentFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesFieldComments_PetitionFieldFragment, unknown>;
 export const ExportRepliesDialog_PetitionFieldFragmentDoc = gql`
@@ -23085,7 +23010,7 @@ export const PetitionReplies_userDocument = gql`
   ${PetitionReplies_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_userQuery, PetitionReplies_userQueryVariables>;
 export const PetitionReplies_petitionDocument = gql`
-  query PetitionReplies_petition($id: GID!, $hasInternalComments: Boolean!) {
+  query PetitionReplies_petition($id: GID!) {
     petition(id: $id) {
       ...PetitionReplies_Petition
     }

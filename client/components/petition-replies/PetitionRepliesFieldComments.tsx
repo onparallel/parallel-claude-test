@@ -1,10 +1,11 @@
-import { gql } from "@apollo/client";
-import { Box, Button, Checkbox, Flex, Stack, Text } from "@chakra-ui/react";
+import { gql, useQuery } from "@apollo/client";
+import { Box, Button, Center, Checkbox, Flex, Spinner, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon, CommentIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldFragment,
   PetitionReplies_UserFragment,
+  PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
@@ -51,13 +52,26 @@ export function PetitionRepliesFieldComments({
   const commentsRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const { data, loading } = useQuery(
+    PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
+    {
+      variables: {
+        petitionId,
+        petitionFieldId: field.id,
+        hasInternalComments: user.hasInternalComments,
+      },
+      fetchPolicy: "cache-and-network",
+    }
+  );
+  const comments = data?.petitionFieldComments ?? [];
+
   // Scroll to bottom when a comment is added
-  const previousCommentCount = usePreviousValue(field.comments.length);
+  const previousCommentCount = usePreviousValue(comments.length);
   useEffect(() => {
-    if (previousCommentCount === undefined || field.comments.length > previousCommentCount) {
+    if (previousCommentCount === undefined || comments.length > previousCommentCount) {
       commentsRef.current?.scrollTo({ top: 99999, behavior: "smooth" });
     }
-  }, [field.comments.length, previousCommentCount]);
+  }, [comments, previousCommentCount]);
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     const content = draft.trim();
@@ -101,19 +115,31 @@ export function PetitionRepliesFieldComments({
         overflow="auto"
         ref={commentsRef}
       >
-        {field.comments.map((comment, index) => (
-          <Fragment key={comment.id}>
-            <FieldComment
-              comment={comment}
-              isAuthor={user.id === comment.author?.id}
-              onEdit={(content) => onUpdateComment(comment.id, content)}
-              onDelete={() => onDeleteComment(comment.id)}
-              onMarkAsUnread={() => onMarkAsUnread(comment.id)}
+        {loading && !comments.length ? (
+          <Center minHeight={44}>
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="purple.500"
+              size="xl"
             />
-            {index === field.comments.length - 1 ? null : <Divider />}
-          </Fragment>
-        ))}
-        {field.comments.length === 0 ? (
+          </Center>
+        ) : (
+          comments.map((comment, index) => (
+            <Fragment key={comment.id}>
+              <FieldComment
+                comment={comment}
+                isAuthor={user.id === comment.author?.id}
+                onEdit={(content) => onUpdateComment(comment.id, content)}
+                onDelete={() => onDeleteComment(comment.id)}
+                onMarkAsUnread={() => onMarkAsUnread(comment.id)}
+              />
+              {index === comments.length - 1 ? null : <Divider />}
+            </Fragment>
+          ))
+        )}
+        {comments.length === 0 ? (
           <Flex
             flexDirection="column"
             paddingX={4}
@@ -234,9 +260,6 @@ PetitionRepliesFieldComments.fragments = {
         id
         title
         type
-        comments {
-          ...FieldComment_PetitionFieldComment
-        }
         replies {
           ...PetitionRepliesFieldComments_PetitionFieldReply
         }
@@ -245,7 +268,6 @@ PetitionRepliesFieldComments.fragments = {
         id
         content
       }
-      ${FieldComment.fragments.PetitionFieldComment}
     `;
   },
 };

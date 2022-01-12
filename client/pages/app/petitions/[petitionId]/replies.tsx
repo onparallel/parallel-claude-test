@@ -125,7 +125,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const { data, refetch } = useAssertQuery(PetitionReplies_petitionDocument, {
     variables: {
       id: petitionId,
-      hasInternalComments: me.hasInternalComments,
     },
   });
 
@@ -1020,7 +1019,7 @@ PetitionReplies.queries = [
     ${PetitionReplies.fragments.User}
   `,
   gql`
-    query PetitionReplies_petition($id: GID!, $hasInternalComments: Boolean!) {
+    query PetitionReplies_petition($id: GID!) {
       petition(id: $id) {
         ...PetitionReplies_Petition
       }
@@ -1031,13 +1030,10 @@ PetitionReplies.queries = [
 
 PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
-  const {
-    data: { me },
-  } = await fetchQuery(PetitionReplies_userDocument);
+  await fetchQuery(PetitionReplies_userDocument);
   await fetchQuery(PetitionReplies_petitionDocument, {
     variables: {
       id: petitionId,
-      hasInternalComments: me.hasInternalComments,
     },
   });
   return { petitionId };

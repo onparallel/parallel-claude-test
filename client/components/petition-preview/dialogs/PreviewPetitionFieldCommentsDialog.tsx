@@ -65,6 +65,7 @@ export function PreviewPetitionFieldCommentsDialog({
     PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
     {
       variables: { petitionId, petitionFieldId: field.id, hasInternalComments },
+      fetchPolicy: "cache-and-network",
     }
   );
 
@@ -203,8 +204,8 @@ export function PreviewPetitionFieldCommentsDialog({
           flexDirection="column-reverse"
           minHeight="0"
         >
-          {loading ? (
-            <Center minHeight={64}>
+          {loading && !comments.length ? (
+            <Center minHeight={44}>
               <Spinner
                 thickness="4px"
                 speed="0.65s"
