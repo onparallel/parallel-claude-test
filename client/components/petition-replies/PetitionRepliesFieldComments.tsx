@@ -58,7 +58,6 @@ export function PetitionRepliesFieldComments({
       variables: {
         petitionId,
         petitionFieldId: field.id,
-        hasInternalComments: user.hasInternalComments,
       },
       fetchPolicy: "cache-and-network",
     }

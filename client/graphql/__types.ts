@@ -3363,7 +3363,7 @@ export type FieldComment_PetitionFieldCommentFragment = {
   createdAt: string;
   content: string;
   isUnread: boolean;
-  isInternal?: boolean;
+  isInternal: boolean;
   isEdited: boolean;
   author?:
     | {
@@ -8207,7 +8207,7 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
     createdAt: string;
     content: string;
     isUnread: boolean;
-    isInternal?: boolean;
+    isInternal: boolean;
     isEdited: boolean;
     author?:
       | {
@@ -8234,7 +8234,6 @@ export type PreviewPetitionFieldCommentsDialog_userQuery = {
 export type PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQueryVariables = Exact<{
   petitionId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
-  hasInternalComments: Scalars["Boolean"];
 }>;
 
 export type PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQuery = {
@@ -8244,7 +8243,7 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQuery = {
     createdAt: string;
     content: string;
     isUnread: boolean;
-    isInternal?: boolean;
+    isInternal: boolean;
     isEdited: boolean;
     author?:
       | {
@@ -8267,7 +8266,6 @@ export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutatio
   petitionFieldId: Scalars["GID"];
   content: Scalars["String"];
   isInternal?: InputMaybe<Scalars["Boolean"]>;
-  hasInternalComments: Scalars["Boolean"];
 }>;
 
 export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation = {
@@ -8281,7 +8279,7 @@ export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutatio
       createdAt: string;
       content: string;
       isUnread: boolean;
-      isInternal?: boolean;
+      isInternal: boolean;
       isEdited: boolean;
       author?:
         | {
@@ -8305,7 +8303,6 @@ export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutatio
   petitionFieldId: Scalars["GID"];
   petitionFieldCommentId: Scalars["GID"];
   content: Scalars["String"];
-  hasInternalComments: Scalars["Boolean"];
 }>;
 
 export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation = {
@@ -8319,7 +8316,7 @@ export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutatio
       createdAt: string;
       content: string;
       isUnread: boolean;
-      isInternal?: boolean;
+      isInternal: boolean;
       isEdited: boolean;
       author?:
         | {
@@ -8342,7 +8339,6 @@ export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutatio
   petitionId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionFieldCommentId: Scalars["GID"];
-  hasInternalComments: Scalars["Boolean"];
 }>;
 
 export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation = {
@@ -8356,7 +8352,7 @@ export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutatio
       createdAt: string;
       content: string;
       isUnread: boolean;
-      isInternal?: boolean;
+      isInternal: boolean;
       isEdited: boolean;
       author?:
         | {
@@ -18080,7 +18076,7 @@ export const FieldComment_PetitionFieldCommentFragmentDoc = gql`
     createdAt
     content
     isUnread
-    isInternal @include(if: $hasInternalComments)
+    isInternal
     isEdited
     author {
       ... on User {
@@ -21521,7 +21517,6 @@ export const PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument = 
   query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
     $petitionId: GID!
     $petitionFieldId: GID!
-    $hasInternalComments: Boolean!
   ) {
     petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
       ...FieldComment_PetitionFieldComment
@@ -21538,7 +21533,6 @@ export const PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocume
     $petitionFieldId: GID!
     $content: String!
     $isInternal: Boolean
-    $hasInternalComments: Boolean!
   ) {
     createPetitionFieldComment(
       petitionId: $petitionId
@@ -21560,7 +21554,6 @@ export const PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocume
     $petitionFieldId: GID!
     $petitionFieldCommentId: GID!
     $content: String!
-    $hasInternalComments: Boolean!
   ) {
     updatePetitionFieldComment(
       petitionId: $petitionId
@@ -21581,7 +21574,6 @@ export const PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocume
     $petitionId: GID!
     $petitionFieldId: GID!
     $petitionFieldCommentId: GID!
-    $hasInternalComments: Boolean!
   ) {
     deletePetitionFieldComment(
       petitionId: $petitionId

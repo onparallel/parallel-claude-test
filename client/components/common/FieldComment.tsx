@@ -27,7 +27,6 @@ import { UserReference } from "../petition-activity/UserReference";
 import { BreakLines } from "./BreakLines";
 import { ContactReference } from "./ContactReference";
 import { DateTime } from "./DateTime";
-import { DeletedContact } from "./DeletedContact";
 import { GrowingTextarea } from "./GrowingTextarea";
 import { SmallPopover } from "./SmallPopover";
 
@@ -111,7 +110,7 @@ export function FieldComment({
             ) : comment.author?.__typename === "User" ? (
               <UserReference user={comment.author} />
             ) : (
-              <DeletedContact />
+              <UserReference user={null} />
             )
           ) : (
             <Text as="strong">{fullName}</Text>
@@ -247,7 +246,7 @@ FieldComment.fragments = {
         createdAt
         content
         isUnread
-        isInternal @include(if: $hasInternalComments)
+        isInternal
         isEdited
         author {
           ... on User {

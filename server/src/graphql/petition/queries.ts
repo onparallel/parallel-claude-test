@@ -267,8 +267,13 @@ export const petitionFieldCommentsQuery = queryField("petitionFieldComments", {
   },
   description: "The comments for this field.",
   resolve: async (_, args, ctx) => {
+    const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
+      ctx.user!.id,
+      "INTERNAL_COMMENTS"
+    );
+
     return await ctx.petitions.loadPetitionFieldCommentsForField({
-      loadInternalComments: true,
+      loadInternalComments,
       petitionId: args.petitionId,
       petitionFieldId: args.petitionFieldId,
     });

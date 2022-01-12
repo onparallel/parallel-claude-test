@@ -17,11 +17,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
-import { CommentIcon } from "@parallel/chakra/icons";
+import { AlertCircleIcon, CommentIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FieldComment } from "@parallel/components/common/FieldComment";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { Link } from "@parallel/components/common/Link";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   FieldComment_PetitionFieldCommentFragment,
@@ -64,7 +65,7 @@ export function PreviewPetitionFieldCommentsDialog({
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
     {
-      variables: { petitionId, petitionFieldId: field.id, hasInternalComments },
+      variables: { petitionId, petitionFieldId: field.id },
       fetchPolicy: "cache-and-network",
     }
   );
@@ -119,7 +120,6 @@ export function PreviewPetitionFieldCommentsDialog({
           petitionFieldId: field.id,
           content,
           isInternal: isInternalComment,
-          hasInternalComments,
         });
       } catch {}
       setNativeValue(textareaRef.current!, "");
@@ -138,7 +138,6 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionFieldId: field.id,
         content: draft.trim(),
         isInternal: isInternalComment,
-        hasInternalComments,
       });
     } catch {}
     setNativeValue(textareaRef.current!, "");
@@ -159,7 +158,6 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionFieldId: field.id,
         petitionFieldCommentId: commentId,
         content,
-        hasInternalComments,
       });
     } catch {}
   }
@@ -172,7 +170,6 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionId,
         petitionFieldId: field.id,
         petitionFieldCommentId: commentId,
-        hasInternalComments,
       });
     } catch {}
   }
@@ -222,13 +219,40 @@ export function PreviewPetitionFieldCommentsDialog({
               justifyContent="center"
               alignItems="center"
             >
-              <CommentIcon color="gray.300" boxSize="64px" />
-              <Text color="gray.500">
-                <FormattedMessage
-                  id="recipient-view.field-comments.cta"
-                  defaultMessage="Have any questions? Ask here"
-                />
-              </Text>
+              {field.options.hasCommentsEnabled ? (
+                <>
+                  <CommentIcon color="gray.300" boxSize="64px" />
+                  <Text color="gray.500">
+                    <FormattedMessage
+                      id="recipient-view.field-comments.cta"
+                      defaultMessage="Have any questions? Ask here"
+                    />
+                  </Text>
+                </>
+              ) : (
+                <Stack alignItems="center" textAlign="center">
+                  <AlertCircleIcon boxSize="64px" color="gray.200" />
+                  <Text color="gray.400">
+                    <FormattedMessage
+                      id="petition-replies.field-comments.disabled-comments-1"
+                      defaultMessage="Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab."
+                      values={{
+                        a: (chunks: any) => (
+                          <Link href={`/app/petitions/${petitionId}/compose`}>{chunks}</Link>
+                        ),
+                      }}
+                    />
+                  </Text>
+                  {hasInternalComments ? (
+                    <Text color="gray.400">
+                      <FormattedMessage
+                        id="petition-replies.field-comments.disabled-comments-2"
+                        defaultMessage="Only internal comments will be displayed here."
+                      />
+                    </Text>
+                  ) : null}
+                </Stack>
+              )}
             </Flex>
           ) : (
             <Stack spacing={0} divider={<Divider />}>
@@ -274,6 +298,7 @@ export function PreviewPetitionFieldCommentsDialog({
             value={draft}
             onKeyDown={handleKeyDown as any}
             onChange={handleDraftChange as any}
+            isDisabled={!field.options.hasCommentsEnabled && !hasInternalComments}
             {...inputFocusBind}
           />
           <PaddedCollapse in={isExpanded}>
@@ -357,7 +382,6 @@ PreviewPetitionFieldCommentsDialog.queries = [
     query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
       $petitionId: GID!
       $petitionFieldId: GID!
-      $hasInternalComments: Boolean!
     ) {
       petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
         ...FieldComment_PetitionFieldComment
@@ -374,7 +398,6 @@ PreviewPetitionFieldCommentsDialog.mutations = [
       $petitionFieldId: GID!
       $content: String!
       $isInternal: Boolean
-      $hasInternalComments: Boolean!
     ) {
       createPetitionFieldComment(
         petitionId: $petitionId
@@ -393,7 +416,6 @@ PreviewPetitionFieldCommentsDialog.mutations = [
       $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
       $content: String!
-      $hasInternalComments: Boolean!
     ) {
       updatePetitionFieldComment(
         petitionId: $petitionId
@@ -411,7 +433,6 @@ PreviewPetitionFieldCommentsDialog.mutations = [
       $petitionId: GID!
       $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
-      $hasInternalComments: Boolean!
     ) {
       deletePetitionFieldComment(
         petitionId: $petitionId
@@ -444,7 +465,6 @@ export function useCreatePetitionFieldComment() {
               cache,
               variables.petitionId,
               variables.petitionFieldId,
-              variables.hasInternalComments,
               () => data!.createPetitionFieldComment.comments
             );
           }
@@ -473,7 +493,6 @@ export function useUpdatePetitionFieldComment() {
               cache,
               variables.petitionId,
               variables.petitionFieldId,
-              variables.hasInternalComments,
               () => data!.updatePetitionFieldComment.comments
             );
           }
@@ -502,7 +521,6 @@ export function useDeletePetitionFieldComment() {
               cache,
               variables.petitionId,
               variables.petitionFieldId,
-              variables.hasInternalComments,
               () => data!.deletePetitionFieldComment.comments
             );
           }
@@ -517,14 +535,13 @@ function updatePetitionFieldComments(
   proxy: DataProxy,
   petitionId: string,
   petitionFieldId: string,
-  hasInternalComments: boolean,
   updateFn: (
     cached: FieldComment_PetitionFieldCommentFragment[]
   ) => FieldComment_PetitionFieldCommentFragment[]
 ) {
   return updateQuery(proxy, {
     query: PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
-    variables: { petitionId, petitionFieldId, hasInternalComments },
+    variables: { petitionId, petitionFieldId },
     data: (cached) => {
       return {
         petitionFieldComments: cached?.petitionFieldComments
