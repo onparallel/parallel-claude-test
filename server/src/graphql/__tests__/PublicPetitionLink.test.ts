@@ -5,6 +5,7 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Contact,
   Organization,
+  OrganizationUsageLimit,
   Petition,
   PublicPetitionLink,
   User,
@@ -13,6 +14,7 @@ import {
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
+import faker from "faker";
 
 describe("GraphQL/PublicPetitionLink", () => {
   let testClient: TestClient;
@@ -283,6 +285,14 @@ describe("GraphQL/PublicPetitionLink", () => {
   });
 
   describe("publicCreateAndSendPetitionFromPublicLink", () => {
+    let petitionSendLimit: OrganizationUsageLimit;
+    beforeAll(async () => {
+      petitionSendLimit = await mocks.createOrganizationUsageLimit(
+        organization.id,
+        "PETITION_SEND",
+        100
+      );
+    });
     it("creates a petition via a public link and sends it to the provided email", async () => {
       const emailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
@@ -595,6 +605,45 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.publicCreateAndSendPetitionFromPublicLink).toEqual("SUCCESS");
+    });
+
+    it("sends error if trying to start a public link without petition_send credits", async () => {
+      await mocks
+        .knex("organization_usage_limit")
+        .where("id", petitionSendLimit.id)
+        .update({ used: 10, limit: 10 });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $slug: ID!
+            $contactFirstName: String!
+            $contactLastName: String!
+            $contactEmail: String!
+          ) {
+            publicCreateAndSendPetitionFromPublicLink(
+              slug: $slug
+              contactFirstName: $contactFirstName
+              contactLastName: $contactLastName
+              contactEmail: $contactEmail
+            )
+          }
+        `,
+        variables: {
+          slug: publicPetitionLink.slug,
+          contactFirstName: faker.name.firstName(),
+          contactLastName: faker.name.lastName(),
+          contactEmail: faker.internet.email(),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+
+      await mocks
+        .knex("organization_usage_limit")
+        .where("id", petitionSendLimit.id)
+        .update({ used: 0, limit: 100 });
     });
   });
 

@@ -954,7 +954,26 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         })
       ),
     },
-    authorize: validPublicPetitionLinkSlug("slug"),
+    authorize: chain(
+      validPublicPetitionLinkSlug("slug"),
+      // check if the organization has PETITION_SEND credits for this
+      async (_, { slug }, ctx) => {
+        const publicLink = (await ctx.petitions.loadPublicPetitionLinkBySlug(slug))!;
+        const template = await ctx.petitions.loadPetition(publicLink.template_id);
+        if (!template) {
+          return false;
+        }
+        const petitionSendLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
+          template.org_id,
+          "PETITION_SEND"
+        );
+        if (!petitionSendLimit || petitionSendLimit.used >= petitionSendLimit.limit) {
+          return false;
+        }
+
+        return true;
+      }
+    ),
     validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
     resolve: async (_, args, ctx) => {
       const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
@@ -973,7 +992,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         throw new Error(`User not found for public_petition_link.owner_id ${link.owner_id}`);
       }
 
-      const { messages, result } = await ctx.petitions.withTransaction(async (t) => {
+      const { messages, result, petition } = await ctx.petitions.withTransaction(async (t) => {
         const [petition, [contact]] = await Promise.all([
           ctx.petitions.clonePetition(
             link!.template_id,
@@ -1023,7 +1042,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
 
         if (error) throw error; // transaction rollback
 
-        return { messages: messages ?? [], result };
+        return { messages: messages ?? [], result, petition };
       });
 
       // trigger emails and events
@@ -1037,6 +1056,11 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
               data: { petition_message_id: message.id },
               petition_id: message.petition_id,
             }))
+          ),
+          ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+            petition.org_id,
+            "PETITION_SEND",
+            1
           ),
         ]);
       }
