@@ -18,7 +18,7 @@ export interface PublicHeroProps extends BoxProps {
   ratio: number;
   title: string;
   subtitle: string;
-  subtitle2: string;
+  subtitle2?: string;
   buttonText: string;
   url: string;
   sectionTitle?: string;
