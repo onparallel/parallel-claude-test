@@ -401,7 +401,7 @@ function _PetitionSettings({
           <Heading as="h5" size="sm">
             <FormattedMessage
               id="component.petition-settings.adjustments-template"
-              defaultMessage="Adjustments to the template"
+              defaultMessage="Template settings"
             />
           </Heading>
           {restrictEditingSwitch}
@@ -440,7 +440,7 @@ function _PetitionSettings({
           <Heading as="h5" size="sm" paddingTop={2}>
             <FormattedMessage
               id="component.petition-settings.adjustments-petitions"
-              defaultMessage="Adjustments for petitions"
+              defaultMessage="Petition settings"
             />
           </Heading>
         </>
@@ -448,17 +448,10 @@ function _PetitionSettings({
 
       <FormControl id="petition-locale" isDisabled={petition.isRestricted}>
         <FormLabel display="flex" alignItems="center">
-          {petition.__typename === "Petition" ? (
-            <FormattedMessage
-              id="component.petition-settings.locale-label"
-              defaultMessage="Language of the petition"
-            />
-          ) : (
-            <FormattedMessage
-              id="component.petition-settings.template-locale-label"
-              defaultMessage="Language of communications"
-            />
-          )}
+          <FormattedMessage
+            id="component.petition-settings.locale-label"
+            defaultMessage="Language of communications"
+          />
         </FormLabel>
         <Select
           name="petition-locale"
@@ -540,7 +533,7 @@ function _PetitionSettings({
                 <Text fontSize="sm">
                   <FormattedMessage
                     id="component.petition-settings.signature-description"
-                    defaultMessage="Generates a document and initiates a eSignature process upon completion of the request."
+                    defaultMessage="Generates a document and initiates a eSignature process upon completion of the petition."
                   />
                 </Text>
               </HelpPopover>

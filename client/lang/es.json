@@ -1722,12 +1722,12 @@
   {
     "term": "component.petition-settings.adjustments-petitions",
     "definition": "Ajustes para las peticiones",
-    "context": "Adjustments for petitions"
+    "context": "Petition settings"
   },
   {
     "term": "component.petition-settings.adjustments-template",
     "definition": "Ajustes de la plantilla",
-    "context": "Adjustments to the template"
+    "context": "Template settings"
   },
   {
     "term": "component.petition-settings.automatic-reminders",
@@ -1766,8 +1766,8 @@
   },
   {
     "term": "component.petition-settings.locale-label",
-    "definition": "Idioma de la petición",
-    "context": "Language of the petition"
+    "definition": "Idioma de las comunicaciones",
+    "context": "Language of communications"
   },
   {
     "term": "component.petition-settings.petition-comments-enable",
@@ -1822,7 +1822,7 @@
   {
     "term": "component.petition-settings.signature-description",
     "definition": "Genera un documento e inicia un proceso de firma digital al completar la petición.",
-    "context": "Generates a document and initiates a eSignature process upon completion of the request."
+    "context": "Generates a document and initiates a eSignature process upon completion of the petition."
   },
   {
     "term": "component.petition-settings.skip-forward-security",
@@ -1833,11 +1833,6 @@
     "term": "component.petition-settings.skip-forward-security-warning",
     "definition": "Si deshabilitas la protección de reenvío los destinatarios podrán compartir sus enlaces y otras personas podrían acceder a los datos envíados hasta la fecha.",
     "context": "If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far."
-  },
-  {
-    "term": "component.petition-settings.template-locale-label",
-    "definition": "Idioma de las comunicaciones",
-    "context": "Language of communications"
   },
   {
     "term": "component.petition-sharing-dialog.subscribe",

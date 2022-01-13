@@ -1721,13 +1721,13 @@
   },
   {
     "term": "component.petition-settings.adjustments-petitions",
-    "definition": "Adjustments for petitions",
-    "context": "Adjustments for petitions"
+    "definition": "Petition settings",
+    "context": "Petition settings"
   },
   {
     "term": "component.petition-settings.adjustments-template",
-    "definition": "Adjustments to the template",
-    "context": "Adjustments to the template"
+    "definition": "Template settings",
+    "context": "Template settings"
   },
   {
     "term": "component.petition-settings.automatic-reminders",
@@ -1766,8 +1766,8 @@
   },
   {
     "term": "component.petition-settings.locale-label",
-    "definition": "Language of the petition",
-    "context": "Language of the petition"
+    "definition": "Language of communications",
+    "context": "Language of communications"
   },
   {
     "term": "component.petition-settings.petition-comments-enable",
@@ -1821,8 +1821,8 @@
   },
   {
     "term": "component.petition-settings.signature-description",
-    "definition": "Generates a document and initiates a eSignature process upon completion of the request.",
-    "context": "Generates a document and initiates a eSignature process upon completion of the request."
+    "definition": "Generates a document and initiates a eSignature process upon completion of the petition.",
+    "context": "Generates a document and initiates a eSignature process upon completion of the petition."
   },
   {
     "term": "component.petition-settings.skip-forward-security",
@@ -1833,11 +1833,6 @@
     "term": "component.petition-settings.skip-forward-security-warning",
     "definition": "If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far.",
     "context": "If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far."
-  },
-  {
-    "term": "component.petition-settings.template-locale-label",
-    "definition": "Language of the template",
-    "context": "Language of the template"
   },
   {
     "term": "component.petition-sharing-dialog.subscribe",
