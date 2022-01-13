@@ -556,7 +556,7 @@ export type Mutation = {
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
-  updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
+  updatePetitionFieldRepliesStatus: PetitionField;
   /** Updates the metada of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
@@ -1843,6 +1843,7 @@ export type PetitionField = {
   optional: Scalars["Boolean"];
   /** The options of the petition field. */
   options: Scalars["JSONObject"];
+  petition: PetitionBase;
   position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
@@ -2255,12 +2256,6 @@ export type PetitionUserPermission = PetitionPermission &
     /** The user linked to the permission */
     user: User;
   };
-
-export type PetitionWithFieldAndReplies = {
-  field: PetitionField;
-  petition: Petition;
-  replies: Array<PetitionFieldReply>;
-};
 
 export type PublicAccessVerification = {
   cookieName: Maybe<Scalars["String"]>;

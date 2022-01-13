@@ -435,6 +435,10 @@ export const PetitionField = objectType({
       description: "The alias of the petition field.",
       resolve: (o) => o.alias,
     });
+    t.field("petition", {
+      type: "PetitionBase",
+      resolve: async (o, _, ctx) => (await ctx.petitions.loadPetition(o.petition_id))!,
+    });
   },
   sourceType: "db.PetitionField",
 });

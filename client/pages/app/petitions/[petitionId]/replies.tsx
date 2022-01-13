@@ -835,13 +835,13 @@ PetitionReplies.mutations = [
         status: $status
         validateFields: true
       ) {
+        id
+        validated
         petition {
-          id
-          status
-        }
-        field {
-          id
-          validated
+          ... on Petition {
+            id
+            status
+          }
         }
         replies {
           id
@@ -914,16 +914,13 @@ function useUpdatePetitionFieldRepliesStatus() {
           status,
         }: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>) => ({
           updatePetitionFieldRepliesStatus: {
-            __typename: "PetitionWithFieldAndReplies",
+            __typename: "PetitionField",
+            id: petitionFieldId,
+            validated: optimisticValidated,
             petition: {
               id: variables.petitionId,
               status: petitionStatus, // TODO predict correct status
               __typename: "Petition",
-            },
-            field: {
-              __typename: "PetitionField",
-              id: petitionFieldId,
-              validated: optimisticValidated,
             },
             replies: unMaybeArray(petitionFieldReplyIds).map((id) => ({
               __typename: "PetitionFieldReply",

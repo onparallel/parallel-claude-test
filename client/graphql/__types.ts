@@ -586,7 +586,7 @@ export interface Mutation {
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
-  updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
+  updatePetitionFieldRepliesStatus: PetitionField;
   /** Updates the metada of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
@@ -1898,6 +1898,7 @@ export interface PetitionField {
   optional: Scalars["Boolean"];
   /** The options of the petition field. */
   options: Scalars["JSONObject"];
+  petition: PetitionBase;
   position: Scalars["Int"];
   previewReplies: Array<PetitionFieldReply>;
   /** The replies to the petition field */
@@ -2327,13 +2328,6 @@ export interface PetitionUserPermission extends PetitionPermission, Timestamps {
   updatedAt: Scalars["DateTime"];
   /** The user linked to the permission */
   user: User;
-}
-
-export interface PetitionWithFieldAndReplies {
-  __typename?: "PetitionWithFieldAndReplies";
-  field: PetitionField;
-  petition: Petition;
-  replies: Array<PetitionFieldReply>;
 }
 
 export interface PublicAccessVerification {
@@ -15406,9 +15400,12 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables = 
 
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   updatePetitionFieldRepliesStatus: {
-    __typename?: "PetitionWithFieldAndReplies";
-    petition: { __typename?: "Petition"; id: string; status: PetitionStatus };
-    field: { __typename?: "PetitionField"; id: string; validated: boolean };
+    __typename?: "PetitionField";
+    id: string;
+    validated: boolean;
+    petition:
+      | { __typename?: "Petition"; id: string; status: PetitionStatus }
+      | { __typename?: "PetitionTemplate" };
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -23200,13 +23197,13 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
       status: $status
       validateFields: true
     ) {
+      id
+      validated
       petition {
-        id
-        status
-      }
-      field {
-        id
-        validated
+        ... on Petition {
+          id
+          status
+        }
       }
       replies {
         id

@@ -473,12 +473,6 @@ export interface NexusGenObjects {
   };
   PetitionUserGroupPermission: db.PetitionPermission;
   PetitionUserPermission: db.PetitionPermission;
-  PetitionWithFieldAndReplies: {
-    // root type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
-    replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
-  };
   PublicAccessVerification: {
     // root type
     cookieName?: string | null; // String
@@ -974,7 +968,7 @@ export interface NexusGenFieldTypes {
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
+    updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -1200,6 +1194,7 @@ export interface NexusGenFieldTypes {
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
     options: NexusGenScalars["JSONObject"]; // JSONObject!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     position: number; // Int!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     title: string | null; // String
@@ -1391,12 +1386,6 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     user: NexusGenRootTypes["User"]; // User!
-  };
-  PetitionWithFieldAndReplies: {
-    // field return type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
-    replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
   };
   PublicAccessVerification: {
     // field return type
@@ -2281,7 +2270,7 @@ export interface NexusGenFieldTypeNames {
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionBaseAndField";
     updatePetitionFieldComment: "PetitionField";
-    updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
+    updatePetitionFieldRepliesStatus: "PetitionField";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionPermissionSubscription: "Petition";
     updatePetitionRestriction: "PetitionBase";
@@ -2507,6 +2496,7 @@ export interface NexusGenFieldTypeNames {
     multiple: "Boolean";
     optional: "Boolean";
     options: "JSONObject";
+    petition: "PetitionBase";
     position: "Int";
     replies: "PetitionFieldReply";
     title: "String";
@@ -2698,12 +2688,6 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     updatedAt: "DateTime";
     user: "User";
-  };
-  PetitionWithFieldAndReplies: {
-    // field return type name
-    field: "PetitionField";
-    petition: "Petition";
-    replies: "PetitionFieldReply";
   };
   PublicAccessVerification: {
     // field return type name

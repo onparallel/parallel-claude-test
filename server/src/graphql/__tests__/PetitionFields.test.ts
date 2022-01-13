@@ -2352,6 +2352,10 @@ describe("GraphQL/Petition Fields", () => {
       expect(data!.updatePetitionFieldRepliesStatus).toEqual({
         replies: [
           {
+            id: toGlobalId("PetitionFieldReply", field2Replies[1].id),
+            status: "PENDING",
+          },
+          {
             id: toGlobalId("PetitionFieldReply", field2Replies[0].id),
             status: "APPROVED",
           },
@@ -2376,10 +2380,8 @@ describe("GraphQL/Petition Fields", () => {
               status: $status
               validateFields: $validateFields
             ) {
-              field {
-                id
-                validated
-              }
+              id
+              validated
               replies {
                 id
                 status
@@ -2398,10 +2400,8 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionFieldRepliesStatus).toEqual({
-        field: {
-          id: toGlobalId("PetitionField", fields[2].id),
-          validated: true,
-        },
+        id: toGlobalId("PetitionField", fields[2].id),
+        validated: true,
         replies: field2Replies.map((r) => ({
           id: toGlobalId("PetitionFieldReply", r.id),
           status: "APPROVED",
@@ -2424,9 +2424,7 @@ describe("GraphQL/Petition Fields", () => {
               petitionFieldReplyIds: $petitionFieldReplyIds
               status: $status
             ) {
-              petition {
-                id
-              }
+              id
             }
           }
         `,
@@ -2457,9 +2455,7 @@ describe("GraphQL/Petition Fields", () => {
               petitionFieldReplyIds: $petitionFieldReplyIds
               status: $status
             ) {
-              petition {
-                id
-              }
+              id
             }
           }
         `,
@@ -2490,9 +2486,7 @@ describe("GraphQL/Petition Fields", () => {
               petitionFieldReplyIds: $petitionFieldReplyIds
               status: $status
             ) {
-              petition {
-                id
-              }
+              id
             }
           }
         `,

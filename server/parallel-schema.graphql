@@ -1342,7 +1342,7 @@ type Mutation {
     If true, the field will be validated if all the replies are approved or rejected
     """
     validateFields: Boolean
-  ): PetitionWithFieldAndReplies!
+  ): PetitionField!
 
   """
   Updates the metada of the specified petition field reply
@@ -2307,6 +2307,7 @@ type PetitionField {
   The options of the petition field.
   """
   options: JSONObject!
+  petition: PetitionBase!
   position: Int!
 
   """
@@ -3091,12 +3092,6 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
   The user linked to the permission
   """
   user: User!
-}
-
-type PetitionWithFieldAndReplies {
-  field: PetitionField!
-  petition: Petition!
-  replies: [PetitionFieldReply!]!
 }
 
 type PublicAccessVerification {
