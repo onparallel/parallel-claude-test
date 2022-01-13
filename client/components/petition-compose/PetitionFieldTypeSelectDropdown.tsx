@@ -231,7 +231,14 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
             {activeType === "HEADING" ? (
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.heading-description"
-                defaultMessage="Organize your petitions in sections or pages with a heading. These fields are for information purposes only."
+                defaultMessage="Add a text block that may include a title or just text.<i>e.g: Clauses, Sections...</i>"
+                values={{
+                  i: (chunks: any) => (
+                    <Text mt={1} as="p">
+                      <i>{chunks}</i>
+                    </Text>
+                  ),
+                }}
               />
             ) : activeType === "TEXT" ? (
               <FormattedMessage

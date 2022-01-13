@@ -1276,8 +1276,8 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.heading-description",
-    "definition": "Organiza tus peticiones en secciones o páginas con encabezado. Estos campos son únicamente informativos.",
-    "context": "Organize your petitions in sections or pages with a heading. These fields are for information purposes only."
+    "definition": "Añade un bloque de texto que podrá incluir un título o solamente texto.<i>Ej: Cláusulas, Secciones...</i>",
+    "context": "Add a text block that may include a title or just text.<i>e.g: Clauses, Sections...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.select-description",
@@ -5441,8 +5441,8 @@
   },
   {
     "term": "petition.field-type.heading",
-    "definition": "Sección",
-    "context": "Section"
+    "definition": "Bloque de texto",
+    "context": "Text block"
   },
   {
     "term": "petition.field-type.select",

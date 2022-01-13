@@ -1276,8 +1276,8 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.heading-description",
-    "definition": "Organize your petitions in sections or pages with a heading. These fields are for information purposes only.",
-    "context": "Organize your petitions in sections or pages with a heading. These fields are for information purposes only."
+    "definition": "Add a text block that may include a title or just text.<i>e.g: Clauses, Sections...</i>",
+    "context": "Add a text block that may include a title or just text.<i>e.g: Clauses, Sections...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.select-description",
@@ -5441,8 +5441,8 @@
   },
   {
     "term": "petition.field-type.heading",
-    "definition": "Section",
-    "context": "Section"
+    "definition": "Text block",
+    "context": "Text block"
   },
   {
     "term": "petition.field-type.select",

@@ -74,7 +74,7 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
       case "HEADING":
         return intl.formatMessage({
           id: "petition.field-type.heading",
-          defaultMessage: "Section",
+          defaultMessage: "Text block",
         });
       case "SELECT":
         return intl.formatMessage({
