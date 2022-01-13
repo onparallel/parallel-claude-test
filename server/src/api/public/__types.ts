@@ -336,9 +336,9 @@ export type Mutation = {
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
-  changePetitionFieldType: PetitionBaseAndField;
+  changePetitionFieldType: PetitionField;
   /** Clones a petition field */
-  clonePetitionField: PetitionBaseAndField;
+  clonePetitionField: PetitionField;
   /** Clone petition. */
   clonePetitions: Array<PetitionBase>;
   /** Clones the user group with all its members */
@@ -371,7 +371,7 @@ export type Mutation = {
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
   /** Creates a petition field */
-  createPetitionField: PetitionBaseAndField;
+  createPetitionField: PetitionField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
@@ -552,7 +552,7 @@ export type Mutation = {
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
-  updatePetitionField: PetitionBaseAndField;
+  updatePetitionField: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
@@ -1624,11 +1624,6 @@ export type PetitionAccessStatus =
   /** The petition is not accessible by the contact. */
   | "INACTIVE";
 
-export type PetitionAndField = PetitionBaseAndField & {
-  field: PetitionField;
-  petition: Petition;
-};
-
 /** The petition and a subset of some of its fields. */
 export type PetitionAndPartialFields = {
   fields: Array<PetitionField>;
@@ -1693,11 +1688,6 @@ export type PetitionBase = {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
-
-export type PetitionBaseAndField = {
-  field: PetitionField;
-  petition: PetitionBase;
 };
 
 export type PetitionBasePagination = {
@@ -2193,11 +2183,6 @@ export type PetitionTemplate = PetitionBase & {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
-
-export type PetitionTemplateAndField = PetitionBaseAndField & {
-  field: PetitionField;
-  petition: PetitionTemplate;
 };
 
 export type PetitionTemplatePagination = {

@@ -80,10 +80,7 @@ describe("GraphQL/Petition Fields", () => {
                 }
                 fieldCount
               }
-              field {
-                type
-              }
-              __typename
+              type
             }
           }
         `,
@@ -116,10 +113,7 @@ describe("GraphQL/Petition Fields", () => {
           ],
           fieldCount: 1,
         },
-        field: {
-          type: "TEXT",
-        },
-        __typename: "PetitionAndField",
+        type: "TEXT",
       });
     });
 
@@ -148,10 +142,7 @@ describe("GraphQL/Petition Fields", () => {
                 }
                 fieldCount
               }
-              field {
-                type
-              }
-              __typename
+              type
             }
           }
         `,
@@ -184,10 +175,7 @@ describe("GraphQL/Petition Fields", () => {
           ],
           fieldCount: 1,
         },
-        field: {
-          type: "HEADING",
-        },
-        __typename: "PetitionAndField",
+        type: "HEADING",
       });
     });
 
@@ -216,10 +204,7 @@ describe("GraphQL/Petition Fields", () => {
                 }
                 fieldCount
               }
-              field {
-                type
-              }
-              __typename
+              type
             }
           }
         `,
@@ -252,10 +237,7 @@ describe("GraphQL/Petition Fields", () => {
           ],
           fieldCount: 1,
         },
-        field: {
-          type: "FILE_UPLOAD",
-        },
-        __typename: "PetitionAndField",
+        type: "FILE_UPLOAD",
       });
     });
 
@@ -265,15 +247,13 @@ describe("GraphQL/Petition Fields", () => {
           mutation: gql`
             mutation ($petitionId: GID!, $type: PetitionFieldType!, $position: Int) {
               createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
+                id
                 petition {
                   fields {
                     id
                     type
                   }
                   fieldCount
-                }
-                field {
-                  id
                 }
               }
             }
@@ -296,17 +276,15 @@ describe("GraphQL/Petition Fields", () => {
       expect(f5Data!.createPetitionField).toEqual({
         petition: {
           fields: [
-            { id: f1Data!.createPetitionField.field.id, type: "HEADING" },
-            { id: f2Data!.createPetitionField.field.id, type: "TEXT" },
-            { id: f5Data!.createPetitionField.field.id, type: "FILE_UPLOAD" },
-            { id: f3Data!.createPetitionField.field.id, type: "TEXT" },
-            { id: f4Data!.createPetitionField.field.id, type: "HEADING" },
+            { id: f1Data!.createPetitionField.id, type: "HEADING" },
+            { id: f2Data!.createPetitionField.id, type: "TEXT" },
+            { id: f5Data!.createPetitionField.id, type: "FILE_UPLOAD" },
+            { id: f3Data!.createPetitionField.id, type: "TEXT" },
+            { id: f4Data!.createPetitionField.id, type: "HEADING" },
           ],
           fieldCount: 5,
         },
-        field: {
-          id: f5Data!.createPetitionField.field.id,
-        },
+        id: f5Data!.createPetitionField.id,
       });
     });
 
@@ -1040,15 +1018,13 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-                title
-                description
-                options
-                optional
-                multiple
-                visibility
-              }
+              id
+              title
+              description
+              options
+              optional
+              multiple
+              visibility
             }
           }
         `,
@@ -1081,28 +1057,26 @@ describe("GraphQL/Petition Fields", () => {
       });
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
-        field: {
-          id: fieldGIDs[4],
-          title: "new title",
-          description: "this is the new description",
-          options: {
-            hasCommentsEnabled: true,
-            placeholder: "enter text here...",
-          },
-          optional: true,
-          multiple: true,
-          visibility: {
-            type: "SHOW",
-            operator: "AND",
-            conditions: [
-              {
-                fieldId: fieldGIDs[2],
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "EQUAL",
-                value: 1,
-              },
-            ],
-          },
+        id: fieldGIDs[4],
+        title: "new title",
+        description: "this is the new description",
+        options: {
+          hasCommentsEnabled: true,
+          placeholder: "enter text here...",
+        },
+        optional: true,
+        multiple: true,
+        visibility: {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: fieldGIDs[2],
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "EQUAL",
+              value: 1,
+            },
+          ],
         },
       });
     });
@@ -1112,10 +1086,8 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-                visibility
-              }
+              id
+              visibility
             }
           }
         `,
@@ -1140,20 +1112,18 @@ describe("GraphQL/Petition Fields", () => {
       });
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
-        field: {
-          id: fieldGIDs[4],
-          visibility: {
-            type: "SHOW",
-            operator: "AND",
-            conditions: [
-              {
-                fieldId: fieldGIDs[2],
-                modifier: "NUMBER_OF_REPLIES",
-                operator: "EQUAL",
-                value: null,
-              },
-            ],
-          },
+        id: fieldGIDs[4],
+        visibility: {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: fieldGIDs[2],
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "EQUAL",
+              value: null,
+            },
+          ],
         },
       });
     });
@@ -1163,10 +1133,8 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-                visibility
-              }
+              id
+              visibility
             }
           }
         `,
@@ -1198,10 +1166,8 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-                visibility
-              }
+              id
+              visibility
             }
           }
         `,
@@ -1233,10 +1199,8 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-                visibility
-              }
+              id
+              visibility
             }
           }
         `,
@@ -1268,10 +1232,8 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                title
-                description
-              }
+              title
+              description
             }
           }
         `,
@@ -1288,10 +1250,8 @@ describe("GraphQL/Petition Fields", () => {
       });
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
-        field: {
-          title: "new title",
-          description: "this is the new description",
-        },
+        title: "new title",
+        description: "this is the new description",
       });
     });
 
@@ -1300,10 +1260,8 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                options
-                validated
-              }
+              options
+              validated
             }
           }
         `,
@@ -1319,13 +1277,11 @@ describe("GraphQL/Petition Fields", () => {
       });
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
-        field: {
-          options: {
-            hasCommentsEnabled: true,
-            placeholder: "new placeholder",
-          },
-          validated: false,
+        options: {
+          hasCommentsEnabled: true,
+          placeholder: "new placeholder",
         },
+        validated: false,
       });
     });
 
@@ -1369,10 +1325,9 @@ describe("GraphQL/Petition Fields", () => {
                   status
                 }
               }
-              field {
-                id
-                optional
-              }
+
+              id
+              optional
             }
           }
         `,
@@ -1389,10 +1344,8 @@ describe("GraphQL/Petition Fields", () => {
         petition: {
           status: "PENDING",
         },
-        field: {
-          id: fieldGIDs[4],
-          optional: false,
-        },
+        id: fieldGIDs[4],
+        optional: false,
       });
     });
 
@@ -1401,9 +1354,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1423,9 +1374,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1446,9 +1395,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1469,9 +1416,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1490,9 +1435,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1514,9 +1457,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1538,9 +1479,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1600,13 +1539,11 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
-              field {
-                id
-                type
-                optional
-                multiple
-                options
-              }
+              id
+              type
+              optional
+              multiple
+              options
             }
           }
         `,
@@ -1619,15 +1556,13 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
-        field: {
-          id: toGlobalId("PetitionField", field.id),
-          type: "SHORT_TEXT",
-          optional: field.optional,
-          multiple: field.multiple,
-          options: {
-            hasCommentsEnabled: true,
-            placeholder: field.options.placeholder,
-          },
+        id: toGlobalId("PetitionField", field.id),
+        type: "SHORT_TEXT",
+        optional: field.optional,
+        multiple: field.multiple,
+        options: {
+          hasCommentsEnabled: true,
+          placeholder: field.options.placeholder,
         },
       });
     });
@@ -1637,13 +1572,11 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
-              field {
-                id
-                type
-                optional
-                multiple
-                options
-              }
+              id
+              type
+              optional
+              multiple
+              options
             }
           }
         `,
@@ -1656,15 +1589,13 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
-        field: {
-          id: toGlobalId("PetitionField", field.id),
-          type: "HEADING",
-          optional: true,
-          multiple: false,
-          options: {
-            hasCommentsEnabled: false,
-            hasPageBreak: false,
-          },
+        id: toGlobalId("PetitionField", field.id),
+        type: "HEADING",
+        optional: true,
+        multiple: false,
+        options: {
+          hasCommentsEnabled: false,
+          hasPageBreak: false,
         },
       });
     });
@@ -1674,13 +1605,11 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
-              field {
-                id
-                type
-                optional
-                multiple
-                options
-              }
+              id
+              type
+              optional
+              multiple
+              options
             }
           }
         `,
@@ -1693,15 +1622,13 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
-        field: {
-          id: toGlobalId("PetitionField", field.id),
-          type: "FILE_UPLOAD",
-          optional: false,
-          multiple: true,
-          options: {
-            hasCommentsEnabled: true,
-            accepts: null,
-          },
+        id: toGlobalId("PetitionField", field.id),
+        type: "FILE_UPLOAD",
+        optional: false,
+        multiple: true,
+        options: {
+          hasCommentsEnabled: true,
+          accepts: null,
         },
       });
     });
@@ -1716,12 +1643,10 @@ describe("GraphQL/Petition Fields", () => {
               type: $type
               force: $force
             ) {
-              field {
+              id
+              type
+              replies {
                 id
-                type
-                replies {
-                  id
-                }
               }
             }
           }
@@ -1736,11 +1661,9 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
-        field: {
-          id: toGlobalId("PetitionField", fieldWithReply.id),
-          type: "SHORT_TEXT",
-          replies: [{ id: expect.any(String) }],
-        },
+        id: toGlobalId("PetitionField", fieldWithReply.id),
+        type: "SHORT_TEXT",
+        replies: [{ id: expect.any(String) }],
       });
     });
 
@@ -1754,12 +1677,10 @@ describe("GraphQL/Petition Fields", () => {
               type: $type
               force: $force
             ) {
-              field {
+              id
+              type
+              replies {
                 id
-                type
-                replies {
-                  id
-                }
               }
             }
           }
@@ -1774,11 +1695,9 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
-        field: {
-          id: toGlobalId("PetitionField", fieldWithReply.id),
-          type: "FILE_UPLOAD",
-          replies: [],
-        },
+        id: toGlobalId("PetitionField", fieldWithReply.id),
+        type: "FILE_UPLOAD",
+        replies: [],
       });
     });
 
@@ -1792,11 +1711,9 @@ describe("GraphQL/Petition Fields", () => {
               type: $type
               force: $force
             ) {
-              field {
-                id
-                type
-                validated
-              }
+              id
+              type
+              validated
             }
           }
         `,
@@ -1810,11 +1727,9 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
-        field: {
-          id: toGlobalId("PetitionField", fieldWithReply.id),
-          type: "FILE_UPLOAD",
-          validated: false,
-        },
+        id: toGlobalId("PetitionField", fieldWithReply.id),
+        type: "FILE_UPLOAD",
+        validated: false,
       });
     });
 
@@ -1828,9 +1743,7 @@ describe("GraphQL/Petition Fields", () => {
               type: $type
               force: $force
             ) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1856,9 +1769,7 @@ describe("GraphQL/Petition Fields", () => {
               type: $type
               force: $force
             ) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1879,9 +1790,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
-              field {
-                id
-              }
+              id
             }
           }
         `,
@@ -1901,9 +1810,7 @@ describe("GraphQL/Petition Fields", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
-              field {
-                id
-              }
+              id
             }
           }
         `,

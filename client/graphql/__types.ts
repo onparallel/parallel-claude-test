@@ -366,9 +366,9 @@ export interface Mutation {
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
-  changePetitionFieldType: PetitionBaseAndField;
+  changePetitionFieldType: PetitionField;
   /** Clones a petition field */
-  clonePetitionField: PetitionBaseAndField;
+  clonePetitionField: PetitionField;
   /** Clone petition. */
   clonePetitions: Array<PetitionBase>;
   /** Clones the user group with all its members */
@@ -401,7 +401,7 @@ export interface Mutation {
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
   /** Creates a petition field */
-  createPetitionField: PetitionBaseAndField;
+  createPetitionField: PetitionField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
@@ -582,7 +582,7 @@ export interface Mutation {
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
-  updatePetitionField: PetitionBaseAndField;
+  updatePetitionField: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
@@ -1664,12 +1664,6 @@ export type PetitionAccessStatus =
   /** The petition is not accessible by the contact. */
   | "INACTIVE";
 
-export interface PetitionAndField extends PetitionBaseAndField {
-  __typename?: "PetitionAndField";
-  field: PetitionField;
-  petition: Petition;
-}
-
 /** The petition and a subset of some of its fields. */
 export interface PetitionAndPartialFields {
   __typename?: "PetitionAndPartialFields";
@@ -1737,11 +1731,6 @@ export interface PetitionBase {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-}
-
-export interface PetitionBaseAndField {
-  field: PetitionField;
-  petition: PetitionBase;
 }
 
 export interface PetitionBasePagination {
@@ -2264,12 +2253,6 @@ export interface PetitionTemplate extends PetitionBase {
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-}
-
-export interface PetitionTemplateAndField extends PetitionBaseAndField {
-  __typename?: "PetitionTemplateAndField";
-  field: PetitionField;
-  petition: PetitionTemplate;
 }
 
 export interface PetitionTemplatePagination {
@@ -13758,39 +13741,23 @@ export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_createPetitionFieldMutation = {
-  createPetitionField:
-    | {
-        __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          description?: string | null;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: { [key: string]: any } | null;
-          options: { [key: string]: any };
-          position: number;
-          alias?: string | null;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
+  createPetitionField: {
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    description?: string | null;
+    optional: boolean;
+    multiple: boolean;
+    isFixed: boolean;
+    isReadOnly: boolean;
+    visibility?: { [key: string]: any } | null;
+    options: { [key: string]: any };
+    position: number;
+    alias?: string | null;
+    validated: boolean;
+    petition:
+      | {
           __typename?: "Petition";
           id: string;
           name?: string | null;
@@ -13804,40 +13771,8 @@ export type PetitionCompose_createPetitionFieldMutation = {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
           } | null;
-        };
-      }
-    | {
-        __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          description?: string | null;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: { [key: string]: any } | null;
-          options: { [key: string]: any };
-          position: number;
-          alias?: string | null;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
+        }
+      | {
           __typename?: "PetitionTemplate";
           id: string;
           name?: string | null;
@@ -13847,7 +13782,20 @@ export type PetitionCompose_createPetitionFieldMutation = {
           updatedAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         };
+    attachments: Array<{
+      __typename?: "PetitionFieldAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
       };
+    }>;
+    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  };
 };
 
 export type PetitionCompose_clonePetitionFieldMutationVariables = Exact<{
@@ -13856,39 +13804,23 @@ export type PetitionCompose_clonePetitionFieldMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_clonePetitionFieldMutation = {
-  clonePetitionField:
-    | {
-        __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          description?: string | null;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: { [key: string]: any } | null;
-          options: { [key: string]: any };
-          position: number;
-          alias?: string | null;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
+  clonePetitionField: {
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    description?: string | null;
+    optional: boolean;
+    multiple: boolean;
+    isFixed: boolean;
+    isReadOnly: boolean;
+    visibility?: { [key: string]: any } | null;
+    options: { [key: string]: any };
+    position: number;
+    alias?: string | null;
+    validated: boolean;
+    petition:
+      | {
           __typename?: "Petition";
           id: string;
           name?: string | null;
@@ -13902,40 +13834,8 @@ export type PetitionCompose_clonePetitionFieldMutation = {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
           } | null;
-        };
-      }
-    | {
-        __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          description?: string | null;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: { [key: string]: any } | null;
-          options: { [key: string]: any };
-          position: number;
-          alias?: string | null;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
+        }
+      | {
           __typename?: "PetitionTemplate";
           id: string;
           name?: string | null;
@@ -13945,7 +13845,20 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           updatedAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
         };
+    attachments: Array<{
+      __typename?: "PetitionFieldAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
       };
+    }>;
+    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  };
 };
 
 export type PetitionCompose_deletePetitionFieldMutationVariables = Exact<{
@@ -13990,78 +13903,38 @@ export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_updatePetitionFieldMutation = {
-  updatePetitionField:
-    | {
-        __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          description?: string | null;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: { [key: string]: any } | null;
-          options: { [key: string]: any };
-          position: number;
-          alias?: string | null;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
-          __typename?: "Petition";
-          status: PetitionStatus;
-          id: string;
-          updatedAt: string;
-        };
-      }
-    | {
-        __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          description?: string | null;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: { [key: string]: any } | null;
-          options: { [key: string]: any };
-          position: number;
-          alias?: string | null;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
+  updatePetitionField: {
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    description?: string | null;
+    optional: boolean;
+    multiple: boolean;
+    isFixed: boolean;
+    isReadOnly: boolean;
+    visibility?: { [key: string]: any } | null;
+    options: { [key: string]: any };
+    position: number;
+    alias?: string | null;
+    validated: boolean;
+    petition:
+      | { __typename?: "Petition"; status: PetitionStatus; id: string; updatedAt: string }
+      | { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
+    attachments: Array<{
+      __typename?: "PetitionFieldAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
       };
+    }>;
+    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  };
 };
 
 export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
@@ -14072,78 +13945,38 @@ export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_changePetitionFieldTypeMutation = {
-  changePetitionFieldType:
-    | {
-        __typename?: "PetitionAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          description?: string | null;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: { [key: string]: any } | null;
-          options: { [key: string]: any };
-          position: number;
-          alias?: string | null;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: {
-          __typename?: "Petition";
-          status: PetitionStatus;
-          id: string;
-          updatedAt: string;
-        };
-      }
-    | {
-        __typename?: "PetitionTemplateAndField";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          description?: string | null;
-          optional: boolean;
-          multiple: boolean;
-          isFixed: boolean;
-          isReadOnly: boolean;
-          visibility?: { [key: string]: any } | null;
-          options: { [key: string]: any };
-          position: number;
-          alias?: string | null;
-          validated: boolean;
-          attachments: Array<{
-            __typename?: "PetitionFieldAttachment";
-            id: string;
-            file: {
-              __typename?: "FileUpload";
-              filename: string;
-              contentType: string;
-              size: number;
-              isComplete: boolean;
-            };
-          }>;
-          comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-        };
-        petition: { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
+  changePetitionFieldType: {
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    description?: string | null;
+    optional: boolean;
+    multiple: boolean;
+    isFixed: boolean;
+    isReadOnly: boolean;
+    visibility?: { [key: string]: any } | null;
+    options: { [key: string]: any };
+    position: number;
+    alias?: string | null;
+    validated: boolean;
+    petition:
+      | { __typename?: "Petition"; status: PetitionStatus; id: string; updatedAt: string }
+      | { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
+    attachments: Array<{
+      __typename?: "PetitionFieldAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
       };
+    }>;
+    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  };
 };
 
 export type PetitionCompose_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -22944,10 +22777,8 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
     $position: Int
   ) {
     createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
-      field {
-        id
-        ...PetitionCompose_PetitionField
-      }
+      id
+      ...PetitionCompose_PetitionField
       petition {
         ...PetitionLayout_PetitionBase
         fields {
@@ -22965,10 +22796,8 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
 export const PetitionCompose_clonePetitionFieldDocument = gql`
   mutation PetitionCompose_clonePetitionField($petitionId: GID!, $fieldId: GID!) {
     clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
-      field {
-        id
-        ...PetitionCompose_PetitionField
-      }
+      id
+      ...PetitionCompose_PetitionField
       petition {
         ...PetitionLayout_PetitionBase
         fields {
@@ -23005,10 +22834,8 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
     $data: UpdatePetitionFieldInput!
   ) {
     updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-      field {
-        id
-        ...PetitionCompose_PetitionField
-      }
+      id
+      ...PetitionCompose_PetitionField
       petition {
         id
         updatedAt
@@ -23036,10 +22863,8 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
       type: $type
       force: $force
     ) {
-      field {
-        id
-        ...PetitionCompose_PetitionField
-      }
+      id
+      ...PetitionCompose_PetitionField
       petition {
         id
         ... on Petition {

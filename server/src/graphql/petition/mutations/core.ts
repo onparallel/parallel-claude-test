@@ -636,7 +636,7 @@ export const updatePetition = mutationField("updatePetition", {
 
 export const createPetitionField = mutationField("createPetitionField", {
   description: "Creates a petition field",
-  type: "PetitionBaseAndField",
+  type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionsAreEditable("petitionId"),
@@ -649,6 +649,7 @@ export const createPetitionField = mutationField("createPetitionField", {
   },
   validateArgs: inRange((args) => args.position, "position", 0),
   resolve: async (_, args, ctx) => {
+    ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
     return await ctx.petitions.createPetitionFieldAtPosition(
       args.petitionId,
       {
@@ -663,7 +664,7 @@ export const createPetitionField = mutationField("createPetitionField", {
 
 export const clonePetitionField = mutationField("clonePetitionField", {
   description: "Clones a petition field",
-  type: "PetitionBaseAndField",
+  type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
@@ -720,7 +721,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
 
 export const updatePetitionField = mutationField("updatePetitionField", {
   description: "Updates a petition field.",
-  type: "PetitionBaseAndField",
+  type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
@@ -803,6 +804,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     }
 
     try {
+      ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
       return await ctx.petitions.updatePetitionField(
         args.petitionId,
         args.fieldId,
@@ -885,14 +887,12 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
       },
     };
     await ctx.petitions.validateFieldData(args.fieldId, { options });
-    const { field } = await ctx.petitions.updatePetitionField(
+    return await ctx.petitions.updatePetitionField(
       args.petitionId,
       args.fieldId,
       { options },
       ctx.user!
     );
-
-    return field;
   },
 });
 
@@ -1451,7 +1451,7 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
 
 export const changePetitionFieldType = mutationField("changePetitionFieldType", {
   description: "Changes the type of a petition Field",
-  type: "PetitionBaseAndField",
+  type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
@@ -1472,7 +1472,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     const field = await ctx.petitions.loadField(args.fieldId);
 
     if (field && !args.force && replies.length > 0 && !isValueCompatible(field.type, args.type)) {
-      throw new WhitelistedError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+      throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
     }
     try {
       return await ctx.petitions.changePetitionFieldType(
@@ -1483,10 +1483,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
       );
     } catch (e: any) {
       if (e.message === "UPDATE_FIXED_FIELD_ERROR") {
-        throw new WhitelistedError(
-          "Can't change type of a fixed field",
-          "UPDATE_FIXED_FIELD_ERROR"
-        );
+        throw new ApolloError("Can't change type of a fixed field", "UPDATE_FIXED_FIELD_ERROR");
       } else {
         throw e;
       }

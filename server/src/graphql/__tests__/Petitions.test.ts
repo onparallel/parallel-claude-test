@@ -2363,9 +2363,7 @@ describe("GraphQL/Petitions", () => {
         mutation: gql`
           mutation ($petitionId: GID!, $type: PetitionFieldType!) {
             createPetitionField(petitionId: $petitionId, type: $type) {
-              petition {
-                id
-              }
+              id
             }
           }
         `,

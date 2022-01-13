@@ -399,7 +399,7 @@ describe("repositories/PetitionRepository", () => {
 
     test("should clone second field", async () => {
       const toCloneId = fields[1].id;
-      const { field: newField } = await petitions.clonePetitionField(petition.id, toCloneId, user);
+      const newField = await petitions.clonePetitionField(petition.id, toCloneId, user);
 
       const newFields = await petitions.loadFieldsForPetition(petition.id, {
         refresh: true,
@@ -411,7 +411,7 @@ describe("repositories/PetitionRepository", () => {
 
     test("cloned field should have the same contents", async () => {
       const toClone = fields[3];
-      const { field: newField } = await petitions.clonePetitionField(petition.id, toClone.id, user);
+      const newField = await petitions.clonePetitionField(petition.id, toClone.id, user);
 
       expect(toClone).toMatchObject({
         petition_id: newField.petition_id,
@@ -427,7 +427,7 @@ describe("repositories/PetitionRepository", () => {
     test("validated field should be cloned invalidated", async () => {
       const toClone = fields[3];
       await petitions.validatePetitionFields(petition.id, [toClone.id], true, user);
-      const { field: cloned } = await petitions.clonePetitionField(petition.id, toClone.id, user);
+      const cloned = await petitions.clonePetitionField(petition.id, toClone.id, user);
 
       expect(cloned).toMatchObject({
         validated: false,
@@ -439,11 +439,7 @@ describe("repositories/PetitionRepository", () => {
         alias: "field-alias",
       }));
 
-      const { field: clonedField } = await petitions.clonePetitionField(
-        petition.id,
-        fieldWithAlias.id,
-        user
-      );
+      const clonedField = await petitions.clonePetitionField(petition.id, fieldWithAlias.id, user);
 
       expect(clonedField.alias).toBeNull();
     });

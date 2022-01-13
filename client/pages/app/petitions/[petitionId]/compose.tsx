@@ -313,8 +313,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       const { data } = await createPetitionField({
         variables: { petitionId, type, position },
       });
-      const field = data!.createPetitionField.field;
-      focusFieldTitle(field.id);
+
+      focusFieldTitle(data!.createPetitionField.id);
     }),
     [petitionId]
   );
@@ -631,10 +631,8 @@ PetitionCompose.mutations = [
       $position: Int
     ) {
       createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
-        field {
-          id
-          ...PetitionCompose_PetitionField
-        }
+        id
+        ...PetitionCompose_PetitionField
         petition {
           ...PetitionLayout_PetitionBase
           fields {
@@ -649,10 +647,8 @@ PetitionCompose.mutations = [
   gql`
     mutation PetitionCompose_clonePetitionField($petitionId: GID!, $fieldId: GID!) {
       clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
-        field {
-          id
-          ...PetitionCompose_PetitionField
-        }
+        id
+        ...PetitionCompose_PetitionField
         petition {
           ...PetitionLayout_PetitionBase
           fields {
@@ -687,10 +683,8 @@ PetitionCompose.mutations = [
       $data: UpdatePetitionFieldInput!
     ) {
       updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-        field {
-          id
-          ...PetitionCompose_PetitionField
-        }
+        id
+        ...PetitionCompose_PetitionField
         petition {
           id
           updatedAt
@@ -715,10 +709,8 @@ PetitionCompose.mutations = [
         type: $type
         force: $force
       ) {
-        field {
-          id
-          ...PetitionCompose_PetitionField
-        }
+        id
+        ...PetitionCompose_PetitionField
         petition {
           id
           ... on Petition {

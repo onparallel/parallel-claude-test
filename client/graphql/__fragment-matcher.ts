@@ -18,7 +18,6 @@ const result: PossibleTypesResultData = {
       "UserProvisioningOrgIntegration",
     ],
     PetitionBase: ["Petition", "PetitionTemplate"],
-    PetitionBaseAndField: ["PetitionAndField", "PetitionTemplateAndField"],
     PetitionEvent: [
       "AccessActivatedEvent",
       "AccessActivatedFromPublicPetitionLinkEvent",

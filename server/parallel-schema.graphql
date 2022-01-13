@@ -486,12 +486,12 @@ type Mutation {
     force: Boolean = false
     petitionId: GID!
     type: PetitionFieldType!
-  ): PetitionBaseAndField!
+  ): PetitionField!
 
   """
   Clones a petition field
   """
-  clonePetitionField(fieldId: GID!, petitionId: GID!): PetitionBaseAndField!
+  clonePetitionField(fieldId: GID!, petitionId: GID!): PetitionField!
 
   """
   Clone petition.
@@ -610,11 +610,7 @@ type Mutation {
   """
   Creates a petition field
   """
-  createPetitionField(
-    petitionId: GID!
-    position: Int
-    type: PetitionFieldType!
-  ): PetitionBaseAndField!
+  createPetitionField(petitionId: GID!, position: Int, type: PetitionFieldType!): PetitionField!
 
   """
   Generates and returns a signed url to upload a field attachment to AWS S3
@@ -1317,7 +1313,7 @@ type Mutation {
     data: UpdatePetitionFieldInput!
     fieldId: GID!
     petitionId: GID!
-  ): PetitionBaseAndField!
+  ): PetitionField!
 
   """
   Update a petition field comment.
@@ -1983,11 +1979,6 @@ enum PetitionAccessStatus {
   INACTIVE
 }
 
-type PetitionAndField implements PetitionBaseAndField {
-  field: PetitionField!
-  petition: Petition!
-}
-
 """
 The petition and a subset of some of its fields.
 """
@@ -2109,11 +2100,6 @@ interface PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
-}
-
-interface PetitionBaseAndField {
-  field: PetitionField!
-  petition: PetitionBase!
 }
 
 type PetitionBasePagination {
@@ -2986,11 +2972,6 @@ type PetitionTemplate implements PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
-}
-
-type PetitionTemplateAndField implements PetitionBaseAndField {
-  field: PetitionField!
-  petition: PetitionTemplate!
 }
 
 type PetitionTemplatePagination {

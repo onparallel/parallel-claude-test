@@ -1087,7 +1087,7 @@ export class PetitionRepository extends BaseRepository {
           "id"
         );
 
-      const [[field], [petition]] = await Promise.all([
+      const [[field]] = await Promise.all([
         this.insert(
           "petition_field",
           {
@@ -1120,7 +1120,7 @@ export class PetitionRepository extends BaseRepository {
         await this.from("petition_field", t).whereIn("id", fieldIds).update({ deleted_at: null });
       }
 
-      return { field, petition };
+      return field;
     }, t);
   }
 
@@ -1232,10 +1232,9 @@ export class PetitionRepository extends BaseRepository {
         throw new Error("UPDATE_FIXED_FIELD_ERROR");
       }
 
-      let petition: Petition;
       // update petition status if changing anything other than title and description
       if (Object.keys(omit(data, ["title", "description"])).length > 0) {
-        [petition] = await this.from("petition", t)
+        await this.from("petition", t)
           .where({
             id: petitionId,
           })
@@ -1258,13 +1257,9 @@ export class PetitionRepository extends BaseRepository {
             },
             "*"
           );
-      } else {
-        [petition] = await this.from("petition", t).where({
-          id: petitionId,
-        });
       }
 
-      return { field, petition };
+      return field;
     }, t);
   }
 

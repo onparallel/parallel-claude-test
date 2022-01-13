@@ -384,11 +384,6 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     totalCount: number; // Int!
   };
-  PetitionAndField: {
-    // root type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
-  };
   PetitionAndPartialFields: {
     // root type
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
@@ -461,11 +456,6 @@ export interface NexusGenObjects {
     email: string;
   };
   PetitionTemplate: db.Petition;
-  PetitionTemplateAndField: {
-    // root type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    petition: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
-  };
   PetitionTemplatePagination: {
     // root type
     items: NexusGenRootTypes["PetitionTemplate"][]; // [PetitionTemplate!]!
@@ -604,10 +594,6 @@ export interface NexusGenInterfaces {
   };
   OrgIntegration: db.OrgIntegration;
   PetitionBase: db.Petition;
-  PetitionBaseAndField: {
-    petition: db.Petition;
-    field: db.PetitionField;
-  };
   PetitionEvent: events.PetitionEvent;
   PetitionPermission: db.PetitionPermission;
   PetitionUserNotification: db.PetitionUserNotification;
@@ -859,8 +845,8 @@ export interface NexusGenFieldTypes {
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
-    changePetitionFieldType: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
-    clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
+    changePetitionFieldType: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    clonePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     cloneUserGroup: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
@@ -875,7 +861,7 @@ export interface NexusGenFieldTypes {
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     createPetitionAttachmentUploadLink: NexusGenRootTypes["PetitionAttachmentUploadData"]; // PetitionAttachmentUploadData!
-    createPetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
+    createPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
     createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
@@ -966,7 +952,7 @@ export interface NexusGenFieldTypes {
     updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
+    updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -1092,11 +1078,6 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     totalCount: number; // Int!
-  };
-  PetitionAndField: {
-    // field return type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   PetitionAndPartialFields: {
     // field return type
@@ -1358,11 +1339,6 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
-  };
-  PetitionTemplateAndField: {
-    // field return type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    petition: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
   };
   PetitionTemplatePagination: {
     // field return type
@@ -1896,11 +1872,6 @@ export interface NexusGenFieldTypes {
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  PetitionBaseAndField: {
-    // field return type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-  };
   PetitionEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2161,8 +2132,8 @@ export interface NexusGenFieldTypeNames {
     cancelScheduledMessage: "PetitionMessage";
     cancelSignatureRequest: "PetitionSignatureRequest";
     changePassword: "ChangePasswordResult";
-    changePetitionFieldType: "PetitionBaseAndField";
-    clonePetitionField: "PetitionBaseAndField";
+    changePetitionFieldType: "PetitionField";
+    clonePetitionField: "PetitionField";
     clonePetitions: "PetitionBase";
     cloneUserGroup: "UserGroup";
     completePetition: "Petition";
@@ -2177,7 +2148,7 @@ export interface NexusGenFieldTypeNames {
     createOrganizationUser: "User";
     createPetition: "PetitionBase";
     createPetitionAttachmentUploadLink: "PetitionAttachmentUploadData";
-    createPetitionField: "PetitionBaseAndField";
+    createPetitionField: "PetitionField";
     createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
     createPetitionFieldComment: "PetitionField";
     createPrintPdfTask: "Task";
@@ -2268,7 +2239,7 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationPreferredTone: "Organization";
     updateOrganizationUser: "User";
     updatePetition: "PetitionBase";
-    updatePetitionField: "PetitionBaseAndField";
+    updatePetitionField: "PetitionField";
     updatePetitionFieldComment: "PetitionField";
     updatePetitionFieldRepliesStatus: "PetitionField";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
@@ -2394,11 +2365,6 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "PetitionAccess";
     totalCount: "Int";
-  };
-  PetitionAndField: {
-    // field return type name
-    field: "PetitionField";
-    petition: "Petition";
   };
   PetitionAndPartialFields: {
     // field return type name
@@ -2660,11 +2626,6 @@ export interface NexusGenFieldTypeNames {
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
-  };
-  PetitionTemplateAndField: {
-    // field return type name
-    field: "PetitionField";
-    petition: "PetitionTemplate";
   };
   PetitionTemplatePagination: {
     // field return type name
@@ -3197,11 +3158,6 @@ export interface NexusGenFieldTypeNames {
     tags: "Tag";
     tone: "Tone";
     updatedAt: "DateTime";
-  };
-  PetitionBaseAndField: {
-    // field return type name
-    field: "PetitionField";
-    petition: "PetitionBase";
   };
   PetitionEvent: {
     // field return type name
@@ -4230,7 +4186,6 @@ export interface NexusGenAbstractTypeMembers {
     | "SsoOrgIntegration"
     | "UserProvisioningOrgIntegration";
   PetitionBase: "Petition" | "PetitionTemplate";
-  PetitionBaseAndField: "PetitionAndField" | "PetitionTemplateAndField";
   PetitionEvent:
     | "AccessActivatedEvent"
     | "AccessActivatedFromPublicPetitionLinkEvent"
@@ -4320,7 +4275,6 @@ export interface NexusGenTypeInterfaces {
   OwnershipTransferredEvent: "PetitionEvent";
   Petition: "PetitionBase";
   PetitionAccess: "Timestamps";
-  PetitionAndField: "PetitionBaseAndField";
   PetitionAttachment: "CreatedAt";
   PetitionClonedEvent: "PetitionEvent";
   PetitionClosedEvent: "PetitionEvent";
@@ -4339,7 +4293,6 @@ export interface NexusGenTypeInterfaces {
   PetitionSharedUserNotification: "PetitionUserNotification";
   PetitionSignatureRequest: "Timestamps";
   PetitionTemplate: "PetitionBase";
-  PetitionTemplateAndField: "PetitionBaseAndField";
   PetitionUserGroupPermission: "PetitionPermission" | "Timestamps";
   PetitionUserPermission: "PetitionPermission" | "Timestamps";
   PublicPetition: "Timestamps";
@@ -4393,7 +4346,6 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "CreatedAt"
   | "OrgIntegration"
   | "PetitionBase"
-  | "PetitionBaseAndField"
   | "PetitionEvent"
   | "PetitionPermission"
   | "PetitionUserNotification"
