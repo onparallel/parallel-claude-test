@@ -1195,9 +1195,14 @@
     "context": "Ask for the information that you need..."
   },
   {
+    "term": "component.petition-compose-field.heading-description-placeholder",
+    "definition": "Enter the text that you need...",
+    "context": "Enter the text that you need..."
+  },
+  {
     "term": "component.petition-compose-field.heading-title-placeholder",
-    "definition": "Enter an introductory title for this section...",
-    "context": "Enter an introductory title for this section..."
+    "definition": "Add a title for this text block...",
+    "context": "Add a title for this text block..."
   },
   {
     "term": "component.petition-compose-field.invalid-attachment-header",

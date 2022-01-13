@@ -530,7 +530,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               field.type === "HEADING"
                 ? intl.formatMessage({
                     id: "component.petition-compose-field.heading-title-placeholder",
-                    defaultMessage: "Enter an introductory title for this section...",
+                    defaultMessage: "Add a title for this text block...",
                   })
                 : field.type === "FILE_UPLOAD"
                 ? intl.formatMessage({
@@ -638,10 +638,17 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           ref={descriptionRef}
           id={`field-description-${field.id}`}
           className={"field-description"}
-          placeholder={intl.formatMessage({
-            id: "component.petition-compose-field.field-description-placeholder",
-            defaultMessage: "Add a description...",
-          })}
+          placeholder={
+            field.type === "HEADING"
+              ? intl.formatMessage({
+                  id: "component.petition-compose-field.heading-description-placeholder",
+                  defaultMessage: "Enter the text that you need...",
+                })
+              : intl.formatMessage({
+                  id: "component.petition-compose-field.field-description-placeholder",
+                  defaultMessage: "Add a description...",
+                })
+          }
           aria-label={intl.formatMessage({
             id: "component.petition-compose-field.field-description-label",
             defaultMessage: "Field description",
