@@ -7,6 +7,7 @@ import {
   Collapse,
   FormControl,
   FormLabel,
+  Heading,
   HStack,
   IconButton,
   Input,
@@ -57,6 +58,7 @@ import { noop, pick } from "remeda";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
+import { Divider } from "../common/Divider";
 import { HelpPopover } from "../common/HelpPopover";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
 import { usePetitionDeadlineDialog } from "../petition-compose/dialogs/PetitionDeadlineDialog";
@@ -370,8 +372,80 @@ function _PetitionSettings({
     } catch {}
   };
 
+  const restrictEditingSwitch = (
+    <SwitchSetting
+      isDisabled={isPublicTemplate}
+      icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
+      label={
+        <FormattedMessage
+          id="component.petition-settings.restrict-editing"
+          defaultMessage="Restrict editing"
+        />
+      }
+      description={
+        <FormattedMessage
+          id="component.petition-settings.restrict-editing-description"
+          defaultMessage="Enable this option to prevent users from accidentally making changes to this petition."
+        />
+      }
+      isChecked={petition.isRestricted}
+      onChange={handleRestrictPetition}
+      controlId="restrict-editing"
+    />
+  );
+
   return (
-    <Stack padding={4} spacing={4}>
+    <Stack padding={4} spacing={2}>
+      {petition.__typename === "PetitionTemplate" ? (
+        <>
+          <Heading as="h5" size="sm">
+            <FormattedMessage
+              id="component.petition-settings.adjustments-template"
+              defaultMessage="Adjustments to the template"
+            />
+          </Heading>
+          {restrictEditingSwitch}
+          <SwitchSetting
+            isDisabled={isPublicTemplate || petition.isRestricted}
+            icon={<LinkIcon />}
+            label={
+              <FormattedMessage
+                id="component.petition-settings.share-by-link"
+                defaultMessage="Share by link"
+              />
+            }
+            description={
+              <FormattedMessage
+                id="component.petition-settings.share-by-link-description"
+                defaultMessage="Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
+              />
+            }
+            isChecked={hasActivePublicLink}
+            onChange={handleToggleShareByLink}
+            controlId="share-by-link"
+          >
+            <HStack paddingLeft={6}>
+              <Input type="text" value={petition.publicLink?.url} onChange={noop} />
+              <CopyToClipboardButton text={petition.publicLink?.url as string} />
+              <IconButton
+                variant="outline"
+                aria-label="public link settings"
+                onClick={handleEditPublicPetitionLink}
+                icon={<SettingsIcon boxSize={"1.125rem"} />}
+                isDisabled={isPublicTemplate || petition.isRestricted}
+              />
+            </HStack>
+          </SwitchSetting>
+          <Divider paddingTop={2} />
+          <Heading as="h5" size="sm" paddingTop={2}>
+            <FormattedMessage
+              id="component.petition-settings.adjustments-petitions"
+              defaultMessage="Adjustments for petitions"
+            />
+          </Heading>
+        </>
+      ) : null}
+
       <FormControl id="petition-locale" isDisabled={petition.isRestricted}>
         <FormLabel display="flex" alignItems="center">
           {petition.__typename === "Petition" ? (
@@ -382,7 +456,7 @@ function _PetitionSettings({
           ) : (
             <FormattedMessage
               id="component.petition-settings.template-locale-label"
-              defaultMessage="Language of the template"
+              defaultMessage="Language of communications"
             />
           )}
         </FormLabel>
@@ -418,195 +492,149 @@ function _PetitionSettings({
           />
         </FormControl>
       ) : null}
-      <Stack spacing={2}>
-        {petition.signatureConfig || hasSignature ? (
-          <SwitchSetting
-            isDisabled={!hasSignature || isPublicTemplate}
-            icon={<SignatureIcon />}
-            label={
-              <HStack>
-                <Text as="span">
-                  <FormattedMessage
-                    id="component.petition-settings.petition-signature-enable"
-                    defaultMessage="Enable eSignature"
-                  />
-                </Text>
-                {petition.signatureConfig?.integration?.environment === "DEMO" ||
-                hasDemoSignature ? (
-                  <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
-                ) : null}
-              </HStack>
-            }
-            onChange={handleSignatureChange}
-            isChecked={Boolean(petition.signatureConfig)}
-            controlId="enable-esignature"
-          >
-            <Center>
-              <Button onClick={handleConfigureSignatureClick} isDisabled={!hasSignature}>
-                <Text as="span">
-                  <FormattedMessage
-                    id="component.petition-settings.petition-signature-configure"
-                    defaultMessage="Configure eSignature"
-                  />
-                </Text>
-              </Button>
-            </Center>
-          </SwitchSetting>
-        ) : null}
+      {petition.__typename === "PetitionTemplate" ? (
         <SwitchSetting
-          isDisabled={isPublicTemplate}
-          icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
+          isDisabled={isPublicTemplate || petition.isRestricted}
+          icon={<UserArrowIcon />}
           label={
             <FormattedMessage
-              id="component.petition-settings.restrict-editing"
-              defaultMessage="Restrict editing"
+              id="component.petition-settings.share-automatically"
+              defaultMessage="Share automatically"
             />
           }
           description={
             <FormattedMessage
-              id="component.petition-settings.restrict-editing-description"
-              defaultMessage="Enable this option to prevent users from accidentally making changes to this petition."
+              id="component.petition-settings.share-automatically-description"
+              defaultMessage="Specify which users or groups of users the petitions created from this template are shared with"
             />
           }
-          isChecked={petition.isRestricted}
-          onChange={handleRestrictPetition}
-          controlId="restrict-editing"
-        />
-
-        {petition.__typename === "PetitionTemplate" ? (
-          <SwitchSetting
-            isDisabled={isPublicTemplate || petition.isRestricted}
-            icon={<UserArrowIcon />}
-            label={
+          isChecked={hasDefaultPermissions}
+          onChange={handleUpdateTemplateDefaultPermissions}
+          controlId="share-by-link"
+        >
+          <Center>
+            <Button onClick={() => handleUpdateTemplateDefaultPermissions(true)}>
               <FormattedMessage
-                id="component.petition-settings.share-automatically"
-                defaultMessage="Share automatically"
+                id="component.petition-settings.share-automatically-settings"
+                defaultMessage="Sharing settings"
               />
-            }
-            description={
-              <FormattedMessage
-                id="component.petition-settings.share-automatically-description"
-                defaultMessage="Specify which users or groups of users the petitions created from this template are shared with"
-              />
-            }
-            isChecked={hasDefaultPermissions}
-            onChange={handleUpdateTemplateDefaultPermissions}
-            controlId="share-by-link"
-          >
-            <Center>
-              <Button onClick={() => handleUpdateTemplateDefaultPermissions(true)}>
+            </Button>
+          </Center>
+        </SwitchSetting>
+      ) : (
+        restrictEditingSwitch
+      )}
+      {petition.signatureConfig || hasSignature ? (
+        <SwitchSetting
+          isDisabled={!hasSignature || isPublicTemplate}
+          icon={<SignatureIcon />}
+          label={
+            <HStack>
+              <Text as="span">
                 <FormattedMessage
-                  id="component.petition-settings.share-automatically-settings"
-                  defaultMessage="Sharing settings"
+                  id="component.petition-settings.petition-signature-enable"
+                  defaultMessage="Include eSignature process"
                 />
-              </Button>
-            </Center>
-          </SwitchSetting>
-        ) : null}
-        {petition.__typename === "PetitionTemplate" ? (
-          <SwitchSetting
-            isDisabled={isPublicTemplate || petition.isRestricted}
-            icon={<LinkIcon />}
-            label={
-              <FormattedMessage
-                id="component.petition-settings.share-by-link"
-                defaultMessage="Share by link"
-              />
-            }
-            description={
-              <FormattedMessage
-                id="component.petition-settings.share-by-link-description"
-                defaultMessage="Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
-              />
-            }
-            isChecked={hasActivePublicLink}
-            onChange={handleToggleShareByLink}
-            controlId="share-by-link"
-          >
-            <HStack paddingLeft={6}>
-              <Input type="text" value={petition.publicLink?.url} onChange={noop} />
-              <CopyToClipboardButton text={petition.publicLink?.url as string} />
-              <IconButton
-                variant="outline"
-                aria-label="public link settings"
-                onClick={handleEditPublicPetitionLink}
-                icon={<SettingsIcon boxSize={"1.125rem"} />}
-                isDisabled={isPublicTemplate || petition.isRestricted}
-              />
-            </HStack>
-          </SwitchSetting>
-        ) : null}
-        {user.hasSkipForwardSecurity ? (
-          <SwitchSetting
-            isDisabled={isPublicTemplate}
-            icon={<ShieldIcon />}
-            label={
-              <FormattedMessage
-                id="component.petition-settings.skip-forward-security"
-                defaultMessage="Disable Forward Security"
-              />
-            }
-            description={
-              <FormattedMessage
-                id="component.petition-settings.forward-security-description"
-                defaultMessage="Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake."
-              />
-            }
-            isChecked={petition.skipForwardSecurity}
-            onChange={handleSkipForwardSecurityChange}
-            controlId="disable-forward-security"
-          />
-        ) : null}
-        {user.hasHideRecipientViewContents ? (
-          <SwitchSetting
-            isDisabled={isPublicTemplate}
-            icon={<ListIcon />}
-            label={
-              <FormattedMessage
-                id="component.petition-settings.hide-recipient-view-contents"
-                defaultMessage="Hide recipient view contents"
-              />
-            }
-            description={
-              <FormattedMessage
-                id="component.petition-settings.hide-recipient-view-contents-description"
-                defaultMessage="By enabling this, the contents card in the recipient view will be hidden."
-              />
-            }
-            isChecked={petition.isRecipientViewContentsHidden}
-            onChange={async (value) =>
-              await onUpdatePetition({ isRecipientViewContentsHidden: value })
-            }
-            controlId="hide-recipient-view-contents"
-          />
-        ) : null}
-        {petition.__typename === "PetitionTemplate" ? (
-          <SwitchSetting
-            isDisabled={isPublicTemplate}
-            icon={<BellSettingsIcon />}
-            label={
-              <FormattedMessage
-                id="component.petition-settings.automatic-reminders"
-                defaultMessage="Enable automatic reminders"
-              />
-            }
-            isChecked={Boolean(petition.remindersConfig)}
-            onChange={handleAutomaticReminders}
-            controlId="automatic-reminders"
-          >
-            <Center>
-              <Button onClick={handleConfigureAutomaticReminders}>
-                <Text as="span">
+              </Text>
+              <HelpPopover>
+                <Text fontSize="sm">
                   <FormattedMessage
-                    id="component.petition-settings.automatic-reminders-configure"
-                    defaultMessage="Configure reminders"
+                    id="component.petition-settings.signature-description"
+                    defaultMessage="Generates a document and initiates a eSignature process upon completion of the request."
                   />
                 </Text>
-              </Button>
-            </Center>
-          </SwitchSetting>
-        ) : null}
-      </Stack>
+              </HelpPopover>
+              {petition.signatureConfig?.integration?.environment === "DEMO" || hasDemoSignature ? (
+                <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
+              ) : null}
+            </HStack>
+          }
+          onChange={handleSignatureChange}
+          isChecked={Boolean(petition.signatureConfig)}
+          controlId="enable-esignature"
+        >
+          <Center>
+            <Button onClick={handleConfigureSignatureClick} isDisabled={!hasSignature}>
+              <Text as="span">
+                <FormattedMessage
+                  id="component.petition-settings.petition-signature-configure"
+                  defaultMessage="Configure eSignature"
+                />
+              </Text>
+            </Button>
+          </Center>
+        </SwitchSetting>
+      ) : null}
+      {petition.__typename === "PetitionTemplate" ? (
+        <SwitchSetting
+          isDisabled={isPublicTemplate}
+          icon={<BellSettingsIcon />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.automatic-reminders"
+              defaultMessage="Enable automatic reminders"
+            />
+          }
+          isChecked={Boolean(petition.remindersConfig)}
+          onChange={handleAutomaticReminders}
+          controlId="automatic-reminders"
+        >
+          <Center>
+            <Button onClick={handleConfigureAutomaticReminders}>
+              <Text as="span">
+                <FormattedMessage
+                  id="component.petition-settings.automatic-reminders-configure"
+                  defaultMessage="Configure reminders"
+                />
+              </Text>
+            </Button>
+          </Center>
+        </SwitchSetting>
+      ) : null}
+      {user.hasSkipForwardSecurity ? (
+        <SwitchSetting
+          isDisabled={isPublicTemplate}
+          icon={<ShieldIcon />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.skip-forward-security"
+              defaultMessage="Disable Forward Security"
+            />
+          }
+          description={
+            <FormattedMessage
+              id="component.petition-settings.forward-security-description"
+              defaultMessage="Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake."
+            />
+          }
+          isChecked={petition.skipForwardSecurity}
+          onChange={handleSkipForwardSecurityChange}
+          controlId="disable-forward-security"
+        />
+      ) : null}
+      {user.hasHideRecipientViewContents ? (
+        <SwitchSetting
+          isDisabled={isPublicTemplate}
+          icon={<ListIcon />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.hide-recipient-view-contents"
+              defaultMessage="Hide recipient view contents"
+            />
+          }
+          description={
+            <FormattedMessage
+              id="component.petition-settings.hide-recipient-view-contents-description"
+              defaultMessage="By enabling this, the contents card in the recipient view will be hidden."
+            />
+          }
+          isChecked={petition.isRecipientViewContentsHidden}
+          onChange={async (value) =>
+            await onUpdatePetition({ isRecipientViewContentsHidden: value })
+          }
+          controlId="hide-recipient-view-contents"
+        />
+      ) : null}
     </Stack>
   );
 }

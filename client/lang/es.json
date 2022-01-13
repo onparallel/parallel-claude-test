@@ -1720,6 +1720,16 @@
     "context": "Fields not shown to the recipient because the visibility conditions are not met."
   },
   {
+    "term": "component.petition-settings.adjustments-petitions",
+    "definition": "Ajustes para las peticiones",
+    "context": "Adjustments for petitions"
+  },
+  {
+    "term": "component.petition-settings.adjustments-template",
+    "definition": "Ajustes de la plantilla",
+    "context": "Adjustments to the template"
+  },
+  {
     "term": "component.petition-settings.automatic-reminders",
     "definition": "Activar recordatorios automáticos",
     "context": "Enable automatic reminders"
@@ -1771,8 +1781,8 @@
   },
   {
     "term": "component.petition-settings.petition-signature-enable",
-    "definition": "Habilitar firma digital",
-    "context": "Enable eSignature"
+    "definition": "Incluir proceso de firma",
+    "context": "Include eSignature process"
   },
   {
     "term": "component.petition-settings.restrict-editing",
@@ -1810,6 +1820,11 @@
     "context": "Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
   },
   {
+    "term": "component.petition-settings.signature-description",
+    "definition": "Genera un documento e inicia un proceso de firma digital al completar la petición.",
+    "context": "Generates a document and initiates a eSignature process upon completion of the request."
+  },
+  {
     "term": "component.petition-settings.skip-forward-security",
     "definition": "Deshabilitar protección de reenvío",
     "context": "Disable Forward Security"
@@ -1821,8 +1836,8 @@
   },
   {
     "term": "component.petition-settings.template-locale-label",
-    "definition": "Idioma de la plantilla",
-    "context": "Language of the template"
+    "definition": "Idioma de las comunicaciones",
+    "context": "Language of communications"
   },
   {
     "term": "component.petition-sharing-dialog.subscribe",
