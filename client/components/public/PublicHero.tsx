@@ -71,7 +71,7 @@ export function PublicHero({
           >
             {title}
           </Heading>
-          <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="160%">
+          <Heading as="h2" size="md" fontWeight="light" marginTop={4} lineHeight="160%">
             {subtitle}
             <br />
             {subtitle2}
@@ -79,7 +79,7 @@ export function PublicHero({
           <Stack
             direction={{ base: "column-reverse", sm: "row" }}
             spacing={3}
-            paddingTop={8}
+            marginTop={6}
             marginBottom={{ base: 2, [breakpoint]: 0 }}
             marginRight={{ base: 0, [breakpoint]: 2 }}
           >
@@ -94,7 +94,7 @@ export function PublicHero({
               </Button>
             </NakedLink>
           </Stack>
-          <Stack spacing={3} paddingTop={{ base: 8, [breakpoint]: 16 }} marginRight="auto">
+          <Stack direction="row" marginTop={8}>
             <NakedLink href="https://www.capterra.com/reviews/236724/Parallel?utm_source=vendor&utm_medium=badge&utm_campaign=capterra_reviews_badge">
               <Box as="a">
                 <Image
