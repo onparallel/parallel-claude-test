@@ -1423,6 +1423,7 @@ type Mutation {
   Triggered by new users that want to sign up into Parallel
   """
   userSignUp(
+    captcha: String!
     email: String!
     firstName: String!
     industry: String

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Center,
   FormControl,
@@ -36,7 +37,7 @@ export function PublicSignupFormOrganization({
   const [organizationName, setOrganizationName] = useState("");
   const [isInvalid, setIsInvalid] = useState(false);
 
-  const [organizationLogo, setOrganizationLogo] = useState<Maybe<File> | undefined>(undefined);
+  const [organizationLogo, setOrganizationLogo] = useState<Maybe<File>>(null);
 
   useEffect(() => {
     if (isInvalid) setIsInvalid(false);
@@ -50,18 +51,9 @@ export function PublicSignupFormOrganization({
     }
   };
 
-  const MemoizedLogoInput = useMemo(() => {
-    return (
-      <SelectLogoInput
-        organizationLogo={organizationLogo}
-        setOrganizationLogo={setOrganizationLogo}
-      />
-    );
-  }, [organizationLogo, setOrganizationLogo]);
-
   return (
-    <>
-      <Text as="span" color="gray.500" fontSize="sm">
+    <Box>
+      <Text color="gray.500" fontSize="sm">
         2/3
       </Text>
       <Stack spacing={4}>
@@ -92,8 +84,8 @@ export function PublicSignupFormOrganization({
           </FormLabel>
           <Input
             name="company-name"
-            type="text"
             autoComplete="off"
+            autoFocus
             value={organizationName}
             onChange={(e) => setOrganizationName(e.target.value)}
           />
@@ -104,32 +96,26 @@ export function PublicSignupFormOrganization({
             />
           </FormErrorMessage>
         </FormControl>
-        {MemoizedLogoInput}
-        <Stack spacing={4} paddingTop={4} direction={{ base: "column-reverse", md: "row" }}>
-          <Button width="100%" variant="outline" size="md" fontSize="md" onClick={onBack}>
-            <FormattedMessage
-              id="component.public-signup-form-organization.go-back-button"
-              defaultMessage="Go back"
-            />
-          </Button>
-          <Button width="100%" colorScheme="purple" size="md" fontSize="md" onClick={handleNext}>
-            <FormattedMessage
-              id="component.public-signup-form-organization.continue-button"
-              defaultMessage="Continue"
-            />
-          </Button>
-        </Stack>
+        <SelectLogoInput logo={organizationLogo} onChangeLogo={setOrganizationLogo} />
       </Stack>
-    </>
+      <Stack spacing={4} marginTop={8} direction={{ base: "column-reverse", md: "row" }}>
+        <Button width="100%" variant="outline" onClick={onBack}>
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+        </Button>
+        <Button width="100%" colorScheme="purple" onClick={handleNext}>
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      </Stack>
+    </Box>
   );
 }
 
 function SelectLogoInput({
-  organizationLogo,
-  setOrganizationLogo,
+  logo,
+  onChangeLogo: onChangeLogo,
 }: {
-  organizationLogo: Maybe<File> | undefined;
-  setOrganizationLogo: (arg0: File | undefined) => void;
+  logo: Maybe<File> | undefined;
+  onChangeLogo: (file: File | null) => void;
 }) {
   const intl = useIntl();
 
@@ -140,7 +126,7 @@ function SelectLogoInput({
   const handleFileChange = (files: Maybe<FileList>) => {
     if (files?.length) {
       if (files[0].size <= maxSize) {
-        setOrganizationLogo(files[0] as any);
+        onChangeLogo(files[0]);
         setIsMaxSizeExceeded(false);
       } else {
         setIsMaxSizeExceeded(true);
@@ -150,9 +136,9 @@ function SelectLogoInput({
     }
   };
 
-  const handleRemoveLogo = () => {
-    setOrganizationLogo(undefined);
-  };
+  const objectUrl = useMemo(() => {
+    return logo ? URL.createObjectURL(logo) : null;
+  }, [logo]);
 
   return (
     <FormControl id="organizationLogo">
@@ -173,9 +159,11 @@ function SelectLogoInput({
         <Input
           ref={organizationLogoInputRef}
           position="absolute"
+          width="100%"
+          height="100%"
+          opacity={0}
           name="organizationLogo"
           type="file"
-          hidden
           onChange={(e) => handleFileChange(e.target.files)}
           accept=".png"
         />
@@ -185,7 +173,7 @@ function SelectLogoInput({
           fontWeight="normal"
           onClick={() => organizationLogoInputRef?.current?.click()}
         >
-          {organizationLogo ? (
+          {logo ? (
             <FormattedMessage
               id="component.public-signup-form-organization.upload-other-organizationLogo-button"
               defaultMessage="Upload another logo"
@@ -198,8 +186,8 @@ function SelectLogoInput({
           )}
         </Button>
         <Text fontSize="sm" color="gray.600">
-          {organizationLogo?.name ? (
-            organizationLogo.name
+          {logo?.name ? (
+            logo.name
           ) : (
             <FormattedMessage
               id="component.public-signup-form-organization.upload-organizationLogo-text"
@@ -222,7 +210,7 @@ function SelectLogoInput({
           />
         </Text>
       )}
-      {typeof window !== "undefined" && organizationLogo && (
+      {logo && (
         <Center
           paddingX={6}
           paddingY={2}
@@ -233,11 +221,7 @@ function SelectLogoInput({
           width="fit-content"
           position="relative"
         >
-          <Image
-            maxHeight="140px"
-            width="min-content"
-            src={URL.createObjectURL(organizationLogo)}
-          />
+          <Image maxHeight="140px" width="min-content" src={objectUrl!} />
           <IconButton
             pos="absolute"
             size="sm"
@@ -251,7 +235,7 @@ function SelectLogoInput({
               id: "component.public-signup-form-organization.remove-image",
               defaultMessage: "Remove image",
             })}
-            onClick={handleRemoveLogo}
+            onClick={() => onChangeLogo(null)}
             icon={<CloseIcon />}
           />
         </Center>

@@ -14,6 +14,7 @@ import {
   authenticate,
   authenticateAnd,
   ifArgDefined,
+  verifyCaptcha,
 } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -353,7 +354,9 @@ export const userSignUp = mutationField("userSignUp", {
     industry: stringArg(),
     role: stringArg(),
     position: stringArg(),
+    captcha: nonNull(stringArg()),
   },
+  authorize: verifyCaptcha("captcha"),
   validateArgs: validateAnd(
     validPassword((args) => args.password),
     validEmail((args) => args.email, "email"),

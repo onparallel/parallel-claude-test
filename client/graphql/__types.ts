@@ -1359,6 +1359,7 @@ export interface MutationuploadUserAvatarArgs {
 }
 
 export interface MutationuserSignUpArgs {
+  captcha: Scalars["String"];
   email: Scalars["String"];
   firstName: Scalars["String"];
   industry?: InputMaybe<Scalars["String"]>;
@@ -16849,6 +16850,7 @@ export type Signup_userSignUpMutationVariables = Exact<{
   industry?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
   position?: InputMaybe<Scalars["String"]>;
+  captcha: Scalars["String"];
 }>;
 
 export type Signup_userSignUpMutation = {
@@ -23391,6 +23393,7 @@ export const Signup_userSignUpDocument = gql`
     $industry: String
     $role: String
     $position: String
+    $captcha: String!
   ) {
     userSignUp(
       email: $email
@@ -23403,6 +23406,7 @@ export const Signup_userSignUpDocument = gql`
       industry: $industry
       role: $role
       position: $position
+      captcha: $captcha
     ) {
       id
       email

@@ -3963,6 +3963,7 @@ export interface NexusGenArgTypes {
     };
     userSignUp: {
       // args
+      captcha: string; // String!
       email: string; // String!
       firstName: string; // String!
       industry?: string | null; // String

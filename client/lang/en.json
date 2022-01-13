@@ -1975,6 +1975,11 @@
     "context": "Generating PDF file..."
   },
   {
+    "term": "component.public-signup-form-experience.captcha-error",
+    "definition": "Please, complete the captcha",
+    "context": "Please, complete the captcha"
+  },
+  {
     "term": "component.public-signup-form-experience.complete-button",
     "definition": "Complete registration",
     "context": "Complete registration"
@@ -1983,11 +1988,6 @@
     "term": "component.public-signup-form-experience.description",
     "definition": "We will ask you some questions to get to know you better and offer you the best possible experience.",
     "context": "We will ask you some questions to get to know you better and offer you the best possible experience."
-  },
-  {
-    "term": "component.public-signup-form-experience.go-back-button",
-    "definition": "Go back",
-    "context": "Go back"
   },
   {
     "term": "component.public-signup-form-experience.heading",
@@ -2035,6 +2035,11 @@
     "context": "Healthcare"
   },
   {
+    "term": "component.public-signup-form-experience.industry-label",
+    "definition": "What industry do you work at?",
+    "context": "What industry do you work at?"
+  },
+  {
     "term": "component.public-signup-form-experience.industry-legal",
     "definition": "Legal",
     "context": "Legal"
@@ -2050,6 +2055,11 @@
     "context": "Outsourcing"
   },
   {
+    "term": "component.public-signup-form-experience.industry-placeholder",
+    "definition": "Select an industry",
+    "context": "Select an industry"
+  },
+  {
     "term": "component.public-signup-form-experience.industry-real-estate",
     "definition": "Real Estate",
     "context": "Real Estate"
@@ -2058,6 +2068,11 @@
     "term": "component.public-signup-form-experience.industry-software",
     "definition": "Software",
     "context": "Software"
+  },
+  {
+    "term": "component.public-signup-form-experience.position-label",
+    "definition": "And finally, what is your position?",
+    "context": "And finally, what is your position?"
   },
   {
     "term": "component.public-signup-form-experience.role-administration",
@@ -2105,6 +2120,11 @@
     "context": "IT"
   },
   {
+    "term": "component.public-signup-form-experience.role-label",
+    "definition": "Which best describes your role?",
+    "context": "Which best describes your role?"
+  },
+  {
     "term": "component.public-signup-form-experience.role-legal",
     "definition": "Legal",
     "context": "Legal"
@@ -2123,6 +2143,11 @@
     "term": "component.public-signup-form-experience.role-other",
     "definition": "Other",
     "context": "Other"
+  },
+  {
+    "term": "component.public-signup-form-experience.role-placeholder",
+    "definition": "Select a role",
+    "context": "Select a role"
   },
   {
     "term": "component.public-signup-form-experience.role-procurement",
@@ -2153,11 +2178,6 @@
     "term": "component.public-signup-form-inbox.heading",
     "definition": "Ckeck your inbox",
     "context": "Ckeck your inbox"
-  },
-  {
-    "term": "component.public-signup-form-name.continue-button",
-    "definition": "Continue",
-    "context": "Continue"
   },
   {
     "term": "component.public-signup-form-name.description",
@@ -2200,19 +2220,9 @@
     "context": "Company name*"
   },
   {
-    "term": "component.public-signup-form-organization.continue-button",
-    "definition": "Continue",
-    "context": "Continue"
-  },
-  {
     "term": "component.public-signup-form-organization.description",
     "definition": "Fill out your organization’s profile that your customers will see in your communications.",
     "context": "Fill out your organization’s profile that your customers will see in your communications."
-  },
-  {
-    "term": "component.public-signup-form-organization.go-back-button",
-    "definition": "Go back",
-    "context": "Go back"
   },
   {
     "term": "component.public-signup-form-organization.heading",
@@ -2265,34 +2275,9 @@
     "context": "Create your free account now and automate your workflow agilely and safely."
   },
   {
-    "term": "component.public-signup-form.experience.industry-label",
-    "definition": "What industry do you work at?",
-    "context": "What industry do you work at?"
-  },
-  {
-    "term": "component.public-signup-form.experience.industry-placeholder",
-    "definition": "Select an industry",
-    "context": "Select an industry"
-  },
-  {
-    "term": "component.public-signup-form.experience.position-label",
-    "definition": "And finally, what’s your position?",
-    "context": "And finally, what’s your position?"
-  },
-  {
     "term": "component.public-signup-form.experience.position-placeholder",
     "definition": "E.g., Financial Analyst",
     "context": "E.g., Financial Analyst"
-  },
-  {
-    "term": "component.public-signup-form.experience.role-label",
-    "definition": "Which best describes your role?",
-    "context": "Which best describes your role?"
-  },
-  {
-    "term": "component.public-signup-form.experience.role-placeholder",
-    "definition": "Select a role",
-    "context": "Select a role"
   },
   {
     "term": "component.public-signup-form.heading",

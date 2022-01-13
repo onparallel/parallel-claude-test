@@ -2,7 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Flex, Image, keyframes, Stack, useCounter } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { SimpleWizard } from "@parallel/components/common/SimpleWizard";
+import { Steps } from "@parallel/components/common/Steps";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicSignupForm } from "@parallel/components/public/signup/PublicSignupForm";
@@ -27,6 +27,7 @@ type SignupFormData = {
   industry?: Maybe<string> | undefined;
   role?: Maybe<string> | undefined;
   position?: Maybe<string> | undefined;
+  captcha: string;
 };
 
 function Signup() {
@@ -108,7 +109,7 @@ function Signup() {
               },
             }}
           >
-            <SimpleWizard index={currentStep as number} direction="column">
+            <Steps currentStep={currentStep}>
               <PublicSignupForm onNext={handleNextPage} />
               <PublicSignupFormName onNext={handleNextPage} />
               <PublicSignupFormOrganization onBack={prevStep} onNext={handleNextPage} />
@@ -118,7 +119,7 @@ function Signup() {
                 isLoading={loading}
               />
               <PublicSignupFormInbox email={formData.current.email ?? ""} />
-            </SimpleWizard>
+            </Steps>
           </Center>
         </Flex>
         <Box
@@ -139,7 +140,7 @@ function Signup() {
             <PublicSignupRightHeading display={currentStep === 4 ? "none" : "block"} />
             <Center height="100%">
               <Flex width="100%">
-                <SimpleWizard index={currentStep as number} width="100%">
+                <Steps currentStep={currentStep} width="100%">
                   {[0, 1, 2, 3].map((step) => (
                     <Stack key={step} spacing={10}>
                       {[0, 1, 2].map((i) => {
@@ -191,7 +192,7 @@ function Signup() {
                       src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/check-inbox.svg`}
                     />
                   </Box>
-                </SimpleWizard>
+                </Steps>
               </Flex>
             </Center>
           </Flex>
@@ -214,6 +215,7 @@ Signup.mutations = [
       $industry: String
       $role: String
       $position: String
+      $captcha: String!
     ) {
       userSignUp(
         email: $email
@@ -226,6 +228,7 @@ Signup.mutations = [
         industry: $industry
         role: $role
         position: $position
+        captcha: $captcha
       ) {
         id
         email

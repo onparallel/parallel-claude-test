@@ -33,12 +33,13 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
   });
 
   return (
-    <form
+    <Box
+      as="form"
       onSubmit={handleSubmit(({ firstName, lastName }) => {
         onNext({ firstName, lastName });
       })}
     >
-      <Text as="span" color="gray.500" fontSize="sm">
+      <Text color="gray.500" fontSize="sm">
         1/3
       </Text>
       <Stack spacing={4}>
@@ -65,6 +66,7 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
             {...register("firstName", {
               required: true,
             })}
+            autoFocus
             autoComplete="given-name"
           />
           <FormErrorMessage>
@@ -94,22 +96,12 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
             />
           </FormErrorMessage>
         </FormControl>
-        <Box>
-          <Button
-            width="100%"
-            colorScheme="purple"
-            size="md"
-            fontSize="md"
-            marginTop={4}
-            type="submit"
-          >
-            <FormattedMessage
-              id="component.public-signup-form-name.continue-button"
-              defaultMessage="Continue"
-            />
-          </Button>
-        </Box>
       </Stack>
-    </form>
+      <Box marginTop={8}>
+        <Button width="100%" colorScheme="purple" type="submit">
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      </Box>
+    </Box>
   );
 }

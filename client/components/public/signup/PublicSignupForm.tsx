@@ -73,7 +73,8 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
   };
 
   return (
-    <form
+    <Box
+      as="form"
       onSubmit={handleSubmit(({ email, password }) => {
         onNext({ email, password });
       })}
@@ -155,52 +156,44 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
             />
           </FormErrorMessage>
         </FormControl>
-
-        <Box>
-          <Button
-            width="100%"
-            colorScheme="purple"
-            size="md"
-            fontSize="md"
-            marginTop={4}
-            type="submit"
-          >
-            <FormattedMessage id="generic.continue" defaultMessage="Continue" />
-          </Button>
-        </Box>
-        <Text align="center" fontSize="sm">
-          <FormattedMessage
-            id="component.public-signup-form.legal-text"
-            defaultMessage="By continuing you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
-            values={{
-              Terms: (chunks: any) => (
-                <NormalLink role="a" href="legal/terms" target="_blank">
-                  {chunks}
-                </NormalLink>
-              ),
-              Policy: (chunks: any) => (
-                <NormalLink role="a" href="legal/privacy" target="_blank">
-                  {chunks}
-                </NormalLink>
-              ),
-            }}
-          />
-        </Text>
-        <Text align="center" paddingTop={6}>
-          <FormattedMessage
-            id="component.public-signup-form.login-text"
-            defaultMessage="Already have an account? <Link>Login</Link>"
-            values={{
-              Link: (chunks: any) => (
-                <NormalLink role="a" href="login">
-                  {chunks}
-                </NormalLink>
-              ),
-            }}
-          />
-        </Text>
       </Stack>
-    </form>
+      <Box marginTop={8}>
+        <Button width="100%" colorScheme="purple" size="md" fontSize="md" type="submit">
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      </Box>
+      <Text align="center" fontSize="sm" marginTop={4}>
+        <FormattedMessage
+          id="component.public-signup-form.legal-text"
+          defaultMessage="By continuing you agree to our <Terms>Terms & Conditions</Terms> and <Policy>Privacy policy</Policy>"
+          values={{
+            Terms: (chunks: any) => (
+              <NormalLink role="a" href="legal/terms" target="_blank">
+                {chunks}
+              </NormalLink>
+            ),
+            Policy: (chunks: any) => (
+              <NormalLink role="a" href="legal/privacy" target="_blank">
+                {chunks}
+              </NormalLink>
+            ),
+          }}
+        />
+      </Text>
+      <Text align="center" marginTop={10}>
+        <FormattedMessage
+          id="component.public-signup-form.login-text"
+          defaultMessage="Already have an account? <Link>Login</Link>"
+          values={{
+            Link: (chunks: any) => (
+              <NormalLink role="a" href="login">
+                {chunks}
+              </NormalLink>
+            ),
+          }}
+        />
+      </Text>
+    </Box>
   );
 }
 

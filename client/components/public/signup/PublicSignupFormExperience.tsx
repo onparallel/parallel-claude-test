@@ -1,20 +1,31 @@
-import { Button, FormControl, FormLabel, Input, Select, Stack, Text } from "@chakra-ui/react";
-import { Maybe } from "@parallel/utils/types";
-import { useMemo, useState } from "react";
+import {
+  Box,
+  Button,
+  Center,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Select,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { useMemo } from "react";
+import ReCaptcha from "react-google-recaptcha";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+
+type PublicSignupFormExperienceData = {
+  industry: string | undefined;
+  role: string | undefined;
+  position: string | undefined;
+  captcha: string;
+};
 
 export type PublicSignupFormExperienceProps = {
   isLoading: boolean;
   onBack: () => void;
-  onFinish: ({
-    industry,
-    role,
-    position,
-  }: {
-    industry?: Maybe<string> | undefined;
-    role?: Maybe<string> | undefined;
-    position?: Maybe<string> | undefined;
-  }) => void;
+  onFinish: (data: PublicSignupFormExperienceData) => void;
 };
 
 export function PublicSignupFormExperience({
@@ -23,17 +34,21 @@ export function PublicSignupFormExperience({
   isLoading,
 }: PublicSignupFormExperienceProps) {
   const intl = useIntl();
-  const [industry, setIndustry] = useState("");
-  const [role, setRole] = useState("");
-  const [position, setPosition] = useState("");
-
-  const handleComplete = () => {
-    onFinish({
-      industry: industry || undefined,
-      role: role || undefined,
-      position: position || undefined,
-    });
-  };
+  const {
+    handleSubmit,
+    register,
+    control,
+    watch,
+    formState: { errors },
+  } = useForm<PublicSignupFormExperienceData>({
+    defaultValues: {
+      industry: "",
+      role: "",
+      position: "",
+      captcha: undefined,
+    },
+  });
+  const { role, industry } = watch();
 
   const industryOptions = useMemo(
     () => [
@@ -251,8 +266,18 @@ export function PublicSignupFormExperience({
   );
 
   return (
-    <>
-      <Text as="span" color="gray.500" fontSize="sm">
+    <Box
+      as="form"
+      onSubmit={handleSubmit((data) => {
+        onFinish({
+          industry: data.industry || undefined,
+          role: data.role || undefined,
+          position: data.position || undefined,
+          captcha: data.captcha,
+        });
+      })}
+    >
+      <Text color="gray.500" fontSize="sm">
         3/3
       </Text>
       <Stack spacing={4}>
@@ -271,24 +296,21 @@ export function PublicSignupFormExperience({
         <FormControl id="industry">
           <FormLabel>
             <FormattedMessage
-              id="component.public-signup-form.experience.industry-label"
+              id="component.public-signup-form-experience.industry-label"
               defaultMessage="What industry do you work at?"
             />
           </FormLabel>
           <Select
-            onChange={(e) => setIndustry(e.target.value)}
+            {...register("industry")}
             placeholder={intl.formatMessage({
-              id: "component.public-signup-form.experience.industry-placeholder",
+              id: "component.public-signup-form-experience.industry-placeholder",
               defaultMessage: "Select an industry",
             })}
             sx={{
-              "&": {
-                color: industry === "" ? "gray.400" : "inherit",
-              },
+              "&": { color: industry === "" ? "gray.400" : "inherit" },
               "& option": { color: "gray.800" },
               "& option[value='']": { color: "gray.400" },
             }}
-            iconColor="gray.800"
           >
             {industryOptions.map((industry, index) => (
               <option key={index} value={industry.value}>
@@ -300,24 +322,21 @@ export function PublicSignupFormExperience({
         <FormControl id="role">
           <FormLabel>
             <FormattedMessage
-              id="component.public-signup-form.experience.role-label"
+              id="component.public-signup-form-experience.role-label"
               defaultMessage="Which best describes your role?"
             />
           </FormLabel>
           <Select
-            onChange={(e) => setRole(e.target.value)}
+            {...register("role")}
             placeholder={intl.formatMessage({
-              id: "component.public-signup-form.experience.role-placeholder",
+              id: "component.public-signup-form-experience.role-placeholder",
               defaultMessage: "Select a role",
             })}
             sx={{
-              "&": {
-                color: role === "" ? "gray.400" : "inherit",
-              },
+              "&": { color: role === "" ? "gray.400" : "inherit" },
               "& option": { color: "gray.800" },
               "& option[value='']": { color: "gray.400" },
             }}
-            iconColor="gray.800"
           >
             {roleOptions.map((role, index) => (
               <option key={index} value={role.value}>
@@ -329,44 +348,53 @@ export function PublicSignupFormExperience({
         <FormControl id="position">
           <FormLabel>
             <FormattedMessage
-              id="component.public-signup-form.experience.position-label"
-              defaultMessage="And finally, what’s your position?"
+              id="component.public-signup-form-experience.position-label"
+              defaultMessage="And finally, what is your position?"
             />
           </FormLabel>
           <Input
-            name="position"
+            {...register("position")}
             autoComplete="off"
-            type="text"
             placeholder={intl.formatMessage({
               id: "component.public-signup-form.experience.position-placeholder",
               defaultMessage: "E.g., Financial Analyst",
             })}
-            value={position}
-            onChange={(e) => setPosition(e.target.value)}
           />
         </FormControl>
-        <Stack spacing={4} paddingTop={4} direction={{ base: "column-reverse", md: "row" }}>
-          <Button width="100%" variant="outline" size="md" fontSize="md" onClick={onBack}>
-            <FormattedMessage
-              id="component.public-signup-form-experience.go-back-button"
-              defaultMessage="Go back"
-            />
-          </Button>
-          <Button
-            width="100%"
-            colorScheme="purple"
-            size="md"
-            fontSize="md"
-            onClick={handleComplete}
-            isLoading={isLoading}
-          >
-            <FormattedMessage
-              id="component.public-signup-form-experience.complete-button"
-              defaultMessage="Complete registration"
-            />
-          </Button>
-        </Stack>
       </Stack>
-    </>
+      <FormControl as={Center} marginTop={8} isInvalid={!!errors.captcha}>
+        <Stack>
+          <Controller
+            name="captcha"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange } }) => (
+              <ReCaptcha
+                hl={intl.locale}
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                onChange={onChange}
+              />
+            )}
+          />
+          <FormErrorMessage>
+            <FormattedMessage
+              id="component.public-signup-form-experience.captcha-error"
+              defaultMessage="Please, complete the captcha"
+            />
+          </FormErrorMessage>
+        </Stack>
+      </FormControl>
+      <Stack spacing={4} marginTop={8} direction={{ base: "column-reverse", md: "row" }}>
+        <Button width="100%" variant="outline" onClick={onBack}>
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+        </Button>
+        <Button width="100%" colorScheme="purple" type="submit" isLoading={isLoading}>
+          <FormattedMessage
+            id="component.public-signup-form-experience.complete-button"
+            defaultMessage="Complete registration"
+          />
+        </Button>
+      </Stack>
+    </Box>
   );
 }
