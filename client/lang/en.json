@@ -1766,8 +1766,8 @@
   },
   {
     "term": "component.petition-settings.locale-label",
-    "definition": "Language of communications",
-    "context": "Language of communications"
+    "definition": "Language used in the communications",
+    "context": "Language used in the communications"
   },
   {
     "term": "component.petition-settings.petition-comments-enable",
@@ -1821,8 +1821,8 @@
   },
   {
     "term": "component.petition-settings.signature-description",
-    "definition": "Generates a document and initiates a eSignature process upon completion of the petition.",
-    "context": "Generates a document and initiates a eSignature process upon completion of the petition."
+    "definition": "Generates a document and initiates an eSignature process upon completion of the petition.",
+    "context": "Generates a document and initiates an eSignature process upon completion of the petition."
   },
   {
     "term": "component.petition-settings.skip-forward-security",

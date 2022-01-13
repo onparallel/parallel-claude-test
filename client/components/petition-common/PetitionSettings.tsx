@@ -450,7 +450,7 @@ function _PetitionSettings({
         <FormLabel display="flex" alignItems="center">
           <FormattedMessage
             id="component.petition-settings.locale-label"
-            defaultMessage="Language of communications"
+            defaultMessage="Language used in the communications"
           />
         </FormLabel>
         <Select
@@ -530,7 +530,7 @@ function _PetitionSettings({
               <HelpPopover>
                 <FormattedMessage
                   id="component.petition-settings.signature-description"
-                  defaultMessage="Generates a document and initiates a eSignature process upon completion of the petition."
+                  defaultMessage="Generates a document and initiates an eSignature process upon completion of the petition."
                 />
               </HelpPopover>
               {petition.signatureConfig?.integration?.environment === "DEMO" || hasDemoSignature ? (
