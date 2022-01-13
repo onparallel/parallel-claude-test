@@ -1976,7 +1976,7 @@
   },
   {
     "term": "component.public-signup-form-experience.captcha-error",
-    "definition": "",
+    "definition": "Por favor, complete el captcha",
     "context": "Please, complete the captcha"
   },
   {

@@ -176,7 +176,7 @@ function Signup() {
                       })}
                     </Stack>
                   ))}
-                  <Box paddingX={6} margin="0 auto">
+                  <Center paddingX={6}>
                     <Image
                       opacity="0"
                       animation={`${keyframes`
@@ -191,7 +191,7 @@ function Signup() {
                       `} 1.2s ease 0.12s forwards`}
                       src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/check-inbox.svg`}
                     />
-                  </Box>
+                  </Center>
                 </Steps>
               </Flex>
             </Center>
