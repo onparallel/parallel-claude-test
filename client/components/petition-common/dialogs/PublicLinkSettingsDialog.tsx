@@ -328,7 +328,7 @@ export function PublicLinkSettingsDialog({
                 <Text>
                   <FormattedMessage
                     id="component.settings-public-link-dialog.link-error-exemple"
-                    defaultMessage="E.g: abc-ABC-123"
+                    defaultMessage="E.g., abc-ABC-123"
                   />
                 </Text>
               </Stack>

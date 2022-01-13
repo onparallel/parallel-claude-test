@@ -339,7 +339,7 @@ export function PublicSignupFormExperience({
             type="text"
             placeholder={intl.formatMessage({
               id: "component.public-signup-form.experience.position-placeholder",
-              defaultMessage: "E.g: Financial Analyst",
+              defaultMessage: "E.g., Financial Analyst",
             })}
             value={position}
             onChange={(e) => setPosition(e.target.value)}

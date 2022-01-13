@@ -231,11 +231,11 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
             {activeType === "HEADING" ? (
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.heading-description"
-                defaultMessage="Add a text block that may include a title or just text.<i>e.g: Clauses, Sections...</i>"
+                defaultMessage="Add a text block that may include a title or just text.<i>E.g., clauses, sections...</i>"
                 values={{
                   i: (chunks: any) => (
-                    <Text mt={1} as="p">
-                      <i>{chunks}</i>
+                    <Text marginTop={1} fontStyle="italic">
+                      {chunks}
                     </Text>
                   ),
                 }}
@@ -243,11 +243,11 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
             ) : activeType === "TEXT" ? (
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.text-description"
-                defaultMessage="Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
+                defaultMessage="Allow the recipient to write down everything they need.<i>E.g., descriptions, observations...</i>"
                 values={{
                   i: (chunks: any) => (
-                    <Text mt={1} as="p">
-                      <i>{chunks}</i>
+                    <Text marginTop={1} fontStyle="italic">
+                      {chunks}
                     </Text>
                   ),
                 }}
@@ -255,11 +255,11 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
             ) : activeType === "SHORT_TEXT" ? (
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.short-text-description"
-                defaultMessage="Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
+                defaultMessage="Allow the recipient to reply briefly.<i>E.g., name, ID number...</i>"
                 values={{
                   i: (chunks: any) => (
-                    <Text mt={1} as="p">
-                      <i>{chunks}</i>
+                    <Text marginTop={1} fontStyle="italic">
+                      {chunks}
                     </Text>
                   ),
                 }}

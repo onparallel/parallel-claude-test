@@ -1281,8 +1281,8 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.heading-description",
-    "definition": "Add a text block that may include a title or just text.<i>e.g: Clauses, Sections...</i>",
-    "context": "Add a text block that may include a title or just text.<i>e.g: Clauses, Sections...</i>"
+    "definition": "Add a text block that may include a title or just text.<i>E.g., clauses, sections...</i>",
+    "context": "Add a text block that may include a title or just text.<i>E.g., clauses, sections...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.select-description",
@@ -1291,13 +1291,13 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.short-text-description",
-    "definition": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>",
-    "context": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
+    "definition": "Allow the recipient to reply briefly.<i>E.g., name, ID number...</i>",
+    "context": "Allow the recipient to reply briefly.<i>E.g., name, ID number...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.text-description",
-    "definition": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>",
-    "context": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
+    "definition": "Allow the recipient to write down everything they need.<i>E.g., descriptions, observations...</i>",
+    "context": "Allow the recipient to write down everything they need.<i>E.g., descriptions, observations...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
@@ -2271,8 +2271,8 @@
   },
   {
     "term": "component.public-signup-form.experience.position-placeholder",
-    "definition": "E.g: Financial Analyst",
-    "context": "E.g: Financial Analyst"
+    "definition": "E.g., Financial Analyst",
+    "context": "E.g., Financial Analyst"
   },
   {
     "term": "component.public-signup-form.experience.role-label",
@@ -2701,8 +2701,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.link-error-exemple",
-    "definition": "E.g: abc-ABC-123",
-    "context": "E.g: abc-ABC-123"
+    "definition": "E.g., abc-ABC-123",
+    "context": "E.g., abc-ABC-123"
   },
   {
     "term": "component.settings-public-link-dialog.link-label",

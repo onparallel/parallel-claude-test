@@ -1282,7 +1282,7 @@
   {
     "term": "component.petition-field-type-select-dropdown.heading-description",
     "definition": "Añade un bloque de texto que podrá incluir un título o solamente texto.<i>Ej: Cláusulas, Secciones...</i>",
-    "context": "Add a text block that may include a title or just text.<i>e.g: Clauses, Sections...</i>"
+    "context": "Add a text block that may include a title or just text.<i>E.g., clauses, sections...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.select-description",
@@ -1292,12 +1292,12 @@
   {
     "term": "component.petition-field-type-select-dropdown.short-text-description",
     "definition": "Permiten al destinatario responder de forma breve.<i>Ej: Nombre, DNI/NIE...</i>",
-    "context": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
+    "context": "Allow the recipient to reply briefly.<i>E.g., name, ID number...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.text-description",
     "definition": "Permiten al destinatario escribir todo lo que necesite.<i>Ej: Descripciones, comentarios...</i>",
-    "context": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
+    "context": "Allow the recipient to write down everything they need.<i>E.g., descriptions, observations...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
@@ -2272,7 +2272,7 @@
   {
     "term": "component.public-signup-form.experience.position-placeholder",
     "definition": "Ej: Analista financiero",
-    "context": "E.g: Financial Analyst"
+    "context": "E.g., Financial Analyst"
   },
   {
     "term": "component.public-signup-form.experience.role-label",
@@ -2702,7 +2702,7 @@
   {
     "term": "component.settings-public-link-dialog.link-error-exemple",
     "definition": "Ej: abc-ABC-123",
-    "context": "E.g: abc-ABC-123"
+    "context": "E.g., abc-ABC-123"
   },
   {
     "term": "component.settings-public-link-dialog.link-label",
