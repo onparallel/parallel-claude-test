@@ -384,11 +384,6 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     totalCount: number; // Int!
   };
-  PetitionAndPartialFields: {
-    // root type
-    fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
-  };
   PetitionAttachment: db.PetitionAttachment;
   PetitionAttachmentUploadData: {
     // root type
@@ -969,7 +964,7 @@ export interface NexusGenFieldTypes {
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
-    validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
+    validatePetitionFields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
   OrgIntegrationPagination: {
@@ -1078,11 +1073,6 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     totalCount: number; // Int!
-  };
-  PetitionAndPartialFields: {
-    // field return type
-    fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
-    petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   PetitionAttachment: {
     // field return type
@@ -2256,7 +2246,7 @@ export interface NexusGenFieldTypeNames {
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
-    validatePetitionFields: "PetitionAndPartialFields";
+    validatePetitionFields: "PetitionField";
     verifyPublicAccess: "PublicAccessVerification";
   };
   OrgIntegrationPagination: {
@@ -2365,11 +2355,6 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "PetitionAccess";
     totalCount: "Int";
-  };
-  PetitionAndPartialFields: {
-    // field return type name
-    fields: "PetitionField";
-    petition: "Petition";
   };
   PetitionAttachment: {
     // field return type name

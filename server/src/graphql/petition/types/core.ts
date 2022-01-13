@@ -412,15 +412,6 @@ export const PetitionField = objectType({
   sourceType: "db.PetitionField",
 });
 
-export const PetitionAndUpdatedFields = objectType({
-  name: "PetitionAndPartialFields",
-  description: "The petition and a subset of some of its fields.",
-  definition(t) {
-    t.field("petition", { type: "Petition" });
-    t.list.nonNull.field("fields", { type: "PetitionField" });
-  },
-});
-
 export const RemindersConfig = objectType({
   name: "RemindersConfig",
   description: "The reminder settings of a petition",

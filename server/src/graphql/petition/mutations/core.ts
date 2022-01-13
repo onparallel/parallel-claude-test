@@ -937,10 +937,10 @@ export const dynamicSelectFieldFileDownloadLink = mutationField(
 export const validatePetitionFields = mutationField("validatePetitionFields", {
   description:
     "Updates the validation of a field and sets the petition as closed if all fields are validated.",
-  type: "PetitionAndPartialFields",
-  authorize: chain(
-    authenticate(),
-    and(userHasAccessToPetitions("petitionId"), fieldsBelongsToPetition("petitionId", "fieldIds"))
+  type: nonNull(list(nonNull("PetitionField"))),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldIds")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -984,7 +984,8 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
         },
       });
     }
-    return { petition, fields };
+    ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
+    return fields;
   },
 });
 

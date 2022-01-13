@@ -186,27 +186,25 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           validateRepliesWith,
         },
         optimisticResponse: {
-          validatePetitionFields: {
-            __typename: "PetitionAndPartialFields",
-            petition: {
-              id: petition.id,
-              status: petition.status, // TODO predict correct status
-              __typename: "Petition",
-            },
-            fields: fieldIds.map((id) => {
-              const field = petition.fields.find((f) => f.id === id)!;
-              return {
-                __typename: "PetitionField",
-                id,
-                validated: value,
-                replies: field.replies.map((reply) => ({
-                  ...pick(reply, ["__typename", "id"]),
-                  status:
-                    reply.status === "PENDING" ? validateRepliesWith ?? reply.status : reply.status,
-                })),
-              };
-            }),
-          },
+          validatePetitionFields: fieldIds.map((id) => {
+            const field = petition.fields.find((f) => f.id === id)!;
+            return {
+              __typename: "PetitionField",
+              id,
+              validated: value,
+              replies: field.replies.map((reply) => ({
+                ...pick(reply, ["__typename", "id"]),
+                status:
+                  reply.status === "PENDING" ? validateRepliesWith ?? reply.status : reply.status,
+              })),
+
+              petition: {
+                id: petition.id,
+                status: petition.status, // TODO predict correct status
+                __typename: "Petition",
+              },
+            };
+          }),
         },
       });
     },
@@ -794,14 +792,14 @@ PetitionReplies.mutations = [
         value: $value
         validateRepliesWith: $validateRepliesWith
       ) {
-        petition {
+        id
+        validated
+        replies {
           id
           status
         }
-        fields {
-          id
-          validated
-          replies {
+        petition {
+          ... on Petition {
             id
             status
           }

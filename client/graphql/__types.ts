@@ -622,7 +622,7 @@ export interface Mutation {
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
-  validatePetitionFields: PetitionAndPartialFields;
+  validatePetitionFields: Array<PetitionField>;
   verifyPublicAccess: PublicAccessVerification;
 }
 
@@ -1663,13 +1663,6 @@ export type PetitionAccessStatus =
   | "ACTIVE"
   /** The petition is not accessible by the contact. */
   | "INACTIVE";
-
-/** The petition and a subset of some of its fields. */
-export interface PetitionAndPartialFields {
-  __typename?: "PetitionAndPartialFields";
-  fields: Array<PetitionField>;
-  petition: Petition;
-}
 
 export interface PetitionAttachment extends CreatedAt {
   __typename?: "PetitionAttachment";
@@ -15194,20 +15187,19 @@ export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
 }>;
 
 export type PetitionReplies_validatePetitionFieldsMutation = {
-  validatePetitionFields: {
-    __typename?: "PetitionAndPartialFields";
-    petition: { __typename?: "Petition"; id: string; status: PetitionStatus };
-    fields: Array<{
-      __typename?: "PetitionField";
+  validatePetitionFields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    validated: boolean;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
       id: string;
-      validated: boolean;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-      }>;
+      status: PetitionFieldReplyStatus;
     }>;
-  };
+    petition:
+      | { __typename?: "Petition"; id: string; status: PetitionStatus }
+      | { __typename?: "PetitionTemplate" };
+  }>;
 };
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact<{
@@ -22975,14 +22967,14 @@ export const PetitionReplies_validatePetitionFieldsDocument = gql`
       value: $value
       validateRepliesWith: $validateRepliesWith
     ) {
-      petition {
+      id
+      validated
+      replies {
         id
         status
       }
-      fields {
-        id
-        validated
-        replies {
+      petition {
+        ... on Petition {
           id
           status
         }

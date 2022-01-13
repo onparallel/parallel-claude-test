@@ -1469,7 +1469,7 @@ type Mutation {
     petitionId: GID!
     validateRepliesWith: PetitionFieldReplyStatus
     value: Boolean!
-  ): PetitionAndPartialFields!
+  ): [PetitionField!]!
   verifyPublicAccess(
     ip: String
     keycode: ID!
@@ -1977,14 +1977,6 @@ enum PetitionAccessStatus {
   The petition is not accessible by the contact.
   """
   INACTIVE
-}
-
-"""
-The petition and a subset of some of its fields.
-"""
-type PetitionAndPartialFields {
-  fields: [PetitionField!]!
-  petition: Petition!
 }
 
 type PetitionAttachment implements CreatedAt {
