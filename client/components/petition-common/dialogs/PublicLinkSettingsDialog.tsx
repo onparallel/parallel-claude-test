@@ -276,12 +276,10 @@ export function PublicLinkSettingsDialog({
                 *
               </Text>
               <HelpPopover>
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="component.settings-public-link-dialog.link-popover"
-                    defaultMessage="Customize your public link. Add between 8 and 30 characters, only alphanumeric and hyphens are allowed."
-                  />
-                </Text>
+                <FormattedMessage
+                  id="component.settings-public-link-dialog.link-popover"
+                  defaultMessage="Customize your public link. Add between 8 and 30 characters, only alphanumeric and hyphens are allowed."
+                />
               </HelpPopover>
             </FormLabel>
             <Controller

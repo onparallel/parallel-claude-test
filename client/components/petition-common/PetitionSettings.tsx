@@ -471,12 +471,10 @@ function _PetitionSettings({
           <FormLabel display="flex" alignItems="center">
             <FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />
             <HelpPopover>
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="component.petition-settings.deadline-description"
-                  defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
-                />
-              </Text>
+              <FormattedMessage
+                id="component.petition-settings.deadline-description"
+                defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
+              />
             </HelpPopover>
           </FormLabel>
           <DeadlineInput
@@ -530,12 +528,10 @@ function _PetitionSettings({
                 />
               </Text>
               <HelpPopover>
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="component.petition-settings.signature-description"
-                    defaultMessage="Generates a document and initiates a eSignature process upon completion of the petition."
-                  />
-                </Text>
+                <FormattedMessage
+                  id="component.petition-settings.signature-description"
+                  defaultMessage="Generates a document and initiates a eSignature process upon completion of the petition."
+                />
               </HelpPopover>
               {petition.signatureConfig?.integration?.environment === "DEMO" || hasDemoSignature ? (
                 <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />

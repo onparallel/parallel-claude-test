@@ -130,12 +130,10 @@ export function TemplateDefaultPermissionsDialog({
                     />
                   </Text>
                   <HelpPopover>
-                    <Text fontSize="sm">
-                      <FormattedMessage
-                        id="component.template-default-permissions-dialog.subscribe-explanation"
-                        defaultMessage="These users will be receive notifications from the petitions created from this template."
-                      />
-                    </Text>
+                    <FormattedMessage
+                      id="component.template-default-permissions-dialog.subscribe-explanation"
+                      defaultMessage="These users will be receive notifications from the petitions created from this template."
+                    />
                   </HelpPopover>
                 </Flex>
               </Checkbox>

@@ -94,12 +94,10 @@ function AddSignatureApiKeyDialog({ ...props }: DialogProps<{}, AddSignatureApiK
                   defaultMessage="API Key"
                 />
                 <HelpPopover>
-                  <Text fontSize="sm">
-                    <FormattedMessage
-                      id="component.add-signature-api-key-dialog.api-key-help"
-                      defaultMessage="This key is provided by Signaturit and is required to activate the integration"
-                    />
-                  </Text>
+                  <FormattedMessage
+                    id="component.add-signature-api-key-dialog.api-key-help"
+                    defaultMessage="This key is provided by Signaturit and is required to activate the integration"
+                  />
                 </HelpPopover>
               </HStack>
             </FormLabel>
