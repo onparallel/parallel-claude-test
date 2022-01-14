@@ -361,7 +361,7 @@ export const PetitionField = objectType({
       type: "PetitionFieldReply",
       description: "The replies to the petition field",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadRepliesForField(root.id);
+        return await ctx.petitions.loadRepliesForField(root.id, { refresh: true });
       },
     });
     t.list.nonNull.field("comments", {

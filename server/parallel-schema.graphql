@@ -765,7 +765,7 @@ type Mutation {
   """
   Deletes a reply to a petition field.
   """
-  deletePetitionReply(petitionId: GID!, replyId: GID!): Result!
+  deletePetitionReply(petitionId: GID!, replyId: GID!): PetitionField!
 
   """
   Delete petitions.

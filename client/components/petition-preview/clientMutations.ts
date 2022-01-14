@@ -10,7 +10,6 @@ import {
   PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument,
   PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment,
   PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
-  PreviewPetitionFieldMutations_updatePetitionStatus_PetitionFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
   PreviewPetitionFieldMutations_updateSimpleReplyDocument,
   Scalars,
@@ -29,7 +28,18 @@ function getRandomId() {
 
 const _deletePetitionReply = gql`
   mutation PreviewPetitionFieldMutations_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
-    deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+      id
+      petition {
+        id
+        ... on Petition {
+          status
+        }
+      }
+      replies {
+        id
+      }
+    }
   }
 `;
 
@@ -37,8 +47,7 @@ export function useDeletePetitionReply() {
   const client = useApolloClient();
 
   const [deletePetitionReply] = useMutation(
-    PreviewPetitionFieldMutations_deletePetitionReplyDocument,
-    { optimisticResponse: { deletePetitionReply: "SUCCESS" } }
+    PreviewPetitionFieldMutations_deletePetitionReplyDocument
   );
   return useCallback(
     async function _deletePetitionReply({
@@ -59,12 +68,6 @@ export function useDeletePetitionReply() {
       } else {
         await deletePetitionReply({
           variables: { petitionId, replyId },
-          update(cache) {
-            updateFieldReplies(cache, fieldId, (replies) =>
-              replies.filter(({ id }) => id !== replyId)
-            );
-            updatePetitionStatus(cache, petitionId);
-          },
         });
       }
     },
@@ -83,6 +86,15 @@ const _updateSimpleReply = gql`
       content
       status
       updatedAt
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+      }
     }
   }
 `;
@@ -114,11 +126,6 @@ export function useUpdateSimpleReply() {
             replyId,
             reply,
           },
-          update(cache, { data }) {
-            if (data) {
-              updatePetitionStatus(cache, petitionId);
-            }
-          },
         });
       }
     },
@@ -134,6 +141,18 @@ const _createSimpleReply = gql`
   ) {
     createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
       ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+        replies {
+          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+        }
+      }
     }
   }
   ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
@@ -176,12 +195,6 @@ export function useCreateSimpleReply() {
             fieldId,
             reply,
           },
-          update(cache, { data }) {
-            updateFieldReplies(cache, fieldId, (replies) => [...replies, data!.createSimpleReply]);
-            if (data) {
-              updatePetitionStatus(cache, petitionId);
-            }
-          },
         });
         return data?.createSimpleReply;
       }
@@ -198,6 +211,18 @@ const _createCheckboxReply = gql`
   ) {
     createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
       ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+        replies {
+          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+        }
+      }
     }
   }
   ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
@@ -242,15 +267,6 @@ export function useCreateCheckboxReply() {
             fieldId,
             values,
           },
-          update(cache, { data }) {
-            updateFieldReplies(cache, fieldId, (replies) => [
-              ...replies,
-              data!.createCheckboxReply,
-            ]);
-            if (data) {
-              updatePetitionStatus(cache, petitionId);
-            }
-          },
         });
         return data?.createCheckboxReply;
       }
@@ -270,6 +286,15 @@ const _updateCheckboxReply = gql`
       content
       status
       updatedAt
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+      }
     }
   }
 `;
@@ -304,11 +329,6 @@ export function useUpdateCheckboxReply() {
             replyId,
             values,
           },
-          update(cache, { data }) {
-            if (data) {
-              updatePetitionStatus(cache, petitionId);
-            }
-          },
         });
       }
     },
@@ -324,6 +344,18 @@ const _createDynamicSelectReply = gql`
   ) {
     createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
       ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+        replies {
+          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+        }
+      }
     }
   }
   ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
@@ -368,15 +400,6 @@ export function useCreateDynamicSelectReply() {
             fieldId,
             value,
           },
-          update(cache, { data }) {
-            updateFieldReplies(cache, fieldId, (replies) => [
-              ...replies,
-              data!.createDynamicSelectReply,
-            ]);
-            if (data) {
-              updatePetitionStatus(cache, petitionId);
-            }
-          },
         });
         return data?.createDynamicSelectReply;
       }
@@ -396,6 +419,15 @@ const _updateDynamicSelectReply = gql`
       content
       status
       updatedAt
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+      }
     }
   }
 `;
@@ -430,11 +462,6 @@ export function useUpdateDynamicSelectReply() {
             replyId,
             value,
           },
-          update(cache, { data }) {
-            if (data) {
-              updatePetitionStatus(cache, petitionId);
-            }
-          },
         });
       }
     },
@@ -454,6 +481,18 @@ const _createFileUploadReply = gql`
       }
       reply {
         ...RecipientViewPetitionFieldCard_PetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            ... on Petition {
+              status
+            }
+          }
+          replies {
+            ...RecipientViewPetitionFieldCard_PetitionFieldReply
+          }
+        }
       }
     }
   }
@@ -529,14 +568,10 @@ export function useCreateFileUploadReply() {
             },
             update(cache, { data }) {
               const reply = data!.createFileUploadReply.reply;
-              updateFieldReplies(cache, fieldId, (replies) => [...replies, reply]);
               updateReplyContent(cache, reply.id, (content) => ({
                 ...content,
                 progress: 0,
               }));
-              if (data) {
-                updatePetitionStatus(cache, petitionId);
-              }
             },
           });
           const { reply, presignedPostData } = data!.createFileUploadReply;
@@ -564,21 +599,6 @@ export function useCreateFileUploadReply() {
 
 // CACHE UPDATES
 
-function updateFieldReplies(
-  proxy: DataProxy,
-  fieldId: string,
-  updateFn: (
-    cached: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment["replies"]
-  ) => PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment["replies"]
-) {
-  updateFragment(proxy, {
-    id: fieldId,
-    fragment: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
-    fragmentName: "PreviewPetitionFieldMutations_updateFieldReplies_PetitionField",
-    data: (cached) => ({ ...cached, replies: updateFn(cached!.replies), previewReplies: [] }),
-  });
-}
-
 function updatePreviewFieldReplies(
   proxy: DataProxy,
   fieldId: string,
@@ -598,32 +618,6 @@ function updatePreviewFieldReplies(
   });
 }
 
-updateFieldReplies.fragments = {
-  get PetitionFieldReply() {
-    return gql`
-      fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply on PetitionFieldReply {
-        id
-        content
-        status
-        createdAt
-        updatedAt
-      }
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PreviewPetitionFieldMutations_updateFieldReplies_PetitionField on PetitionField {
-        previewReplies @client {
-          ...PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply
-        }
-        replies {
-          ...PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldReply
-        }
-      }
-      ${this.PetitionFieldReply}
-    `;
-  },
-};
 function updateReplyContent(
   proxy: DataProxy,
   replyId: string,
@@ -643,25 +637,6 @@ updateReplyContent.fragments = {
   PetitionFieldReply: gql`
     fragment PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply on PetitionFieldReply {
       content
-    }
-  `,
-};
-
-function updatePetitionStatus(proxy: DataProxy, petitionId: string) {
-  updateFragment(proxy, {
-    fragment: PreviewPetitionFieldMutations_updatePetitionStatus_PetitionFragmentDoc,
-    id: petitionId,
-    data: (cached) => ({
-      ...cached,
-      status: cached!.status === "COMPLETED" ? "PENDING" : cached!.status,
-    }),
-  });
-}
-
-updatePetitionStatus.fragments = {
-  Petition: gql`
-    fragment PreviewPetitionFieldMutations_updatePetitionStatus_Petition on Petition {
-      status
     }
   `,
 };

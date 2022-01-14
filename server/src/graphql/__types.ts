@@ -875,7 +875,7 @@ export interface NexusGenFieldTypes {
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldAttachment: NexusGenEnums["Result"]; // Result!
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    deletePetitionReply: NexusGenEnums["Result"]; // Result!
+    deletePetitionReply: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitions: NexusGenEnums["Result"]; // Result!
     deleteSignatureIntegration: NexusGenEnums["Result"]; // Result!
     deleteTag: NexusGenEnums["Result"]; // Result!
@@ -2158,7 +2158,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionField: "PetitionBase";
     deletePetitionFieldAttachment: "Result";
     deletePetitionFieldComment: "PetitionField";
-    deletePetitionReply: "Result";
+    deletePetitionReply: "PetitionField";
     deletePetitions: "Result";
     deleteSignatureIntegration: "Result";
     deleteTag: "Result";

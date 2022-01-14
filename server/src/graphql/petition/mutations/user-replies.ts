@@ -4,7 +4,6 @@ import { Maybe } from "../../../util/types";
 import { authenticateAnd } from "../../helpers/authorize";
 import { InvalidOptionError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { RESULT } from "../../helpers/result";
 import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../../utils";
 import {
@@ -411,7 +410,7 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
 
 export const deletePetitionReply = mutationField("deletePetitionReply", {
   description: "Deletes a reply to a petition field.",
-  type: "Result",
+  type: "PetitionField",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
@@ -422,7 +421,6 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     replyCanBeUpdated("replyId")
   ),
   resolve: async (_, args, ctx) => {
-    await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
-    return RESULT.SUCCESS;
+    return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
   },
 });

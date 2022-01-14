@@ -1399,7 +1399,9 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!) {
-            deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
           }
         `,
         variables: {
@@ -1409,14 +1411,16 @@ describe("GraphQL/Petition Field Replies", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.deletePetitionReply).toBe("SUCCESS");
+      expect(data!.deletePetitionReply).toEqual({ id: toGlobalId("PetitionField", fields[0].id) });
     });
 
     it("deletes a file reply and its entry on file_upload table", async () => {
       const { errors } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!) {
-            deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
           }
         `,
         variables: {
@@ -1449,7 +1453,9 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!) {
-            deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
           }
         `,
         variables: {
@@ -1466,7 +1472,9 @@ describe("GraphQL/Petition Field Replies", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $replyId: GID!) {
-            deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
           }
         `,
         variables: {
@@ -1476,7 +1484,9 @@ describe("GraphQL/Petition Field Replies", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.deletePetitionReply).toEqual("SUCCESS");
+      expect(data?.deletePetitionReply).toEqual({
+        id: toGlobalId("PetitionField", fields[0].id),
+      });
     });
   });
 });

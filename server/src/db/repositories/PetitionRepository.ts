@@ -1484,6 +1484,8 @@ export class PetitionRepository extends BaseRepository {
         },
       }),
     ]);
+
+    return field;
   }
 
   public async reopenPetition(
