@@ -81,7 +81,7 @@ export class MockAwsService implements IAws {
   }
   async deleteUser() {}
   async resendVerificationCode() {}
-  async enqueueMessages() {}
+  enqueueMessages() {}
   async enqueueEvents() {}
   async createCognitoUser() {
     return "";

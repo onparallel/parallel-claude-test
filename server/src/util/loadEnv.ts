@@ -6,4 +6,5 @@ export function loadEnv(overrides?: string) {
     config({ path: path.resolve(process.cwd(), overrides) });
   }
   config();
+  config({ path: path.resolve(process.cwd(), ".development.env") });
 }

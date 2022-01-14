@@ -106,7 +106,7 @@ async function processCommentNotifications(
   }
 }
 
-async function processSingatureCancelledNoCreditsLeftUserNotifications(context: WorkerContext) {
+async function processSignatureCancelledNoCreditsLeftUserNotifications(context: WorkerContext) {
   const signatureCancelledUserNotifications =
     await context.petitions.loadUnprocessedUserNotificationsOfType("SIGNATURE_CANCELLED");
 
@@ -130,5 +130,5 @@ async function processSingatureCancelledNoCreditsLeftUserNotifications(context: 
 
 createCronWorker("petition-notifications", async (context, config) => {
   await processCommentNotifications(context, config);
-  await processSingatureCancelledNoCreditsLeftUserNotifications(context);
+  await processSignatureCancelledNoCreditsLeftUserNotifications(context);
 });

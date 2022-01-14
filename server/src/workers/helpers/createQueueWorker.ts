@@ -19,7 +19,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
   options?: QueueWorkerOptions<P>
 ) {
   loadEnv(`.${name}.env`);
-  loadEnv(".development.env");
+
   const { parser } = {
     parser: (message: string) => JSON.parse(message) as P,
     ...options,

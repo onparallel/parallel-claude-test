@@ -16,7 +16,7 @@ export interface IAws {
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
     messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
-  ): Promise<void>;
+  ): void;
   enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>): void;
   createCognitoUser(
     email: string,
@@ -103,14 +103,14 @@ export class Aws implements IAws {
     return createHash("md5").update(value).digest("hex");
   }
 
-  async enqueueMessages(
+  enqueueMessages(
     queue: keyof Config["queueWorkers"],
     messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
   ) {
     const queueUrl = this.config.queueWorkers[queue].endpoint;
     if (Array.isArray(messages)) {
       for (const batch of chunk(messages, 10)) {
-        await this.sqs
+        this.sqs
           .sendMessageBatch({
             QueueUrl: queueUrl,
             Entries: batch.map(({ id, body, groupId }) => ({
@@ -123,7 +123,7 @@ export class Aws implements IAws {
           .catch((err) => this.logger.error(err));
       }
     } else {
-      await this.sqs
+      this.sqs
         .sendMessage({
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(messages.body),
@@ -144,7 +144,7 @@ export class Aws implements IAws {
           groupId: `event-processor-${event.id}`,
           body: event,
         }))
-      ).catch((err) => this.logger.error(err));
+      );
     }
   }
 

@@ -2,7 +2,10 @@ import { Knex } from "knex";
 import { countBy, difference, isDefined, omit } from "remeda";
 import { ApiContext } from "../context";
 import { IntegrationSettings } from "../db/repositories/IntegrationRepository";
-import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
+import {
+  PetitionSignatureConfig,
+  PetitionSignatureConfigSigner,
+} from "../db/repositories/PetitionRepository";
 import { Petition, PetitionAccess, PetitionField, User } from "../db/__types";
 import { toGlobalId } from "../util/globalId";
 import { DynamicSelectOption } from "./helpers/parseDynamicSelectValues";
@@ -60,14 +63,18 @@ export async function startSignatureRequest(
   ctx: ApiContext,
   t?: Knex.Transaction
 ) {
+  if (!petition.signature_config) {
+    throw new Error(`Petition:${petition.id} was expected to have signature_config set`);
+  }
   await verifySignatureIntegration(petition.signature_config.orgIntegrationId, petition.id, ctx);
 
   const isAccess = "keycode" in starter;
   const updatedBy = isAccess ? `Contact:${starter.contact_id}` : `User:${starter.id}`;
 
   let updatedPetition = null;
-  const userSigners = (petition.signature_config?.signersInfo ??
-    []) as PetitionSignatureConfigSigner[];
+
+  const config = petition.signature_config as PetitionSignatureConfig;
+  const userSigners = [...config.signersInfo, ...additionalSignersInfo];
 
   const allSigners = [...userSigners, ...additionalSignersInfo].map((s) => s.email);
   if (process.env.NODE_ENV === "development") {
