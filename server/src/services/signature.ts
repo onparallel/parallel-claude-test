@@ -1,6 +1,8 @@
 import { EventEmitter } from "events";
 import { inject, injectable } from "inversify";
+import { Knex } from "knex";
 import "reflect-metadata";
+import { countBy, omit } from "remeda";
 import SignaturitSDK, {
   BrandingParams,
   BrandingResponse,
@@ -13,7 +15,9 @@ import {
   IntegrationRepository,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
-import { OrgIntegration } from "../db/__types";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+import { PetitionRepository, PetitionSignatureConfig } from "../db/repositories/PetitionRepository";
+import { OrgIntegration, PetitionAccess, User } from "../db/__types";
 import { buildEmail } from "../emails/buildEmail";
 import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../emails/components/SignatureCompletedEmail";
@@ -25,6 +29,7 @@ import { removeNotDefined } from "../util/remedaExtensions";
 import { PageSignatureMetadata } from "../workers/helpers/calculateSignatureBoxPositions";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
+import { AWS_SERVICE, IAws } from "./aws";
 import { FetchService, FETCH_SERVICE } from "./fetch";
 
 type SignatureOptions = {
@@ -77,6 +82,12 @@ export interface ISignatureClient {
 
 export interface ISignatureService {
   checkSignaturitApiKey(apiKey: string): Promise<"sandbox" | "production">;
+  createSignatureRequest(
+    petitionId: number,
+    signatureConfig: PetitionSignatureConfig,
+    starter: User | PetitionAccess,
+    t?: Knex.Transaction
+  ): Promise<any>;
 }
 
 export const SIGNATURE = Symbol.for("SIGNATURE");
@@ -86,6 +97,9 @@ export class SignatureService implements ISignatureService {
     @inject(CONFIG) private config: Config,
     @inject(IntegrationRepository)
     private integrationRepository: IntegrationRepository,
+    @inject(PetitionRepository) private petitionsRepository: PetitionRepository,
+    @inject(OrganizationRepository) private organizationsRepository: OrganizationRepository,
+    @inject(AWS_SERVICE) private aws: IAws,
     @inject(FETCH_SERVICE) private fetch: FetchService
   ) {}
   public getClient(integration: OrgIntegration): ISignatureClient {
@@ -140,6 +154,162 @@ export class SignatureService implements ISignatureService {
           })
       )
     );
+  }
+
+  async createSignatureRequest(
+    petitionId: number,
+    signatureConfig: PetitionSignatureConfig,
+    starter: User | PetitionAccess,
+    t?: Knex.Transaction
+  ) {
+    await this.verifySignatureIntegration(petitionId, signatureConfig.orgIntegrationId);
+
+    const isAccess = "keycode" in starter;
+    const updatedBy = isAccess ? `Contact:${starter.contact_id}` : `User:${starter.id}`;
+
+    let updatedPetition = null;
+
+    const allSigners = [
+      ...signatureConfig.signersInfo,
+      ...(signatureConfig.additionalSignersInfo ?? []),
+    ];
+
+    const emails = allSigners.map((s) => s.email);
+    if (process.env.NODE_ENV === "development") {
+      if (!emails.every((email) => this.config.development.whitelistedEmails.includes(email))) {
+        throw new Error(
+          "DEVELOPMENT: Every recipient email must be whitelisted in .development.env"
+        );
+      }
+    }
+
+    if (allSigners.length === 0) {
+      throw new Error(`REQUIRED_SIGNER_INFO_ERROR`);
+    }
+
+    if ((signatureConfig.additionalSignersInfo ?? [])?.length > 0) {
+      [updatedPetition] = await this.petitionsRepository.updatePetition(
+        petitionId,
+        { signature_config: signatureConfig },
+        updatedBy,
+        t
+      );
+    }
+
+    const previousSignatureRequests =
+      await this.petitionsRepository.loadPetitionSignaturesByPetitionId(petitionId, {
+        refresh: true,
+      });
+
+    // avoid recipients restarting the signature process too many times
+    if (countBy(previousSignatureRequests, (r) => r.cancel_reason === "REQUEST_RESTARTED") >= 20) {
+      throw new Error(`Signature request on Petition:${petitionId} was restarted too many times`);
+    }
+
+    const enqueuedSignatureRequest = previousSignatureRequests.find((r) => r.status === "ENQUEUED");
+    // ENQUEUED signature requests cannot be cancelled because those still don't have an external_id
+    if (enqueuedSignatureRequest) {
+      throw new Error(
+        `Can't cancel enqueued PetitionSignatureRequest:${enqueuedSignatureRequest.id}`
+      );
+    }
+    const pendingSignatureRequest = previousSignatureRequests.find(
+      (r) => r.status === "PROCESSING"
+    );
+
+    // cancel pending signature request before starting a new one
+    if (pendingSignatureRequest) {
+      await Promise.all([
+        this.petitionsRepository.cancelPetitionSignatureRequest(
+          pendingSignatureRequest.id,
+          "REQUEST_RESTARTED",
+          isAccess ? { petition_access_id: starter.id } : { user_id: starter.id },
+          t
+        ),
+        this.petitionsRepository.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId),
+        this.petitionsRepository.createEvent(
+          {
+            type: "SIGNATURE_CANCELLED",
+            petition_id: petitionId,
+            data: {
+              petition_signature_request_id: pendingSignatureRequest.id,
+              cancel_reason: "REQUEST_RESTARTED",
+              cancel_data: isAccess ? { petition_access_id: starter.id } : { user_id: starter.id },
+            },
+          },
+          t
+        ),
+        this.aws.enqueueMessages("signature-worker", {
+          groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
+          body: {
+            type: "cancel-signature-process",
+            payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
+          },
+        }),
+      ]);
+    }
+
+    const signatureRequest = await this.petitionsRepository.createPetitionSignature(
+      petitionId,
+      {
+        ...(omit(signatureConfig, ["additionalSignersInfo"]) as any),
+        signersInfo: signatureConfig.signersInfo.concat(
+          signatureConfig.additionalSignersInfo ?? []
+        ),
+      },
+      t
+    );
+
+    await Promise.all([
+      this.aws.enqueueMessages("signature-worker", {
+        groupId: `signature-${toGlobalId("Petition", petitionId)}`,
+        body: {
+          type: "start-signature-process",
+          payload: { petitionSignatureRequestId: signatureRequest.id },
+        },
+      }),
+      this.petitionsRepository.createEvent(
+        {
+          type: "SIGNATURE_STARTED",
+          petition_id: petitionId,
+          data: {
+            petition_signature_request_id: signatureRequest.id,
+          },
+        },
+        t
+      ),
+    ]);
+
+    return { petition: updatedPetition, signatureRequest };
+  }
+  /**
+   *
+   * checks that the signature integration exists and is valid.
+   * also checks the usage limit if the integration uses our shared sandbox API_KEY
+   */
+  private async verifySignatureIntegration(
+    petitionId: number,
+    orgIntegrationId: number | undefined
+  ) {
+    if (orgIntegrationId === undefined) {
+      throw new Error(`undefined orgIntegrationId on signature_config. Petition:${petitionId}`);
+    }
+    const integration = await this.integrationRepository.loadIntegration(orgIntegrationId);
+    if (!integration || integration.type !== "SIGNATURE") {
+      throw new Error(
+        `Couldn't find an enabled signature integration for OrgIntegration:${orgIntegrationId}`
+      );
+    }
+    const settings = integration.settings as IntegrationSettings<"SIGNATURE">;
+    if (settings.API_KEY === this.config.signature.signaturitSharedProductionApiKey) {
+      const sharedKeyUsage = await this.organizationsRepository.getOrganizationCurrentUsageLimit(
+        integration.org_id,
+        "SIGNATURIT_SHARED_APIKEY"
+      );
+      if (!sharedKeyUsage || sharedKeyUsage.used >= sharedKeyUsage.limit) {
+        throw new Error("SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED");
+      }
+    }
   }
 }
 

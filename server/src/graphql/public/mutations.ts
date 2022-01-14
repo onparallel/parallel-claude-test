@@ -34,11 +34,7 @@ import {
   replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../petition/authorizers";
-import {
-  startSignatureRequest,
-  validateCheckboxReplyValues,
-  validateDynamicSelectReplyValues,
-} from "../utils";
+import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -48,7 +44,6 @@ import {
   replyBelongsToAccess,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
-
 function anonymizePart(part: string) {
   return part.length > 2
     ? part[0] + "*".repeat(part.length - 2) + part[part.length - 1]
@@ -579,12 +574,14 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         );
 
         if (petition.signature_config?.review === false) {
-          const { petition: updatedPetition } = await startSignatureRequest(
-            petition,
-            args.additionalSigners ?? [],
-            args.message ?? null,
+          const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
+            petition.id,
+            {
+              ...petition.signature_config,
+              additionalSignersInfo: args.additionalSigners ?? [],
+              message: args.message ?? undefined,
+            },
             ctx.access!,
-            ctx,
             t
           );
           petition = updatedPetition ?? petition;
@@ -614,7 +611,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         let petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
         petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!, {
           signature_config: {
-            ...petition!.signature_config,
+            ...petition.signature_config,
             signersInfo: (petition.signature_config!.signersInfo ?? []).concat(
               args.additionalSigners ?? []
             ),

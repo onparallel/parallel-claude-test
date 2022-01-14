@@ -10,7 +10,6 @@ import {
   userHasAccessToSignatureRequest,
   userHasEnabledIntegration,
 } from "../authorizers";
-import { startSignatureRequest as _startSignatureRequest } from "./../../utils";
 
 export const startSignatureRequest = mutationField("startSignatureRequest", {
   type: "PetitionSignatureRequest",
@@ -34,12 +33,14 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
           throw new Error(`Petition with id ${petitionId} not found`);
         }
 
-        const { signatureRequest } = await _startSignatureRequest(
-          petition,
-          [],
-          null,
+        if (!petition.signature_config) {
+          throw new Error(`Petition:${petition.id} was expected to have signature_config set`);
+        }
+
+        const { signatureRequest } = await ctx.signature.createSignatureRequest(
+          petition.id,
+          petition.signature_config,
           ctx.user!,
-          ctx,
           t
         );
         return signatureRequest;

@@ -423,9 +423,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
 });
 
 export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
-  description: `Shares our SignaturIt production APIKEY (${process.env
-    .SIGNATURIT_SHARED_PRODUCTION_API_KEY!.slice(0, 4)
-    .padEnd(7, ".")}) with the passed Org, and creates corresponding usage limits.`,
+  description: `Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits.`,
   type: "SupportMethodResponse",
   args: {
     orgId: nonNull(intArg({ description: "Numeric ID of the Organization" })),

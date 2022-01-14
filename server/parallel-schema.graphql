@@ -1125,7 +1125,7 @@ type Mutation {
   setUserPreferredLocale(locale: String!): User!
 
   """
-  Shares our SignaturIt production APIKEY (OWjT...) with the passed Org, and creates corresponding usage limits.
+  Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits.
   """
   shareSignaturitApiKey(
     """

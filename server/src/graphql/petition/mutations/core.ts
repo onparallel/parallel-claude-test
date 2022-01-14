@@ -63,7 +63,6 @@ import { validRichTextContent } from "../../helpers/validators/validRichTextCont
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
 import { orgHasAvailablePetitionSendCredits } from "../../organization/authorizers";
 import { contextUserHasRole } from "../../users/authorizers";
-import { startSignatureRequest } from "../../utils";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
@@ -1784,17 +1783,19 @@ export const completePetition = mutationField("completePetition", {
         );
         if (petition.signature_config?.review === false) {
           const contacts = await ctx.contacts.loadContact(args.additionalSignersContactIds ?? []);
-          const { petition: updatedPetition } = await startSignatureRequest(
-            petition,
-            contacts.map((c) => ({
-              contactId: c!.id,
-              email: c!.email,
-              firstName: c!.first_name!,
-              lastName: c!.last_name!,
-            })),
-            args.message ?? null,
+          const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
+            petition.id,
+            {
+              ...petition.signature_config,
+              additionalSignersInfo: contacts.map((c) => ({
+                contactId: c!.id,
+                email: c!.email,
+                firstName: c!.first_name!,
+                lastName: c!.last_name!,
+              })),
+              message: args.message ?? undefined,
+            },
             ctx.user!,
-            ctx,
             t
           );
           petition = updatedPetition ?? petition;
