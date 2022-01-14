@@ -204,7 +204,6 @@ export function verifyCaptcha<
     })}`;
     const response = await fetch(url);
     const body = await response.json();
-    console.log(body);
     return body.success ?? false;
   };
 }
