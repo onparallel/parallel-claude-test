@@ -1,26 +1,26 @@
-import { Button, Input, Stack, Text } from "@chakra-ui/react";
+import { Button, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { Controller, useForm } from "react-hook-form";
+import { FormattedMessage } from "react-intl";
+import { ConfirmInput } from "../../common/ConfirmInput";
 
 export function DeleteAccessTokenDialog({
   selectedCount,
   ...props
 }: DialogProps<{ selectedCount: number }>) {
-  const intl = useIntl();
-  const confirmation = intl
-    .formatMessage({
-      id: "generic.delete",
-      defaultMessage: "Delete",
-    })
-    .toLocaleLowerCase(intl.locale);
-  const [value, setValue] = useState("");
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{
+    confirm: boolean;
+  }>();
   return (
     <ConfirmDialog
       content={{
         as: "form",
-        onSubmit: () => props.onResolve(),
+        onSubmit: handleSubmit(() => props.onResolve()),
       }}
       header={
         <FormattedMessage
@@ -45,30 +45,16 @@ export function DeleteAccessTokenDialog({
               values={{ count: selectedCount }}
             />
           </Text>
-          <Text>
-            <FormattedMessage
-              id="generic.type-to-confirm"
-              defaultMessage="Please type {confirmation} to confirm"
-              values={{
-                confirmation: <Text as="strong">{confirmation}</Text>,
-              }}
-            />
-          </Text>
-          <Input
-            aria-label={intl.formatMessage(
-              {
-                id: "generic.type-to-confirm",
-                defaultMessage: "Please type {confirmation} to confirm",
-              },
-              { confirmation }
-            )}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+          <Controller
+            name="confirm"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => <ConfirmInput {...field} isInvalid={!!errors.confirm} />}
           />
         </Stack>
       }
       confirm={
-        <Button colorScheme="red" isDisabled={confirmation !== value} type="submit">
+        <Button colorScheme="red" type="submit">
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
