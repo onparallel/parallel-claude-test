@@ -4636,8 +4636,8 @@
   },
   {
     "term": "organization.confirm-deactivate.user-select.input-error",
-    "definition": "Por favor, selecciona un usuario o grupo o cambia tu respuesta",
-    "context": "Please, select a user or team or change your reply"
+    "definition": "Por favor, selecciona un usuario o cambia tu respuesta",
+    "context": "Please, select a user or change your reply"
   },
   {
     "term": "organization.confirm-deactivate.user-select.input-placeholder",

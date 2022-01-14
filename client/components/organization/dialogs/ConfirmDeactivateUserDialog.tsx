@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { ConfirmInput } from "@parallel/components/common/ConfirmInput";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -36,6 +37,7 @@ function ConfirmDeactivateUserDialog({
     formState: { errors },
   } = useForm<{
     user: UserSelectSelection | null;
+    confirm: boolean;
   }>({
     mode: "all",
     defaultValues: {
@@ -136,7 +138,7 @@ function ConfirmDeactivateUserDialog({
                     <FormErrorMessage>
                       <FormattedMessage
                         id="organization.confirm-deactivate.user-select.input-error"
-                        defaultMessage="Please, select a user or team or change your reply"
+                        defaultMessage="Please, select a user or change your reply"
                       />
                     </FormErrorMessage>
                   </FormControl>
@@ -148,6 +150,14 @@ function ConfirmDeactivateUserDialog({
                   defaultMessage="Delete all petitions"
                 />
               </Radio>
+              {option === "DELETE" ? (
+                <Controller
+                  name="confirm"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => <ConfirmInput {...field} isInvalid={!!errors.confirm} />}
+                />
+              ) : null}
             </Stack>
           </RadioGroup>
         </Stack>

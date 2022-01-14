@@ -318,6 +318,8 @@ export type MessageSentEvent = PetitionEvent & {
 };
 
 export type Mutation = {
+  /** set user status to ACTIVE. */
+  activateUser: Array<User>;
   /** Adds permissions on given petitions and users */
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
@@ -390,6 +392,8 @@ export type Mutation = {
   createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
+  /** Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions. */
+  deactivateUser: Array<User>;
   /** Delete contacts. */
   deleteContacts: Result;
   /** Deletes event subscriptions */
@@ -581,8 +585,6 @@ export type Mutation = {
   updateUser: User;
   /** Updates the name of a given user group */
   updateUserGroup: UserGroup;
-  /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
-  updateUserStatus: Array<User>;
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
   uploadDynamicSelectFieldFile: PetitionField;
   /** Uploads a user avatar image */
@@ -592,6 +594,10 @@ export type Mutation = {
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
+};
+
+export type MutationactivateUserArgs = {
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationaddPetitionPermissionArgs = {
@@ -798,6 +804,11 @@ export type MutationcreateUserGroupArgs = {
 export type MutationdeactivateAccessesArgs = {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
+};
+
+export type MutationdeactivateUserArgs = {
+  transferToUserId?: InputMaybe<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationdeleteContactsArgs = {
@@ -1317,12 +1328,6 @@ export type MutationupdateUserArgs = {
 export type MutationupdateUserGroupArgs = {
   data: UpdateUserGroupInput;
   id: Scalars["GID"];
-};
-
-export type MutationupdateUserStatusArgs = {
-  status: UserStatus;
-  transferToUserId?: InputMaybe<Scalars["GID"]>;
-  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationuploadDynamicSelectFieldFileArgs = {

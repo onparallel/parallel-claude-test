@@ -198,9 +198,46 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   },
 });
 
-export const updateUserStatus = mutationField("updateUserStatus", {
+export const activateUser = mutationField("activateUser", {
+  description: "set user status to ACTIVE.",
+  type: list("User"),
+  authorize: authenticateAnd(
+    contextUserHasRole("ADMIN"),
+    userHasAccessToUsers("userIds"),
+    userIsNotSSO("userIds")
+  ),
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.userIds, "userIds"),
+    userIdNotIncludedInArray((args) => args.userIds, "userIds"),
+    async (_, { userIds }, ctx, info) => {
+      const [org, activeUserCount] = await Promise.all([
+        ctx.organizations.loadOrg(ctx.user!.org_id),
+        ctx.organizations.loadActiveUserCount(ctx.user!.org_id),
+      ]);
+
+      if (org!.usage_details.USER_LIMIT < activeUserCount + userIds.length) {
+        throw new ArgValidationError(
+          info,
+          `User limit reached for this organization`,
+          "USER_LIMIT_ERROR",
+          {
+            userLimit: org!.usage_details.USER_LIMIT,
+          }
+        );
+      }
+    }
+  ),
+  args: {
+    userIds: nonNull(list(nonNull(globalIdArg("User")))),
+  },
+  resolve: async (_, { userIds }, ctx) => {
+    return await ctx.users.updateUserById(userIds, { status: "ACTIVE" }, `User:${ctx.user!.id}`);
+  },
+});
+
+export const deactivateUser = mutationField("deactivateUser", {
   description:
-    "Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org.",
+    "Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions.",
   type: list("User"),
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
@@ -217,37 +254,14 @@ export const updateUserStatus = mutationField("updateUserStatus", {
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
-    validateIf(
-      (args) => args.status === "INACTIVE",
-      validateAnd(
-        validIsDefined((args) => args.transferToUserId, "transferToUserId"),
-        (_, { userIds, transferToUserId }, ctx, info) => {
-          if (transferToUserId && userIds.includes(transferToUserId)) {
-            throw new ArgValidationError(
-              info,
-              "transferToUserId",
-              "Can't transfer to a user that will be disabled."
-            );
-          }
-        }
-      )
-    ),
-    validateIf(
-      (args) => args.status === "ACTIVE",
-      async (_, { userIds }, ctx, info) => {
-        const [org, activeUserCount] = await Promise.all([
-          ctx.organizations.loadOrg(ctx.user!.org_id),
-          ctx.organizations.loadActiveUserCount(ctx.user!.org_id),
-        ]);
-
-        if (org!.usage_details.USER_LIMIT < activeUserCount + userIds.length) {
+    validateAnd(
+      validIsDefined((args) => args.transferToUserId, "transferToUserId"),
+      (_, { userIds, transferToUserId }, ctx, info) => {
+        if (transferToUserId && userIds.includes(transferToUserId)) {
           throw new ArgValidationError(
             info,
-            `User limit reached for this organization`,
-            "USER_LIMIT_ERROR",
-            {
-              userLimit: org!.usage_details.USER_LIMIT,
-            }
+            "transferToUserId",
+            "Can't transfer to a user that will be disabled."
           );
         }
       }
@@ -255,54 +269,49 @@ export const updateUserStatus = mutationField("updateUserStatus", {
   ),
   args: {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
-    status: nonNull(arg({ type: "UserStatus" })),
     transferToUserId: globalIdArg("User"),
   },
-  resolve: async (_, { userIds, status, transferToUserId }, ctx) => {
-    if (status === "ACTIVE") {
-      return await ctx.users.updateUserById(userIds, { status }, `User:${ctx.user!.id}`);
-    } else {
-      return await ctx.petitions.withTransaction(async (t) => {
-        await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);
-        const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
-          userIds
-        );
-        return await pMap(
-          zip(userIds, permissions),
-          async ([userId, userPermissions]) => {
-            const [ownedPermissions, notOwnedPermissions] = partition(
-              userPermissions,
-              (p) => p.type === "OWNER"
-            );
-            const [[user]] = await Promise.all([
-              ctx.users.updateUserById(userId, { status }, `User:${ctx.user!.id}`, t),
-              // delete permissions with type !== OWNER
-              notOwnedPermissions.length > 0
-                ? ctx.petitions.deleteUserPermissions(
-                    notOwnedPermissions.map((p) => p.petition_id),
-                    userId,
-                    ctx.user!,
-                    t
-                  )
-                : undefined,
-              // transfer OWNER permissions to new user and remove original permissions
-              ownedPermissions.length > 0
-                ? ctx.petitions.transferOwnership(
-                    ownedPermissions.map((p) => p.petition_id),
-                    transferToUserId!,
-                    false,
-                    ctx.user!,
-                    t
-                  )
-                : undefined,
-              ctx.petitions.transferPublicLinkOwnership([userId], transferToUserId!, ctx.user!, t),
-            ]);
-            return user;
-          },
-          { concurrency: 1 }
-        );
-      });
-    }
+  resolve: async (_, { userIds, transferToUserId }, ctx) => {
+    return await ctx.petitions.withTransaction(async (t) => {
+      await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);
+      const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
+        userIds
+      );
+      return await pMap(
+        zip(userIds, permissions),
+        async ([userId, userPermissions]) => {
+          const [ownedPermissions, notOwnedPermissions] = partition(
+            userPermissions,
+            (p) => p.type === "OWNER"
+          );
+          const [[user]] = await Promise.all([
+            ctx.users.updateUserById(userId, { status: "INACTIVE" }, `User:${ctx.user!.id}`, t),
+            // delete permissions with type !== OWNER
+            notOwnedPermissions.length > 0
+              ? ctx.petitions.deleteUserPermissions(
+                  notOwnedPermissions.map((p) => p.petition_id),
+                  userId,
+                  ctx.user!,
+                  t
+                )
+              : undefined,
+            // transfer OWNER permissions to new user and remove original permissions
+            ownedPermissions.length > 0
+              ? ctx.petitions.transferOwnership(
+                  ownedPermissions.map((p) => p.petition_id),
+                  transferToUserId!,
+                  false,
+                  ctx.user!,
+                  t
+                )
+              : undefined,
+            ctx.petitions.transferPublicLinkOwnership([userId], transferToUserId!, ctx.user!, t),
+          ]);
+          return user;
+        },
+        { concurrency: 1 }
+      );
+    });
   },
 });
 

@@ -404,6 +404,11 @@ type MessageSentEvent implements PetitionEvent {
 
 type Mutation {
   """
+  set user status to ACTIVE.
+  """
+  activateUser(userIds: [GID!]!): [User!]!
+
+  """
   Adds permissions on given petitions and users
   """
   addPetitionPermission(
@@ -711,6 +716,11 @@ type Mutation {
   Deactivates the specified active petition accesses.
   """
   deactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
+
+  """
+  Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions.
+  """
+  deactivateUser(transferToUserId: GID, userIds: [GID!]!): [User!]!
 
   """
   Delete contacts.
@@ -1416,11 +1426,6 @@ type Mutation {
   Updates the name of a given user group
   """
   updateUserGroup(data: UpdateUserGroupInput!, id: GID!): UserGroup!
-
-  """
-  Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org.
-  """
-  updateUserStatus(status: UserStatus!, transferToUserId: GID, userIds: [GID!]!): [User!]!
 
   """
   Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options

@@ -81,7 +81,7 @@ describe("GraphQL/Users", () => {
     });
   });
 
-  describe("updateUserStatus", () => {
+  describe("activate and deactivate Users", () => {
     let activeUsers: User[];
     let inactiveUsers: User[];
     let user0Petition: Petition;
@@ -119,12 +119,8 @@ describe("GraphQL/Users", () => {
     it("updates user status to inactive and transfers petition to session user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!, $transferToUserId: GID) {
-            updateUserStatus(
-              userIds: $userIds
-              status: $status
-              transferToUserId: $transferToUserId
-            ) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
             }
@@ -132,13 +128,12 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
-          status: "INACTIVE",
           transferToUserId: sessionUserGID,
         },
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.updateUserStatus).toEqual([
+      expect(data!.deactivateUser).toEqual([
         {
           id: toGlobalId("User", activeUsers[0].id),
           status: "INACTIVE",
@@ -189,12 +184,8 @@ describe("GraphQL/Users", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!, $transferToUserId: GID) {
-            updateUserStatus(
-              userIds: $userIds
-              status: $status
-              transferToUserId: $transferToUserId
-            ) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
             }
@@ -203,12 +194,11 @@ describe("GraphQL/Users", () => {
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
           transferToUserId: toGlobalId("User", activeUsers[2].id),
-          status: "INACTIVE",
         },
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.updateUserStatus).toEqual([
+      expect(data!.deactivateUser).toEqual([
         {
           id: toGlobalId("User", activeUsers[0].id),
           status: "INACTIVE",
@@ -230,8 +220,8 @@ describe("GraphQL/Users", () => {
     it("updates user status to active without specifying transferToUserId argument", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!) {
-            updateUserStatus(userIds: $userIds, status: $status) {
+          mutation ($userIds: [GID!]!) {
+            activateUser(userIds: $userIds) {
               id
               status
             }
@@ -239,12 +229,11 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", inactiveUsers[0].id)],
-          status: "ACTIVE",
         },
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.updateUserStatus).toEqual([
+      expect(data!.activateUser).toEqual([
         {
           id: toGlobalId("User", inactiveUsers[0].id),
           status: "ACTIVE",
@@ -255,12 +244,8 @@ describe("GraphQL/Users", () => {
     it("updates multiple users to INACTIVE, and transfers all their petitions to another user in the org", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!, $transferToUserId: GID) {
-            updateUserStatus(
-              userIds: $userIds
-              status: $status
-              transferToUserId: $transferToUserId
-            ) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
             }
@@ -268,13 +253,12 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id), toGlobalId("User", activeUsers[1].id)],
-          status: "INACTIVE",
           transferToUserId: toGlobalId("User", activeUsers[2].id),
         },
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.updateUserStatus).toEqual([
+      expect(data?.deactivateUser).toEqual([
         {
           id: toGlobalId("User", activeUsers[0].id),
           status: "INACTIVE",
@@ -326,8 +310,8 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to update status to active when reached the user limit", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!) {
-            updateUserStatus(userIds: $userIds, status: $status) {
+          mutation ($userIds: [GID!]!) {
+            activateUser(userIds: $userIds) {
               id
               status
             }
@@ -335,7 +319,6 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", inactiveUsers[0].id)],
-          status: "ACTIVE",
         },
       });
 
@@ -346,8 +329,8 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to update status of a user in another organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!) {
-            updateUserStatus(userIds: $userIds, status: $status) {
+          mutation ($userIds: [GID!]!) {
+            activateUser(userIds: $userIds) {
               id
               status
             }
@@ -355,7 +338,6 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", otherOrgUser.id)],
-          status: "ACTIVE",
         },
       });
 
@@ -366,12 +348,8 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to an inactive user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!, $transferToUserId: GID) {
-            updateUserStatus(
-              userIds: $userIds
-              status: $status
-              transferToUserId: $transferToUserId
-            ) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
             }
@@ -379,7 +357,6 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
-          status: "INACTIVE",
           transferToUserId: toGlobalId("User", inactiveUsers[0].id),
         },
       });
@@ -391,12 +368,8 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to a user in another organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!, $transferToUserId: GID) {
-            updateUserStatus(
-              userIds: $userIds
-              status: $status
-              transferToUserId: $transferToUserId
-            ) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
             }
@@ -404,7 +377,6 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
-          status: "INACTIVE",
           transferToUserId: toGlobalId("User", otherOrgUser.id),
         },
       });
@@ -416,8 +388,8 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to set status to inactive without specifying transferToUserId argument", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!) {
-            updateUserStatus(userIds: $userIds, status: $status) {
+          mutation ($userIds: [GID!]!) {
+            deactivateUser(userIds: $userIds) {
               id
               status
             }
@@ -425,7 +397,6 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
-          status: "INACTIVE",
         },
       });
 
@@ -436,15 +407,14 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to set own status", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!) {
-            updateUserStatus(userIds: $userIds, status: $status) {
+          mutation ($userIds: [GID!]!) {
+            deactivateUser(userIds: $userIds) {
               id
             }
           }
         `,
         variables: {
           userIds: [sessionUserGID],
-          status: "INACTIVE",
         },
       });
 
@@ -455,12 +425,8 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to the same user that will be set as inactive", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $status: UserStatus!, $transferToUserId: GID) {
-            updateUserStatus(
-              userIds: $userIds
-              status: $status
-              transferToUserId: $transferToUserId
-            ) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
             }
@@ -468,7 +434,6 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
-          status: "INACTIVE",
           transferToUserId: toGlobalId("User", activeUsers[0].id),
         },
       });

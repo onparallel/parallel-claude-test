@@ -15,10 +15,11 @@ import { OrganizationUsersListTableHeader } from "@parallel/components/organizat
 import { UserLimitReachedAlert } from "@parallel/components/organization/UserLimitReachedAlert";
 import {
   OrganizationRole,
+  OrganizationUsers_activateUserDocument,
   OrganizationUsers_createOrganizationUserDocument,
+  OrganizationUsers_deactivateUserDocument,
   OrganizationUsers_OrderBy,
   OrganizationUsers_updateOrganizationUserDocument,
-  OrganizationUsers_updateUserStatusDocument,
   OrganizationUsers_userDocument,
   OrganizationUsers_UserFragment,
   User,
@@ -183,29 +184,38 @@ function OrganizationUsers() {
 
   const showConfirmActivateUserDialog = useConfirmActivateUsersDialog();
   const showConfirmDeactivateUserDialog = useConfirmDeactivateUserDialog();
-  const [updateUserStatus] = useMutation(OrganizationUsers_updateUserStatusDocument);
+  const [activateUser] = useMutation(OrganizationUsers_activateUserDocument);
+  const [deactivateUser] = useMutation(OrganizationUsers_deactivateUserDocument);
+
   const handleUpdateUserStatus = async (userIds: string[], newStatus: UserStatus) => {
     try {
       let transferToUser: Maybe<UserSelectSelection> = null;
       if (newStatus === "ACTIVE") {
         await showConfirmActivateUserDialog({ count: userIds.length });
+
+        await activateUser({
+          variables: {
+            userIds,
+          },
+          update: () => {
+            refetch();
+          },
+        });
       } else if (newStatus === "INACTIVE") {
         transferToUser = await showConfirmDeactivateUserDialog({
           selected: userIds,
           me,
         });
+        await deactivateUser({
+          variables: {
+            userIds,
+            transferToUserId: transferToUser?.id,
+          },
+          update: () => {
+            refetch();
+          },
+        });
       }
-      console.log("transferToUser: ", transferToUser);
-      await updateUserStatus({
-        variables: {
-          newStatus,
-          userIds,
-          transferToUserId: transferToUser?.id,
-        },
-        update: () => {
-          refetch();
-        },
-      });
       toast({
         title: intl.formatMessage({
           id: "generic.success",
@@ -465,12 +475,16 @@ OrganizationUsers.mutations = [
     ${OrganizationUsers.fragments.User}
   `,
   gql`
-    mutation OrganizationUsers_updateUserStatus(
-      $userIds: [GID!]!
-      $newStatus: UserStatus!
-      $transferToUserId: GID
-    ) {
-      updateUserStatus(userIds: $userIds, status: $newStatus, transferToUserId: $transferToUserId) {
+    mutation OrganizationUsers_activateUser($userIds: [GID!]!) {
+      activateUser(userIds: $userIds) {
+        id
+        status
+      }
+    }
+  `,
+  gql`
+    mutation OrganizationUsers_deactivateUser($userIds: [GID!]!, $transferToUserId: GID) {
+      deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
         id
         status
       }

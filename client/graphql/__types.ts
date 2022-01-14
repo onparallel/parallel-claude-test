@@ -348,6 +348,8 @@ export interface MessageSentEvent extends PetitionEvent {
 
 export interface Mutation {
   __typename?: "Mutation";
+  /** set user status to ACTIVE. */
+  activateUser: Array<User>;
   /** Adds permissions on given petitions and users */
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
@@ -420,6 +422,8 @@ export interface Mutation {
   createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
+  /** Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions. */
+  deactivateUser: Array<User>;
   /** Delete contacts. */
   deleteContacts: Result;
   /** Deletes event subscriptions */
@@ -611,8 +615,6 @@ export interface Mutation {
   updateUser: User;
   /** Updates the name of a given user group */
   updateUserGroup: UserGroup;
-  /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
-  updateUserStatus: Array<User>;
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
   uploadDynamicSelectFieldFile: PetitionField;
   /** Uploads a user avatar image */
@@ -622,6 +624,10 @@ export interface Mutation {
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
+}
+
+export interface MutationactivateUserArgs {
+  userIds: Array<Scalars["GID"]>;
 }
 
 export interface MutationaddPetitionPermissionArgs {
@@ -828,6 +834,11 @@ export interface MutationcreateUserGroupArgs {
 export interface MutationdeactivateAccessesArgs {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
+}
+
+export interface MutationdeactivateUserArgs {
+  transferToUserId?: InputMaybe<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]>;
 }
 
 export interface MutationdeleteContactsArgs {
@@ -1347,12 +1358,6 @@ export interface MutationupdateUserArgs {
 export interface MutationupdateUserGroupArgs {
   data: UpdateUserGroupInput;
   id: Scalars["GID"];
-}
-
-export interface MutationupdateUserStatusArgs {
-  status: UserStatus;
-  transferToUserId?: InputMaybe<Scalars["GID"]>;
-  userIds: Array<Scalars["GID"]>;
 }
 
 export interface MutationuploadDynamicSelectFieldFileArgs {
@@ -10848,14 +10853,21 @@ export type OrganizationUsers_updateOrganizationUserMutation = {
   };
 };
 
-export type OrganizationUsers_updateUserStatusMutationVariables = Exact<{
+export type OrganizationUsers_activateUserMutationVariables = Exact<{
   userIds: Array<Scalars["GID"]> | Scalars["GID"];
-  newStatus: UserStatus;
+}>;
+
+export type OrganizationUsers_activateUserMutation = {
+  activateUser: Array<{ __typename?: "User"; id: string; status: UserStatus }>;
+};
+
+export type OrganizationUsers_deactivateUserMutationVariables = Exact<{
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
   transferToUserId?: InputMaybe<Scalars["GID"]>;
 }>;
 
-export type OrganizationUsers_updateUserStatusMutation = {
-  updateUserStatus: Array<{ __typename?: "User"; id: string; status: UserStatus }>;
+export type OrganizationUsers_deactivateUserMutation = {
+  deactivateUser: Array<{ __typename?: "User"; id: string; status: UserStatus }>;
 };
 
 export type OrganizationUsers_userQueryVariables = Exact<{
@@ -22562,20 +22574,27 @@ export const OrganizationUsers_updateOrganizationUserDocument = gql`
   OrganizationUsers_updateOrganizationUserMutation,
   OrganizationUsers_updateOrganizationUserMutationVariables
 >;
-export const OrganizationUsers_updateUserStatusDocument = gql`
-  mutation OrganizationUsers_updateUserStatus(
-    $userIds: [GID!]!
-    $newStatus: UserStatus!
-    $transferToUserId: GID
-  ) {
-    updateUserStatus(userIds: $userIds, status: $newStatus, transferToUserId: $transferToUserId) {
+export const OrganizationUsers_activateUserDocument = gql`
+  mutation OrganizationUsers_activateUser($userIds: [GID!]!) {
+    activateUser(userIds: $userIds) {
       id
       status
     }
   }
 ` as unknown as DocumentNode<
-  OrganizationUsers_updateUserStatusMutation,
-  OrganizationUsers_updateUserStatusMutationVariables
+  OrganizationUsers_activateUserMutation,
+  OrganizationUsers_activateUserMutationVariables
+>;
+export const OrganizationUsers_deactivateUserDocument = gql`
+  mutation OrganizationUsers_deactivateUser($userIds: [GID!]!, $transferToUserId: GID) {
+    deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  OrganizationUsers_deactivateUserMutation,
+  OrganizationUsers_deactivateUserMutationVariables
 >;
 export const OrganizationUsers_userDocument = gql`
   query OrganizationUsers_user(

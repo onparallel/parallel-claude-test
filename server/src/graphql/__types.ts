@@ -848,6 +848,7 @@ export interface NexusGenFieldTypes {
   };
   Mutation: {
     // field return type
+    activateUser: NexusGenRootTypes["User"][]; // [User!]!
     addPetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -883,6 +884,7 @@ export interface NexusGenFieldTypes {
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deleteEventSubscriptions: NexusGenEnums["Result"]; // Result!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -976,7 +978,6 @@ export interface NexusGenFieldTypes {
     updateTemplateDefaultPermissions: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
-    updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
@@ -2140,6 +2141,7 @@ export interface NexusGenFieldTypeNames {
   };
   Mutation: {
     // field return type name
+    activateUser: "User";
     addPetitionPermission: "PetitionBase";
     addUsersToUserGroup: "UserGroup";
     assignPetitionToUser: "SupportMethodResponse";
@@ -2175,6 +2177,7 @@ export interface NexusGenFieldTypeNames {
     createUser: "SupportMethodResponse";
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
+    deactivateUser: "User";
     deleteContacts: "Result";
     deleteEventSubscriptions: "Result";
     deletePetition: "SupportMethodResponse";
@@ -2268,7 +2271,6 @@ export interface NexusGenFieldTypeNames {
     updateTemplateDefaultPermissions: "PetitionTemplate";
     updateUser: "User";
     updateUserGroup: "UserGroup";
-    updateUserStatus: "User";
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
@@ -3233,6 +3235,10 @@ export interface NexusGenArgTypes {
     };
   };
   Mutation: {
+    activateUser: {
+      // args
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
     addPetitionPermission: {
       // args
       message?: string | null; // String
@@ -3438,6 +3444,11 @@ export interface NexusGenArgTypes {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    deactivateUser: {
+      // args
+      transferToUserId?: NexusGenScalars["GID"] | null; // GID
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     deleteContacts: {
       // args
@@ -3957,12 +3968,6 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateUserGroupInput"]; // UpdateUserGroupInput!
       id: NexusGenScalars["GID"]; // GID!
-    };
-    updateUserStatus: {
-      // args
-      status: NexusGenEnums["UserStatus"]; // UserStatus!
-      transferToUserId?: NexusGenScalars["GID"] | null; // GID
-      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     uploadDynamicSelectFieldFile: {
       // args
