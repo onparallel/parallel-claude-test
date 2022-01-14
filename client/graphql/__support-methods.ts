@@ -347,6 +347,59 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "shareSignaturitApiKey",
+      description:
+        "Shares our SignaturIt production APIKEY (OWjT...) with the passed Org, and creates corresponding usage limits.",
+      args: [
+        {
+          name: "limit",
+          description: "How many credits allow the org to use in the given period",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "Numeric ID of the Org",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "period",
+          description: "Period of the usage limit. e.g.: 1 month, 1 year, 20 days, etc...",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "transferOrganizationOwnership",
       description:
         "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",

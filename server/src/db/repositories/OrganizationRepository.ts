@@ -45,8 +45,8 @@ export class OrganizationRepository extends BaseRepository {
       period: "1 month",
     },
     SIGNATURIT_SHARED_APIKEY: {
-      limit: 10,
-      period: "1 year",
+      limit: 0,
+      period: "1 month",
     },
   };
 
@@ -154,10 +154,6 @@ export class OrganizationRepository extends BaseRepository {
           {
             limit_name: "PETITION_SEND",
             ...this.defaultOrganizationUsageDetails["PETITION_SEND"],
-          },
-          {
-            limit_name: "SIGNATURIT_SHARED_APIKEY",
-            ...this.defaultOrganizationUsageDetails["SIGNATURIT_SHARED_APIKEY"],
           },
         ],
 

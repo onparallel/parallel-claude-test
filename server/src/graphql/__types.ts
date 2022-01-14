@@ -941,6 +941,7 @@ export interface NexusGenFieldTypes {
     sendReminders: NexusGenEnums["Result"]; // Result!
     sendSignatureRequestReminders: NexusGenEnums["Result"]; // Result!
     setUserPreferredLocale: NexusGenRootTypes["User"]; // User!
+    shareSignaturitApiKey: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -2231,6 +2232,7 @@ export interface NexusGenFieldTypeNames {
     sendReminders: "Result";
     sendSignatureRequestReminders: "Result";
     setUserPreferredLocale: "User";
+    shareSignaturitApiKey: "SupportMethodResponse";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
     startSignatureRequest: "PetitionSignatureRequest";
     switchAutomaticReminders: "PetitionAccess";
@@ -3754,6 +3756,12 @@ export interface NexusGenArgTypes {
     setUserPreferredLocale: {
       // args
       locale: string; // String!
+    };
+    shareSignaturitApiKey: {
+      // args
+      limit: number; // Int!
+      orgId: number; // Int!
+      period: string; // String!
     };
     signedPetitionDownloadLink: {
       // args

@@ -536,6 +536,8 @@ export interface Mutation {
   sendSignatureRequestReminders: Result;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
+  /** Shares our SignaturIt production APIKEY (OWjT...) with the passed Org, and creates corresponding usage limits. */
+  shareSignaturitApiKey: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
@@ -1146,6 +1148,12 @@ export interface MutationsendSignatureRequestRemindersArgs {
 
 export interface MutationsetUserPreferredLocaleArgs {
   locale: Scalars["String"];
+}
+
+export interface MutationshareSignaturitApiKeyArgs {
+  limit: Scalars["Int"];
+  orgId: Scalars["Int"];
+  period: Scalars["String"];
 }
 
 export interface MutationsignedPetitionDownloadLinkArgs {

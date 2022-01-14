@@ -506,6 +506,8 @@ export type Mutation = {
   sendSignatureRequestReminders: Result;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
+  /** Shares our SignaturIt production APIKEY (OWjT...) with the passed Org, and creates corresponding usage limits. */
+  shareSignaturitApiKey: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
@@ -1118,6 +1120,12 @@ export type MutationsetUserPreferredLocaleArgs = {
   locale: Scalars["String"];
 };
 
+export type MutationshareSignaturitApiKeyArgs = {
+  limit: Scalars["Int"];
+  orgId: Scalars["Int"];
+  period: Scalars["String"];
+};
+
 export type MutationsignedPetitionDownloadLinkArgs = {
   downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
   petitionSignatureRequestId: Scalars["GID"];
@@ -1329,6 +1337,7 @@ export type MutationuploadUserAvatarArgs = {
 };
 
 export type MutationuserSignUpArgs = {
+  captcha: Scalars["String"];
   email: Scalars["String"];
   firstName: Scalars["String"];
   industry?: InputMaybe<Scalars["String"]>;
@@ -2778,12 +2787,14 @@ export type SignatureCancelledEvent = PetitionEvent & {
   canceller: Maybe<PetitionSigner>;
   cancellerReason: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
+  errorCode: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   type: PetitionEventType;
 };
 
 export type SignatureCancelledUserNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"];
+  errorCode: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
   petition: PetitionBase;

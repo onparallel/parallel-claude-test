@@ -421,3 +421,63 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
     }
   },
 });
+
+export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
+  description: `Shares our SignaturIt production APIKEY (${process.env
+    .SIGNATURIT_SHARED_PRODUCTION_API_KEY!.slice(0, 4)
+    .padEnd(7, ".")}) with the passed Org, and creates corresponding usage limits.`,
+  type: "SupportMethodResponse",
+  args: {
+    orgId: nonNull(intArg({ description: "Numeric ID of the Organization" })),
+    limit: nonNull(
+      intArg({ description: "How many credits allow the org to use in the given period" })
+    ),
+    period: nonNull(
+      stringArg({
+        description: "Period of the usage limit. e.g.: 1 month, 1 year, 20 days, etc...",
+      })
+    ),
+  },
+  authorize: supportMethodAccess(),
+  resolve: async (_, { orgId, period, limit }, ctx) => {
+    const org = await ctx.organizations.loadOrg(orgId);
+    if (!org) {
+      return { result: RESULT.FAILURE, message: `Organization:${orgId} not found` };
+    }
+
+    return await ctx.organizations.withTransaction(async (t) => {
+      try {
+        await ctx.organizations.createOrganizationUsageLimit(
+          orgId,
+          {
+            limit_name: "SIGNATURIT_SHARED_APIKEY",
+            limit,
+            period,
+          },
+          t
+        );
+        await ctx.organizations.updateOrganization(
+          orgId,
+          {
+            usage_details: {
+              ...org.usage_details,
+              SIGNATURIT_SHARED_APIKEY: { limit, period },
+            },
+          },
+          `User:${ctx.user!.id}`,
+          t
+        );
+        return { result: RESULT.SUCCESS };
+      } catch (error: any) {
+        if ((error.message as string).includes("invalid input syntax for type interval")) {
+          return {
+            result: RESULT.FAILURE,
+            message: `"${period}" is not a valid Postgres interval`,
+          };
+        } else {
+          return { result: RESULT.FAILURE, message: error.message };
+        }
+      }
+    });
+  },
+});
