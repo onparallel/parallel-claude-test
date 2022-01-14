@@ -2409,6 +2409,7 @@ export interface PublicPetitionField {
   optional: Scalars["Boolean"];
   /** The options of the petition field. */
   options: Scalars["JSONObject"];
+  petition: PublicPetition;
   /** The replies to the petition field */
   replies: Array<PublicPetitionFieldReply>;
   /** The title of the petition field. */
@@ -2444,6 +2445,7 @@ export interface PublicPetitionFieldReply extends Timestamps {
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  field: PublicPetitionField;
   /** The ID of the petition field reply. */
   id: Scalars["GID"];
   /** The status of the petition field reply. */
@@ -9621,6 +9623,12 @@ export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation 
     content: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+    };
   };
 };
 
@@ -22150,6 +22158,16 @@ export const RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument
   ) {
     publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+        replies {
+          id
+        }
+      }
     }
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}

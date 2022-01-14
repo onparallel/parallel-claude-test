@@ -1351,6 +1351,7 @@ export class PetitionRepository extends BaseRepository {
     if (field.validated) {
       throw new Error("Petition field is already validated.");
     }
+    this.loadRepliesForField.dataloader.clear(data.petition_field_id);
     const [[reply]] = await Promise.all([
       this.insert("petition_field_reply", {
         ...data,

@@ -3247,6 +3247,7 @@ type PublicPetitionField {
   The options of the petition field.
   """
   options: JSONObject!
+  petition: PublicPetition!
 
   """
   The replies to the petition field
@@ -3318,6 +3319,7 @@ type PublicPetitionFieldReply implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  field: PublicPetitionField!
 
   """
   The ID of the petition field reply.

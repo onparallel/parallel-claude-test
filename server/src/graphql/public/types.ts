@@ -174,6 +174,12 @@ export const PublicPetitionField = objectType({
       description: "The ID of the petition field.",
       prefixName: "PetitionField",
     });
+    t.field("petition", {
+      type: "PublicPetition",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadPetition(root.petition_id))!;
+      },
+    });
     t.field("type", {
       type: "PetitionFieldType",
       description: "The type of the petition field.",
@@ -356,6 +362,12 @@ export const PublicPetitionFieldReply = objectType({
           default:
             return {};
         }
+      },
+    });
+    t.field("field", {
+      type: "PublicPetitionField",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadField(root.petition_field_id))!;
       },
     });
   },

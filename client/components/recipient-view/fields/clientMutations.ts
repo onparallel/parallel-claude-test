@@ -3,7 +3,6 @@ import {
   RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument,
   RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument,
   RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument,
-  RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument,
   RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument,
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument,
   RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument,
@@ -118,48 +117,20 @@ const _publicCreateSimpleReply = gql`
   ) {
     publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+        replies {
+          id
+        }
+      }
     }
   }
   ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
 `;
-
-export function useCreateSimpleReply() {
-  const [createSimpleReply] = useMutation(
-    RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument
-  );
-  return useCallback(
-    async function _createSimpleReply({
-      petitionId,
-      keycode,
-      fieldId,
-      value,
-    }: {
-      petitionId: string;
-      keycode: string;
-      fieldId: string;
-      value: string;
-    }) {
-      const { data } = await createSimpleReply({
-        variables: {
-          keycode,
-          fieldId,
-          value,
-        },
-        update(cache, { data }) {
-          updateFieldReplies(cache, fieldId, (replies) => [
-            ...replies,
-            pick(data!.publicCreateSimpleReply, ["id", "__typename"]),
-          ]);
-          if (data) {
-            updatePetitionStatus(cache, petitionId);
-          }
-        },
-      });
-      return data?.publicCreateSimpleReply;
-    },
-    [createSimpleReply]
-  );
-}
 
 const _publicCreateCheckboxReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateCheckboxReply(

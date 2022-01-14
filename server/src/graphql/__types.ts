@@ -1415,6 +1415,7 @@ export interface NexusGenFieldTypes {
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
     options: NexusGenScalars["JSONObject"]; // JSONObject!
+    petition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     replies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
@@ -1434,6 +1435,7 @@ export interface NexusGenFieldTypes {
     // field return type
     content: NexusGenScalars["JSONObject"]; // JSONObject!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    field: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     id: NexusGenScalars["GID"]; // GID!
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2698,6 +2700,7 @@ export interface NexusGenFieldTypeNames {
     multiple: "Boolean";
     optional: "Boolean";
     options: "JSONObject";
+    petition: "PublicPetition";
     replies: "PublicPetitionFieldReply";
     title: "String";
     type: "PetitionFieldType";
@@ -2717,6 +2720,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     content: "JSONObject";
     createdAt: "DateTime";
+    field: "PublicPetitionField";
     id: "GID";
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";

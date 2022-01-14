@@ -4,6 +4,7 @@ import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
+  RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument,
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
 } from "@parallel/graphql/__types";
@@ -19,7 +20,6 @@ import {
   useCreateCheckboxReply,
   useCreateDynamicSelectReply,
   useCreateFileUploadReply,
-  useCreateSimpleReply,
   useDeletePetitionReply,
   useUpdateCheckboxReply,
   useUpdateDynamicSelectReply,
@@ -124,18 +124,21 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     [updateSimpleReply, updateLastSaved]
   );
 
-  const createSimpleReply = useCreateSimpleReply();
+  const [createSimpleReply] = useMutation(
+    RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument
+  );
   const handleCreateSimpleReply = useCallback(
     async (value: string) => {
       try {
-        const reply = await createSimpleReply({
-          petitionId: props.petitionId,
-          value,
-          fieldId: props.field.id,
-          keycode: props.keycode,
+        const { data } = await createSimpleReply({
+          variables: {
+            value,
+            fieldId: props.field.id,
+            keycode: props.keycode,
+          },
         });
         updateLastSaved();
-        return reply?.id;
+        return data?.publicCreateSimpleReply?.id;
       } catch {}
 
       return;
