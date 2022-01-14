@@ -28,6 +28,7 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
+import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
@@ -218,13 +219,16 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
     validateIf(
       (args) => args.status === "INACTIVE",
-      validateAnd((_, { userIds, transferToUserId }, ctx, info) => {
-        if (transferToUserId && userIds.includes(transferToUserId)) {
-          throw new ArgValidationError(
-            info,
-            "transferToUserId",
-            "Can't transfer to a user that will be disabled."
-          );
+      validateAnd(
+        validIsDefined((args) => args.transferToUserId, "transferToUserId"),
+        (_, { userIds, transferToUserId }, ctx, info) => {
+          if (transferToUserId && userIds.includes(transferToUserId)) {
+            throw new ArgValidationError(
+              info,
+              "transferToUserId",
+              "Can't transfer to a user that will be disabled."
+            );
+          }
         }
       )
     ),
@@ -270,7 +274,6 @@ export const updateUserStatus = mutationField("updateUserStatus", {
               userPermissions,
               (p) => p.type === "OWNER"
             );
-
             const [[user]] = await Promise.all([
               ctx.users.updateUserById(userId, { status }, `User:${ctx.user!.id}`, t),
               // delete permissions with type !== OWNER
@@ -283,7 +286,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
                   )
                 : undefined,
               // transfer OWNER permissions to new user and remove original permissions
-              transferToUserId && ownedPermissions.length > 0
+              ownedPermissions.length > 0
                 ? ctx.petitions.transferOwnership(
                     ownedPermissions.map((p) => p.petition_id),
                     transferToUserId!,
@@ -292,21 +295,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
                     t
                   )
                 : undefined,
-              transferToUserId
-                ? ctx.petitions.transferPublicLinkOwnership(
-                    [userId],
-                    transferToUserId!,
-                    ctx.user!,
-                    t
-                  )
-                : undefined,
-              transferToUserId === undefined && ownedPermissions.length > 0
-                ? ctx.petitions.deleteAllPermissions(
-                    ownedPermissions.map((p) => p.petition_id),
-                    ctx.user!,
-                    t
-                  )
-                : undefined,
+              ctx.petitions.transferPublicLinkOwnership([userId], transferToUserId!, ctx.user!, t),
             ]);
             return user;
           },
