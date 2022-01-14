@@ -1445,6 +1445,7 @@ export interface NexusGenFieldTypes {
     isActive: boolean; // Boolean!
     owner: NexusGenRootTypes["User"]; // User!
     slug: string; // String!
+    template: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     title: string; // String!
     url: string; // String!
   };
@@ -2727,6 +2728,7 @@ export interface NexusGenFieldTypeNames {
     isActive: "Boolean";
     owner: "User";
     slug: "String";
+    template: "PetitionTemplate";
     title: "String";
     url: "String";
   };

@@ -3341,6 +3341,7 @@ type PublicPetitionLink {
   isActive: Boolean!
   owner: User!
   slug: String!
+  template: PetitionTemplate!
   title: String!
   url: String!
 }

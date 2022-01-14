@@ -380,6 +380,7 @@ PublicLinkSettingsDialog.fragments = {
   `,
   PublicPetitionLink: gql`
     fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
+      id
       isActive
       title
       description

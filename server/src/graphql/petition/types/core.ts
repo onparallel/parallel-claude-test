@@ -287,7 +287,9 @@ export const PetitionTemplate = objectType({
       description: "The public link linked to this template",
       resolve: async (root, _, ctx) => {
         // for now we just expose only the first created
-        const [publicLink] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id);
+        const [publicLink] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id, {
+          refresh: true,
+        });
         return publicLink;
       },
     });
@@ -761,6 +763,10 @@ export const PublicPetitionLink = objectType({
       resolve: async (root, _, ctx) => {
         return (await ctx.users.loadUser(root.owner_id))!;
       },
+    });
+    t.nonNull.field("template", {
+      type: "PetitionTemplate",
+      resolve: async (o, _, ctx) => (await ctx.petitions.loadPetition(o.template_id))!,
     });
   },
 });

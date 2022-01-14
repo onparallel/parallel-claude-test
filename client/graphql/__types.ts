@@ -2459,6 +2459,7 @@ export interface PublicPetitionLink {
   isActive: Scalars["Boolean"];
   owner: User;
   slug: Scalars["String"];
+  template: PetitionTemplate;
   title: Scalars["String"];
   url: Scalars["String"];
 }
@@ -6666,19 +6667,6 @@ export type PetitionContents_PetitionFieldFragment = {
   replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
 };
 
-export type PetitionSettings_updatePetitionLink_PetitionTemplateFragment = {
-  __typename?: "PetitionTemplate";
-  publicLink?: {
-    __typename?: "PublicPetitionLink";
-    isActive: boolean;
-    title: string;
-    description: string;
-    slug: string;
-    url: string;
-    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-  } | null;
-};
-
 export type PetitionSettings_UserFragment = {
   __typename?: "User";
   hasDeveloperAccess: boolean;
@@ -6877,11 +6865,26 @@ export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
 export type PetitionSettings_createPublicPetitionLinkMutation = {
   createPublicPetitionLink: {
     __typename?: "PublicPetitionLink";
+    id: string;
     isActive: boolean;
     title: string;
     description: string;
     slug: string;
     url: string;
+    template: {
+      __typename?: "PetitionTemplate";
+      id: string;
+      publicLink?: {
+        __typename?: "PublicPetitionLink";
+        id: string;
+        isActive: boolean;
+        title: string;
+        description: string;
+        slug: string;
+        url: string;
+        owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+      } | null;
+    };
     owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
   };
 };
@@ -6898,11 +6901,26 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
 export type PetitionSettings_updatePublicPetitionLinkMutation = {
   updatePublicPetitionLink: {
     __typename?: "PublicPetitionLink";
+    id: string;
     isActive: boolean;
     title: string;
     description: string;
     slug: string;
     url: string;
+    template: {
+      __typename?: "PetitionTemplate";
+      id: string;
+      publicLink?: {
+        __typename?: "PublicPetitionLink";
+        id: string;
+        isActive: boolean;
+        title: string;
+        description: string;
+        slug: string;
+        url: string;
+        owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+      } | null;
+    };
     owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
   };
 };
@@ -7482,6 +7500,7 @@ export type PublicLinkSettingsDialog_PetitionTemplateFragment = {
 
 export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   __typename?: "PublicPetitionLink";
+  id: string;
   isActive: boolean;
   title: string;
   description: string;
@@ -17802,27 +17821,6 @@ export const UserSelect_UserFragmentDoc = gql`
     email
   }
 ` as unknown as DocumentNode<UserSelect_UserFragment, unknown>;
-export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
-  fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
-    isActive
-    title
-    description
-    slug
-    url
-    owner {
-      ...UserSelect_User
-    }
-  }
-  ${UserSelect_UserFragmentDoc}
-` as unknown as DocumentNode<PublicLinkSettingsDialog_PublicPetitionLinkFragment, unknown>;
-export const PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc = gql`
-  fragment PetitionSettings_updatePetitionLink_PetitionTemplate on PetitionTemplate {
-    publicLink {
-      ...PublicLinkSettingsDialog_PublicPetitionLink
-    }
-  }
-  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
-` as unknown as DocumentNode<PetitionSettings_updatePetitionLink_PetitionTemplateFragment, unknown>;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
     id
@@ -19562,6 +19560,20 @@ export const PublicLinkSettingsDialog_PetitionTemplateFragmentDoc = gql`
   }
   ${UserSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<PublicLinkSettingsDialog_PetitionTemplateFragment, unknown>;
+export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
+  fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
+    id
+    isActive
+    title
+    description
+    slug
+    url
+    owner {
+      ...UserSelect_User
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+` as unknown as DocumentNode<PublicLinkSettingsDialog_PublicPetitionLinkFragment, unknown>;
 export const UserSelect_UserGroupFragmentDoc = gql`
   fragment UserSelect_UserGroup on UserGroup {
     id
@@ -21116,6 +21128,12 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
       slug: $slug
     ) {
       ...PublicLinkSettingsDialog_PublicPetitionLink
+      template {
+        id
+        publicLink {
+          ...PublicLinkSettingsDialog_PublicPetitionLink
+        }
+      }
     }
   }
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
@@ -21141,6 +21159,12 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
       slug: $slug
     ) {
       ...PublicLinkSettingsDialog_PublicPetitionLink
+      template {
+        id
+        publicLink {
+          ...PublicLinkSettingsDialog_PublicPetitionLink
+        }
+      }
     }
   }
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}

@@ -1,4 +1,4 @@
-import { DataProxy, gql, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -35,12 +35,10 @@ import {
   PetitionSettings_createPublicPetitionLinkDocument,
   PetitionSettings_PetitionBaseFragment,
   PetitionSettings_startPetitionSignatureRequestDocument,
-  PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc,
   PetitionSettings_updatePetitionRestrictionDocument,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
   PetitionSettings_UserFragment,
-  PublicLinkSettingsDialog_PublicPetitionLinkFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
@@ -219,11 +217,6 @@ function _PetitionSettings({
       if (publicLink) {
         await updatePublicPetitionLink({
           variables: { publicPetitionLinkId: publicLink.id, isActive: !publicLink.isActive },
-          update(cache, result) {
-            if (result.data) {
-              updatePetitionLinkCache(cache, petition.id, result.data.updatePublicPetitionLink);
-            }
-          },
         });
       } else {
         const publicLinkSettings = await showPublicLinkSettingDialog({ template: petition });
@@ -231,11 +224,6 @@ function _PetitionSettings({
           variables: {
             templateId: petition.id,
             ...publicLinkSettings,
-          },
-          update(cache, result) {
-            if (result.data) {
-              updatePetitionLinkCache(cache, petition.id, result.data.createPublicPetitionLink);
-            }
           },
         });
 
@@ -263,11 +251,6 @@ function _PetitionSettings({
         variables: {
           publicPetitionLinkId: publicLink.id,
           ...publicLinkSettings,
-        },
-        update(cache, result) {
-          if (result.data) {
-            updatePetitionLinkCache(cache, petition.id, result.data.updatePublicPetitionLink);
-          }
         },
       });
     } catch {}
@@ -628,29 +611,6 @@ function _PetitionSettings({
   );
 }
 
-function updatePetitionLinkCache(
-  proxy: DataProxy,
-  templateId: string,
-  publicLink: PublicLinkSettingsDialog_PublicPetitionLinkFragment
-) {
-  proxy.writeFragment({
-    id: templateId,
-    fragment: PetitionSettings_updatePetitionLink_PetitionTemplateFragmentDoc,
-    fragmentName: "PetitionSettings_updatePetitionLink_PetitionTemplate",
-    data: { publicLink },
-  });
-}
-updatePetitionLinkCache.fragments = {
-  PetitionTemplate: gql`
-    fragment PetitionSettings_updatePetitionLink_PetitionTemplate on PetitionTemplate {
-      publicLink {
-        ...PublicLinkSettingsDialog_PublicPetitionLink
-      }
-    }
-    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
-  `,
-};
-
 const fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
@@ -765,6 +725,12 @@ const mutations = [
         slug: $slug
       ) {
         ...PublicLinkSettingsDialog_PublicPetitionLink
+        template {
+          id
+          publicLink {
+            ...PublicLinkSettingsDialog_PublicPetitionLink
+          }
+        }
       }
     }
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
@@ -787,6 +753,12 @@ const mutations = [
         slug: $slug
       ) {
         ...PublicLinkSettingsDialog_PublicPetitionLink
+        template {
+          id
+          publicLink {
+            ...PublicLinkSettingsDialog_PublicPetitionLink
+          }
+        }
       }
     }
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
