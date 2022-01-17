@@ -3447,6 +3447,7 @@ export interface NexusGenArgTypes {
     };
     deactivateUser: {
       // args
+      deletePetitions?: boolean | null; // Boolean
       transferToUserId?: NexusGenScalars["GID"] | null; // GID
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };

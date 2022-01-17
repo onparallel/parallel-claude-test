@@ -1,4 +1,13 @@
-import { arg, enumType, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
+import {
+  arg,
+  booleanArg,
+  enumType,
+  inputObjectType,
+  list,
+  mutationField,
+  nonNull,
+  stringArg,
+} from "nexus";
 import pMap from "p-map";
 import { isDefined, zip } from "remeda";
 import { PublicFileUpload } from "../../db/__types";
@@ -23,12 +32,12 @@ import { uploadArg } from "../helpers/upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
+import { maxActiveUsers } from "../helpers/validators/maxActiveUsers";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
-import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
@@ -209,23 +218,7 @@ export const activateUser = mutationField("activateUser", {
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
-    async (_, { userIds }, ctx, info) => {
-      const [org, activeUserCount] = await Promise.all([
-        ctx.organizations.loadOrg(ctx.user!.org_id),
-        ctx.organizations.loadActiveUserCount(ctx.user!.org_id),
-      ]);
-
-      if (org!.usage_details.USER_LIMIT < activeUserCount + userIds.length) {
-        throw new ArgValidationError(
-          info,
-          `User limit reached for this organization`,
-          "USER_LIMIT_ERROR",
-          {
-            userLimit: org!.usage_details.USER_LIMIT,
-          }
-        );
-      }
-    }
+    maxActiveUsers((args) => args.userIds)
   ),
   args: {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
@@ -254,24 +247,35 @@ export const deactivateUser = mutationField("deactivateUser", {
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
-    validateAnd(
-      validIsDefined((args) => args.transferToUserId, "transferToUserId"),
-      (_, { userIds, transferToUserId }, ctx, info) => {
-        if (transferToUserId && userIds.includes(transferToUserId)) {
-          throw new ArgValidationError(
-            info,
-            "transferToUserId",
-            "Can't transfer to a user that will be disabled."
-          );
-        }
+    (_, { userIds, transferToUserId, deletePetitions }, ctx, info) => {
+      if (transferToUserId && deletePetitions) {
+        throw new ArgValidationError(
+          info,
+          "transferToUserId",
+          "Can't transfer to a user when deletePetitions is true."
+        );
+      } else if (!transferToUserId && !deletePetitions) {
+        throw new ArgValidationError(
+          info,
+          "transferToUserId",
+          "Expected transferToUserId or deletePetitions to be defined."
+        );
       }
-    )
+      if (transferToUserId && userIds.includes(transferToUserId)) {
+        throw new ArgValidationError(
+          info,
+          "transferToUserId",
+          "Can't transfer to a user that will be disabled."
+        );
+      }
+    }
   ),
   args: {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
     transferToUserId: globalIdArg("User"),
+    deletePetitions: booleanArg(),
   },
-  resolve: async (_, { userIds, transferToUserId }, ctx) => {
+  resolve: async (_, { userIds, transferToUserId, deletePetitions }, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
       await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);
       const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
@@ -284,6 +288,49 @@ export const deactivateUser = mutationField("deactivateUser", {
             userPermissions,
             (p) => p.type === "OWNER"
           );
+
+          const deleteOrTransferPetitionsMethods = deletePetitions
+            ? [
+                // make sure to also remove every remaining permission on deleted owned petitions
+                ctx.petitions.deleteAllPermissions(
+                  ownedPermissions.map((p) => p.petition_id),
+                  ctx.user!,
+                  t
+                ),
+                //finally, delete only petitions OWNED by me
+                ctx.petitions.deletePetition(
+                  ownedPermissions.map((p) => p.petition_id),
+                  ctx.user!,
+                  t
+                ),
+                // delete every user notification on the deleted petitions
+                ctx.petitions.deletePetitionUserNotificationsByPetitionId(
+                  userPermissions.map((p) => p.petition_id),
+                  undefined,
+                  t
+                ),
+                // delete all ownership of public links
+                ctx.petitions.deletePublicPetitionLinkOwnershipByOwnerIds(userIds, t),
+              ]
+            : [
+                // transfer OWNER permissions to new user and remove original permissions
+                ownedPermissions.length > 0
+                  ? ctx.petitions.transferOwnership(
+                      ownedPermissions.map((p) => p.petition_id),
+                      transferToUserId!,
+                      false,
+                      ctx.user!,
+                      t
+                    )
+                  : undefined,
+                ctx.petitions.transferPublicLinkOwnership(
+                  [userId],
+                  transferToUserId!,
+                  ctx.user!,
+                  t
+                ),
+              ];
+
           const [[user]] = await Promise.all([
             ctx.users.updateUserById(userId, { status: "INACTIVE" }, `User:${ctx.user!.id}`, t),
             // delete permissions with type !== OWNER
@@ -295,18 +342,9 @@ export const deactivateUser = mutationField("deactivateUser", {
                   t
                 )
               : undefined,
-            // transfer OWNER permissions to new user and remove original permissions
-            ownedPermissions.length > 0
-              ? ctx.petitions.transferOwnership(
-                  ownedPermissions.map((p) => p.petition_id),
-                  transferToUserId!,
-                  false,
-                  ctx.user!,
-                  t
-                )
-              : undefined,
-            ctx.petitions.transferPublicLinkOwnership([userId], transferToUserId!, ctx.user!, t),
+            ...deleteOrTransferPetitionsMethods,
           ]);
+
           return user;
         },
         { concurrency: 1 }

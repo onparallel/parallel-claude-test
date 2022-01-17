@@ -404,6 +404,31 @@ describe("GraphQL/Users", () => {
       expect(data).toBeNull();
     });
 
+    it("sends error when trying to set status to inactive specifying transferToUserId anb deletePetitions", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($userIds: [GID!]!, $transferToUserId: GID, $deletePetitions: Boolean) {
+            deactivateUser(
+              userIds: $userIds
+              transferToUserId: $transferToUserId
+              deletePetitions: $deletePetitions
+            ) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          userIds: [toGlobalId("User", activeUsers[0].id), toGlobalId("User", activeUsers[1].id)],
+          transferToUserId: toGlobalId("User", activeUsers[2].id),
+          deletePetitions: true,
+        },
+      });
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("sends error when trying to set own status", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

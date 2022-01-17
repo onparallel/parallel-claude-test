@@ -837,6 +837,7 @@ export interface MutationdeactivateAccessesArgs {
 }
 
 export interface MutationdeactivateUserArgs {
+  deletePetitions?: InputMaybe<Scalars["Boolean"]>;
   transferToUserId?: InputMaybe<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
 }
@@ -10864,6 +10865,7 @@ export type OrganizationUsers_activateUserMutation = {
 export type OrganizationUsers_deactivateUserMutationVariables = Exact<{
   userIds: Array<Scalars["GID"]> | Scalars["GID"];
   transferToUserId?: InputMaybe<Scalars["GID"]>;
+  deletePetitions?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type OrganizationUsers_deactivateUserMutation = {
@@ -22586,8 +22588,16 @@ export const OrganizationUsers_activateUserDocument = gql`
   OrganizationUsers_activateUserMutationVariables
 >;
 export const OrganizationUsers_deactivateUserDocument = gql`
-  mutation OrganizationUsers_deactivateUser($userIds: [GID!]!, $transferToUserId: GID) {
-    deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+  mutation OrganizationUsers_deactivateUser(
+    $userIds: [GID!]!
+    $transferToUserId: GID
+    $deletePetitions: Boolean
+  ) {
+    deactivateUser(
+      userIds: $userIds
+      transferToUserId: $transferToUserId
+      deletePetitions: $deletePetitions
+    ) {
       id
       status
     }

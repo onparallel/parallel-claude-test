@@ -206,10 +206,17 @@ function OrganizationUsers() {
           selected: userIds,
           me,
         });
+
+        console.log("transferToUser: ", transferToUser);
+        // If transferToUser is undefined means that delete petitions whas selected
+        const params = transferToUser
+          ? { transferToUserId: transferToUser?.id }
+          : { deletePetitions: true };
+
         await deactivateUser({
           variables: {
             userIds,
-            transferToUserId: transferToUser?.id,
+            ...params,
           },
           update: () => {
             refetch();
@@ -483,8 +490,16 @@ OrganizationUsers.mutations = [
     }
   `,
   gql`
-    mutation OrganizationUsers_deactivateUser($userIds: [GID!]!, $transferToUserId: GID) {
-      deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+    mutation OrganizationUsers_deactivateUser(
+      $userIds: [GID!]!
+      $transferToUserId: GID
+      $deletePetitions: Boolean
+    ) {
+      deactivateUser(
+        userIds: $userIds
+        transferToUserId: $transferToUserId
+        deletePetitions: $deletePetitions
+      ) {
         id
         status
       }

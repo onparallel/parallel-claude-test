@@ -720,7 +720,7 @@ type Mutation {
   """
   Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions.
   """
-  deactivateUser(transferToUserId: GID, userIds: [GID!]!): [User!]!
+  deactivateUser(deletePetitions: Boolean, transferToUserId: GID, userIds: [GID!]!): [User!]!
 
   """
   Delete contacts.

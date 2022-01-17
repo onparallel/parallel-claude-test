@@ -807,6 +807,7 @@ export type MutationdeactivateAccessesArgs = {
 };
 
 export type MutationdeactivateUserArgs = {
+  deletePetitions?: InputMaybe<Scalars["Boolean"]>;
   transferToUserId?: InputMaybe<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
 };

@@ -47,6 +47,10 @@ export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
   },
   resolve: async (_, { slug }, ctx) => {
     const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
-    return publicLink?.is_active ? publicLink : null;
+    const petition = publicLink
+      ? await ctx.petitions.loadPetition(publicLink.template_id)
+      : undefined;
+
+    return publicLink?.is_active && petition ? publicLink : null;
   },
 });
