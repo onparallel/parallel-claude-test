@@ -1,4 +1,4 @@
-import { idArg, list, nonNull, nullable, queryField } from "nexus";
+import { idArg, nonNull, nullable, queryField } from "nexus";
 import { chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { authenticatePublicAccess, fieldBelongsToAccess } from "./authorizers";
@@ -14,8 +14,8 @@ export const accessQuery = queryField("access", {
   },
 });
 
-export const publicPetitionFieldCommentsQuery = queryField("publicPetitionFieldComments", {
-  type: list(nonNull("PublicPetitionFieldComment")),
+export const publicPetitionFieldQuery = queryField("publicPetitionField", {
+  type: nonNull("PublicPetitionField"),
   authorize: chain(authenticatePublicAccess("keycode"), fieldBelongsToAccess("petitionFieldId")),
   args: {
     keycode: nonNull(idArg()),
@@ -23,10 +23,7 @@ export const publicPetitionFieldCommentsQuery = queryField("publicPetitionFieldC
   },
   description: "The comments for this field.",
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.loadPetitionFieldCommentsForField({
-      petitionId: ctx.access!.petition_id,
-      petitionFieldId: args.petitionFieldId,
-    });
+    return await ctx.petitions.loadField(args.petitionFieldId);
   },
 });
 

@@ -491,7 +491,7 @@ export interface Mutation {
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
   publicDelegateAccessToContact: PublicPetitionAccess;
   /** Delete a petition field comment. */
-  publicDeletePetitionFieldComment: Result;
+  publicDeletePetitionFieldComment: PublicPetitionField;
   /** Deletes a reply to a petition field. */
   publicDeletePetitionReply: Result;
   /** Notifies the backend that the upload is complete. */
@@ -2434,6 +2434,7 @@ export interface PublicPetitionFieldComment {
   content: Scalars["String"];
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
+  field: PublicPetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
   /** Whether the comment has been read or not. */
@@ -2563,7 +2564,7 @@ export interface Query {
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The comments for this field. */
-  publicPetitionFieldComments: Array<PublicPetitionFieldComment>;
+  publicPetitionField: PublicPetitionField;
   publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
@@ -2676,7 +2677,7 @@ export interface QuerypublicOrgLogoUrlArgs {
   id: Scalars["GID"];
 }
 
-export interface QuerypublicPetitionFieldCommentsArgs {
+export interface QuerypublicPetitionFieldArgs {
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
 }
@@ -9291,23 +9292,28 @@ export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment
   title?: string | null;
 };
 
-export type RecipientViewPetitionFieldCommentsDialog_commentsQueryVariables = Exact<{
+export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQueryVariables = Exact<{
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
 }>;
 
-export type RecipientViewPetitionFieldCommentsDialog_commentsQuery = {
-  publicPetitionFieldComments: Array<{
-    __typename?: "PublicPetitionFieldComment";
+export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery = {
+  publicPetitionField: {
+    __typename?: "PublicPetitionField";
     id: string;
-    content: string;
-    createdAt: string;
-    isUnread: boolean;
-    author?:
-      | { __typename?: "PublicContact"; id: string; fullName?: string | null }
-      | { __typename?: "PublicUser"; id: string; fullName?: string | null }
-      | null;
-  }>;
+    title?: string | null;
+    comments: Array<{
+      __typename?: "PublicPetitionFieldComment";
+      id: string;
+      content: string;
+      createdAt: string;
+      isUnread: boolean;
+      author?:
+        | { __typename?: "PublicContact"; id: string; fullName?: string | null }
+        | { __typename?: "PublicUser"; id: string; fullName?: string | null }
+        | null;
+    }>;
+  };
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationVariables =
@@ -9338,6 +9344,11 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
     content: string;
     createdAt: string;
     isUnread: boolean;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      comments: Array<{ __typename?: "PublicPetitionFieldComment"; id: string }>;
+    };
     author?:
       | { __typename?: "PublicContact"; id: string; fullName?: string | null }
       | { __typename?: "PublicUser"; id: string; fullName?: string | null }
@@ -9375,11 +9386,12 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation = {
-  publicDeletePetitionFieldComment: Result;
+  publicDeletePetitionFieldComment: {
+    __typename?: "PublicPetitionField";
+    id: string;
+    comments: Array<{ __typename?: "PublicPetitionFieldComment"; id: string }>;
+  };
 };
-
-export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment =
-  { __typename?: "PublicPetitionField"; commentCount: number; unreadCommentCount: number };
 
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
@@ -18139,16 +18151,6 @@ export const PublicTemplateCard_LandingTemplateFragmentDoc = gql`
     organizationName
   }
 ` as unknown as DocumentNode<PublicTemplateCard_LandingTemplateFragment, unknown>;
-export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragmentDoc =
-  gql`
-    fragment RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionField on PublicPetitionField {
-      commentCount
-      unreadCommentCount
-    }
-  ` as unknown as DocumentNode<
-    RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment,
-    unknown
-  >;
 export const RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
     content
@@ -21978,16 +21980,24 @@ export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   RecipientViewHeader_publicDelegateAccessToContactMutation,
   RecipientViewHeader_publicDelegateAccessToContactMutationVariables
 >;
-export const RecipientViewPetitionFieldCommentsDialog_commentsDocument = gql`
-  query RecipientViewPetitionFieldCommentsDialog_comments($keycode: ID!, $petitionFieldId: GID!) {
-    publicPetitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {
-      ...FieldComment_PublicPetitionFieldComment
+export const RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocument = gql`
+  query RecipientViewPetitionFieldCommentsDialog_publicPetitionField(
+    $keycode: ID!
+    $petitionFieldId: GID!
+  ) {
+    publicPetitionField(keycode: $keycode, petitionFieldId: $petitionFieldId) {
+      id
+      title
+      comments {
+        id
+        ...FieldComment_PublicPetitionFieldComment
+      }
     }
   }
   ${FieldComment_PublicPetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
-  RecipientViewPetitionFieldCommentsDialog_commentsQuery,
-  RecipientViewPetitionFieldCommentsDialog_commentsQueryVariables
+  RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery,
+  RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQueryVariables
 >;
 export const RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument = gql`
   mutation RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsRead(
@@ -22018,6 +22028,12 @@ export const RecipientViewPetitionFieldCommentsDialog_createPetitionFieldComment
       content: $content
     ) {
       ...FieldComment_PublicPetitionFieldComment
+      field {
+        id
+        comments {
+          id
+        }
+      }
     }
   }
   ${FieldComment_PublicPetitionFieldCommentFragmentDoc}
@@ -22056,7 +22072,12 @@ export const RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment
       keycode: $keycode
       petitionFieldId: $petitionFieldId
       petitionFieldCommentId: $petitionFieldCommentId
-    )
+    ) {
+      id
+      comments {
+        id
+      }
+    }
   }
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation,

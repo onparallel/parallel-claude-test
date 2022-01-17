@@ -1,4 +1,4 @@
-import { DataProxy, gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Center,
@@ -12,31 +12,24 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { VariablesOf } from "@graphql-typed-document-node/core";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FieldComment } from "@parallel/components/common/FieldComment";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
-  RecipientViewPetitionFieldCommentsDialog_commentsDocument,
   RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
   RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
-  FieldComment_PublicPetitionFieldCommentFragment,
-  FieldComment_PublicPetitionFieldCommentFragmentDoc,
+  RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocument,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
-  RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment,
-  RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragmentDoc,
   RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
 } from "@parallel/graphql/__types";
-import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { updateQuery } from "@parallel/utils/apollo/updateQuery";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../../common/Divider";
 import { GrowingTextarea } from "../../common/GrowingTextarea";
@@ -55,10 +48,13 @@ export function RecipientViewPetitionFieldCommentsDialog({
 }: DialogProps<RecipientViewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
 
-  const { data, loading } = useQuery(RecipientViewPetitionFieldCommentsDialog_commentsDocument, {
-    variables: { keycode, petitionFieldId: field.id },
-  });
-  const comments = data?.publicPetitionFieldComments ?? [];
+  const { data, loading } = useQuery(
+    RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocument,
+    {
+      variables: { keycode, petitionFieldId: field.id },
+    }
+  );
+  const comments = data?.publicPetitionField.comments ?? [];
 
   const [draft, setDraft] = useState("");
   const [inputFocused, inputFocusBind] = useFocus({
@@ -69,31 +65,39 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  const markPetitionFieldCommentsAsRead = useMarkPetitionFieldCommentsAsRead();
+  const [markPetitionFieldCommentsAsRead] = useMutation(
+    RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument
+  );
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
       const petitionFieldCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
       if (petitionFieldCommentIds.length > 0) {
         await markPetitionFieldCommentsAsRead({
-          keycode,
-          petitionFieldCommentIds,
-          petitionFieldId: field.id,
+          variables: {
+            keycode,
+            petitionFieldCommentIds,
+          },
         });
       }
     }, 1000);
     return () => clearTimeout(timeout);
   }, [field.id, comments.map((c) => c.id).join(",")]);
 
-  const createPetitionFieldComment = useCreatePetitionFieldComment();
+  const [createPetitionFieldComment] = useMutation(
+    RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
+  );
   async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     const content = draft.trim();
     if (isMetaReturn(event) && content) {
       event.preventDefault();
       try {
         await createPetitionFieldComment({
-          keycode,
-          petitionFieldId: field.id,
-          content,
+          variables: {
+            keycode,
+            petitionFieldId: field.id,
+            content,
+          },
         });
       } catch {}
       setNativeValue(textareaRef.current!, "");
@@ -107,9 +111,11 @@ export function RecipientViewPetitionFieldCommentsDialog({
   async function handleSubmitClick() {
     try {
       await createPetitionFieldComment({
-        keycode,
-        petitionFieldId: field.id,
-        content: draft.trim(),
+        variables: {
+          keycode,
+          petitionFieldId: field.id,
+          content: draft.trim(),
+        },
       });
     } catch {}
     setNativeValue(textareaRef.current!, "");
@@ -121,25 +127,34 @@ export function RecipientViewPetitionFieldCommentsDialog({
     closeRef.current!.focus();
   }
 
-  const updatePetitionFieldComment = useUpdatePetitionFieldComment();
+  const [updatePetitionFieldComment] = useMutation(
+    RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
+  );
+
   async function handleEditCommentContent(commentId: string, content: string) {
     try {
       await updatePetitionFieldComment({
-        keycode,
-        petitionFieldId: field.id,
-        petitionFieldCommentId: commentId,
-        content,
+        variables: {
+          keycode,
+          petitionFieldId: field.id,
+          petitionFieldCommentId: commentId,
+          content,
+        },
       });
     } catch {}
   }
 
-  const deletePetitionFieldComment = useDeletePetitionFieldComment();
+  const [deletePetitionFieldComment] = useMutation(
+    RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument
+  );
   async function handleDeleteClick(commentId: string) {
     try {
       await deletePetitionFieldComment({
-        keycode,
-        petitionFieldId: field.id,
-        petitionFieldCommentId: commentId,
+        variables: {
+          keycode,
+          petitionFieldId: field.id,
+          petitionFieldCommentId: commentId,
+        },
       });
     } catch {}
   }
@@ -295,9 +310,17 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
 
 RecipientViewPetitionFieldCommentsDialog.queries = [
   gql`
-    query RecipientViewPetitionFieldCommentsDialog_comments($keycode: ID!, $petitionFieldId: GID!) {
-      publicPetitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {
-        ...FieldComment_PublicPetitionFieldComment
+    query RecipientViewPetitionFieldCommentsDialog_publicPetitionField(
+      $keycode: ID!
+      $petitionFieldId: GID!
+    ) {
+      publicPetitionField(keycode: $keycode, petitionFieldId: $petitionFieldId) {
+        id
+        title
+        comments {
+          id
+          ...FieldComment_PublicPetitionFieldComment
+        }
       }
     }
     ${FieldComment.fragments.PublicPetitionFieldComment}
@@ -331,6 +354,12 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
         content: $content
       ) {
         ...FieldComment_PublicPetitionFieldComment
+        field {
+          id
+          comments {
+            id
+          }
+        }
       }
     }
     ${FieldComment.fragments.PublicPetitionFieldComment}
@@ -363,175 +392,12 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
         keycode: $keycode
         petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
-      )
+      ) {
+        id
+        comments {
+          id
+        }
+      }
     }
   `,
 ];
-
-function useMarkPetitionFieldCommentsAsRead() {
-  const [markPetitionFieldCommentsAsRead] = useMutation(
-    RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument
-  );
-  return useCallback(async function ({
-    petitionFieldId,
-    ...variables
-  }: {
-    petitionFieldId: string;
-  } & VariablesOf<
-    typeof RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument
-  >) {
-    await markPetitionFieldCommentsAsRead({
-      variables,
-      update(client, { data }) {
-        if (data) {
-          updatePetitionFieldCommentCounts(client, petitionFieldId, (field) => ({
-            ...field,
-            unreadCommentCount: field.unreadCommentCount - variables.petitionFieldCommentIds.length,
-          }));
-        }
-      },
-    });
-  }, []);
-}
-
-function useCreatePetitionFieldComment() {
-  const [createPetitionFieldComment] = useMutation(
-    RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
-  );
-  return useCallback(
-    async (
-      variables: VariablesOf<
-        typeof RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
-      >
-    ) => {
-      await createPetitionFieldComment({
-        variables,
-        update(client, { data }) {
-          if (data) {
-            updatePetitionFieldComments(
-              client,
-              variables.keycode,
-              variables.petitionFieldId,
-              (comments) => [...comments, data!.publicCreatePetitionFieldComment]
-            );
-
-            updatePetitionFieldCommentCounts(client, variables.petitionFieldId, (field) => ({
-              ...field,
-              commentCount: field.commentCount + 1,
-            }));
-          }
-        },
-      });
-    },
-    [createPetitionFieldComment]
-  );
-}
-
-function useUpdatePetitionFieldComment() {
-  const [updatePetitionFieldComment] = useMutation(
-    RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
-  );
-  const apollo = useApolloClient();
-  return useCallback(
-    async (
-      variables: VariablesOf<
-        typeof RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
-      >
-    ) => {
-      await updatePetitionFieldComment({
-        variables,
-        optimisticResponse: () => {
-          const comment = apollo.readFragment({
-            fragment: FieldComment_PublicPetitionFieldCommentFragmentDoc,
-            id: variables.petitionFieldCommentId,
-          });
-          return {
-            publicUpdatePetitionFieldComment: {
-              ...comment!,
-              content: variables.content,
-            },
-          };
-        },
-      });
-    },
-    [updatePetitionFieldComment]
-  );
-}
-
-function useDeletePetitionFieldComment() {
-  const [deletePetitionFieldComment] = useMutation(
-    RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument
-  );
-  return useCallback(
-    async (
-      variables: VariablesOf<
-        typeof RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument
-      >
-    ) => {
-      await deletePetitionFieldComment({
-        variables,
-        update(client, { data }) {
-          if (data) {
-            const { previous } = updatePetitionFieldComments(
-              client,
-              variables.keycode,
-              variables.petitionFieldId,
-              (comments) => comments.filter((c) => c.id !== variables.petitionFieldCommentId)
-            );
-            const removed = previous?.publicPetitionFieldComments?.find(
-              (c) => c.id === variables.petitionFieldCommentId
-            );
-            if (removed) {
-              updatePetitionFieldCommentCounts(client, variables.petitionFieldId, (field) => ({
-                ...field,
-                commentCount: field.commentCount - 1,
-              }));
-            }
-          }
-        },
-      });
-    },
-    [deletePetitionFieldComment]
-  );
-}
-
-function updatePetitionFieldComments(
-  proxy: DataProxy,
-  keycode: string,
-  petitionFieldId: string,
-  updateFn: (
-    cached: FieldComment_PublicPetitionFieldCommentFragment[]
-  ) => FieldComment_PublicPetitionFieldCommentFragment[]
-) {
-  return updateQuery(proxy, {
-    query: RecipientViewPetitionFieldCommentsDialog_commentsDocument,
-    variables: { keycode, petitionFieldId },
-    data: (cached) => ({
-      publicPetitionFieldComments: updateFn(cached!.publicPetitionFieldComments),
-    }),
-  });
-}
-
-function updatePetitionFieldCommentCounts(
-  proxy: DataProxy,
-  petitionFieldId: string,
-  updateFn: (
-    cached: RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment
-  ) => RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragment
-) {
-  return updateFragment(proxy, {
-    fragment:
-      RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionFieldFragmentDoc,
-    id: petitionFieldId,
-    data: (field) => updateFn(field!),
-  });
-}
-
-updatePetitionFieldCommentCounts.fragments = {
-  PublicPetitionField: gql`
-    fragment RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts_PublicPetitionField on PublicPetitionField {
-      commentCount
-      unreadCommentCount
-    }
-  `,
-};

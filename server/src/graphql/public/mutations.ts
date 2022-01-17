@@ -659,6 +659,10 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
   },
   resolve: async (_, args, ctx) => {
     const petitionId = ctx.access!.petition_id;
+    ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
+      petitionId: ctx.access!.petition_id,
+      petitionFieldId: args.petitionFieldId,
+    });
     return await ctx.petitions.createPetitionFieldCommentFromAccess(
       {
         petitionId: petitionId,
@@ -672,7 +676,7 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
 
 export const publicDeletePetitionFieldComment = mutationField("publicDeletePetitionFieldComment", {
   description: "Delete a petition field comment.",
-  type: "Result",
+  type: "PublicPetitionField",
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId"))
@@ -689,7 +693,11 @@ export const publicDeletePetitionFieldComment = mutationField("publicDeletePetit
       args.petitionFieldCommentId,
       ctx.access!
     );
-    return RESULT.SUCCESS;
+    ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
+      petitionId: ctx.access!.petition_id,
+      petitionFieldId: args.petitionFieldId,
+    });
+    return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
 });
 

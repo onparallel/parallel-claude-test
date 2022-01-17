@@ -459,6 +459,10 @@ export const PublicPetitionFieldComment = objectType({
         });
       },
     });
+    t.field("field", {
+      type: "PublicPetitionField",
+      resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.petition_field_id))!,
+    });
   },
 });
 

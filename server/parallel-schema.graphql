@@ -951,7 +951,7 @@ type Mutation {
     keycode: ID!
     petitionFieldCommentId: GID!
     petitionFieldId: GID!
-  ): Result!
+  ): PublicPetitionField!
 
   """
   Deletes a reply to a petition field.
@@ -3296,6 +3296,7 @@ type PublicPetitionFieldComment {
   Time when the comment was created.
   """
   createdAt: DateTime!
+  field: PublicPetitionField!
 
   """
   The ID of the petition field comment.
@@ -3608,7 +3609,7 @@ type Query {
   """
   The comments for this field.
   """
-  publicPetitionFieldComments(keycode: ID!, petitionFieldId: GID!): [PublicPetitionFieldComment!]!
+  publicPetitionField(keycode: ID!, petitionFieldId: GID!): PublicPetitionField!
   publicPetitionLinkBySlug(slug: ID!): PublicPublicPetitionLink
   publicTemplateCategories: [String!]!
 

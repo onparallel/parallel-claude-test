@@ -5,7 +5,7 @@ import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldFragment,
   PetitionReplies_UserFragment,
-  PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
+  PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
@@ -53,7 +53,7 @@ export function PetitionRepliesFieldComments({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { data, loading } = useQuery(
-    PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
+    PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
     {
       variables: {
         petitionId,
@@ -62,7 +62,7 @@ export function PetitionRepliesFieldComments({
       fetchPolicy: "cache-and-network",
     }
   );
-  const comments = data?.petitionFieldComments ?? [];
+  const comments = data?.petitionField.comments ?? [];
 
   // Scroll to bottom when a comment is added
   const previousCommentCount = usePreviousValue(comments.length);
