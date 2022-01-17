@@ -5,7 +5,7 @@ import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
-import { LOGGER, ILogger } from "../../services/logger";
+import { ILogger, LOGGER } from "../../services/logger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 
@@ -30,13 +30,12 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
     .command(
       "run [payload]",
       "Run once with payload",
-      (yargs) => {
+      (yargs: yargs.Argv) =>
         yargs.positional("payload", {
           describe: "The payload of the message.",
           type: "string",
           demandOption: true,
-        });
-      },
+        }),
       async ({ payload }: { payload: string }) => {
         try {
           await handler(

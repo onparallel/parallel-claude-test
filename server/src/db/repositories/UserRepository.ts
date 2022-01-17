@@ -160,11 +160,11 @@ export class UserRepository extends BaseRepository {
             q.whereNotIn("id", opts.excludeUsers);
           }
           q.andWhere((q) => {
-            q.whereIlike(
+            q.whereEscapedILike(
               this.knex.raw(`concat("first_name", ' ', "last_name")`) as any,
               `%${escapeLike(search, "\\")}%`,
               "\\"
-            ).or.whereIlike("email", `%${escapeLike(search, "\\")}%`, "\\");
+            ).or.whereEscapedILike("email", `%${escapeLike(search, "\\")}%`, "\\");
           });
         })
         .select<({ __type: "User" } & User)[]>("*", this.knex.raw(`'User' as __type`)),
@@ -179,7 +179,7 @@ export class UserRepository extends BaseRepository {
                 q.whereNotIn("id", opts.excludeUserGroups);
               }
             })
-            .whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\")
+            .whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\")
             .select<({ __type: "UserGroup" } & UserGroup)[]>(
               "*",
               this.knex.raw(`'UserGroup' as __type`)

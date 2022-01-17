@@ -25,7 +25,7 @@ export class UserGroupRepository extends BaseRepository {
         .where({ org_id: orgId, deleted_at: null })
         .mmodify((q) => {
           if (opts.search) {
-            q.whereIlike("name", `%${escapeLike(opts.search, "\\")}%`, "\\");
+            q.whereEscapedILike("name", `%${escapeLike(opts.search, "\\")}%`, "\\");
           }
           if (opts.sortBy) {
             q.orderByRaw(opts.sortBy.map((s) => `"${s.column}" ${s.order}`).join(", "));

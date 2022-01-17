@@ -2,9 +2,9 @@ import "knex";
 declare module "knex" {
   namespace Knex {
     interface QueryBuilder<TRecord extends {} = any, TResult = any> {
-      whereLike: WhereLike<TRecord, TResult>;
-      whereIlike: WhereLike<TRecord, TResult>;
-      whereNotLike: WhereLike<TRecord, TResult>;
+      whereEscapedLike: WhereLike<TRecord, TResult>;
+      whereEscapedILike: WhereLike<TRecord, TResult>;
+      whereEscapedNotLike: WhereLike<TRecord, TResult>;
       whereNotIlike: WhereLike<TRecord, TResult>;
       /**
        * Same as .modify but without any change in types. Use only chainable

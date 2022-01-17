@@ -163,11 +163,11 @@ export class ContactRepository extends BaseRepository {
           const { search, excludeIds } = opts;
           if (search) {
             q.andWhere((q2) => {
-              q2.whereIlike(
+              q2.whereEscapedILike(
                 this.knex.raw(`concat("first_name", ' ', "last_name")`),
                 `%${escapeLike(search, "\\")}%`,
                 "\\"
-              ).or.whereIlike("email", `%${escapeLike(search, "\\")}%`, "\\");
+              ).or.whereEscapedILike("email", `%${escapeLike(search, "\\")}%`, "\\");
             });
           }
           if (excludeIds) {

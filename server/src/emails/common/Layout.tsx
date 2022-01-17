@@ -17,7 +17,7 @@ import {
   MjmlTitle,
   MjmlWrapper,
 } from "mjml-react";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { URLSearchParams } from "url";
 import { GdprDisclaimer } from "./GdprDisclaimer";
@@ -28,7 +28,7 @@ export type LayoutProps = {
   logoUrl: string;
   logoAlt: string;
   assetsUrl: string;
-  contentHeading?: Element | null;
+  contentHeading?: ReactNode;
   useAlternativeSlogan?: boolean;
   optOutUrl?: string;
   optOutText?: string;

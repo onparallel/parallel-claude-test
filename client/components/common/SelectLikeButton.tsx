@@ -6,7 +6,7 @@ import { omit } from "remeda";
 export const SelectLikeButton = chakraForwardRef<"div", SelectProps>(
   function PetitionFieldTypeSelectButton({ children, isDisabled, ...props }, ref) {
     const styles = useMultiStyleConfig("Select", props);
-    const { rootProps, color, ...rest } = omitThemingProps(props);
+    const { color, ...rest } = omitThemingProps(props as any);
     return (
       <Box
         ref={ref}
@@ -20,7 +20,6 @@ export const SelectLikeButton = chakraForwardRef<"div", SelectProps>(
           textAlign: "left",
           color,
         }}
-        {...rootProps}
         {...(rest as any)}
         aria-haspopup="listbox"
       >

@@ -3413,7 +3413,7 @@ export class PetitionRepository extends BaseRepository {
           if (search) {
             const escapedSearch = `%${escapeLike(search, "\\")}%`;
             q.andWhere((q2) => {
-              q2.whereIlike("name", escapedSearch, "\\").or.whereIlike(
+              q2.whereEscapedILike("name", escapedSearch, "\\").or.whereEscapedILike(
                 "template_description",
                 escapedSearch,
                 "\\"

@@ -1,8 +1,8 @@
 import { Knex, knex } from "knex";
 
-(knex as any).QueryBuilder.extend("whereLike", likeClause("like"));
-(knex as any).QueryBuilder.extend("whereIlike", likeClause("ilike"));
-(knex as any).QueryBuilder.extend("whereNotLike", likeClause("not like"));
+(knex as any).QueryBuilder.extend("whereEscapedLike", likeClause("like"));
+(knex as any).QueryBuilder.extend("whereEscapedILike", likeClause("ilike"));
+(knex as any).QueryBuilder.extend("whereEscapedNotLike", likeClause("not like"));
 (knex as any).QueryBuilder.extend("whereNotIlike", likeClause("not ilike"));
 
 function likeClause<TRecord = any, TResult = unknown>(operator: string) {

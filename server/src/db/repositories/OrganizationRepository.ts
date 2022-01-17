@@ -75,11 +75,11 @@ export class OrganizationRepository extends BaseRepository {
           const { search, excludeIds, sortBy, includeInactive } = opts;
           if (search) {
             q.andWhere((q2) => {
-              q2.whereIlike(
+              q2.whereEscapedILike(
                 this.knex.raw(`concat("first_name", ' ', "last_name")`) as any,
                 `%${escapeLike(search, "\\")}%`,
                 "\\"
-              ).or.whereIlike("email", `%${escapeLike(search, "\\")}%`, "\\");
+              ).or.whereEscapedILike("email", `%${escapeLike(search, "\\")}%`, "\\");
             });
           }
           if (excludeIds) {
@@ -178,7 +178,7 @@ export class OrganizationRepository extends BaseRepository {
         .mmodify((q) => {
           const { search, status, sortBy } = opts;
           if (search) {
-            q.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
+            q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\");
           }
           if (status) {
             q.where("status", status);
