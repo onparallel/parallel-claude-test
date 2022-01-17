@@ -310,7 +310,7 @@ export const deactivateUser = mutationField("deactivateUser", {
                   t
                 ),
                 // delete all ownership of public links
-                ctx.petitions.deletePublicPetitionLinkOwnershipByOwnerIds(userIds, t),
+                // ctx.petitions.deletePublicPetitionLinkOwnershipByOwnerIds(userIds, t),
               ]
             : [
                 // transfer OWNER permissions to new user and remove original permissions

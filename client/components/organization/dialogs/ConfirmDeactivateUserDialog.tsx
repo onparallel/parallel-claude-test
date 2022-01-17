@@ -144,7 +144,7 @@ function ConfirmDeactivateUserDialog({
                   </FormControl>
                 </Box>
               ) : null}
-              <Radio value="DELETE">
+              <Radio value="DELETE" isDisabled>
                 <FormattedMessage
                   id="organization.confirm-deactivate-user-dialog.delete-all-petitions"
                   defaultMessage="Delete all petitions"
