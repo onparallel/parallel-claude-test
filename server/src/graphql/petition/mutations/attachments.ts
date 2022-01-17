@@ -48,6 +48,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
         },
         `User:${ctx.user!.id}`
       );
+      ctx.petitions.loadFieldAttachmentsByFieldId.dataloader.clear(args.fieldId);
       const [presignedPostData, attachment] = await Promise.all([
         ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
         ctx.petitions.createPetitionFieldAttachment(
@@ -94,7 +95,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
 
 export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldAttachment", {
   description: "Remove a petition field attachment",
-  type: "Result",
+  type: "PetitionField",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
@@ -108,7 +109,7 @@ export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldA
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionFieldAttachment(args.attachmentId, ctx.user!);
-    return RESULT.SUCCESS;
+    return (await ctx.petitions.loadField(args.fieldId))!;
   },
 });
 

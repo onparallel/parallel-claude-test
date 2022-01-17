@@ -1,4 +1,4 @@
-import { DataProxy, gql, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Center,
@@ -26,16 +26,13 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
+  PetitionComposeField_deletePetitionFieldAttachmentDocument,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
-  PetitionComposeField_PetitionFieldAttachmentFragment,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
   PetitionComposeField_PetitionFieldFragment,
-  PetitionComposeField_deletePetitionFieldAttachmentDocument,
-  PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDoc,
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -159,11 +156,6 @@ const _PetitionComposeField = chakraForwardRef<
       optimisticResponse: {
         deletePetitionFieldAttachment: "SUCCESS",
       },
-      update(cache, { data }) {
-        updateFieldAttachments(cache, field.id, (attachments) =>
-          attachments.filter((a) => a.id !== attachmentId)
-        );
-      },
     });
   };
 
@@ -236,13 +228,6 @@ const _PetitionComposeField = chakraForwardRef<
                 size: file.size,
                 contentType: file.type,
               },
-            },
-            update(cache, { data }) {
-              const { attachment } = data!.createPetitionFieldAttachmentUploadLink;
-              updateFieldAttachments(cache, field.id, (attachments) => [
-                ...attachments,
-                attachment,
-              ]);
             },
           });
           const { attachment, presignedPostData } = data!.createPetitionFieldAttachmentUploadLink;
@@ -989,6 +974,12 @@ const _mutations = [
         }
         attachment {
           ...PetitionComposeField_PetitionFieldAttachment
+          field {
+            id
+            attachments {
+              id
+            }
+          }
         }
       }
     }
@@ -1021,7 +1012,12 @@ const _mutations = [
         petitionId: $petitionId
         fieldId: $fieldId
         attachmentId: $attachmentId
-      )
+      ) {
+        id
+        attachments {
+          id
+        }
+      }
     }
   `,
   gql`
@@ -1205,32 +1201,3 @@ function useDragAndDrop(
   drop(elementRef);
   return { elementRef, dragRef, previewRef, isDragging };
 }
-
-function updateFieldAttachments(
-  proxy: DataProxy,
-  fieldId: string,
-  updateFn: (
-    cached: PetitionComposeField_PetitionFieldAttachmentFragment[]
-  ) => PetitionComposeField_PetitionFieldAttachmentFragment[]
-) {
-  updateFragment(proxy, {
-    id: fieldId,
-    fragmentName: "PetitionComposeField_updateFieldAttachments_PetitionField",
-    fragment: PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDoc,
-    data: (cached) => ({
-      ...cached,
-      attachments: updateFn(cached!.attachments),
-    }),
-  });
-}
-
-updateFieldAttachments.fragments = {
-  PetitionField: gql`
-    fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
-      attachments {
-        ...PetitionComposeField_PetitionFieldAttachment
-      }
-    }
-    ${fragments.PetitionFieldAttachment}
-  `,
-};

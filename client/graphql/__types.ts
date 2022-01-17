@@ -435,7 +435,7 @@ export interface Mutation {
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
   /** Remove a petition field attachment */
-  deletePetitionFieldAttachment: Result;
+  deletePetitionFieldAttachment: PetitionField;
   /** Delete a petition field comment. */
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
@@ -1900,6 +1900,7 @@ export interface PetitionFieldAttachment extends CreatedAt {
   __typename?: "PetitionFieldAttachment";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  field: PetitionField;
   file: FileUpload;
   id: Scalars["GID"];
 }
@@ -7752,6 +7753,11 @@ export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation
     attachment: {
       __typename?: "PetitionFieldAttachment";
       id: string;
+      field: {
+        __typename?: "PetitionField";
+        id: string;
+        attachments: Array<{ __typename?: "PetitionFieldAttachment"; id: string }>;
+      };
       file: {
         __typename?: "FileUpload";
         filename: string;
@@ -7790,7 +7796,11 @@ export type PetitionComposeField_deletePetitionFieldAttachmentMutationVariables 
 }>;
 
 export type PetitionComposeField_deletePetitionFieldAttachmentMutation = {
-  deletePetitionFieldAttachment: Result;
+  deletePetitionFieldAttachment: {
+    __typename?: "PetitionField";
+    id: string;
+    attachments: Array<{ __typename?: "PetitionFieldAttachment"; id: string }>;
+  };
 };
 
 export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
@@ -7804,21 +7814,6 @@ export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation = {
     __typename?: "FileUploadDownloadLinkResult";
     url?: string | null;
   };
-};
-
-export type PetitionComposeField_updateFieldAttachments_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  attachments: Array<{
-    __typename?: "PetitionFieldAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
 };
 
 export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
@@ -10330,11 +10325,11 @@ export type AppRedirect_petitionsQuery = {
   petitions: { __typename?: "PetitionBasePagination"; totalCount: number };
 };
 
-export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
+export type OrganizationBranding_updateOrganizationLogoMutationVariables = Exact<{
   file: Scalars["Upload"];
 }>;
 
-export type OrganizationBranding_updateOrgLogoMutation = {
+export type OrganizationBranding_updateOrganizationLogoMutation = {
   updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: string | null };
 };
 
@@ -17970,17 +17965,6 @@ export const PetitionComposeField_PetitionFieldAttachmentFragmentDoc = gql`
   }
   ${PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeField_PetitionFieldAttachmentFragment, unknown>;
-export const PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDoc = gql`
-  fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
-    attachments {
-      ...PetitionComposeField_PetitionFieldAttachment
-    }
-  }
-  ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionComposeField_updateFieldAttachments_PetitionFieldFragment,
-  unknown
->;
 export const PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc = gql`
   fragment PetitionFieldOptionsListEditor_PetitionField on PetitionField {
     id
@@ -21325,6 +21309,12 @@ export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocumen
       }
       attachment {
         ...PetitionComposeField_PetitionFieldAttachment
+        field {
+          id
+          attachments {
+            id
+          }
+        }
       }
     }
   }
@@ -21363,7 +21353,12 @@ export const PetitionComposeField_deletePetitionFieldAttachmentDocument = gql`
       petitionId: $petitionId
       fieldId: $fieldId
       attachmentId: $attachmentId
-    )
+    ) {
+      id
+      attachments {
+        id
+      }
+    }
   }
 ` as unknown as DocumentNode<
   PetitionComposeField_deletePetitionFieldAttachmentMutation,
@@ -22394,16 +22389,16 @@ export const AppRedirect_petitionsDocument = gql`
     }
   }
 ` as unknown as DocumentNode<AppRedirect_petitionsQuery, AppRedirect_petitionsQueryVariables>;
-export const OrganizationBranding_updateOrgLogoDocument = gql`
-  mutation OrganizationBranding_updateOrgLogo($file: Upload!) {
+export const OrganizationBranding_updateOrganizationLogoDocument = gql`
+  mutation OrganizationBranding_updateOrganizationLogo($file: Upload!) {
     updateOrganizationLogo(file: $file) {
       id
       logoUrl
     }
   }
 ` as unknown as DocumentNode<
-  OrganizationBranding_updateOrgLogoMutation,
-  OrganizationBranding_updateOrgLogoMutationVariables
+  OrganizationBranding_updateOrganizationLogoMutation,
+  OrganizationBranding_updateOrganizationLogoMutationVariables
 >;
 export const OrganizationBranding_updateOrganizationPreferredToneDocument = gql`
   mutation OrganizationBranding_updateOrganizationPreferredTone($tone: Tone!) {

@@ -873,7 +873,7 @@ export interface NexusGenFieldTypes {
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deletePetitionAttachment: NexusGenEnums["Result"]; // Result!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    deletePetitionFieldAttachment: NexusGenEnums["Result"]; // Result!
+    deletePetitionFieldAttachment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionReply: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitions: NexusGenEnums["Result"]; // Result!
@@ -1176,6 +1176,7 @@ export interface NexusGenFieldTypes {
   PetitionFieldAttachment: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     file: NexusGenRootTypes["FileUpload"]; // FileUpload!
     id: NexusGenScalars["GID"]; // GID!
   };
@@ -2159,7 +2160,7 @@ export interface NexusGenFieldTypeNames {
     deletePetition: "SupportMethodResponse";
     deletePetitionAttachment: "Result";
     deletePetitionField: "PetitionBase";
-    deletePetitionFieldAttachment: "Result";
+    deletePetitionFieldAttachment: "PetitionField";
     deletePetitionFieldComment: "PetitionField";
     deletePetitionReply: "PetitionField";
     deletePetitions: "Result";
@@ -2462,6 +2463,7 @@ export interface NexusGenFieldTypeNames {
   PetitionFieldAttachment: {
     // field return type name
     createdAt: "DateTime";
+    field: "PetitionField";
     file: "FileUpload";
     id: "GID";
   };

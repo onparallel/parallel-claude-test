@@ -12,6 +12,10 @@ export const PetitionFieldAttachment = objectType({
         return (await ctx.files.loadFileUpload(o.file_upload_id))!;
       },
     });
+    t.field("field", {
+      type: "PetitionField",
+      resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.petition_field_id))!,
+    });
   },
 });
 

@@ -751,7 +751,7 @@ type Mutation {
   """
   Remove a petition field attachment
   """
-  deletePetitionFieldAttachment(attachmentId: GID!, fieldId: GID!, petitionId: GID!): Result!
+  deletePetitionFieldAttachment(attachmentId: GID!, fieldId: GID!, petitionId: GID!): PetitionField!
 
   """
   Delete a petition field comment.
@@ -2322,6 +2322,7 @@ type PetitionFieldAttachment implements CreatedAt {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  field: PetitionField!
   file: FileUpload!
   id: GID!
 }
