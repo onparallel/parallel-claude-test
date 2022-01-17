@@ -405,7 +405,7 @@ export interface Mutation {
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
-  createPetitionFieldComment: PetitionField;
+  createPetitionFieldComment: PetitionFieldComment;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
@@ -584,7 +584,7 @@ export interface Mutation {
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
-  updatePetitionFieldComment: PetitionField;
+  updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionField;
   /** Updates the metada of the specified petition field reply */
@@ -1919,6 +1919,7 @@ export interface PetitionFieldComment {
   content: Scalars["String"];
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
+  field: PetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
   /** Whether the comment has been edited after being published. */
@@ -2554,8 +2555,8 @@ export interface Query {
   organizations: OrganizationPagination;
   petition?: Maybe<PetitionBase>;
   petitionAuthToken?: Maybe<Petition>;
-  /** The comments for this field. */
-  petitionFieldComments: Array<PetitionFieldComment>;
+  /** A field of the petition. */
+  petitionField: PetitionField;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
@@ -2653,7 +2654,7 @@ export interface QuerypetitionAuthTokenArgs {
   token: Scalars["String"];
 }
 
-export interface QuerypetitionFieldCommentsArgs {
+export interface QuerypetitionFieldArgs {
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 }
@@ -8332,45 +8333,13 @@ export type PreviewPetitionFieldCommentsDialog_userQuery = {
   me: { __typename?: "User"; id: string; hasInternalComments: boolean };
 };
 
-export type PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQueryVariables = Exact<{
+export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables = Exact<{
   petitionId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
 }>;
 
-export type PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQuery = {
-  petitionFieldComments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    createdAt: string;
-    content: string;
-    isUnread: boolean;
-    isInternal: boolean;
-    isEdited: boolean;
-    author?:
-      | {
-          __typename?: "PetitionAccess";
-          id: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
-        }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-      | null;
-  }>;
-};
-
-export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  petitionFieldId: Scalars["GID"];
-  content: Scalars["String"];
-  isInternal?: InputMaybe<Scalars["Boolean"]>;
-}>;
-
-export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation = {
-  createPetitionFieldComment: {
+export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
+  petitionField: {
     __typename?: "PetitionField";
     id: string;
     title?: string | null;
@@ -8399,6 +8368,43 @@ export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutatio
   };
 };
 
+export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  content: Scalars["String"];
+  isInternal?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation = {
+  createPetitionFieldComment: {
+    __typename?: "PetitionFieldComment";
+    id: string;
+    createdAt: string;
+    content: string;
+    isUnread: boolean;
+    isInternal: boolean;
+    isEdited: boolean;
+    field: {
+      __typename?: "PetitionField";
+      id: string;
+      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+    };
+    author?:
+      | {
+          __typename?: "PetitionAccess";
+          id: string;
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            fullName?: string | null;
+            email: string;
+          } | null;
+        }
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | null;
+  };
+};
+
 export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
@@ -8408,31 +8414,31 @@ export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutatio
 
 export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation = {
   updatePetitionFieldComment: {
-    __typename?: "PetitionField";
+    __typename?: "PetitionFieldComment";
     id: string;
-    title?: string | null;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
+    createdAt: string;
+    content: string;
+    isUnread: boolean;
+    isInternal: boolean;
+    isEdited: boolean;
+    field: {
+      __typename?: "PetitionField";
       id: string;
-      createdAt: string;
-      content: string;
-      isUnread: boolean;
-      isInternal: boolean;
-      isEdited: boolean;
-      author?:
-        | {
-            __typename?: "PetitionAccess";
+      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+    };
+    author?:
+      | {
+          __typename?: "PetitionAccess";
+          id: string;
+          contact?: {
+            __typename?: "Contact";
             id: string;
-            contact?: {
-              __typename?: "Contact";
-              id: string;
-              fullName?: string | null;
-              email: string;
-            } | null;
-          }
-        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-        | null;
-    }>;
+            fullName?: string | null;
+            email: string;
+          } | null;
+        }
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | null;
   };
 };
 
@@ -21677,19 +21683,19 @@ export const PreviewPetitionFieldCommentsDialog_userDocument = gql`
   PreviewPetitionFieldCommentsDialog_userQuery,
   PreviewPetitionFieldCommentsDialog_userQueryVariables
 >;
-export const PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument = gql`
-  query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
+export const PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument = gql`
+  query PreviewPetitionFieldCommentsDialog_petitionFieldQuery(
     $petitionId: GID!
     $petitionFieldId: GID!
   ) {
-    petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-      ...FieldComment_PetitionFieldComment
+    petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+      ...PreviewPetitionFieldCommentsDialog_PetitionField
     }
   }
-  ${FieldComment_PetitionFieldCommentFragmentDoc}
+  ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
-  PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQuery,
-  PreviewPetitionFieldCommentsDialog_petitionFieldCommentsQueryVariables
+  PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery,
+  PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables
 >;
 export const PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument = gql`
   mutation PreviewPetitionFieldCommentsDialog_createPetitionFieldComment(
@@ -21704,10 +21710,16 @@ export const PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocume
       content: $content
       isInternal: $isInternal
     ) {
-      ...PreviewPetitionFieldCommentsDialog_PetitionField
+      ...FieldComment_PetitionFieldComment
+      field {
+        id
+        comments {
+          id
+        }
+      }
     }
   }
-  ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
+  ${FieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
   PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation,
   PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables
@@ -21725,10 +21737,16 @@ export const PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocume
       petitionFieldCommentId: $petitionFieldCommentId
       content: $content
     ) {
-      ...PreviewPetitionFieldCommentsDialog_PetitionField
+      ...FieldComment_PetitionFieldComment
+      field {
+        id
+        comments {
+          id
+        }
+      }
     }
   }
-  ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
+  ${FieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
   PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation,
   PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables
@@ -21745,6 +21763,9 @@ export const PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocume
       petitionFieldCommentId: $petitionFieldCommentId
     ) {
       ...PreviewPetitionFieldCommentsDialog_PetitionField
+      comments {
+        id
+      }
     }
   }
   ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}

@@ -90,7 +90,6 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
       typePolicies: {
         Query: {
           fields: {
-            petitionFieldComments: { merge: false },
             templates: {
               keyArgs: ["isOwner", "isPublic", "locale", "search", "category"],
               merge(existing, incoming, { readField }) {
@@ -156,6 +155,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         },
         PetitionField: {
           fields: {
+            comments: { merge: false },
             options: { merge: false },
             replies: { merge: false },
             attachments: { merge: false },

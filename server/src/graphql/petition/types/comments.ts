@@ -67,5 +67,9 @@ export const PetitionFieldComment = objectType({
         "Whether the comment is internal (only visible to org users) or public (visible for users and accesses)",
       resolve: (root) => root.is_internal,
     });
+    t.field("field", {
+      type: "PetitionField",
+      resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.petition_field_id))!,
+    });
   },
 });

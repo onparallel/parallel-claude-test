@@ -858,7 +858,7 @@ export interface NexusGenFieldTypes {
     createPetitionAttachmentUploadLink: NexusGenRootTypes["PetitionAttachmentUploadData"]; // PetitionAttachmentUploadData!
     createPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
-    createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createSignatureIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
@@ -948,7 +948,7 @@ export interface NexusGenFieldTypes {
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    updatePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
@@ -1189,6 +1189,7 @@ export interface NexusGenFieldTypes {
     author: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     content: string; // String!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     id: NexusGenScalars["GID"]; // GID!
     isEdited: boolean; // Boolean!
     isInternal: boolean; // Boolean!
@@ -1502,7 +1503,7 @@ export interface NexusGenFieldTypes {
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
-    petitionFieldComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
+    petitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     publicOrgLogoUrl: string | null; // String
@@ -2143,7 +2144,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionAttachmentUploadLink: "PetitionAttachmentUploadData";
     createPetitionField: "PetitionField";
     createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
-    createPetitionFieldComment: "PetitionField";
+    createPetitionFieldComment: "PetitionFieldComment";
     createPrintPdfTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
     createSignatureIntegration: "SignatureOrgIntegration";
@@ -2233,7 +2234,7 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationUser: "User";
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionField";
-    updatePetitionFieldComment: "PetitionField";
+    updatePetitionFieldComment: "PetitionFieldComment";
     updatePetitionFieldRepliesStatus: "PetitionField";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionPermissionSubscription: "Petition";
@@ -2474,6 +2475,7 @@ export interface NexusGenFieldTypeNames {
     author: "UserOrPetitionAccess";
     content: "String";
     createdAt: "DateTime";
+    field: "PetitionField";
     id: "GID";
     isEdited: "Boolean";
     isInternal: "Boolean";
@@ -2787,7 +2789,7 @@ export interface NexusGenFieldTypeNames {
     organizations: "OrganizationPagination";
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
-    petitionFieldComments: "PetitionFieldComment";
+    petitionField: "PetitionField";
     petitions: "PetitionBasePagination";
     petitionsById: "PetitionBase";
     publicOrgLogoUrl: "String";
@@ -4078,7 +4080,7 @@ export interface NexusGenArgTypes {
       // args
       token: string; // String!
     };
-    petitionFieldComments: {
+    petitionField: {
       // args
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!

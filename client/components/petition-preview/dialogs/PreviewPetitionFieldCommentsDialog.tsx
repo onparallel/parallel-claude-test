@@ -1,4 +1,4 @@
-import { DataProxy, gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -25,15 +25,13 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Link } from "@parallel/components/common/Link";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
-  FieldComment_PetitionFieldCommentFragment,
   PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
-  PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
+  PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
   PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_userDocument,
   PreviewPetitionField_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import { updateQuery } from "@parallel/utils/apollo/updateQuery";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
@@ -63,14 +61,14 @@ export function PreviewPetitionFieldCommentsDialog({
   const hasInternalComments = userData?.me.hasInternalComments ?? false;
 
   const { data, loading } = useQuery(
-    PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
+    PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
     {
       variables: { petitionId, petitionFieldId: field.id },
       fetchPolicy: "cache-and-network",
     }
   );
 
-  const comments = data?.petitionFieldComments ?? [];
+  const comments = data?.petitionField.comments ?? [];
 
   const [draft, setDraft] = useState("");
   const [inputFocused, inputFocusBind] = useFocus({
@@ -379,15 +377,15 @@ PreviewPetitionFieldCommentsDialog.queries = [
     }
   `,
   gql`
-    query PreviewPetitionFieldCommentsDialog_petitionFieldComments(
+    query PreviewPetitionFieldCommentsDialog_petitionFieldQuery(
       $petitionId: GID!
       $petitionFieldId: GID!
     ) {
-      petitionFieldComments(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-        ...FieldComment_PetitionFieldComment
+      petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+        ...PreviewPetitionFieldCommentsDialog_PetitionField
       }
     }
-    ${FieldComment.fragments.PetitionFieldComment}
+    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
   `,
 ];
 
@@ -405,10 +403,16 @@ PreviewPetitionFieldCommentsDialog.mutations = [
         content: $content
         isInternal: $isInternal
       ) {
-        ...PreviewPetitionFieldCommentsDialog_PetitionField
+        ...FieldComment_PetitionFieldComment
+        field {
+          id
+          comments {
+            id
+          }
+        }
       }
     }
-    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
+    ${FieldComment.fragments.PetitionFieldComment}
   `,
   gql`
     mutation PreviewPetitionFieldCommentsDialog_updatePetitionFieldComment(
@@ -423,10 +427,16 @@ PreviewPetitionFieldCommentsDialog.mutations = [
         petitionFieldCommentId: $petitionFieldCommentId
         content: $content
       ) {
-        ...PreviewPetitionFieldCommentsDialog_PetitionField
+        ...FieldComment_PetitionFieldComment
+        field {
+          id
+          comments {
+            id
+          }
+        }
       }
     }
-    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
+    ${FieldComment.fragments.PetitionFieldComment}
   `,
   gql`
     mutation PreviewPetitionFieldCommentsDialog_deletePetitionFieldComment(
@@ -440,6 +450,9 @@ PreviewPetitionFieldCommentsDialog.mutations = [
         petitionFieldCommentId: $petitionFieldCommentId
       ) {
         ...PreviewPetitionFieldCommentsDialog_PetitionField
+        comments {
+          id
+        }
       }
     }
     ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
@@ -457,19 +470,7 @@ export function useCreatePetitionFieldComment() {
         typeof PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
       >
     ) => {
-      await createPetitionFieldComment({
-        variables,
-        update(cache, { data }) {
-          if (data) {
-            updatePetitionFieldComments(
-              cache,
-              variables.petitionId,
-              variables.petitionFieldId,
-              () => data!.createPetitionFieldComment.comments
-            );
-          }
-        },
-      });
+      await createPetitionFieldComment({ variables });
     },
     [createPetitionFieldComment]
   );
@@ -485,19 +486,7 @@ export function useUpdatePetitionFieldComment() {
         typeof PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
       >
     ) => {
-      await updatePetitionFieldComment({
-        variables,
-        update(cache, { data }) {
-          if (data) {
-            updatePetitionFieldComments(
-              cache,
-              variables.petitionId,
-              variables.petitionFieldId,
-              () => data!.updatePetitionFieldComment.comments
-            );
-          }
-        },
-      });
+      await updatePetitionFieldComment({ variables });
     },
     [updatePetitionFieldComment]
   );
@@ -513,41 +502,8 @@ export function useDeletePetitionFieldComment() {
         typeof PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument
       >
     ) => {
-      await deletePetitionFieldComment({
-        variables,
-        update(cache, { data }) {
-          if (data) {
-            updatePetitionFieldComments(
-              cache,
-              variables.petitionId,
-              variables.petitionFieldId,
-              () => data!.deletePetitionFieldComment.comments
-            );
-          }
-        },
-      });
+      await deletePetitionFieldComment({ variables });
     },
     [deletePetitionFieldComment]
   );
-}
-
-function updatePetitionFieldComments(
-  proxy: DataProxy,
-  petitionId: string,
-  petitionFieldId: string,
-  updateFn: (
-    cached: FieldComment_PetitionFieldCommentFragment[]
-  ) => FieldComment_PetitionFieldCommentFragment[]
-) {
-  return updateQuery(proxy, {
-    query: PreviewPetitionFieldCommentsDialog_petitionFieldCommentsDocument,
-    variables: { petitionId, petitionFieldId },
-    data: (cached) => {
-      return {
-        petitionFieldComments: cached?.petitionFieldComments
-          ? updateFn(cached!.petitionFieldComments)
-          : [],
-      };
-    },
-  });
 }

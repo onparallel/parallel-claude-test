@@ -255,8 +255,8 @@ export const isValidPublicPetitionLinkSlug = queryField("isValidPublicPetitionLi
   resolve: () => true,
 });
 
-export const petitionFieldCommentsQuery = queryField("petitionFieldComments", {
-  type: list(nonNull("PetitionFieldComment")),
+export const petitionFieldQuery = queryField("petitionField", {
+  type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId")
@@ -265,17 +265,6 @@ export const petitionFieldCommentsQuery = queryField("petitionFieldComments", {
     petitionId: nonNull(globalIdArg("Petition")),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
   },
-  description: "The comments for this field.",
-  resolve: async (_, args, ctx) => {
-    const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
-      ctx.user!.id,
-      "INTERNAL_COMMENTS"
-    );
-
-    return await ctx.petitions.loadPetitionFieldCommentsForField({
-      loadInternalComments,
-      petitionId: args.petitionId,
-      petitionFieldId: args.petitionFieldId,
-    });
-  },
+  description: "A field of the petition.",
+  resolve: async (_, args, ctx) => (await ctx.petitions.loadField(args.petitionFieldId))!,
 });

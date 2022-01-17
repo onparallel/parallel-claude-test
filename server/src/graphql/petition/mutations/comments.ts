@@ -1,5 +1,5 @@
 import { booleanArg, mutationField, nonNull, stringArg } from "nexus";
-import { and, authenticate, authenticateAnd, chain, ifArgEquals } from "../../helpers/authorize";
+import { authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import {
   commentsBelongsToPetition,
@@ -12,7 +12,7 @@ import { userIsCommentAuthor } from "./authorizers";
 
 export const createPetitionFieldComment = mutationField("createPetitionFieldComment", {
   description: "Create a petition field comment.",
-  type: "PetitionField",
+  type: "PetitionFieldComment",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
@@ -30,7 +30,16 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     isInternal: booleanArg(),
   },
   resolve: async (_, args, ctx) => {
-    await ctx.petitions.createPetitionFieldCommentFromUser(
+    const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
+      ctx.user!.id,
+      "INTERNAL_COMMENTS"
+    );
+    ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
+      loadInternalComments,
+      petitionFieldId: args.petitionFieldId,
+      petitionId: args.petitionId,
+    });
+    return await ctx.petitions.createPetitionFieldCommentFromUser(
       {
         petitionId: args.petitionId,
         petitionFieldId: args.petitionFieldId,
@@ -39,20 +48,16 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
       },
       ctx.user!
     );
-    return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
 });
 
 export const deletePetitionFieldComment = mutationField("deletePetitionFieldComment", {
   description: "Delete a petition field comment.",
   type: "PetitionField",
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-      commentsBelongsToPetition("petitionId", "petitionFieldCommentId")
-    )
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+    commentsBelongsToPetition("petitionId", "petitionFieldCommentId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -72,15 +77,12 @@ export const deletePetitionFieldComment = mutationField("deletePetitionFieldComm
 
 export const updatePetitionFieldComment = mutationField("updatePetitionFieldComment", {
   description: "Update a petition field comment.",
-  type: "PetitionField",
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-      commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
-      userIsCommentAuthor("petitionFieldCommentId")
-    )
+  type: "PetitionFieldComment",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+    commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
+    userIsCommentAuthor("petitionFieldCommentId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -89,11 +91,10 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
     content: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
-    await ctx.petitions.updatePetitionFieldCommentFromUser(
+    return await ctx.petitions.updatePetitionFieldCommentFromUser(
       args.petitionFieldCommentId,
       args.content,
       ctx.user!
     );
-    return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
 });

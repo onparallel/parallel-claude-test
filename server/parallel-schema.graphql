@@ -629,7 +629,7 @@ type Mutation {
     isInternal: Boolean
     petitionFieldId: GID!
     petitionId: GID!
-  ): PetitionField!
+  ): PetitionFieldComment!
 
   """
   Creates a task for printing a PDF of the petition and sends it to the queue
@@ -1323,7 +1323,7 @@ type Mutation {
     petitionFieldCommentId: GID!
     petitionFieldId: GID!
     petitionId: GID!
-  ): PetitionField!
+  ): PetitionFieldComment!
 
   """
   Updates the status of a petition field reply and sets the petition as closed if all fields are validated.
@@ -2349,6 +2349,7 @@ type PetitionFieldComment {
   Time when the comment was created.
   """
   createdAt: DateTime!
+  field: PetitionField!
 
   """
   The ID of the petition field comment.
@@ -3570,9 +3571,9 @@ type Query {
   petitionAuthToken(token: String!): Petition
 
   """
-  The comments for this field.
+  A field of the petition.
   """
-  petitionFieldComments(petitionFieldId: GID!, petitionId: GID!): [PetitionFieldComment!]!
+  petitionField(petitionFieldId: GID!, petitionId: GID!): PetitionField!
 
   """
   The petitions of the user
