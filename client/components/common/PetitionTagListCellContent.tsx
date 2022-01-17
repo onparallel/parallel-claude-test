@@ -11,7 +11,6 @@ import {
   PetitionTagListCellContent_tagsDocument,
   PetitionTagListCellContent_untagPetitionDocument,
 } from "@parallel/graphql/__types";
-import { clearCache } from "@parallel/utils/apollo/clearCache";
 import { withError } from "@parallel/utils/promises/withError";
 import { ExtendComponentProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
@@ -86,9 +85,6 @@ export function PetitionTagListCellContent({
           tags: [...petition.tags, tag],
         },
       },
-      update(cache) {
-        clearCache(cache, /\$ROOT_QUERY\.petitions\(.*tagIds":\[/);
-      },
     });
   }
 
@@ -101,9 +97,6 @@ export function PetitionTagListCellContent({
           ...pick(petition, ["__typename", "id"]),
           tags: petition.tags.filter((t) => t.id !== tag.id),
         },
-      },
-      update(cache) {
-        clearCache(cache, /\$ROOT_QUERY\.petitions\(.*tagIds":\[/);
       },
     });
   }
