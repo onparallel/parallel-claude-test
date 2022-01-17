@@ -150,7 +150,7 @@ const _createSimpleReply = gql`
           }
         }
         replies {
-          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+          id
         }
       }
     }
@@ -220,7 +220,7 @@ const _createCheckboxReply = gql`
           }
         }
         replies {
-          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+          id
         }
       }
     }
@@ -353,7 +353,7 @@ const _createDynamicSelectReply = gql`
           }
         }
         replies {
-          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+          id
         }
       }
     }
@@ -490,7 +490,7 @@ const _createFileUploadReply = gql`
             }
           }
           replies {
-            ...RecipientViewPetitionFieldCard_PetitionFieldReply
+            id
           }
         }
       }

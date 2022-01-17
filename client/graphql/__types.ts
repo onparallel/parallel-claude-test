@@ -8120,14 +8120,7 @@ export type PreviewPetitionFieldMutations_createSimpleReplyMutation = {
       petition:
         | { __typename?: "Petition"; status: PetitionStatus; id: string }
         | { __typename?: "PetitionTemplate"; id: string };
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-        createdAt: string;
-        updatedAt: string;
-      }>;
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
     } | null;
   };
 };
@@ -8152,14 +8145,7 @@ export type PreviewPetitionFieldMutations_createCheckboxReplyMutation = {
       petition:
         | { __typename?: "Petition"; status: PetitionStatus; id: string }
         | { __typename?: "PetitionTemplate"; id: string };
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-        createdAt: string;
-        updatedAt: string;
-      }>;
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
     } | null;
   };
 };
@@ -8210,14 +8196,7 @@ export type PreviewPetitionFieldMutations_createDynamicSelectReplyMutation = {
       petition:
         | { __typename?: "Petition"; status: PetitionStatus; id: string }
         | { __typename?: "PetitionTemplate"; id: string };
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-        createdAt: string;
-        updatedAt: string;
-      }>;
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
     } | null;
   };
 };
@@ -8275,14 +8254,7 @@ export type PreviewPetitionFieldMutations_createFileUploadReplyMutation = {
         petition:
           | { __typename?: "Petition"; status: PetitionStatus; id: string }
           | { __typename?: "PetitionTemplate"; id: string };
-        replies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          status: PetitionFieldReplyStatus;
-          content: { [key: string]: any };
-          createdAt: string;
-          updatedAt: string;
-        }>;
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
       } | null;
     };
   };
@@ -21531,7 +21503,7 @@ export const PreviewPetitionFieldMutations_createSimpleReplyDocument = gql`
           }
         }
         replies {
-          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+          id
         }
       }
     }
@@ -21558,7 +21530,7 @@ export const PreviewPetitionFieldMutations_createCheckboxReplyDocument = gql`
           }
         }
         replies {
-          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+          id
         }
       }
     }
@@ -21611,7 +21583,7 @@ export const PreviewPetitionFieldMutations_createDynamicSelectReplyDocument = gq
           }
         }
         replies {
-          ...RecipientViewPetitionFieldCard_PetitionFieldReply
+          id
         }
       }
     }
@@ -21668,7 +21640,7 @@ export const PreviewPetitionFieldMutations_createFileUploadReplyDocument = gql`
             }
           }
           replies {
-            ...RecipientViewPetitionFieldCard_PetitionFieldReply
+            id
           }
         }
       }

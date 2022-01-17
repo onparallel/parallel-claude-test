@@ -287,9 +287,7 @@ export const PetitionTemplate = objectType({
       description: "The public link linked to this template",
       resolve: async (root, _, ctx) => {
         // for now we just expose only the first created
-        const [publicLink] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id, {
-          refresh: true,
-        });
+        const [publicLink] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id);
         return publicLink;
       },
     });
@@ -361,7 +359,7 @@ export const PetitionField = objectType({
       type: "PetitionFieldReply",
       description: "The replies to the petition field",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadRepliesForField(root.id, { refresh: true });
+        return await ctx.petitions.loadRepliesForField(root.id);
       },
     });
     t.list.nonNull.field("comments", {

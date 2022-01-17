@@ -308,6 +308,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
       },
       `Contact:${ctx.contact!.id}`
     );
+    ctx.petitions.loadRepliesForField.dataloader.clear(args.fieldId);
     const [presignedPostData, reply] = await Promise.all([
       ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
       ctx.petitions.createPetitionFieldReply(
@@ -351,6 +352,7 @@ export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", 
   },
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
+    ctx.petitions.loadRepliesForField.dataloader.clear(args.fieldId);
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
@@ -427,6 +429,7 @@ export const publicCreateCheckboxReply = mutationField("publicCreateCheckboxRepl
     }
   },
   resolve: async (_, args, ctx) => {
+    ctx.petitions.loadRepliesForField.dataloader.clear(args.fieldId);
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
@@ -502,6 +505,7 @@ export const publicCreateDynamicSelectReply = mutationField("publicCreateDynamic
     }
   },
   resolve: async (_, args, ctx) => {
+    ctx.petitions.loadRepliesForField.dataloader.clear(args.fieldId);
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
