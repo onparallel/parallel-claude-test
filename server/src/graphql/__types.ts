@@ -901,7 +901,7 @@ export interface NexusGenFieldTypes {
     publicCreateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicDelegateAccessToContact: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicDeletePetitionFieldComment: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
-    publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
+    publicDeletePetitionReply: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicFileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
@@ -2189,7 +2189,7 @@ export interface NexusGenFieldTypeNames {
     publicCreateSimpleReply: "PublicPetitionFieldReply";
     publicDelegateAccessToContact: "PublicPetitionAccess";
     publicDeletePetitionFieldComment: "PublicPetitionField";
-    publicDeletePetitionReply: "Result";
+    publicDeletePetitionReply: "PublicPetitionField";
     publicFileUploadReplyComplete: "PublicPetitionFieldReply";
     publicFileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";

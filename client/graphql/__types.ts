@@ -493,7 +493,7 @@ export interface Mutation {
   /** Delete a petition field comment. */
   publicDeletePetitionFieldComment: PublicPetitionField;
   /** Deletes a reply to a petition field. */
-  publicDeletePetitionReply: Result;
+  publicDeletePetitionReply: PublicPetitionField;
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
@@ -9451,6 +9451,161 @@ export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink
   };
 };
 
+export type RecipientViewPetitionField_publicDeletePetitionReplyMutationVariables = Exact<{
+  replyId: Scalars["GID"];
+  keycode: Scalars["ID"];
+}>;
+
+export type RecipientViewPetitionField_publicDeletePetitionReplyMutation = {
+  publicDeletePetitionReply: {
+    __typename?: "PublicPetitionField";
+    id: string;
+    replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+    petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+  };
+};
+
+export type RecipientViewPetitionField_publicCreateSimpleReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  value: Scalars["String"];
+}>;
+
+export type RecipientViewPetitionField_publicCreateSimpleReplyMutation = {
+  publicCreateSimpleReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+    };
+  };
+};
+
+export type RecipientViewPetitionField_publicUpdateSimpleReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  value: Scalars["String"];
+}>;
+
+export type RecipientViewPetitionField_publicUpdateSimpleReplyMutation = {
+  publicUpdateSimpleReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+    };
+  };
+};
+
+export type RecipientViewPetitionField_publicCreateCheckboxReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  values: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type RecipientViewPetitionField_publicCreateCheckboxReplyMutation = {
+  publicCreateCheckboxReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+    };
+  };
+};
+
+export type RecipientViewPetitionField_publicUpdateCheckboxReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  values: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type RecipientViewPetitionField_publicUpdateCheckboxReplyMutation = {
+  publicUpdateCheckboxReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+    };
+  };
+};
+
+export type RecipientViewPetitionField_publicCreateDynamicSelectReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  value:
+    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
+    | Array<InputMaybe<Scalars["String"]>>
+    | InputMaybe<Scalars["String"]>;
+}>;
+
+export type RecipientViewPetitionField_publicCreateDynamicSelectReplyMutation = {
+  publicCreateDynamicSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+    };
+  };
+};
+
+export type RecipientViewPetitionField_publicUpdateDynamicSelectReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  values:
+    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
+    | Array<InputMaybe<Scalars["String"]>>
+    | InputMaybe<Scalars["String"]>;
+}>;
+
+export type RecipientViewPetitionField_publicUpdateDynamicSelectReplyMutation = {
+  publicUpdateDynamicSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+    };
+  };
+};
+
 export type RecipientViewPetitionFieldCard_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -9569,128 +9724,6 @@ export type RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMuta
   };
 };
 
-export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables = Exact<{
-  replyId: Scalars["GID"];
-  keycode: Scalars["ID"];
-}>;
-
-export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation = {
-  publicDeletePetitionReply: Result;
-};
-
-export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  value: Scalars["String"];
-}>;
-
-export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation = {
-  publicUpdateSimpleReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    updatedAt: string;
-  };
-};
-
-export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  fieldId: Scalars["GID"];
-  value: Scalars["String"];
-}>;
-
-export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation = {
-  publicCreateSimpleReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-    field: {
-      __typename?: "PublicPetitionField";
-      id: string;
-      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
-      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
-    };
-  };
-};
-
-export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  fieldId: Scalars["GID"];
-  values: Array<Scalars["String"]> | Scalars["String"];
-}>;
-
-export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation = {
-  publicCreateCheckboxReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
-export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  values: Array<Scalars["String"]> | Scalars["String"];
-}>;
-
-export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation = {
-  publicUpdateCheckboxReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    updatedAt: string;
-  };
-};
-
-export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    fieldId: Scalars["GID"];
-    value:
-      | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
-      | Array<InputMaybe<Scalars["String"]>>
-      | InputMaybe<Scalars["String"]>;
-  }>;
-
-export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation = {
-  publicCreateDynamicSelectReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
-export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    replyId: Scalars["GID"];
-    value:
-      | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
-      | Array<InputMaybe<Scalars["String"]>>
-      | InputMaybe<Scalars["String"]>;
-  }>;
-
-export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation = {
-  publicUpdateDynamicSelectReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    updatedAt: string;
-  };
-};
-
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables =
   Exact<{
     keycode: Scalars["ID"];
@@ -9713,6 +9746,12 @@ export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutat
       content: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
+      field: {
+        __typename?: "PublicPetitionField";
+        id: string;
+        petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+        replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+      };
     };
   };
 };
@@ -9731,18 +9770,8 @@ export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMut
   };
 };
 
-export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment = {
-  __typename?: "PublicPetitionField";
-  replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
-};
-
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
   { __typename?: "PublicPetitionFieldReply"; content: { [key: string]: any } };
-
-export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment = {
-  __typename?: "PublicPetition";
-  status: PetitionStatus;
-};
 
 export type CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment = {
   __typename?: "PetitionEventSubscription";
@@ -10337,11 +10366,11 @@ export type AppRedirect_petitionsQuery = {
   petitions: { __typename?: "PetitionBasePagination"; totalCount: number };
 };
 
-export type OrganizationBranding_updateOrganizationLogoMutationVariables = Exact<{
+export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
   file: Scalars["Upload"];
 }>;
 
-export type OrganizationBranding_updateOrganizationLogoMutation = {
+export type OrganizationBranding_updateOrgLogoMutation = {
   updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: string | null };
 };
 
@@ -18156,17 +18185,6 @@ export const RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc = gq
     content
   }
 ` as unknown as DocumentNode<RecipientViewPetitionField_PublicPetitionFieldReplyFragment, unknown>;
-export const RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragmentDoc =
-  gql`
-    fragment RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionField on PublicPetitionField {
-      replies {
-        id
-      }
-    }
-  ` as unknown as DocumentNode<
-    RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment,
-    unknown
-  >;
 export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragmentDoc =
   gql`
     fragment RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReply on PublicPetitionFieldReply {
@@ -18174,15 +18192,6 @@ export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetiti
     }
   ` as unknown as DocumentNode<
     RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
-    unknown
-  >;
-export const RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragmentDoc =
-  gql`
-    fragment RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetition on PublicPetition {
-      status
-    }
-  ` as unknown as DocumentNode<
-    RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment,
     unknown
   >;
 export const AdminOrganizations_OrganizationFragmentDoc = gql`
@@ -22101,6 +22110,164 @@ export const RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLin
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation,
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutationVariables
 >;
+export const RecipientViewPetitionField_publicDeletePetitionReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicDeletePetitionReply($replyId: GID!, $keycode: ID!) {
+    publicDeletePetitionReply(replyId: $replyId, keycode: $keycode) {
+      id
+      replies {
+        id
+      }
+      petition {
+        id
+        status
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicDeletePetitionReplyMutation,
+  RecipientViewPetitionField_publicDeletePetitionReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicCreateSimpleReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicCreateSimpleReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $value: String!
+  ) {
+    publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+        replies {
+          id
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicCreateSimpleReplyMutation,
+  RecipientViewPetitionField_publicCreateSimpleReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicUpdateSimpleReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicUpdateSimpleReply(
+    $keycode: ID!
+    $replyId: GID!
+    $value: String!
+  ) {
+    publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicUpdateSimpleReplyMutation,
+  RecipientViewPetitionField_publicUpdateSimpleReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicCreateCheckboxReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicCreateCheckboxReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $values: [String!]!
+  ) {
+    publicCreateCheckboxReply(keycode: $keycode, fieldId: $fieldId, values: $values) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+        replies {
+          id
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicCreateCheckboxReplyMutation,
+  RecipientViewPetitionField_publicCreateCheckboxReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicUpdateCheckboxReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicUpdateCheckboxReply(
+    $keycode: ID!
+    $replyId: GID!
+    $values: [String!]!
+  ) {
+    publicUpdateCheckboxReply(keycode: $keycode, replyId: $replyId, values: $values) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicUpdateCheckboxReplyMutation,
+  RecipientViewPetitionField_publicUpdateCheckboxReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicCreateDynamicSelectReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicCreateDynamicSelectReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $value: [[String]!]!
+  ) {
+    publicCreateDynamicSelectReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+        replies {
+          id
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicCreateDynamicSelectReplyMutation,
+  RecipientViewPetitionField_publicCreateDynamicSelectReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicUpdateDynamicSelectReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicUpdateDynamicSelectReply(
+    $keycode: ID!
+    $replyId: GID!
+    $values: [[String]!]!
+  ) {
+    publicUpdateDynamicSelectReply(keycode: $keycode, replyId: $replyId, value: $values) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicUpdateDynamicSelectReplyMutation,
+  RecipientViewPetitionField_publicUpdateDynamicSelectReplyMutationVariables
+>;
 export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument = gql`
   mutation RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLink(
     $keycode: ID!
@@ -22131,123 +22298,6 @@ export const RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDoc
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutation,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkMutationVariables
 >;
-export const RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument = gql`
-  mutation RecipientViewPetitionFieldMutations_publicDeletePetitionReply(
-    $replyId: GID!
-    $keycode: ID!
-  ) {
-    publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
-  }
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
-  RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables
->;
-export const RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument = gql`
-  mutation RecipientViewPetitionFieldMutations_publicUpdateSimpleReply(
-    $keycode: ID!
-    $replyId: GID!
-    $value: String!
-  ) {
-    publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
-      id
-      content
-      status
-      updatedAt
-    }
-  }
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
-  RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables
->;
-export const RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument = gql`
-  mutation RecipientViewPetitionFieldMutations_publicCreateSimpleReply(
-    $keycode: ID!
-    $fieldId: GID!
-    $value: String!
-  ) {
-    publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          status
-        }
-        replies {
-          id
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation,
-  RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables
->;
-export const RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument = gql`
-  mutation RecipientViewPetitionFieldMutations_publicCreateCheckboxReply(
-    $keycode: ID!
-    $fieldId: GID!
-    $values: [String!]!
-  ) {
-    publicCreateCheckboxReply(keycode: $keycode, fieldId: $fieldId, values: $values) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation,
-  RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables
->;
-export const RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument = gql`
-  mutation RecipientViewPetitionFieldMutations_publicUpdateCheckboxReply(
-    $keycode: ID!
-    $replyId: GID!
-    $values: [String!]!
-  ) {
-    publicUpdateCheckboxReply(keycode: $keycode, replyId: $replyId, values: $values) {
-      id
-      content
-      status
-      updatedAt
-    }
-  }
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation,
-  RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables
->;
-export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument = gql`
-  mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
-    $keycode: ID!
-    $fieldId: GID!
-    $value: [[String]!]!
-  ) {
-    publicCreateDynamicSelectReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
-  RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables
->;
-export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument = gql`
-  mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
-    $keycode: ID!
-    $replyId: GID!
-    $value: [[String]!]!
-  ) {
-    publicUpdateDynamicSelectReply(keycode: $keycode, replyId: $replyId, value: $value) {
-      id
-      content
-      status
-      updatedAt
-    }
-  }
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
-  RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables
->;
 export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(
     $keycode: ID!
@@ -22260,6 +22310,16 @@ export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocu
       }
       reply {
         ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+          replies {
+            id
+          }
+        }
       }
     }
   }
@@ -22410,16 +22470,16 @@ export const AppRedirect_petitionsDocument = gql`
     }
   }
 ` as unknown as DocumentNode<AppRedirect_petitionsQuery, AppRedirect_petitionsQueryVariables>;
-export const OrganizationBranding_updateOrganizationLogoDocument = gql`
-  mutation OrganizationBranding_updateOrganizationLogo($file: Upload!) {
+export const OrganizationBranding_updateOrgLogoDocument = gql`
+  mutation OrganizationBranding_updateOrgLogo($file: Upload!) {
     updateOrganizationLogo(file: $file) {
       id
       logoUrl
     }
   }
 ` as unknown as DocumentNode<
-  OrganizationBranding_updateOrganizationLogoMutation,
-  OrganizationBranding_updateOrganizationLogoMutationVariables
+  OrganizationBranding_updateOrgLogoMutation,
+  OrganizationBranding_updateOrgLogoMutationVariables
 >;
 export const OrganizationBranding_updateOrganizationPreferredToneDocument = gql`
   mutation OrganizationBranding_updateOrganizationPreferredTone($tone: Tone!) {

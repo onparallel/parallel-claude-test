@@ -4,9 +4,15 @@ import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
-  RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument,
+  RecipientViewPetitionField_publicCreateCheckboxReplyDocument,
+  RecipientViewPetitionField_publicCreateDynamicSelectReplyDocument,
+  RecipientViewPetitionField_publicCreateSimpleReplyDocument,
+  RecipientViewPetitionField_publicDeletePetitionReplyDocument,
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
+  RecipientViewPetitionField_publicUpdateCheckboxReplyDocument,
+  RecipientViewPetitionField_publicUpdateDynamicSelectReplyDocument,
+  RecipientViewPetitionField_publicUpdateSimpleReplyDocument,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -16,15 +22,7 @@ import {
   usePetitionFieldCommentsDialog,
 } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
 import { useLastSaved } from "../LastSavedProvider";
-import {
-  useCreateCheckboxReply,
-  useCreateDynamicSelectReply,
-  useCreateFileUploadReply,
-  useDeletePetitionReply,
-  useUpdateCheckboxReply,
-  useUpdateDynamicSelectReply,
-  useUpdateSimpleReply,
-} from "./clientMutations";
+import { useCreateFileUploadReply } from "./clientMutations";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -88,7 +86,9 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     } catch {}
   }
 
-  const deletePetitionReply = useDeletePetitionReply();
+  const [deletePetitionReply] = useMutation(
+    RecipientViewPetitionField_publicDeletePetitionReplyDocument
+  );
   const handleDeletePetitionReply = useCallback(
     async (replyId: string) => {
       try {
@@ -97,10 +97,10 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
           delete uploads.current[replyId];
         }
         await deletePetitionReply({
-          petitionId: props.petitionId,
-          replyId,
-          fieldId: props.field.id,
-          keycode: props.keycode,
+          variables: {
+            replyId,
+            keycode: props.keycode,
+          },
         });
         updateLastSaved();
       } catch {}
@@ -108,15 +108,18 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     [deletePetitionReply, updateLastSaved]
   );
 
-  const updateSimpleReply = useUpdateSimpleReply();
+  const [updateSimpleReply] = useMutation(
+    RecipientViewPetitionField_publicUpdateSimpleReplyDocument
+  );
   const handleUpdateSimpleReply = useCallback(
     async (replyId: string, value: string) => {
       try {
         await updateSimpleReply({
-          petitionId: props.petitionId,
-          replyId,
-          keycode: props.keycode,
-          value,
+          variables: {
+            replyId,
+            keycode: props.keycode,
+            value,
+          },
         });
         updateLastSaved();
       } catch {}
@@ -125,7 +128,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
   );
 
   const [createSimpleReply] = useMutation(
-    RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument
+    RecipientViewPetitionField_publicCreateSimpleReplyDocument
   );
   const handleCreateSimpleReply = useCallback(
     async (value: string) => {
@@ -146,15 +149,18 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     [createSimpleReply, updateLastSaved]
   );
 
-  const updateCheckboxReply = useUpdateCheckboxReply();
+  const [updateCheckboxReply] = useMutation(
+    RecipientViewPetitionField_publicUpdateCheckboxReplyDocument
+  );
   const handleUpdateCheckboxReply = useCallback(
     async (replyId: string, values: string[]) => {
       try {
         await updateCheckboxReply({
-          petitionId: props.petitionId,
-          replyId,
-          keycode: props.keycode,
-          values,
+          variables: {
+            replyId,
+            keycode: props.keycode,
+            values,
+          },
         });
         updateLastSaved();
       } catch {}
@@ -162,15 +168,18 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     [updateCheckboxReply, updateLastSaved]
   );
 
-  const createCheckboxReply = useCreateCheckboxReply();
+  const [createCheckboxReply] = useMutation(
+    RecipientViewPetitionField_publicCreateCheckboxReplyDocument
+  );
   const handleCreateCheckboxReply = useCallback(
     async (values: CheckboxValue) => {
       try {
         await createCheckboxReply({
-          petitionId: props.petitionId,
-          fieldId: props.field.id,
-          keycode: props.keycode,
-          values,
+          variables: {
+            fieldId: props.field.id,
+            keycode: props.keycode,
+            values,
+          },
         });
         updateLastSaved();
       } catch {}
@@ -178,32 +187,38 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     [createCheckboxReply, updateLastSaved]
   );
 
-  const updateDynamicSelectReply = useUpdateDynamicSelectReply();
+  const [updateDynamicSelectReply] = useMutation(
+    RecipientViewPetitionField_publicUpdateDynamicSelectReplyDocument
+  );
   const handleUpdateDynamicSelectReply = useCallback(
-    async (replyId: string, value: DynamicSelectValue) => {
+    async (replyId: string, values: DynamicSelectValue) => {
       await updateDynamicSelectReply({
-        petitionId: props.petitionId,
-        keycode: props.keycode,
-        replyId,
-        value,
+        variables: {
+          keycode: props.keycode,
+          replyId,
+          values,
+        },
       });
       updateLastSaved();
     },
     [updateDynamicSelectReply, updateLastSaved]
   );
 
-  const createDynamicSelectReply = useCreateDynamicSelectReply();
+  const [createDynamicSelectReply] = useMutation(
+    RecipientViewPetitionField_publicCreateDynamicSelectReplyDocument
+  );
   const handleCreateDynamicSelectReply = useCallback(
     async (value: DynamicSelectValue) => {
       try {
-        const reply = await createDynamicSelectReply({
-          petitionId: props.petitionId,
-          keycode: props.keycode,
-          fieldId: props.field.id,
-          value,
+        const { data } = await createDynamicSelectReply({
+          variables: {
+            keycode: props.keycode,
+            fieldId: props.field.id,
+            value,
+          },
         });
         updateLastSaved();
-        return reply?.id;
+        return data?.publicCreateDynamicSelectReply.id;
       } catch {}
     },
     [createDynamicSelectReply, updateLastSaved]
@@ -214,7 +229,6 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     async (content: File[]) => {
       try {
         createFileUploadReply({
-          petitionId: props.petitionId,
           keycode: props.keycode,
           fieldId: props.field.id,
           content,
@@ -342,5 +356,142 @@ RecipientViewPetitionField.mutations = [
         url
       }
     }
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicDeletePetitionReply($replyId: GID!, $keycode: ID!) {
+      publicDeletePetitionReply(replyId: $replyId, keycode: $keycode) {
+        id
+        replies {
+          id
+        }
+        petition {
+          id
+          status
+        }
+      }
+    }
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicCreateSimpleReply(
+      $keycode: ID!
+      $fieldId: GID!
+      $value: String!
+    ) {
+      publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+          replies {
+            id
+          }
+        }
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicUpdateSimpleReply(
+      $keycode: ID!
+      $replyId: GID!
+      $value: String!
+    ) {
+      publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+        }
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicCreateCheckboxReply(
+      $keycode: ID!
+      $fieldId: GID!
+      $values: [String!]!
+    ) {
+      publicCreateCheckboxReply(keycode: $keycode, fieldId: $fieldId, values: $values) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+          replies {
+            id
+          }
+        }
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicUpdateCheckboxReply(
+      $keycode: ID!
+      $replyId: GID!
+      $values: [String!]!
+    ) {
+      publicUpdateCheckboxReply(keycode: $keycode, replyId: $replyId, values: $values) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+        }
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicCreateDynamicSelectReply(
+      $keycode: ID!
+      $fieldId: GID!
+      $value: [[String]!]!
+    ) {
+      publicCreateDynamicSelectReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+          replies {
+            id
+          }
+        }
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicUpdateDynamicSelectReply(
+      $keycode: ID!
+      $replyId: GID!
+      $values: [[String]!]!
+    ) {
+      publicUpdateDynamicSelectReply(keycode: $keycode, replyId: $replyId, value: $values) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+        }
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
   `,
 ];

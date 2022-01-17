@@ -229,7 +229,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
 
 export const publicDeletePetitionReply = mutationField("publicDeletePetitionReply", {
   description: "Deletes a reply to a petition field.",
-  type: "Result",
+  type: "PublicPetitionField",
   authorize: chain(
     authenticatePublicAccess("keycode"),
     replyBelongsToAccess("replyId"),
@@ -240,8 +240,7 @@ export const publicDeletePetitionReply = mutationField("publicDeletePetitionRepl
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   resolve: async (_, args, ctx) => {
-    await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.access!);
-    return RESULT.SUCCESS;
+    return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.access!);
   },
 });
 

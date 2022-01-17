@@ -956,7 +956,7 @@ type Mutation {
   """
   Deletes a reply to a petition field.
   """
-  publicDeletePetitionReply(keycode: ID!, replyId: GID!): Result!
+  publicDeletePetitionReply(keycode: ID!, replyId: GID!): PublicPetitionField!
 
   """
   Notifies the backend that the upload is complete.
