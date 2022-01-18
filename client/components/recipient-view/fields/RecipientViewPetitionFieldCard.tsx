@@ -175,7 +175,6 @@ RecipientViewPetitionFieldCard.fragments = {
         options
         optional
         multiple
-        validated
         replies {
           ...RecipientViewPetitionFieldCard_PetitionFieldReply
         }
@@ -218,7 +217,6 @@ RecipientViewPetitionFieldCard.fragments = {
         options
         optional
         multiple
-        validated
         replies {
           ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         }

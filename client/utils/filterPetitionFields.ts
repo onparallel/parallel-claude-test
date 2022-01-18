@@ -50,11 +50,17 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
       if (filter.SHOW_REPLIED) {
         conditions.push(field.replies.length > 0);
       }
+
       if (filter.SHOW_REVIEWED && !filter.SHOW_NOT_REVIEWED) {
-        conditions.push(field.validated);
+        conditions.push(
+          field.replies.length > 0 && field.replies.every((r) => r.status === "APPROVED")
+        );
       }
       if (!filter.SHOW_REVIEWED && filter.SHOW_NOT_REVIEWED) {
-        conditions.push(!field.validated);
+        conditions.push(
+          field.replies.length === 0 ||
+            field.replies.some((r) => r.status === "REJECTED" || r.status === "PENDING")
+        );
       }
       if (filter.SHOW_WITH_COMMENTS) {
         conditions.push(field.comments.length > 0);
@@ -72,12 +78,12 @@ filterPetitionFields.fragments = {
     fragment filterPetitionFields_PetitionField on PetitionField {
       id
       isReadOnly
-      validated
       comments {
         id
       }
       replies {
         id
+        status
       }
     }
   `,

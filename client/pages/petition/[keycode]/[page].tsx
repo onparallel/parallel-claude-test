@@ -84,11 +84,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
         setFinalized(true);
         const canFinalize = petition.fields.every(
           (f, index) =>
-            !visibility[index] ||
-            f.validated ||
-            f.optional ||
-            completedFieldReplies(f).length > 0 ||
-            f.isReadOnly
+            !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
         );
         if (canFinalize) {
           let completeSignerInfoData: CompleteSignerInfoDialogResult | null = null;
@@ -141,7 +137,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               visibility[index] &&
               !completedFieldReplies(field).length &&
               !field.optional &&
-              !field.validated &&
               !field.isReadOnly
             );
           })!;
@@ -347,12 +342,9 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                         keycode={keycode}
                         access={access!}
                         field={field}
-                        isDisabled={field.validated || petition.status === "CLOSED"}
+                        isDisabled={petition.status === "CLOSED"}
                         isInvalid={
-                          finalized &&
-                          !field.validated &&
-                          completedFieldReplies(field).length === 0 &&
-                          !field.optional
+                          finalized && completedFieldReplies(field).length === 0 && !field.optional
                         }
                         hasCommentsEnabled={field.options.hasCommentsEnabled}
                       />

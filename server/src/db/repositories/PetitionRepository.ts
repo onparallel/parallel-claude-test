@@ -519,6 +519,7 @@ export class PetitionRepository extends BaseRepository {
                       uploadComplete: file?.upload_complete,
                     }
                   : null,
+                status: reply.status,
               };
             })
             .filter((r) => r.content !== null),
@@ -529,14 +530,19 @@ export class PetitionRepository extends BaseRepository {
           .map(([field]) => field);
 
         return {
-          validated: countBy(visibleFields, (f) => f.validated),
+          validated: countBy(
+            visibleFields,
+            (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
+          ),
           replied: countBy(
             visibleFields,
-            (f) => completedFieldReplies(f).length > 0 && !f.validated
+            (f) =>
+              completedFieldReplies(f).length > 0 &&
+              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
           ),
           optional: countBy(
             visibleFields,
-            (f) => f.optional && completedFieldReplies(f).length === 0 && !f.validated
+            (f) => f.optional && completedFieldReplies(f).length === 0
           ),
           total: visibleFields.length,
         };
@@ -1141,20 +1147,34 @@ export class PetitionRepository extends BaseRepository {
           is_fixed: false,
         });
 
-      // TODO: delete replies
-
       if (!field) {
         throw new Error("Invalid petition field id");
       }
+
+      await this.from("petition_field_reply", t)
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        })
+        .where({
+          petition_field_id: fieldId,
+          deleted_at: null,
+        });
 
       const fields = await this.from("petition_field").where({
         petition_id: petitionId,
         deleted_at: null,
       });
 
-      const otherFieldsAreValidated = fields
-        .filter((f) => f.type !== "HEADING" && f.id !== fieldId)
-        .every((f) => f.validated);
+      const replies = await this.from("petition_field_reply")
+        .whereIn(
+          "petition_field_id",
+          fields.map((f) => f.from_petition_field_id)
+        )
+        .whereNull("deleted_at")
+        .select("*");
+
+      const otherFieldsAreValidated = replies.every((r) => r.status === "APPROVED");
 
       const [[petition]] = await Promise.all([
         this.from("petition", t)
@@ -1222,7 +1242,6 @@ export class PetitionRepository extends BaseRepository {
         .update(
           {
             ...data,
-            validated: this.knex.raw(`case type when 'HEADING' then true else false end`),
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
           },
@@ -1285,38 +1304,6 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  async validatePetitionFields(petitionId: number, fieldIds: number[], value: boolean, user: User) {
-    const fields = await this.from("petition_field")
-      .whereIn("id", fieldIds)
-      .where("petition_id", petitionId)
-      .update(
-        {
-          validated: value,
-          updated_at: this.now(),
-          updated_by: `User:${user.id}`,
-        },
-        "*"
-      );
-
-    // if every field is validated, update the petition status
-    const petitionFields = await this.loadFieldsForPetition(petitionId);
-    const petition = await this.loadPetition(petitionId);
-    const newStatus = petitionFields.filter((f) => f.type !== "HEADING").every((f) => f.validated)
-      ? "CLOSED"
-      : petition!.status === "CLOSED"
-      ? "PENDING"
-      : petition!.status;
-
-    await this.from("petition").where("id", petitionId).update({ status: newStatus });
-
-    if (newStatus === "CLOSED") {
-      await this.updateRemindersForPetition(petitionId, null);
-    }
-
-    // return in the same order as input
-    return sortBy(fields, (f) => fieldIds.indexOf(f.id));
-  }
-
   async updateRemindersForPetition(
     petitionId: number,
     nextReminderAt: Maybe<Date>,
@@ -1347,9 +1334,6 @@ export class PetitionRepository extends BaseRepository {
     const field = await this.loadField(data.petition_field_id);
     if (!field) {
       throw new Error("Petition field not found");
-    }
-    if (field.validated) {
-      throw new Error("Petition field is already validated.");
     }
     this.loadRepliesForField.dataloader.clear(data.petition_field_id);
     const [[reply]] = await Promise.all([
@@ -1456,9 +1440,6 @@ export class PetitionRepository extends BaseRepository {
     if (!field) {
       throw new Error("Petition field not found");
     }
-    if (field.validated) {
-      throw new Error("Petition field is already validated.");
-    }
     if (!reply) {
       throw new Error("Petition field reply not found");
     }
@@ -1554,8 +1535,7 @@ export class PetitionRepository extends BaseRepository {
       ([field, isVisible]) =>
         field.type === "HEADING" ||
         field.optional ||
-        field.validated ||
-        field.replies.length > 0 ||
+        (field.replies.length > 0 && field.replies.every((r) => r.status === "APPROVED")) ||
         !isVisible
     );
 

@@ -243,12 +243,6 @@ const _PetitionField = {
       description: "If `true`, this field allows an unlimited amount of replies.",
       example: false,
     },
-    validated: {
-      type: "boolean",
-      description:
-        "If `true`, this field is already validated and its replies cannot be edited in any way.",
-      example: false,
-    },
   },
 } as const;
 

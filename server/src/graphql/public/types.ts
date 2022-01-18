@@ -200,9 +200,6 @@ export const PublicPetitionField = objectType({
     t.boolean("multiple", {
       description: "Determines if this field allows multiple replies.",
     });
-    t.boolean("validated", {
-      description: "Determines if the content of this field has been validated.",
-    });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),

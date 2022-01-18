@@ -1170,7 +1170,6 @@ export interface NexusGenFieldTypes {
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
-    validated: boolean; // Boolean!
     visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   PetitionFieldAttachment: {
@@ -1422,7 +1421,6 @@ export interface NexusGenFieldTypes {
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     unreadCommentCount: number; // Int!
-    validated: boolean; // Boolean!
     visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   PublicPetitionFieldComment: {
@@ -2458,7 +2456,6 @@ export interface NexusGenFieldTypeNames {
     replies: "PetitionFieldReply";
     title: "String";
     type: "PetitionFieldType";
-    validated: "Boolean";
     visibility: "JSONObject";
   };
   PetitionFieldAttachment: {
@@ -2710,7 +2707,6 @@ export interface NexusGenFieldTypeNames {
     title: "String";
     type: "PetitionFieldType";
     unreadCommentCount: "Int";
-    validated: "Boolean";
     visibility: "JSONObject";
   };
   PublicPetitionFieldComment: {
@@ -3876,7 +3872,6 @@ export interface NexusGenArgTypes {
       petitionFieldReplyIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
-      validateFields?: boolean | null; // Boolean
     };
     updatePetitionFieldReplyMetadata: {
       // args
@@ -3967,13 +3962,6 @@ export interface NexusGenArgTypes {
       password: string; // String!
       position?: string | null; // String
       role?: string | null; // String
-    };
-    validatePetitionFields: {
-      // args
-      fieldIds: NexusGenScalars["GID"][]; // [GID!]!
-      petitionId: NexusGenScalars["GID"]; // GID!
-      validateRepliesWith?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
-      value: boolean; // Boolean!
     };
     verifyPublicAccess: {
       // args

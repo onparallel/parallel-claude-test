@@ -352,9 +352,6 @@ export const PetitionField = objectType({
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),
     });
-    t.boolean("validated", {
-      description: "Determines if the content of this field has been validated.",
-    });
     t.list.nonNull.field("replies", {
       type: "PetitionFieldReply",
       description: "The replies to the petition field",

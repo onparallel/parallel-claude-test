@@ -1326,7 +1326,7 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
-  Updates the status of a petition field reply and sets the petition as closed if all fields are validated.
+  Updates the status of a petition field reply.
   """
   updatePetitionFieldRepliesStatus(
     petitionFieldId: GID!
@@ -2304,11 +2304,6 @@ type PetitionField {
   type: PetitionFieldType!
 
   """
-  Determines if the content of this field has been validated.
-  """
-  validated: Boolean!
-
-  """
   A JSON object representing the conditions for the field to be visible
   """
   visibility: JSONObject
@@ -3266,11 +3261,6 @@ type PublicPetitionField {
   """
   type: PetitionFieldType!
   unreadCommentCount: Int!
-
-  """
-  Determines if the content of this field has been validated.
-  """
-  validated: Boolean!
 
   """
   A JSON object representing the conditions for the field to be visible

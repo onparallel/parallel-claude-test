@@ -58,8 +58,8 @@ export function RecipientViewProgressFooter({
     for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
       const fieldReplies = completedFieldReplies(field);
       if (isVisible && !field.isReadOnly) {
-        replied += fieldReplies.length || field.validated ? 1 : 0;
-        optional += field.optional && !fieldReplies.length && !field.validated ? 1 : 0;
+        replied += fieldReplies.length ? 1 : 0;
+        optional += field.optional && !fieldReplies.length ? 1 : 0;
         total += 1;
       }
     }
@@ -187,7 +187,6 @@ RecipientViewProgressFooter.fragments = {
         id
         type
         optional
-        validated
         isReadOnly
         replies {
           id
@@ -217,7 +216,6 @@ RecipientViewProgressFooter.fragments = {
         id
         type
         optional
-        validated
         isReadOnly
         replies {
           id

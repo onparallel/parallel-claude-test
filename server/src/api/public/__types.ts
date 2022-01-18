@@ -1263,7 +1263,6 @@ export type MutationupdatePetitionFieldRepliesStatusArgs = {
   petitionFieldReplyIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   status: PetitionFieldReplyStatus;
-  validateFields?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationupdatePetitionFieldReplyMetadataArgs = {
@@ -1354,13 +1353,6 @@ export type MutationuserSignUpArgs = {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
-};
-
-export type MutationvalidatePetitionFieldsArgs = {
-  fieldIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-  validateRepliesWith?: InputMaybe<PetitionFieldReplyStatus>;
-  value: Scalars["Boolean"];
 };
 
 export type MutationverifyPublicAccessArgs = {
@@ -1835,8 +1827,6 @@ export type PetitionField = {
   title: Maybe<Scalars["String"]>;
   /** The type of the petition field. */
   type: PetitionFieldType;
-  /** Determines if the content of this field has been validated. */
-  validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility: Maybe<Scalars["JSONObject"]>;
 };
@@ -2342,8 +2332,6 @@ export type PublicPetitionField = {
   /** The type of the petition field. */
   type: PetitionFieldType;
   unreadCommentCount: Scalars["Int"];
-  /** Determines if the content of this field has been validated. */
-  validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility: Maybe<Scalars["JSONObject"]>;
 };
@@ -3246,7 +3234,6 @@ export type PetitionFieldFragment = {
   alias: string | null;
   options: { [key: string]: any };
   multiple: boolean;
-  validated: boolean;
 };
 
 export type PetitionFieldReplyFragment = {
@@ -3265,7 +3252,6 @@ export type PetitionFieldWithRepliesFragment = {
   alias: string | null;
   options: { [key: string]: any };
   multiple: boolean;
-  validated: boolean;
   replies: Array<{
     id: string;
     content: { [key: string]: any };
@@ -3318,7 +3304,6 @@ export type PetitionFragment = {
     alias: string | null;
     options: { [key: string]: any };
     multiple: boolean;
-    validated: boolean;
     replies: Array<{
       id: string;
       content: { [key: string]: any };
@@ -3345,7 +3330,6 @@ export type TemplateFragment = {
     alias: string | null;
     options: { [key: string]: any };
     multiple: boolean;
-    validated: boolean;
   }>;
   tags?: Array<{ id: string; name: string }>;
 };
@@ -3466,7 +3450,6 @@ export type GetPetitions_petitionsQuery = {
             alias: string | null;
             options: { [key: string]: any };
             multiple: boolean;
-            validated: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -3533,7 +3516,6 @@ export type CreatePetition_petitionMutation = {
           alias: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3597,7 +3579,6 @@ export type GetPetition_petitionQuery = {
           alias: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3663,7 +3644,6 @@ export type UpdatePetition_updatePetitionMutation = {
           alias: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3827,7 +3807,6 @@ export type PetitionReplies_repliesQuery = {
           alias: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -3846,7 +3825,6 @@ export type PetitionReplies_repliesQuery = {
           alias: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          validated: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -4126,7 +4104,6 @@ export type GetTemplates_templatesQuery = {
             alias: string | null;
             options: { [key: string]: any };
             multiple: boolean;
-            validated: boolean;
           }>;
           tags?: Array<{ id: string; name: string }>;
         }
@@ -4158,7 +4135,6 @@ export type GetTemplate_templateQuery = {
           alias: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          validated: boolean;
         }>;
         tags?: Array<{ id: string; name: string }>;
       }
@@ -4643,7 +4619,6 @@ export const PetitionFieldFragmentDoc = gql`
     alias
     options
     multiple
-    validated
   }
 ` as unknown as DocumentNode<PetitionFieldFragment, unknown>;
 export const PetitionFieldReplyFragmentDoc = gql`

@@ -156,7 +156,9 @@ export function RecipientViewContentsCard({
                                         : "inherit",
                                     }
                                   : {
-                                      color: field.validated ? "gray.500" : "red.600",
+                                      color: field.replies.some((r) => r.status === "REJECTED")
+                                        ? "red.600"
+                                        : "gray.500",
                                       fontWeight: "normal",
                                       fontStyle: "italic",
                                     })}
@@ -284,7 +286,6 @@ RecipientViewContentsCard.fragments = {
         title
         options
         optional
-        validated
         isReadOnly
         replies {
           id
@@ -315,7 +316,6 @@ RecipientViewContentsCard.fragments = {
         title
         options
         optional
-        validated
         isReadOnly
         replies {
           id

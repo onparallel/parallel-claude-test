@@ -77,7 +77,6 @@ export const PetitionFieldFragment = gql`
     alias
     options
     multiple
-    validated
   }
 `;
 

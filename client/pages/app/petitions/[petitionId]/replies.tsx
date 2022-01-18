@@ -76,7 +76,6 @@ import {
   PetitionReplies_updatePetitionDocument,
   PetitionReplies_updatePetitionFieldRepliesStatusDocument,
   PetitionReplies_userDocument,
-  PetitionReplies_validatePetitionFieldsDocument,
   PetitionSettings_cancelPetitionSignatureRequestDocument,
   PetitionStatus,
   UpdatePetitionInput,
@@ -107,7 +106,6 @@ import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/useP
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
@@ -173,43 +171,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const wrapper = usePetitionStateWrapper();
   const [updatePetition] = useMutation(PetitionReplies_updatePetitionDocument);
-  const [_validatePetitionFields] = useMutation(PetitionReplies_validatePetitionFieldsDocument);
   const downloadReplyFile = useDownloadReplyFile();
-
-  const handleValidateToggle = useCallback(
-    async (fieldIds: string[], value: boolean, validateRepliesWith?: PetitionFieldReplyStatus) => {
-      await _validatePetitionFields({
-        variables: {
-          petitionId: petition.id,
-          fieldIds,
-          value,
-          validateRepliesWith,
-        },
-        optimisticResponse: {
-          validatePetitionFields: fieldIds.map((id) => {
-            const field = petition.fields.find((f) => f.id === id)!;
-            return {
-              __typename: "PetitionField",
-              id,
-              validated: value,
-              replies: field.replies.map((reply) => ({
-                ...pick(reply, ["__typename", "id"]),
-                status:
-                  reply.status === "PENDING" ? validateRepliesWith ?? reply.status : reply.status,
-              })),
-
-              petition: {
-                id: petition.id,
-                status: petition.status, // TODO predict correct status
-                __typename: "Petition",
-              },
-            };
-          }),
-        },
-      });
-    },
-    [petition]
-  );
 
   const updatePetitionFieldRepliesStatus = useUpdatePetitionFieldRepliesStatus();
   async function handleUpdateRepliesStatus(
@@ -227,7 +189,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         input!.focus();
       }, 150);
     }
-    const field = petition.fields.find((f) => f.id === petitionFieldId)!;
     await updatePetitionFieldRepliesStatus(
       {
         petitionId,
@@ -235,14 +196,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         petitionFieldReplyIds,
         status,
       },
-      petition.status,
-      // field is automatically validated if there are no pending replies
-      status === "APPROVED"
-        ? field.validated ||
-            field.replies.every(
-              (r) => petitionFieldReplyIds.includes(r.id) || r.status !== "PENDING"
-            )
-        : field.validated
+      petition.status
     );
   }
 
@@ -367,8 +321,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         duration: 3000,
         isClosable: true,
       };
+
       let message: Maybe<RichTextEditorValue> = null;
       let pdfExportTitle: Maybe<string> = null;
+
       try {
         const data = await showClosePetitionDialog({
           locale: petition.locale,
@@ -451,15 +407,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       );
       const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog({}) : "APPROVE";
 
-      await handleFinishPetition({ requiredMessage: false });
+      // TODO: Approve or reject all pending replies
 
-      await handleValidateToggle(
-        petition.fields.map((f) => f.id),
-        true,
-        option === "APPROVE" ? "APPROVED" : "REJECTED"
-      );
+      await handleFinishPetition({ requiredMessage: false });
     } catch {}
-  }, [petition, handleValidateToggle, handleFinishPetition, cancelSignatureRequest]);
+  }, [petition, handleFinishPetition, cancelSignatureRequest]);
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
@@ -779,34 +731,6 @@ PetitionReplies.mutations = [
     ${PetitionLayout.fragments.PetitionBase}
   `,
   gql`
-    mutation PetitionReplies_validatePetitionFields(
-      $petitionId: GID!
-      $fieldIds: [GID!]!
-      $value: Boolean!
-      $validateRepliesWith: PetitionFieldReplyStatus
-    ) {
-      validatePetitionFields(
-        petitionId: $petitionId
-        fieldIds: $fieldIds
-        value: $value
-        validateRepliesWith: $validateRepliesWith
-      ) {
-        id
-        validated
-        replies {
-          id
-          status
-        }
-        petition {
-          ... on Petition {
-            id
-            status
-          }
-        }
-      }
-    }
-  `,
-  gql`
     mutation PetitionReplies_fileUploadReplyDownloadLink(
       $petitionId: GID!
       $replyId: GID!
@@ -830,7 +754,6 @@ PetitionReplies.mutations = [
         petitionFieldId: $petitionFieldId
         petitionFieldReplyIds: $petitionFieldReplyIds
         status: $status
-        validateFields: true
       ) {
         id
         validated
@@ -900,8 +823,7 @@ function useUpdatePetitionFieldRepliesStatus() {
   return useCallback(
     async (
       variables: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>,
-      petitionStatus: PetitionStatus,
-      optimisticValidated: boolean
+      petitionStatus: PetitionStatus
     ) =>
       await updatePetitionFieldRepliesStatus({
         variables,

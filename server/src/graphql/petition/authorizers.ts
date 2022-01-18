@@ -188,9 +188,6 @@ export function fieldCanBeReplied<
         "FIELD_ALREADY_REPLIED_ERROR"
       );
     }
-    if (field.validated) {
-      throw new ApolloError("The field is already validated", "FIELD_ALREADY_VALIDATED_ERROR");
-    }
 
     return true;
   };
@@ -479,20 +476,13 @@ export function replyCanBeUpdated<
   return async (_, args, ctx) => {
     const replyId = args[argReplyId] as unknown as number;
 
-    const [reply, field] = await Promise.all([
-      ctx.petitions.loadFieldReply(replyId),
-      ctx.petitions.loadFieldForReply(replyId),
-    ]);
+    const reply = await ctx.petitions.loadFieldReply(replyId);
 
     if (reply!.status === "APPROVED") {
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
         "REPLY_ALREADY_APPROVED_ERROR"
       );
-    }
-
-    if (field!.validated) {
-      throw new ApolloError("The field is already validated", "FIELD_ALREADY_VALIDATED_ERROR");
     }
 
     return true;

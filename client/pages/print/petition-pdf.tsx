@@ -129,7 +129,6 @@ PetitionPdf.fragments = {
         title
         options
         description
-        validated
         replies {
           id
           status

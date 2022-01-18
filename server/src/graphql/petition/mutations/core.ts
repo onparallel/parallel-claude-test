@@ -934,64 +934,8 @@ export const dynamicSelectFieldFileDownloadLink = mutationField(
   }
 );
 
-export const validatePetitionFields = mutationField("validatePetitionFields", {
-  description:
-    "Updates the validation of a field and sets the petition as closed if all fields are validated.",
-  type: nonNull(list(nonNull("PetitionField"))),
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
-    fieldsBelongsToPetition("petitionId", "fieldIds")
-  ),
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    fieldIds: nonNull(list(nonNull(globalIdArg("PetitionField")))),
-    value: nonNull(booleanArg()),
-    validateRepliesWith: arg({ type: "PetitionFieldReplyStatus" }),
-  },
-  validateArgs: notEmptyArray((args) => args.fieldIds, "fieldIds"),
-  resolve: async (_, args, ctx) => {
-    const fields = await ctx.petitions.validatePetitionFields(
-      args.petitionId,
-      args.fieldIds,
-      args.value,
-      ctx.user!
-    );
-    if (args.value || args.validateRepliesWith) {
-      const replies = await ctx.petitions.loadRepliesForField(args.fieldIds, {
-        cache: false,
-      });
-      await ctx.petitions.updatePetitionFieldRepliesStatus(
-        replies.flatMap((r) => r.filter((r) => r.status === "PENDING").map((r) => r.id)),
-        args.validateRepliesWith || "APPROVED",
-        `User:${ctx.user!.id}`
-      );
-    }
-
-    const petition = (await ctx.petitions.loadPetition(args.petitionId, {
-      cache: false,
-    }))!;
-
-    if (
-      args.validateRepliesWith &&
-      args.validateRepliesWith !== "PENDING" &&
-      petition.status === "CLOSED"
-    ) {
-      await ctx.petitions.createEvent({
-        type: "PETITION_CLOSED",
-        petition_id: petition.id,
-        data: {
-          user_id: ctx.user!.id,
-        },
-      });
-    }
-    ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
-    return fields;
-  },
-});
-
 export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFieldRepliesStatus", {
-  description:
-    "Updates the status of a petition field reply and sets the petition as closed if all fields are validated.",
+  description: "Updates the status of a petition field reply.",
   type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -1003,10 +947,6 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
     petitionFieldReplyIds: nonNull(list(nonNull(globalIdArg("PetitionFieldReply")))),
     status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
-    validateFields: booleanArg({
-      description:
-        "If true, the field will be validated if all the replies are approved or rejected",
-    }),
   },
   validateArgs: notEmptyArray((args) => args.petitionFieldReplyIds, "petitionFieldReplyIds"),
   resolve: async (_, args, ctx) => {
@@ -1015,18 +955,6 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
       args.status,
       `User:${ctx.user!.id}`
     );
-    if (args.status === "APPROVED" && args.validateFields) {
-      const allReplies = await ctx.petitions.loadRepliesForField(args.petitionFieldId);
-      if (allReplies.every((r) => ["APPROVED", "REJECTED"].includes(r.status))) {
-        const [field] = await ctx.petitions.validatePetitionFields(
-          args.petitionId,
-          [args.petitionFieldId],
-          true,
-          ctx.user!
-        );
-        return field;
-      }
-    }
     return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
 });

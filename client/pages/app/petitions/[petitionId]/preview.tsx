@@ -118,11 +118,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         setFinalized(true);
         const canFinalize = petition.fields.every(
           (f, index) =>
-            !visibility[index] ||
-            f.validated ||
-            f.optional ||
-            completedFieldReplies(f).length > 0 ||
-            f.isReadOnly
+            !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
         );
         if (canFinalize && isPetition) {
           let completeSignerInfoData: PetitionPreviewSignerInfoDialogResult | null = null;
@@ -213,7 +209,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               visibility[index] &&
               !completedFieldReplies(field).length &&
               !field.optional &&
-              !field.validated &&
               !field.isReadOnly
             );
           })!;
@@ -303,10 +298,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                       field={field}
                       isDisabled={isPetition && (field.validated || petition.status === "CLOSED")}
                       isInvalid={
-                        finalized &&
-                        !field.validated &&
-                        completedFieldReplies(field).length === 0 &&
-                        !field.optional
+                        finalized && completedFieldReplies(field).length === 0 && !field.optional
                       }
                       hasCommentsEnabled={field.options.hasCommentsEnabled}
                       isCacheOnly={!isPetition}
