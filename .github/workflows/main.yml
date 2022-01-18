@@ -22,6 +22,8 @@ jobs:
           key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-cache-
+      - name: Show node version
+        run: node -v
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --production=false
