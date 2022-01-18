@@ -9,6 +9,5 @@
     "emitDecoratorMetadata": true,
     "sourceMap": true
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["migrations/archived"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

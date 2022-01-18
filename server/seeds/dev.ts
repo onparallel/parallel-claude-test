@@ -48,10 +48,10 @@ export async function seed(knex: Knex): Promise<any> {
     },
   ];
 
-  const _orgs = await knex<Organization>("organization").insert(orgs, ["id"]);
+  const orgIds = await knex<Organization>("organization").insert(orgs, "id");
   const users: CreateUser[] = [
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       cognito_id: "123e4567-e89b-12d3-a456-426655440000",
       email: "harvey@onparallel.com",
       organization_role: "OWNER",
@@ -59,7 +59,7 @@ export async function seed(knex: Knex): Promise<any> {
       last_name: "Specter",
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       cognito_id: "f3a469da-cd92-46de-84d1-cc09b4e57788",
       email: "mike@onparallel.com",
       organization_role: "NORMAL",
@@ -67,7 +67,7 @@ export async function seed(knex: Knex): Promise<any> {
       last_name: "Ross",
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       cognito_id: "bd82c5a1-5622-41a5-9116-1686a44cf3fa",
       email: "santialbo@gmail.com",
       organization_role: "ADMIN",
@@ -75,7 +75,7 @@ export async function seed(knex: Knex): Promise<any> {
       last_name: "Albo",
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       cognito_id: "3f3f3d5b-5e83-45f0-8c5f-36e4360eb704",
       email: "mariano@onparallel.com",
       organization_role: "ADMIN",
@@ -83,7 +83,7 @@ export async function seed(knex: Knex): Promise<any> {
       last_name: "Rodriguez",
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       cognito_id: "013f5bce-5459-4e7c-bc64-773a4ffcd084",
       email: "konstantin@onparallel.com",
       organization_role: "ADMIN",
@@ -91,24 +91,24 @@ export async function seed(knex: Knex): Promise<any> {
       last_name: "Klykov",
     },
   ];
-  const _users = await knex<User>("user").insert(users, ["id"]);
+  const userIds = await knex<User>("user").insert(users, "id");
   await knex<Organization>("organization")
-    .where("id", _orgs[0].id)
+    .where("id", orgIds[0])
     .update({
-      created_by: `User:${_users[0].id}`,
-      updated_by: `User:${_users[0].id}`,
+      created_by: `User:${userIds[0]}`,
+      updated_by: `User:${userIds[0]}`,
     });
 
   await knex<OrganizationUsageLimit>("organization_usage_limit").insert([
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       limit_name: "PETITION_SEND",
       limit: 5000,
       period: "1 month",
       used: 0,
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       limit_name: "SIGNATURIT_SHARED_APIKEY",
       limit: 5000,
       period: "1 month",
@@ -118,103 +118,103 @@ export async function seed(knex: Knex): Promise<any> {
 
   const contacts: CreateContact[] = [
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       email: "derek@onparallel.com",
       first_name: "Derek",
       last_name: "Lou",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       email: "alex@onparallel.com",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       first_name: "Santi",
       email: "santi@onparallel.com",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       last_name: "Lou",
       email: "dereklou00@gmail.com",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       email: "santialbo@gmail.com",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       first_name: "konstantin",
       last_name: "Klykov",
       email: "konstantin@onparallel.com",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
   ];
-  await knex<Contact>("contact").insert(contacts, ["id"]);
+  await knex<Contact>("contact").insert(contacts, "id");
 
   await knex<OrgIntegration>("org_integration").insert({
-    org_id: _orgs[0].id,
+    org_id: orgIds[0],
     type: "SIGNATURE",
     provider: "SIGNATURIT",
     name: "Signaturit Sandbox",
     settings: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY, ENVIRONMENT: "sandbox" },
     is_enabled: true,
-    created_by: `User:${_users[0].id}`,
+    created_by: `User:${userIds[0]}`,
     is_default: true,
   });
 
   const groups: CreateUserGroup[] = [
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       name: "Empty",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       name: "Dev",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       name: "All",
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
     },
   ];
-  const _userGroups = await knex<UserGroup>("user_group").insert(groups, ["id"]);
+  const userGroupIds = await knex<UserGroup>("user_group").insert(groups, "id");
 
   const userGroupMembers: CreateUserGroupMember[] = [
     {
-      user_group_id: _userGroups[1].id,
-      user_id: _users[2].id,
-      created_by: `User:${_users[2].id}`,
+      user_group_id: userGroupIds[1],
+      user_id: userIds[2],
+      created_by: `User:${userIds[2]}`,
     },
     {
-      user_group_id: _userGroups[1].id,
-      user_id: _users[3].id,
-      created_by: `User:${_users[2].id}`,
+      user_group_id: userGroupIds[1],
+      user_id: userIds[3],
+      created_by: `User:${userIds[2]}`,
     },
     {
-      user_group_id: _userGroups[1].id,
-      user_id: _users[4].id,
-      created_by: `User:${_users[2].id}`,
+      user_group_id: userGroupIds[1],
+      user_id: userIds[4],
+      created_by: `User:${userIds[2]}`,
     },
-    ..._users.map((user) => ({
-      user_group_id: _userGroups[2].id,
-      user_id: user.id,
-      created_by: `User:${_users[2].id}`,
+    ...userIds.map((userId) => ({
+      user_group_id: userGroupIds[2],
+      user_id: userId,
+      created_by: `User:${userIds[2]}`,
     })),
   ];
 
@@ -222,7 +222,7 @@ export async function seed(knex: Knex): Promise<any> {
 
   const petitions: CreatePetition[] = [
     {
-      org_id: _orgs[0].id,
+      org_id: orgIds[0],
       name: "Tu primer envío con Parallel",
       custom_ref: null,
       locale: "es",
@@ -233,8 +233,8 @@ export async function seed(knex: Knex): Promise<any> {
       email_body:
         '[{"type":"paragraph","children":[{"text":"Hola "},{"children":[{"text":""}],"placeholder":"contact-first-name","type":"placeholder"},{"text":","}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Este es el mensaje que enviarás a tu destinatario. Muchas de nuestras plantillas vienen con mensajes configurados por defecto como este, con personalización de mensaje para que tú, "},{"children":[{"text":""}],"placeholder":"user-first-name","type":"placeholder"},{"text":", solo tengas que darle a enviar. No obstante, puedes cambiarlo siempre que quieras por tus propias palabras. "}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Un saludo,"}],"type":"paragraph"},{"children":[{"text":"Paco"}],"type":"paragraph"}]',
       reminders_active: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       reminders_config: null,
       template_description:
         '[{"type":"paragraph","children":[{"text":"Esta plantilla está pensada para facilitarte lo máximo posible tus primeros pasos con Parallel."}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Te recomendamos utilizarla para"},{"bold":true,"text":" realizar un primer envío y enviártela a tu propia dirección de correo"},{"text":" de forma que puedas ver la experiencia que tendrán tus destinatarios."}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"El listado de información que aparece abajo, son los campos que luego verás como destinatario. Algunos campos están ocultos, de forma que solo se mostrarán si se cumplen las condiciones."}],"type":"paragraph"}]',
@@ -256,14 +256,14 @@ export async function seed(knex: Knex): Promise<any> {
     },
   ];
 
-  const _petitions = await knex<Petition>("petition").insert(petitions, ["id"]);
+  const petitionsIds = await knex<Petition>("petition").insert(petitions, "id");
 
   const petitionOwners: CreatePetitionPermission[] = [
     {
-      petition_id: _petitions[0].id,
-      user_id: _users[2].id,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      petition_id: petitionsIds[0],
+      user_id: userIds[2],
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       type: "OWNER",
       is_subscribed: true,
     },
@@ -273,7 +273,7 @@ export async function seed(knex: Knex): Promise<any> {
 
   const petitionFieldsPrimerEnvio: CreatePetitionField[] = [
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 0,
       type: "HEADING",
       title: "Te presentamos la vista de destinatario",
@@ -283,14 +283,14 @@ export async function seed(knex: Knex): Promise<any> {
       multiple: false,
       options: '{"hasPageBreak":false, "hasCommentsEnabled":false}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: true,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 1,
       type: "CHECKBOX",
       title: "¿Qué te gustaría saber ahora?",
@@ -300,14 +300,14 @@ export async function seed(knex: Knex): Promise<any> {
       options:
         '{"values":["Quiero ver todos los tipos de campos","Quiero saber cómo veré las respuestas de mis destinatarios","Quiero más información acerca del funcionamiento de Parallel"],"limit":{"type":"EXACT","min":1,"max":1}, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 2,
       type: "HEADING",
       title: "Esto es una Sección",
@@ -317,14 +317,14 @@ export async function seed(knex: Knex): Promise<any> {
       multiple: false,
       options: '{"hasPageBreak":false, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 3,
       type: "SHORT_TEXT",
       title: "Esto es un campo de Respuestas cortas",
@@ -333,14 +333,14 @@ export async function seed(knex: Knex): Promise<any> {
       multiple: false,
       options: '{"placeholder":null, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 4,
       type: "TEXT",
       title: "Esto es un campo de Respuestas largas",
@@ -350,14 +350,14 @@ export async function seed(knex: Knex): Promise<any> {
       multiple: false,
       options: '{"placeholder":null, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 5,
       type: "FILE_UPLOAD",
       title: "Esto es un campo de Documentos y archivos",
@@ -366,14 +366,14 @@ export async function seed(knex: Knex): Promise<any> {
       multiple: true,
       options: '{"accepts":null, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 6,
       type: "CHECKBOX",
       title: "Esto es un campo de Opciones",
@@ -384,14 +384,14 @@ export async function seed(knex: Knex): Promise<any> {
       options:
         '{"values":["Opción 1","Opción 2","Opción 3"],"limit":{"type":"UNLIMITED","min":1,"max":1}, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 7,
       type: "SELECT",
       title: "Esto es un campo de Desplegable",
@@ -402,14 +402,14 @@ export async function seed(knex: Knex): Promise<any> {
       options:
         '{"values":["Opción 1","Opción 2","Opción 3"],"placeholder":null, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 8,
       type: "HEADING",
       title: "Claro, te animamos a que vuelvas a tu cuenta de Parallel y te mostraremos cómo.",
@@ -419,14 +419,14 @@ export async function seed(knex: Knex): Promise<any> {
       multiple: false,
       options: '{"hasPageBreak":false, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 9,
       type: "HEADING",
       title: "Hemos redactado toda la información que necesitas en nuestra Guía de Parallel",
@@ -436,14 +436,14 @@ export async function seed(knex: Knex): Promise<any> {
       multiple: false,
       options: '{"hasPageBreak":false, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
     },
     {
-      petition_id: _petitions[0].id,
+      petition_id: petitionsIds[0],
       position: 10,
       type: "HEADING",
       title: "Si sigues teniendo dudas",
@@ -453,8 +453,8 @@ export async function seed(knex: Knex): Promise<any> {
       multiple: false,
       options: '{"hasPageBreak":false, "hasCommentsEnabled":true}',
       validated: false,
-      created_by: `User:${_users[2].id}`,
-      updated_by: `User:${_users[2].id}`,
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
       is_fixed: false,
       from_petition_field_id: null,
       alias: null,
