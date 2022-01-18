@@ -1397,7 +1397,9 @@ api
       try {
         gql`
           mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
-            deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
           }
         `;
         await client.request(DeleteReply_deletePetitionReplyDocument, params);

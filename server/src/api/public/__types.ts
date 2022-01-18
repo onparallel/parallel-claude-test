@@ -375,7 +375,7 @@ export type Mutation = {
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
-  createPetitionFieldComment: PetitionField;
+  createPetitionFieldComment: PetitionFieldComment;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
@@ -405,11 +405,11 @@ export type Mutation = {
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
   /** Remove a petition field attachment */
-  deletePetitionFieldAttachment: Result;
+  deletePetitionFieldAttachment: PetitionField;
   /** Delete a petition field comment. */
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
-  deletePetitionReply: Result;
+  deletePetitionReply: PetitionField;
   /** Delete petitions. */
   deletePetitions: Result;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
@@ -461,9 +461,9 @@ export type Mutation = {
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
   publicDelegateAccessToContact: PublicPetitionAccess;
   /** Delete a petition field comment. */
-  publicDeletePetitionFieldComment: Result;
+  publicDeletePetitionFieldComment: PublicPetitionField;
   /** Deletes a reply to a petition field. */
-  publicDeletePetitionReply: Result;
+  publicDeletePetitionReply: PublicPetitionField;
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
@@ -554,7 +554,7 @@ export type Mutation = {
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
-  updatePetitionFieldComment: PetitionField;
+  updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionField;
   /** Updates the metada of the specified petition field reply */
@@ -592,7 +592,7 @@ export type Mutation = {
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
-  validatePetitionFields: PetitionAndPartialFields;
+  validatePetitionFields: Array<PetitionField>;
   verifyPublicAccess: PublicAccessVerification;
 };
 
@@ -1624,12 +1624,6 @@ export type PetitionAccessStatus =
   /** The petition is not accessible by the contact. */
   | "INACTIVE";
 
-/** The petition and a subset of some of its fields. */
-export type PetitionAndPartialFields = {
-  fields: Array<PetitionField>;
-  petition: Petition;
-};
-
 export type PetitionAttachment = CreatedAt & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -1851,6 +1845,7 @@ export type PetitionField = {
 export type PetitionFieldAttachment = CreatedAt & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  field: PetitionField;
   file: FileUpload;
   id: Scalars["GID"];
 };
@@ -1868,6 +1863,7 @@ export type PetitionFieldComment = {
   content: Scalars["String"];
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
+  field: PetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
   /** Whether the comment has been edited after being published. */
@@ -2338,6 +2334,7 @@ export type PublicPetitionField = {
   optional: Scalars["Boolean"];
   /** The options of the petition field. */
   options: Scalars["JSONObject"];
+  petition: PublicPetition;
   /** The replies to the petition field */
   replies: Array<PublicPetitionFieldReply>;
   /** The title of the petition field. */
@@ -2359,6 +2356,7 @@ export type PublicPetitionFieldComment = {
   content: Scalars["String"];
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
+  field: PublicPetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
   /** Whether the comment has been read or not. */
@@ -2371,6 +2369,7 @@ export type PublicPetitionFieldReply = Timestamps & {
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  field: PublicPetitionField;
   /** The ID of the petition field reply. */
   id: Scalars["GID"];
   /** The status of the petition field reply. */
@@ -2385,6 +2384,7 @@ export type PublicPetitionLink = {
   isActive: Scalars["Boolean"];
   owner: User;
   slug: Scalars["String"];
+  template: PetitionTemplate;
   title: Scalars["String"];
   url: Scalars["String"];
 };
@@ -2470,14 +2470,14 @@ export type Query = {
   organizations: OrganizationPagination;
   petition: Maybe<PetitionBase>;
   petitionAuthToken: Maybe<Petition>;
-  /** The comments for this field. */
-  petitionFieldComments: Array<PetitionFieldComment>;
+  /** A field of the petition. */
+  petitionField: PetitionField;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   /** The comments for this field. */
-  publicPetitionFieldComments: Array<PublicPetitionFieldComment>;
+  publicPetitionField: PublicPetitionField;
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
@@ -2569,7 +2569,7 @@ export type QuerypetitionAuthTokenArgs = {
   token: Scalars["String"];
 };
 
-export type QuerypetitionFieldCommentsArgs = {
+export type QuerypetitionFieldArgs = {
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 };
@@ -2590,7 +2590,7 @@ export type QuerypublicOrgLogoUrlArgs = {
   id: Scalars["GID"];
 };
 
-export type QuerypublicPetitionFieldCommentsArgs = {
+export type QuerypublicPetitionFieldArgs = {
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
 };
@@ -3864,7 +3864,7 @@ export type DeleteReply_deletePetitionReplyMutationVariables = Exact<{
   replyId: Scalars["GID"];
 }>;
 
-export type DeleteReply_deletePetitionReplyMutation = { deletePetitionReply: Result };
+export type DeleteReply_deletePetitionReplyMutation = { deletePetitionReply: { id: string } };
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -4997,7 +4997,9 @@ export const PetitionReplies_repliesDocument = gql`
 ` as unknown as DocumentNode<PetitionReplies_repliesQuery, PetitionReplies_repliesQueryVariables>;
 export const DeleteReply_deletePetitionReplyDocument = gql`
   mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
-    deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+      id
+    }
   }
 ` as unknown as DocumentNode<
   DeleteReply_deletePetitionReplyMutation,
