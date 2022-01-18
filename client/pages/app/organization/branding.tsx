@@ -14,8 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { Dropzone } from "@parallel/components/common/Dropzone";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -30,7 +30,7 @@ import {
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 const MAX_FILE_SIZE = 50 * 1024;
@@ -45,9 +45,8 @@ function OrganizationBranding() {
   const sections = useOrganizationSections(me);
   const dropzoneRef = useRef<DropzoneRef>(null);
 
-  const [logoSrc, setLogoSrc] = useState<string>(
-    me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`
-  );
+  const logoSrc =
+    me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
 
   const tone = me.organization.preferredTone;
 
@@ -65,14 +64,7 @@ function OrganizationBranding() {
         ),
       });
     } else {
-      await updateLogo({
-        variables: {
-          file: files[0],
-        },
-        update(_, { data }) {
-          setLogoSrc(data!.updateOrganizationLogo.logoUrl!);
-        },
-      });
+      await updateLogo({ variables: { file: files[0] } });
     }
   };
 
@@ -123,7 +115,7 @@ function OrganizationBranding() {
             <Stack spacing={1}>
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="organization.branding.logo-atach-help"
+                  id="organization.branding.logo-attach-help"
                   defaultMessage="Attach an image that you would like us to display in your emails."
                   values={{
                     size: <FileSize value={MAX_FILE_SIZE} />,
@@ -132,7 +124,7 @@ function OrganizationBranding() {
               </Text>
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="organization.branding.logo-atach-requirements-help"
+                  id="organization.branding.logo-attach-requirements-help"
                   defaultMessage="Requirements: PNG image, max. {size}"
                   values={{
                     size: <FileSize value={MAX_FILE_SIZE} />,

@@ -4585,7 +4585,7 @@
     "context": "Error loading image. Please upload again."
   },
   {
-    "term": "organization.branding.logo-atach-help",
+    "term": "organization.branding.logo-attach-help",
     "definition": "Attach an image that you would like us to display in your emails.",
     "context": "Attach an image that you would like us to display in your emails."
   },
@@ -4595,7 +4595,7 @@
     "context": "(PNG image, max. {size})"
   },
   {
-    "term": "organization.branding.logo-atach-requirements-help",
+    "term": "organization.branding.logo-attach-requirements-help",
     "definition": "Requirements: PNG image, max. {size}",
     "context": "Requirements: PNG image, max. {size}"
   },
