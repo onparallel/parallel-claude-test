@@ -8,8 +8,8 @@ import {
   PreviewPetitionFieldMutations_deletePetitionReplyDocument,
   PreviewPetitionFieldMutations_updateCheckboxReplyDocument,
   PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument,
-  PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment,
-  PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
+  PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
+  PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
   PreviewPetitionFieldMutations_updateSimpleReplyDocument,
   Scalars,
@@ -603,13 +603,13 @@ function updatePreviewFieldReplies(
   proxy: DataProxy,
   fieldId: string,
   updateFn: (
-    cached: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment["previewReplies"]
-  ) => PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragment["previewReplies"]
+    cached: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment["previewReplies"]
+  ) => PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment["previewReplies"]
 ) {
   updateFragment(proxy, {
     id: fieldId,
-    fragment: PreviewPetitionFieldMutations_updateFieldReplies_PetitionFieldFragmentDoc,
-    fragmentName: "PreviewPetitionFieldMutations_updateFieldReplies_PetitionField",
+    fragment: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
+    fragmentName: "PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField",
     data: (cached) => ({
       ...cached,
       replies: [],
@@ -617,6 +617,33 @@ function updatePreviewFieldReplies(
     }),
   });
 }
+
+updatePreviewFieldReplies.fragments = {
+  get PetitionFieldReply() {
+    return gql`
+      fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply on PetitionFieldReply {
+        id
+        content
+        status
+        createdAt
+        updatedAt
+      }
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField on PetitionField {
+        previewReplies @client {
+          ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+        }
+        replies {
+          ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+        }
+      }
+      ${this.PetitionFieldReply}
+    `;
+  },
+};
 
 function updateReplyContent(
   proxy: DataProxy,

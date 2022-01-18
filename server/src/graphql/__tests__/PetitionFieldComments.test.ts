@@ -55,9 +55,13 @@ describe("GraphQL/Petition Fields Comments", () => {
               content: $content
             ) {
               id
-              comments {
-                content
-                isInternal
+              content
+              isInternal
+              field {
+                id
+                comments {
+                  id
+                }
               }
             }
           }
@@ -71,13 +75,13 @@ describe("GraphQL/Petition Fields Comments", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.createPetitionFieldComment).toEqual({
-        id: toGlobalId("PetitionField", headingField.id),
-        comments: [
-          {
-            content: "Hello this is my comment",
-            isInternal: false,
-          },
-        ],
+        id: data!.createPetitionFieldComment.id,
+        content: "Hello this is my comment",
+        isInternal: false,
+        field: {
+          id: toGlobalId("PetitionField", headingField.id),
+          comments: [{ id: data!.createPetitionFieldComment.id }],
+        },
       });
     });
 
@@ -97,9 +101,13 @@ describe("GraphQL/Petition Fields Comments", () => {
               isInternal: $isInternal
             ) {
               id
-              comments {
-                content
-                isInternal
+              content
+              isInternal
+              field {
+                id
+                comments {
+                  id
+                }
               }
             }
           }
@@ -114,13 +122,13 @@ describe("GraphQL/Petition Fields Comments", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.createPetitionFieldComment).toEqual({
-        id: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
-        comments: [
-          {
-            content: "Hello this is my comment",
-            isInternal: true,
-          },
-        ],
+        id: data!.createPetitionFieldComment.id,
+        content: "Hello this is my comment",
+        isInternal: true,
+        field: {
+          id: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
+          comments: [{ id: data!.createPetitionFieldComment.id }],
+        },
       });
     });
 
@@ -142,10 +150,6 @@ describe("GraphQL/Petition Fields Comments", () => {
               isInternal: $isInternal
             ) {
               id
-              comments {
-                content
-                isInternal
-              }
             }
           }
         `,
@@ -177,10 +181,6 @@ describe("GraphQL/Petition Fields Comments", () => {
               isInternal: $isInternal
             ) {
               id
-              comments {
-                content
-                isInternal
-              }
             }
           }
         `,

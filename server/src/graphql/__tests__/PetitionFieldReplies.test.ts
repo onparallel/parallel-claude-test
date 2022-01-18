@@ -62,6 +62,63 @@ describe("GraphQL/Petition Field Replies", () => {
       await mocks.knex("petition_event").delete();
     });
 
+    it("petition status should change to DRAFT when creating a reply on a already completed petition without recipients", async () => {
+      const [completedPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({
+          is_template: false,
+          status: "COMPLETED",
+        })
+      );
+      const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
+        type: "TEXT",
+      }));
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              id
+              content
+              field {
+                id
+                replies {
+                  id
+                }
+                petition {
+                  id
+                  ... on Petition {
+                    status
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", completedPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          reply: "my reply",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createSimpleReply).toEqual({
+        id: data!.createSimpleReply.id,
+        content: { text: "my reply" },
+        field: {
+          id: toGlobalId("PetitionField", field.id),
+          replies: [{ id: data!.createSimpleReply.id }],
+          petition: {
+            id: toGlobalId("Petition", completedPetition.id),
+            status: "DRAFT",
+          },
+        },
+      });
+    });
+
     it("should not be able to create a second reply on a single-reply field", async () => {
       await mocks.createRandomTextReply(fields[0].id, petitionAccess.id, 1);
 
@@ -297,6 +354,64 @@ describe("GraphQL/Petition Field Replies", () => {
 
     afterEach(async () => {
       await mocks.knex("petition_event").delete();
+    });
+
+    it("petition status should change to PENDING when updating a reply on a already completed petition with active accesses", async () => {
+      const [completedPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({
+          is_template: false,
+          status: "COMPLETED",
+        })
+      );
+      const [access] = await mocks.createPetitionAccess(
+        completedPetition.id,
+        user.id,
+        [contact.id],
+        user.id
+      );
+      const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
+        type: "TEXT",
+      }));
+      const [reply] = await mocks.createRandomTextReply(field.id, access.id, 1);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              field {
+                id
+                petition {
+                  id
+                  ... on Petition {
+                    status
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", completedPetition.id),
+          replyId: toGlobalId("PetitionFieldReply", reply.id),
+          reply: "my new reply",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateSimpleReply).toEqual({
+        id: toGlobalId("PetitionFieldReply", reply.id),
+        field: {
+          id: toGlobalId("PetitionField", field.id),
+          petition: {
+            id: toGlobalId("Petition", completedPetition.id),
+            status: "PENDING",
+          },
+        },
+      });
     });
 
     it("should be able to update a rejected reply", async () => {
@@ -1146,7 +1261,6 @@ describe("GraphQL/Petition Field Replies", () => {
 
   describe("createFileUploadReply", () => {
     let fileUploadField: PetitionField;
-
     let fileUploadReplyGID: string;
 
     beforeAll(async () => {
@@ -1393,6 +1507,105 @@ describe("GraphQL/Petition Field Replies", () => {
         user_id: user.id,
         status: "REJECTED",
       }));
+    });
+
+    it("petition status should change to PENDING when deleting a reply on a already completed petition with accesses", async () => {
+      const [completedPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({
+          is_template: false,
+          status: "COMPLETED",
+        })
+      );
+      const [access] = await mocks.createPetitionAccess(
+        completedPetition.id,
+        user.id,
+        [contact.id],
+        user.id
+      );
+      const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
+        type: "TEXT",
+      }));
+      const [reply] = await mocks.createRandomTextReply(field.id, access.id, 1);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+              petition {
+                id
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", completedPetition.id),
+          replyId: toGlobalId("PetitionFieldReply", reply.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.deletePetitionReply).toEqual({
+        id: toGlobalId("PetitionField", field.id),
+        petition: {
+          id: toGlobalId("Petition", completedPetition.id),
+          status: "PENDING",
+        },
+      });
+    });
+
+    it("petition status should change to DRAFT when deleting a reply on a already completed petition without accesses", async () => {
+      const [completedPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({
+          is_template: false,
+          status: "COMPLETED",
+        })
+      );
+      const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
+        type: "TEXT",
+      }));
+      const [reply] = await mocks.createRandomTextReply(field.id, 0, 1, () => ({
+        user_id: user.id,
+        petition_access_id: null,
+      }));
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+              petition {
+                id
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", completedPetition.id),
+          replyId: toGlobalId("PetitionFieldReply", reply.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.deletePetitionReply).toEqual({
+        id: toGlobalId("PetitionField", field.id),
+        petition: {
+          id: toGlobalId("Petition", completedPetition.id),
+          status: "DRAFT",
+        },
+      });
     });
 
     it("deletes a simple reply as an User", async () => {

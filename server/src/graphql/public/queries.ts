@@ -23,7 +23,7 @@ export const publicPetitionFieldQuery = queryField("publicPetitionField", {
   },
   description: "The comments for this field.",
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.loadField(args.petitionFieldId);
+    return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
 });
 

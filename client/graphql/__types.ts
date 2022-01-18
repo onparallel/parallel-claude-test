@@ -8270,6 +8270,35 @@ export type PreviewPetitionFieldMutations_createFileUploadReplyCompleteMutation 
   };
 };
 
+export type PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
+  status: PetitionFieldReplyStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  previewReplies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+};
+
 export type PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   content: { [key: string]: any };
@@ -18090,6 +18119,33 @@ export const PreviewPetitionField_PetitionFieldReplyFragmentDoc = gql`
     content
   }
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldReplyFragment, unknown>;
+export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc =
+  gql`
+    fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      status
+      createdAt
+      updatedAt
+    }
+  ` as unknown as DocumentNode<
+    PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment,
+    unknown
+  >;
+export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc = gql`
+  fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField on PetitionField {
+    previewReplies @client {
+      ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+    }
+    replies {
+      ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+    }
+  }
+  ${PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
+  unknown
+>;
 export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc = gql`
   fragment PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply on PetitionFieldReply {
     content

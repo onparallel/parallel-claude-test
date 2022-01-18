@@ -1495,7 +1495,7 @@ export class PetitionRepository extends BaseRepository {
     ifCompleted = true,
     t?: Knex.Transaction
   ) {
-    return await this.raw<Petition>(
+    const [petition] = await this.raw<Petition>(
       /* sql */ `
       update petition set "status" = (
         case when id in (
@@ -1510,6 +1510,11 @@ export class PetitionRepository extends BaseRepository {
       [petitionId, updatedBy, petitionId],
       t
     );
+
+    // update dataloader cache to make sure petition status is updated in next graphql calls
+    this.loadPetition.dataloader.clear(petitionId).prime(petitionId, petition);
+
+    return petition;
   }
 
   async updatePetitionFieldRepliesStatus(

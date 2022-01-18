@@ -493,6 +493,39 @@ describe("GraphQL/Public", () => {
         );
       });
 
+      it("petition status should change to PENDING when creating a reply on a already completed petition", async () => {
+        await mocks.knex("petition").where("id", access.petition_id).update("status", "COMPLETED");
+
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $value: String!) {
+              publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                field {
+                  petition {
+                    id
+                    status
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", textField.id),
+            value: "reply",
+          },
+        });
+        expect(errors).toBeUndefined();
+        expect(data?.publicCreateSimpleReply).toEqual({
+          field: {
+            petition: {
+              id: toGlobalId("Petition", access.petition_id),
+              status: "PENDING",
+            },
+          },
+        });
+      });
+
       it("creates a reply of type TEXT", async () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`
@@ -698,6 +731,41 @@ describe("GraphQL/Public", () => {
           1,
           () => ({ status: "APPROVED", type: "SHORT_TEXT" })
         );
+      });
+
+      it("petition status should change to PENDING when updating a reply on a already completed petition", async () => {
+        await mocks.knex("petition").where("id", access.petition_id).update("status", "COMPLETED");
+
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: String!) {
+              publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                content
+                field {
+                  petition {
+                    id
+                    status
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", textReply.id),
+            value: "updated reply",
+          },
+        });
+        expect(errors).toBeUndefined();
+        expect(data?.publicUpdateSimpleReply).toEqual({
+          content: { text: "updated reply" },
+          field: {
+            petition: {
+              id: toGlobalId("Petition", access.petition_id),
+              status: "PENDING",
+            },
+          },
+        });
       });
 
       it("updates a TEXT reply", async () => {
@@ -1173,11 +1241,47 @@ describe("GraphQL/Public", () => {
         }));
       });
 
+      it("petition status should change to PENDING when deleting a reply on a already completed petition", async () => {
+        await mocks.knex("petition").where("id", access.petition_id).update("status", "COMPLETED");
+        const [field] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "SHORT_TEXT",
+        }));
+        const [reply] = await mocks.createRandomTextReply(field.id, access.id, 1);
+
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId) {
+                petition {
+                  id
+                  status
+                }
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", reply.id),
+          },
+        });
+        expect(errors).toBeUndefined();
+        expect(data?.publicDeletePetitionReply).toEqual({
+          petition: {
+            id: toGlobalId("Petition", access.petition_id),
+            status: "PENDING",
+          },
+        });
+        await mocks.knex("petition_field_reply").where("id", reply.id).delete();
+        await mocks.knex("petition_field").where("id", field.id).delete();
+      });
+
       it("deletes a simple reply", async () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`
             mutation ($keycode: ID!, $replyId: GID!) {
-              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId)
+              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
             }
           `,
           variables: {
@@ -1187,14 +1291,18 @@ describe("GraphQL/Public", () => {
         });
 
         expect(errors).toBeUndefined();
-        expect(data?.publicDeletePetitionReply).toEqual("SUCCESS");
+        expect(data?.publicDeletePetitionReply).toEqual({
+          id: toGlobalId("PetitionField", simpleReply.petition_field_id),
+        });
       });
 
       it("deletes a FILE_UPLOAD reply and its entry on file_upload table", async () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`
             mutation ($keycode: ID!, $replyId: GID!) {
-              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId)
+              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
             }
           `,
           variables: {
@@ -1203,7 +1311,9 @@ describe("GraphQL/Public", () => {
           },
         });
         expect(errors).toBeUndefined();
-        expect(data?.publicDeletePetitionReply).toEqual("SUCCESS");
+        expect(data?.publicDeletePetitionReply).toEqual({
+          id: toGlobalId("PetitionField", fileUploadReply.petition_field_id),
+        });
 
         const [file] = await mocks.knex
           .from("file_upload")
@@ -1217,7 +1327,9 @@ describe("GraphQL/Public", () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`
             mutation ($keycode: ID!, $replyId: GID!) {
-              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId)
+              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
             }
           `,
           variables: {
@@ -1233,7 +1345,9 @@ describe("GraphQL/Public", () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`
             mutation ($keycode: ID!, $replyId: GID!) {
-              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId)
+              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
             }
           `,
           variables: {

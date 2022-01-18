@@ -423,7 +423,9 @@ describe("GraphQL/PetitionFieldAttachments", () => {
               petitionId: $petitionId
               fieldId: $fieldId
               attachmentId: $attachmentId
-            )
+            ) {
+              id
+            }
           }
         `,
         variables: {
@@ -434,7 +436,9 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.deletePetitionFieldAttachment).toEqual("SUCCESS");
+      expect(data!.deletePetitionFieldAttachment).toEqual({
+        id: toGlobalId("PetitionField", field.id),
+      });
 
       const attachments = await mocks.knex
         .from("petition_field_attachment")

@@ -338,7 +338,7 @@ describe("GraphQL/PetitionAttachments", () => {
   });
 
   describe("deletePetitionAttachment", () => {
-    it("deletes the field attachment and its corresponding file", async () => {
+    it("deletes the petition attachment and its corresponding file", async () => {
       const [file] = await mocks.createRandomFileUpload(1, () => ({
         filename: "image.png",
         content_type: "image/png",
