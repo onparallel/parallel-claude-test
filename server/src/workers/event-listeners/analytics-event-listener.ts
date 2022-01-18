@@ -474,22 +474,26 @@ async function trackSignatureReminderEvent(event: SignatureReminderEvent, ctx: W
 async function trackSignatureCancelledEvent(event: SignatureCancelledEvent, ctx: WorkerContext) {
   const [petition, petitionSignatureRequest] = await Promise.all([
     ctx.petitions.loadPetition(event.petition_id),
-    ctx.petitions.loadPetitionSignatureById(event.data.petition_signature_request_id),
+    isDefined(event.data.petition_signature_request_id)
+      ? ctx.petitions.loadPetitionSignatureById(event.data.petition_signature_request_id)
+      : null,
   ]);
-  if (!petition || !petitionSignatureRequest) return;
+  if (!petition) return;
 
   const user = await loadPetitionOwner(petition.id, ctx);
 
-  const orgIntegration = await ctx.integrations.loadIntegration(
-    petitionSignatureRequest.signature_config.orgIntegrationId
-  );
+  const orgIntegration = petitionSignatureRequest
+    ? await ctx.integrations.loadIntegration(
+        petitionSignatureRequest.signature_config.orgIntegrationId
+      )
+    : null;
 
   await ctx.analytics.trackEvent({
     type: "SIGNATURE_CANCELLED",
     user_id: user.id,
     data: {
       petition_id: petition.id,
-      petition_signature_request_id: petitionSignatureRequest.id,
+      petition_signature_request_id: petitionSignatureRequest?.id,
       cancel_reason: event.data.cancel_reason,
       test_mode: orgIntegration?.settings["ENVIRONMENT"] === "sandbox",
     },
