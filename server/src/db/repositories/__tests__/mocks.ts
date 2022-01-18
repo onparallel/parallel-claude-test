@@ -1,4 +1,4 @@
-import faker from "faker";
+import faker from "@faker-js/faker";
 import { Knex } from "knex";
 import { range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
@@ -40,9 +40,9 @@ import {
   PetitionMessage,
   PetitionPermission,
   PetitionPermissionType,
+  PetitionStatus,
   PetitionUserNotification,
   PublicPetitionLink,
-  PublicPetitionLinkUser,
   Tag,
   User,
   UserAuthenticationToken,
@@ -576,7 +576,7 @@ export class Mocks {
 }
 
 function randomPetitionStatus() {
-  return faker.random.arrayElement(["DRAFT", "PENDING", "COMPLETED"] as const);
+  return faker.random.arrayElement<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED"]);
 }
 
 function randomPetitionFieldType() {

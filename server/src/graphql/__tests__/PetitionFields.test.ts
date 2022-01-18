@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import faker from "faker";
+import faker from "@faker-js/faker";
 import { Knex } from "knex";
 import { pick } from "remeda";
 import { defaultFieldOptions } from "../../db/helpers/fieldOptions";

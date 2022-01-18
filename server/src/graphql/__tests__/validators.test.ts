@@ -1,4 +1,4 @@
-import faker from "faker";
+import faker from "@faker-js/faker";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";

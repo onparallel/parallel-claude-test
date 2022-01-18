@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { datatype, internet, lorem } from "faker";
+import { datatype, internet, lorem } from "@faker-js/faker";
 import knex, { Knex } from "knex";
 import { sortBy } from "remeda";
 import { PetitionEvent } from "../../db/events";

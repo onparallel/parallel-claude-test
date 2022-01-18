@@ -114,6 +114,7 @@
     "yargs": "^17.3.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.3",
     "@graphql-codegen/cli": "^2.3.1",
     "@graphql-codegen/typed-document-node": "^2.2.2",
     "@graphql-codegen/typescript": "^2.4.2",
@@ -133,7 +134,6 @@
     "@types/cron": "^1.7.3",
     "@types/escape-html": "^1.0.1",
     "@types/express": "^4.17.13",
-    "@types/faker": "^5.5.9",
     "@types/fold-to-ascii": "^5.0.0",
     "@types/graphql-upload": "^8.0.9",
     "@types/jest": "^27.4.0",
@@ -160,7 +160,6 @@
     "concurrently": "^7.0.0",
     "cors": "^2.8.5",
     "escape-html": "^1.0.3",
-    "faker": "^6.6.6",
     "jest": "^27.4.7",
     "livereload": "^0.9.3",
     "localtunnel": "^2.0.2",

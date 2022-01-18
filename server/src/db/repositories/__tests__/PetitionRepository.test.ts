@@ -15,7 +15,7 @@ import {
 import { Mocks } from "./mocks";
 import { PetitionRepository } from "../PetitionRepository";
 import { pick, range, sortBy } from "remeda";
-import faker from "faker";
+import faker from "@faker-js/faker";
 import { createTestContainer } from "../../../../test/testContainer";
 
 describe("repositories/PetitionRepository", () => {

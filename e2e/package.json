@@ -13,9 +13,9 @@
     "@types/jsdom": "^16.2.14"
   },
   "dependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.3",
     "babel-jest": "^27.4.6",
     "dotenv": "^14.1.0",
-    "faker": "^6.6.6",
     "jest": "^27.4.7",
     "jsdom": "^19.0.0",
     "node-fetch": "^2.6.1",
