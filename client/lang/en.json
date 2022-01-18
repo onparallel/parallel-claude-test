@@ -7425,6 +7425,16 @@
     "context": "Help them work more effectively, allowing them to review and sharing their thought around the information received."
   },
   {
+    "term": "public.public-petition-link-unavailable.description",
+    "definition": "Contact with {fullName} <{email}> to continue.",
+    "context": "Contact with {fullName} <{email}> to continue."
+  },
+  {
+    "term": "public.public-petition-link-unavailable.title",
+    "definition": "This process is closed",
+    "context": "This process is closed"
+  },
+  {
     "term": "public.public-petition.error--reminder-description",
     "definition": "You can only send one reminder each 24 hours",
     "context": "You can only send one reminder each 24 hours"

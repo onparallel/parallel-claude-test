@@ -14,7 +14,7 @@ import {
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
-import faker from "faker";
+import faker from "@faker-js/faker";
 
 describe("GraphQL/PublicPetitionLink", () => {
   let testClient: TestClient;
@@ -66,6 +66,15 @@ describe("GraphQL/PublicPetitionLink", () => {
   });
 
   describe("publicPetitionLinkBySlug", () => {
+    let sendLimit: OrganizationUsageLimit;
+    beforeAll(async () => {
+      sendLimit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 100);
+    });
+
+    afterAll(async () => {
+      await mocks.knex.raw("delete from organization_usage_limit");
+    });
+
     it("should query a public link by slug", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
@@ -142,6 +151,27 @@ describe("GraphQL/PublicPetitionLink", () => {
         .from("public_petition_link")
         .where("id", publicPetitionLink.id)
         .update("is_active", true);
+    });
+
+    it("should set isAvailable to false if the org does not have PETITION_SEND credits left", async () => {
+      await knex
+        .from("organization_usage_limit")
+        .where("id", sendLimit.id)
+        .update({ used: 100, limit: 100 });
+
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($slug: ID!) {
+            publicPetitionLinkBySlug(slug: $slug) {
+              isAvailable
+            }
+          }
+        `,
+        variables: { slug: publicPetitionLink.slug },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.publicPetitionLinkBySlug).toEqual({ isAvailable: false });
     });
   });
 

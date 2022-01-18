@@ -42,6 +42,7 @@ interface PublicPetitionInitialFormProps {
   description: string;
   onSubmit: SubmitHandler<PublicPetitionInitialFormInputs>;
   isLoading: boolean;
+  isDisabled: boolean;
 }
 
 export function PublicPetitionInitialForm({
@@ -51,6 +52,7 @@ export function PublicPetitionInitialForm({
   description,
   onSubmit,
   isLoading,
+  isDisabled,
 }: PublicPetitionInitialFormProps) {
   const router = useRouter();
   const intl = useIntl();
@@ -110,7 +112,7 @@ export function PublicPetitionInitialForm({
           <Logo width="152px" height="40px" />
         )}
         <Stack spacing={0} maxWidth={{ base: "auto", md: "25rem" }}>
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="gray.500" fontWeight="600">
             {organizationName}
           </Text>
           <Text fontSize="2xl" fontWeight="bold">
@@ -180,6 +182,7 @@ export function PublicPetitionInitialForm({
               <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" /> *
             </FormLabel>
             <Input
+              isDisabled={isDisabled}
               autoComplete="given-name"
               {...register("firstName", {
                 required: true,
@@ -200,6 +203,7 @@ export function PublicPetitionInitialForm({
               <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" /> *
             </FormLabel>
             <Input
+              isDisabled={isDisabled}
               autoComplete="family-name"
               {...register("lastName", {
                 required: true,
@@ -220,6 +224,7 @@ export function PublicPetitionInitialForm({
               <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" /> *
             </FormLabel>
             <Input
+              isDisabled={isDisabled}
               type="email"
               autoComplete="email"
               {...register("email", { required: true, pattern: EMAIL_REGEX })}
@@ -231,7 +236,13 @@ export function PublicPetitionInitialForm({
               />
             </FormErrorMessage>
           </FormControl>
-          <Button type="submit" colorScheme="purple" size="md" isLoading={isLoading}>
+          <Button
+            type="submit"
+            colorScheme="purple"
+            size="md"
+            isLoading={isLoading}
+            isDisabled={isDisabled}
+          >
             <FormattedMessage
               id="public-petition.help.request-access-button"
               defaultMessage="Request access"

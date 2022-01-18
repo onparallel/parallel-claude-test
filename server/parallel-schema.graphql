@@ -3391,6 +3391,11 @@ input PublicPetitionSignerDataInput {
 type PublicPublicPetitionLink {
   description: String!
   isActive: Boolean!
+
+  """
+  If the organization has enough credits to send a petition with this public link or not
+  """
+  isAvailable: Boolean!
   organization: PublicOrganization!
   owner: PublicUser!
   slug: String!

@@ -2501,6 +2501,8 @@ export interface PublicPublicPetitionLink {
   __typename?: "PublicPublicPetitionLink";
   description: Scalars["String"];
   isActive: Scalars["Boolean"];
+  /** If the organization has enough credits to send a petition with this public link or not */
+  isAvailable: Scalars["Boolean"];
   organization: PublicOrganization;
   owner: PublicUser;
   slug: Scalars["String"];
@@ -16723,7 +16725,9 @@ export type OptOut_accessQuery = {
 export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
   __typename?: "PublicPublicPetitionLink";
   title: string;
+  isAvailable: boolean;
   description: string;
+  owner: { __typename?: "PublicUser"; fullName?: string | null; email: string };
   organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
 };
 
@@ -16754,7 +16758,9 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
   publicPetitionLinkBySlug?: {
     __typename?: "PublicPublicPetitionLink";
     title: string;
+    isAvailable: boolean;
     description: string;
+    owner: { __typename?: "PublicUser"; fullName?: string | null; email: string };
     organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
   } | null;
 };
@@ -20672,7 +20678,12 @@ export const OptOut_PublicPetitionAccessFragmentDoc = gql`
 export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
   fragment PublicPetitionLink_PublicPublicPetitionLink on PublicPublicPetitionLink {
     title
+    isAvailable
     description
+    owner {
+      fullName
+      email
+    }
     organization {
       name
       logoUrl

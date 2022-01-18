@@ -1,5 +1,17 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Center, Flex, SimpleGrid, Spacer, Text, useToast } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Center,
+  Flex,
+  SimpleGrid,
+  Spacer,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicPetitionEmailExists } from "@parallel/components/public/public-petitions/PublicPetitionEmailExists";
@@ -177,6 +189,28 @@ function PublicPetitionLink({
           backgroundColor="white"
           overflow="auto"
         >
+          {!publicPetitionLink.isAvailable ? (
+            <Alert status="warning">
+              <AlertIcon color="yellow.500" />
+              <AlertTitle>
+                <FormattedMessage
+                  id="public.public-petition-link-unavailable.title"
+                  defaultMessage="This process is closed"
+                />
+              </AlertTitle>
+              <AlertDescription>
+                -{" "}
+                <FormattedMessage
+                  id="public.public-petition-link-unavailable.description"
+                  defaultMessage="Contact with {fullName} <{email}> to continue."
+                  values={{
+                    fullName: publicPetitionLink.owner.fullName!,
+                    email: publicPetitionLink.owner.email,
+                  }}
+                />
+              </AlertDescription>
+            </Alert>
+          ) : null}
           <SimpleGrid
             paddingX={{ base: 6, md: 8 }}
             paddingY={{ base: 6, md: 10 }}
@@ -213,6 +247,7 @@ function PublicPetitionLink({
                 description={description}
                 onSubmit={onSubmit}
                 isLoading={loading}
+                isDisabled={!publicPetitionLink.isAvailable}
               />
             )}
           </SimpleGrid>
@@ -247,7 +282,12 @@ PublicPetitionLink.fragments = {
   PublicPublicPetitionLink: gql`
     fragment PublicPetitionLink_PublicPublicPetitionLink on PublicPublicPetitionLink {
       title
+      isAvailable
       description
+      owner {
+        fullName
+        email
+      }
       organization {
         name
         logoUrl

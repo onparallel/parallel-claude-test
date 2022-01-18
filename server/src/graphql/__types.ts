@@ -1489,6 +1489,7 @@ export interface NexusGenFieldTypes {
     // field return type
     description: string; // String!
     isActive: boolean; // Boolean!
+    isAvailable: boolean; // Boolean!
     organization: NexusGenRootTypes["PublicOrganization"]; // PublicOrganization!
     owner: NexusGenRootTypes["PublicUser"]; // PublicUser!
     slug: string; // String!
@@ -2780,6 +2781,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     description: "String";
     isActive: "Boolean";
+    isAvailable: "Boolean";
     organization: "PublicOrganization";
     owner: "PublicUser";
     slug: "String";

@@ -481,5 +481,20 @@ export const PublicPublicPetitionLink = objectType({
         return organization;
       },
     });
+    t.nonNull.boolean("isAvailable", {
+      description:
+        "If the organization has enough credits to send a petition with this public link or not",
+      resolve: async (o, _, ctx) => {
+        const owner = await ctx.users.loadUser(o.owner_id);
+        const orgLimits = await ctx.organizations.getOrganizationCurrentUsageLimit(
+          owner!.org_id,
+          "PETITION_SEND"
+        );
+        if (!orgLimits || orgLimits.used >= orgLimits.limit) {
+          return false;
+        }
+        return true;
+      },
+    });
   },
 });
