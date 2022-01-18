@@ -3820,7 +3820,7 @@ export class PetitionRepository extends BaseRepository {
       },
       t
     ).select("*");
-
+    this.loadPublicPetitionLinksByTemplateId.dataloader.clear(data.template_id);
     return row;
   }
 

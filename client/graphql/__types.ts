@@ -6879,16 +6879,7 @@ export type PetitionSettings_createPublicPetitionLinkMutation = {
     template: {
       __typename?: "PetitionTemplate";
       id: string;
-      publicLink?: {
-        __typename?: "PublicPetitionLink";
-        id: string;
-        isActive: boolean;
-        title: string;
-        description: string;
-        slug: string;
-        url: string;
-        owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-      } | null;
+      publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
     };
     owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
   };
@@ -6915,16 +6906,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutation = {
     template: {
       __typename?: "PetitionTemplate";
       id: string;
-      publicLink?: {
-        __typename?: "PublicPetitionLink";
-        id: string;
-        isActive: boolean;
-        title: string;
-        description: string;
-        slug: string;
-        url: string;
-        owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-      } | null;
+      publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
     };
     owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
   };
@@ -21188,7 +21170,7 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
       template {
         id
         publicLink {
-          ...PublicLinkSettingsDialog_PublicPetitionLink
+          id
         }
       }
     }
@@ -21219,7 +21201,7 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
       template {
         id
         publicLink {
-          ...PublicLinkSettingsDialog_PublicPetitionLink
+          id
         }
       }
     }

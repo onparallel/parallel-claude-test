@@ -728,7 +728,7 @@ const mutations = [
         template {
           id
           publicLink {
-            ...PublicLinkSettingsDialog_PublicPetitionLink
+            id
           }
         }
       }
@@ -756,7 +756,7 @@ const mutations = [
         template {
           id
           publicLink {
-            ...PublicLinkSettingsDialog_PublicPetitionLink
+            id
           }
         }
       }
