@@ -12,13 +12,14 @@ export interface PetitionFieldTypeIndicatorProps {
   type: PetitionFieldType;
   fieldIndex: PetitionFieldIndex;
   isTooltipDisabled?: boolean;
+  hideIcon?: boolean;
 }
 
 export const PetitionFieldTypeIndicator = chakraForwardRef<
   "button",
   PetitionFieldTypeIndicatorProps
 >(function PetitionFieldTypeIndicator(
-  { type, fieldIndex, isTooltipDisabled, ...props }: PetitionFieldTypeIndicatorProps,
+  { type, fieldIndex, isTooltipDisabled, hideIcon, ...props }: PetitionFieldTypeIndicatorProps,
   ref
 ) {
   const label = usePetitionFieldTypeLabel(type);
@@ -35,10 +36,11 @@ export const PetitionFieldTypeIndicator = chakraForwardRef<
         _active={{ backgroundColor: color }}
         color="white"
         alignItems="center"
+        minWidth={8}
         {...props}
       >
-        <PetitionFieldTypeIcon type={type} boxSize="16px" role="presentation" />
-        <Text width={4} as="span" fontSize="xs" marginLeft={1} textAlign="center">
+        {hideIcon ? null : <PetitionFieldTypeIcon type={type} boxSize="16px" role="presentation" />}
+        <Text width={4} as="span" fontSize="xs" marginLeft={hideIcon ? 0 : 1} textAlign="center">
           {fieldIndex}
         </Text>
       </Button>

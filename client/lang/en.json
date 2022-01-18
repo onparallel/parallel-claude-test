@@ -2861,8 +2861,8 @@
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-yes.explainer",
-    "definition": "After reviewing the information you will have to start the signature manually.",
-    "context": "After reviewing the information you will have to start the signature manually."
+    "definition": "After approving all the information you will have to start the signature manually.",
+    "context": "After approving all the information you will have to start the signature manually."
   },
   {
     "term": "component.signature-config-dialog.title-help",

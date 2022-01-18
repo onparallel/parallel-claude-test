@@ -252,7 +252,7 @@ export function SignatureConfigDialog({
                     {review ? (
                       <FormattedMessage
                         id="component.signature-config-dialog.review-before-send.option-yes.explainer"
-                        defaultMessage="After reviewing the information you will have to start the signature manually."
+                        defaultMessage="After approving all the information you will have to start the signature manually."
                       />
                     ) : (
                       <FormattedMessage

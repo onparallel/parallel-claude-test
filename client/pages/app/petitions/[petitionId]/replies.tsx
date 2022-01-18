@@ -656,7 +656,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                     field={x.field}
                     isVisible={true}
                     fieldIndex={x.fieldIndex}
-                    onValidateToggle={() => handleValidateToggle([x.field.id], !x.field.validated)}
                     onAction={handleAction}
                     isActive={activeFieldId === x.field.id}
                     onToggleComments={() =>

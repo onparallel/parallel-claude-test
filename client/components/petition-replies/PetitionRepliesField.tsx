@@ -13,7 +13,6 @@ import {
   Heading,
   IconButton,
   Stack,
-  Switch,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
@@ -31,12 +30,11 @@ import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
+import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { Spacer } from "../common/Spacer";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
-import { FileAttachmentButton } from "../common/FileAttachmentButton";
 
 export interface PetitionRepliesFieldProps extends BoxProps {
   petitionId: string;
@@ -50,7 +48,6 @@ export interface PetitionRepliesFieldProps extends BoxProps {
   ) => void;
   onToggleComments: () => void;
   onUpdateReplyStatus: (replyId: string, status: PetitionFieldReplyStatus) => void;
-  onValidateToggle: () => void;
 }
 
 export const PetitionRepliesField = Object.assign(
@@ -63,7 +60,6 @@ export const PetitionRepliesField = Object.assign(
       isActive: isShowingComments,
       onAction,
       onToggleComments,
-      onValidateToggle,
       onUpdateReplyStatus,
       ...props
     },
@@ -94,10 +90,15 @@ export const PetitionRepliesField = Object.assign(
         {...props}
       >
         <Flex alignItems="center">
-          <PetitionFieldTypeIndicator marginLeft="1px" type={field.type} fieldIndex={fieldIndex} />
+          <PetitionFieldTypeIndicator
+            marginLeft="1px"
+            type={field.type}
+            fieldIndex={fieldIndex}
+            hideIcon={true}
+          />
           <Box flex="1" minWidth="0">
             {field.title ? (
-              <Heading marginLeft={4} size="md" isTruncated>
+              <Heading marginLeft={4} size="md" fontWeight={600} isTruncated>
                 {field.title}
               </Heading>
             ) : (
@@ -186,10 +187,15 @@ export const PetitionRepliesField = Object.assign(
                 </Box>
               </Tooltip>
             ) : null}
-            <PetitionFieldTypeIndicator marginTop="2px" type={field.type} fieldIndex={fieldIndex} />
-            <Box marginLeft={4} flex="1">
+            <PetitionFieldTypeIndicator
+              marginTop="2px"
+              type={field.type}
+              fieldIndex={fieldIndex}
+              hideIcon={true}
+            />
+            <Box marginLeft={2} flex="1">
               {field.title ? (
-                <Text as="h4" overflowWrap="anywhere">
+                <Text as="h4" overflowWrap="anywhere" fontWeight={600}>
                   {field.title}
                 </Text>
               ) : (
@@ -201,40 +207,7 @@ export const PetitionRepliesField = Object.assign(
           </Flex>
           <Flex width={{ base: "100%", lg: "auto" }}>
             <Spacer />
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={onValidateToggle}
-              aria-pressed={field.validated}
-              aria-label={
-                field.validated
-                  ? intl.formatMessage({
-                      id: "component.petition-replies-field.review-button-validated-label",
-                      defaultMessage: "Reviewed",
-                    })
-                  : intl.formatMessage({
-                      id: "component.petition-replies-field.review-button-not-validated-label",
-                      defaultMessage: "Not reviewed",
-                    })
-              }
-              marginRight={1}
-            >
-              <Switch
-                color="green"
-                isChecked={field.validated}
-                onChange={noop}
-                size="sm"
-                pointerEvents="none"
-                marginRight={2}
-                position="relative"
-                top="1px"
-                aria-hidden={field.validated}
-              />
-              <FormattedMessage
-                id="component.petition-replies-field.review-button"
-                defaultMessage="Reviewed"
-              />
-            </Button>
+
             {/* This Flex element makes the reviewed buttons to be aligned */}
             <Flex width="66px">
               <Spacer />
@@ -328,7 +301,6 @@ export const PetitionRepliesField = Object.assign(
           title
           description
           optional
-          validated
           replies {
             ...PetitionRepliesField_PetitionFieldReply
           }
