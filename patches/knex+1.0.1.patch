@@ -1,0 +1,49 @@
+diff --git a/node_modules/knex/types/index.d.ts b/node_modules/knex/types/index.d.ts
+index d9bf6e5..b50c579 100644
+--- a/node_modules/knex/types/index.d.ts
++++ b/node_modules/knex/types/index.d.ts
+@@ -692,7 +692,7 @@ export declare namespace Knex {
+     ): QueryBuilder<TRecord, DeferredKeySelection<TRecord, never>[]>;
+     insert<
+       TKey extends StrKey<ResolveTableType<TRecord>>,
+-      TResult2 = DeferredIndex.Augment<
++      TResult2 = DeferredKeySelection.Augment<
+         UnwrapArrayMember<TResult>,
+         ResolveTableType<TRecord>,
+         TKey
+@@ -720,7 +720,7 @@ export declare namespace Knex {
+     ): QueryBuilder<TRecord, TResult2>;
+     insert<
+       TKey extends string,
+-      TResult2 = DeferredIndex.Augment<
++      TResult2 = DeferredKeySelection.Augment<
+         UnwrapArrayMember<TResult>,
+         TRecord,
+         TKey
+@@ -828,7 +828,7 @@ export declare namespace Knex {
+     update<
+       K1 extends StrKey<ResolveTableType<TRecord, 'update'>>,
+       K2 extends StrKey<ResolveTableType<TRecord>>,
+-      TResult2 = DeferredIndex.Augment<
++      TResult2 = DeferredKeySelection.Augment<
+         UnwrapArrayMember<TResult>,
+         ResolveTableType<TRecord>,
+         K2
+@@ -870,7 +870,7 @@ export declare namespace Knex {
+     ): QueryBuilder<TRecord, DeferredKeySelection<TRecord, never>[]>;
+     update<
+       TKey extends StrKey<ResolveTableType<TRecord>>,
+-      TResult2 = DeferredIndex.Augment<
++      TResult2 = DeferredKeySelection.Augment<
+         UnwrapArrayMember<TResult>,
+         ResolveTableType<TRecord>,
+         TKey
+@@ -925,7 +925,7 @@ export declare namespace Knex {
+     returning(column: '*', options?: DMLOptions): QueryBuilder<TRecord, DeferredKeySelection<TRecord, never>[]>;
+     returning<
+       TKey extends StrKey<ResolveTableType<TRecord>>,
+-      TResult2 = DeferredIndex.Augment<
++      TResult2 = DeferredKeySelection.Augment<
+         UnwrapArrayMember<TResult>,
+         ResolveTableType<TRecord>,
+         TKey

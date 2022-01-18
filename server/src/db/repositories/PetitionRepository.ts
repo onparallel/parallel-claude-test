@@ -1075,7 +1075,7 @@ export class PetitionRepository extends BaseRepository {
       } else {
         position = position === -1 ? max + 1 : Math.min(max + 1, position);
       }
-      const fieldIds = await this.from("petition_field", t)
+      const fields = await this.from("petition_field", t)
         .where("petition_id", petitionId)
         .whereNull("deleted_at")
         .where("position", ">=", position)
@@ -1084,7 +1084,7 @@ export class PetitionRepository extends BaseRepository {
             deleted_at: this.now(), // temporarily delete to avoid unique index constraint
             position: this.knex.raw(`position + 1`),
           },
-          "id"
+          ["id"]
         );
 
       const [[field], [petition]] = await Promise.all([
@@ -1116,8 +1116,13 @@ export class PetitionRepository extends BaseRepository {
           ),
       ]);
 
-      if (fieldIds.length > 0) {
-        await this.from("petition_field", t).whereIn("id", fieldIds).update({ deleted_at: null });
+      if (fields.length > 0) {
+        await this.from("petition_field", t)
+          .whereIn(
+            "id",
+            fields.map((r) => r.id)
+          )
+          .update({ deleted_at: null });
       }
 
       return { field, petition };

@@ -27,13 +27,14 @@ export class UserAuthenticationRepository extends BaseRepository {
     }
     const tokenHash = await hash(apiKey, "");
     return await this.withTransaction(async (t) => {
-      const [userId] = await this.from("user_authentication_token", t)
+      const tokens = await this.from("user_authentication_token", t)
         .where({
           deleted_at: null,
           token_hash: tokenHash,
         })
         .update({ last_used_at: this.now() })
         .returning("user_id");
+      const userId = tokens[0].user_id;
 
       if (!userId) return null;
 
