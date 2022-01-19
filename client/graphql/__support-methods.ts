@@ -349,7 +349,7 @@ export const supportMethods: {
     field: {
       name: "shareSignaturitApiKey",
       description:
-        "Shares our SignaturIt production APIKEY (OWjT...) with the passed Org, and creates corresponding usage limits.",
+        "Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits.",
       args: [
         {
           name: "limit",
@@ -365,7 +365,7 @@ export const supportMethods: {
         },
         {
           name: "orgId",
-          description: "Numeric ID of the Org",
+          description: "Numeric ID of the Organization",
           type: {
             kind: "NON_NULL",
             name: null,
