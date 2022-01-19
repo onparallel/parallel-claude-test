@@ -248,18 +248,8 @@ export const deactivateUser = mutationField("deactivateUser", {
     notEmptyArray((args) => args.userIds, "userIds"),
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
     (_, { userIds, transferToUserId, deletePetitions }, ctx, info) => {
-      if (transferToUserId && deletePetitions) {
-        throw new ArgValidationError(
-          info,
-          "transferToUserId",
-          "Can't transfer to a user when deletePetitions is true."
-        );
-      } else if (!transferToUserId && !deletePetitions) {
-        throw new ArgValidationError(
-          info,
-          "transferToUserId",
-          "Expected transferToUserId or deletePetitions to be defined."
-        );
+      if (deletePetitions) {
+        throw new ArgValidationError(info, "transferToUserId", "Can't deletePetitions from user");
       }
       if (transferToUserId && userIds.includes(transferToUserId)) {
         throw new ArgValidationError(
@@ -309,8 +299,7 @@ export const deactivateUser = mutationField("deactivateUser", {
                   undefined,
                   t
                 ),
-                // delete all ownership of public links
-                // ctx.petitions.deletePublicPetitionLinkOwnershipByOwnerIds(userIds, t),
+                // TODO: delete all ownership of public links
               ]
             : [
                 // transfer OWNER permissions to new user and remove original permissions

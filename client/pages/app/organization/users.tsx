@@ -197,9 +197,6 @@ function OrganizationUsers() {
           variables: {
             userIds,
           },
-          update: () => {
-            refetch();
-          },
         });
       } else if (newStatus === "INACTIVE") {
         transferToUser = await showConfirmDeactivateUserDialog({
@@ -207,19 +204,10 @@ function OrganizationUsers() {
           me,
         });
 
-        console.log("transferToUser: ", transferToUser);
-        // If transferToUser is undefined means that delete petitions whas selected
-        const params = transferToUser
-          ? { transferToUserId: transferToUser?.id }
-          : { deletePetitions: true };
-
         await deactivateUser({
           variables: {
             userIds,
-            ...params,
-          },
-          update: () => {
-            refetch();
+            transferToUserId: transferToUser?.id,
           },
         });
       }

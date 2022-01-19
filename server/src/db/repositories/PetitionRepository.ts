@@ -3820,10 +3820,6 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  async deletePublicPetitionLinkOwnershipByOwnerIds(ownerIds: number[], t?: Knex.Transaction) {
-    return await this.from("public_petition_link", t).whereIn("owner_id", ownerIds).delete();
-  }
-
   async updatePublicPetitionLink(
     publicPetitionLinkId: number,
     data: Partial<PublicPetitionLink>,
