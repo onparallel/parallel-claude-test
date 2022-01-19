@@ -439,6 +439,17 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
   authorize: supportMethodAccess(),
   resolve: async (_, { orgId, period, limit }, ctx) => {
     const org = await ctx.organizations.loadOrg(orgId);
+    const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
+      orgId,
+      "SIGNATURE"
+    );
+
+    const hasSharedSignaturitApiKey =
+      signatureIntegrations.length > 0 &&
+      signatureIntegrations.some(
+        (i) => i.settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey
+      );
+
     if (!org) {
       return { result: RESULT.FAILURE, message: `Organization:${orgId} not found` };
     }
@@ -446,21 +457,23 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
     return await ctx.organizations.withTransaction(async (t) => {
       try {
         await Promise.all([
-          ctx.integrations.createOrgIntegration(
-            {
-              type: "SIGNATURE",
-              name: "Parallel - Signaturit",
-              provider: "SIGNATURIT",
-              org_id: orgId,
-              settings: {
-                API_KEY: ctx.config.signature.signaturitSharedProductionApiKey,
-                ENVIRONMENT: "production",
-              },
-              is_enabled: true,
-            },
-            `User:${ctx.user!.id}`,
-            t
-          ),
+          !hasSharedSignaturitApiKey
+            ? ctx.integrations.createOrgIntegration(
+                {
+                  type: "SIGNATURE",
+                  name: "Signaturit",
+                  provider: "SIGNATURIT",
+                  org_id: orgId,
+                  settings: {
+                    API_KEY: ctx.config.signature.signaturitSharedProductionApiKey,
+                    ENVIRONMENT: "production",
+                  },
+                  is_enabled: true,
+                },
+                `User:${ctx.user!.id}`,
+                t
+              )
+            : null,
           ctx.organizations.createOrganizationUsageLimit(
             orgId,
             {
