@@ -94,8 +94,19 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_REOPENED: {
     user_id: number;
   };
+  SIGNATURE_OPENED: {
+    petition_signature_request_id: number;
+    signer: {
+      firstName: string;
+      lastName: string;
+      email: string;
+    };
+  };
   SIGNATURE_STARTED: {
     petition_signature_request_id: number;
+    email_delivered_at?: Date;
+    email_opened_at?: Date;
+    email_bounced_at?: Date;
   };
   SIGNATURE_CANCELLED: {
     petition_signature_request_id?: number; // if signature was cancelled because of lack of credits, the petition_signature_request_id will be undefined
@@ -259,7 +270,10 @@ export type PetitionReopenedEvent<IsCreate extends boolean = false> = GenericPet
   "PETITION_REOPENED",
   IsCreate
 >;
-
+export type SignatureOpenedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "SIGNATURE_OPENED",
+  IsCreate
+>;
 export type SignatureStartedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
   "SIGNATURE_STARTED",
   IsCreate
@@ -337,6 +351,7 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionClosedEvent<IsCreate>
   | PetitionClosedNotifiedEvent<IsCreate>
   | PetitionReopenedEvent<IsCreate>
+  | SignatureOpenedEvent<IsCreate>
   | SignatureStartedEvent<IsCreate>
   | SignatureCompletedEvent<IsCreate>
   | SignatureCancelledEvent<IsCreate>

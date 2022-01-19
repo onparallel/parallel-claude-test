@@ -1,18 +1,23 @@
 import { gql } from "@apollo/client";
 import { Box, BoxProps } from "@chakra-ui/react";
 import { CheckIcon, CheckShortIcon } from "@parallel/chakra/icons";
-import { MessageEventsIndicator_PetitionMessageFragment } from "@parallel/graphql/__types";
+import {
+  EmailEventsIndicator_PetitionMessageFragment,
+  EmailEventsIndicator_SignatureStartedEventFragment,
+} from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useIntl } from "react-intl";
 
-export interface MessageEventsIndicatorProps extends BoxProps {
-  message: MessageEventsIndicator_PetitionMessageFragment;
+export interface EmailEventsIndicatorProps extends BoxProps {
+  event:
+    | EmailEventsIndicator_PetitionMessageFragment
+    | EmailEventsIndicator_SignatureStartedEventFragment;
 }
 
-export function MessageEventsIndicator({
-  message: { bouncedAt, deliveredAt, openedAt },
+export function EmailEventsIndicator({
+  event: { bouncedAt, deliveredAt, openedAt },
   ...props
-}: MessageEventsIndicatorProps) {
+}: EmailEventsIndicatorProps) {
   const intl = useIntl();
   if (bouncedAt) {
     return (
@@ -86,9 +91,16 @@ export function MessageEventsIndicator({
   }
 }
 
-MessageEventsIndicator.fragments = {
+EmailEventsIndicator.fragments = {
   PetitionMessage: gql`
-    fragment MessageEventsIndicator_PetitionMessage on PetitionMessage {
+    fragment EmailEventsIndicator_PetitionMessage on PetitionMessage {
+      bouncedAt
+      deliveredAt
+      openedAt
+    }
+  `,
+  SignatureStartedEvent: gql`
+    fragment EmailEventsIndicator_SignatureStartedEvent on SignatureStartedEvent {
       bouncedAt
       deliveredAt
       openedAt

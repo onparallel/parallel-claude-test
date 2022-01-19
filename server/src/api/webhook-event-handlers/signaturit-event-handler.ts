@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
+import { SignatureStartedEvent } from "../../db/events";
 import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
@@ -48,6 +49,8 @@ export type SignaturItEventBody = {
 
 export function signaturItEventHandler(type: SignatureEvents) {
   switch (type) {
+    case "document_opened":
+      return documentOpened;
     case "document_signed":
       return documentSigned;
     case "document_declined":
@@ -56,11 +59,35 @@ export function signaturItEventHandler(type: SignatureEvents) {
       return documentCompleted;
     case "audit_trail_completed":
       return auditTrailCompleted;
+    case "email_delivered":
+      return emailDelivered;
+    case "email_opened":
+      return emailOpened;
     case "email_bounced":
       return emailBounced;
     default:
       return appendEventLogs;
   }
+}
+
+/** a signer opened the signing page on the signature provider */
+async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
+    `SIGNATURIT/${data.document.signature.id}`
+  );
+
+  const [signer] = findSigner(signature!.signature_config.signersInfo, data.document);
+  await Promise.all([
+    appendEventLogs(ctx, data),
+    ctx.petitions.createEvent({
+      type: "SIGNATURE_OPENED",
+      petition_id: petitionId,
+      data: {
+        signer,
+        petition_signature_request_id: signature!.id,
+      },
+    }),
+  ]);
 }
 
 /** the document was signed by any of the assigned signers */
@@ -181,6 +208,20 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
   ]);
 }
 
+async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+  await Promise.all([
+    updateSignatureStartedEvent(petitionId, { email_delivered_at: new Date(data.created_at) }, ctx),
+    appendEventLogs(ctx, data),
+  ]);
+}
+
+async function emailOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+  await Promise.all([
+    updateSignatureStartedEvent(petitionId, { email_opened_at: new Date(data.created_at) }, ctx),
+    appendEventLogs(ctx, data),
+  ]);
+}
+
 async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
     `SIGNATURIT/${data.document.signature.id}`
@@ -203,6 +244,7 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
       "REQUEST_ERROR",
       cancelData
     ),
+    updateSignatureStartedEvent(petitionId, { email_bounced_at: new Date(data.created_at) }, ctx),
     ctx.petitions.createEvent({
       type: "SIGNATURE_CANCELLED",
       petition_id: petitionId,
@@ -254,4 +296,22 @@ function findSigner(
   }
 
   return [signer, signerIndex];
+}
+
+async function updateSignatureStartedEvent(
+  petitionId: number,
+  newData: Omit<SignatureStartedEvent["data"], "petition_signature_request_id">,
+  ctx: ApiContext
+) {
+  const [[signatureStartedEvent]] = await Promise.all([
+    ctx.petitions.getPetitionEventsByType(petitionId, ["SIGNATURE_STARTED"]),
+  ]);
+
+  await ctx.petitions.updateEvent(signatureStartedEvent.id, {
+    ...signatureStartedEvent,
+    data: {
+      ...signatureStartedEvent.data,
+      ...newData,
+    },
+  });
 }

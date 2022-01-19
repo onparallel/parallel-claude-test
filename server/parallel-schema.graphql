@@ -2240,6 +2240,7 @@ enum PetitionEventType {
   REPLY_UPDATED
   SIGNATURE_CANCELLED
   SIGNATURE_COMPLETED
+  SIGNATURE_OPENED
   SIGNATURE_REMINDER
   SIGNATURE_STARTED
   TEMPLATE_USED
@@ -4008,6 +4009,13 @@ input SignatureConfigInputSigner {
   lastName: String!
 }
 
+type SignatureOpenedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  signer: PetitionSigner
+  type: PetitionEventType!
+}
+
 type SignatureOrgIntegration implements OrgIntegration {
   """
   Environment of this integration, to differentiate between sandbox and production-ready integrations
@@ -4049,8 +4057,11 @@ type SignatureReminderEvent implements PetitionEvent {
 }
 
 type SignatureStartedEvent implements PetitionEvent {
+  bouncedAt: DateTime
   createdAt: DateTime!
+  deliveredAt: DateTime
   id: GID!
+  openedAt: DateTime
   type: PetitionEventType!
 }
 

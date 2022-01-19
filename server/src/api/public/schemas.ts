@@ -1304,6 +1304,30 @@ export const AnyPetitionEvent = {
         },
       },
     },
+    SIGNATURE_OPENED: {
+      description: "A signer has opened the signing page on the signature provider",
+      properties: {
+        signer: {
+          type: "object",
+          description: "Information about the signer",
+          properties: {
+            firstName: { type: "string" },
+            lastName: { type: "string" },
+            email: { type: "string" },
+          },
+          example: {
+            firstName: "Tywin",
+            lastName: "Lannister",
+            email: "tywin@casterlyrock.com",
+          },
+        },
+        petitionSignatureRequestId: {
+          type: "string",
+          description: "The ID of the signature request",
+          example: toGlobalId("PetitionSignatureRequest", 2),
+        },
+      },
+    },
     SIGNATURE_COMPLETED: {
       description: "The eSignature request on the petition was completed",
       properties: {

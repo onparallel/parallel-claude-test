@@ -2017,6 +2017,7 @@ export class PetitionRepository extends BaseRepository {
     const events = await this.from("petition_event")
       .where("petition_id", petitionId)
       .whereIn("type", eventType)
+      .orderBy("created_at", "desc")
       .select("*");
     return events as any;
   }

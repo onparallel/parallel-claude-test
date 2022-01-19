@@ -1865,6 +1865,7 @@ export type PetitionEventType =
   | "REPLY_UPDATED"
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_OPENED"
   | "SIGNATURE_REMINDER"
   | "SIGNATURE_STARTED"
   | "TEMPLATE_USED"
@@ -2964,6 +2965,14 @@ export interface SignatureConfigInputSigner {
   lastName: Scalars["String"];
 }
 
+export interface SignatureOpenedEvent extends PetitionEvent {
+  __typename?: "SignatureOpenedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  signer?: Maybe<PetitionSigner>;
+  type: PetitionEventType;
+}
+
 export interface SignatureOrgIntegration extends OrgIntegration {
   __typename?: "SignatureOrgIntegration";
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
@@ -2992,8 +3001,11 @@ export interface SignatureReminderEvent extends PetitionEvent {
 
 export interface SignatureStartedEvent extends PetitionEvent {
   __typename?: "SignatureStartedEvent";
+  bouncedAt?: Maybe<Scalars["DateTime"]>;
   createdAt: Scalars["DateTime"];
+  deliveredAt?: Maybe<Scalars["DateTime"]>;
   id: Scalars["GID"];
+  openedAt?: Maybe<Scalars["DateTime"]>;
   type: PetitionEventType;
 }
 
@@ -4809,8 +4821,15 @@ export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
 
 export type CreateUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
 
-export type MessageEventsIndicator_PetitionMessageFragment = {
+export type EmailEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
+  bouncedAt?: string | null;
+  deliveredAt?: string | null;
+  openedAt?: string | null;
+};
+
+export type EmailEventsIndicator_SignatureStartedEventFragment = {
+  __typename?: "SignatureStartedEvent";
   bouncedAt?: string | null;
   deliveredAt?: string | null;
   openedAt?: string | null;
@@ -5397,6 +5416,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
       | {
+          __typename?: "SignatureOpenedEvent";
+          id: string;
+          createdAt: string;
+          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+        }
+      | {
           __typename?: "SignatureReminderEvent";
           id: string;
           createdAt: string;
@@ -5407,7 +5432,14 @@ export type PetitionActivityTimeline_PetitionFragment = {
             status: UserStatus;
           } | null;
         }
-      | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
+      | {
+          __typename?: "SignatureStartedEvent";
+          id: string;
+          createdAt: string;
+          bouncedAt?: string | null;
+          deliveredAt?: string | null;
+          openedAt?: string | null;
+        }
       | { __typename?: "TemplateUsedEvent"; id: string }
       | {
           __typename?: "UserPermissionAddedEvent";
@@ -5948,6 +5980,13 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragm
   createdAt: string;
 };
 
+export type PetitionActivityTimeline_PetitionEvent_SignatureOpenedEvent_Fragment = {
+  __typename?: "SignatureOpenedEvent";
+  id: string;
+  createdAt: string;
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+};
+
 export type PetitionActivityTimeline_PetitionEvent_SignatureReminderEvent_Fragment = {
   __typename?: "SignatureReminderEvent";
   id: string;
@@ -5959,6 +5998,9 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragmen
   __typename?: "SignatureStartedEvent";
   id: string;
   createdAt: string;
+  bouncedAt?: string | null;
+  deliveredAt?: string | null;
+  openedAt?: string | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_TemplateUsedEvent_Fragment = {
@@ -6039,6 +6081,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_SignatureOpenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureReminderEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_TemplateUsedEvent_Fragment
@@ -6579,6 +6622,12 @@ export type TimelineSignatureCompletedEvent_SignatureCompletedEventFragment = {
   createdAt: string;
 };
 
+export type TimelineSignatureOpenedEvent_SignatureOpenedEventFragment = {
+  __typename?: "SignatureOpenedEvent";
+  createdAt: string;
+  signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+};
+
 export type TimelineSignatureReminderEvent_SignatureReminderEventFragment = {
   __typename?: "SignatureReminderEvent";
   createdAt: string;
@@ -6588,6 +6637,9 @@ export type TimelineSignatureReminderEvent_SignatureReminderEventFragment = {
 export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
   __typename?: "SignatureStartedEvent";
   createdAt: string;
+  bouncedAt?: string | null;
+  deliveredAt?: string | null;
+  openedAt?: string | null;
 };
 
 export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = {
@@ -11488,6 +11540,12 @@ export type PetitionActivity_PetitionFragment = {
         }
       | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
       | {
+          __typename?: "SignatureOpenedEvent";
+          id: string;
+          createdAt: string;
+          signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+        }
+      | {
           __typename?: "SignatureReminderEvent";
           id: string;
           createdAt: string;
@@ -11498,7 +11556,14 @@ export type PetitionActivity_PetitionFragment = {
             status: UserStatus;
           } | null;
         }
-      | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
+      | {
+          __typename?: "SignatureStartedEvent";
+          id: string;
+          createdAt: string;
+          bouncedAt?: string | null;
+          deliveredAt?: string | null;
+          openedAt?: string | null;
+        }
       | { __typename?: "TemplateUsedEvent"; id: string }
       | {
           __typename?: "UserPermissionAddedEvent";
@@ -12234,6 +12299,12 @@ export type PetitionActivity_updatePetitionMutation = {
               }
             | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
             | {
+                __typename?: "SignatureOpenedEvent";
+                id: string;
+                createdAt: string;
+                signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+              }
+            | {
                 __typename?: "SignatureReminderEvent";
                 id: string;
                 createdAt: string;
@@ -12244,7 +12315,14 @@ export type PetitionActivity_updatePetitionMutation = {
                   status: UserStatus;
                 } | null;
               }
-            | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
+            | {
+                __typename?: "SignatureStartedEvent";
+                id: string;
+                createdAt: string;
+                bouncedAt?: string | null;
+                deliveredAt?: string | null;
+                openedAt?: string | null;
+              }
             | { __typename?: "TemplateUsedEvent"; id: string }
             | {
                 __typename?: "UserPermissionAddedEvent";
@@ -13017,6 +13095,12 @@ export type PetitionActivity_petitionQuery = {
               }
             | { __typename?: "SignatureCompletedEvent"; id: string; createdAt: string }
             | {
+                __typename?: "SignatureOpenedEvent";
+                id: string;
+                createdAt: string;
+                signer?: { __typename?: "PetitionSigner"; email: string; fullName: string } | null;
+              }
+            | {
                 __typename?: "SignatureReminderEvent";
                 id: string;
                 createdAt: string;
@@ -13027,7 +13111,14 @@ export type PetitionActivity_petitionQuery = {
                   status: UserStatus;
                 } | null;
               }
-            | { __typename?: "SignatureStartedEvent"; id: string; createdAt: string }
+            | {
+                __typename?: "SignatureStartedEvent";
+                id: string;
+                createdAt: string;
+                bouncedAt?: string | null;
+                deliveredAt?: string | null;
+                openedAt?: string | null;
+              }
             | { __typename?: "TemplateUsedEvent"; id: string }
             | {
                 __typename?: "UserPermissionAddedEvent";
@@ -18750,13 +18841,13 @@ export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gq
   ${ContactReference_ContactFragmentDoc}
   ${UserReference_UserFragmentDoc}
 ` as unknown as DocumentNode<TimelineMessageCancelledEvent_MessageCancelledEventFragment, unknown>;
-export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
-  fragment MessageEventsIndicator_PetitionMessage on PetitionMessage {
+export const EmailEventsIndicator_PetitionMessageFragmentDoc = gql`
+  fragment EmailEventsIndicator_PetitionMessage on PetitionMessage {
     bouncedAt
     deliveredAt
     openedAt
   }
-` as unknown as DocumentNode<MessageEventsIndicator_PetitionMessageFragment, unknown>;
+` as unknown as DocumentNode<EmailEventsIndicator_PetitionMessageFragment, unknown>;
 export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
   fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
     message {
@@ -18770,14 +18861,14 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
           ...ContactReference_Contact
         }
       }
-      ...MessageEventsIndicator_PetitionMessage
+      ...EmailEventsIndicator_PetitionMessage
       ...SentPetitionMessageDialog_PetitionMessage
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
-  ${MessageEventsIndicator_PetitionMessageFragmentDoc}
+  ${EmailEventsIndicator_PetitionMessageFragmentDoc}
   ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
 ` as unknown as DocumentNode<TimelineMessageSentEvent_MessageSentEventFragment, unknown>;
 export const SentReminderMessageDialog_PetitionReminderFragmentDoc = gql`
@@ -19027,10 +19118,34 @@ export const TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc = gq
   }
   ${UserReference_UserFragmentDoc}
 ` as unknown as DocumentNode<TimelinePetitionReopenedEvent_PetitionReopenedEventFragment, unknown>;
-export const TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc = gql`
-  fragment TimelineSignatureStartedEvent_SignatureStartedEvent on SignatureStartedEvent {
+export const SignerReference_PetitionSignerFragmentDoc = gql`
+  fragment SignerReference_PetitionSigner on PetitionSigner {
+    email
+    fullName
+  }
+` as unknown as DocumentNode<SignerReference_PetitionSignerFragment, unknown>;
+export const TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc = gql`
+  fragment TimelineSignatureOpenedEvent_SignatureOpenedEvent on SignatureOpenedEvent {
+    signer {
+      ...SignerReference_PetitionSigner
+    }
     createdAt
   }
+  ${SignerReference_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<TimelineSignatureOpenedEvent_SignatureOpenedEventFragment, unknown>;
+export const EmailEventsIndicator_SignatureStartedEventFragmentDoc = gql`
+  fragment EmailEventsIndicator_SignatureStartedEvent on SignatureStartedEvent {
+    bouncedAt
+    deliveredAt
+    openedAt
+  }
+` as unknown as DocumentNode<EmailEventsIndicator_SignatureStartedEventFragment, unknown>;
+export const TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc = gql`
+  fragment TimelineSignatureStartedEvent_SignatureStartedEvent on SignatureStartedEvent {
+    ...EmailEventsIndicator_SignatureStartedEvent
+    createdAt
+  }
+  ${EmailEventsIndicator_SignatureStartedEventFragmentDoc}
 ` as unknown as DocumentNode<TimelineSignatureStartedEvent_SignatureStartedEventFragment, unknown>;
 export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc = gql`
   fragment TimelineSignatureCompletedEvent_SignatureCompletedEvent on SignatureCompletedEvent {
@@ -19040,12 +19155,6 @@ export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc 
   TimelineSignatureCompletedEvent_SignatureCompletedEventFragment,
   unknown
 >;
-export const SignerReference_PetitionSignerFragmentDoc = gql`
-  fragment SignerReference_PetitionSigner on PetitionSigner {
-    email
-    fullName
-  }
-` as unknown as DocumentNode<SignerReference_PetitionSignerFragment, unknown>;
 export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc = gql`
   fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
     cancelledBy {
@@ -19295,6 +19404,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionReopenedEvent {
       ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
     }
+    ... on SignatureOpenedEvent {
+      ...TimelineSignatureOpenedEvent_SignatureOpenedEvent
+    }
     ... on SignatureStartedEvent {
       ...TimelineSignatureStartedEvent_SignatureStartedEvent
     }
@@ -19359,6 +19471,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc}
   ${TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc}
   ${TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc}
+  ${TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc}
   ${TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc}
   ${TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc}
   ${TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc}

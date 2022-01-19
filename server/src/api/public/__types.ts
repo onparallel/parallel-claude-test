@@ -1811,6 +1811,7 @@ export type PetitionEventType =
   | "REPLY_UPDATED"
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_OPENED"
   | "SIGNATURE_REMINDER"
   | "SIGNATURE_STARTED"
   | "TEMPLATE_USED"
@@ -2858,6 +2859,13 @@ export type SignatureConfigInputSigner = {
   lastName: Scalars["String"];
 };
 
+export type SignatureOpenedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  signer: PetitionSigner;
+  type: PetitionEventType;
+};
+
 export type SignatureOrgIntegration = OrgIntegration & {
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
@@ -2883,8 +2891,11 @@ export type SignatureReminderEvent = PetitionEvent & {
 };
 
 export type SignatureStartedEvent = PetitionEvent & {
+  bouncedAt: Maybe<Scalars["DateTime"]>;
   createdAt: Scalars["DateTime"];
+  deliveredAt: Maybe<Scalars["DateTime"]>;
   id: Scalars["GID"];
+  openedAt: Maybe<Scalars["DateTime"]>;
   type: PetitionEventType;
 };
 

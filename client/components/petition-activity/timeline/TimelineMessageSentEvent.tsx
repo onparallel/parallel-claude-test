@@ -3,7 +3,7 @@ import { Box, Button, Flex } from "@chakra-ui/react";
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { MessageEventsIndicator } from "@parallel/components/petition-activity/MessageEventsIndicator";
+import { EmailEventsIndicator } from "@parallel/components/petition-activity/EmailEventsIndicator";
 import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -64,7 +64,7 @@ export function TimelineMessageSentEvent({
               }}
             />
           )}
-          <MessageEventsIndicator message={message} marginLeft={2} />
+          <EmailEventsIndicator event={message} marginLeft={2} />
         </Box>
         {message.emailBody ? (
           <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
@@ -90,14 +90,14 @@ TimelineMessageSentEvent.fragments = {
             ...ContactReference_Contact
           }
         }
-        ...MessageEventsIndicator_PetitionMessage
+        ...EmailEventsIndicator_PetitionMessage
         ...SentPetitionMessageDialog_PetitionMessage
       }
       createdAt
     }
     ${UserReference.fragments.User}
     ${ContactReference.fragments.Contact}
-    ${MessageEventsIndicator.fragments.PetitionMessage}
+    ${EmailEventsIndicator.fragments.PetitionMessage}
     ${SentPetitionMessageDialog.fragments.PetitionMessage}
   `,
 };

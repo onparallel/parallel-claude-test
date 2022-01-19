@@ -84,6 +84,8 @@ export const PetitionEvent = interfaceType({
         return "PetitionClosedNotifiedEvent";
       case "PETITION_REOPENED":
         return "PetitionReopenedEvent";
+      case "SIGNATURE_OPENED":
+        return "SignatureOpenedEvent";
       case "SIGNATURE_STARTED":
         return "SignatureStartedEvent";
       case "SIGNATURE_COMPLETED":
@@ -494,9 +496,32 @@ export const PetitionReopenedEvent = createPetitionEvent("PetitionReopenedEvent"
 });
 
 /**
+ * Triggered when the signers opens the signing page
+ */
+export const SignatureOpenedEvent = createPetitionEvent("SignatureOpenedEvent", (t) => {
+  t.nullable.field("signer", {
+    type: "PetitionSigner",
+    resolve: ({ data }) => data.signer,
+  });
+});
+
+/**
  * Triggered when a signature request on the petition is started.
  */
-export const SignatureStartedEvent = createPetitionEvent("SignatureStartedEvent", (t) => {});
+export const SignatureStartedEvent = createPetitionEvent("SignatureStartedEvent", (t) => {
+  t.nullable.field("deliveredAt", {
+    type: "DateTime",
+    resolve: ({ data }) => data.email_delivered_at ?? null,
+  });
+  t.nullable.field("openedAt", {
+    type: "DateTime",
+    resolve: ({ data }) => data.email_opened_at ?? null,
+  });
+  t.nullable.field("bouncedAt", {
+    type: "DateTime",
+    resolve: ({ data }) => data.email_bounced_at ?? null,
+  });
+});
 
 /**
  * Triggered when a signature request on the petition is completed.

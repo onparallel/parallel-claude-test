@@ -8770,6 +8770,11 @@
     "context": "See reason"
   },
   {
+    "term": "timeline.signature-opened-description",
+    "definition": "{signer} opened the signing document {timeAgo}",
+    "context": "{signer} opened the signing document {timeAgo}"
+  },
+  {
     "term": "timeline.signature-reminder.description",
     "definition": "{same, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}"

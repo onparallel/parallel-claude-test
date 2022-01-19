@@ -541,6 +541,7 @@ export interface NexusGenObjects {
     review?: boolean;
     letRecipientsChooseSigners?: boolean;
   };
+  SignatureOpenedEvent: events.SignatureOpenedEvent;
   SignatureOrgIntegration: db.OrgIntegration;
   SignatureReminderEvent: events.SignatureReminderEvent;
   SignatureStartedEvent: events.SignatureStartedEvent;
@@ -1668,6 +1669,13 @@ export interface NexusGenFieldTypes {
     timezone: string; // String!
     title: string; // String!
   };
+  SignatureOpenedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    signer: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+  };
   SignatureOrgIntegration: {
     // field return type
     environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"]; // SignatureOrgIntegrationEnvironment!
@@ -1686,8 +1694,11 @@ export interface NexusGenFieldTypes {
   };
   SignatureStartedEvent: {
     // field return type
+    bouncedAt: NexusGenScalars["DateTime"] | null; // DateTime
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    deliveredAt: NexusGenScalars["DateTime"] | null; // DateTime
     id: NexusGenScalars["GID"]; // GID!
+    openedAt: NexusGenScalars["DateTime"] | null; // DateTime
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SsoOrgIntegration: {
@@ -2961,6 +2972,13 @@ export interface NexusGenFieldTypeNames {
     timezone: "String";
     title: "String";
   };
+  SignatureOpenedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    signer: "PetitionSigner";
+    type: "PetitionEventType";
+  };
   SignatureOrgIntegration: {
     // field return type name
     environment: "SignatureOrgIntegrationEnvironment";
@@ -2979,8 +2997,11 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureStartedEvent: {
     // field return type name
+    bouncedAt: "DateTime";
     createdAt: "DateTime";
+    deliveredAt: "DateTime";
     id: "GID";
+    openedAt: "DateTime";
     type: "PetitionEventType";
   };
   SsoOrgIntegration: {
@@ -4243,6 +4264,7 @@ export interface NexusGenAbstractTypeMembers {
     | "ReplyUpdatedEvent"
     | "SignatureCancelledEvent"
     | "SignatureCompletedEvent"
+    | "SignatureOpenedEvent"
     | "SignatureReminderEvent"
     | "SignatureStartedEvent"
     | "TemplateUsedEvent"
@@ -4335,6 +4357,7 @@ export interface NexusGenTypeInterfaces {
   SignatureCancelledUserNotification: "PetitionUserNotification";
   SignatureCompletedEvent: "PetitionEvent";
   SignatureCompletedUserNotification: "PetitionUserNotification";
+  SignatureOpenedEvent: "PetitionEvent";
   SignatureOrgIntegration: "OrgIntegration";
   SignatureReminderEvent: "PetitionEvent";
   SignatureStartedEvent: "PetitionEvent";
