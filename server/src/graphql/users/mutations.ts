@@ -38,6 +38,7 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
+import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
@@ -247,6 +248,7 @@ export const deactivateUser = mutationField("deactivateUser", {
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
+    validIsDefined((args) => args.transferToUserId, "transferToUserId"),
     (_, { userIds, transferToUserId, deletePetitions }, ctx, info) => {
       if (deletePetitions) {
         throw new ArgValidationError(info, "transferToUserId", "Can't deletePetitions from user");
