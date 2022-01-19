@@ -512,6 +512,29 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
   },
 });
 
+export const closePetition = mutationField("closePetition", {
+  description: "Closes an open petition.",
+  type: "Petition",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, args, ctx) => {
+    const [petition] = await ctx.petitions.updatePetition(
+      args.petitionId,
+      { status: "CLOSED" },
+      `User:${ctx.user!.id}`
+    );
+
+    await ctx.petitions.updateRemindersForPetition(args.petitionId, null);
+
+    return petition;
+  },
+});
+
 export const updatePetition = mutationField("updatePetition", {
   description: "Updates a petition.",
   type: "PetitionBase",

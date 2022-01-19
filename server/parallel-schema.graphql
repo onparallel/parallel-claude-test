@@ -512,6 +512,11 @@ type Mutation {
   cloneUserGroup(locale: String, userGroupIds: [GID!]!): [UserGroup!]!
 
   """
+  Closes an open petition.
+  """
+  closePetition(petitionId: GID!): Petition!
+
+  """
   Marks a petition as COMPLETED.
   If the petition has a signature configured and does not require a review, starts the signing process.
   """

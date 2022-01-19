@@ -345,6 +345,8 @@ export type Mutation = {
   clonePetitions: Array<PetitionBase>;
   /** Clones the user group with all its members */
   cloneUserGroup: Array<UserGroup>;
+  /** Closes an open petition. */
+  closePetition: Petition;
   /**
    * Marks a petition as COMPLETED.
    * If the petition has a signature configured and does not require a review, starts the signing process.
@@ -674,6 +676,10 @@ export type MutationclonePetitionsArgs = {
 export type MutationcloneUserGroupArgs = {
   locale?: InputMaybe<Scalars["String"]>;
   userGroupIds: Array<Scalars["GID"]>;
+};
+
+export type MutationclosePetitionArgs = {
+  petitionId: Scalars["GID"];
 };
 
 export type MutationcompletePetitionArgs = {

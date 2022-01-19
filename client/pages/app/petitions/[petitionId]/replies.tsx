@@ -69,6 +69,7 @@ import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
   PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
+  PetitionReplies_closePetitionDocument,
   PetitionReplies_fileUploadReplyDownloadLinkDocument,
   PetitionReplies_petitionDocument,
   PetitionReplies_PetitionFieldFragment,
@@ -306,6 +307,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const [sendPetitionClosedNotification] = useMutation(
     PetitionReplies_sendPetitionClosedNotificationDocument
   );
+  const [closePetition] = useMutation(PetitionReplies_closePetitionDocument);
   const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
   const handleFinishPetition = useCallback(
     async ({ requiredMessage }: { requiredMessage: boolean }) => {
@@ -334,6 +336,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           requiredMessage,
           showNotify: petition.accesses.length > 0,
         });
+
+        await closePetition({
+          variables: {
+            petitionId,
+          },
+        });
+
         message = data.message;
         pdfExportTitle = data.pdfExportTitle;
 
@@ -741,6 +750,14 @@ PetitionReplies.mutations = [
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
+  `,
+  gql`
+    mutation PetitionReplies_closePetition($petitionId: GID!) {
+      closePetition(petitionId: $petitionId) {
+        ...PetitionReplies_Petition
+      }
+    }
+    ${PetitionReplies.fragments.Petition}
   `,
   gql`
     mutation PetitionReplies_approveOrRejectPetitionFieldReplies(
