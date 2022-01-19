@@ -178,12 +178,17 @@ export class IntegrationRepository extends BaseRepository {
 
   async createOrgIntegration<IType extends IntegrationType>(
     data: Replace<CreateOrgIntegration, { settings: IntegrationSettings<IType> }>,
-    createdBy: string
+    createdBy: string,
+    t?: Knex.Transaction
   ) {
-    const [integration] = await this.insert("org_integration", {
-      ...data,
-      created_by: createdBy,
-    }).returning("*");
+    const [integration] = await this.insert(
+      "org_integration",
+      {
+        ...data,
+        created_by: createdBy,
+      },
+      t
+    ).returning("*");
     return integration;
   }
 

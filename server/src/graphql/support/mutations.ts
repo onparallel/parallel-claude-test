@@ -445,26 +445,43 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
 
     return await ctx.organizations.withTransaction(async (t) => {
       try {
-        await ctx.organizations.createOrganizationUsageLimit(
-          orgId,
-          {
-            limit_name: "SIGNATURIT_SHARED_APIKEY",
-            limit,
-            period,
-          },
-          t
-        );
-        await ctx.organizations.updateOrganization(
-          orgId,
-          {
-            usage_details: {
-              ...org.usage_details,
-              SIGNATURIT_SHARED_APIKEY: { limit, period },
+        await Promise.all([
+          ctx.integrations.createOrgIntegration(
+            {
+              type: "SIGNATURE",
+              name: "Parallel - Signaturit",
+              provider: "SIGNATURIT",
+              org_id: orgId,
+              settings: {
+                API_KEY: ctx.config.signature.signaturitSharedProductionApiKey,
+                ENVIRONMENT: "production",
+              },
+              is_enabled: true,
             },
-          },
-          `User:${ctx.user!.id}`,
-          t
-        );
+            `User:${ctx.user!.id}`,
+            t
+          ),
+          ctx.organizations.createOrganizationUsageLimit(
+            orgId,
+            {
+              limit_name: "SIGNATURIT_SHARED_APIKEY",
+              limit,
+              period,
+            },
+            t
+          ),
+          ctx.organizations.updateOrganization(
+            orgId,
+            {
+              usage_details: {
+                ...org.usage_details,
+                SIGNATURIT_SHARED_APIKEY: { limit, period },
+              },
+            },
+            `User:${ctx.user!.id}`,
+            t
+          ),
+        ]);
         return { result: RESULT.SUCCESS };
       } catch (error: any) {
         if ((error.message as string).includes("invalid input syntax for type interval")) {
