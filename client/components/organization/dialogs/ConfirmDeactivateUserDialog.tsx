@@ -108,7 +108,7 @@ function ConfirmDeactivateUserDialog({
             <FormErrorMessage>
               <FormattedMessage
                 id="organization.confirm-deactivate.user-select.input-error"
-                defaultMessage="Please, select a user or change your reply"
+                defaultMessage="Please, select a user"
               />
             </FormErrorMessage>
           </FormControl>

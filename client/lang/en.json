@@ -4636,8 +4636,8 @@
   },
   {
     "term": "organization.confirm-deactivate.user-select.input-error",
-    "definition": "Please, select a user or change your reply",
-    "context": "Please, select a user or change your reply"
+    "definition": "Please, select a user",
+    "context": "Please, select a user"
   },
   {
     "term": "organization.confirm-deactivate.user-select.input-placeholder",
