@@ -1489,31 +1489,28 @@ export class PetitionRepository extends BaseRepository {
     return field;
   }
 
-  public async reopenPetition(
-    petitionId: number,
-    updatedBy: string,
-    ifCompleted = true,
-    t?: Knex.Transaction
-  ) {
+  public async reopenPetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
     const [petition] = await this.raw<Petition>(
       /* sql */ `
       update petition set "status" = (
         case when id in (
           select distinct(pa.petition_id) from petition_access pa where pa.petition_id = ?
-        ) then 'PENDING'::petition_status else 'DRAFT'::petition_status 
+        ) then 
+          (case when status = 'COMPLETED' then 'PENDING'::petition_status else "status" end)
+        else 
+          (case when status = 'COMPLETED' then 'DRAFT'::petition_status else "status" end)
         end),
         updated_at = NOW(),
         updated_by = ?
-      where id = ? ${ifCompleted ? /* sql*/ `and status = 'COMPLETED'` : ""} 
+      where id = ?
       returning *;
     `,
       [petitionId, updatedBy, petitionId],
       t
     );
 
-    // update dataloader cache to make sure petition status is updated in next graphql calls
-    this.loadPetition.dataloader.clear(petitionId).prime(petitionId, petition);
-
+    // clear cache to make sure petition status is updated in next graphql calls
+    this.loadPetition.dataloader.clear(petitionId);
     return petition;
   }
 
