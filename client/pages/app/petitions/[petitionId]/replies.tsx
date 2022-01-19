@@ -307,7 +307,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const [sendPetitionClosedNotification] = useMutation(
     PetitionReplies_sendPetitionClosedNotificationDocument
   );
-  const [closePetition] = useMutation(PetitionReplies_closePetitionDocument);
   const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
   const handleFinishPetition = useCallback(
     async ({ requiredMessage }: { requiredMessage: boolean }) => {
@@ -335,12 +334,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           hasPetitionPdfExport: me.hasPetitionPdfExport,
           requiredMessage,
           showNotify: petition.accesses.length > 0,
-        });
-
-        await closePetition({
-          variables: {
-            petitionId,
-          },
         });
 
         message = data.message;
@@ -384,6 +377,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const [approveOrRejectReplies] = useMutation(
     PetitionReplies_approveOrRejectPetitionFieldRepliesDocument
   );
+  const [closePetition] = useMutation(PetitionReplies_closePetitionDocument);
 
   const showConfirmCancelOngoingSignature = useDialog(ConfirmCancelOngoingSignature);
 
@@ -419,20 +413,31 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         f.replies.some((r) => r.status === "PENDING")
       );
 
-      if (hasUnreviewedReplies) {
-        const option = await showSolveUnreviewedRepliesDialog({});
+      const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog({}) : "APPROVE";
 
+      await handleFinishPetition({ requiredMessage: false });
+
+      if (hasUnreviewedReplies)
         await approveOrRejectReplies({
           variables: {
             petitionId,
             status: option === "APPROVE" ? "APPROVED" : "REJECTED",
           },
         });
-      }
 
-      await handleFinishPetition({ requiredMessage: false });
+      await closePetition({
+        variables: {
+          petitionId,
+        },
+      });
     } catch {}
-  }, [petition, handleFinishPetition, cancelSignatureRequest]);
+  }, [
+    petition,
+    approveOrRejectReplies,
+    closePetition,
+    handleFinishPetition,
+    cancelSignatureRequest,
+  ]);
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
