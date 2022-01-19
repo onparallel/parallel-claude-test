@@ -1550,8 +1550,8 @@ export const reopenPetition = mutationField("reopenPetition", {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.withTransaction(async (t) => {
-      const [petition] = await Promise.all([
+    await ctx.petitions.withTransaction(async (t) => {
+      await Promise.all([
         ctx.petitions.reopenPetition(args.petitionId, `User:${ctx.user!.id}`, t),
         ctx.petitions.createEvent(
           {
@@ -1562,9 +1562,8 @@ export const reopenPetition = mutationField("reopenPetition", {
           t
         ),
       ]);
-
-      return petition;
     });
+    return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });
 
