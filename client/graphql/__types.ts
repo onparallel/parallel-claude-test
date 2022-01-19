@@ -354,6 +354,8 @@ export interface Mutation {
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
+  /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
+  approveOrRejectPetitionFieldReplies: Petition;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
@@ -643,6 +645,11 @@ export interface MutationaddPetitionPermissionArgs {
 export interface MutationaddUsersToUserGroupArgs {
   userGroupId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
+}
+
+export interface MutationapproveOrRejectPetitionFieldRepliesArgs {
+  petitionId: Scalars["GID"];
+  status: PetitionFieldReplyStatus;
 }
 
 export interface MutationassignPetitionToUserArgs {

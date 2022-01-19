@@ -934,6 +934,28 @@ export const dynamicSelectFieldFileDownloadLink = mutationField(
   }
 );
 
+export const approveOrRejectPetitionFieldReplies = mutationField(
+  "approveOrRejectPetitionFieldReplies",
+  {
+    description: "Updates the status of a PENDING petition field replies to APPROVED or REJECTED",
+    type: "Petition",
+    authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
+    },
+    resolve: async (_, args, ctx) => {
+      await ctx.petitions.updatePendingPetitionFieldRepliesStatusByPetitionId(
+        args.petitionId,
+        args.status,
+        `User:${ctx.user!.id}`
+      );
+
+      return (await ctx.petitions.loadPetition(args.petitionId))!;
+    },
+  }
+);
+
 export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFieldRepliesStatus", {
   description: "Updates the status of a petition field reply.",
   type: "PetitionField",

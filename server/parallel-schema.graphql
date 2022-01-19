@@ -435,6 +435,14 @@ type Mutation {
   addUsersToUserGroup(userGroupId: GID!, userIds: [GID!]!): UserGroup!
 
   """
+  Updates the status of a PENDING petition field replies to APPROVED or REJECTED
+  """
+  approveOrRejectPetitionFieldReplies(
+    petitionId: GID!
+    status: PetitionFieldReplyStatus!
+  ): Petition!
+
+  """
   Clones the petition and assigns the given user as owner and creator.
   """
   assignPetitionToUser(

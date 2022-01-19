@@ -1161,46 +1161,8 @@ export class PetitionRepository extends BaseRepository {
           deleted_at: null,
         });
 
-      const fields = await this.from("petition_field").where({
-        petition_id: petitionId,
-        deleted_at: null,
-      });
-
-      const replies = await this.from("petition_field_reply")
-        .whereIn(
-          "petition_field_id",
-          fields.map((f) => f.from_petition_field_id)
-        )
-        .whereNull("deleted_at")
-        .select("*");
-
-      const otherFieldsAreValidated = replies.every((r) => r.status === "APPROVED");
-
       const [[petition]] = await Promise.all([
-        this.from("petition", t)
-          .where("id", petitionId)
-          .update(
-            {
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-              status: this.knex.raw(/* sql */ `
-                case is_template 
-                when false then 
-                  (case ${otherFieldsAreValidated} 
-                    when true then 
-                      (case status 
-                        when 'PENDING' then 'CLOSED'
-                        else status
-                      end) 
-                    else status
-                  end) 
-                else
-                  NULL
-                end
-              `) as any,
-            },
-            "*"
-          ),
+        this.from("petition", t).where("id", petitionId).select("*"),
         this.from("petition_field", t)
           .update({
             updated_at: this.now(),
@@ -1488,6 +1450,27 @@ export class PetitionRepository extends BaseRepository {
 
     // clear cache to make sure petition status is updated in next graphql calls
     this.loadPetition.dataloader.clear(petitionId);
+  }
+
+  async updatePendingPetitionFieldRepliesStatusByPetitionId(
+    petitionId: number,
+    status: PetitionFieldReplyStatus,
+    updatedBy: string
+  ) {
+    const fields = await this.loadFieldsForPetition(petitionId);
+    const fieldIds = fields.flatMap((f) => f.id);
+
+    return await this.from("petition_field_reply")
+      .whereIn("petition_field_id", fieldIds)
+      .andWhere("status", "PENDING")
+      .update(
+        {
+          status,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
   }
 
   async updatePetitionFieldRepliesStatus(

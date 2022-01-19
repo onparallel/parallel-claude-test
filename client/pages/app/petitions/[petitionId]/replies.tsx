@@ -68,6 +68,7 @@ import { RecipientViewCommentsBadge } from "@parallel/components/recipient-view/
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
+  PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
   PetitionReplies_fileUploadReplyDownloadLinkDocument,
   PetitionReplies_petitionDocument,
   PetitionReplies_PetitionFieldFragment,
@@ -371,6 +372,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   );
 
   const showSolveUnreviewedRepliesDialog = useSolveUnreviewedRepliesDialog();
+  const [approveOrRejectReplies] = useMutation(
+    PetitionReplies_approveOrRejectPetitionFieldRepliesDocument
+  );
 
   const showConfirmCancelOngoingSignature = useDialog(ConfirmCancelOngoingSignature);
 
@@ -405,9 +409,17 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       const hasUnreviewedReplies = petition.fields.some((f) =>
         f.replies.some((r) => r.status === "PENDING")
       );
-      const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog({}) : "APPROVE";
 
-      // TODO: Approve or reject all pending replies
+      if (hasUnreviewedReplies) {
+        const option = await showSolveUnreviewedRepliesDialog({});
+
+        await approveOrRejectReplies({
+          variables: {
+            petitionId,
+            status: option === "APPROVE" ? "APPROVED" : "REJECTED",
+          },
+        });
+      }
 
       await handleFinishPetition({ requiredMessage: false });
     } catch {}
@@ -729,6 +741,17 @@ PetitionReplies.mutations = [
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
+  `,
+  gql`
+    mutation PetitionReplies_approveOrRejectPetitionFieldReplies(
+      $petitionId: GID!
+      $status: PetitionFieldReplyStatus!
+    ) {
+      approveOrRejectPetitionFieldReplies(petitionId: $petitionId, status: $status) {
+        ...PetitionReplies_Petition
+      }
+    }
+    ${PetitionReplies.fragments.Petition}
   `,
   gql`
     mutation PetitionReplies_fileUploadReplyDownloadLink(
