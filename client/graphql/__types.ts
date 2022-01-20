@@ -17821,11 +17821,6 @@ export const OrganizationUsersListTableHeader_UserFragmentDoc = gql`
     role
   }
 ` as unknown as DocumentNode<OrganizationUsersListTableHeader_UserFragment, unknown>;
-export const UserGroupReference_UserGroupFragmentDoc = gql`
-  fragment UserGroupReference_UserGroup on UserGroup {
-    name
-  }
-` as unknown as DocumentNode<UserGroupReference_UserGroupFragment, unknown>;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -19078,18 +19073,24 @@ export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
   }
   ${ContactReference_ContactFragmentDoc}
 ` as unknown as DocumentNode<TimelineAccessDelegatedEvent_AccessDelegatedEventFragment, unknown>;
+export const UserGroupReference_UserGroupFragmentDoc = gql`
+  fragment UserGroupReference_UserGroup on UserGroup {
+    name
+  }
+` as unknown as DocumentNode<UserGroupReference_UserGroupFragment, unknown>;
 export const TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc = gql`
   fragment TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent on GroupPermissionAddedEvent {
     user {
       ...UserReference_User
     }
     permissionGroup {
-      name
+      ...UserGroupReference_UserGroup
     }
     permissionType
     createdAt
   }
   ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<
   TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment,
   unknown
@@ -19100,12 +19101,13 @@ export const TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragme
       ...UserReference_User
     }
     permissionGroup {
-      name
+      ...UserGroupReference_UserGroup
     }
     permissionType
     createdAt
   }
   ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<
   TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment,
   unknown
@@ -19116,11 +19118,12 @@ export const TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFrag
       ...UserReference_User
     }
     permissionGroup {
-      name
+      ...UserGroupReference_UserGroup
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<
   TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment,
   unknown

@@ -44,10 +44,11 @@ TimelineGroupPermissionRemovedEvent.fragments = {
         ...UserReference_User
       }
       permissionGroup {
-        name
+        ...UserGroupReference_UserGroup
       }
       createdAt
     }
     ${UserReference.fragments.User}
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };

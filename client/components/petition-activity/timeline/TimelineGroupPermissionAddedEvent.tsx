@@ -54,11 +54,12 @@ TimelineGroupPermissionAddedEvent.fragments = {
         ...UserReference_User
       }
       permissionGroup {
-        name
+        ...UserGroupReference_UserGroup
       }
       permissionType
       createdAt
     }
     ${UserReference.fragments.User}
+    ${UserGroupReference.fragments.UserGroup}
   `,
 };
