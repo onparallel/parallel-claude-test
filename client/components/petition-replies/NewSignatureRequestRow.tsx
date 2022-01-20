@@ -76,27 +76,21 @@ export function NewSignatureRequestRow({
         </Box>
       </Box>
       <Box padding={2} paddingRight={4}>
-        {petition.status === "PENDING" || petition.status === "DRAFT" ? (
-          <Button width="24" colorScheme="red" onClick={() => onUpdateConfig(null)}>
+        <Flex alignItems="center">
+          <Button width="24" onClick={() => onUpdateConfig(null)}>
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
           </Button>
-        ) : (
-          <Flex alignItems="center">
-            <Button width="24" onClick={() => onUpdateConfig(null)}>
-              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-            </Button>
-            <Button width="24" colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
-              {signers.length === 0 ? (
-                <FormattedMessage
-                  id="component.petition-signatures-card.start"
-                  defaultMessage="Start..."
-                />
-              ) : (
-                <FormattedMessage id="generic.start" defaultMessage="Start" />
-              )}
-            </Button>
-          </Flex>
-        )}
+          <Button width="24" colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
+            {signers.length === 0 ? (
+              <FormattedMessage
+                id="component.petition-signatures-card.start"
+                defaultMessage="Start..."
+              />
+            ) : (
+              <FormattedMessage id="generic.start" defaultMessage="Start" />
+            )}
+          </Button>
+        </Flex>
       </Box>
     </>
   );
@@ -105,7 +99,6 @@ export function NewSignatureRequestRow({
 NewSignatureRequestRow.fragments = {
   Petition: gql`
     fragment NewSignatureRequestRow_Petition on Petition {
-      status
       signatureConfig {
         signers {
           ...SignerReference_PetitionSigner
