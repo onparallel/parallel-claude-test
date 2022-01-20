@@ -253,7 +253,7 @@ export function RecipientViewHeader({
                 direction={{ base: "column", md: "row" }}
                 alignItems="stretch"
                 spacing={4}
-                divider={<Divider height="auto" orientation={dividerOrientation} />}
+                divider={<Divider height="auto" orientation={dividerOrientation ?? "vertical"} />}
               >
                 <Stack flex="1">
                   <Box>
