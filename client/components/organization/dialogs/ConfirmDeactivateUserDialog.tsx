@@ -79,7 +79,7 @@ function ConfirmDeactivateUserDialog({
           <Text>
             <FormattedMessage
               id="organization.confirm-deactivate-user-dialog.transfer-to-user"
-              defaultMessage="Before continuing, choose what you want to do with the petitions associated to this {count, plural, =1{user} other {users}}:"
+              defaultMessage="To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
               values={{
                 count: selected.length,
               }}

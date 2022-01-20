@@ -4631,8 +4631,8 @@
   },
   {
     "term": "organization.confirm-deactivate-user-dialog.transfer-to-user",
-    "definition": "Before continuing, choose what you want to do with the petitions associated to this {count, plural, =1{user} other {users}}:",
-    "context": "Before continuing, choose what you want to do with the petitions associated to this {count, plural, =1{user} other {users}}:"
+    "definition": "To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate.",
+    "context": "To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
   },
   {
     "term": "organization.confirm-deactivate.user-select.input-error",
