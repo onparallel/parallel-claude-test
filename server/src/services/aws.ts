@@ -1,6 +1,7 @@
 import AWS from "aws-sdk";
 import { createHash } from "crypto";
 import { inject, injectable, interfaces } from "inversify";
+import { Knex } from "knex";
 import { chunk, isDefined } from "remeda";
 import { Memoize } from "typescript-memoize";
 import { Config, CONFIG } from "../config";
@@ -15,9 +16,10 @@ export interface IAws {
   fileUploads: IStorage;
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
-    messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
+    messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string },
+    t?: Knex.Transaction
   ): void;
-  enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>): void;
+  enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>, t?: Knex.Transaction): void;
   createCognitoUser(
     email: string,
     password: string | null,
@@ -105,6 +107,22 @@ export class Aws implements IAws {
 
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
+    messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string },
+    t?: Knex.Transaction
+  ) {
+    if (isDefined(t) && !t.isCompleted()) {
+      t.on("query", (data) => {
+        if (data.sql === "COMMIT;") {
+          this.sendSQSMessage(queue, messages);
+        }
+      });
+    } else {
+      this.sendSQSMessage(queue, messages);
+    }
+  }
+
+  private sendSQSMessage(
+    queue: keyof Config["queueWorkers"],
     messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
   ) {
     const queueUrl = this.config.queueWorkers[queue].endpoint;
@@ -134,7 +152,7 @@ export class Aws implements IAws {
     }
   }
 
-  enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>) {
+  enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>, t?: Knex.Transaction) {
     const _events = unMaybeArray(events).filter(isDefined);
     if (_events.length > 0) {
       this.enqueueMessages(
@@ -143,7 +161,8 @@ export class Aws implements IAws {
           id: `event-processor-${event.id}`,
           groupId: `event-processor-${event.id}`,
           body: event,
-        }))
+        })),
+        t
       );
     }
   }

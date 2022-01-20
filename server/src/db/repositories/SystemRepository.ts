@@ -22,7 +22,7 @@ export class SystemRepository extends BaseRepository {
     const systemEvents = await this.insert("system_event", eventsArray, t);
 
     // dont await this. we may be inside a transaction
-    this.aws.enqueueEvents(systemEvents);
+    this.aws.enqueueEvents(systemEvents, t);
 
     return systemEvents;
   }

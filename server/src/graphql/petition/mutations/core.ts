@@ -343,7 +343,8 @@ export const deletePetitions = mutationField("deletePetitions", {
           ctx.petitions.cancelPetitionSignatureRequest(
             pendingSignatureRequests.map((s) => s.id),
             "CANCELLED_BY_USER",
-            { user_id: ctx.user!.id }
+            { user_id: ctx.user!.id },
+            t
           ),
           ctx.petitions.createEvent(
             pendingSignatureRequests.map((s) => ({
@@ -356,7 +357,8 @@ export const deletePetitions = mutationField("deletePetitions", {
                   user_id: ctx.user!.id,
                 },
               },
-            }))
+            })),
+            t
           ),
           ctx.aws.enqueueMessages(
             "signature-worker",
@@ -369,7 +371,8 @@ export const deletePetitions = mutationField("deletePetitions", {
                   type: "cancel-signature-process",
                   payload: { petitionSignatureRequestId: s.id },
                 },
-              }))
+              })),
+            t
           ),
         ]);
       }

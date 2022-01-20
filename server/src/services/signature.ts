@@ -239,13 +239,17 @@ export class SignatureService implements ISignatureService {
           },
           t
         ),
-        this.aws.enqueueMessages("signature-worker", {
-          groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
-          body: {
-            type: "cancel-signature-process",
-            payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
+        this.aws.enqueueMessages(
+          "signature-worker",
+          {
+            groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
+            body: {
+              type: "cancel-signature-process",
+              payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
+            },
           },
-        }),
+          t
+        ),
       ]);
     }
 
@@ -261,13 +265,17 @@ export class SignatureService implements ISignatureService {
     );
 
     await Promise.all([
-      this.aws.enqueueMessages("signature-worker", {
-        groupId: `signature-${toGlobalId("Petition", petitionId)}`,
-        body: {
-          type: "start-signature-process",
-          payload: { petitionSignatureRequestId: signatureRequest.id },
+      this.aws.enqueueMessages(
+        "signature-worker",
+        {
+          groupId: `signature-${toGlobalId("Petition", petitionId)}`,
+          body: {
+            type: "start-signature-process",
+            payload: { petitionSignatureRequestId: signatureRequest.id },
+          },
         },
-      }),
+        t
+      ),
       this.petitionsRepository.createEvent(
         {
           type: "SIGNATURE_STARTED",
