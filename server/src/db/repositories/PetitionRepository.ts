@@ -1499,7 +1499,7 @@ export class PetitionRepository extends BaseRepository {
         end),
         updated_at = NOW(),
         updated_by = ?
-      where id = ? and status = 'COMPLETED'
+      where id = ? and status in ('COMPLETED', 'CLOSED')
     `,
       [petitionId, updatedBy, petitionId],
       t
