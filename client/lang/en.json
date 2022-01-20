@@ -1875,6 +1875,26 @@
     "context": "Sending"
   },
   {
+    "term": "component.petition-signature-request.signer-status.dates.declined-at",
+    "definition": "Document declined: {declinedAt}",
+    "context": "Document declined: {declinedAt}"
+  },
+  {
+    "term": "component.petition-signature-request.signer-status.dates.opened-at",
+    "definition": "Document opened: {openedAt}",
+    "context": "Document opened: {openedAt}"
+  },
+  {
+    "term": "component.petition-signature-request.signer-status.dates.sent-at",
+    "definition": "Signature sent: {sentAt}",
+    "context": "Signature sent: {sentAt}"
+  },
+  {
+    "term": "component.petition-signature-request.signer-status.dates.signed-at",
+    "definition": "Signature completed: {signedAt}",
+    "context": "Signature completed: {signedAt}"
+  },
+  {
     "term": "component.petition-signatures-card.add-signature.label",
     "definition": "Add signature",
     "context": "Add signature"

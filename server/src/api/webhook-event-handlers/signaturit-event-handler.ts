@@ -72,13 +72,16 @@ export function signaturItEventHandler(type: SignatureEvents) {
 
 /** a signer opened the signing page on the signature provider */
 async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
-    `SIGNATURIT/${data.document.signature.id}`
-  );
+  const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
+  const [signer, signerIndex] = findSigner(signature!.signature_config.signersInfo, data.document);
 
-  const [signer] = findSigner(signature!.signature_config.signersInfo, data.document);
   await Promise.all([
-    appendEventLogs(ctx, data),
+    ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
+      signer_status: {
+        ...signature.signer_status,
+        [signerIndex]: { ...signature.signer_status[signerIndex], opened_at: data.created_at },
+      },
+    }),
     ctx.petitions.createEvent({
       type: "SIGNATURE_OPENED",
       petition_id: petitionId,
@@ -87,6 +90,7 @@ async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petiti
         petition_signature_request_id: signature!.id,
       },
     }),
+    appendEventLogs(ctx, data),
   ]);
 }
 
@@ -100,9 +104,11 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
 
   await Promise.all([
     ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${data.document.signature.id}`, {
-      signer_status: { ...signature!.signer_status, [signerIndex]: "SIGNED" },
+      signer_status: {
+        ...signature!.signer_status,
+        [signerIndex]: { ...signature!.signer_status[signerIndex], signed_at: data.created_at },
+      },
     }),
-    appendEventLogs(ctx, data),
     ctx.petitions.createEvent({
       type: "RECIPIENT_SIGNED",
       petition_id: petitionId,
@@ -111,21 +117,13 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
         petition_signature_request_id: signature!.id,
       },
     }),
+    appendEventLogs(ctx, data),
   ]);
 }
 
 /** signer declined the document. Whole signature process will be cancelled */
 async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
-    `SIGNATURIT/${data.document.signature.id}`
-  );
-
-  if (!signature) {
-    throw new Error(
-      `Can't find PetitionSignatureRequest with external_id: SIGNATURIT/${data.document.signature.id}`
-    );
-  }
-
+  const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [canceller, cancellerIndex] = findSigner(
     signature.signature_config.signersInfo,
     data.document
@@ -142,7 +140,10 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
       {
         signer_status: {
           ...signature.signer_status,
-          [cancellerIndex]: "DECLINED",
+          [cancellerIndex]: {
+            ...signature.signer_status[cancellerIndex],
+            declined_at: data.created_at,
+          },
         },
       }
     ),
@@ -209,7 +210,15 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
 }
 
 async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+  const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
+  const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
   await Promise.all([
+    ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
+      signer_status: {
+        ...signature.signer_status,
+        [signerIndex]: { ...signature.signer_status[signerIndex], sent_at: data.created_at },
+      },
+    }),
     updateSignatureStartedEvent(petitionId, { email_delivered_at: new Date(data.created_at) }, ctx),
     appendEventLogs(ctx, data),
   ]);
@@ -303,8 +312,8 @@ async function updateSignatureStartedEvent(
   newData: Omit<SignatureStartedEvent["data"], "petition_signature_request_id">,
   ctx: ApiContext
 ) {
-  const [[signatureStartedEvent]] = await Promise.all([
-    ctx.petitions.getPetitionEventsByType(petitionId, ["SIGNATURE_STARTED"]),
+  const [signatureStartedEvent] = await ctx.petitions.getPetitionEventsByType(petitionId, [
+    "SIGNATURE_STARTED",
   ]);
 
   await ctx.petitions.updateEvent(signatureStartedEvent.id, {

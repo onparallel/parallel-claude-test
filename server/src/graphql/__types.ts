@@ -445,7 +445,14 @@ export interface NexusGenObjects {
     firstName: string;
     lastName: string;
     email: string;
-    status?: "SIGNED" | "DECLINED" | undefined;
+    status?:
+      | {
+          sent_at?: string;
+          opened_at?: string;
+          signed_at?: string;
+          declined_at?: string;
+        }
+      | undefined;
   };
   PetitionSigner: {
     contactId?: number;
@@ -1310,6 +1317,10 @@ export interface NexusGenFieldTypes {
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type
+    declinedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    openedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    sentAt: NexusGenScalars["DateTime"] | null; // DateTime
+    signedAt: NexusGenScalars["DateTime"] | null; // DateTime
     signer: NexusGenRootTypes["PetitionSigner"]; // PetitionSigner!
     status: string; // String!
   };
@@ -2613,6 +2624,10 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type name
+    declinedAt: "DateTime";
+    openedAt: "DateTime";
+    sentAt: "DateTime";
+    signedAt: "DateTime";
     signer: "PetitionSigner";
     status: "String";
   };

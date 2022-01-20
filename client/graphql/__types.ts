@@ -2172,6 +2172,10 @@ export interface PetitionSignatureRequest extends Timestamps {
 
 export interface PetitionSignatureRequestSignerStatus {
   __typename?: "PetitionSignatureRequestSignerStatus";
+  declinedAt?: Maybe<Scalars["DateTime"]>;
+  openedAt?: Maybe<Scalars["DateTime"]>;
+  sentAt?: Maybe<Scalars["DateTime"]>;
+  signedAt?: Maybe<Scalars["DateTime"]>;
   signer: PetitionSigner;
   /** The signing status of the individual contact. */
   status: Scalars["String"];
@@ -8458,6 +8462,10 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   signerStatus: Array<{
     __typename?: "PetitionSignatureRequestSignerStatus";
     status: string;
+    sentAt?: string | null;
+    openedAt?: string | null;
+    signedAt?: string | null;
+    declinedAt?: string | null;
     signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
   }>;
 };
@@ -8637,6 +8645,23 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
     | null;
 };
 
+export type DatesList_SignerStatusFragment = {
+  __typename?: "PetitionSignatureRequestSignerStatus";
+  sentAt?: string | null;
+  openedAt?: string | null;
+  signedAt?: string | null;
+  declinedAt?: string | null;
+};
+
+export type PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment = {
+  __typename?: "PetitionSignatureRequestSignerStatus";
+  status: string;
+  sentAt?: string | null;
+  openedAt?: string | null;
+  signedAt?: string | null;
+  declinedAt?: string | null;
+};
+
 export type PetitionSignaturesCard_UserFragment = {
   __typename?: "User";
   hasPetitionSignature: boolean;
@@ -8671,6 +8696,10 @@ export type PetitionSignaturesCard_PetitionFragment = {
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
+      sentAt?: string | null;
+      openedAt?: string | null;
+      signedAt?: string | null;
+      declinedAt?: string | null;
       signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
     }>;
     signatureConfig: {
@@ -8726,6 +8755,10 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           signerStatus: Array<{
             __typename?: "PetitionSignatureRequestSignerStatus";
             status: string;
+            sentAt?: string | null;
+            openedAt?: string | null;
+            signedAt?: string | null;
+            declinedAt?: string | null;
             signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
           }>;
           signatureConfig: {
@@ -15148,6 +15181,10 @@ export type PetitionReplies_PetitionFragment = {
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
+      sentAt?: string | null;
+      openedAt?: string | null;
+      signedAt?: string | null;
+      declinedAt?: string | null;
       signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
     }>;
     signatureConfig: {
@@ -15535,6 +15572,10 @@ export type PetitionReplies_petitionQuery = {
           signerStatus: Array<{
             __typename?: "PetitionSignatureRequestSignerStatus";
             status: string;
+            sentAt?: string | null;
+            openedAt?: string | null;
+            signedAt?: string | null;
+            declinedAt?: string | null;
             signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
           }>;
           signatureConfig: {
@@ -20222,6 +20263,24 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   }
   ${SignerReference_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<NewSignatureRequestRow_PetitionFragment, unknown>;
+export const DatesList_SignerStatusFragmentDoc = gql`
+  fragment DatesList_SignerStatus on PetitionSignatureRequestSignerStatus {
+    sentAt
+    openedAt
+    signedAt
+    declinedAt
+  }
+` as unknown as DocumentNode<DatesList_SignerStatusFragment, unknown>;
+export const PetitionSignatureRequestSignerStatusIcon_SignerStatusFragmentDoc = gql`
+  fragment PetitionSignatureRequestSignerStatusIcon_SignerStatus on PetitionSignatureRequestSignerStatus {
+    status
+    ...DatesList_SignerStatus
+  }
+  ${DatesList_SignerStatusFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment,
+  unknown
+>;
 export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gql`
   fragment CurrentSignatureRequestRow_PetitionSignatureRequest on PetitionSignatureRequest {
     id
@@ -20230,10 +20289,11 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
       signer {
         ...SignerReference_PetitionSigner
       }
-      status
+      ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
     }
   }
   ${SignerReference_PetitionSignerFragmentDoc}
+  ${PetitionSignatureRequestSignerStatusIcon_SignerStatusFragmentDoc}
 ` as unknown as DocumentNode<CurrentSignatureRequestRow_PetitionSignatureRequestFragment, unknown>;
 export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql`
   fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {

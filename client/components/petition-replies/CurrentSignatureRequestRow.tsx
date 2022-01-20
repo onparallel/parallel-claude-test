@@ -30,6 +30,11 @@ export function CurrentSignatureRequestRow({
   const isAwaitingSignature = ["ENQUEUED", "PROCESSING"].includes(status);
   const isSigned = status === "COMPLETED";
 
+  // when everyone signed (or declined) the document, there is a time window where the request is still in "processing" status
+  // because the signed documents are being generated. In this window it makes no sense to cancel the request or send reminders,
+  // so we will show this actions only of there is at least one signer that didn't sign/decline the document
+  const someSignerIsPending = signerStatus.some((s) => s.status === "PENDING");
+
   const showConfirmSendSignatureReminderDialog = useConfirmSendSignatureReminderDialog();
   async function handleConfirmSendSignatureReminders() {
     const [, sendReminder] = await withError(
@@ -65,12 +70,12 @@ export function CurrentSignatureRequestRow({
         </Heading>
         <Box>
           <FormattedList
-            value={signerStatus.map(({ signer, status }, index) => (
+            value={signerStatus.map((sStatus, index) => (
               <Fragment key={index}>
-                <SignerReference signer={signer} />
+                <SignerReference signer={sStatus.signer} />
                 {isAwaitingSignature ? (
                   <PetitionSignatureRequestSignerStatusIcon
-                    status={status}
+                    signerStatus={sStatus}
                     position="relative"
                     top={-0.5}
                     marginX={0.5}
@@ -82,7 +87,7 @@ export function CurrentSignatureRequestRow({
         </Box>
       </Box>
       <Box padding={2} paddingRight={4}>
-        {status === "PROCESSING" ? (
+        {status === "PROCESSING" && someSignerIsPending ? (
           <>
             <IconButtonWithTooltip
               marginRight={2}
@@ -116,9 +121,10 @@ CurrentSignatureRequestRow.fragments = {
         signer {
           ...SignerReference_PetitionSigner
         }
-        status
+        ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
       }
     }
     ${SignerReference.fragments.PetitionSigner}
+    ${PetitionSignatureRequestSignerStatusIcon.fragments.SignerStatus}
   `,
 };

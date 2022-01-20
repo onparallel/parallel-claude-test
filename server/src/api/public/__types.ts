@@ -2103,6 +2103,10 @@ export type PetitionSignatureRequest = Timestamps & {
 };
 
 export type PetitionSignatureRequestSignerStatus = {
+  declinedAt: Maybe<Scalars["DateTime"]>;
+  openedAt: Maybe<Scalars["DateTime"]>;
+  sentAt: Maybe<Scalars["DateTime"]>;
+  signedAt: Maybe<Scalars["DateTime"]>;
   signer: PetitionSigner;
   /** The signing status of the individual contact. */
   status: Scalars["String"];
@@ -2862,7 +2866,7 @@ export type SignatureConfigInputSigner = {
 export type SignatureOpenedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  signer: PetitionSigner;
+  signer: Maybe<PetitionSigner>;
   type: PetitionEventType;
 };
 

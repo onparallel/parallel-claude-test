@@ -16,7 +16,14 @@ export const PetitionSignatureRequestSignerStatus = objectType({
     firstName: string;
     lastName: string;
     email: string;
-    status?: "SIGNED" | "DECLINED" | undefined;
+    status?:
+      | {
+          sent_at?: string;
+          opened_at?: string;
+          signed_at?: string;
+          declined_at?: string;
+        }
+      | undefined;
   }`,
   definition(t) {
     t.field("signer", {
@@ -29,7 +36,20 @@ export const PetitionSignatureRequestSignerStatus = objectType({
     });
     t.string("status", {
       description: "The signing status of the individual contact.",
-      resolve: (o) => o.status ?? "PENDING",
+      resolve: (o) =>
+        o.status?.signed_at ? "SIGNED" : o.status?.declined_at ? "DECLINED" : "PENDING",
+    });
+    t.nullable.datetime("sentAt", {
+      resolve: (o) => (o.status?.sent_at ? new Date(o.status.sent_at) : null),
+    });
+    t.nullable.datetime("openedAt", {
+      resolve: (o) => (o.status?.opened_at ? new Date(o.status.opened_at) : null),
+    });
+    t.nullable.datetime("signedAt", {
+      resolve: (o) => (o.status?.signed_at ? new Date(o.status.signed_at) : null),
+    });
+    t.nullable.datetime("declinedAt", {
+      resolve: (o) => (o.status?.declined_at ? new Date(o.status.declined_at) : null),
     });
   },
 });

@@ -2802,6 +2802,10 @@ type PetitionSignatureRequest implements Timestamps {
 }
 
 type PetitionSignatureRequestSignerStatus {
+  declinedAt: DateTime
+  openedAt: DateTime
+  sentAt: DateTime
+  signedAt: DateTime
   signer: PetitionSigner!
 
   """
