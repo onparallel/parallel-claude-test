@@ -97,7 +97,7 @@ export function PetitionLayout({
         />
       ) : null}
       {subHeader ? <Box>{subHeader}</Box> : null}
-      <Box flex="1" overflow="auto" {...props}>
+      <Box flex="1" overflow="auto" {...props} id="petition-layout-body">
         {children}
       </Box>
     </AppLayout>

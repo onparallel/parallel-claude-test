@@ -39,9 +39,9 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRouter } from "next/router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
@@ -77,6 +77,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;
 
   const currentPage = Number(query.page) || 1;
+
+  useEffect(() => {
+    const layoutBody = document.getElementById("petition-layout-body");
+    if (layoutBody) layoutBody.scrollTop = 0;
+  }, [currentPage]);
 
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, !isPetition);
 
@@ -290,26 +295,24 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             </Box>
             <Flex flexDirection="column" flex="2" minWidth={0}>
               <Stack spacing={4} key={0}>
-                <AnimatePresence initial={false}>
-                  {fields.map((field) => (
-                    <motion.div key={field.id} layout="position">
-                      <PreviewPetitionField
-                        key={field.id}
-                        petitionId={petition.id}
-                        field={field}
-                        isDisabled={isPetition && (field.validated || petition.status === "CLOSED")}
-                        isInvalid={
-                          finalized &&
-                          !field.validated &&
-                          completedFieldReplies(field).length === 0 &&
-                          !field.optional
-                        }
-                        hasCommentsEnabled={field.options.hasCommentsEnabled}
-                        isCacheOnly={!isPetition}
-                      />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
+                {fields.map((field) => (
+                  <motion.div key={field.id} layout="position">
+                    <PreviewPetitionField
+                      key={field.id}
+                      petitionId={petition.id}
+                      field={field}
+                      isDisabled={isPetition && (field.validated || petition.status === "CLOSED")}
+                      isInvalid={
+                        finalized &&
+                        !field.validated &&
+                        completedFieldReplies(field).length === 0 &&
+                        !field.optional
+                      }
+                      hasCommentsEnabled={field.options.hasCommentsEnabled}
+                      isCacheOnly={!isPetition}
+                    />
+                  </motion.div>
+                ))}
               </Stack>
               <Spacer />
               {pages > 1 ? (
