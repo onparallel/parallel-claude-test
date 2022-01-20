@@ -20,6 +20,7 @@ createCronWorker("reminder-trigger", async (context) => {
     const reminders = await context.petitions.createReminders(
       batch.map((access) => ({
         petition_access_id: access.id,
+        sender_id: access.granter_id,
         status: "PROCESSING",
         type: "AUTOMATIC",
         created_by: `PetitionAccess:${access.id}`,
