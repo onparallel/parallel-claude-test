@@ -758,7 +758,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    permissionGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -767,7 +767,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    permissionGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -776,7 +776,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    permissionGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };

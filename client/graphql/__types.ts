@@ -234,7 +234,7 @@ export interface GroupPermissionAddedEvent extends PetitionEvent {
   __typename?: "GroupPermissionAddedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: UserGroup;
+  permissionGroup?: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -244,7 +244,7 @@ export interface GroupPermissionEditedEvent extends PetitionEvent {
   __typename?: "GroupPermissionEditedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: UserGroup;
+  permissionGroup?: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -254,7 +254,7 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
   __typename?: "GroupPermissionRemovedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: UserGroup;
+  permissionGroup?: Maybe<UserGroup>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -5013,7 +5013,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
+          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
         }
       | {
           __typename?: "GroupPermissionEditedEvent";
@@ -5026,7 +5026,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
+          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
         }
       | {
           __typename?: "GroupPermissionRemovedEvent";
@@ -5038,7 +5038,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
+          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
         }
       | {
           __typename?: "MessageCancelledEvent";
@@ -5594,7 +5594,7 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fra
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
+  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment = {
@@ -5603,7 +5603,7 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fr
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
+  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment = {
@@ -5611,7 +5611,7 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_F
   id: string;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
+  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
@@ -6043,6 +6043,8 @@ export type PetitionFieldReference_PetitionFieldFragment = {
   title?: string | null;
 };
 
+export type UserGroupReference_UserGroupFragment = { __typename?: "UserGroup"; name: string };
+
 export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
   __typename?: "PetitionAccess";
   contact?: { __typename?: "Contact"; id: string; fullName?: string | null; email: string } | null;
@@ -6251,7 +6253,7 @@ export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment 
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
+  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
 };
 
 export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment = {
@@ -6259,14 +6261,14 @@ export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmen
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
+  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
 };
 
 export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment = {
   __typename?: "GroupPermissionRemovedEvent";
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  permissionGroup: { __typename?: "UserGroup"; name: string };
+  permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
 };
 
 export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
@@ -11094,7 +11096,7 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
+          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
         }
       | {
           __typename?: "GroupPermissionEditedEvent";
@@ -11107,7 +11109,7 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
+          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
         }
       | {
           __typename?: "GroupPermissionRemovedEvent";
@@ -11119,7 +11121,7 @@ export type PetitionActivity_PetitionFragment = {
             fullName?: string | null;
             status: UserStatus;
           } | null;
-          permissionGroup: { __typename?: "UserGroup"; name: string };
+          permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
         }
       | {
           __typename?: "MessageCancelledEvent";
@@ -11811,7 +11813,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
+                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
               }
             | {
                 __typename?: "GroupPermissionEditedEvent";
@@ -11824,7 +11826,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
+                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
               }
             | {
                 __typename?: "GroupPermissionRemovedEvent";
@@ -11836,7 +11838,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
+                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
               }
             | {
                 __typename?: "MessageCancelledEvent";
@@ -12594,7 +12596,7 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
+                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
               }
             | {
                 __typename?: "GroupPermissionEditedEvent";
@@ -12607,7 +12609,7 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
+                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
               }
             | {
                 __typename?: "GroupPermissionRemovedEvent";
@@ -12619,7 +12621,7 @@ export type PetitionActivity_petitionQuery = {
                   fullName?: string | null;
                   status: UserStatus;
                 } | null;
-                permissionGroup: { __typename?: "UserGroup"; name: string };
+                permissionGroup?: { __typename?: "UserGroup"; name: string } | null;
               }
             | {
                 __typename?: "MessageCancelledEvent";
@@ -17819,6 +17821,11 @@ export const OrganizationUsersListTableHeader_UserFragmentDoc = gql`
     role
   }
 ` as unknown as DocumentNode<OrganizationUsersListTableHeader_UserFragment, unknown>;
+export const UserGroupReference_UserGroupFragmentDoc = gql`
+  fragment UserGroupReference_UserGroup on UserGroup {
+    name
+  }
+` as unknown as DocumentNode<UserGroupReference_UserGroupFragment, unknown>;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id

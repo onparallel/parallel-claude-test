@@ -3700,6 +3700,11 @@
     "context": "Deleted user"
   },
   {
+    "term": "generic.deleted-user-group",
+    "definition": "Grupo eliminado",
+    "context": "Deleted user group"
+  },
+  {
     "term": "generic.done",
     "definition": "Listo",
     "context": "Done"

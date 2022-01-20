@@ -382,10 +382,10 @@ export const GroupPermissionAddedEvent = createPetitionEvent("GroupPermissionAdd
     type: "PetitionPermissionType",
     resolve: (root) => root.data.permission_type,
   });
-  t.field("permissionGroup", {
+  t.nullable.field("permissionGroup", {
     type: "UserGroup",
     resolve: async (root, _, ctx) => {
-      return (await ctx.userGroups.loadUserGroup(root.data.user_group_id))!;
+      return await ctx.userGroups.loadUserGroup(root.data.user_group_id);
     },
   });
 });
@@ -399,10 +399,10 @@ export const GroupPermissionRemovedEvent = createPetitionEvent(
         return await ctx.users.loadUser(root.data.user_id);
       },
     });
-    t.field("permissionGroup", {
+    t.nullable.field("permissionGroup", {
       type: "UserGroup",
       resolve: async (root, _, ctx) => {
-        return (await ctx.userGroups.loadUserGroup(root.data.user_group_id))!;
+        return await ctx.userGroups.loadUserGroup(root.data.user_group_id);
       },
     });
   }
@@ -419,10 +419,10 @@ export const GroupPermissionEditedEvent = createPetitionEvent("GroupPermissionEd
     type: "PetitionPermissionType",
     resolve: (root) => root.data.permission_type,
   });
-  t.field("permissionGroup", {
+  t.nullable.field("permissionGroup", {
     type: "UserGroup",
     resolve: async (root, _, ctx) => {
-      return (await ctx.userGroups.loadUserGroup(root.data.user_group_id))!;
+      return await ctx.userGroups.loadUserGroup(root.data.user_group_id);
     },
   });
 });

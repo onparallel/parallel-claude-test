@@ -215,7 +215,7 @@ export type GenerateUserAuthTokenResponse = {
 export type GroupPermissionAddedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: UserGroup;
+  permissionGroup: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -224,7 +224,7 @@ export type GroupPermissionAddedEvent = PetitionEvent & {
 export type GroupPermissionEditedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: UserGroup;
+  permissionGroup: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -233,7 +233,7 @@ export type GroupPermissionEditedEvent = PetitionEvent & {
 export type GroupPermissionRemovedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: UserGroup;
+  permissionGroup: Maybe<UserGroup>;
   type: PetitionEventType;
   user: Maybe<User>;
 };

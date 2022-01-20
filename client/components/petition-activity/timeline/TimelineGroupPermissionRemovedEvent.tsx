@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
 import { UserGroupXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserGroupReference } from "../UserGroupReference";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
@@ -27,7 +27,7 @@ export function TimelineGroupPermissionRemovedEvent({
         values={{
           same: userId === event.user?.id,
           user: <UserReference user={event.user} />,
-          groupName: <Text as="strong">{event.permissionGroup.name}</Text>,
+          groupName: <UserGroupReference userGroup={event.permissionGroup} />,
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
