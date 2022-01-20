@@ -83,4 +83,4 @@ jobs:
 
       - name: Run server test suite
         timeout-minutes: 10
-        run: yarn --cwd server/ test
+        run: yarn --cwd server/ test --silent --coverage
