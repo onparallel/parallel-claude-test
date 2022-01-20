@@ -424,16 +424,6 @@ describe("repositories/PetitionRepository", () => {
       });
     });
 
-    test("validated field should be cloned invalidated", async () => {
-      const toClone = fields[3];
-      await petitions.validatePetitionFields(petition.id, [toClone.id], true, user);
-      const cloned = await petitions.clonePetitionField(petition.id, toClone.id, user);
-
-      expect(cloned).toMatchObject({
-        validated: false,
-      });
-    });
-
     test("should not copy alias when cloning the field", async () => {
       const [fieldWithAlias] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         alias: "field-alias",

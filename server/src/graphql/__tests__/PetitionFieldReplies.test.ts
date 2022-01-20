@@ -146,31 +146,6 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error when trying to create a simple reply on an already validated field", async () => {
-      const [validatedField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
-        validated: true,
-        type: "TEXT",
-        multiple: true,
-      }));
-      const { data, errors } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
-            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          fieldId: toGlobalId("PetitionField", validatedField.id),
-          reply: ".",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-      expect(data).toBeNull();
-    });
-
     it("creates a simple reply as an User", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
@@ -783,30 +758,29 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if trying to create a checkbox reply on an already validated field", async () => {
-      await mocks.knex
-        .from("petition_field")
-        .where("id", checkboxField.id)
-        .update("validated", true);
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $fieldId: GID!, $values: [String!]!) {
-            createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
-              status
-              content
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          fieldId: toGlobalId("PetitionField", checkboxField.id),
-          values: ["1"],
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-      expect(data).toBeNull();
+    it("sends error if trying to create a checkbox reply on an already approved field", async () => {
+      // await mocks.knex
+      //   .from("petition_field")
+      //   .where("id", checkboxField.id)
+      //   .update("validated", true);
+      // const { errors, data } = await testClient.mutate({
+      //   mutation: gql`
+      //     mutation ($petitionId: GID!, $fieldId: GID!, $values: [String!]!) {
+      //       createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
+      //         status
+      //         content
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     petitionId: toGlobalId("Petition", petition.id),
+      //     fieldId: toGlobalId("PetitionField", checkboxField.id),
+      //     values: ["1"],
+      //   },
+      // });
+      // expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
+      // expect(data).toBeNull();
+      // TODO: create the field, add replies, approved and try to create more
     });
   });
 
@@ -1038,34 +1012,6 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if trying to create a reply on an already validated field", async () => {
-      await mocks.knex
-        .from("petition_field")
-        .where("id", dynamicSelectField.id)
-        .update("validated", true);
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $fieldId: GID!, $value: [[String]!]!) {
-            createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
-              content
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          fieldId: toGlobalId("PetitionField", dynamicSelectField.id),
-          value: [
-            ["Comunidad autónoma", "Andalucía"],
-            ["Provincia", "Cadiz"],
-          ],
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-      expect(data).toBeNull();
-    });
-
     it("sends error if trying to create a reply on a single-reply field with a previously submitted reply", async () => {
       await mocks.knex
         .from("petition_field")
@@ -1229,33 +1175,32 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error when trying to update a reply on an already validated field", async () => {
-      await mocks.knex
-        .from("petition_field")
-        .where("id", dynamicSelectField.id)
-        .update("validated", true);
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $replyId: GID!, $value: [[String]!]!) {
-            updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
-              id
-              content
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          replyId: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
-          value: [
-            ["Comunidad autónoma", "Canarias"],
-            ["Provincia", "Lanzarote"],
-          ],
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-      expect(data).toBeNull();
+    it("sends error when trying to update a reply thats already approved", async () => {
+      // await mocks.knex
+      //   .from("petition_field")
+      //   .where("id", dynamicSelectField.id)
+      //   .update("validated", true);
+      // const { errors, data } = await testClient.mutate({
+      //   mutation: gql`
+      //     mutation ($petitionId: GID!, $replyId: GID!, $value: [[String]!]!) {
+      //       updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
+      //         id
+      //         content
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     petitionId: toGlobalId("Petition", petition.id),
+      //     replyId: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
+      //     value: [
+      //       ["Comunidad autónoma", "Canarias"],
+      //       ["Provincia", "Lanzarote"],
+      //     ],
+      //   },
+      // });
+      // expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
+      // expect(data).toBeNull();
+      // TODO: create the field, add replies, approved, and try to update them latter
     });
   });
 

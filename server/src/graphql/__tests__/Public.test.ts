@@ -595,28 +595,6 @@ describe("GraphQL/Public", () => {
         });
       });
 
-      it("sends error when trying to create a reply on an already validated field", async () => {
-        await mocks.knex.from("petition_field").where("id", textField.id).update("validated", true);
-
-        const { errors, data } = await testClient.mutate({
-          mutation: gql`
-            mutation ($keycode: ID!, $fieldId: GID!, $value: String!) {
-              publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
-                status
-                content
-              }
-            }
-          `,
-          variables: {
-            keycode: access.keycode,
-            fieldId: toGlobalId("PetitionField", textField.id),
-            value: "my text reply",
-          },
-        });
-        expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-        expect(data).toBeNull();
-      });
-
       it("sends error if passing invalid option on a SELECT field", async () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`
@@ -816,27 +794,6 @@ describe("GraphQL/Public", () => {
         expect(data).toBeNull();
       });
 
-      it("sends error when trying to update a reply on a validated field", async () => {
-        const { errors, data } = await testClient.mutate({
-          mutation: gql`
-            mutation ($keycode: ID!, $replyId: GID!, $value: String!) {
-              publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
-                id
-                status
-                content
-              }
-            }
-          `,
-          variables: {
-            keycode: access.keycode,
-            replyId: toGlobalId("PetitionFieldReply", validatedFieldReply.id),
-            value: "updated reply",
-          },
-        });
-        expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-        expect(data).toBeNull();
-      });
-
       it("sends error when trying to update an approved reply", async () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`
@@ -994,29 +951,6 @@ describe("GraphQL/Public", () => {
         expect(data).toBeNull();
       });
 
-      it("sends error if trying to create a reply on an already validated field", async () => {
-        const { errors, data } = await testClient.mutate({
-          mutation: gql`
-            mutation ($keycode: ID!, $fieldId: GID!, $value: [[String]!]!) {
-              publicCreateDynamicSelectReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
-                content
-                status
-              }
-            }
-          `,
-          variables: {
-            keycode: access.keycode,
-            fieldId: toGlobalId("PetitionField", validatedField.id),
-            value: [
-              ["Comunidad autónoma", "Cataluña"],
-              ["Provincia", "Barcelona"],
-            ],
-          },
-        });
-        expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-        expect(data).toBeNull();
-      });
-
       it("sends error if trying to create a reply on a single-reply field with a previously submitted reply", async () => {
         const { errors, data } = await testClient.mutate({
           mutation: gql`
@@ -1136,36 +1070,6 @@ describe("GraphQL/Public", () => {
         });
 
         expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
-        expect(data).toBeNull();
-      });
-
-      it("sends error when trying to update a reply on an already validated field", async () => {
-        await mocks
-          .knex("petition_field")
-          .where("id", dynamicSelectReply.petition_field_id)
-          .update("validated", true);
-
-        const { errors, data } = await testClient.mutate({
-          mutation: gql`
-            mutation ($keycode: ID!, $replyId: GID!, $value: [[String]!]!) {
-              publicUpdateDynamicSelectReply(keycode: $keycode, replyId: $replyId, value: $value) {
-                id
-                content
-                status
-              }
-            }
-          `,
-          variables: {
-            keycode: access.keycode,
-            replyId: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
-            value: [
-              ["Comunidad autónoma", "Galicia"],
-              ["Provincia", "Orense"],
-            ],
-          },
-        });
-
-        expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
         expect(data).toBeNull();
       });
 
@@ -1321,24 +1225,6 @@ describe("GraphQL/Public", () => {
           .select("*");
 
         expect(file.deleted_at).not.toBeNull();
-      });
-
-      it("sends error if trying to delete a reply on an already validated field", async () => {
-        const { errors, data } = await testClient.mutate({
-          mutation: gql`
-            mutation ($keycode: ID!, $replyId: GID!) {
-              publicDeletePetitionReply(keycode: $keycode, replyId: $replyId) {
-                id
-              }
-            }
-          `,
-          variables: {
-            keycode: access.keycode,
-            replyId: toGlobalId("PetitionFieldReply", validatedFieldReply.id),
-          },
-        });
-        expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-        expect(data).toBeNull();
       });
 
       it("sends error if trying to delete an already approved reply", async () => {
