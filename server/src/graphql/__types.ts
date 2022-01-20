@@ -447,10 +447,10 @@ export interface NexusGenObjects {
     email: string;
     status?:
       | {
-          sent_at?: string;
-          opened_at?: string;
-          signed_at?: string;
-          declined_at?: string;
+          sent_at?: Date;
+          opened_at?: Date;
+          signed_at?: Date;
+          declined_at?: Date;
         }
       | undefined;
   };

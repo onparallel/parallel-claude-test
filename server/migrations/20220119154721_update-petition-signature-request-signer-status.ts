@@ -35,25 +35,25 @@ export async function up(knex: Knex): Promise<void> {
         if (event.type === "email_delivered") {
           newSignerStatus[signerIndex] = {
             ...(newSignerStatus[signerIndex] ?? {}),
-            sent_at: event.created_at,
+            sent_at: new Date(event.created_at),
           };
         }
         if (event.type === "document_opened") {
           newSignerStatus[signerIndex] = {
             ...(newSignerStatus[signerIndex] ?? {}),
-            opened_at: event.created_at,
+            opened_at: new Date(event.created_at),
           };
         }
         if (event.type === "document_signed") {
           newSignerStatus[signerIndex] = {
             ...(newSignerStatus[signerIndex] ?? {}),
-            signed_at: event.created_at,
+            signed_at: new Date(event.created_at),
           };
         }
         if (event.type === "document_declined") {
           newSignerStatus[signerIndex] = {
             ...(newSignerStatus[signerIndex] ?? {}),
-            declined_at: event.created_at,
+            declined_at: new Date(event.created_at),
           };
         }
       }

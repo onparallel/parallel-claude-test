@@ -18,10 +18,10 @@ export const PetitionSignatureRequestSignerStatus = objectType({
     email: string;
     status?:
       | {
-          sent_at?: string;
-          opened_at?: string;
-          signed_at?: string;
-          declined_at?: string;
+          sent_at?: Date;
+          opened_at?: Date;
+          signed_at?: Date;
+          declined_at?: Date;
         }
       | undefined;
   }`,
@@ -40,16 +40,16 @@ export const PetitionSignatureRequestSignerStatus = objectType({
         o.status?.signed_at ? "SIGNED" : o.status?.declined_at ? "DECLINED" : "PENDING",
     });
     t.nullable.datetime("sentAt", {
-      resolve: (o) => (o.status?.sent_at ? new Date(o.status.sent_at) : null),
+      resolve: (o) => o.status?.sent_at ?? null,
     });
     t.nullable.datetime("openedAt", {
-      resolve: (o) => (o.status?.opened_at ? new Date(o.status.opened_at) : null),
+      resolve: (o) => o.status?.opened_at ?? null,
     });
     t.nullable.datetime("signedAt", {
-      resolve: (o) => (o.status?.signed_at ? new Date(o.status.signed_at) : null),
+      resolve: (o) => o.status?.signed_at ?? null,
     });
     t.nullable.datetime("declinedAt", {
-      resolve: (o) => (o.status?.declined_at ? new Date(o.status.declined_at) : null),
+      resolve: (o) => o.status?.declined_at ?? null,
     });
   },
 });

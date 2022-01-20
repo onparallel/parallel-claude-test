@@ -509,16 +509,13 @@ export const SignatureOpenedEvent = createPetitionEvent("SignatureOpenedEvent", 
  * Triggered when a signature request on the petition is started.
  */
 export const SignatureStartedEvent = createPetitionEvent("SignatureStartedEvent", (t) => {
-  t.nullable.field("deliveredAt", {
-    type: "DateTime",
+  t.nullable.datetime("deliveredAt", {
     resolve: ({ data }) => data.email_delivered_at ?? null,
   });
-  t.nullable.field("openedAt", {
-    type: "DateTime",
+  t.nullable.datetime("openedAt", {
     resolve: ({ data }) => data.email_opened_at ?? null,
   });
-  t.nullable.field("bouncedAt", {
-    type: "DateTime",
+  t.nullable.datetime("bouncedAt", {
     resolve: ({ data }) => data.email_bounced_at ?? null,
   });
 });

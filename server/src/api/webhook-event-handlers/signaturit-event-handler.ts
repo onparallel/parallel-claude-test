@@ -79,7 +79,10 @@ async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petiti
     ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
       signer_status: {
         ...signature.signer_status,
-        [signerIndex]: { ...signature.signer_status[signerIndex], opened_at: data.created_at },
+        [signerIndex]: {
+          ...signature.signer_status[signerIndex],
+          opened_at: new Date(data.created_at),
+        },
       },
     }),
     ctx.petitions.createEvent({
@@ -106,7 +109,10 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
     ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${data.document.signature.id}`, {
       signer_status: {
         ...signature!.signer_status,
-        [signerIndex]: { ...signature!.signer_status[signerIndex], signed_at: data.created_at },
+        [signerIndex]: {
+          ...signature!.signer_status[signerIndex],
+          signed_at: new Date(data.created_at),
+        },
       },
     }),
     ctx.petitions.createEvent({
@@ -142,7 +148,7 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
           ...signature.signer_status,
           [cancellerIndex]: {
             ...signature.signer_status[cancellerIndex],
-            declined_at: data.created_at,
+            declined_at: new Date(data.created_at),
           },
         },
       }
@@ -216,7 +222,10 @@ async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petiti
     ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
       signer_status: {
         ...signature.signer_status,
-        [signerIndex]: { ...signature.signer_status[signerIndex], sent_at: data.created_at },
+        [signerIndex]: {
+          ...signature.signer_status[signerIndex],
+          sent_at: new Date(data.created_at),
+        },
       },
     }),
     updateSignatureStartedEvent(petitionId, { email_delivered_at: new Date(data.created_at) }, ctx),
