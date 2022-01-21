@@ -8,12 +8,13 @@ export async function orgAlmostOutOfSignatureCredits(
   payload: { org_id: number },
   context: WorkerContext
 ) {
-  const [usageLimit, ownerAndAdmins] = await Promise.all([
+  const [usageLimit, ownerAndAdmins, parallelOrg] = await Promise.all([
     context.organizations.getOrganizationCurrentUsageLimit(
       payload.org_id,
       "SIGNATURIT_SHARED_APIKEY"
     ),
     context.organizations.loadOwnerAndAdmins(payload.org_id),
+    context.organizations.loadRootOrganization(),
   ]);
 
   if (!usageLimit) {
@@ -22,7 +23,7 @@ export async function orgAlmostOutOfSignatureCredits(
     );
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(payload.org_id, context);
+  const { emailFrom, ...layoutProps } = await getLayoutProps(parallelOrg.id, context);
 
   const emails = [];
   for (const user of ownerAndAdmins) {

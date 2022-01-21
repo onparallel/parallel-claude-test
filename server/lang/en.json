@@ -171,13 +171,18 @@
   },
   {
     "term": "generic.action-required.org-almost-out-of-signature-credits",
-    "definition": "You have used {percent}% of your signature credits.",
-    "context": "You have used {percent}% of your signature credits."
+    "definition": "You have consumed {percent}% of your signatures",
+    "context": "You have consumed {percent}% of your signatures"
   },
   {
     "term": "generic.action-required.org-last-signature-credit-used",
-    "definition": "You have used all of your signature credits.",
-    "context": "You have used all of your signature credits."
+    "definition": "You hit your plan's signatures limit",
+    "context": "You hit your plan's signatures limit"
+  },
+  {
+    "term": "generic.action-required.signature-cancelled-no-credits-left",
+    "definition": "You hit your plan's signatures limit",
+    "context": "You hit your plan's signatures limit"
   },
   {
     "term": "generic.complete-information-button",
@@ -296,23 +301,38 @@
   },
   {
     "term": "org-almost-out-of-signature-credits.contact-us",
-    "definition": "Please contact us at <a>support@onparallel.com</a> to get more credits.",
-    "context": "Please contact us at <a>support@onparallel.com</a> to get more credits."
-  },
-  {
-    "term": "org-almost-out-of-signature-credits.intro-text",
-    "definition": "We notify you that at the time this email was sent, you had {remaining} signature credits remaining, {remainingPercent}% of the contracted credits. Remember that each eSignature sent means one credit.",
-    "context": "We notify you that at the time this email was sent, you had {remaining} signature credits remaining, {remainingPercent}% of the contracted credits. Remember that each eSignature sent means one credit."
+    "definition": "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan.",
+    "context": "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan."
   },
   {
     "term": "org-almost-out-of-signature-credits.subject",
-    "definition": "Credit alert: {percent}% of eSignature credits have been consumed.",
-    "context": "Credit alert: {percent}% of eSignature credits have been consumed."
+    "definition": "Alert: {percent}% of your signatures have been consumed",
+    "context": "Alert: {percent}% of your signatures have been consumed"
+  },
+  {
+    "term": "org-almost-out-of-signature-credits.text",
+    "definition": "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signature plan.",
+    "context": "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signature plan."
+  },
+  {
+    "term": "org-almost-out-of-signature-credits.text-2",
+    "definition": "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted.",
+    "context": "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted."
   },
   {
     "term": "org-last-signature-credit-used.subject",
-    "definition": "Credit alert: All of your eSignature credits have been consumed.",
-    "context": "Credit alert: All of your eSignature credits have been consumed."
+    "definition": "You hit your signatures limit",
+    "context": "You hit your signatures limit"
+  },
+  {
+    "term": "org-last-signature-credit-used.text",
+    "definition": "It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>.",
+    "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>."
+  },
+  {
+    "term": "org-last-signature-credit-used.text-2",
+    "definition": "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>.",
+    "context": "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>."
   },
   {
     "term": "petition-closed-notification.subject",
@@ -471,18 +491,18 @@
   },
   {
     "term": "signature-cancelled-no-credits-left.contact-org-user",
-    "definition": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits.",
-    "context": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits."
+    "definition": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) so you can start the signing process.",
+    "context": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) so you can start the signing process."
   },
   {
     "term": "signature-cancelled-no-credits-left.intro-text",
-    "definition": "The following signing process sent through {signatureProvider} could not be started due to lack of credits.",
-    "context": "The following signing process sent through {signatureProvider} could not be started due to lack of credits."
+    "definition": "The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit.",
+    "context": "The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit."
   },
   {
     "term": "signature-cancelled-no-credits-left.subject",
-    "definition": "eSignature couldn’t start due to lack of credits",
-    "context": "eSignature couldn’t start due to lack of credits"
+    "definition": "eSignature couldn’t be started",
+    "context": "eSignature couldn’t be started"
   },
   {
     "term": "signature-cancelled.subject",

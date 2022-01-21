@@ -10,9 +10,10 @@ export async function signatureCancelledNoCreditsLeft(
   payload: { petition_id: number },
   context: WorkerContext
 ) {
-  const [petition, users] = await Promise.all([
+  const [petition, users, parallelOrg] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
     context.petitions.loadUsersOnPetition(payload.petition_id),
+    context.organizations.loadRootOrganization(),
   ]);
 
   if (!petition) return;
@@ -31,7 +32,7 @@ export async function signatureCancelledNoCreditsLeft(
       continue;
     }
 
-    const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
+    const { emailFrom, ...layoutProps } = await getLayoutProps(parallelOrg.id, context);
 
     const { html, text, subject, from } = await buildEmail(
       SignatureCancelledNoCreditsLeftEmail,

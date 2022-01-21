@@ -1006,8 +1006,8 @@
   },
   {
     "term": "component.notification-signature-cancelled.no-credits-left.body",
-    "definition": "No se ha podido iniciar el proceso de firma digital por falta de créditos de firma.",
-    "context": "The eSignature could not be started due to lack of signature credits."
+    "definition": "No se ha podido iniciar el proceso de firma digital por haber alcanzado el límite de firmas.",
+    "context": "The eSignature could not be started because you hit your plan’s limit."
   },
   {
     "term": "component.notification-signature-completed.body",

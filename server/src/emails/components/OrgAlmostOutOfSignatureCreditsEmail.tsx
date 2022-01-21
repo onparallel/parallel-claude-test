@@ -24,12 +24,12 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
     return used === total
       ? intl.formatMessage({
           id: "org-last-signature-credit-used.subject",
-          defaultMessage: "Credit alert: All of your eSignature credits have been consumed.",
+          defaultMessage: "You hit your signatures limit",
         })
       : intl.formatMessage(
           {
             id: "org-almost-out-of-signature-credits.subject",
-            defaultMessage: "Credit alert: {percent}% of eSignature credits have been consumed.",
+            defaultMessage: "Alert: {percent}% of your signatures have been consumed",
           },
           { percent: Math.round((used / total) * 100) }
         );
@@ -38,41 +38,73 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
     return outdent`
       **${
         used === total
-          ? intl.formatMessage({
-              id: "generic.action-required.org-last-signature-credit-used",
-              defaultMessage: "You have used all of your signature credits.",
-            })
-          : intl.formatMessage(
-              {
-                id: "generic.action-required.org-almost-out-of-signature-credits",
-                defaultMessage: "You have used {percent}% of your signature credits.",
-              },
-              { percent: Math.round((used / total) * 100) }
-            )
+          ? intl
+              .formatMessage({
+                id: "generic.action-required.org-last-signature-credit-used",
+                defaultMessage: "You hit your plan's signatures limit",
+              })
+              .toUpperCase()
+          : intl
+              .formatMessage(
+                {
+                  id: "generic.action-required.org-almost-out-of-signature-credits",
+                  defaultMessage: "You have consumed {percent}% of your signatures",
+                },
+                { percent: Math.round((used / total) * 100) }
+              )
+              .toUpperCase()
       }**
 
       ${greetingUser({ name: senderName }, intl)}
 
-      ${intl.formatMessage(
-        {
-          id: "org-almost-out-of-signature-credits.intro-text",
-          defaultMessage:
-            "We notify you that at the time this email was sent, you had {remaining} signature credits remaining, {remainingPercent}% of the contracted credits. Remember that each eSignature sent means one credit.",
-        },
-        {
-          remaining: total - used,
-          remainingPercent: Math.round(((total - used) / total) * 100),
-        }
-      )}
+      ${
+        used < total
+          ? `${intl.formatMessage({
+              id: "org-almost-out-of-signature-credits.text",
+              defaultMessage:
+                "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signature plan.",
+            })}
 
-      ${intl.formatMessage(
-        {
-          id: "org-almost-out-of-signature-credits.contact-us",
-          defaultMessage: "Please contact us at <a>support@onparallel.com</a> to get more credits.",
-        },
-        { a: () => "support@onparallel.com" }
-      )}
-
+${intl.formatMessage(
+  {
+    id: "org-almost-out-of-signature-credits.text-2",
+    defaultMessage:
+      "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted.",
+  },
+  {
+    remaining: total - used,
+    remainingPercent: Math.round(((total - used) / total) * 100),
+    b: (chunks: any[]) => chunks,
+  }
+)}
+          
+${intl.formatMessage(
+  {
+    id: "org-almost-out-of-signature-credits.contact-us",
+    defaultMessage:
+      "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan.",
+  },
+  { a: () => "support@onparallel.com" }
+)}`
+          : `${intl.formatMessage(
+              {
+                id: "org-last-signature-credit-used.text",
+                defaultMessage:
+                  "It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>.",
+              },
+              { b: (chunks: any[]) => chunks }
+            )}
+      
+${intl.formatMessage(
+  {
+    id: "org-last-signature-credit-used.text-2",
+    defaultMessage:
+      "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>.",
+  },
+  { a: () => "support@onparallel.com" }
+)}`
+      }
+            
       ${closing({}, intl)}
     `;
   },
@@ -92,18 +124,18 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         contentHeading={
-          <MjmlSection backgroundColor="#3182CE" borderRadius="5px" padding="10px 0">
+          <MjmlSection backgroundColor="#CEEDFF" borderRadius="5px" padding="10px 0">
             <MjmlColumn>
-              <MjmlText align="center" color="white" fontWeight={600}>
+              <MjmlText align="center" color="#153E75" fontWeight={600} textTransform="uppercase">
                 {used === total ? (
                   <FormattedMessage
                     id="generic.action-required.org-last-signature-credit-used"
-                    defaultMessage="You have used all of your signature credits."
+                    defaultMessage="You hit your plan's signatures limit"
                   />
                 ) : (
                   <FormattedMessage
                     id="generic.action-required.org-almost-out-of-signature-credits"
-                    defaultMessage="You have used {percent}% of your signature credits."
+                    defaultMessage="You have consumed {percent}% of your signatures"
                     values={{ percent: Math.round((used / total) * 100) }}
                   />
                 )}
@@ -115,25 +147,57 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
         <MjmlSection padding="10px 0 0 0">
           <MjmlColumn>
             <GreetingUser name={senderName} />
-            <MjmlText>
-              <FormattedMessage
-                id="org-almost-out-of-signature-credits.intro-text"
-                defaultMessage="We notify you that at the time this email was sent, you had {remaining} signature credits remaining, {remainingPercent}% of the contracted credits. Remember that each eSignature sent means one credit."
-                values={{
-                  remaining: total - used,
-                  remainingPercent: Math.round(((total - used) / total) * 100),
-                }}
-              />
-            </MjmlText>
-            <MjmlText>
-              <FormattedMessage
-                id="org-almost-out-of-signature-credits.contact-us"
-                defaultMessage="Please contact us at <a>support@onparallel.com</a> to get more credits."
-                values={{
-                  a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
-                }}
-              />
-            </MjmlText>
+            {used < total ? (
+              <>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="org-almost-out-of-signature-credits.text"
+                    defaultMessage="We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signature plan."
+                  />
+                </MjmlText>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="org-almost-out-of-signature-credits.text-2"
+                    defaultMessage="At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted."
+                    values={{
+                      remaining: total - used,
+                      remainingPercent: Math.round(((total - used) / total) * 100),
+                      b: (chunks: any[]) => <b>{chunks}</b>,
+                    }}
+                  />
+                </MjmlText>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="org-almost-out-of-signature-credits.contact-us"
+                    defaultMessage="Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan."
+                    values={{
+                      a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
+                    }}
+                  />
+                </MjmlText>
+              </>
+            ) : (
+              <>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="org-last-signature-credit-used.text"
+                    defaultMessage="It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>."
+                    values={{
+                      b: (chunks: any[]) => <b>{chunks}</b>,
+                    }}
+                  />
+                </MjmlText>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="org-last-signature-credit-used.text-2"
+                    defaultMessage="If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>."
+                    values={{
+                      a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
+                    }}
+                  />
+                </MjmlText>
+              </>
+            )}
             <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>

@@ -9,6 +9,7 @@
         }
       },
       "args": {
+        "signatureProvider": "Signaturit",
         "senderName": "Santi",
         "orgContactName": "Derek Lou",
         "orgContactEmail": "derek@onparallel.com",
@@ -19,6 +20,7 @@
         "logoAlt": "Parallel"
       },
       "argsTypes": {
+        "signatureProvider": { "control": { "type": "text" } },
         "senderName": { "control": { "type": "text" } },
         "petitionName": { "control": { "type": "text" } },
         "orgContactName": { "control": { "type": "text" } },

@@ -59,6 +59,11 @@ export class OrganizationRepository extends BaseRepository {
       .where("status", "ACTIVE")
   );
 
+  async loadRootOrganization() {
+    const [org] = await this.from("organization").where("status", "ROOT").select("*");
+    return org;
+  }
+
   async loadOrgUsers(
     orgId: number,
     opts: {

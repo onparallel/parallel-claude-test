@@ -25,7 +25,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
   subject(_, intl: IntlShape) {
     return intl.formatMessage({
       id: "signature-cancelled-no-credits-left.subject",
-      defaultMessage: "eSignature couldn’t start due to lack of credits",
+      defaultMessage: "eSignature couldn’t be started",
     });
   },
   text(
@@ -41,8 +41,8 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
     return outdent`
       **${intl
         .formatMessage({
-          id: "generic.action-required",
-          defaultMessage: "Action required",
+          id: "generic.action-required.signature-cancelled-no-credits-left",
+          defaultMessage: "You hit your plan's signatures limit",
         })
         .toUpperCase()}**
 
@@ -52,7 +52,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
         {
           id: "signature-cancelled-no-credits-left.intro-text",
           defaultMessage:
-            "The following signing process sent through {signatureProvider} could not be started due to lack of credits.",
+            "The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit.",
         },
         { signatureProvider }
       )}
@@ -66,7 +66,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
         {
           id: "signature-cancelled-no-credits-left.contact-org-user",
           defaultMessage:
-            "Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits.",
+            "Please contact {orgContactName} (<a>{orgContactEmail}</a>) so you can start the signing process.",
         },
         { a: () => orgContactEmail, orgContactEmail, orgContactName }
       )}
@@ -92,10 +92,13 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         contentHeading={
-          <MjmlSection backgroundColor="#3182CE" borderRadius="5px" padding="10px 0">
+          <MjmlSection backgroundColor="#CEEDFF" borderRadius="5px" padding="10px 0">
             <MjmlColumn>
-              <MjmlText align="center" color="white" fontWeight={600} textTransform="uppercase">
-                <FormattedMessage id="generic.action-required" defaultMessage="Action required" />
+              <MjmlText align="center" color="#153E75" fontWeight={600} textTransform="uppercase">
+                <FormattedMessage
+                  id="generic.action-required.signature-cancelled-no-credits-left"
+                  defaultMessage="You hit your plan's signatures limit"
+                />
               </MjmlText>
             </MjmlColumn>
           </MjmlSection>
@@ -107,7 +110,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-cancelled-no-credits-left.intro-text"
-                defaultMessage="The following signing process sent through {signatureProvider} could not be started due to lack of credits."
+                defaultMessage="The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit."
                 values={{ signatureProvider }}
               />
             </MjmlText>
@@ -130,7 +133,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-cancelled-no-credits-left.contact-org-user"
-                defaultMessage="Please contact {orgContactName} (<a>{orgContactEmail}</a>) to get more credits."
+                defaultMessage="Please contact {orgContactName} (<a>{orgContactEmail}</a>) so you can start the signing process."
                 values={{
                   a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
                   orgContactEmail,
