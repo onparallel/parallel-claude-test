@@ -1712,9 +1712,7 @@ api
     async ({ client, params }) => {
       const _mutation = gql`
         mutation StopSharing_removePetitionPermission($petitionId: GID!) {
-          removePetitionPermission(petitionIds: [$petitionId], removeAll: true) {
-            id
-          }
+          removePetitionPermission(petitionIds: [$petitionId], removeAll: true)
         }
       `;
       await client.request(StopSharing_removePetitionPermissionDocument, {
