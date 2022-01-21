@@ -148,7 +148,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       const { data } = await clonePetitionField({
         variables: { petitionId, fieldId },
       });
-      const field = data!.clonePetitionField.field;
+      const field = data!.clonePetitionField;
       focusFieldTitle(field.id);
     }),
     [petitionId]
@@ -193,7 +193,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const _handleFieldEdit = useCallback(
     async function (fieldId: string, data: UpdatePetitionFieldInput) {
       const { fields } = petitionDataRef.current!;
-      const field = fields.find((f) => f.id === fieldId);
       if (data.multiple === false) {
         // check no field is referencing with invalid NUMBER_OF_REPLIES condition
         const validCondition = (c: PetitionFieldVisibilityCondition) => {
@@ -234,22 +233,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       }
       await updatePetitionField({
         variables: { petitionId, fieldId, data },
-        optimisticResponse: {
-          updatePetitionField: {
-            __typename: `${petition.__typename}AndField` as any,
-            petition: {
-              __typename: petition.__typename! as any,
-              id: petitionId,
-              status: (petition as any).status,
-              updatedAt: new Date().toISOString(),
-            },
-            field: {
-              __typename: "PetitionField",
-              ...field,
-              ...(data as any),
-            },
-          },
-        },
       });
     },
     [petitionId]

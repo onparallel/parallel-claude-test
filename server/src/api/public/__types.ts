@@ -595,8 +595,6 @@ export type Mutation = {
   uploadUserAvatar: SupportMethodResponse;
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
-  /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
-  validatePetitionFields: Array<PetitionField>;
   verifyPublicAccess: PublicAccessVerification;
 };
 
@@ -1276,7 +1274,6 @@ export type MutationupdatePetitionFieldRepliesStatusArgs = {
   petitionFieldReplyIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   status: PetitionFieldReplyStatus;
-  validateFields?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationupdatePetitionFieldReplyMetadataArgs = {
@@ -1367,13 +1364,6 @@ export type MutationuserSignUpArgs = {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
-};
-
-export type MutationvalidatePetitionFieldsArgs = {
-  fieldIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-  validateRepliesWith?: InputMaybe<PetitionFieldReplyStatus>;
-  value: Scalars["Boolean"];
 };
 
 export type MutationverifyPublicAccessArgs = {

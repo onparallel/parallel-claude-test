@@ -153,9 +153,6 @@ const _PetitionComposeField = chakraForwardRef<
     delete uploads.current[attachmentId];
     await deletePetitionFieldAttachment({
       variables: { petitionId, fieldId: field.id, attachmentId },
-      optimisticResponse: {
-        deletePetitionFieldAttachment: "SUCCESS",
-      },
     });
   };
 

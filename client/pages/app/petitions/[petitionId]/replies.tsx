@@ -100,7 +100,7 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
-import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
+import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useExportRepliesTask } from "@parallel/utils/useExportRepliesTask";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -868,30 +868,7 @@ function useUpdatePetitionFieldRepliesStatus() {
     async (
       variables: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>,
       petitionStatus: PetitionStatus
-    ) =>
-      await updatePetitionFieldRepliesStatus({
-        variables,
-        optimisticResponse: (({
-          petitionFieldId,
-          petitionFieldReplyIds,
-          status,
-        }: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>) => ({
-          updatePetitionFieldRepliesStatus: {
-            __typename: "PetitionField",
-            id: petitionFieldId,
-            petition: {
-              id: variables.petitionId,
-              status: petitionStatus, // TODO predict correct status
-              __typename: "Petition",
-            },
-            replies: unMaybeArray(petitionFieldReplyIds).map((id) => ({
-              __typename: "PetitionFieldReply",
-              id,
-              status,
-            })),
-          },
-        })) as any,
-      }),
+    ) => await updatePetitionFieldRepliesStatus({ variables }),
     [updatePetitionFieldRepliesStatus]
   );
 }

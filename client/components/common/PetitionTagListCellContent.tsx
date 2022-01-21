@@ -21,7 +21,7 @@ import { ActionMeta, CommonProps, components, StylesConfig } from "react-select"
 import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
-import { omit, pick } from "remeda";
+import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useTagEditDialog } from "./dialogs/TagEditDialog";
 import { DEFAULT_COLORS } from "./TagColorSelect";
@@ -79,12 +79,6 @@ export function PetitionTagListCellContent({
   async function handleAddTag(tag: TagSelection) {
     await tagPetition({
       variables: { tagId: tag.id, petitionId: petition.id },
-      optimisticResponse: {
-        tagPetition: {
-          ...pick(petition, ["__typename", "id"]),
-          tags: [...petition.tags, tag],
-        },
-      },
     });
   }
 
@@ -92,12 +86,6 @@ export function PetitionTagListCellContent({
   async function handleRemoveTag(tag: TagSelection) {
     await untagPetition({
       variables: { tagId: tag.id, petitionId: petition.id },
-      optimisticResponse: {
-        untagPetition: {
-          ...pick(petition, ["__typename", "id"]),
-          tags: petition.tags.filter((t) => t.id !== tag.id),
-        },
-      },
     });
   }
 
