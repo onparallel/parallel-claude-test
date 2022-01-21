@@ -966,7 +966,6 @@ export interface NexusGenFieldTypes {
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
-    validatePetitionFields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
   OrgIntegrationPagination: {
@@ -2254,7 +2253,6 @@ export interface NexusGenFieldTypeNames {
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
-    validatePetitionFields: "PetitionField";
     verifyPublicAccess: "PublicAccessVerification";
   };
   OrgIntegrationPagination: {

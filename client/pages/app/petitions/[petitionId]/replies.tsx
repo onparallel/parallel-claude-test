@@ -801,7 +801,6 @@ PetitionReplies.mutations = [
         status: $status
       ) {
         id
-        validated
         petition {
           ... on Petition {
             id
@@ -880,7 +879,6 @@ function useUpdatePetitionFieldRepliesStatus() {
           updatePetitionFieldRepliesStatus: {
             __typename: "PetitionField",
             id: petitionFieldId,
-            validated: optimisticValidated,
             petition: {
               id: variables.petitionId,
               status: petitionStatus, // TODO predict correct status

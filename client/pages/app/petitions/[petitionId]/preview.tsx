@@ -296,7 +296,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                       key={field.id}
                       petitionId={petition.id}
                       field={field}
-                      isDisabled={isPetition && (field.validated || petition.status === "CLOSED")}
+                      isDisabled={isPetition && petition.status === "CLOSED"}
                       isInvalid={
                         finalized && completedFieldReplies(field).length === 0 && !field.optional
                       }

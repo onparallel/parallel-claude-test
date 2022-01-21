@@ -957,7 +957,6 @@ describe("GraphQL/Petition Fields", () => {
         return {
           type,
           is_fixed: index === 0,
-          validated: true,
           options: defaultFieldOptions(type).options,
         };
       });
@@ -1427,8 +1426,6 @@ describe("GraphQL/Petition Fields", () => {
 
       [fieldWithReply] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
         type: "TEXT",
-
-        validated: true,
       }));
 
       const [contact] = await mocks.createRandomContacts(organization.id, 1);

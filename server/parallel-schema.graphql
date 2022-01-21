@@ -1346,11 +1346,6 @@ type Mutation {
     petitionFieldReplyIds: [GID!]!
     petitionId: GID!
     status: PetitionFieldReplyStatus!
-
-    """
-    If true, the field will be validated if all the replies are approved or rejected
-    """
-    validateFields: Boolean
   ): PetitionField!
 
   """
@@ -1473,16 +1468,6 @@ type Mutation {
     position: String
     role: String
   ): User!
-
-  """
-  Updates the validation of a field and sets the petition as closed if all fields are validated.
-  """
-  validatePetitionFields(
-    fieldIds: [GID!]!
-    petitionId: GID!
-    validateRepliesWith: PetitionFieldReplyStatus
-    value: Boolean!
-  ): [PetitionField!]!
   verifyPublicAccess(
     ip: String
     keycode: ID!

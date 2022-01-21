@@ -589,7 +589,7 @@ export interface Mutation {
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
-  /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
+  /** Updates the status of a petition field reply. */
   updatePetitionFieldRepliesStatus: PetitionField;
   /** Updates the metada of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
@@ -1306,6 +1306,7 @@ export interface MutationupdatePetitionFieldRepliesStatusArgs {
   petitionFieldReplyIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   status: PetitionFieldReplyStatus;
+  validateFields?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationupdatePetitionFieldReplyMetadataArgs {
@@ -1396,6 +1397,13 @@ export interface MutationuserSignUpArgs {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
+}
+
+export interface MutationvalidatePetitionFieldsArgs {
+  fieldIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+  validateRepliesWith?: InputMaybe<PetitionFieldReplyStatus>;
+  value: Scalars["Boolean"];
 }
 
 export interface MutationverifyPublicAccessArgs {
@@ -8505,7 +8513,6 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
 
 export type NewSignatureRequestRow_PetitionFragment = {
   __typename?: "Petition";
-  status: PetitionStatus;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     letRecipientsChooseSigners: boolean;
@@ -13853,7 +13860,6 @@ export type PetitionCompose_createPetitionFieldMutation = {
     options: { [key: string]: any };
     position: number;
     alias?: string | null;
-    validated: boolean;
     petition:
       | {
           __typename?: "Petition";
@@ -13892,7 +13898,11 @@ export type PetitionCompose_createPetitionFieldMutation = {
       };
     }>;
     comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+    }>;
   };
 };
 
@@ -13916,7 +13926,6 @@ export type PetitionCompose_clonePetitionFieldMutation = {
     options: { [key: string]: any };
     position: number;
     alias?: string | null;
-    validated: boolean;
     petition:
       | {
           __typename?: "Petition";
@@ -13955,7 +13964,11 @@ export type PetitionCompose_clonePetitionFieldMutation = {
       };
     }>;
     comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+    }>;
   };
 };
 
@@ -14015,7 +14028,6 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     options: { [key: string]: any };
     position: number;
     alias?: string | null;
-    validated: boolean;
     petition:
       | { __typename?: "Petition"; status: PetitionStatus; id: string; updatedAt: string }
       | { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
@@ -14031,7 +14043,11 @@ export type PetitionCompose_updatePetitionFieldMutation = {
       };
     }>;
     comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+    }>;
   };
 };
 
@@ -14057,7 +14073,6 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
     options: { [key: string]: any };
     position: number;
     alias?: string | null;
-    validated: boolean;
     petition:
       | { __typename?: "Petition"; status: PetitionStatus; id: string; updatedAt: string }
       | { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
@@ -14073,7 +14088,11 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
       };
     }>;
     comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+    }>;
   };
 };
 
@@ -15281,27 +15300,289 @@ export type PetitionReplies_updatePetitionMutation = {
       };
 };
 
-export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
+export type PetitionReplies_closePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  fieldIds: Array<Scalars["GID"]> | Scalars["GID"];
-  value: Scalars["Boolean"];
-  validateRepliesWith?: InputMaybe<PetitionFieldReplyStatus>;
 }>;
 
-export type PetitionReplies_validatePetitionFieldsMutation = {
-  validatePetitionFields: Array<{
-    __typename?: "PetitionField";
+export type PetitionReplies_closePetitionMutation = {
+  closePetition: {
+    __typename?: "Petition";
     id: string;
-    validated: boolean;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
+    name?: string | null;
+    status: PetitionStatus;
+    locale: PetitionLocale;
+    deadline?: string | null;
+    isRestricted: boolean;
+    updatedAt: string;
+    accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+    fields: Array<{
+      __typename?: "PetitionField";
+      isReadOnly: boolean;
       id: string;
-      status: PetitionFieldReplyStatus;
+      type: PetitionFieldType;
+      title?: string | null;
+      description?: string | null;
+      optional: boolean;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        createdAt: string;
+        metadata: { [key: string]: any };
+        field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+        updatedBy?:
+          | {
+              __typename?: "PetitionAccess";
+              id: string;
+              contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+            }
+          | { __typename?: "User"; id: string; fullName?: string | null }
+          | null;
+      }>;
+      comments: Array<{
+        __typename?: "PetitionFieldComment";
+        id: string;
+        isUnread: boolean;
+        createdAt: string;
+      }>;
+      attachments: Array<{
+        __typename?: "PetitionFieldAttachment";
+        id: string;
+        file: {
+          __typename?: "FileUpload";
+          filename: string;
+          contentType: string;
+          size: number;
+          isComplete: boolean;
+        };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
     }>;
-    petition:
-      | { __typename?: "Petition"; id: string; status: PetitionStatus }
-      | { __typename?: "PetitionTemplate" };
-  }>;
+    currentSignatureRequest?: {
+      __typename?: "PetitionSignatureRequest";
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+    } | null;
+    permissions: Array<
+      | {
+          __typename?: "PetitionUserGroupPermission";
+          permissionType: PetitionPermissionType;
+          group: { __typename?: "UserGroup"; id: string; name: string };
+        }
+      | {
+          __typename?: "PetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          user: { __typename?: "User"; id: string; fullName?: string | null };
+        }
+    >;
+    signatureRequests?: Array<{
+      __typename?: "PetitionSignatureRequest";
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      signerStatus: Array<{
+        __typename?: "PetitionSignatureRequestSignerStatus";
+        status: string;
+        sentAt?: string | null;
+        openedAt?: string | null;
+        signedAt?: string | null;
+        declinedAt?: string | null;
+        signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+      }>;
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+      };
+    }> | null;
+    signatureConfig?: {
+      __typename?: "SignatureConfig";
+      review: boolean;
+      title: string;
+      letRecipientsChooseSigners: boolean;
+      timezone: string;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        environment: SignatureOrgIntegrationEnvironment;
+        id: string;
+        name: string;
+        provider: SignatureOrgIntegrationProvider;
+        isDefault: boolean;
+      } | null;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        firstName: string;
+        lastName: string;
+        email: string;
+        fullName: string;
+      }>;
+    } | null;
+    attachments: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
+      };
+    }>;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      isSubscribed: boolean;
+    } | null;
+  };
+};
+
+export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  status: PetitionFieldReplyStatus;
+}>;
+
+export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
+  approveOrRejectPetitionFieldReplies: {
+    __typename?: "Petition";
+    id: string;
+    name?: string | null;
+    status: PetitionStatus;
+    locale: PetitionLocale;
+    deadline?: string | null;
+    isRestricted: boolean;
+    updatedAt: string;
+    accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+    fields: Array<{
+      __typename?: "PetitionField";
+      isReadOnly: boolean;
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      description?: string | null;
+      optional: boolean;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        createdAt: string;
+        metadata: { [key: string]: any };
+        field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+        updatedBy?:
+          | {
+              __typename?: "PetitionAccess";
+              id: string;
+              contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+            }
+          | { __typename?: "User"; id: string; fullName?: string | null }
+          | null;
+      }>;
+      comments: Array<{
+        __typename?: "PetitionFieldComment";
+        id: string;
+        isUnread: boolean;
+        createdAt: string;
+      }>;
+      attachments: Array<{
+        __typename?: "PetitionFieldAttachment";
+        id: string;
+        file: {
+          __typename?: "FileUpload";
+          filename: string;
+          contentType: string;
+          size: number;
+          isComplete: boolean;
+        };
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }>;
+    currentSignatureRequest?: {
+      __typename?: "PetitionSignatureRequest";
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+    } | null;
+    permissions: Array<
+      | {
+          __typename?: "PetitionUserGroupPermission";
+          permissionType: PetitionPermissionType;
+          group: { __typename?: "UserGroup"; id: string; name: string };
+        }
+      | {
+          __typename?: "PetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          user: { __typename?: "User"; id: string; fullName?: string | null };
+        }
+    >;
+    signatureRequests?: Array<{
+      __typename?: "PetitionSignatureRequest";
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      signerStatus: Array<{
+        __typename?: "PetitionSignatureRequestSignerStatus";
+        status: string;
+        sentAt?: string | null;
+        openedAt?: string | null;
+        signedAt?: string | null;
+        declinedAt?: string | null;
+        signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+      }>;
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+      };
+    }> | null;
+    signatureConfig?: {
+      __typename?: "SignatureConfig";
+      review: boolean;
+      title: string;
+      letRecipientsChooseSigners: boolean;
+      timezone: string;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        environment: SignatureOrgIntegrationEnvironment;
+        id: string;
+        name: string;
+        provider: SignatureOrgIntegrationProvider;
+        isDefault: boolean;
+      } | null;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        contactId?: string | null;
+        firstName: string;
+        lastName: string;
+        email: string;
+        fullName: string;
+      }>;
+    } | null;
+    attachments: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
+      };
+    }>;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      isSubscribed: boolean;
+    } | null;
+  };
 };
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact<{
@@ -15329,7 +15610,6 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   updatePetitionFieldRepliesStatus: {
     __typename?: "PetitionField";
     id: string;
-    validated: boolean;
     petition:
       | { __typename?: "Petition"; id: string; status: PetitionStatus }
       | { __typename?: "PetitionTemplate" };
@@ -20104,7 +20384,6 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionReplies_PetitionFieldFragment, unknown>;
 export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   fragment NewSignatureRequestRow_Petition on Petition {
-    status
     signatureConfig {
       signers {
         ...SignerReference_PetitionSigner
@@ -23191,36 +23470,30 @@ export const PetitionReplies_updatePetitionDocument = gql`
   PetitionReplies_updatePetitionMutation,
   PetitionReplies_updatePetitionMutationVariables
 >;
-export const PetitionReplies_validatePetitionFieldsDocument = gql`
-  mutation PetitionReplies_validatePetitionFields(
-    $petitionId: GID!
-    $fieldIds: [GID!]!
-    $value: Boolean!
-    $validateRepliesWith: PetitionFieldReplyStatus
-  ) {
-    validatePetitionFields(
-      petitionId: $petitionId
-      fieldIds: $fieldIds
-      value: $value
-      validateRepliesWith: $validateRepliesWith
-    ) {
-      id
-      validated
-      replies {
-        id
-        status
-      }
-      petition {
-        ... on Petition {
-          id
-          status
-        }
-      }
+export const PetitionReplies_closePetitionDocument = gql`
+  mutation PetitionReplies_closePetition($petitionId: GID!) {
+    closePetition(petitionId: $petitionId) {
+      ...PetitionReplies_Petition
     }
   }
+  ${PetitionReplies_PetitionFragmentDoc}
 ` as unknown as DocumentNode<
-  PetitionReplies_validatePetitionFieldsMutation,
-  PetitionReplies_validatePetitionFieldsMutationVariables
+  PetitionReplies_closePetitionMutation,
+  PetitionReplies_closePetitionMutationVariables
+>;
+export const PetitionReplies_approveOrRejectPetitionFieldRepliesDocument = gql`
+  mutation PetitionReplies_approveOrRejectPetitionFieldReplies(
+    $petitionId: GID!
+    $status: PetitionFieldReplyStatus!
+  ) {
+    approveOrRejectPetitionFieldReplies(petitionId: $petitionId, status: $status) {
+      ...PetitionReplies_Petition
+    }
+  }
+  ${PetitionReplies_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionReplies_approveOrRejectPetitionFieldRepliesMutation,
+  PetitionReplies_approveOrRejectPetitionFieldRepliesMutationVariables
 >;
 export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
   mutation PetitionReplies_fileUploadReplyDownloadLink(
@@ -23251,7 +23524,6 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
       status: $status
     ) {
       id
-      validated
       petition {
         ... on Petition {
           id

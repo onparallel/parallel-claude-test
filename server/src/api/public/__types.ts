@@ -559,7 +559,7 @@ export type Mutation = {
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
-  /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
+  /** Updates the status of a petition field reply. */
   updatePetitionFieldRepliesStatus: PetitionField;
   /** Updates the metada of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
@@ -1276,6 +1276,7 @@ export type MutationupdatePetitionFieldRepliesStatusArgs = {
   petitionFieldReplyIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   status: PetitionFieldReplyStatus;
+  validateFields?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationupdatePetitionFieldReplyMetadataArgs = {
@@ -1366,6 +1367,13 @@ export type MutationuserSignUpArgs = {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
+};
+
+export type MutationvalidatePetitionFieldsArgs = {
+  fieldIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+  validateRepliesWith?: InputMaybe<PetitionFieldReplyStatus>;
+  value: Scalars["Boolean"];
 };
 
 export type MutationverifyPublicAccessArgs = {
@@ -2407,6 +2415,8 @@ export type PublicPetitionSignerDataInput = {
 export type PublicPublicPetitionLink = {
   description: Scalars["String"];
   isActive: Scalars["Boolean"];
+  /** If the organization has enough credits to send a petition with this public link or not */
+  isAvailable: Scalars["Boolean"];
   organization: PublicOrganization;
   owner: PublicUser;
   slug: Scalars["String"];
