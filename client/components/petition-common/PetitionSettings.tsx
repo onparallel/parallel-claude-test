@@ -487,7 +487,10 @@ function _PetitionSettings({
           controlId="share-by-link"
         >
           <Center>
-            <Button onClick={() => handleUpdateTemplateDefaultPermissions(true)}>
+            <Button
+              onClick={() => handleUpdateTemplateDefaultPermissions(true)}
+              isDisabled={isPublicTemplate || petition.isRestricted}
+            >
               <FormattedMessage
                 id="component.petition-settings.share-automatically-settings"
                 defaultMessage="Sharing settings"
@@ -526,7 +529,10 @@ function _PetitionSettings({
           controlId="enable-esignature"
         >
           <Center>
-            <Button onClick={handleConfigureSignatureClick} isDisabled={!hasSignature}>
+            <Button
+              onClick={handleConfigureSignatureClick}
+              isDisabled={!hasSignature || isPublicTemplate}
+            >
               <Text as="span">
                 <FormattedMessage
                   id="component.petition-settings.petition-signature-configure"
@@ -552,7 +558,7 @@ function _PetitionSettings({
           controlId="automatic-reminders"
         >
           <Center>
-            <Button onClick={handleConfigureAutomaticReminders}>
+            <Button onClick={handleConfigureAutomaticReminders} isDisabled={isPublicTemplate}>
               <Text as="span">
                 <FormattedMessage
                   id="component.petition-settings.automatic-reminders-configure"
