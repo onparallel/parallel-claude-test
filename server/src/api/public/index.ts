@@ -1606,12 +1606,6 @@ api
           const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
           return Redirect(url);
         } catch (error: any) {
-          if (
-            error instanceof ClientError &&
-            containsGraphQLError(error, "EXPORT_DRAFT_PETITION_ERROR")
-          ) {
-            throw new BadRequestError("You can't export the replies of a draft petition.");
-          }
           throw error;
         }
       } else if (query.format === "pdf") {
