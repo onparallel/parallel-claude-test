@@ -1397,9 +1397,7 @@ api
       try {
         gql`
           mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
-            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-              id
-            }
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
           }
         `;
         await client.request(DeleteReply_deletePetitionReplyDocument, params);
@@ -1712,7 +1710,9 @@ api
     async ({ client, params }) => {
       const _mutation = gql`
         mutation StopSharing_removePetitionPermission($petitionId: GID!) {
-          removePetitionPermission(petitionIds: [$petitionId], removeAll: true)
+          removePetitionPermission(petitionIds: [$petitionId], removeAll: true) {
+            id
+          }
         }
       `;
       await client.request(StopSharing_removePetitionPermissionDocument, {
