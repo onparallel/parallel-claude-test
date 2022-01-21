@@ -814,6 +814,7 @@ export interface PetitionField {
   visibility: Maybe<any>; // jsonb
   from_petition_field_id: Maybe<number>; // int4
   alias: Maybe<string>; // varchar
+  is_internal: boolean; // bool
 }
 
 export type CreatePetitionField = PartialProps<
@@ -834,6 +835,7 @@ export type CreatePetitionField = PartialProps<
   | "visibility"
   | "from_petition_field_id"
   | "alias"
+  | "is_internal"
 >;
 
 export interface PetitionFieldAttachment {

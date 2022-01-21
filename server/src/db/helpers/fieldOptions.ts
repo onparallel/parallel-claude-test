@@ -200,6 +200,7 @@ export function defaultFieldOptions(
       return {
         optional: true,
         multiple: false,
+        is_internal: false,
         options: {
           hasCommentsEnabled: false,
           hasPageBreak: false,
@@ -210,6 +211,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: multiple ?? false,
+        is_internal: field?.is_internal ?? false,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -220,6 +222,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: multiple ?? false,
+        is_internal: field?.is_internal ?? false,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -230,6 +233,7 @@ export function defaultFieldOptions(
       return {
         optional: false,
         multiple: true,
+        is_internal: field?.is_internal ?? false,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -240,6 +244,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: multiple ?? false,
+        is_internal: field?.is_internal ?? false,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -252,6 +257,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: multiple ?? false,
+        is_internal: field?.is_internal ?? false,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -265,6 +271,7 @@ export function defaultFieldOptions(
       return {
         optional: optional ?? false,
         multiple: false,
+        is_internal: field?.is_internal ?? false,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,

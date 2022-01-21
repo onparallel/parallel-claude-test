@@ -1164,6 +1164,7 @@ export interface NexusGenFieldTypes {
     fromPetitionFieldId: NexusGenScalars["GID"] | null; // GID
     id: NexusGenScalars["GID"]; // GID!
     isFixed: boolean; // Boolean!
+    isInternal: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
@@ -2453,6 +2454,7 @@ export interface NexusGenFieldTypeNames {
     fromPetitionFieldId: "GID";
     id: "GID";
     isFixed: "Boolean";
+    isInternal: "Boolean";
     isReadOnly: "Boolean";
     multiple: "Boolean";
     optional: "Boolean";

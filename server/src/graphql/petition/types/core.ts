@@ -348,6 +348,10 @@ export const PetitionField = objectType({
       description: "Determines if the field can be moved or deleted.",
       resolve: (o) => o.is_fixed,
     });
+    t.boolean("isInternal", {
+      description: "Determines if the field is only visible inside the app.",
+      resolve: (o) => o.is_internal,
+    });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),

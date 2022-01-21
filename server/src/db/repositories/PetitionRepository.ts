@@ -449,6 +449,12 @@ export class PetitionRepository extends BaseRepository {
     }
   }
 
+  readonly loadPublicFieldsForPetition = this.buildLoadMultipleBy(
+    "petition_field",
+    "petition_id",
+    (q) => q.whereNull("deleted_at").andWhereNot("is_internal").orderBy("position")
+  );
+
   readonly loadFieldsForPetition = this.buildLoadMultipleBy("petition_field", "petition_id", (q) =>
     q.whereNull("deleted_at").orderBy("position")
   );
