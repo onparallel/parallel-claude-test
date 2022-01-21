@@ -80,11 +80,13 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
     const latestPetitionSignature =
       await this.ctx.petitions.loadLatestPetitionSignatureByPetitionId(petitionId);
 
-    const totalFiles =
+    const totalFiles = Math.max(
       Number(fieldReplies.flat().some((r) => r.type !== "HEADING" && r.type !== "FILE_UPLOAD")) +
-      files.length +
-      Number(isDefined(latestPetitionSignature?.file_upload_id)) +
-      Number(isDefined(latestPetitionSignature?.file_upload_audit_trail_id));
+        files.length +
+        Number(isDefined(latestPetitionSignature?.file_upload_id)) +
+        Number(isDefined(latestPetitionSignature?.file_upload_audit_trail_id)),
+      1
+    );
     let processedFiles = 0;
 
     const excelWorkbook = new PetitionExcelExport(locale, this.ctx);

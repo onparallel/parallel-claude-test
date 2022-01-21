@@ -1578,7 +1578,6 @@ api
       tags: ["Petition replies"],
       responses: {
         302: RedirectResponse("Redirect to the resource on AWS S3"),
-        409: ErrorResponse({ description: "You can't export the replies of a draft petition" }),
         500: ErrorResponse({ description: "Error generating the file" }),
       },
     },
