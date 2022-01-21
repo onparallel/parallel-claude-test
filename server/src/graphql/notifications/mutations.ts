@@ -1,8 +1,7 @@
 import { booleanArg, list, mutationField, nonNull } from "nexus";
 import { outdent } from "outdent";
-import { sortBy } from "remeda";
+import { isDefined, sortBy } from "remeda";
 import { PetitionUserNotification } from "../../db/notifications";
-import { xorDefined } from "../../util/remedaExtensions";
 import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -17,9 +16,8 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
   {
     description: outdent`
       Updates the read status of a user's notification. 
-      Must pass ONLY one of:
+      If one of the following args is defined, the other two must be undefined:
         - petitionUserNotificationIds
-        - filter
         - petitionIds
         - petitionFieldCommentIds
     `,
@@ -43,48 +41,57 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
       isRead: nonNull(booleanArg()),
     },
     validateArgs: async (root, args, ctx, info) => {
-      if (
-        !xorDefined(
-          args.petitionUserNotificationIds,
-          args.petitionIds,
-          args.petitionFieldCommentIds,
-          args.filter
-        )
-      ) {
+      const argCount = [
+        args.petitionUserNotificationIds,
+        args.petitionIds,
+        args.petitionFieldCommentIds,
+      ].reduce((result, element) => (isDefined(element) ? result + 1 : result), 0);
+
+      if (argCount > 1) {
+        throw new ArgValidationError(
+          info,
+          "args.petitionUserNotificationIds, args.petitionIds, args.petitionFieldCommentIds",
+          "Only one of `petitionUserNotificationIds`, `petitionIds` or `petitionFieldCommentIds` argument should be defined"
+        );
+      } else if (argCount === 0 && !args.filter) {
         throw new ArgValidationError(
           info,
           "args.petitionUserNotificationIds, args.petitionIds, args.petitionFieldCommentIds, args.filter",
-          "Only one of `petitionUserNotificationIds`, `petitionIds`, `petitionFieldCommentIds` or `filter` argument should be defined"
+          "Some required argument is missing."
         );
       }
     },
     resolve: async (
       _,
       { petitionUserNotificationIds, petitionIds, petitionFieldCommentIds, filter, isRead },
-      ctx
+      ctx,
+      info
     ) => {
       let notifications: PetitionUserNotification<false>[] = [];
       if (petitionUserNotificationIds) {
         notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatus(
           petitionUserNotificationIds,
           isRead,
-          ctx.user!.id
+          ctx.user!.id,
+          filter
         );
       } else if (petitionIds) {
         notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByPetitionId(
           petitionIds,
           isRead,
-          ctx.user!.id
+          ctx.user!.id,
+          filter
         );
       } else if (petitionFieldCommentIds) {
         notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByCommentIds(
           petitionFieldCommentIds,
           isRead,
-          ctx.user!.id
+          ctx.user!.id,
+          filter
         );
-      } else {
+      } else if (filter) {
         notifications = await ctx.petitions.updatePetitionUserNotificationsReadStatusByUserId(
-          filter!,
+          filter,
           isRead,
           ctx.user!.id
         );

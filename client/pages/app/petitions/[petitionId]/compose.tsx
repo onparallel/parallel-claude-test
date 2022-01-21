@@ -76,7 +76,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
-    updateIsReadNotification({ isRead: true, filter: "SHARED" });
+    updateIsReadNotification({ isRead: true, filter: "SHARED", petitionIds: [petitionId] });
   }, []);
 
   const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;

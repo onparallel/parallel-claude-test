@@ -60,7 +60,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
-    updateIsReadNotification({ isRead: true, filter: "OTHER" });
+    updateIsReadNotification({ isRead: true, filter: "OTHER", petitionIds: [petitionId] });
   }, []);
 
   const petition = data!.petition as PetitionActivity_PetitionFragment;

@@ -501,7 +501,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data).toBeNull();
   });
 
-  it("should send error if pasing neither petitionUserNotificationIds nor filter arguments", async () => {
+  it("should send error if passing neither petitionUserNotificationIds nor filter arguments", async () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
         mutation ($isRead: Boolean!) {
@@ -537,17 +537,13 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data).toBeNull();
   });
 
-  it("should throw error if passing both petitionUserNotificationIds and filter", async () => {
+  it("should throw error if passing both petitionUserNotificationIds and petitionIds", async () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
-        mutation (
-          $isRead: Boolean!
-          $filter: PetitionUserNotificationFilter
-          $petitionUserNotificationIds: [GID!]
-        ) {
+        mutation ($isRead: Boolean!, $petitionIds: [GID!], $petitionUserNotificationIds: [GID!]) {
           updatePetitionUserNotificationReadStatus(
             isRead: $isRead
-            filter: $filter
+            petitionIds: $petitionIds
             petitionUserNotificationIds: $petitionUserNotificationIds
           ) {
             id
@@ -560,7 +556,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           toGlobalId("PetitionUserNotification", notifications[2].id),
           toGlobalId("PetitionUserNotification", notifications[3].id),
         ],
-        filter: "COMMENTS",
+        petitionIds: [toGlobalId("Petition", petition.id)],
       },
     });
 

@@ -29,6 +29,7 @@ import {
   CommentCreatedUserNotification,
   CreatePetitionUserNotification,
   GenericPetitionUserNotification,
+  PetitionUserNotification,
 } from "../notifications";
 import {
   Contact,
@@ -2162,6 +2163,30 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.where({ is_read: false }).orderBy("created_at", "desc")
   );
 
+  private filterPetitionUserNotificationQueryBuilder(
+    filter?: Maybe<PetitionUserNotificationFilter>
+  ): Knex.QueryCallback<PetitionUserNotification<false>> {
+    return (q) => {
+      if (filter === "UNREAD") {
+        q.where("is_read", false);
+      } else if (filter === "COMMENTS") {
+        q.where("type", "COMMENT_CREATED");
+      } else if (filter === "COMPLETED") {
+        q.whereIn("type", ["PETITION_COMPLETED", "SIGNATURE_COMPLETED"]);
+      } else if (filter === "SHARED") {
+        q.where("type", "PETITION_SHARED");
+      } else if (filter === "OTHER") {
+        q.whereIn("type", [
+          "MESSAGE_EMAIL_BOUNCED",
+          "REMINDER_EMAIL_BOUNCED",
+          "SIGNATURE_CANCELLED",
+          "REMINDERS_OPT_OUT",
+          "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+        ]);
+      }
+    };
+  }
+
   async loadPetitionUserNotificationsByUserId(
     userId: number,
     opts: {
@@ -2172,24 +2197,8 @@ export class PetitionRepository extends BaseRepository {
   ) {
     return this.from("petition_user_notification")
       .where("user_id", userId)
+      .mmodify(this.filterPetitionUserNotificationQueryBuilder(opts.filter))
       .mmodify((q) => {
-        if (opts.filter === "UNREAD") {
-          q.where("is_read", false);
-        } else if (opts.filter === "COMMENTS") {
-          q.where("type", "COMMENT_CREATED");
-        } else if (opts.filter === "COMPLETED") {
-          q.whereIn("type", ["PETITION_COMPLETED", "SIGNATURE_COMPLETED"]);
-        } else if (opts.filter === "SHARED") {
-          q.where("type", "PETITION_SHARED");
-        } else if (opts.filter === "OTHER") {
-          q.whereIn("type", [
-            "MESSAGE_EMAIL_BOUNCED",
-            "REMINDER_EMAIL_BOUNCED",
-            "SIGNATURE_CANCELLED",
-            "REMINDERS_OPT_OUT",
-            "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
-          ]);
-        }
         if (opts.before) {
           q.where("created_at", "<", opts.before);
         }
@@ -2207,12 +2216,14 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionUserNotificationsReadStatus(
     petitionUserNotificationIds: number[],
     isRead: boolean,
-    userId: number
+    userId: number,
+    filter?: Maybe<PetitionUserNotificationFilter>
   ) {
     return await this.from("petition_user_notification")
       .whereIn("id", petitionUserNotificationIds)
       .where("user_id", userId)
       .where("is_read", !isRead) // to return only the updated notifications
+      .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
       .update(
         removeNotDefined({
           is_read: isRead,
@@ -2225,13 +2236,15 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionUserNotificationsReadStatusByPetitionId(
     petitionIds: number[],
     isRead: boolean,
-    userId: number
+    userId: number,
+    filter?: Maybe<PetitionUserNotificationFilter>
   ) {
     return await this.from("petition_user_notification")
       .whereIn("petition_id", petitionIds)
       .where("user_id", userId)
       .where("is_read", !isRead)
       .whereNot("type", "COMMENT_CREATED")
+      .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
       .update(
         removeNotDefined({
           is_read: isRead,
@@ -2244,7 +2257,8 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionUserNotificationsReadStatusByCommentIds(
     petitionFieldCommentIds: number[],
     isRead: boolean,
-    userId: number
+    userId: number,
+    filter?: Maybe<PetitionUserNotificationFilter>
   ) {
     const comments = (await this.loadPetitionFieldComment(
       petitionFieldCommentIds
@@ -2264,6 +2278,7 @@ export class PetitionRepository extends BaseRepository {
         this.knex.raw("data ->> 'petition_field_comment_id'") as any,
         uniq(comments.map((c) => c.id))
       )
+      .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
       .update(
         removeNotDefined({
           is_read: isRead,
@@ -2281,25 +2296,7 @@ export class PetitionRepository extends BaseRepository {
     return await this.from("petition_user_notification")
       .where("user_id", userId)
       .where("is_read", !isRead)
-      .mmodify((q) => {
-        if (filter === "UNREAD") {
-          q.where("is_read", false);
-        } else if (filter === "COMMENTS") {
-          q.where("type", "COMMENT_CREATED");
-        } else if (filter === "COMPLETED") {
-          q.whereIn("type", ["PETITION_COMPLETED", "SIGNATURE_COMPLETED"]);
-        } else if (filter === "SHARED") {
-          q.where("type", "PETITION_SHARED");
-        } else if (filter === "OTHER") {
-          q.whereIn("type", [
-            "MESSAGE_EMAIL_BOUNCED",
-            "REMINDER_EMAIL_BOUNCED",
-            "SIGNATURE_CANCELLED",
-            "REMINDERS_OPT_OUT",
-            "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
-          ]);
-        }
-      })
+      .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
       .update(
         removeNotDefined({
           is_read: isRead,

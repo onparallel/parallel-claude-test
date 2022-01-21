@@ -32,8 +32,3 @@ export function removeNotDefined<T extends {}>(
 ): { [P in keyof T]?: Exclude<T[P], null> } {
   return removeKeys(object, ([_, value]) => isDefined(value));
 }
-
-/** returns true if only one of the provided elements is defined */
-export function xorDefined(...elements: any[]) {
-  return elements.reduce((result, element) => (isDefined(element) ? result + 1 : result), 0) === 1;
-}

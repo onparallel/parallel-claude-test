@@ -1373,9 +1373,8 @@ type Mutation {
 
   """
   Updates the read status of a user's notification.
-  Must pass ONLY one of:
+  If one of the following args is defined, the other two must be undefined:
     - petitionUserNotificationIds
-    - filter
     - petitionIds
     - petitionFieldCommentIds
   """
