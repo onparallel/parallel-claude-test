@@ -43,8 +43,7 @@ export class TaskRepository extends BaseRepository {
       },
       "*"
     );
-
-    this.aws.enqueueMessages("task-worker", {
+    await this.aws.enqueueMessages("task-worker", {
       groupId: `Task:${task.id}`,
       body: { taskId: task.id },
     });

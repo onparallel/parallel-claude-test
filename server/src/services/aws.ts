@@ -105,30 +105,36 @@ export class Aws implements IAws {
     return createHash("md5").update(value).digest("hex");
   }
 
-  enqueueMessages(
+  async enqueueMessages(
     queue: keyof Config["queueWorkers"],
     messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string },
     t?: Knex.Transaction
   ) {
-    if (isDefined(t) && !t.isCompleted()) {
-      t.on("query", (data) => {
-        if (data.sql === "COMMIT;") {
-          this.sendSQSMessage(queue, messages);
-        }
-      });
+    if (isDefined(t)) {
+      if (!t.isCompleted()) {
+        t.executionPromise
+          .then(() => this.sendSQSMessage(queue, messages))
+          .catch((error) => {
+            this.logger.error(error);
+          });
+      } else {
+        this.sendSQSMessage(queue, messages).catch((error) => {
+          this.logger.error(error);
+        });
+      }
     } else {
-      this.sendSQSMessage(queue, messages);
+      await this.sendSQSMessage(queue, messages);
     }
   }
 
-  private sendSQSMessage(
+  private async sendSQSMessage(
     queue: keyof Config["queueWorkers"],
     messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
   ) {
     const queueUrl = this.config.queueWorkers[queue].endpoint;
     if (Array.isArray(messages)) {
       for (const batch of chunk(messages, 10)) {
-        this.sqs
+        await this.sqs
           .sendMessageBatch({
             QueueUrl: queueUrl,
             Entries: batch.map(({ id, body, groupId }) => ({
@@ -137,25 +143,23 @@ export class Aws implements IAws {
               MessageGroupId: this.hash(groupId),
             })),
           })
-          .promise()
-          .catch((err) => this.logger.error(err));
+          .promise();
       }
     } else {
-      this.sqs
+      await this.sqs
         .sendMessage({
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(messages.body),
           MessageGroupId: messages.groupId,
         })
-        .promise()
-        .catch((err) => this.logger.error(err));
+        .promise();
     }
   }
 
-  enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>, t?: Knex.Transaction) {
+  async enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>, t?: Knex.Transaction) {
     const _events = unMaybeArray(events).filter(isDefined);
     if (_events.length > 0) {
-      this.enqueueMessages(
+      await this.enqueueMessages(
         "event-processor",
         _events.map((event) => ({
           id: `event-processor-${event.id}`,

@@ -2000,9 +2000,7 @@ export class PetitionRepository extends BaseRepository {
 
     const petitionEvents = await this.insert("petition_event", eventsArray, t);
 
-    // dont await this. we may be inside a transaction
-    this.aws.enqueueEvents(petitionEvents, t);
-
+    await this.aws.enqueueEvents(petitionEvents, t);
     return petitionEvents;
   }
 
