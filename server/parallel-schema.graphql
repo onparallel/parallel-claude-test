@@ -2802,7 +2802,7 @@ type PetitionSigner {
   email: String!
   firstName: String!
   fullName: String!
-  lastName: String!
+  lastName: String
 }
 
 """

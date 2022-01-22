@@ -918,6 +918,21 @@ function ListOf<T extends JsonSchema>(item: T) {
   return schema(_ListOf(item));
 }
 
+const _PetitionSigner = {
+  type: "object",
+  description: "Information about the signer",
+  properties: {
+    firstName: { type: "string" },
+    lastName: { type: ["string", "null"] },
+    email: { type: "string" },
+  },
+  example: {
+    firstName: "Tywin",
+    lastName: "Lannister",
+    email: "tywin@casterlyrock.com",
+  },
+} as const;
+
 export const _PetitionEvent = {
   type: "object",
   oneOf: Object.entries({
@@ -1301,20 +1316,7 @@ export const _PetitionEvent = {
     SIGNATURE_OPENED: {
       description: "A signer has opened the signing page on the signature provider",
       properties: {
-        signer: {
-          type: "object",
-          description: "Information about the signer",
-          properties: {
-            firstName: { type: "string" },
-            lastName: { type: "string" },
-            email: { type: "string" },
-          },
-          example: {
-            firstName: "Tywin",
-            lastName: "Lannister",
-            email: "tywin@casterlyrock.com",
-          },
-        },
+        signer: _PetitionSigner,
         petitionSignatureRequestId: {
           type: "string",
           description: "The ID of the signature request",
@@ -1580,20 +1582,7 @@ export const _PetitionEvent = {
     RECIPIENT_SIGNED: {
       description: "A recipient has signed the document.",
       properties: {
-        signer: {
-          type: "object",
-          description: "Information about the signer",
-          properties: {
-            firstName: { type: "string" },
-            lastName: { type: "string" },
-            email: { type: "string" },
-          },
-          example: {
-            firstName: "Tywin",
-            lastName: "Lannister",
-            email: "tywin@casterlyrock.com",
-          },
-        },
+        signer: _PetitionSigner,
         petitionSignatureRequestId: {
           type: "string",
           description: "The ID of the signature request",

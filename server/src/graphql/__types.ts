@@ -1298,7 +1298,7 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     firstName: string; // String!
     fullName: string; // String!
-    lastName: string; // String!
+    lastName: string | null; // String
   };
   PetitionTemplate: {
     // field return type

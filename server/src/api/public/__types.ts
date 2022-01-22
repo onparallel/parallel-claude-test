@@ -569,9 +569,8 @@ export type Mutation = {
   updatePetitionRestriction: PetitionBase;
   /**
    * Updates the read status of a user's notification.
-   * Must pass ONLY one of:
+   * If one of the following args is defined, the other two must be undefined:
    *   - petitionUserNotificationIds
-   *   - filter
    *   - petitionIds
    *   - petitionFieldCommentIds
    */
@@ -2108,7 +2107,7 @@ export type PetitionSigner = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   fullName: Scalars["String"];
-  lastName: Scalars["String"];
+  lastName: Maybe<Scalars["String"]>;
 };
 
 /** The status of a petition. */

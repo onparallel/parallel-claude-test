@@ -443,7 +443,7 @@ export const PetitionSigner = objectType({
       resolve: (root) => root.contactId ?? null,
     });
     t.string("firstName");
-    t.string("lastName");
+    t.nullable.string("lastName");
     t.string("fullName", { resolve: (o) => fullName(o.firstName, o.lastName) });
     t.string("email");
   },
