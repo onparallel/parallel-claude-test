@@ -46,7 +46,7 @@ import {
   waitForTask,
 } from "./helpers";
 import {
-  AnyPetitionEvent,
+  _PetitionEvent,
   Contact,
   CreateContact,
   CreateOrUpdatePetitionCustomProperty,
@@ -187,7 +187,7 @@ export const api = new RestApi({
       },
     },
     schemas: {
-      PetitionEvent: AnyPetitionEvent,
+      PetitionEvent: _PetitionEvent,
     },
   },
   "x-tagGroups": [

@@ -197,7 +197,7 @@ const _PetitionAccess = {
 const _PetitionField = {
   type: "object",
   additionalProperties: false,
-  required: ["id", "title", "type", "multiple", "validated"],
+  required: ["id", "title", "type", "multiple"],
   properties: {
     id: {
       type: "string",
@@ -918,7 +918,7 @@ function ListOf<T extends JsonSchema>(item: T) {
   return schema(_ListOf(item));
 }
 
-export const AnyPetitionEvent = {
+export const _PetitionEvent = {
   type: "object",
   oneOf: Object.entries({
     ACCESS_ACTIVATED: {
@@ -1632,8 +1632,8 @@ export const AnyPetitionEvent = {
               description: "The payload of the event",
               additionalProperties: false,
               required: data.required ?? Object.keys(data.properties!),
-              properties: data.properties!,
-            },
+              properties: data.properties! as any,
+            } as unknown as { type: "object" },
             createdAt: {
               description: "Creation date of the event",
               type: "string",
@@ -1641,11 +1641,11 @@ export const AnyPetitionEvent = {
               example: new Date(2020, 2, 15).toISOString(),
             },
           },
-        } as JsonSchema)
+        } as const)
     ),
-} as any;
+} as const;
 
-export const PetitionEvent = schema(AnyPetitionEvent);
+export const PetitionEvent = schema(_PetitionEvent);
 
 export const PetitionCustomProperties = schema({
   type: "object",
