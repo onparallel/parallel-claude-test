@@ -221,7 +221,9 @@ export function ExportRepliesDialog({
                 onChange={(e) => {
                   setRename(e.target.checked);
                   if (e.target.checked) {
-                    inputRef.current?.focus();
+                    setTimeout(() => {
+                      inputRef.current?.focus();
+                    }, 150);
                   }
                 }}
               >
