@@ -51,6 +51,7 @@ import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { SmallPopover } from "../common/SmallPopover";
 import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -498,7 +499,12 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 
   return (
     <Stack spacing={1} {...props}>
-      <Stack direction="row">
+      <Stack direction="row" spacing={2}>
+        {field.isInternal ? (
+          <Center>
+            <InternalFieldBadge />
+          </Center>
+        ) : null}
         <Box flex={1}>
           <Input
             id={`field-title-${field.id}`}
@@ -931,6 +937,7 @@ const fragments = {
         optional
         multiple
         isFixed
+        isInternal
         isReadOnly
         visibility
         attachments {

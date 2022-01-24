@@ -1833,6 +1833,8 @@ export type PetitionField = {
   id: Scalars["GID"];
   /** Determines if the field can be moved or deleted. */
   isFixed: Scalars["Boolean"];
+  /** Determines if the field is only visible inside the app. */
+  isInternal: Scalars["Boolean"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];
   /** Determines if this field allows multiple replies. */
@@ -3006,6 +3008,7 @@ export type UpdateEventSubscriptionInput = {
 export type UpdatePetitionFieldInput = {
   alias?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["String"]>;
+  isInternal?: InputMaybe<Scalars["Boolean"]>;
   multiple?: InputMaybe<Scalars["Boolean"]>;
   optional?: InputMaybe<Scalars["Boolean"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;

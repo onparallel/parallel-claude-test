@@ -1,5 +1,15 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, List, ListItem, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  List,
+  ListItem,
+  Stack,
+  Text,
+  VisuallyHidden,
+} from "@chakra-ui/react";
 import { ChevronFilledIcon, CommentIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewContentsCard_PetitionFieldFragment,
@@ -14,6 +24,7 @@ import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { countBy, zip } from "remeda";
 import { Card, CardHeader, CardProps } from "../common/Card";
+import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
@@ -115,15 +126,17 @@ export function RecipientViewContentsCard({
               {index + 1 === currentPage ? (
                 <Stack as={List} spacing={1}>
                   {filteredFields.map((field) => {
-                    const { commentCount, unreadCommentCount } =
-                      field.__typename === "PublicPetitionField"
-                        ? field
-                        : field.__typename === "PetitionField"
-                        ? {
-                            commentCount: field.comments.length,
-                            unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
-                          }
-                        : (null as never);
+                    const isPublicPetitionField = field.__typename === "PublicPetitionField";
+                    const isPetitionField = field.__typename === "PetitionField";
+
+                    const { commentCount, unreadCommentCount } = isPublicPetitionField
+                      ? field
+                      : isPetitionField
+                      ? {
+                          commentCount: field.comments.length,
+                          unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
+                        }
+                      : (null as never);
                     return (
                       <ListItem key={field.id} position="relative">
                         <Text
@@ -175,6 +188,11 @@ export function RecipientViewContentsCard({
                                   hasUnreadComments={!!unreadCommentCount}
                                   commentCount={commentCount}
                                 />
+                              ) : null}
+                              {isPetitionField && field.isInternal ? (
+                                <Center>
+                                  <InternalFieldBadge marginLeft={2} />
+                                </Center>
                               ) : null}
                             </Button>
                           </NakedLink>
@@ -316,6 +334,7 @@ RecipientViewContentsCard.fragments = {
         title
         options
         optional
+        isInternal
         isReadOnly
         replies {
           id

@@ -32,6 +32,7 @@ import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
+import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { Spacer } from "../common/Spacer";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
@@ -78,6 +79,10 @@ export const PetitionRepliesField = Object.assign(
         return url!;
       });
     };
+
+    const InternalFieldBadgeComp = field.isInternal ? (
+      <InternalFieldBadge marginRight={2.5} marginBottom={0.5} />
+    ) : null;
 
     return field.type === "HEADING" ? (
       <Stack
@@ -196,10 +201,12 @@ export const PetitionRepliesField = Object.assign(
             <Box marginLeft={2} flex="1">
               {field.title ? (
                 <Text as="h4" overflowWrap="anywhere" fontWeight={600}>
+                  {InternalFieldBadgeComp}
                   {field.title}
                 </Text>
               ) : (
                 <Text as="h4" textStyle="hint" whiteSpace="nowrap">
+                  {InternalFieldBadgeComp}
                   <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
                 </Text>
               )}
@@ -301,6 +308,7 @@ export const PetitionRepliesField = Object.assign(
           title
           description
           optional
+          isInternal
           replies {
             ...PetitionRepliesField_PetitionFieldReply
           }

@@ -32,7 +32,7 @@ export async function petitionReminder(
       context.petitions.loadPetition(access.petition_id),
       context.users.loadUser(access.granter_id),
       context.contacts.loadContact(access.contact_id),
-      context.petitions.loadFieldsForPetition(access.petition_id),
+      context.petitions.loadPublicFieldsForPetition(access.petition_id),
       loadOriginalMessageByPetitionAccess(access.id, access.petition_id, context),
     ]);
     if (!petition) {

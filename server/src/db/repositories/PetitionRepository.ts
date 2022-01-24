@@ -452,7 +452,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadPublicFieldsForPetition = this.buildLoadMultipleBy(
     "petition_field",
     "petition_id",
-    (q) => q.whereNull("deleted_at").andWhereNot("is_internal").orderBy("position")
+    (q) => q.whereNull("deleted_at").andWhere("is_internal", false).orderBy("position")
   );
 
   readonly loadFieldsForPetition = this.buildLoadMultipleBy("petition_field", "petition_id", (q) =>
@@ -1505,7 +1505,9 @@ export class PetitionRepository extends BaseRepository {
     const updatedBy = `${isAccess ? "PetitionAccess" : "User"}:${userOrAccess.id}`;
     const [petition, fields] = await Promise.all([
       this.loadPetition(petitionId),
-      this.loadFieldsForPetition(petitionId),
+      isAccess
+        ? this.loadPublicFieldsForPetition(petitionId)
+        : this.loadFieldsForPetition(petitionId),
     ]);
     if (!petition || !fields) {
       throw new Error();

@@ -13,6 +13,7 @@ import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { ComponentType, createElement, memo, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { Divider } from "../common/Divider";
+import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
 
 interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
@@ -126,6 +127,7 @@ PetitionContents.fragments = {
       title
       type
       options
+      isInternal
       ...filterPetitionFields_PetitionField
     }
     ${filterPetitionFields.fragments.PetitionField}
@@ -183,6 +185,11 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
             )}
           </Text>
           {fieldIndicators ? createElement(fieldIndicators, { field }) : null}
+          {field.isInternal ? (
+            <Center>
+              <InternalFieldBadge />
+            </Center>
+          ) : null}
         </Stack>
       </Box>
     </>

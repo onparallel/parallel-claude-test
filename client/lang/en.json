@@ -880,6 +880,16 @@
     "context": "Change name"
   },
   {
+    "term": "component.internal-field-badge.popover",
+    "definition": "The internal fields will not be visible to the recipient.",
+    "context": "The internal fields will not be visible to the recipient."
+  },
+  {
+    "term": "component.internal-field-badge.text",
+    "definition": "INT",
+    "context": "INT"
+  },
+  {
     "term": "component.message-email-editor.body-placeholder",
     "definition": "Write a message to include in the email",
     "context": "Write a message to include in the email"
@@ -1778,6 +1788,11 @@
     "term": "component.petition-settings.petition-comments-enable",
     "definition": "Allow comments",
     "context": "Allow comments"
+  },
+  {
+    "term": "component.petition-settings.petition-internal-field",
+    "definition": "Internal field",
+    "context": "Internal field"
   },
   {
     "term": "component.petition-settings.petition-signature-configure",

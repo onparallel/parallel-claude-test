@@ -4,6 +4,7 @@ import { AddIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
 import { Linkify } from "@parallel/components/common/Linkify";
 import {
   RecipientViewPetitionFieldCard_PetitionFieldFragment,
@@ -52,16 +53,18 @@ export function RecipientViewPetitionFieldCard({
 }: RecipientViewPetitionFieldCardProps) {
   const intl = useIntl();
 
+  const isPublicPetitionField = field.__typename === "PublicPetitionField";
+  const isPetitionField = field.__typename === "PetitionField";
+
   const fieldReplies = completedFieldReplies(field);
-  const { commentCount, unreadCommentCount } =
-    field.__typename === "PublicPetitionField"
-      ? field
-      : field.__typename === "PetitionField"
-      ? {
-          commentCount: field.comments.length,
-          unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
-        }
-      : (null as never);
+  const { commentCount, unreadCommentCount } = isPublicPetitionField
+    ? field
+    : isPetitionField
+    ? {
+        commentCount: field.comments.length,
+        unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
+      }
+    : (null as never);
 
   return (
     <Card
@@ -78,6 +81,9 @@ export function RecipientViewPetitionFieldCard({
       <Flex alignItems="baseline">
         <Box flex="1" marginRight={2}>
           <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
+            {isPetitionField && field.isInternal ? (
+              <InternalFieldBadge marginRight={2.5} marginBottom={0.5} />
+            ) : null}
             {field.title || (
               <Text as="span" color="gray.500" fontWeight="normal" fontStyle="italic">
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
@@ -98,7 +104,7 @@ export function RecipientViewPetitionFieldCard({
             )}
           </Heading>
         </Box>
-        {hasCommentsEnabled || field.__typename === "PetitionField" ? (
+        {hasCommentsEnabled || isPetitionField ? (
           <CommentsButton
             commentCount={commentCount}
             hasUnreadComments={unreadCommentCount > 0}
@@ -175,6 +181,7 @@ RecipientViewPetitionFieldCard.fragments = {
         options
         optional
         multiple
+        isInternal
         replies {
           ...RecipientViewPetitionFieldCard_PetitionFieldReply
         }

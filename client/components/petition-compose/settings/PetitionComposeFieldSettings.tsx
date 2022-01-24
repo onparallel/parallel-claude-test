@@ -109,6 +109,31 @@ export function PetitionComposeFieldSettings({
           />
         </SettingsRow>
 
+        <SettingsRow
+          isDisabled={isReadOnly}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.petition-internal-field"
+              defaultMessage="Internal field"
+            />
+          }
+          controlId="internal-field"
+        >
+          <Switch
+            height="20px"
+            display="block"
+            id="internal-field"
+            color="green"
+            isChecked={field.isInternal}
+            onChange={(event) =>
+              onFieldEdit(field.id, {
+                isInternal: event.target.checked,
+              })
+            }
+            isDisabled={isReadOnly || field.isFixed}
+          />
+        </SettingsRow>
+
         {!field.isReadOnly && field.type !== "CHECKBOX" && (
           <SettingsRow
             isDisabled={isReadOnly}
@@ -197,6 +222,7 @@ PetitionComposeFieldSettings.fragments = {
       optional
       multiple
       options
+      isInternal
       isReadOnly
       isFixed
       position

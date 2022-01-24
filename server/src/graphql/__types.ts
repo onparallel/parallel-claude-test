@@ -157,6 +157,7 @@ export interface NexusGenInputs {
     // input type
     alias?: string | null; // String
     description?: string | null; // String
+    isInternal?: boolean | null; // Boolean
     multiple?: boolean | null; // Boolean
     optional?: boolean | null; // Boolean
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
