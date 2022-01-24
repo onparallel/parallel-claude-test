@@ -7990,6 +7990,7 @@ export type usePetitionPreviewSignerInfoDialog_UserFragment = {
   firstName?: string | null;
   lastName?: string | null;
   fullName?: string | null;
+  email: string;
 };
 
 export type usePetitionPreviewSignerInfoDialog_OrganizationFragment = {
@@ -19914,6 +19915,7 @@ export const usePetitionPreviewSignerInfoDialog_UserFragmentDoc = gql`
     firstName
     lastName
     fullName
+    email
   }
 ` as unknown as DocumentNode<usePetitionPreviewSignerInfoDialog_UserFragment, unknown>;
 export const PetitionPreview_UserFragmentDoc = gql`

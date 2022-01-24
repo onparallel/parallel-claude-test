@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Button,
+  Checkbox,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -12,6 +13,8 @@ import {
 import { ContactSelect, ContactSelectSelection } from "@parallel/components/common/ContactSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   PetitionLocale,
   usePetitionPreviewSignerInfoDialog_OrganizationFragment,
@@ -19,9 +22,12 @@ import {
   usePetitionPreviewSignerInfoDialog_UserFragment,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
+import autosize from "autosize";
 import { outdent } from "outdent";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -51,6 +57,8 @@ function PetitionPreviewSignerInfoDialog({
   const {
     control,
     handleSubmit,
+    register,
+    watch,
     formState: { errors },
   } = useForm<{ contacts: ContactSelectSelection[]; message: string }>({
     mode: "onChange",
@@ -63,8 +71,22 @@ function PetitionPreviewSignerInfoDialog({
     },
   });
 
+  const [showMessage, setShowMessage] = useState(false);
+  const [userWillSign, setUserWillSign] = useState(false);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  const messageRegisterProps = useRegisterWithRef(messageRef, register, "message");
+
+  useEffect(() => {
+    if (showMessage) {
+      const timeout = setTimeout(() => autosize.update(messageRef.current!));
+      return () => clearTimeout(timeout);
+    }
+  }, [showMessage]);
+
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
+
+  const contacts = watch("contacts");
 
   return (
     <ConfirmDialog
@@ -74,8 +96,12 @@ function PetitionPreviewSignerInfoDialog({
       content={{
         as: "form",
         onSubmit: handleSubmit(({ contacts, message }) => {
+          const contactIds = userWillSign
+            ? [...contacts.map((c) => c.id), user.id]
+            : [...contacts.map((c) => c.id)];
+
           props.onResolve({
-            additionalSignersContactIds: contacts.map((c) => c.id),
+            additionalSignersContactIds: contactIds,
             message,
           });
         }),
@@ -124,7 +150,20 @@ function PetitionPreviewSignerInfoDialog({
                 })}
               </UnorderedList>
             </Stack>
-          ) : null}
+          ) : (
+            <Checkbox
+              colorScheme="purple"
+              isChecked={userWillSign}
+              onChange={(e) => setUserWillSign(e.target.checked)}
+            >
+              <FormattedMessage
+                id="recipient-view.complete-signer-info-dialog.recipient-will-sign"
+                defaultMessage="I will sign ({email})"
+                values={{ email: user.email }}
+              />
+            </Checkbox>
+          )}
+
           {recipientCanAddSigners ? (
             <FormControl isInvalid={!!errors.contacts}>
               <FormLabel>
@@ -170,6 +209,34 @@ function PetitionPreviewSignerInfoDialog({
                 />
               </FormErrorMessage>
             </FormControl>
+          ) : null}
+          {contacts.length > 0 ? (
+            <>
+              <Checkbox
+                colorScheme="purple"
+                isChecked={showMessage}
+                onChange={(e) => setShowMessage(e.target.checked)}
+              >
+                <FormattedMessage
+                  id="recipient-view.complete-signer-info-dialog.include-message"
+                  defaultMessage="Include message"
+                />
+              </Checkbox>
+              <PaddedCollapse in={showMessage}>
+                <GrowingTextarea
+                  {...messageRegisterProps}
+                  maxHeight="30vh"
+                  aria-label={intl.formatMessage({
+                    id: "petition-sharing.message-placeholder",
+                    defaultMessage: "Message",
+                  })}
+                  placeholder={intl.formatMessage({
+                    id: "petition-sharing.message-placeholder",
+                    defaultMessage: "Message",
+                  })}
+                />
+              </PaddedCollapse>
+            </>
           ) : null}
         </Stack>
       }
@@ -217,6 +284,7 @@ usePetitionPreviewSignerInfoDialog.fragments = {
       firstName
       lastName
       fullName
+      email
     }
   `,
   Organization: gql`

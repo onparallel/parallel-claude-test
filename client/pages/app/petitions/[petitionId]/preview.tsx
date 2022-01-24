@@ -142,6 +142,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             variables: {
               petitionId,
               additionalSignersContactIds: completeSignerInfoData?.additionalSignersContactIds,
+              message: completeSignerInfoData?.message,
             },
           });
 
