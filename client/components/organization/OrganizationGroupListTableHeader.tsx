@@ -62,7 +62,7 @@ export function OrganizationGroupListTableHeader({
                   >
                     <FormattedMessage
                       id="organization-groups.remove-from-group"
-                      defaultMessage="Remove from group"
+                      defaultMessage="Remove from team"
                     />
                   </MenuItem>
                 </MenuList>

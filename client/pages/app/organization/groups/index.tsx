@@ -139,7 +139,7 @@ function OrganizationGroups() {
         title: intl.formatMessage(
           {
             id: "view.groups.clone-success-title",
-            defaultMessage: "{count, plural, =1{Group} other{Groups}} cloned successfully.",
+            defaultMessage: "{count, plural, =1{Team} other{Teams}} cloned successfully.",
           },
           { count: selected.length }
         ),
@@ -147,7 +147,7 @@ function OrganizationGroups() {
           {
             id: "view.groups.clone-success-description",
             defaultMessage:
-              "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully cloned.",
+              "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully cloned.",
           },
           {
             count: selected.length,
@@ -178,7 +178,7 @@ function OrganizationGroups() {
         title: intl.formatMessage(
           {
             id: "view.groups.delete-success-title",
-            defaultMessage: "{count, plural, =1{Group} other{Groups}} deleted successfully.",
+            defaultMessage: "{count, plural, =1{Team} other{Teams}} deleted successfully.",
           },
           { count: selected.length }
         ),
@@ -186,7 +186,7 @@ function OrganizationGroups() {
           {
             id: "view.groups.delete-success-description",
             defaultMessage:
-              "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully deleted.",
+              "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully deleted.",
           },
           {
             count: selected.length,
@@ -215,12 +215,12 @@ function OrganizationGroups() {
       toast({
         title: intl.formatMessage({
           id: "view.groups.create-success-title",
-          defaultMessage: "Group created successfully.",
+          defaultMessage: "Team created successfully.",
         }),
         description: intl.formatMessage(
           {
             id: "view.groups.create-success-description",
-            defaultMessage: "Group {name} successfully created.",
+            defaultMessage: "Team {name} successfully created.",
           },
           { name: newGroup.name }
         ),
@@ -235,7 +235,7 @@ function OrganizationGroups() {
     <SettingsLayout
       title={intl.formatMessage({
         id: "view.groups.title",
-        defaultMessage: "User groups",
+        defaultMessage: "Teams",
       })}
       basePath="/app/organization"
       sections={sections}
@@ -245,7 +245,7 @@ function OrganizationGroups() {
       }
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage id="view.groups.title" defaultMessage="User groups" />
+          <FormattedMessage id="view.groups.title" defaultMessage="Teams" />
         </Heading>
       }
     >
@@ -287,7 +287,7 @@ function OrganizationGroups() {
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
                       id="view.groups.no-results"
-                      defaultMessage="There's no groups matching your search"
+                      defaultMessage="There's no teams matching your search"
                     />
                   </Text>
                 </Flex>
@@ -296,7 +296,7 @@ function OrganizationGroups() {
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="view.groups.no-groups"
-                      defaultMessage="You have no groups yet"
+                      defaultMessage="You have no teams yet"
                     />
                   </Text>
                 </Flex>
@@ -399,14 +399,14 @@ function ConfirmDeleteGroupsDialog({
       header={
         <FormattedMessage
           id="view.groups.confirm-delete-header"
-          defaultMessage="Delete {count, plural, =1 {group} other {groups}}"
+          defaultMessage="Delete {count, plural, =1 {team} other {teams}}"
           values={{ count }}
         />
       }
       body={
         <FormattedMessage
           id="view.groups.confirm-delete-body"
-          defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {group} other {groups}}."
+          defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected teams}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {team} other {teams}}."
           values={{
             count,
             name,

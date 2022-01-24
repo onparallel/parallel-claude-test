@@ -64,7 +64,7 @@ export function OrganizationGroupsListTableHeader({
                   >
                     <FormattedMessage
                       id="organization-groups.clone-group"
-                      defaultMessage="Clone {count, plural, =1{group} other {groups}}"
+                      defaultMessage="Clone {count, plural, =1{team} other {teams}}"
                       values={{ count: selectedGroups.length }}
                     />
                   </MenuItem>
@@ -75,7 +75,7 @@ export function OrganizationGroupsListTableHeader({
                   >
                     <FormattedMessage
                       id="organization-groups.delete-group"
-                      defaultMessage="Delete {count, plural, =1{group} other {groups}}"
+                      defaultMessage="Delete {count, plural, =1{team} other {teams}}"
                       values={{ count: selectedGroups.length }}
                     />
                   </MenuItem>
@@ -84,7 +84,7 @@ export function OrganizationGroupsListTableHeader({
             </Menu>
           </Box>
           <Button colorScheme="purple" onClick={onCreateGroup}>
-            <FormattedMessage id="organization-groups.create-group" defaultMessage="Create group" />
+            <FormattedMessage id="organization-groups.create-group" defaultMessage="Create team" />
           </Button>
         </>
       ) : null}

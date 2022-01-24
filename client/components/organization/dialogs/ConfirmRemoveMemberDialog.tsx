@@ -26,7 +26,7 @@ function ConfirmRemoveMemberDialog({
           <Text>
             <FormattedMessage
               id="component.confirm-remove-member-dialog.title"
-              defaultMessage="Remove from group"
+              defaultMessage="Remove from team"
             />
           </Text>
         </Stack>
@@ -36,7 +36,7 @@ function ConfirmRemoveMemberDialog({
           <Text>
             <FormattedMessage
               id="component.confirm-remove-member-dialog.body"
-              defaultMessage="Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the group."
+              defaultMessage="Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team."
               values={{
                 count: selected.length,
                 fullName: selected[0].user.fullName,
@@ -49,7 +49,7 @@ function ConfirmRemoveMemberDialog({
         <Button type="submit" colorScheme="red">
           <FormattedMessage
             id="component.confirm-remove-member-dialog.confirm"
-            defaultMessage="Yes, remove from group"
+            defaultMessage="Yes, remove from team"
           />
         </Button>
       }

@@ -36,7 +36,7 @@ export const PetitionSharedUserNotification = Object.assign(
           {sharedWith.__typename === "UserGroup" ? (
             <FormattedMessage
               id="component.notification-petition-shared-group.body"
-              defaultMessage='{name} has shared the {isTemplate, select, true {template} other {petition}} with the group "{group}" to which you belong.'
+              defaultMessage='{name} has shared the {isTemplate, select, true {template} other {petition}} with the team "{group}" to which you belong.'
               values={{
                 isTemplate: petition.__typename === "PetitionTemplate",
                 name: <UserReference user={notification.owner} />,

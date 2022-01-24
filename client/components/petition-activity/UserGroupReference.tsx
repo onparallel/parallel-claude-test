@@ -13,7 +13,7 @@ export function UserGroupReference({
     <Text as="strong">{userGroup.name}</Text>
   ) : (
     <Text as="em">
-      <FormattedMessage id="generic.deleted-user-group" defaultMessage="Deleted user group" />
+      <FormattedMessage id="generic.deleted-user-group" defaultMessage="Deleted team" />
     </Text>
   );
 }

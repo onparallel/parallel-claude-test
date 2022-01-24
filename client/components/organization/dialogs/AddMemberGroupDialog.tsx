@@ -55,7 +55,7 @@ export function AddMemberGroupDialog({
           <Text>
             <FormattedMessage
               id="component.add-member-group-dialog.title"
-              defaultMessage="Add members to group"
+              defaultMessage="Add members to the team"
             />
           </Text>
         </Stack>
@@ -66,7 +66,7 @@ export function AddMemberGroupDialog({
             <FormLabel>
               <FormattedMessage
                 id="component.add-member-group-dialog.members-label"
-                defaultMessage="Add to group"
+                defaultMessage="Add to team"
               />
             </FormLabel>
             <Controller

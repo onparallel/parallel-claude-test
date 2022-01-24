@@ -386,7 +386,7 @@ const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsM
           {includeGroups ? (
             <FormattedMessage
               id="component.user-select.search-hint-include-groups"
-              defaultMessage="Search for existing users and groups"
+              defaultMessage="Search for existing users and teams"
             />
           ) : (
             <FormattedMessage
@@ -415,7 +415,7 @@ const SingleValue: typeof components.SingleValue = function SingleValue(props) {
             top={-0.5}
             alt={intl.formatMessage({
               id: "component.user-select.user-group-icon-alt",
-              defaultMessage: "User group",
+              defaultMessage: "Team",
             })}
           />
           {data.name} (
@@ -448,7 +448,7 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
               marginRight={1}
               alt={intl.formatMessage({
                 id: "component.user-select.user-group-icon-alt",
-                defaultMessage: "User group",
+                defaultMessage: "Team",
               })}
             />
             {data.name} (
@@ -491,7 +491,7 @@ const Option: typeof components.Option = function Option({ children, ...props })
             position="relative"
             alt={intl.formatMessage({
               id: "component.user-select.user-group-icon-alt",
-              defaultMessage: "User group",
+              defaultMessage: "Team",
             })}
           />
           {data.name} (

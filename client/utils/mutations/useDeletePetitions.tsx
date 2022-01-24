@@ -134,7 +134,7 @@ export function useDeletePetitions() {
             const singlePetitionMessage = (
               <FormattedMessage
                 id="component.delete-petitions.group-error-singular"
-                defaultMessage="The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a group."
+                defaultMessage="The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a team."
                 values={{ name: <b>{petitionName}</b>, type }}
               />
             );
@@ -143,7 +143,7 @@ export function useDeletePetitions() {
               <>
                 <FormattedMessage
                   id="component.delete-petitions.group-error-plural"
-                  defaultMessage="The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a group:"
+                  defaultMessage="The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a team:"
                   values={{ type }}
                 />
                 <UnorderedList paddingLeft={2} pt={2}>

@@ -67,7 +67,7 @@ export function usePricingList(): PricingListCategory[] {
           {
             label: intl.formatMessage({
               id: "page.pricing.user-groups",
-              defaultMessage: "User groups",
+              defaultMessage: "Teams",
             }),
             plan: "PROFESSIONAL",
           },

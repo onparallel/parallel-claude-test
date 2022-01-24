@@ -278,7 +278,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                 >
                   <FormattedMessage
                     id="component.group-header.clone-label"
-                    defaultMessage="Clone group"
+                    defaultMessage="Clone team"
                   />
                 </MenuItem>
                 <MenuDivider />
@@ -289,7 +289,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                 >
                   <FormattedMessage
                     id="component.group-header.delete-label"
-                    defaultMessage="Delete group"
+                    defaultMessage="Delete team"
                   />
                 </MenuItem>
               </MenuList>
@@ -344,7 +344,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="view.group.no-members"
-                      defaultMessage="No members added to this group yet"
+                      defaultMessage="No members added to this team yet"
                     />
                   </Text>
                 </Flex>

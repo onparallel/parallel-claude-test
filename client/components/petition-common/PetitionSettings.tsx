@@ -479,7 +479,7 @@ function _PetitionSettings({
           description={
             <FormattedMessage
               id="component.petition-settings.share-automatically-description"
-              defaultMessage="Specify which users or groups of users the petitions created from this template are shared with"
+              defaultMessage="Specify which users or teams the petitions created from this template are shared with"
             />
           }
           isChecked={hasDefaultPermissions}

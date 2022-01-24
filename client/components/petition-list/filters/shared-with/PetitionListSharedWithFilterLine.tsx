@@ -99,7 +99,7 @@ export function PetitionListSharedWithFilterLine({
           onSearch={handleSearchUsers}
           placeholder={intl.formatMessage({
             id: "component.shared-filter.add-user-or-group",
-            defaultMessage: "Select a user or group",
+            defaultMessage: "Select a user or team",
           })}
           usePortal={false}
         />

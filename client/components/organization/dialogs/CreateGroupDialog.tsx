@@ -55,10 +55,7 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
       }}
       initialFocusRef={nameRef}
       header={
-        <FormattedMessage
-          id="component.create-group-dialog.title"
-          defaultMessage="New user group"
-        />
+        <FormattedMessage id="component.create-group-dialog.title" defaultMessage="New team" />
       }
       body={
         <Stack>
@@ -66,14 +63,14 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
             <FormLabel>
               <FormattedMessage
                 id="component.create-group-dialog.name-label"
-                defaultMessage="Group name"
+                defaultMessage="Team name"
               />
             </FormLabel>
             <Input {...nameRegisterProps} />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.invalid-group-name-error"
-                defaultMessage="Please, enter the group name"
+                defaultMessage="Please, enter the team name"
               />
             </FormErrorMessage>
           </FormControl>
@@ -117,7 +114,7 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
         <Button type="submit" colorScheme="purple" variant="solid">
           <FormattedMessage
             id="component.create-group-dialog.confirm-button"
-            defaultMessage="Create group"
+            defaultMessage="Create team"
           />
         </Button>
       }

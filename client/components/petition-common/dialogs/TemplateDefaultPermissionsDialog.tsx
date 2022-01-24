@@ -95,7 +95,7 @@ export function TemplateDefaultPermissionsDialog({
           <Text>
             <FormattedMessage
               id="component.template-default-permissions-dialog.description"
-              defaultMessage="Specify the users or groups of users with whom you want to share the petitions created from this template."
+              defaultMessage="Specify the users or teams with whom you want to share the petitions created from this template."
             />
           </Text>
           <FormControl id="editors">

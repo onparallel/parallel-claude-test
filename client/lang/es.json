@@ -16,8 +16,8 @@
   },
   {
     "term": "component.add-member-group-dialog.members-label",
-    "definition": "Añadir al grupo",
-    "context": "Add to group"
+    "definition": "Añadir al equipo",
+    "context": "Add to team"
   },
   {
     "term": "component.add-member-group-dialog.members-placeholder",
@@ -26,8 +26,8 @@
   },
   {
     "term": "component.add-member-group-dialog.title",
-    "definition": "Agregar miembros al grupo",
-    "context": "Add members to group"
+    "definition": "Agregar miembros al equipo",
+    "context": "Add members to the team"
   },
   {
     "term": "component.add-petition-access-dialog.petition-limit-near.text",
@@ -256,18 +256,18 @@
   },
   {
     "term": "component.confirm-remove-member-dialog.body",
-    "definition": "¿Estás seguro de querer <b>quitar del grupo</b> a {count, plural, =1{{fullName}} other {los miembros seleccionados}}? Si continúas, {count, plural, =1{perderá} other {perderán}} el acceso a las peticiones compartidas con el grupo.",
-    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the group."
+    "definition": "¿Estás seguro de querer <b>quitar del equipo</b> a {count, plural, =1{{fullName}} other {los miembros seleccionados}}? Si continúas, {count, plural, =1{perderá} other {perderán}} el acceso a las peticiones compartidas con el equipo.",
+    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team."
   },
   {
     "term": "component.confirm-remove-member-dialog.confirm",
-    "definition": "Sí, quitar del grupo",
-    "context": "Yes, remove from group"
+    "definition": "Sí, quitar del equipo",
+    "context": "Yes, remove from team"
   },
   {
     "term": "component.confirm-remove-member-dialog.title",
-    "definition": "Quitar del grupo",
-    "context": "Remove from group"
+    "definition": "Quitar del equipo",
+    "context": "Remove from team"
   },
   {
     "term": "component.confirm-resend-completed-notification.confirm-button",
@@ -451,8 +451,8 @@
   },
   {
     "term": "component.create-group-dialog.confirm-button",
-    "definition": "Crear grupo",
-    "context": "Create group"
+    "definition": "Crear equipo",
+    "context": "Create team"
   },
   {
     "term": "component.create-group-dialog.members-label",
@@ -466,13 +466,13 @@
   },
   {
     "term": "component.create-group-dialog.name-label",
-    "definition": "Nombre del grupo",
-    "context": "Group name"
+    "definition": "Nombre del equipo",
+    "context": "Team name"
   },
   {
     "term": "component.create-group-dialog.title",
-    "definition": "Nuevo grupo de usuarios",
-    "context": "New user group"
+    "definition": "Nuevo equipo",
+    "context": "New team"
   },
   {
     "term": "component.create-or-edit-event-subscription-dialog.challenge-explanation",
@@ -581,13 +581,13 @@
   },
   {
     "term": "component.delete-petitions.group-error-plural",
-    "definition": "Las siguientes {type, select, PETITION {peticiónes} other{plantillas}} no se pueden eliminar porque se han compartido contigo a través de un grupo:",
-    "context": "The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a group:"
+    "definition": "Las siguientes {type, select, PETITION {peticiones} other{plantillas}} no se pueden eliminar porque se han compartido contigo a través de un equipo:",
+    "context": "The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a team:"
   },
   {
     "term": "component.delete-petitions.group-error-singular",
-    "definition": "La {type, select, PETITION {petición} other{plantilla}} {name} no se puede eliminar porque se ha compartido contigo a través de un grupo.",
-    "context": "The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a group."
+    "definition": "La {type, select, PETITION {petición} other{plantilla}} {name} no se puede eliminar porque se ha compartido contigo a través de un equipo.",
+    "context": "The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a team."
   },
   {
     "term": "component.delete-petitions.public-templates-error-plural",
@@ -866,13 +866,13 @@
   },
   {
     "term": "component.group-header.clone-label",
-    "definition": "Duplicar grupo",
-    "context": "Clone group"
+    "definition": "Duplicar equipo",
+    "context": "Clone team"
   },
   {
     "term": "component.group-header.delete-label",
-    "definition": "Eliminar grupo",
-    "context": "Delete group"
+    "definition": "Eliminar equipo",
+    "context": "Delete team"
   },
   {
     "term": "component.header-name-editable.change-name",
@@ -996,8 +996,8 @@
   },
   {
     "term": "component.notification-petition-shared-group.body",
-    "definition": "{name} ha compartido la {isTemplate, select, true {plantilla} other {petición}} con el grupo \"{group}\" al que perteneces.",
-    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the group \"{group}\" to which you belong."
+    "definition": "{name} ha compartido la {isTemplate, select, true {plantilla} other {petición}} con el equipo \"{group}\" al que perteneces.",
+    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the team \"{group}\" to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",
@@ -1807,7 +1807,7 @@
   {
     "term": "component.petition-settings.share-automatically-description",
     "definition": "Indica los usuarios y equipos a los que quieras que se compartan las peticiones creadas a partir de esta plantilla.",
-    "context": "Specify which users or groups of users the petitions created from this template are shared with"
+    "context": "Specify which users or teams the petitions created from this template are shared with"
   },
   {
     "term": "component.petition-settings.share-automatically-settings",
@@ -2781,8 +2781,8 @@
   },
   {
     "term": "component.shared-filter.add-user-or-group",
-    "definition": "Selecciona un usuario o grupo",
-    "context": "Select a user or group"
+    "definition": "Selecciona un usuario o equipo",
+    "context": "Select a user or team"
   },
   {
     "term": "component.signature-config-dialog.alert",
@@ -2977,7 +2977,7 @@
   {
     "term": "component.template-default-permissions-dialog.description",
     "definition": "Indica los usuarios y equipos a los que quieras que se compartan las peticiones creadas a partir de esta plantilla.",
-    "context": "Specify the users or groups of users with whom you want to share the petitions created from this template."
+    "context": "Specify the users or teams with whom you want to share the petitions created from this template."
   },
   {
     "term": "component.template-default-permissions-dialog.subscribe",
@@ -3166,13 +3166,13 @@
   },
   {
     "term": "component.user-select.search-hint-include-groups",
-    "definition": "Busca usuarios y grupos existentes",
-    "context": "Search for existing users and groups"
+    "definition": "Busca usuarios y equipos existentes",
+    "context": "Search for existing users and teams"
   },
   {
     "term": "component.user-select.user-group-icon-alt",
-    "definition": "Grupo de usuarios",
-    "context": "User group"
+    "definition": "Equipo",
+    "context": "Team"
   },
   {
     "term": "components.add-new-signer-dialog.header",
@@ -3731,8 +3731,8 @@
   },
   {
     "term": "generic.deleted-user-group",
-    "definition": "Grupo eliminado",
-    "context": "Deleted user group"
+    "definition": "Equipo eliminado",
+    "context": "Deleted team"
   },
   {
     "term": "generic.done",
@@ -3886,8 +3886,8 @@
   },
   {
     "term": "generic.forms.invalid-group-name-error",
-    "definition": "Por favor, introduzca el nombre del grupo",
-    "context": "Please, enter the group name"
+    "definition": "Por favor, introduzca el nombre del equipo",
+    "context": "Please, enter the team name"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
@@ -4491,23 +4491,23 @@
   },
   {
     "term": "organization-groups.clone-group",
-    "definition": "Duplicar {count, plural, =1{grupo} other {grupos}}",
-    "context": "Clone {count, plural, =1{group} other {groups}}"
+    "definition": "Duplicar {count, plural, =1{equipo} other {equipos}}",
+    "context": "Clone {count, plural, =1{team} other {teams}}"
   },
   {
     "term": "organization-groups.create-group",
-    "definition": "Crear un grupo",
-    "context": "Create group"
+    "definition": "Crear un equipo",
+    "context": "Create team"
   },
   {
     "term": "organization-groups.delete-group",
-    "definition": "Eliminar {count, plural, =1{grupo} other {grupos}}",
-    "context": "Delete {count, plural, =1{group} other {groups}}"
+    "definition": "Eliminar {count, plural, =1{equipo} other {equipos}}",
+    "context": "Delete {count, plural, =1{team} other {teams}}"
   },
   {
     "term": "organization-groups.remove-from-group",
-    "definition": "Quitar del grupo",
-    "context": "Remove from group"
+    "definition": "Quitar del equipo",
+    "context": "Remove from team"
   },
   {
     "term": "organization-role.admin",
@@ -4977,7 +4977,7 @@
   {
     "term": "page.pricing.user-groups",
     "definition": "Equipos de trabajo",
-    "context": "User groups"
+    "context": "Teams"
   },
   {
     "term": "page.pricing.zapier-integration",
@@ -5271,8 +5271,8 @@
   },
   {
     "term": "petition-sharing.header",
-    "definition": "Compartir con personas y grupos",
-    "context": "Share with people and groups"
+    "definition": "Compartir con personas y equipos",
+    "context": "Share with people and teams"
   },
   {
     "term": "petition-sharing.input-placeholder-not-owner",
@@ -8801,8 +8801,8 @@
   },
   {
     "term": "view.group.no-members",
-    "definition": "Aún no se agregaron miembros a este grupo",
-    "context": "No members added to this group yet"
+    "definition": "Aún no se agregaron miembros a este equipo",
+    "context": "No members added to this team yet"
   },
   {
     "term": "view.group.no-results",
@@ -8816,48 +8816,48 @@
   },
   {
     "term": "view.groups.clone-success-description",
-    "definition": "{count, plural, =1 {Grupo <b>{name}</b> clonado} other{<b>#</b> grupos clonados}} con éxito.",
-    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully cloned."
+    "definition": "{count, plural, =1 {Equipo <b>{name}</b> clonado} other{<b>#</b> equipos clonados}} con éxito.",
+    "context": "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully cloned."
   },
   {
     "term": "view.groups.clone-success-title",
-    "definition": "{count, plural, =1{Grupo clonado} other{Grupos clonados}} con éxito.",
-    "context": "{count, plural, =1{Group} other{Groups}} cloned successfully."
+    "definition": "{count, plural, =1{Equipo clonado} other{Equipos clonados}} con éxito.",
+    "context": "{count, plural, =1{Team} other{Teams}} cloned successfully."
   },
   {
     "term": "view.groups.confirm-delete-body",
-    "definition": "¿Estás seguro de querer eliminar {count, plural, =1 {<b>{name}</b>} other {los <b>#</b> grupos seleccionados}}? Si continúa, todos los miembros perderán el acceso a las peticiones compartidas con {count, plural, =1 {el grupo} other {los grupos}}.",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {group} other {groups}}."
+    "definition": "¿Estás seguro de querer eliminar {count, plural, =1 {<b>{name}</b>} other {los <b>#</b> equipos seleccionados}}? Si continúa, todos los miembros perderán el acceso a las peticiones compartidas con {count, plural, =1 {el equipo} other {los equipos}}.",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected teams}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {team} other {teams}}."
   },
   {
     "term": "view.groups.confirm-delete-header",
-    "definition": "Eliminar {count, plural, =1 {grupo} other {grupos}}",
-    "context": "Delete {count, plural, =1 {group} other {groups}}"
+    "definition": "Eliminar {count, plural, =1 {equipo} other {equipos}}",
+    "context": "Delete {count, plural, =1 {team} other {teams}}"
   },
   {
     "term": "view.groups.create-success-description",
-    "definition": "El grupo {name} se creó correctamente.",
-    "context": "Group {name} successfully created."
+    "definition": "El equipo {name} se creó correctamente.",
+    "context": "Team {name} successfully created."
   },
   {
     "term": "view.groups.create-success-title",
-    "definition": "Grupo creado con éxito.",
-    "context": "Group created successfully."
+    "definition": "Equipo creado con éxito.",
+    "context": "Team created successfully."
   },
   {
     "term": "view.groups.delete-success-description",
-    "definition": "{count, plural, =1 {Grupo <b>{name}</b> eliminado} other{<b>#</b> grupos eliminados}} correctamente.",
-    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully deleted."
+    "definition": "{count, plural, =1 {Equipo <b>{name}</b> eliminado} other{<b>#</b> equipos eliminados}} correctamente.",
+    "context": "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully deleted."
   },
   {
     "term": "view.groups.delete-success-title",
-    "definition": "{count, plural, =1{Grupo eliminado} other{Grupos eliminados}} correctamente.",
-    "context": "{count, plural, =1{Group} other{Groups}} deleted successfully."
+    "definition": "{count, plural, =1{Equipo eliminado} other{Equipos eliminados}} correctamente.",
+    "context": "{count, plural, =1{Team} other{Teams}} deleted successfully."
   },
   {
     "term": "view.groups.no-groups",
-    "definition": "Aún no tienes grupos",
-    "context": "You have no groups yet"
+    "definition": "Aún no tienes equipos",
+    "context": "You have no teams yet"
   },
   {
     "term": "view.groups.no-members-added",
@@ -8866,13 +8866,13 @@
   },
   {
     "term": "view.groups.no-results",
-    "definition": "No hay grupos que coincidan con su búsqueda",
-    "context": "There's no groups matching your search"
+    "definition": "No hay equipos que coincidan con su búsqueda",
+    "context": "There's no teams matching your search"
   },
   {
     "term": "view.groups.title",
-    "definition": "Grupos de usuarios",
-    "context": "User groups"
+    "definition": "Equipos",
+    "context": "Teams"
   },
   {
     "term": "view.organization.title",

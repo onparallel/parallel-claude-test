@@ -18,7 +18,7 @@ export function useOrganizationSections(user: Pick<User, "role">) {
       {
         title: intl.formatMessage({
           id: "view.groups.title",
-          defaultMessage: "User groups",
+          defaultMessage: "Teams",
         }),
         path: "/app/organization/groups",
       },
