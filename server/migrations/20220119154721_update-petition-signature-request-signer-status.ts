@@ -17,7 +17,7 @@ import { PetitionSignatureRequest } from "../src/db/__types";
 type SignatureRequestRow = {
   id: number;
   signers: { email: string }[];
-  event_logs: { type: string; created_at: string; document: { email: string } }[];
+  event_logs: { type: string; created_at: string; document?: { email: string } }[];
 };
 
 export async function up(knex: Knex): Promise<void> {
@@ -31,7 +31,10 @@ export async function up(knex: Knex): Promise<void> {
       const newSignerStatus: any = {};
 
       for (const event of row.event_logs) {
-        const signerIndex = row.signers.findIndex((s) => s.email === event.document.email);
+        if (!event.document?.email) {
+          continue;
+        }
+        const signerIndex = row.signers.findIndex((s) => s.email === event.document!.email);
         if (event.type === "email_delivered") {
           newSignerStatus[signerIndex] = {
             ...(newSignerStatus[signerIndex] ?? {}),
