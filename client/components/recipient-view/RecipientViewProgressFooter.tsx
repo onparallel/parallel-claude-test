@@ -57,7 +57,9 @@ export function RecipientViewProgressFooter({
     let total = 0;
     for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
       const fieldReplies = completedFieldReplies(field);
-      if (isVisible && !field.isReadOnly) {
+
+      const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
+      if (isVisible && !field.isReadOnly && !isHiddenToPublic) {
         replied += fieldReplies.length ? 1 : 0;
         optional += field.optional && !fieldReplies.length ? 1 : 0;
         total += 1;
@@ -187,6 +189,7 @@ RecipientViewProgressFooter.fragments = {
         id
         type
         optional
+        isInternal
         isReadOnly
         replies {
           id
@@ -216,6 +219,7 @@ RecipientViewProgressFooter.fragments = {
         id
         type
         optional
+        isInternal
         isReadOnly
         replies {
           id

@@ -59,7 +59,12 @@ export function RecipientViewContentsCard({
   };
 
   const filteredFields = (fields as PetitionFieldSelection[])
-    .filter((field) => (field.type === "HEADING" && !field.title ? false : true))
+    .filter((field) =>
+      (field.__typename === "PublicPetitionField" && field.isInternal) ||
+      (field.type === "HEADING" && !field.title)
+        ? false
+        : true
+    )
     // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
     .slice(fields[0].title ? 1 : 0) as typeof fields;
 
@@ -256,7 +261,11 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
   const visibility = useFieldVisibility(fields);
   const _fields: T = [] as any;
   for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
-    if (field.type === "HEADING" && (pages.length === 0 || field.options.hasPageBreak)) {
+    const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
+    if (
+      field.type === "HEADING" &&
+      (pages.length === 0 || (field.options.hasPageBreak && !isHiddenToPublic))
+    ) {
       pages.push({ title: field.title ?? null, commentCount: 0 });
       page -= 1;
     }

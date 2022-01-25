@@ -28,19 +28,19 @@ useGetPageFields.fragments = {
   PublicPetitionField: gql`
     fragment useGetPageFields_PublicPetitionField on PublicPetitionField {
       id
-      type
-      visibility
+      ...groupFieldsByPages_PublicPetitionField
       ...useFieldVisibility_PublicPetitionField
     }
+    ${groupFieldsByPages.fragments.PublicPetitionField}
     ${useFieldVisibility.fragments.PublicPetitionField}
   `,
   PetitionField: gql`
     fragment useGetPageFields_PetitionField on PetitionField {
       id
-      type
-      visibility
+      ...groupFieldsByPages_PetitionField
       ...useFieldVisibility_PetitionField
     }
+    ${groupFieldsByPages.fragments.PetitionField}
     ${useFieldVisibility.fragments.PetitionField}
   `,
 };

@@ -134,8 +134,10 @@ PetitionPdf.fragments = {
           status
           content
         }
+        ...groupFieldsByPages_PetitionField
         ...useFieldVisibility_PetitionField
       }
+      ${groupFieldsByPages.fragments.PetitionField}
       ${useFieldVisibility.fragments.PetitionField}
     `;
   },

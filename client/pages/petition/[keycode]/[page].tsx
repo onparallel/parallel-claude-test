@@ -84,7 +84,11 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
         setFinalized(true);
         const canFinalize = petition.fields.every(
           (f, index) =>
-            !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
+            !visibility[index] ||
+            f.isInternal ||
+            f.optional ||
+            completedFieldReplies(f).length > 0 ||
+            f.isReadOnly
         );
         if (canFinalize) {
           let completeSignerInfoData: CompleteSignerInfoDialogResult | null = null;
@@ -334,22 +338,28 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             <Flex flexDirection="column" flex="2" minWidth={0}>
               <Stack spacing={4} key={currentPage}>
                 <AnimatePresence initial={false}>
-                  {fields.map((field) => (
-                    <motion.div key={field.id} layout="position">
-                      <RecipientViewPetitionField
-                        key={field.id}
-                        petitionId={petition.id}
-                        keycode={keycode}
-                        access={access!}
-                        field={field}
-                        isDisabled={petition.status === "CLOSED"}
-                        isInvalid={
-                          finalized && completedFieldReplies(field).length === 0 && !field.optional
-                        }
-                        hasCommentsEnabled={field.options.hasCommentsEnabled}
-                      />
-                    </motion.div>
-                  ))}
+                  {fields.map((field) => {
+                    // Hidde internal field to Public
+                    if (field.__typename === "PublicPetitionField" && field.isInternal) return null;
+                    return (
+                      <motion.div key={field.id} layout="position">
+                        <RecipientViewPetitionField
+                          key={field.id}
+                          petitionId={petition.id}
+                          keycode={keycode}
+                          access={access!}
+                          field={field}
+                          isDisabled={petition.status === "CLOSED"}
+                          isInvalid={
+                            finalized &&
+                            completedFieldReplies(field).length === 0 &&
+                            !field.optional
+                          }
+                          hasCommentsEnabled={field.options.hasCommentsEnabled}
+                        />
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
               </Stack>
               <Spacer />
