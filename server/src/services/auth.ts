@@ -22,9 +22,10 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
+import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { Aws, AWS_SERVICE } from "./aws";
-import { REDIS, IRedis } from "./redis";
+import { IRedis, REDIS } from "./redis";
 
 export interface IAuth {
   guessLogin: RequestHandler;
@@ -256,26 +257,35 @@ export class Auth implements IAuth {
   }
 
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    const { email, locale } = req.body;
     try {
-      const { email, locale } = req.body;
-      await this.cognito
-        .forgotPassword({
-          ClientId: this.config.cognito.clientId,
-          Username: email,
-          ClientMetadata: {
-            locale,
-          },
-        })
-        .promise();
-      res.status(204).send();
+      const user = await this.users.loadUserByEmail(email);
+      if (user?.is_sso_user) {
+        res.status(401).send({ error: "ExternalUser" });
+        return;
+      } else {
+        await this.aws.forgotPassword(email, { locale });
+        res.status(204).send();
+      }
     } catch (error: any) {
       switch (error.code) {
         case "NotAuthorizedException":
-          res.status(401).send({ error: "ExternalUser" });
+          const [, data] = await withError(this.aws.getUser(email));
+          if (data?.UserStatus === "FORCE_CHANGE_PASSWORD") {
+            // cognito user is in status FORCE_CHANGE_PASSWORD, can't reset the password
+            res.status(401).send({ error: "ForceChangePasswordException" });
+          } else if (!data) {
+            // if the user is SSO, adminGetUser will throw an UserNotFoundException
+            res.status(401).send({ error: "ExternalUser" });
+          }
           return;
         case "UserNotFoundException":
           // don't leak whether users exist or not
-          res.status(204);
+          res.status(204).send();
+          return;
+        case "InvalidParameterException":
+          // email is not yet verified, cognito can't reset the password
+          res.status(401).send({ error: "EmailNotVerifiedException" });
           return;
       }
       next(error);

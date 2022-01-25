@@ -1091,7 +1091,7 @@ type Mutation {
   reopenPetition(petitionId: GID!): Petition!
 
   """
-  Sends an email with confirmation code to unconfirmed user emails
+  Sends the AccountVerification email with confirmation code to unconfirmed user emails
   """
   resendVerificationCode(email: String!, locale: String): Result!
 
@@ -1099,6 +1099,11 @@ type Mutation {
   Removes the Signaturit Branding Ids of selected organization.
   """
   resetSignaturitOrganizationBranding(orgId: Int!): SupportMethodResponse!
+
+  """
+  Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
+  """
+  resetTemporaryPassword(email: String!, locale: String): Result!
 
   """
   Resets the given user password on AWS Cognito and sends an email with new temporary.

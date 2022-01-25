@@ -1,3 +1,4 @@
+import { differenceInMinutes } from "date-fns";
 import {
   arg,
   booleanArg,
@@ -10,6 +11,7 @@ import {
 } from "nexus";
 import pMap from "p-map";
 import { isDefined, zip } from "remeda";
+import { RESULT } from "..";
 import { PublicFileUpload } from "../../db/__types";
 import { partition } from "../../util/arrays";
 import { fullName } from "../../util/fullName";
@@ -27,7 +29,6 @@ import {
 } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
@@ -39,6 +40,7 @@ import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArr
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
+import { validLocale } from "../helpers/validators/validLocale";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
@@ -492,23 +494,70 @@ export const userSignUp = mutationField("userSignUp", {
 });
 
 export const resendVerificationCode = mutationField("resendVerificationCode", {
-  description: "Sends an email with confirmation code to unconfirmed user emails",
+  description:
+    "Sends the AccountVerification email with confirmation code to unconfirmed user emails",
   type: "Result",
   args: {
     email: nonNull(stringArg()),
     locale: stringArg(),
   },
-  validateArgs: validEmail((args) => args.email, "email"),
+  validateArgs: validateAnd(
+    validEmail((args) => args.email, "email"),
+    validLocale((args) => args.locale, "locale")
+  ),
   resolve: async (_, { email, locale }, ctx) => {
     try {
-      await ctx.aws.resendVerificationCode(email, { locale: locale ?? "en" });
-      return RESULT.SUCCESS;
-    } catch {
-      return RESULT.FAILURE;
-    }
+      const user = await ctx.users.loadUserByEmail(email);
+      if (user && !user.is_sso_user) {
+        await ctx.aws.resendVerificationCode(email, { locale: locale ?? "en" });
+      }
+    } catch {}
+    return RESULT.SUCCESS;
   },
 });
 
+export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
+  description:
+    "Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD",
+  type: "Result",
+  args: {
+    email: nonNull(stringArg()),
+    locale: stringArg(),
+  },
+  validateArgs: validateAnd(
+    validEmail((args) => args.email, "email"),
+    validLocale((args) => args.locale, "locale")
+  ),
+  resolve: async (_, { email, locale }, ctx) => {
+    try {
+      const [user, cognitoUser] = await Promise.all([
+        ctx.users.loadUserByEmail(email),
+        ctx.aws.getUser(email),
+      ]);
+      const organization = user ? await ctx.organizations.loadOrg(user.org_id) : null;
+
+      if (
+        user &&
+        !user.is_sso_user &&
+        organization &&
+        cognitoUser.UserStatus === "FORCE_CHANGE_PASSWORD" &&
+        cognitoUser.UserLastModifiedDate &&
+        // allow 1 reset every hour
+        differenceInMinutes(new Date(), cognitoUser.UserLastModifiedDate) >= 60
+      ) {
+        const orgOwner = await ctx.organizations.getOrganizationOwner(organization.id);
+        await ctx.aws.resetUserPassword(email, {
+          locale: locale ?? "en",
+          organizationName: organization.name,
+          organizationUser: fullName(orgOwner.first_name, orgOwner.last_name),
+        });
+      }
+    } catch {}
+
+    // always return SUCCESS to avoid leaking errors and user statuses
+    return RESULT.SUCCESS;
+  },
+});
 export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
   description:
     "Sets the locale passed as arg as the preferred language of the user to see the page",

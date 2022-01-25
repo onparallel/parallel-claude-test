@@ -1,25 +1,13 @@
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
-import {
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Image,
-  Stack,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Center, Flex, Image, useToast } from "@chakra-ui/react";
 import { AlreadyLoggedIn } from "@parallel/components/auth/AlreadyLoggedIn";
+import { EmailVerificationRequiredAlert } from "@parallel/components/auth/EmailVerificationRequiredAlert";
 import { LoginData, LoginForm } from "@parallel/components/auth/LoginForm";
 import {
   PasswordChangeData,
   PasswordChangeForm,
 } from "@parallel/components/auth/PasswordChangeForm";
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
-import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -31,7 +19,6 @@ import {
   Login_resendVerificationCodeDocument,
 } from "@parallel/graphql/__types";
 import { postJSON } from "@parallel/utils/rest";
-import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -43,7 +30,6 @@ function Login() {
   const [showContinueAs, setShowContinueAs] = useState(Boolean(data?.me));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerificationRequired, setIsVerificationRequired] = useState(false);
-  const [isVerificationEmailSent, setIsVerificationEmailSent] = useState(false);
   const nonVerifiedEmail = useRef("");
   const [passwordChange, setPasswordChange] = useState<{
     type: "CHANGE" | "RESET";
@@ -169,42 +155,18 @@ function Login() {
     }
   }
 
-  const genericErrorToast = useGenericErrorToast();
-
-  const resendSuccessToast = () => {
-    toast({
-      title: intl.formatMessage({
-        id: "public.resend-verification-email.success-title",
-        defaultMessage: "Verification link sent",
-      }),
-      description: intl.formatMessage({
-        id: "public.resend-verification-email.success-description",
-        defaultMessage: "Please, check your email.",
-      }),
-      status: "success",
-      isClosable: true,
-    });
-  };
-
   const [resendVerificationCode] = useMutation(Login_resendVerificationCodeDocument);
   const handleResendVerificationEmail = async () => {
     try {
-      setIsVerificationEmailSent(true);
       const { data } = await resendVerificationCode({
         variables: {
           email: nonVerifiedEmail.current,
           locale: intl.locale,
         },
       });
-      if (data?.resendVerificationCode === "SUCCESS") {
-        resendSuccessToast();
-      } else {
-        throw new Error();
-      }
-    } catch (error) {
-      setIsVerificationEmailSent(false);
-      genericErrorToast();
-    }
+      return data?.resendVerificationCode === "SUCCESS";
+    } catch (error) {}
+    return false;
   };
 
   return (
@@ -246,60 +208,11 @@ function Login() {
             }}
           >
             <PublicUserFormContainer>
-              <CloseableAlert
+              <EmailVerificationRequiredAlert
                 isOpen={isVerificationRequired}
                 onClose={() => setIsVerificationRequired(false)}
-                status="error"
-                variant="subtle"
-                rounded="md"
-                zIndex={2}
-                marginBottom={10}
-              >
-                <Flex
-                  alignItems="center"
-                  justifyContent="flex-start"
-                  marginX="auto"
-                  width="100%"
-                  paddingLeft={4}
-                  paddingRight={12}
-                >
-                  <AlertIcon />
-                  <Stack spacing={1}>
-                    <AlertTitle>
-                      <FormattedMessage
-                        id="public.login.activation-pending-title"
-                        defaultMessage="Activation pending"
-                      />
-                    </AlertTitle>
-                    <AlertDescription>
-                      <Text>
-                        <FormattedMessage
-                          id="public.login.activation-pending-body"
-                          defaultMessage="Please activate your account through the activation link that was sent to your email."
-                        />
-                      </Text>
-                      <Text>
-                        <FormattedMessage
-                          id="public.login.activation-pending-resend"
-                          defaultMessage="Can't find it? <a>Resend email.</a>"
-                          values={{
-                            a: (chunks: any) => (
-                              <Button
-                                isDisabled={isVerificationEmailSent}
-                                variant="link"
-                                fontWeight="bold"
-                                onClick={handleResendVerificationEmail}
-                              >
-                                {chunks}
-                              </Button>
-                            ),
-                          }}
-                        />
-                      </Text>
-                    </AlertDescription>
-                  </Stack>
-                </Flex>
-              </CloseableAlert>
+                onResendEmail={handleResendVerificationEmail}
+              />
               {showContinueAs ? (
                 <AlreadyLoggedIn
                   me={data!.me}

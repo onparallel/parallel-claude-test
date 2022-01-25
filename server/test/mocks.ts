@@ -75,6 +75,10 @@ export class MockEmailsService implements IEmailsService {
 
 @injectable()
 export class MockAwsService implements IAws {
+  async getUser() {
+    return {} as any;
+  }
+  async forgotPassword() {}
   async resetUserPassword() {}
   async signUpUser() {
     return "";

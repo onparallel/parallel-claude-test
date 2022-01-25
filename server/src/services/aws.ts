@@ -1,4 +1,5 @@
-import AWS from "aws-sdk";
+import AWS, { AWSError, CognitoIdentityServiceProvider } from "aws-sdk";
+import { PromiseResult } from "aws-sdk/lib/request";
 import { createHash } from "crypto";
 import { inject, injectable, interfaces } from "inversify";
 import { Knex } from "knex";
@@ -8,7 +9,7 @@ import { Config, CONFIG } from "../config";
 import { PetitionEvent, SystemEvent } from "../db/events";
 import { unMaybeArray } from "../util/arrays";
 import { MaybeArray } from "../util/types";
-import { LOGGER, ILogger } from "./logger";
+import { ILogger, LOGGER } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
 export interface IAws {
@@ -48,6 +49,10 @@ export interface IAws {
     clientMetadata: { locale: string }
   ): Promise<string>;
   deleteUser(email: string): Promise<void>;
+  getUser(
+    email: string
+  ): Promise<PromiseResult<CognitoIdentityServiceProvider.AdminGetUserResponse, AWSError>>;
+  forgotPassword(email: string, clientMetadata: { locale: string }): Promise<void>;
   resendVerificationCode(email: string, clientMetadata: { locale: string }): Promise<void>;
 }
 
@@ -250,6 +255,25 @@ export class Aws implements IAws {
       .adminDeleteUser({
         Username: email,
         UserPoolId: this.config.cognito.defaultPoolId,
+      })
+      .promise();
+  }
+
+  async getUser(email: string) {
+    return await this.cognitoIdP
+      .adminGetUser({
+        Username: email,
+        UserPoolId: this.config.cognito.defaultPoolId,
+      })
+      .promise();
+  }
+
+  async forgotPassword(email: string, clientMetadata: { locale: string }) {
+    await this.cognitoIdP
+      .forgotPassword({
+        ClientId: this.config.cognito.clientId,
+        Username: email,
+        ClientMetadata: clientMetadata,
       })
       .promise();
   }

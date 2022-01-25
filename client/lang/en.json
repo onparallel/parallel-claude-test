@@ -640,6 +640,21 @@
     "context": "File name"
   },
   {
+    "term": "component.email-verification-required-alert.body",
+    "definition": "Please activate your account through the activation link that was sent to your email and try again.",
+    "context": "Please activate your account through the activation link that was sent to your email and try again."
+  },
+  {
+    "term": "component.email-verification-required-alert.resend",
+    "definition": "Can't find it? <a>Resend email.</a>",
+    "context": "Can't find it? <a>Resend email.</a>"
+  },
+  {
+    "term": "component.email-verification-required-alert.title",
+    "definition": "Activation pending",
+    "context": "Activation pending"
+  },
+  {
     "term": "component.error-dialog.header",
     "definition": "Error",
     "context": "Error"
@@ -6863,21 +6878,6 @@
     "term": "public.login-button",
     "definition": "Login",
     "context": "Login"
-  },
-  {
-    "term": "public.login.activation-pending-body",
-    "definition": "Please activate your account through the activation link that was sent to your email.",
-    "context": "Please activate your account through the activation link that was sent to your email."
-  },
-  {
-    "term": "public.login.activation-pending-resend",
-    "definition": "Can't find it? <a>Resend email.</a>",
-    "context": "Can't find it? <a>Resend email.</a>"
-  },
-  {
-    "term": "public.login.activation-pending-title",
-    "definition": "Activation pending",
-    "context": "Activation pending"
   },
   {
     "term": "public.login.already-logged-in.continue-button",

@@ -528,10 +528,12 @@ export interface Mutation {
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
   reopenPetition: Petition;
-  /** Sends an email with confirmation code to unconfirmed user emails */
+  /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationCode: Result;
   /** Removes the Signaturit Branding Ids of selected organization. */
   resetSignaturitOrganizationBranding: SupportMethodResponse;
+  /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
+  resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
@@ -1136,6 +1138,11 @@ export interface MutationresendVerificationCodeArgs {
 
 export interface MutationresetSignaturitOrganizationBrandingArgs {
   orgId: Scalars["Int"];
+}
+
+export interface MutationresetTemporaryPasswordArgs {
+  email: Scalars["String"];
+  locale?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationresetUserPasswordArgs {
@@ -16568,6 +16575,20 @@ export type Security_userQuery = {
   };
 };
 
+export type Forgot_resendVerificationCodeMutationVariables = Exact<{
+  email: Scalars["String"];
+  locale?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type Forgot_resendVerificationCodeMutation = { resendVerificationCode: Result };
+
+export type Forgot_resetTemporaryPasswordMutationVariables = Exact<{
+  email: Scalars["String"];
+  locale?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type Forgot_resetTemporaryPasswordMutation = { resetTemporaryPassword: Result };
+
 export type Login_resendVerificationCodeMutationVariables = Exact<{
   email: Scalars["String"];
   locale?: InputMaybe<Scalars["String"]>;
@@ -23777,6 +23798,22 @@ export const Security_userDocument = gql`
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
 ` as unknown as DocumentNode<Security_userQuery, Security_userQueryVariables>;
+export const Forgot_resendVerificationCodeDocument = gql`
+  mutation Forgot_resendVerificationCode($email: String!, $locale: String) {
+    resendVerificationCode(email: $email, locale: $locale)
+  }
+` as unknown as DocumentNode<
+  Forgot_resendVerificationCodeMutation,
+  Forgot_resendVerificationCodeMutationVariables
+>;
+export const Forgot_resetTemporaryPasswordDocument = gql`
+  mutation Forgot_resetTemporaryPassword($email: String!, $locale: String) {
+    resetTemporaryPassword(email: $email, locale: $locale)
+  }
+` as unknown as DocumentNode<
+  Forgot_resetTemporaryPasswordMutation,
+  Forgot_resetTemporaryPasswordMutationVariables
+>;
 export const Login_resendVerificationCodeDocument = gql`
   mutation Login_resendVerificationCode($email: String!, $locale: String) {
     resendVerificationCode(email: $email, locale: $locale)

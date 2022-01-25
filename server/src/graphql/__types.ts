@@ -922,6 +922,7 @@ export interface NexusGenFieldTypes {
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
@@ -2210,6 +2211,7 @@ export interface NexusGenFieldTypeNames {
     reopenPetition: "Petition";
     resendVerificationCode: "Result";
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
+    resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";
@@ -3716,6 +3718,11 @@ export interface NexusGenArgTypes {
     resetSignaturitOrganizationBranding: {
       // args
       orgId: number; // Int!
+    };
+    resetTemporaryPassword: {
+      // args
+      email: string; // String!
+      locale?: string | null; // String
     };
     resetUserPassword: {
       // args

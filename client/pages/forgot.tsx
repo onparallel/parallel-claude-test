@@ -1,4 +1,6 @@
+import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Flex, Image, useToast } from "@chakra-ui/react";
+import { EmailVerificationRequiredAlert } from "@parallel/components/auth/EmailVerificationRequiredAlert";
 import {
   ForgotPasswordData,
   ForgotPasswordForm,
@@ -6,15 +8,20 @@ import {
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
 import { NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
+import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
+import {
+  Forgot_resendVerificationCodeDocument,
+  Forgot_resetTemporaryPasswordDocument,
+} from "@parallel/graphql/__types";
 import { postJSON } from "@parallel/utils/rest";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export default function Forgot() {
+function Forgot() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verification, setVerification] = useState<{
     sent: boolean;
@@ -22,6 +29,8 @@ export default function Forgot() {
     hasVerificationCodeError?: boolean;
     isInvalidPassword?: boolean;
     isExternalUserError?: boolean;
+    isEmailNotVerifiedError?: boolean;
+    isForceChangePasswordError?: boolean;
   }>({ sent: false });
   const router = useRouter();
   const intl = useIntl();
@@ -48,12 +57,13 @@ export default function Forgot() {
         isClosable: true,
       });
     } catch (error: any) {
-      if (error.error === "ExternalUser") {
-        setVerification({
-          sent: false,
-          isExternalUserError: error.error === "ExternalUser",
-        });
-      }
+      setVerification({
+        email,
+        sent: false,
+        isExternalUserError: error.error === "ExternalUser",
+        isEmailNotVerifiedError: error.error === "EmailNotVerifiedException",
+        isForceChangePasswordError: error.error === "ForceChangePasswordException",
+      });
     }
     setIsSubmitting(false);
   }
@@ -64,6 +74,8 @@ export default function Forgot() {
       ...verification,
       hasVerificationCodeError: false,
       isInvalidPassword: false,
+      isEmailNotVerifiedError: false,
+      isForceChangePasswordError: false,
     });
     try {
       await postJSON("/api/auth/confirm-forgot-password", {
@@ -92,6 +104,26 @@ export default function Forgot() {
       });
     }
     setIsSubmitting(false);
+  }
+
+  const [resendVerificationCode] = useMutation(Forgot_resendVerificationCodeDocument);
+  const [resetTemporaryPassword] = useMutation(Forgot_resetTemporaryPasswordDocument);
+  async function handleResendEmail() {
+    try {
+      if (verification.email) {
+        if (verification.isEmailNotVerifiedError) {
+          await resendVerificationCode({
+            variables: { email: verification.email, locale: intl.locale },
+          });
+        } else if (verification.isForceChangePasswordError) {
+          await resetTemporaryPassword({
+            variables: { email: verification.email, locale: intl.locale },
+          });
+        }
+        return true;
+      }
+    } catch {}
+    return false;
   }
 
   return (
@@ -128,6 +160,21 @@ export default function Forgot() {
             }}
           >
             <PublicUserFormContainer>
+              <EmailVerificationRequiredAlert
+                isOpen={
+                  verification.isEmailNotVerifiedError ||
+                  verification.isForceChangePasswordError ||
+                  false
+                }
+                onClose={() =>
+                  setVerification({
+                    sent: false,
+                    isEmailNotVerifiedError: false,
+                    isForceChangePasswordError: false,
+                  })
+                }
+                onResendEmail={handleResendEmail}
+              />
               {verification.sent ? (
                 <PasswordResetForm
                   onSubmit={handlePasswordResetSubmit}
@@ -180,3 +227,18 @@ export default function Forgot() {
     </PublicLayout>
   );
 }
+
+Forgot.mutations = [
+  gql`
+    mutation Forgot_resendVerificationCode($email: String!, $locale: String) {
+      resendVerificationCode(email: $email, locale: $locale)
+    }
+  `,
+  gql`
+    mutation Forgot_resetTemporaryPassword($email: String!, $locale: String) {
+      resetTemporaryPassword(email: $email, locale: $locale)
+    }
+  `,
+];
+
+export default withApolloData(Forgot);
