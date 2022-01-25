@@ -3237,6 +3237,11 @@ type PublicPetitionField {
   id: GID!
 
   """
+  Determines if the field is only visible inside the app.
+  """
+  isInternal: Boolean!
+
+  """
   Determines if the field accepts replies
   """
   isReadOnly: Boolean!

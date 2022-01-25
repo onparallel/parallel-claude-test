@@ -16,6 +16,7 @@ describe("GraphQL/Petition Fields Comments", () => {
   let petition: Petition;
   let headingField: PetitionField;
   let textFieldWithCommentsDisabled: PetitionField;
+  let textFieldInternal: PetitionField;
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -36,6 +37,12 @@ describe("GraphQL/Petition Fields Comments", () => {
         options: { hasCommentsEnabled: i === 0 },
       })
     );
+
+    [textFieldInternal] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+      type: "TEXT",
+      is_internal: true,
+      options: { hasCommentsEnabled: true },
+    }));
 
     await mocks.createFeatureFlags([{ name: "INTERNAL_COMMENTS", default_value: true }]);
   });
@@ -187,6 +194,37 @@ describe("GraphQL/Petition Fields Comments", () => {
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
+          content: "Hello this is my comment",
+          isInternal: false,
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("throws error if user wants to submit a comment on a internal field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $content: String!
+            $isInternal: Boolean
+          ) {
+            createPetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              content: $content
+              isInternal: $isInternal
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", textFieldInternal.id),
           content: "Hello this is my comment",
           isInternal: false,
         },

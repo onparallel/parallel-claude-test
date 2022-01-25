@@ -118,7 +118,7 @@ export const PublicPetition = objectType({
       type: "PublicPetitionField",
       description: "The field definition of the petition.",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPublicFieldsForPetition(root.id);
+        return await ctx.petitions.loadFieldsForPetition(root.id);
       },
     });
     t.nullable.field("signatureConfig", {
@@ -199,6 +199,10 @@ export const PublicPetitionField = objectType({
     });
     t.boolean("multiple", {
       description: "Determines if this field allows multiple replies.",
+    });
+    t.boolean("isInternal", {
+      description: "Determines if the field is only visible inside the app.",
+      resolve: (o) => o.is_internal,
     });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",

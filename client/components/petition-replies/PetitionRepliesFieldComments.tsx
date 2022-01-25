@@ -46,7 +46,9 @@ export function PetitionRepliesFieldComments({
   const intl = useIntl();
 
   const [draft, setDraft] = useState("");
-  const [isInternalComment, setInternalComment] = useState(hasCommentsEnabled ? false : true);
+  const [isInternalComment, setInternalComment] = useState(
+    hasCommentsEnabled && !field.isInternal ? false : true
+  );
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
   const commentsRef = useRef<HTMLDivElement>(null);
@@ -189,7 +191,7 @@ export function PetitionRepliesFieldComments({
             id: "petition-replies.field-comments.placeholder",
             defaultMessage: "Type a new comment",
           })}
-          isDisabled={!hasCommentsEnabled && !user.hasInternalComments}
+          isDisabled={(!hasCommentsEnabled && !user.hasInternalComments) || field.isInternal}
           value={draft}
           onKeyDown={handleKeyDown as any}
           onChange={handleDraftChange as any}
@@ -259,6 +261,7 @@ PetitionRepliesFieldComments.fragments = {
         id
         title
         type
+        isInternal
         replies {
           ...PetitionRepliesFieldComments_PetitionFieldReply
         }

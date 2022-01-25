@@ -2340,6 +2340,8 @@ export type PublicPetitionField = {
   description: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
   id: Scalars["GID"];
+  /** Determines if the field is only visible inside the app. */
+  isInternal: Scalars["Boolean"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];
   /** Determines if this field allows multiple replies. */

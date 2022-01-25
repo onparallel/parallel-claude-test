@@ -189,7 +189,7 @@ export function RecipientViewContentsCard({
                                   commentCount={commentCount}
                                 />
                               ) : null}
-                              {isPetitionField && field.isInternal ? (
+                              {field.isInternal ? (
                                 <Center>
                                   <InternalFieldBadge marginLeft={2} />
                                 </Center>
@@ -304,6 +304,7 @@ RecipientViewContentsCard.fragments = {
         title
         options
         optional
+        isInternal
         isReadOnly
         replies {
           id

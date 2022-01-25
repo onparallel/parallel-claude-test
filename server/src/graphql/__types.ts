@@ -1417,6 +1417,7 @@ export interface NexusGenFieldTypes {
     comments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     description: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
+    isInternal: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
@@ -2707,6 +2708,7 @@ export interface NexusGenFieldTypeNames {
     comments: "PublicPetitionFieldComment";
     description: "String";
     id: "GID";
+    isInternal: "Boolean";
     isReadOnly: "Boolean";
     multiple: "Boolean";
     optional: "Boolean";

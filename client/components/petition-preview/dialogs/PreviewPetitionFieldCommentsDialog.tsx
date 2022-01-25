@@ -76,7 +76,7 @@ export function PreviewPetitionFieldCommentsDialog({
   });
 
   const [isInternalComment, setInternalComment] = useState(
-    field.options.hasCommentsEnabled ? false : true
+    field.options.hasCommentsEnabled && !field.isInternal ? false : true
   );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -306,7 +306,7 @@ export function PreviewPetitionFieldCommentsDialog({
                     marginLeft={1}
                     colorScheme="purple"
                     isChecked={isInternalComment}
-                    isDisabled={!field.options.hasCommentsEnabled}
+                    isDisabled={!field.options.hasCommentsEnabled || field.isInternal}
                     onChange={() => setInternalComment(!isInternalComment)}
                   >
                     <FormattedMessage
@@ -353,6 +353,7 @@ PreviewPetitionFieldCommentsDialog.fragments = {
       fragment PreviewPetitionFieldCommentsDialog_PetitionField on PetitionField {
         id
         title
+        isInternal
         comments {
           ...FieldComment_PetitionFieldComment
         }

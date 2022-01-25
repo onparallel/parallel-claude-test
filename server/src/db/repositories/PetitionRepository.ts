@@ -213,6 +213,18 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(fieldIds).size;
   }
 
+  async fieldsAreNotInternal(fieldIds: number[]) {
+    if (fieldIds.length === 0) {
+      return true;
+    }
+    const [{ count }] = await this.from("petition_field")
+      .whereIn("id", fieldIds)
+      .where("is_internal", false)
+      .select(this.count());
+
+    return count === new Set(fieldIds).size;
+  }
+
   async fieldAttachmentBelongsToField(fieldId: number, attachmentIds: number[]) {
     const [{ count }] = await this.from("petition_field_attachment")
       .where({
@@ -448,12 +460,6 @@ export class PetitionRepository extends BaseRepository {
       };
     }
   }
-
-  readonly loadPublicFieldsForPetition = this.buildLoadMultipleBy(
-    "petition_field",
-    "petition_id",
-    (q) => q.whereNull("deleted_at").andWhere("is_internal", false).orderBy("position")
-  );
 
   readonly loadFieldsForPetition = this.buildLoadMultipleBy("petition_field", "petition_id", (q) =>
     q.whereNull("deleted_at").orderBy("position")
@@ -1505,9 +1511,7 @@ export class PetitionRepository extends BaseRepository {
     const updatedBy = `${isAccess ? "PetitionAccess" : "User"}:${userOrAccess.id}`;
     const [petition, fields] = await Promise.all([
       this.loadPetition(petitionId),
-      isAccess
-        ? this.loadPublicFieldsForPetition(petitionId)
-        : this.loadFieldsForPetition(petitionId),
+      this.loadFieldsForPetition(petitionId),
     ]);
     if (!petition || !fields) {
       throw new Error();

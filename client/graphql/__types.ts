@@ -2417,6 +2417,8 @@ export interface PublicPetitionField {
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
   id: Scalars["GID"];
+  /** Determines if the field is only visible inside the app. */
+  isInternal: Scalars["Boolean"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];
   /** Determines if this field allows multiple replies. */
@@ -8012,6 +8014,7 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   title?: string | null;
+  isInternal: boolean;
   comments: Array<{
     __typename?: "PetitionFieldComment";
     id: string;
@@ -8047,6 +8050,7 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
     __typename?: "PetitionField";
     id: string;
     title?: string | null;
+    isInternal: boolean;
     comments: Array<{
       __typename?: "PetitionFieldComment";
       id: string;
@@ -8147,6 +8151,7 @@ export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutatio
     __typename?: "PetitionField";
     id: string;
     title?: string | null;
+    isInternal: boolean;
     comments: Array<{
       __typename?: "PetitionFieldComment";
       id: string;
@@ -8330,6 +8335,7 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   id: string;
   title?: string | null;
   type: PetitionFieldType;
+  isInternal: boolean;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -8715,6 +8721,7 @@ export type RecipientViewContentsCard_PublicPetitionFragment = {
     title?: string | null;
     options: { [key: string]: any };
     optional: boolean;
+    isInternal: boolean;
     isReadOnly: boolean;
     commentCount: number;
     unreadCommentCount: number;
@@ -8735,6 +8742,7 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
   title?: string | null;
   options: { [key: string]: any };
   optional: boolean;
+  isInternal: boolean;
   isReadOnly: boolean;
   commentCount: number;
   unreadCommentCount: number;
@@ -8926,6 +8934,7 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
     isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
+    isInternal: boolean;
     replies: Array<{
       __typename?: "PublicPetitionFieldReply";
       id: string;
@@ -8943,6 +8952,7 @@ export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   isReadOnly: boolean;
   options: { [key: string]: any };
   visibility?: { [key: string]: any } | null;
+  isInternal: boolean;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -9099,6 +9109,7 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   options: { [key: string]: any };
   optional: boolean;
   multiple: boolean;
+  isInternal: boolean;
   commentCount: number;
   unreadCommentCount: number;
   replies: Array<{
@@ -9351,6 +9362,7 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
   options: { [key: string]: any };
   optional: boolean;
   multiple: boolean;
+  isInternal: boolean;
   commentCount: number;
   unreadCommentCount: number;
   replies: Array<{
@@ -16343,6 +16355,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
       title?: string | null;
       options: { [key: string]: any };
       optional: boolean;
+      isInternal: boolean;
       isReadOnly: boolean;
       commentCount: number;
       unreadCommentCount: number;
@@ -16436,6 +16449,7 @@ export type RecipientView_PublicPetitionFragment = {
     title?: string | null;
     options: { [key: string]: any };
     optional: boolean;
+    isInternal: boolean;
     isReadOnly: boolean;
     commentCount: number;
     unreadCommentCount: number;
@@ -16497,6 +16511,7 @@ export type RecipientView_PublicPetitionFieldFragment = {
   title?: string | null;
   options: { [key: string]: any };
   optional: boolean;
+  isInternal: boolean;
   isReadOnly: boolean;
   commentCount: number;
   unreadCommentCount: number;
@@ -16557,6 +16572,7 @@ export type RecipientView_publicCompletePetitionMutation = {
       title?: string | null;
       options: { [key: string]: any };
       optional: boolean;
+      isInternal: boolean;
       isReadOnly: boolean;
       commentCount: number;
       unreadCommentCount: number;
@@ -16634,6 +16650,7 @@ export type RecipientView_accessQuery = {
         title?: string | null;
         options: { [key: string]: any };
         optional: boolean;
+        isInternal: boolean;
         isReadOnly: boolean;
         commentCount: number;
         unreadCommentCount: number;
@@ -17134,6 +17151,7 @@ export type useFieldVisibility_PublicPetitionFieldFragment = {
   type: PetitionFieldType;
   options: { [key: string]: any };
   visibility?: { [key: string]: any } | null;
+  isInternal: boolean;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -17361,6 +17379,7 @@ export type useGetPageFields_PublicPetitionFieldFragment = {
   type: PetitionFieldType;
   visibility?: { [key: string]: any } | null;
   options: { [key: string]: any };
+  isInternal: boolean;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -18162,6 +18181,7 @@ export const PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionFieldCommentsDialog_PetitionField on PetitionField {
     id
     title
+    isInternal
     comments {
       ...FieldComment_PetitionFieldComment
     }
@@ -20084,6 +20104,7 @@ export const PetitionRepliesFieldComments_PetitionFieldFragmentDoc = gql`
     id
     title
     type
+    isInternal
     replies {
       ...PetitionRepliesFieldComments_PetitionFieldReply
     }
@@ -20487,6 +20508,7 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql
     options
     optional
     multiple
+    isInternal
     replies {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
@@ -20516,6 +20538,7 @@ export const useFieldVisibility_PublicPetitionFieldFragmentDoc = gql`
     type
     options
     visibility
+    isInternal
     replies {
       id
       content
@@ -20529,6 +20552,7 @@ export const RecipientViewContentsCard_PublicPetitionFieldFragmentDoc = gql`
     title
     options
     optional
+    isInternal
     isReadOnly
     replies {
       id

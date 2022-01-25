@@ -170,6 +170,20 @@ export function fieldsHaveCommentsEnabled<
   };
 }
 
+export function fieldsAreNotInternal<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argNameFieldIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const ids = unMaybeArray(args[argNameFieldIds] as unknown as MaybeArray<number>);
+      return await ctx.petitions.fieldsAreNotInternal(ids);
+    } catch {}
+    return false;
+  };
+}
+
 export function fieldCanBeReplied<
   TypeName extends string,
   FieldName extends string,

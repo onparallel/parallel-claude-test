@@ -81,9 +81,7 @@ export function RecipientViewPetitionFieldCard({
       <Flex alignItems="baseline">
         <Box flex="1" marginRight={2}>
           <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
-            {isPetitionField && field.isInternal ? (
-              <InternalFieldBadge marginRight={2.5} marginBottom={0.5} />
-            ) : null}
+            {field.isInternal ? <InternalFieldBadge marginRight={2.5} marginBottom={0.5} /> : null}
             {field.title || (
               <Text as="span" color="gray.500" fontWeight="normal" fontStyle="italic">
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
@@ -224,6 +222,7 @@ RecipientViewPetitionFieldCard.fragments = {
         options
         optional
         multiple
+        isInternal
         replies {
           ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         }

@@ -152,6 +152,7 @@ useFieldVisibility.fragments = {
       type
       options
       visibility
+      isInternal
       replies {
         id
         content
