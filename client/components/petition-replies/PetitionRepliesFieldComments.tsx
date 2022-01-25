@@ -191,7 +191,7 @@ export function PetitionRepliesFieldComments({
             id: "petition-replies.field-comments.placeholder",
             defaultMessage: "Type a new comment",
           })}
-          isDisabled={(!hasCommentsEnabled && !user.hasInternalComments) || field.isInternal}
+          isDisabled={!hasCommentsEnabled && !user.hasInternalComments}
           value={draft}
           onKeyDown={handleKeyDown as any}
           onChange={handleDraftChange as any}
@@ -210,7 +210,7 @@ export function PetitionRepliesFieldComments({
                     marginLeft={1}
                     colorScheme="purple"
                     isChecked={isInternalComment}
-                    isDisabled={hasCommentsEnabled ? false : true}
+                    isDisabled={hasCommentsEnabled && !field.isInternal ? false : true}
                     onChange={() => setInternalComment(!isInternalComment)}
                   >
                     <FormattedMessage
