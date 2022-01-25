@@ -841,7 +841,6 @@ describe("GraphQL/PublicPetitionLink", () => {
         .from("petition")
         .whereNotNull("from_public_petition_link_id")
         .update("from_public_petition_link_id", null);
-      await mocks.knex.from("public_petition_link_user").delete();
       await mocks.knex.from("public_petition_link").delete();
 
       otherUsers = await mocks.createRandomUsers(organization.id, 2);

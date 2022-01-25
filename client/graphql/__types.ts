@@ -180,7 +180,6 @@ export interface EffectivePetitionUserPermission {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
-  | "AUTO_SEND_TEMPLATE"
   | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"

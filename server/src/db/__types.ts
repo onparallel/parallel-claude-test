@@ -14,7 +14,6 @@ export type FeatureFlagName =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "SKIP_FORWARD_SECURITY"
   | "EXPORT_CUATRECASAS"
-  | "AUTO_SEND_TEMPLATE"
   | "DEVELOPER_ACCESS";
 
 export const FeatureFlagNameValues = [
@@ -24,7 +23,6 @@ export const FeatureFlagNameValues = [
   "HIDE_RECIPIENT_VIEW_CONTENTS",
   "SKIP_FORWARD_SECURITY",
   "EXPORT_CUATRECASAS",
-  "AUTO_SEND_TEMPLATE",
   "DEVELOPER_ACCESS",
 ] as FeatureFlagName[];
 
@@ -312,7 +310,6 @@ export interface TableTypes {
   petition_user_notification: PetitionUserNotification;
   public_file_upload: PublicFileUpload;
   public_petition_link: PublicPetitionLink;
-  public_petition_link_user: PublicPetitionLinkUser;
   system_event: SystemEvent;
   tag: Tag;
   task: Task;
@@ -355,7 +352,6 @@ export interface TableCreateTypes {
   petition_user_notification: CreatePetitionUserNotification;
   public_file_upload: CreatePublicFileUpload;
   public_petition_link: CreatePublicPetitionLink;
-  public_petition_link_user: CreatePublicPetitionLinkUser;
   system_event: CreateSystemEvent;
   tag: CreateTag;
   task: CreateTask;
@@ -398,7 +394,6 @@ export interface TablePrimaryKeys {
   petition_user_notification: "id";
   public_file_upload: "id";
   public_petition_link: "id";
-  public_petition_link_user: "id";
   system_event: "id";
   tag: "id";
   task: "id";
@@ -656,7 +651,6 @@ export interface Petition {
   signature_config: Maybe<any>; // jsonb
   hide_recipient_view_contents: boolean; // bool
   skip_forward_security: boolean; // bool
-  is_readonly: boolean; // bool
   public_metadata: Maybe<any>; // jsonb
   from_public_petition_link_id: Maybe<number>; // int4
   custom_properties: any; // jsonb
@@ -690,7 +684,6 @@ export type CreatePetition = PartialProps<
   | "signature_config"
   | "hide_recipient_view_contents"
   | "skip_forward_security"
-  | "is_readonly"
   | "public_metadata"
   | "from_public_petition_link_id"
   | "custom_properties"
@@ -901,8 +894,8 @@ export interface PetitionFieldReply {
   deleted_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   status: PetitionFieldReplyStatus; // petition_field_reply_status
-  user_id: Maybe<number>; // int4
   metadata: any; // jsonb
+  user_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -915,8 +908,8 @@ export type CreatePetitionFieldReply = PartialProps<
   | "deleted_by"
   | "petition_access_id"
   | "status"
-  | "user_id"
   | "metadata"
+  | "user_id"
 >;
 
 export interface PetitionMessage {
@@ -976,14 +969,14 @@ export interface PetitionReminder {
   status: PetitionReminderStatus; // petition_reminder_status
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
-  sender_id: Maybe<number>; // int4
+  sender_id: number; // int4
   petition_access_id: number; // int4
   email_body: Maybe<string>; // text
 }
 
 export type CreatePetitionReminder = PartialProps<
   Omit<PetitionReminder, "id">,
-  "email_log_id" | "created_at" | "created_by" | "sender_id" | "email_body"
+  "email_log_id" | "created_at" | "created_by" | "email_body"
 >;
 
 export interface PetitionSignatureRequest {
@@ -1082,36 +1075,6 @@ export interface PublicPetitionLink {
 export type CreatePublicPetitionLink = PartialProps<
   Omit<PublicPetitionLink, "id">,
   "is_active" | "created_at" | "created_by" | "updated_at" | "updated_by"
->;
-
-export interface PublicPetitionLinkUser {
-  id: number; // int4
-  public_petition_link_id: number; // int4
-  user_id: Maybe<number>; // int4
-  type: PetitionPermissionType; // petition_permission_type
-  is_subscribed: boolean; // bool
-  user_group_id: Maybe<number>; // int4
-  from_user_group_id: Maybe<number>; // int4
-  created_at: Date; // timestamptz
-  created_by: Maybe<string>; // varchar
-  updated_at: Date; // timestamptz
-  updated_by: Maybe<string>; // varchar
-  deleted_at: Maybe<Date>; // timestamptz
-  deleted_by: Maybe<string>; // varchar
-}
-
-export type CreatePublicPetitionLinkUser = PartialProps<
-  Omit<PublicPetitionLinkUser, "id">,
-  | "user_id"
-  | "is_subscribed"
-  | "user_group_id"
-  | "from_user_group_id"
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
 >;
 
 export interface SystemEvent {
