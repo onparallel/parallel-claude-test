@@ -3400,6 +3400,16 @@
     "context": "Oops!"
   },
   {
+    "term": "error.maintenance.description",
+    "definition": "Parallel se encuentra en mantenimiento programado y se retomará la actividad normal lo antes posible.",
+    "context": "Parallel is under scheduled maintenance and will resume normal activity as soon as possible."
+  },
+  {
+    "term": "error.maintenance.header",
+    "definition": "Parallel se encuentra en mantenimiento",
+    "context": "Parallel is under maintenance"
+  },
+  {
     "term": "error.petition-not-available.header",
     "definition": "Parece que esta petición ya no está disponible.",
     "context": "It seems that this petition is no longer available."
