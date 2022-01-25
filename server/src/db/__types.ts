@@ -969,14 +969,14 @@ export interface PetitionReminder {
   status: PetitionReminderStatus; // petition_reminder_status
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
-  sender_id: number; // int4
+  sender_id: Maybe<number>; // int4
   petition_access_id: number; // int4
   email_body: Maybe<string>; // text
 }
 
 export type CreatePetitionReminder = PartialProps<
   Omit<PetitionReminder, "id">,
-  "email_log_id" | "created_at" | "created_by" | "email_body"
+  "email_log_id" | "created_at" | "created_by" | "sender_id" | "email_body"
 >;
 
 export interface PetitionSignatureRequest {

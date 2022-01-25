@@ -8,10 +8,6 @@ export async function up(knex: Knex): Promise<void> {
 
   await removeFeatureFlag(knex, "AUTO_SEND_TEMPLATE");
 
-  await knex.schema.alterTable("petition_reminder", (t) => {
-    t.integer("sender_id").notNullable().alter();
-  });
-
   await knex.schema.dropTable("public_petition_link_user");
 }
 
@@ -20,10 +16,6 @@ export async function down(knex: Knex): Promise<void> {
     t.boolean("is_readonly").notNullable().defaultTo(false);
   });
   await addFeatureFlag(knex, "AUTO_SEND_TEMPLATE", false);
-
-  await knex.schema.alterTable("petition_reminder", (t) => {
-    t.integer("sender_id").nullable().alter();
-  });
 
   await knex.raw(/* sql */ `
     create table public_petition_link_user (

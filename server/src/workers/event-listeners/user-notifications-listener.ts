@@ -12,6 +12,7 @@ import {
   SignatureCompletedEvent,
   UserPermissionAddedEvent,
 } from "../../db/events";
+import { User } from "../../db/__types";
 import { EventListener } from "../event-processor";
 
 async function createPetitionCompletedUserNotifications(
@@ -129,10 +130,18 @@ async function createPetitionReminderBouncedUserNotifications(
   if (!reminder) {
     throw new Error(`PetitionReminder:${event.data.petition_reminder_id} not found.`);
   }
-  const sender = await ctx.users.loadUser(reminder.sender_id!);
-  if (!sender) {
-    throw new Error(`User:${reminder.sender_id} not found.`);
+  let sender: User | null = null;
+  if (isDefined(reminder.sender_id)) {
+    sender = await ctx.users.loadUser(reminder.sender_id);
+  } else {
+    // automatic reminders don't have sender_id set, so we need to look for the petition owner through reminder.petition_access_id
+    const access = await ctx.petitions.loadAccess(reminder.petition_access_id);
+    sender = access ? await ctx.users.loadUser(access.granter_id) : null;
   }
+  if (!sender) {
+    throw new Error(`Petition owner not found on Reminder:${reminder.id}.`);
+  }
+
   await ctx.petitions.createPetitionUserNotification([
     {
       type: "REMINDER_EMAIL_BOUNCED",
